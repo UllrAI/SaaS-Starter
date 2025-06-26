@@ -23,7 +23,7 @@ export function Hero() {
         <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--border))_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border))_1px,transparent_1px)] bg-[size:4rem_4rem] opacity-20" />
       </div>
 
-      <div className="relative mx-auto max-w-7xl px-6 py-16 lg:px-8 lg:py-24">
+      <div className="relative mx-auto max-w-7xl px-6 py-16 lg:py-24 lg:px-8">
         <div className="grid items-center gap-12 lg:grid-cols-2">
           {/* Left Content */}
           <div className="space-y-8">

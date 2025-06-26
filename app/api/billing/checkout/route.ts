@@ -4,16 +4,6 @@ import { billing } from "@/lib/billing";
 import { Session } from "@/types/auth";
 import { z } from "zod";
 import { getUserSubscription } from "@/lib/database/subscription";
-import { rateLimiters } from "@/lib/rate-limit";
-import {
-  createRateLimitError,
-  createAuthError,
-  createValidationError,
-  createConflictError,
-  handleApiError,
-  addRateLimitHeaders,
-  type ErrorLogContext,
-} from "@/lib/api-error-handler";
 
 const checkoutSchema = z.object({
   tierId: z.string(),
@@ -24,25 +14,19 @@ const checkoutSchema = z.object({
 export async function POST(request: NextRequest) {
   let session: Session | null = null;
   try {
-    // Rate limiting check
-    const rateLimitResult = await rateLimiters.billing(request);
-    if (!rateLimitResult.success) {
-      return createRateLimitError(
-        rateLimitResult,
-        "Too many billing requests, please try again later.",
-      );
-    }
-
     session = await auth.api.getSession({ headers: request.headers });
     if (!session?.user) {
-      return createAuthError();
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await request.json();
     const parsedBody = checkoutSchema.safeParse(body);
 
     if (!parsedBody.success) {
-      return createValidationError(parsedBody.error, "Invalid request body");
+      return NextResponse.json(
+        { error: "Invalid request body", details: parsedBody.error.flatten() },
+        { status: 400 },
+      );
     }
 
     const { tierId, paymentMode, billingCycle } = parsedBody.data;
@@ -64,9 +48,13 @@ export async function POST(request: NextRequest) {
         );
 
         // 返回 409 Conflict 状态码，并附带管理链接
-        return createConflictError(
-          "You already have an active subscription. Please manage your plan from the billing portal.",
-          { managementUrl: portalUrl },
+        return NextResponse.json(
+          {
+            error:
+              "You already have an active subscription. Please manage your plan from the billing portal.",
+            managementUrl: portalUrl,
+          },
+          { status: 409 },
         );
       }
     }
@@ -104,18 +92,18 @@ export async function POST(request: NextRequest) {
     const { checkoutUrl } =
       await billing.createCheckoutSession(checkoutOptions);
 
-    const response = NextResponse.json({ checkoutUrl });
-
-    // Add rate limit headers to response
-    return addRateLimitHeaders(response, rateLimitResult);
+    return NextResponse.json({ checkoutUrl });
   } catch (error) {
-    const context: ErrorLogContext = {
-      endpoint: "/api/billing/checkout",
-      method: "POST",
+    console.error("[Checkout API Error]", {
+      message: error instanceof Error ? error.message : "Unknown error",
+      stack: error instanceof Error ? error.stack : undefined,
+      timestamp: new Date().toISOString(),
       userId: session?.user?.id,
-      error,
-    };
+    });
 
-    return handleApiError(error, context);
+    return NextResponse.json(
+      { error: "Failed to create checkout session. Please try again later." },
+      { status: 500 },
+    );
   }
 }

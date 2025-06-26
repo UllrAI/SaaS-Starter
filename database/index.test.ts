@@ -1,18 +1,5 @@
-import { describe, it, expect, afterEach, jest } from "@jest/globals";
+import { describe, it, expect, afterEach } from "@jest/globals";
 import { db, sql, closeDatabase } from "./index";
-
-jest.mock("@/lib/database/connection", () => ({
-  getConnectionConfig: jest.fn(() => ({
-    max: 10,
-    idle_timeout: 300,
-    max_lifetime: 14400,
-    connect_timeout: 30,
-    prepare: true,
-  })),
-  getEnvironmentType: jest.fn(() => "traditional"),
-  validateDatabaseConfig: jest.fn(),
-}));
-
 import {
   getConnectionConfig,
   getEnvironmentType,
@@ -25,7 +12,6 @@ describe("Database Connection Configuration", () => {
     await closeDatabase();
   });
 
-  /*
   describe("Dynamic Configuration", () => {
     it("should detect environment type correctly", () => {
       const envType = getEnvironmentType();
@@ -66,7 +52,6 @@ describe("Database Connection Configuration", () => {
       expect(traditionalConfig.idle_timeout).toBeGreaterThan(20);
     });
   });
-  */
 
   describe("Database Connectivity", () => {
     it("should have proper connection pool configuration", () => {

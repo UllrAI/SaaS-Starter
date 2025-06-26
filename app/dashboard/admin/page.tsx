@@ -14,10 +14,8 @@ import {
   getAdminStatsWithCharts,
   AdminStatsWithCharts,
 } from "@/lib/admin/stats";
-import {
-  LazyRecentUsersChart,
-  LazyRevenueChart,
-} from "./_components/lazy-charts";
+import { RecentUsersChart } from "./_components/recent-users-chart";
+import { RevenueChart } from "./_components/revenue-chart";
 
 export const metadata = createMetadata({
   title: "Admin Dashboard",
@@ -47,9 +45,7 @@ export default async function AdminDashboardPage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="pl-2">
-            <LazyRecentUsersChart
-              chartData={statsWithCharts.charts.recentUsers}
-            />
+            <RecentUsersChart chartData={statsWithCharts.charts.recentUsers} />
           </CardContent>
         </Card>
       </div>
@@ -61,7 +57,7 @@ export default async function AdminDashboardPage() {
           <CardDescription>Monthly revenue and payment trends</CardDescription>
         </CardHeader>
         <CardContent className="pl-2">
-          <LazyRevenueChart chartData={statsWithCharts.charts.monthlyRevenue} />
+          <RevenueChart chartData={statsWithCharts.charts.monthlyRevenue} />
         </CardContent>
       </Card>
     </DashboardPageWrapper>

@@ -2,37 +2,19 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth/server";
 import { billing } from "@/lib/billing";
 import { getUserSubscription } from "@/lib/database/subscription";
-import { rateLimiters } from "@/lib/rate-limit";
-import {
-  createRateLimitError,
-  createAuthError,
-  createNotFoundError,
-  handleApiError,
-  addRateLimitHeaders,
-  type ErrorLogContext,
-} from "@/lib/api-error-handler";
 
 export async function GET(request: NextRequest) {
   try {
-    // Rate limiting check
-    const rateLimitResult = await rateLimiters.billing(request);
-    if (!rateLimitResult.success) {
-      return createRateLimitError(
-        rateLimitResult,
-        "Too many billing requests, please try again later.",
-      );
-    }
-
     const session = await auth.api.getSession({ headers: request.headers });
     if (!session?.user) {
-      return createAuthError();
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const subscription = await getUserSubscription(session.user.id);
     if (!subscription?.customerId) {
-      return createNotFoundError(
-        "subscription",
-        "No active subscription found for this user.",
+      return NextResponse.json(
+        { error: "No active subscription found for this user." },
+        { status: 404 },
       );
     }
 
@@ -40,18 +22,11 @@ export async function GET(request: NextRequest) {
       subscription.customerId,
     );
 
-    const response = NextResponse.json({ portalUrl });
-
-    // Add rate limit headers to response
-    return addRateLimitHeaders(response, rateLimitResult);
+    return NextResponse.json({ portalUrl });
   } catch (error) {
-    const context: ErrorLogContext = {
-      endpoint: "/api/billing/portal",
-      method: "GET",
-      userId: undefined, // session might not be available in catch block
-      error,
-    };
-
-    return handleApiError(error, context);
+    console.error("[Portal API Error]", error);
+    const message =
+      error instanceof Error ? error.message : "Internal Server Error";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

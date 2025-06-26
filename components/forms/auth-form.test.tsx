@@ -16,13 +16,13 @@ jest.mock("@/lib/auth/client", () => ({
 }));
 jest.mock("next/navigation");
 jest.mock("sonner");
-jest.mock("next/link", () => {
-  const Link: React.FC<React.PropsWithChildren<{ href: string }>> = ({
-    children,
-    href,
-  }) => <a href={href}>{children}</a>;
-  return Link;
-});
+jest.mock("next/link", () => ({
+  Link: ({ children, href, ...props }: React.ComponentProps<"a">) => (
+    <a href={href} {...props}>
+      {children}
+    </a>
+  ),
+}));
 
 const mockSignIn = signIn as jest.Mocked<typeof signIn>;
 const mockUseRouter = useRouter as jest.MockedFunction<typeof useRouter>;
@@ -48,10 +48,10 @@ describe("AuthForm", () => {
       render(<AuthForm mode="login" />);
 
       expect(
-        screen.getByRole("button", { name: /Send Magic Link/i }),
+        screen.getByRole("button", { name: /send login link/i }),
       ).toBeInTheDocument();
       expect(
-        screen.getByPlaceholderText("you@example.com"),
+        screen.getByPlaceholderText("Enter your email address"),
       ).toBeInTheDocument();
 
       // Should not show terms for login
@@ -61,7 +61,7 @@ describe("AuthForm", () => {
     it("has correct link to signup page", () => {
       render(<AuthForm mode="login" />);
 
-      const signupLink = screen.getByText("Create an account");
+      const signupLink = screen.getByText("Create one now");
       expect(signupLink.closest("a")).toHaveAttribute("href", "/signup");
     });
   });
@@ -71,10 +71,10 @@ describe("AuthForm", () => {
       render(<AuthForm mode="signup" />);
 
       expect(
-        screen.getByRole("button", { name: /Create Account/i }),
+        screen.getByRole("button", { name: /send signup link/i }),
       ).toBeInTheDocument();
       expect(
-        screen.getByPlaceholderText("you@example.com"),
+        screen.getByPlaceholderText("Enter your email address"),
       ).toBeInTheDocument();
 
       // Should show terms for signup
@@ -84,7 +84,7 @@ describe("AuthForm", () => {
     it("has correct link to login page", () => {
       render(<AuthForm mode="signup" />);
 
-      const loginLink = screen.getByText("Sign in instead");
+      const loginLink = screen.getByText("Sign in here");
       expect(loginLink.closest("a")).toHaveAttribute("href", "/login");
     });
   });
@@ -95,9 +95,11 @@ describe("AuthForm", () => {
 
       render(<AuthForm mode="login" />);
 
-      const emailInput = screen.getByPlaceholderText("you@example.com");
+      const emailInput = screen.getByPlaceholderText(
+        "Enter your email address",
+      );
       const submitButton = screen.getByRole("button", {
-        name: /Send Magic Link/i,
+        name: /send login link/i,
       });
 
       fireEvent.change(emailInput, { target: { value: "test@example.com" } });
@@ -108,9 +110,7 @@ describe("AuthForm", () => {
           email: "test@example.com",
           callbackURL: "/dashboard",
         });
-        expect(mockPush).toHaveBeenCalledWith(
-          "/auth/sent?email=test%40example.com",
-        );
+        expect(mockPush).toHaveBeenCalledWith("/auth/sent");
       });
     });
 
@@ -122,9 +122,11 @@ describe("AuthForm", () => {
 
       render(<AuthForm mode="login" />);
 
-      const emailInput = screen.getByPlaceholderText("you@example.com");
+      const emailInput = screen.getByPlaceholderText(
+        "Enter your email address",
+      );
       const submitButton = screen.getByRole("button", {
-        name: /Send Magic Link/i,
+        name: /send login link/i,
       });
 
       fireEvent.change(emailInput, { target: { value: "test@example.com" } });

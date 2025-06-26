@@ -1,8 +1,12 @@
-### `README.md`
-
 # UllrAI SaaS Starter Kit
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/ullrai/saas-starter)
+🚧 注意：此项目当前仍然在密集完善及修改中
+
+⚠️ 暂不建议在生产环境使用
+
+---
+
+<!-- [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/ullrai/saas-starter) -->
 
 这是一个免费、开源、生产就绪的全栈 SaaS 入门套件，旨在帮助您以前所未有的速度启动下一个项目。它集成了现代 Web 开发中备受推崇的工具和实践，为您提供了一个坚实的基础。
 

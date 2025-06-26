@@ -153,6 +153,23 @@ export const webhookEvents = pgTable(
   },
 );
 
+// Rate limit table for Better-Auth rate limiting
+export const rateLimit = pgTable(
+  "rate_limit",
+  {
+    id: text("id").primaryKey(),
+    key: text("key").notNull(),
+    count: integer("count").notNull().default(0),
+    lastRequest: timestamp("lastRequest").notNull().defaultNow(),
+    resetTime: timestamp("resetTime").notNull(),
+  },
+  (table) => {
+    return {
+      keyIdx: index("rate_limit_key_idx").on(table.key),
+    };
+  },
+);
+
 // File uploads table to store uploaded file metadata
 export const uploads = pgTable(
   "uploads",

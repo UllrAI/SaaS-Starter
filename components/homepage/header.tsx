@@ -18,6 +18,7 @@ import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ChevronDown, Menu, UserCircle, ExternalLink } from "lucide-react";
 import { APP_NAME } from "@/lib/config/constants";
+import { useFocusManagement } from "@/hooks/use-focus-management";
 
 interface NavItem {
   title: string;
@@ -276,10 +277,32 @@ function MobileNavigation({
   onClose: () => void;
 }) {
   const { data: session, isPending } = useSession();
+  const { handleDialogOpen, handleDialogClose } = useFocusManagement();
 
   return (
-    <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent side="right" className="w-80 p-0">
+    <Sheet
+      open={isOpen}
+      onOpenChange={(open) => {
+        onClose();
+        if (!open) {
+          handleDialogClose();
+        }
+      }}
+    >
+      <SheetContent
+        side="right"
+        className="w-80 p-0"
+        onOpenAutoFocus={(e) => {
+          // Prevent default focus and focus first navigation item
+          e.preventDefault();
+          handleDialogOpen();
+          const target = e.currentTarget as HTMLElement;
+          const firstNavItem = target?.querySelector("nav a") as HTMLElement;
+          if (firstNavItem) {
+            setTimeout(() => firstNavItem.focus(), 10);
+          }
+        }}
+      >
         <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
         <div className="border-border flex items-center gap-2 border-b p-6">
           <Logo className="text-primary h-6 w-6" variant="icon-only" />
@@ -287,13 +310,18 @@ function MobileNavigation({
         </div>
 
         <div className="flex flex-col p-6">
-          <nav className="space-y-4">
+          <nav
+            className="space-y-4"
+            role="navigation"
+            aria-label="Mobile navigation"
+          >
             {mobileNavItems.map((item, index) => (
               <Link
                 key={index}
                 href={item.href!}
-                className="text-foreground hover:text-primary block py-2 text-sm font-medium transition-colors"
+                className="text-foreground hover:text-primary focus:ring-primary block rounded-md py-2 text-sm font-medium transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none"
                 onClick={onClose}
+                tabIndex={0}
               >
                 {item.title}
               </Link>
@@ -312,6 +340,7 @@ export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
   const { data: session, isPending } = useSession();
+  const { handleDialogOpen } = useFocusManagement();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -380,9 +409,15 @@ export function Header() {
                 variant="ghost"
                 size="sm"
                 className="md:hidden"
-                onClick={() => setIsMobileMenuOpen(true)}
+                onClick={() => {
+                  setIsMobileMenuOpen(true);
+                  handleDialogOpen();
+                }}
+                aria-label="Open navigation menu"
+                aria-expanded={isMobileMenuOpen}
+                aria-controls="mobile-navigation"
               >
-                <Menu className="h-5 w-5" />
+                <Menu className="h-5 w-5" aria-hidden="true" />
                 <span className="sr-only">Toggle menu</span>
               </Button>
             </div>

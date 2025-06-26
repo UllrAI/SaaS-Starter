@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { headers } from "next/headers";
 import { billing } from "@/lib/billing";
+import {
+  createApiError,
+  handleApiError,
+  API_ERROR_CODES,
+  type ErrorLogContext,
+} from "@/lib/api-error-handler";
 
 export async function POST(request: NextRequest) {
   try {
@@ -11,9 +17,10 @@ export async function POST(request: NextRequest) {
 
     if (!signature) {
       console.warn("Webhook request missing 'creem-signature' header.");
-      return NextResponse.json(
-        { error: "Missing webhook signature header" },
-        { status: 400 },
+      return createApiError(
+        API_ERROR_CODES.MISSING_REQUIRED_FIELD,
+        "Missing webhook signature header",
+        400,
       );
     }
 
@@ -22,16 +29,12 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(result);
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "Webhook processing failed";
-    console.error(`[Creem Webhook Error]: ${message}`);
+    const context: ErrorLogContext = {
+      endpoint: "/api/billing/webhooks/creem",
+      method: "POST",
+      error,
+    };
 
-    const status =
-      error instanceof Error &&
-      error.message.toLowerCase().includes("signature")
-        ? 400
-        : 500;
-
-    return NextResponse.json({ error: message }, { status });
+    return handleApiError(error, context);
   }
 }

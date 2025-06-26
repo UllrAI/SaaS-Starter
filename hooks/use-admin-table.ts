@@ -10,23 +10,29 @@ interface Pagination {
   totalPages: number;
 }
 
-interface AdminTableQueryArgs {
+// Base interface for admin table query arguments
+interface BaseAdminTableQueryArgs {
   page: number;
   limit: number;
   search?: string;
   filter?: string;
-  [key: string]: any;
 }
 
-interface UseAdminTableProps<T> {
+// Generic interface that allows extending with specific query parameters
+type AdminTableQueryArgs<TExtensions = Record<string, never>> =
+  BaseAdminTableQueryArgs & TExtensions;
+
+interface UseAdminTableProps<T, TQueryExtensions = Record<string, never>> {
   queryAction: (
-    args: AdminTableQueryArgs,
+    args: AdminTableQueryArgs<TQueryExtensions>,
   ) => Promise<{ data: T[]; pagination: Pagination }>;
   initialData?: T[];
   initialPagination?: Pagination;
   initialSearch?: string;
   initialFilter?: string;
   debounceDelay?: number;
+  // Optional additional query parameters
+  additionalQueryParams?: TQueryExtensions;
 }
 
 interface UseAdminTableReturn<T> {
@@ -42,14 +48,15 @@ interface UseAdminTableReturn<T> {
   refresh: () => void;
 }
 
-export function useAdminTable<T>({
+export function useAdminTable<T, TQueryExtensions = Record<string, never>>({
   queryAction,
   initialData = [],
   initialPagination = { page: 1, limit: 20, total: 0, totalPages: 1 },
   initialSearch = "",
   initialFilter = "all",
   debounceDelay = 500,
-}: UseAdminTableProps<T>): UseAdminTableReturn<T> {
+  additionalQueryParams = {} as TQueryExtensions,
+}: UseAdminTableProps<T, TQueryExtensions>): UseAdminTableReturn<T> {
   const [data, setData] = useState<T[]>(initialData);
   const [pagination, setPagination] = useState<Pagination>(initialPagination);
   const [error, setError] = useState<string | null>(null);
@@ -88,7 +95,8 @@ export function useAdminTable<T>({
           limit: initialPagination.limit,
           search: debouncedSearchTerm,
           filter: filter,
-        });
+          ...additionalQueryParams,
+        } as AdminTableQueryArgs<TQueryExtensions>);
         setData(result.data);
         setPagination(result.pagination);
       } catch (err) {
@@ -116,7 +124,8 @@ export function useAdminTable<T>({
           limit: initialPagination.limit,
           search: debouncedSearchTerm,
           filter: filter,
-        });
+          ...additionalQueryParams,
+        } as AdminTableQueryArgs<TQueryExtensions>);
         setData(result.data);
         setPagination(result.pagination);
       } catch (err) {

@@ -9,7 +9,7 @@ import {
 import { requireAdmin } from "@/lib/auth/permissions";
 import { DashboardPageWrapper } from "../../_components/dashboard-page-wrapper";
 import { createMetadata } from "@/lib/metadata";
-import { UploadManagementTable } from "./_components/upload-management-table";
+import { LazyUploadManagementTable } from "./_components/lazy-upload-management-table";
 import { UploadStatsCards } from "./_components/upload-stats-cards";
 import { StatsCardsSkeleton } from "../_components/stats-cards-skeleton";
 import { getUploads } from "@/lib/actions/admin";
@@ -41,7 +41,7 @@ export default async function UploadManagementPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <UploadManagementTable
+          <LazyUploadManagementTable
             initialData={initialTableData.data}
             initialPagination={initialTableData.pagination}
           />

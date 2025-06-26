@@ -10,49 +10,63 @@ import {
   formatFileSize,
   presignedUrlRequestSchema, // 导入 Zod schema
 } from "@/lib/config/upload";
+import { rateLimiters } from "@/lib/rate-limit";
+import {
+  createRateLimitError,
+  createAuthError,
+  createValidationError,
+  createApiError,
+  handleApiError,
+  addRateLimitHeaders,
+  API_ERROR_CODES,
+  type ErrorLogContext,
+} from "@/lib/api-error-handler";
 
 export async function POST(request: NextRequest) {
   try {
-    // 1. 认证检查
-    const session = await auth.api.getSession({ headers: request.headers });
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    // 1. Rate limiting check
+    const rateLimitResult = await rateLimiters.upload(request);
+    if (!rateLimitResult.success) {
+      return createRateLimitError(
+        rateLimitResult,
+        "Too many upload requests, please try again later.",
+      );
     }
 
-    // 2. 解析和验证请求体
+    // 2. 认证检查
+    const session = await auth.api.getSession({ headers: request.headers });
+    if (!session?.user?.id) {
+      return createAuthError();
+    }
+
+    // 3. 解析和验证请求体
     const body = await request.json();
     const validation = presignedUrlRequestSchema.safeParse(body);
 
     if (!validation.success) {
-      return NextResponse.json(
-        {
-          error: "Invalid request data",
-          details: validation.error.flatten().fieldErrors,
-        },
-        { status: 400 },
-      );
+      return createValidationError(validation.error, "Invalid request data");
     }
 
     const { fileName, contentType, size } = validation.data;
 
-    // 3. 服务器端文件规则验证 (关键安全修复)
+    // 4. 服务器端文件规则验证 (关键安全修复)
     if (!isFileTypeAllowed(contentType)) {
-      return NextResponse.json(
-        { error: `File type '${contentType}' is not allowed.` },
-        { status: 400 },
+      return createApiError(
+        API_ERROR_CODES.INVALID_FILE_TYPE,
+        `File type '${contentType}' is not allowed.`,
+        400,
       );
     }
 
     if (!isFileSizeAllowed(size)) {
-      return NextResponse.json(
-        {
-          error: `File size of ${formatFileSize(size)} exceeds the limit of ${formatFileSize(UPLOAD_CONFIG.MAX_FILE_SIZE)}.`,
-        },
-        { status: 400 },
+      return createApiError(
+        API_ERROR_CODES.FILE_TOO_LARGE,
+        `File size of ${formatFileSize(size)} exceeds the limit of ${formatFileSize(UPLOAD_CONFIG.MAX_FILE_SIZE)}.`,
+        400,
       );
     }
 
-    // 4. 创建预签名 URL
+    // 5. 创建预签名 URL
     const result = await createPresignedUrl({
       userId: session.user.id,
       fileName,
@@ -62,10 +76,14 @@ export async function POST(request: NextRequest) {
 
     if (!result.success) {
       // createPresignedUrl 内部已经包含了验证，但我们在这里再次捕获以防万一
-      return NextResponse.json({ error: result.error }, { status: 400 });
+      return createApiError(
+        API_ERROR_CODES.FILE_UPLOAD_FAILED,
+        result.error || "Failed to create presigned URL",
+        400,
+      );
     }
 
-    // 5. 在数据库中存储待上传记录 (pending status)
+    // 6. 在数据库中存储待上传记录 (pending status)
     // 注意：这里的状态是隐式的。上传成功后，客户端不需再通知服务端。
     // 如果需要更严格的上传状态管理（例如，确认上传完成），则需要额外的步骤。
     if (result.key && result.publicUrl) {
@@ -80,17 +98,23 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // 6. 返回预签名 URL 给客户端
-    return NextResponse.json({
+    // 7. 返回预签名 URL 给客户端
+    const response = NextResponse.json({
       presignedUrl: result.presignedUrl,
       publicUrl: result.publicUrl,
       key: result.key,
     });
+
+    // Add rate limit headers to response
+    return addRateLimitHeaders(response, rateLimitResult);
   } catch (error) {
-    console.error("Error creating presigned URL:", error);
-    return NextResponse.json(
-      { error: "Internal Server Error. Please try again later." },
-      { status: 500 },
-    );
+    const context: ErrorLogContext = {
+      endpoint: "/api/upload/presigned-url",
+      method: "POST",
+      userId: undefined, // session might not be available in catch block
+      error,
+    };
+
+    return handleApiError(error, context);
   }
 }

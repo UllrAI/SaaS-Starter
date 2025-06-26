@@ -78,10 +78,10 @@ export default function RootLayout({
           </ThemeProvider>
         </NuqsAdapter>
         <Script
-            src="https://track.pixmiller.com/script.js"
-            data-website-id="9315890d-80ba-455a-b624-ab2ab48595f4"
-            strategy="lazyOnload"
-          />
+          src="https://track.pixmiller.com/script.js"
+          data-website-id="9315890d-80ba-455a-b624-ab2ab48595f4"
+          strategy="lazyOnload"
+        />
       </body>
     </html>
   );

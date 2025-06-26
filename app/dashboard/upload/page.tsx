@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { DashboardPageWrapper } from "../_components/dashboard-page-wrapper";
-import { FileUploader } from "@/components/ui/file-uploader";
+import { FileUploader } from "@/components/upload";
 import {
   Card,
   CardContent,
@@ -89,14 +89,21 @@ export default function UploadPage() {
       const result = await response.json();
       setServerUploadProgress(100);
 
-      // 添加成功上传的文件到列表
+      // 添加成功上传的文件到列表，只处理包含所有必需字段的成功结果
       const successfulUploads = (result.results as ServerUploadResult[])
-        .filter((r: ServerUploadResult) => r.success)
+        .filter(
+          (r: ServerUploadResult) =>
+            r.success &&
+            r.url &&
+            r.key &&
+            r.size !== undefined &&
+            r.contentType,
+        )
         .map((r: ServerUploadResult) => ({
-          url: r.url!,
-          key: r.key!,
-          size: r.size!,
-          contentType: r.contentType!,
+          url: r.url as string,
+          key: r.key as string,
+          size: r.size as number,
+          contentType: r.contentType as string,
           fileName: r.fileName,
         }));
 
@@ -264,7 +271,7 @@ export default function UploadPage() {
                     isServerUploading ? "cursor-not-allowed opacity-50" : ""
                   }`}
                 >
-                  <Server className="h-12 w-12 text-muted-foreground" />
+                  <Server className="text-muted-foreground h-12 w-12" />
                   <p className="text-lg font-medium">
                     {isServerUploading
                       ? "Uploading..."
@@ -328,7 +335,7 @@ export default function UploadPage() {
               />
               <div className="mt-4 rounded-lg border bg-gray-50 p-4">
                 <h4 className="mb-2 font-medium">Compression Settings:</h4>
-                <ul className="space-y-1 text-sm text-muted-foreground">
+                <ul className="text-muted-foreground space-y-1 text-sm">
                   <li>• Quality: 60%</li>
                   <li>• Max Width: 1280px</li>
                   <li>• Max Height: 720px</li>

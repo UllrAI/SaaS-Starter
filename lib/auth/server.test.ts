@@ -11,11 +11,11 @@ const mockEnv = {
 };
 
 // Mock modules
-jest.mock("../../env", () => mockEnv);
+jest.mock("@/env", () => mockEnv);
 jest.mock("@/database", () => ({ db: {} }));
 jest.mock("@/database/tables", () => ({}));
 jest.mock("@/emails/magic-link", () => ({ sendMagicLink: jest.fn() }));
-jest.mock("@/constants", () => ({ APP_NAME: "Test App" }));
+jest.mock("@/lib/config/constants", () => ({ APP_NAME: "Test App" }));
 jest.mock("better-auth/plugins", () => ({
   magicLink: jest.fn(() => ({})),
 }));

@@ -36,17 +36,17 @@ const navigationItems: NavItem[] = [
     items: [
       {
         title: "Authentication",
-        href: "/features/auth",
+        href: "/login",
         description: "Secure user authentication with magic links",
       },
       {
         title: "Billing",
-        href: "/features/billing",
+        href: "/dashboard/settings?page=billing",
         description: "Subscription management and payments",
       },
       {
         title: "Dashboard",
-        href: "/features/dashboard",
+        href: "/dashboard",
         description: "User dashboard and settings",
       },
     ],

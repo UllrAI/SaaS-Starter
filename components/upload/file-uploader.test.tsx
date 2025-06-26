@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 import React from "react";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor, act, waitForElementToBeRemoved } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 import { FileUploader } from "./file-uploader";
@@ -116,11 +116,13 @@ describe("FileUploader Performance", () => {
 
     // Simulate upload progress
     if (progressCallback) {
-      progressCallback({
-        lengthComputable: true,
-        loaded: 50,
-        total: 100,
-      } as ProgressEvent);
+      act(() => {
+        progressCallback({
+          lengthComputable: true,
+          loaded: 50,
+          total: 100,
+        } as ProgressEvent);
+      });
 
       await waitFor(() => {
         const progressBar = screen.getByRole("progressbar");
@@ -146,15 +148,13 @@ describe("FileUploader Performance", () => {
     });
 
     // Remove the file
-    const removeButton = screen.getByRole("button");
+    const removeButton = screen.getByLabelText(/remove test\.jpg/i);
     await user.click(removeButton);
 
-    await waitFor(() => {
-      expect(screen.queryByText("test.jpg")).not.toBeInTheDocument();
-    });
+    await waitForElementToBeRemoved(() => screen.queryByText("test.jpg"));
 
     // Check that URL.revokeObjectURL was called
-    expect(global.URL.revokeObjectURL).toHaveBeenCalled();
+    expect(global.URL.revokeObjectURL).toHaveBeenCalledWith("blob:mock-url");
   });
 
   it("should handle multiple file uploads efficiently", async () => {
@@ -281,8 +281,10 @@ describe("FileUploader Memory Management", () => {
         expect(screen.getByText(`test${i}.txt`)).toBeInTheDocument();
       });
 
-      const removeButton = screen.getByRole("button");
+      const removeButton = screen.getByLabelText(/remove test\d+\.txt/i);
       await user.click(removeButton);
+
+      await waitForElementToBeRemoved(() => screen.queryByText(`test${i}.txt`));
     }
 
     // Check that cleanup is happening appropriately

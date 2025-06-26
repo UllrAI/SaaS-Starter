@@ -136,15 +136,6 @@ export const FileItem = memo(
         </Button>
       </div>
     );
-  },
-  (prevProps, nextProps) => {
-    return (
-      prevProps.fileState.id === nextProps.fileState.id &&
-      prevProps.fileState.status === nextProps.fileState.status &&
-      prevProps.fileState.progress === nextProps.fileState.progress &&
-      prevProps.fileState.error === nextProps.fileState.error
-    );
-  },
-);
+  );
 
 FileItem.displayName = "FileItem";

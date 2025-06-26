@@ -32,32 +32,20 @@ export function AuthForm({ mode, availableProviders }: AuthFormProps) {
   });
 
   const onSubmit = async (data: z.infer<typeof authSchema>) => {
-    setLoading(true);
+    const result = await signIn.magicLink({
+      email: data.email,
+      callbackURL: "/dashboard",
+    });
 
-    try {
-      const result = await signIn.magicLink({
-        email: data.email,
-        callbackURL: "/dashboard",
-      });
-
-      if (result.error) {
-        toast.error(result.error.message);
-        return;
-      }
-
-      // Navigate to the unified sent page with the email as a query param
-      const params = new URLSearchParams({ email: data.email });
-      router.push(`/auth/sent?${params.toString()}`);
-    } catch (error) {
-      // Handle rate limit and other errors from client fetchOptions
-      if (error instanceof Error) {
-        toast.error(error.message);
-      } else {
-        toast.error("An error occurred while sending the magic link");
-      }
-    } finally {
+    if (result.error) {
+      toast.error(result.error.message);
       setLoading(false);
+      return;
     }
+
+    // Navigate to the unified sent page with the email as a query param
+    const params = new URLSearchParams({ email: data.email });
+    router.push(`/auth/sent?${params.toString()}`);
   };
 
   const isLogin = mode === "login";

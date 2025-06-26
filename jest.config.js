@@ -12,13 +12,6 @@ const config = {
     "^@/(.*)$": "<rootDir>/$1",
   },
   setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
-  transform: {
-    "^.+\.(ts|tsx)$": "ts-jest",
-    "^.+\.(js|jsx)$": "babel-jest",
-  },
-  transformIgnorePatterns: [
-    "/node_modules/(?!@t3-oss/env-nextjs|@t3-oss/env-core)",
-  ],
 };
 
 module.exports = createJestConfig(config);

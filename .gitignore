@@ -43,5 +43,3 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-usage_tracking2.json
-/analyze

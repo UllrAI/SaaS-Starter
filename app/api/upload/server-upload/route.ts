@@ -12,17 +12,6 @@ import {
   isFileSizeAllowed,
   getFileExtension,
 } from "@/lib/config/upload";
-import { rateLimiters } from "@/lib/rate-limit";
-import { validateFileForR2 } from "@/lib/file-security";
-import {
-  createRateLimitError,
-  createAuthError,
-  createApiError,
-  handleApiError,
-  addRateLimitHeaders,
-  API_ERROR_CODES,
-  type ErrorLogContext,
-} from "@/lib/api-error-handler";
 
 // Initialize S3 client for Cloudflare R2
 const r2Client = new S3Client({
@@ -36,29 +25,21 @@ const r2Client = new S3Client({
 
 export async function POST(request: NextRequest) {
   try {
-    // Rate limiting check
-    const rateLimitResult = await rateLimiters.fileUpload(request);
-    if (!rateLimitResult.success) {
-      return createRateLimitError(
-        rateLimitResult,
-        "Too many file upload requests, please try again later.",
-      );
-    }
-
     // Check authentication
     const session = await auth.api.getSession({ headers: request.headers });
     if (!session?.user?.id) {
-      return createAuthError();
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Check if request is multipart/form-data
     const contentType = request.headers.get("content-type");
     if (!contentType || !contentType.includes("multipart/form-data")) {
-      return createApiError(
-        API_ERROR_CODES.INVALID_REQUEST,
-        "Invalid content type. Expected multipart/form-data",
-        400,
-        { received: contentType || "none" },
+      return NextResponse.json(
+        {
+          error: "Invalid content type. Expected multipart/form-data",
+          received: contentType || "none",
+        },
+        { status: 400 },
       );
     }
 
@@ -67,11 +48,7 @@ export async function POST(request: NextRequest) {
     const files = formData.getAll("files") as File[];
 
     if (!files || files.length === 0) {
-      return createApiError(
-        API_ERROR_CODES.INVALID_REQUEST,
-        "No files provided",
-        400,
-      );
+      return NextResponse.json({ error: "No files provided" }, { status: 400 });
     }
 
     // Function to process a single file
@@ -87,31 +64,6 @@ export async function POST(request: NextRequest) {
           throw new Error(
             `File size ${file.size} bytes exceeds maximum allowed size of ${UPLOAD_CONFIG.MAX_FILE_SIZE} bytes`,
           );
-        }
-
-        // Lightweight security validation for R2 hosting
-        const securityCheck = await validateFileForR2(file);
-        if (!securityCheck.allowUpload) {
-          throw new Error(
-            `File upload blocked: ${securityCheck.securityLog.risks.join(", ")}`,
-          );
-        }
-
-        // Log security findings for monitoring (non-blocking)
-        if (
-          securityCheck.securityLog.risks.length > 0 ||
-          securityCheck.securityLog.warnings.length > 0
-        ) {
-          console.warn(`File security log for ${file.name}:`, {
-            risks: securityCheck.securityLog.risks,
-            warnings: securityCheck.securityLog.warnings,
-            fileInfo: {
-              size: file.size,
-              type: file.type,
-              name: file.name,
-            },
-            timestamp: securityCheck.securityLog.timestamp,
-          });
         }
 
         // Generate unique key for the file
@@ -176,7 +128,7 @@ export async function POST(request: NextRequest) {
     const successCount = uploadResults.filter((r) => r.success).length;
     const failureCount = uploadResults.length - successCount;
 
-    const response = NextResponse.json({
+    return NextResponse.json({
       message: `Uploaded ${successCount} file(s) successfully${failureCount > 0 ? `, ${failureCount} failed` : ""}`,
       results: uploadResults,
       summary: {
@@ -185,18 +137,12 @@ export async function POST(request: NextRequest) {
         failed: failureCount,
       },
     });
-
-    // Add rate limit headers to response
-    return addRateLimitHeaders(response, rateLimitResult);
   } catch (error) {
-    const context: ErrorLogContext = {
-      endpoint: "/api/upload/server-upload",
-      method: "POST",
-      userId: undefined, // session might not be available in catch block
-      error,
-    };
-
-    return handleApiError(error, context);
+    console.error("Error in server upload:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }
 

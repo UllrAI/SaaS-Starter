@@ -37,27 +37,6 @@ export const auth = betterAuth({
     disabled: process.env.NODE_ENV === "production",
     level: "debug",
   },
-  rateLimit: {
-    enabled: true,
-    window: 60, // 1 minute window
-    max: 100, // 100 requests per minute
-    storage: "database",
-    modelName: "rateLimit",
-    customRules: {
-      "/magic-link": {
-        window: 300, // 5 minutes
-        max: 3, // max 3 magic link requests per 5 minutes per IP
-      },
-      "/sign-in/email": {
-        window: 300, // 5 minutes
-        max: 5, // max 5 sign-in attempts per 5 minutes per IP
-      },
-      "/sign-up/email": {
-        window: 300, // 5 minutes
-        max: 5, // max 5 sign-up attempts per 5 minutes per IP
-      },
-    },
-  },
   session: {
     expiresIn: 60 * 60 * 24 * 30, // 30 days
     cookieCache: {

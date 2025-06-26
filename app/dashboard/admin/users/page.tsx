@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/card";
 import { DashboardPageWrapper } from "../../_components/dashboard-page-wrapper";
 import { createMetadata } from "@/lib/metadata";
-import { LazyUserManagementTable } from "./_components/lazy-user-management-table";
+import { UserManagementTable } from "./_components/user-management-table";
 import { UserStatsCards } from "./_components/user-stats-cards";
 import { StatsCardsSkeleton } from "../_components/stats-cards-skeleton";
 import { getUsers } from "@/lib/actions/admin";
@@ -42,7 +42,7 @@ export default async function UserManagementPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <LazyUserManagementTable
+          <UserManagementTable
             initialData={initialTableData.data}
             initialPagination={initialTableData.pagination}
           />

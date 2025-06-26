@@ -251,7 +251,7 @@ pnpm dev
 #### 基本用法
 
 ```tsx
-import { FileUploader } from "@/components/upload";
+import { FileUploader } from "@/components/ui/file-uploader";
 
 function MyComponent() {
   const handleUploadComplete = (files) => {

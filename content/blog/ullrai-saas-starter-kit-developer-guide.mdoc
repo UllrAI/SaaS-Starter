@@ -1,0 +1,687 @@
+---
+title: UllrAI SaaS Starter Kit Developer Documentation
+publishedDate: 2025-06-24
+author: admin
+excerpt: >-
+  This documentation provides a comprehensive and in-depth technical reference for developers using the UllrAI SaaS Starter Kit. Whether you want to quickly launch a new project or perform deep customization and secondary development, this documentation will provide you with the necessary guidance.
+tags:
+  - Next.js
+  - SaaS Starter
+  - TypeScript
+  - Tailwind CSS
+  - shadcn/ui
+  - Drizzle ORM
+  - Creem
+  - Resend
+  - Cloudflare R2
+featured: true
+heroImage: https://images.unsplash.com/photo-1561886362-a2b38ce83470?q=80&w=1674&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D
+---
+# UllrAI SaaS Starter Kit Developer Documentation
+
+This documentation provides a comprehensive and in-depth technical reference for developers using the UllrAI SaaS Starter Kit. Whether you want to quickly launch a new project or perform deep customization and secondary development, this documentation will provide you with the necessary guidance.
+
+## 1. Project Overview
+
+### 1.1. Project Introduction
+
+**UllrAI SaaS Starter Kit** is a free, open-source, production-ready full-stack SaaS starter kit. It integrates the most respected technologies and practices in modern web development, designed to help developers launch their next SaaS project at unprecedented speed, allowing you to focus on business logic rather than infrastructure setup.
+
+- **Core Features**: Provides authentication, payment subscriptions, database management, file uploads, content management, and other core SaaS application features.
+- **Technology Stack**: Based on Next.js 15 App Router, TypeScript, PostgreSQL, Drizzle ORM, and integrates Creem payments, Resend email service, and Cloudflare R2 file storage.
+- **Use Cases**:
+  - Quickly build full-stack SaaS applications requiring user login and paid subscription features.
+  - As a practical project for learning modern full-stack web development technologies.
+  - Provide a stable, scalable initial scaffold for enterprise-level projects.
+  - Independent developers or small teams quickly validate business ideas.
+
+### 1.2. Quick Start
+
+1.**Clone the project**
+
+   ```bash
+   git clone https://github.com/ullrai/saas-starter.git
+   cd saas-starter
+   ```
+
+2.**Install dependencies**
+
+   ```bash
+   pnpm install
+   ```
+
+3.**Configure environment**
+   Copy `.env.example` to `.env` and fill in all required environment variables.
+
+   ```bash
+   cp .env.example .env
+   ```
+
+4.**Sync database**
+   Make sure your local PostgreSQL database is running, then execute:
+
+   ```bash
+   pnpm db:push
+   ```
+
+5.**Run development server**
+
+   ```bash
+   pnpm dev
+   ```
+
+   The application will run at `http://localhost:3000`.
+
+### 1.3. Feature List
+
+- **Modern Framework**: Next.js 15 (App Router, RSC), React 19, TypeScript
+- **UI**: Tailwind CSS v4, shadcn/ui, Lucide Icons, Dark/Light Mode
+- **Authentication**: Better-Auth (Magic Link, OAuth - Google/GitHub/LinkedIn)
+- **Database**: PostgreSQL + Drizzle ORM (Type-safe queries, Migration management)
+- **Payment Subscriptions**: Creem integration (One-time payments, Subscriptions, Customer portal, Webhooks)
+- **File Upload**: Cloudflare R2 integration (Client-side presigned direct upload, Server-side proxy upload, Image compression)
+- **Content Management**: Keystatic (Markdown/MDX blog system)
+- **Email Service**: Resend + React Email (Transactional email templates)
+- **Form Handling**: React Hook Form + Zod (Type-safe form validation)
+- **Code Quality**: ESLint, Prettier
+- **Admin Dashboard**: Generic data management dashboard, easily extensible to manage any database table
+- **Deployment**: One-click Vercel deployment
+
+### 1.4. Technical Architecture Diagram
+
+[![Technical Architecture Diagram](https://mermaid.ink/img/pako:eNqNk1tPwjAUx79K09cRkuVSLqsv-g1MfDBkw8TEB1rOHGMd2zLWQkhCmAlKXP7bFr6F09Ol59d-_Z_Tt8N6DhoCVlSHoA3IqmKCU3-JOHy2hHhLUWOZ-_Ek1pj1Qv-KCWp7vdfJlsIe20g-kXGXGjQpIqQiEpMUpGOGJB9JGhCdhRJJWnNwCuI_gdWCTfZH5pB6Cri_7j6Fz5vF-Ow3SrqLAHaMvBVSLGj0bYG6vWm0LcSgBm0A6ZKjmzJdLlFmQgQZ8VsXuPFd4x4GzWfH6VpXILdvuJBsWKjXIW3ywQoTqPRNWDcnW3UqaEpGOzBW-a6V7N3x0wIgqtd6I3_sxJ6-77jEtJXHBhJ47QvqUpEVX6VCRBKrn2RfqDgvQU-XfgQsG3RFgNpj4Hx2v4DH7ZPQR2X8aRlQdGWKoKGbWXhQZJG3k4LhlDVs6Rf6QFyS6qYWWKGV4jZp4rJPJ1kVWJA6wPdg0r3qWANyf7K5yJT3rn7-Acr4J7o)]([https://mermaid.live/edit#pako:eNqNk1tPwjAUx79K09cRkuVSLqsv-g1MfDBkw8TEB1rOHGMd2zLWQkhCmAlKXP7bFr6F09Ol59d-_Z_Tt8N6DhoCVlSHoA3IqmKCU3-JOHy2hHhLUWOZ-_Ek1pj1Qv-KCWp7vdfJlsIe20g-kXGXGjQpIqQiEpMUpGOGJB9JGhCdhRJJWnNwCuI_gdWCTfZH5pB6Cri_7j6Fz5vF-Ow3SrqLAHaMvBVSLGj0bYG6vWm0LcSgBm0A6ZKjmzJdLlFmQgQZ8VsXuPFd4x4GzWfH6VpXILdvuJBsWKjXIW3ywQoTqPRNWDcnW3UqaEpGOzBW-a6V7N3x0wIgqtd6I3_sxJ6-77jEtJXHBhJ47QvqUpEVX6VCRBKrn2RfqDgvQU-XfgQsG3RFgNpj4Hx2v4DH7ZPQR2X8aRlQdGWKoKGbWXhQZJG3k4LhlDVs6Rf6QFyS6qYWWKGV4jZp4rJPJ1kVWJA6wPdg0r3qWANyf7K5yJT3rn7-Acr4J7o)](https://mermaid.live/edit#pako:eNqNk1tPwjAUx79K09cRkuVSLqsv-g1MfDBkw8TEB1rOHGMd2zLWQkhCmAlKXP7bFr6F09Ol59d-_Z_Tt8N6DhoCVlSHoA3IqmKCU3-JOHy2hHhLUWOZ-_Ek1pj1Qv-KCWp7vdfJlsIe20g-kXGXGjQpIqQiEpMUpGOGJB9JGhCdhRJJWnNwCuI_gdWCTfZH5pB6Cri_7j6Fz5vF-Ow3SrqLAHaMvBVSLGj0bYG6vWm0LcSgBm0A6ZKjmzJdLlFmQgQZ8VsXuPFd4x4GzWfH6VpXILdvuJBsWKjXIW3ywQoTqPRNWDcnW3UqaEpGOzBW-a6V7N3x0wIgqtd6I3_sxJ6-77jEtJXHBhJ47QvqUpEVX6VCRBKrn2RfqDgvQU-XfgQsG3RFgNpj4Hx2v4DH7ZPQR2X8aRlQdGWKoKGbWXhQZJG3k4LhlDVs6Rf6QFyS6qYWWKGV4jZp4rJPJ1kVWJA6wPdg0r3qWANyf7K5yJT3rn7-Acr4J7o)
+
+```mermaid
+graph TD
+    subgraph "Frontend (Browser)"
+        A[User] --> B{Next.js App};
+    end
+
+    subgraph "Vercel Platform"
+        B -- React Server Components --> C["UI (shadcn/ui, Tailwind)"];
+        B -- API Routes/Server Actions --> D[Backend Logic];
+    end
+
+    subgraph "Core Services"
+        D -- ORM --> E[Drizzle ORM];
+        E --> F[(PostgreSQL)];
+        D -- Auth API --> G[Better-Auth];
+        D -- Payment API --> H[Creem];
+        D -- Email API --> I[Resend];
+        D -- Storage API --> J[Cloudflare R2];
+    end
+    
+    subgraph "Content Management (CMS)"
+        K[Keystatic] -- Reads/Writes --> L[Markdown/JSON in Git];
+        B -- Reads data --> L;
+    end
+    
+    G -- OAuth --> M[Google/GitHub/LinkedIn];
+    H -- Webhooks --> D;
+
+    style A fill:#f9f,stroke:#333,stroke-width:2px;
+    style F fill:#add,stroke:#333,stroke-width:2px;
+    style J fill:#f90,stroke:#333,stroke-width:2px;
+    style H fill:#f66,stroke:#333,stroke-width:2px;
+    style I fill:#9cf,stroke:#333,stroke-width:2px;
+```
+
+---
+
+## 2. In-Depth Technical Analysis
+
+### 2.1. Directory Structure Breakdown
+
+```
+SaaS-Starter-main/
+├── app/                  # Next.js App Router core directory
+│   ├── (auth)/           # Authentication-related pages (login, signup)
+│   ├── (dashboard)/      # Protected dashboard pages
+│   ├── (pages)/          # Public pages (home, about, blog, etc.)
+│   ├── api/              # API routes
+│   ├── keystatic/        # Keystatic CMS admin interface
+│   ├── layout.tsx        # Root layout
+│   └── not-found.tsx     # Global 404 page
+├── components/           # React components
+│   ├── admin/            # Admin dashboard components
+│   ├── auth/             # Authentication flow components
+│   ├── blog/             # Blog-related components
+│   ├── forms/            # Form components
+│   ├── homepage/         # Homepage-specific components
+│   └── ui/               # Generic UI components (based on shadcn/ui)
+├── content/              # Keystatic-managed content (Markdown, JSON)
+├── database/             # Drizzle ORM related
+│   ├── migrations/       # Database migration files
+│   ├── config.ts         # Development migration config
+│   ├── config.prod.ts    # Production migration config
+│   ├── index.ts          # Drizzle client initialization
+│   └── schema.ts         # Database table structure definitions
+├── emails/               # React Email templates
+├── hooks/                # Custom React Hooks
+├── lib/                  # Core logic and utility functions
+│   ├── actions/          # Next.js Server Actions
+│   ├── admin/            # Admin dashboard core logic
+│   ├── auth/             # Authentication config and logic (Better-Auth)
+│   ├── billing/          # Payment abstraction layer and providers (Creem)
+│   ├── config/           # Global constants, products, roles, etc.
+│   ├── database/         # Database helper functions
+│   ├── email.tsx         # Email sending service
+│   └── r2.ts             # Cloudflare R2 file upload service
+├── public/               # Static assets
+├── schemas/              # Zod validation schemas
+├── scripts/              # Helper scripts (like setting up admin)
+└── styles/               # Global styles and CSS
+```
+
+### 2.2. Core Module Analysis
+
+#### 2.2.1. Entry Files and Startup Flow
+
+- **`app/layout.tsx`**: The project's root layout that wraps all pages. It handles:
+  - Setting HTML `lang` attribute and font variables.
+  - Integrating `ThemeProvider` for dark/light mode.
+  - Integrating `NextTopLoader` for page loading progress.
+  - Integrating `Toaster` for global notifications.
+  - Integrating `CookieConsent` for cookie consent management.
+- **`middleware.ts`**: Runs before requests reach pages, core for route protection.
+  - Checks user session cookies.
+  - Redirects to `/login` if user is not logged in but accessing `/dashboard/*`.
+  - Redirects to `/dashboard` if user is logged in but accessing `/login` or `/signup`.
+- **`app/dashboard/layout.tsx`**: Root layout for the dashboard.
+  - Uses `SessionGuard` component to protect all child routes. `SessionGuard` is a client component that verifies session existence, redirects to login if not found, and shows loading animation during verification.
+  - Renders `AppSidebar` and main content area `SidebarInset`.
+
+#### 2.2.2. Configuration System Design
+
+The project's configuration is highly centralized for easy maintenance and extension.
+
+- **Environment Variables (`env.ts`)**: Uses `@t3-oss/env-nextjs` to enforce environment variable validation. All environment variables (like API keys, database URLs) must be defined in the `.env` file and accessed through `env.ts` for type safety. This prevents runtime errors due to missing environment variables.
+- **Application Constants (`lib/config/constants.ts`)**: Stores app name, description, contact email, and other hardcoded values that don't change frequently.
+- **Product Plans (`lib/config/products.ts`)**: Centrally defines all paid plans. Each plan includes internal ID, name, feature list, and product IDs in different payment providers (like Creem). This structure makes it easy to add new plans or switch payment providers.
+- **User Roles (`lib/config/roles.ts`)**: Defines user roles and their hierarchical relationships (`user`, `admin`, `super_admin`). Helper functions like `hasRole` provide unified permission checking logic.
+- **File Upload (`lib/config/upload.ts`)**: Centrally manages all file upload rules, including maximum file size, allowed file types, etc. All upload paths (client and server-side) share this configuration, ensuring rule consistency.
+
+#### 2.2.3. Routing Architecture
+
+The project uses Next.js App Router and leverages Route Groups for logical page separation.
+
+- `(pages)`: Contains all public pages like home, about, blog, pricing, etc. Uses `app/(pages)/layout.tsx` to provide unified header and footer.
+- `(auth)`: Contains authentication flow pages like login, signup. Uses `app/(auth)/layout.tsx` to provide a centered, clean layout.
+- `(dashboard)`: Contains all pages requiring user login. Its layout `app/dashboard/layout.tsx` implements route protection through `SessionGuard`.
+
+#### 2.2.4. Build and Packaging Process
+
+- **`next.config.ts`**: Next.js core configuration file.
+  - Configures `images.remotePatterns` to allow loading images from Unsplash and Cloudflare R2.
+  - Integrates `@next/bundle-analyzer`. When `ANALYZE` environment variable is set to `true`, running `pnpm analyze` generates and opens bundle size analysis report after build, helping developers optimize frontend resource size.
+- **`package.json`**:
+  - `dev`: Starts development server with Next.js 15's `--turbo` mode for faster local compilation.
+  - `build`: Builds production application.
+  - `start`: Starts production server.
+
+---
+
+## 3. Development Guide
+
+### 3.1. Environment Setup
+
+1. **Install Tools**:
+   - Node.js v20.x or higher.
+   - pnpm (`npm install -g pnpm`).
+   - PostgreSQL database (recommended using Docker: `docker run --name my-postgres -e POSTGRES_PASSWORD=mysecretpassword -p 5432:5432 -d postgres`).
+1. **Clone and Install**:
+   ```bash
+   git clone https://github.com/ullrai/saas-starter.git
+   cd saas-starter
+   pnpm install
+   ```
+1. **Configure Environment Variables**:
+   - Copy `.env.example` to `.env`.
+   - Generate a secure `BETTER_AUTH_SECRET`: `openssl rand -base64 32`.
+   - Fill in your PostgreSQL `DATABASE_URL`.
+   - Register and obtain API keys for Creem, Resend, Cloudflare R2, and fill them in the `.env` file.
+1. **Database Setup**:
+   - **Development**: `pnpm db:push` synchronizes changes from `database/schema.ts` directly to the database, suitable for rapid iteration.
+   - **Production**: **Must** use migration files. Process:
+     1. `pnpm db:generate:prod`: Generate production migration SQL files.
+     1. Deploy code and migration files to production.
+     1. Run `pnpm db:migrate:prod` in production to apply migrations.
+
+### 3.2. Development Workflow
+
+1. **Start Development Server**: `pnpm dev`
+1. **Modify Database**:
+   - Edit `database/schema.ts`.
+   - Run `pnpm db:push` to sync changes.
+1. **Create New Pages**:
+   - Create new folders and `page.tsx` files in `app/(pages)` or `app/(dashboard)`.
+1. **Create API Routes**:
+   - Create new folders and `route.ts` files in the `app/api` directory.
+1. **Create Server Actions**:
+   - Create new files in the `lib/actions` directory using the `"use server";` directive.
+1. **Code Checking**:
+   - Run `pnpm lint` to check code style.
+   - Run `pnpm prettier:format` to format code.
+
+### 3.3. Code Standards
+
+- **Naming Conventions**:
+  - Components use PascalCase, e.g., `FileUploader`.
+  - Functions and variables use camelCase.
+  - Constants use UPPER_SNAKE_CASE.
+- **File Organization**:
+  - Page components are placed in their respective `app` route folders, usually in `_components` subdirectories.
+  - Reusable components are placed in the `components` directory.
+  - Logic, types, configurations are separated into `lib`, `types`, `schemas` directories.
+- **Comment Requirements**:
+  - Use JSDoc comments for complex functions or logic blocks.
+  - Use inline comments for non-intuitive code.
+
+---
+
+## 4. Feature Module Details
+
+### 4.1. Authentication System (Better-Auth)
+
+This starter kit uses the `better-auth` library to provide a complete authentication solution.
+- **Core Configuration**: `lib/auth/server.ts`
+  - Configures Drizzle database adapter.
+  - Dynamically loads social login providers (Google, GitHub, LinkedIn), only enabled when corresponding `CLIENT_ID` and `SECRET` are provided in `.env`.
+  - Integrates `magicLink` plugin and configures using Resend for email sending.
+- **API Route**: `app/api/auth/[...all]/route.ts`
+  - This is a dynamic route that captures all `better-auth` authentication requests (like `/api/auth/magic-link`, `/api/auth/google/login`, etc.) and hands them to `auth.handler`.
+- **Client**: `lib/auth/client.ts`
+  - Provides methods for interacting with the authentication system in client components, like `signIn`, `signOut`, `useSession`, etc.
+- **Authentication Flow (Magic Link)**:
+[![Magic Link](https://mermaid.ink/img/pako:eNp1k-1r00Acx_-V415NaNN2fVh74ETqA4KysYc30je35NaGJrl6SUQtBVeUVXHasQ1ZrYjCQBxL3ZvOWde_ppe0_4WXnh1ldiGQu-P7uXy_97tfFapUIxBBmzxxiaWSOzouMmwWLDB-Kpg5uqpXsOWAdZuwWet5Qyfig23AvW9-4yw47oC5265TukeZeWMWsUrYU8JCwm_v8Ldf-eF3QSw_mCleITaxtFA8qnuDXlcioXKiDo1FFxelDwSG_T3--kiIA--Un3eD-jnf7gWHPX5xMCGkVDDSCQLLS6trIIYregwL4zETF3U1auhWeUJI4RQR7H_xG02__cb_2PUPGkHrFVijZWL9B0j_wlbnzD-t8w-7o5dbMgmY481jSYH1lYeX6SURFWyYDIF_zMm-3-6M9vr--yPJX8kvxTKuFAx-nQhfErk2-v2708lVbBgbWC3fckJbNxVFufYERj_eDTtb0n8E8MYn3vs9-NMadj5fQaZr4_WDC0-qQJ7Ssk6AqNFoe4d7Ld7c5Y2fIKZhu7RBMdNgBBaZrkHkMJdEoEmYicMprI7LD50SMUkBIjHUyCZ2DacAC1ZNYOLmPKbUnJCMusUSRJvYsMXMrWjYmdz0y1UmzpywPHUtB6L5xHgPiKrwGUTJRFxJL8TjafFmc6nkfDoCn0OUziqpXC6XyWUzyVQmk0nUIvDF-K9xJbsgNETTHcoeyQ4bN1rtLzk3Xew)](https://mermaid.live/edit#pako:eNp1k-1r00Acx_-V415NaNN2fVh74ETqA4KysYc30je35NaGJrl6SUQtBVeUVXHasQ1ZrYjCQBxL3ZvOWde_ppe0_4WXnh1ldiGQu-P7uXy_97tfFapUIxBBmzxxiaWSOzouMmwWLDB-Kpg5uqpXsOWAdZuwWet5Qyfig23AvW9-4yw47oC5265TukeZeWMWsUrYU8JCwm_v8Ldf-eF3QSw_mCleITaxtFA8qnuDXlcioXKiDo1FFxelDwSG_T3--kiIA--Un3eD-jnf7gWHPX5xMCGkVDDSCQLLS6trIIYregwL4zETF3U1auhWeUJI4RQR7H_xG02__cb_2PUPGkHrFVijZWL9B0j_wlbnzD-t8w-7o5dbMgmY481jSYH1lYeX6SURFWyYDIF_zMm-3-6M9vr--yPJX8kvxTKuFAx-nQhfErk2-v2708lVbBgbWC3fckJbNxVFufYERj_eDTtb0n8E8MYn3vs9-NMadj5fQaZr4_WDC0-qQJ7Ssk6AqNFoe4d7Ld7c5Y2fIKZhu7RBMdNgBBaZrkHkMJdEoEmYicMprI7LD50SMUkBIjHUyCZ2DacAC1ZNYOLmPKbUnJCMusUSRJvYsMXMrWjYmdz0y1UmzpywPHUtB6L5xHgPiKrwGUTJRFxJL8TjafFmc6nkfDoCn0OUziqpXC6XyWUzyVQmk0nUIvDF-K9xJbsgNETTHcoeyQ4bN1rtLzk3Xew)
+  ```mermaid
+  sequenceDiagram
+      participant User
+      participant Client as Frontend (AuthForm)
+      participant Server as Server (API)
+      participant Resend as Email Service
+  
+      User->>Client: Enter email and click login
+      Client->>Server: POST /api/auth/magic-link
+      Server->>Server: Generate time-limited Token
+      Server->>Resend: Request to send email (with Token URL)
+      Resend-->>User: Send magic link email
+      User->>User: Click link in email
+      Client->>Server: GET /api/auth/callback?token=...
+      Server->>Server: Verify Token, create session
+      Server-->>Client: Set session Cookie and redirect to /dashboard
+  ```
+### 4.2. Database & ORM (Drizzle)
+
+- **Schema Definition**: `database/schema.ts` is the single source of truth for all database tables, defining table structures, relationships, and constraints using Drizzle ORM syntax.
+- **Client Initialization**: `database/index.ts` initializes the Drizzle client and applies different connection pool configurations based on environment (Serverless or traditional server) (`lib/database/connection.ts`).
+- **Migration Management**:
+  - The project maintains two separate migration histories for development and production environments, located in `database/migrations/development` and `database/migrations/production` respectively.
+  - `pnpm db:generate` & `pnpm db:generate:prod`: Generate SQL migration files based on changes in `schema.ts`.
+  - `pnpm db:push`: Development only, directly syncs schema to database, loses history.
+  - `pnpm db:migrate:dev` & `pnpm db:migrate:prod`: Apply migration files to database.
+
+### 4.3. Payment & Subscriptions (Creem)
+- **Abstraction Layer**: `lib/billing/index.ts` exports a unified `billing` object, making it easy to switch to other payment providers (like Stripe) in the future without modifying upper-level business code.
+- **Provider Implementation**: `lib/billing/creem/provider.ts` is the specific implementation for Creem payment provider, encapsulating logic for creating checkout sessions, customer portals, and handling webhooks.
+- **API Interfaces**:
+  - `/api/billing/checkout`: Creates payment sessions. Returns `409 Conflict` status and management link when user tries to purchase existing subscription.
+  - `/api/billing/portal`: Creates a URL to Creem customer portal where users can manage their subscriptions.
+  - `/api/billing/webhooks/creem`: Receives webhook events from Creem for updating subscription status, recording payments, etc.
+- **Webhook Handling**: `lib/billing/creem/webhook.ts`
+  - **Security**: Uses `crypto.timingSafeEqual` to verify webhook signatures, preventing forged requests.
+  - **Idempotency**: Records processed event IDs in `webhook_events` table to prevent duplicate processing of the same event.
+  - **Transactional**: All database operations are completed in one transaction, ensuring data consistency.
+- **Payment Flow**:
+[![Payment Flow](https://mermaid.ink/img/pako:eNp1U11rE0EU_SvDPCWQJqn5aDIPfTAFn8RAWwTJy3T3Nlm6u7POzoo1BKwgDbWBCLG0VoT2qSgmedCKBvXPZDbJv3B2txtqTZaF3Zl7zj1n7tzbxBrTARPswlMPbA02DFrn1KrZKHwcyoWhGQ61Bdp2gS_ar5gGqA91kexf-u3vk88DlKhyFbbrqErrkFzE2gT-DHjA8j905NGFPLtamJwDhG7iYOBiZX09EiVo8uqHPByhGn4AAlVNatdwjIwgChtJEVR9tLmFMtQxMjuGaSp3Ga0B2h7zREyJkEH6QJYE6lQAqtzAVNx1DWbPFQLUyi2FON82N--kvGV5-qcnzz8uws4dB4ckaHbYkf33svtWtoeRFvJ7g_HodHbx7W45Ir-yf-y3uxFoqcnHsNNgbA8lYgdpjVmOCQL05H-FiEmzT8fTwcHky2_Z7aTQtD-Uv96Nf74Zj66XUhIb99EWp7ZLNaGKlkT--Vf_ZDjpXakmmfYvZ6evJ0fX_suDJVf7z_EzDt23guK4ggrPxSlc54aOieAepLAF3KLBEjfDXsGiARbUMFG_OuxSzxRBX7QUTXXVE8asmMmZV29gsktNV608R1f3fTMD810Otg68wjxbYHKvEObApImfY5JbzaYLa9lsQb2lcj4XRPcxKZTS-XK5XCyXirl8sVhcbaXwi1A1my6tKQzohmD8YTR74Qi2_gLtEE8s)](https://mermaid.live/edit#pako:eNp1U11rE0EU_SvDPCWQJqn5aDIPfTAFn8RAWwTJy3T3Nlm6u7POzoo1BKwgDbWBCLG0VoT2qSgmedCKBvXPZDbJv3B2txtqTZaF3Zl7zj1n7tzbxBrTARPswlMPbA02DFrn1KrZKHwcyoWhGQ61Bdp2gS_ar5gGqA91kexf-u3vk88DlKhyFbbrqErrkFzE2gT-DHjA8j905NGFPLtamJwDhG7iYOBiZX09EiVo8uqHPByhGn4AAlVNatdwjIwgChtJEVR9tLmFMtQxMjuGaSp3Ga0B2h7zREyJkEH6QJYE6lQAqtzAVNx1DWbPFQLUyi2FON82N--kvGV5-qcnzz8uws4dB4ckaHbYkf33svtWtoeRFvJ7g_HodHbx7W45Ir-yf-y3uxFoqcnHsNNgbA8lYgdpjVmOCQL05H-FiEmzT8fTwcHky2_Z7aTQtD-Uv96Nf74Zj66XUhIb99EWp7ZLNaGKlkT--Vf_ZDjpXakmmfYvZ6evJ0fX_suDJVf7z_EzDt23guK4ggrPxSlc54aOieAepLAF3KLBEjfDXsGiARbUMFG_OuxSzxRBX7QUTXXVE8asmMmZV29gsktNV608R1f3fTMD810Otg68wjxbYHKvEObApImfY5JbzaYLa9lsQb2lcj4XRPcxKZTS-XK5XCyXirl8sVhcbaXwi1A1my6tKQzohmD8YTR74Qi2_gLtEE8s)
+  ```mermaid
+  sequenceDiagram
+      participant User
+      participant Client as Frontend (Pricing Page)
+      participant Server as Server
+      participant Creem
+  
+      User->>Client: Click "Get Plan"
+      Client->>Server: POST /api/billing/checkout
+      Server->>Creem: Create Checkout Session
+      Creem-->>Server: checkoutUrl
+      Server-->>Client: Return checkoutUrl
+      Client->>User: Redirect to Creem payment page
+      User->>Creem: Complete payment
+      Creem-->>Server: Webhook (checkout.completed)
+      Server->>Server: Verify signature, record event
+      Server->>Server: (DB Transaction) Update user subscription status
+      User->>Client: Redirect to /payment-status
+  ```
+### 4.4. File Upload (Cloudflare R2)
+
+The system supports two upload modes, providing optimal choices for different scenarios. All upload rules are centralized in `lib/config/upload.ts`.
+
+#### 4.4.1. Client-side Presigned Upload (UI Recommended)
+
+This is the default method used by the `FileUploader` component, offering better performance.
+
+**Flow Diagram**:
+
+[![Presigned Upload](https://mermaid.ink/img/pako:eNqNU21rUzEY_Sshn1Zoe7u-rTcfBlIRBMXSrV_kfgm9aXfhvpneK2opqJtsa9c5RAdSqToUncO1A3Fit_lnmtz2X5g2W6nrBoYQkifnnJwnyVOFRUcnEMEKeeATu0huGrhMsaXZQDQXU88oGi62PVCoEDobvWWYpOCaDtYJBbgC2OEe3zgODjpBb63f-zlLWCL0oYTyd01W_8jefgU3crdngfn4CJQ1HV8vmZgSEZAgOY7sRBYXp89HYPh0kzf2Fd7Y5Y1Tvrs-cTANm2FNPA-_bQ06z8BccNRj7YbCPn1h3ZehMGCts2BznW03gpP9K_VkUgjk7i0tAwW7huKPNxWXkopRtoke8akJ5gadY370vP-r3j_5UMjfCUkxyZ6SkT4Gvw_6vVP2aksmwl6s8jdd3jy8RMrHEZC6w7214PsZ22kCoS1R-XhkSnfw5zVrta-AnYvN3My1hEv5jzzkCsvi5lo_-PZnmaC0HZo28q_6OWxjh9Xf_8czObacZx3LNYlHxLO0B91VGIZlaugQedQnYWgRauHRElZHmhr0VohFNIjEVCcl7JueBjW7Jmjim913HOuCSR2_vAJRCZsVsfJdHXsX1TCJUmILL1nHtz2I4upYA6IqfARRYj4WTS3EYinRM2oyEU-F4WOIUploUlXVtJpJJ5LpdHq-FoZPxqfGopkFgSG64Tn0rqzCcTHW_gKzZHRj)](https://mermaid.live/edit#pako:eNqNU21rUzEY_Sshn1Zoe7u-rTcfBlIRBMXSrV_kfgm9aXfhvpneK2opqJtsa9c5RAdSqToUncO1A3Fit_lnmtz2X5g2W6nrBoYQkifnnJwnyVOFRUcnEMEKeeATu0huGrhMsaXZQDQXU88oGi62PVCoEDobvWWYpOCaDtYJBbgC2OEe3zgODjpBb63f-zlLWCL0oYTyd01W_8jefgU3crdngfn4CJQ1HV8vmZgSEZAgOY7sRBYXp89HYPh0kzf2Fd7Y5Y1Tvrs-cTANm2FNPA-_bQ06z8BccNRj7YbCPn1h3ZehMGCts2BznW03gpP9K_VkUgjk7i0tAwW7huKPNxWXkopRtoke8akJ5gadY370vP-r3j_5UMjfCUkxyZ6SkT4Gvw_6vVP2aksmwl6s8jdd3jy8RMrHEZC6w7214PsZ22kCoS1R-XhkSnfw5zVrta-AnYvN3My1hEv5jzzkCsvi5lo_-PZnmaC0HZo28q_6OWxjh9Xf_8czObacZx3LNYlHxLO0B91VGIZlaugQedQnYWgRauHRElZHmhr0VohFNIjEVCcl7JueBjW7Jmjim913HOuCSR2_vAJRCZsVsfJdHXsX1TCJUmILL1nHtz2I4upYA6IqfARRYj4WTS3EYinRM2oyEU-F4WOIUploUlXVtJpJJ5LpdHq-FoZPxqfGopkFgSG64Tn0rqzCcTHW_gKzZHRj)
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant FileUploader as Frontend Component
+    participant Server as Server API
+    participant R2 as Cloudflare R2
+    
+    User->>FileUploader: Select/drag files
+    FileUploader->>FileUploader: Client-side validation (type/size), image compression
+    FileUploader->>Server: POST /api/upload/presigned-url (request upload URL)
+    Server->>Server: Verify identity and file metadata
+    Server->>R2: Request presigned URL
+    R2-->>Server: Return presigned URL
+    Server-->>FileUploader: Return presigned URL
+    FileUploader->>R2: PUT (direct file upload)
+    R2-->>FileUploader: Upload success
+    FileUploader->>FileUploader: onUploadComplete callback
+```
+
+#### 4.4.2. Server-side Proxy Upload
+
+This mode allows server-side processing before storage.
+
+**Flow Diagram**:
+
+[![Server-side Upload](https://mermaid.ink/img/pako:eNp1ks9LIzEUx_-V4Z1caDu1P8ZODoLUyx5kpe5J5hI6aR2YmcymM4tr6UEQthTFZauCWvyxp2WV2os_sLr-M02c_S8206BUxRCSvJfP-z7y8ppQpTYBBA3yJSJ-lcw7uM6wZ_maHAFmoVN1AuyHWtl1iNxwQ-P9X6J9_Xh2occbB6J3_pZdIuwrYQkrelu8c8r3f2tzix_fgpVcApVdGtk1FzMiHQpSq8qZnp1Vgkhb_LT0WdNx4OhR4FJs643xRVpZ2pQXuaGTJNBrlHlpG4f4g5JSChNS__5sxhfr8e3ZaHjPf26Kve-j4dUrtpJDmrhc53fbo7uT-G93Eqrk0hNqo5uORET7B-8cv5Mw7g_4_S5vD8TuQGz1-W33BShJ9VxJPuzwwyMl-TjsiqMepKDOHBtQyCKSAo8wDycmNBMNC8IV4hELkDzapIZlFSyw_JYMk2VeptR7imQ0qq8AqmG3Ia0okBV6-vJnLyO-TViZRn4IKJ8fawBqwqq0prOZ4kw2W5SzZBbyuWIKvgEqljIF0zQNs2TkC4ZhTLdSsDbOms2UZiRDbCekbEG12rjjWv8BwdH1ng)](https://mermaid.live/edit#pako:eNp1ks9LIzEUx_-V4Z1caDu1P8ZODoLUyx5kpe5J5hI6aR2YmcymM4tr6UEQthTFZauCWvyxp2WV2os_sLr-M02c_S8206BUxRCSvJfP-z7y8ppQpTYBBA3yJSJ-lcw7uM6wZ_maHAFmoVN1AuyHWtl1iNxwQ-P9X6J9_Xh2occbB6J3_pZdIuwrYQkrelu8c8r3f2tzix_fgpVcApVdGtk1FzMiHQpSq8qZnp1Vgkhb_LT0WdNx4OhR4FJs643xRVpZ2pQXuaGTJNBrlHlpG4f4g5JSChNS__5sxhfr8e3ZaHjPf26Kve-j4dUrtpJDmrhc53fbo7uT-G93Eqrk0hNqo5uORET7B-8cv5Mw7g_4_S5vD8TuQGz1-W33BShJ9VxJPuzwwyMl-TjsiqMepKDOHBtQyCKSAo8wDycmNBMNC8IV4hELkDzapIZlFSyw_JYMk2VeptR7imQ0qq8AqmG3Ia0okBV6-vJnLyO-TViZRn4IKJ8fawBqwqq0prOZ4kw2W5SzZBbyuWIKvgEqljIF0zQNs2TkC4ZhTLdSsDbOms2UZiRDbCekbEG12rjjWv8BwdH1ng)
+
+```mermaid
+sequenceDiagram
+    participant Client as Client/Script
+    participant Server as Server API
+    participant R2 as Cloudflare R2
+    
+    Client->>Server: POST /api/upload/server-upload (multipart/form-data)
+    Server->>Server: Verify identity and file
+    Server->>R2: Stream file
+    R2-->>Server: Upload success
+    Server->>Server: Record to database
+    Server-->>Client: Return upload result
+```
+
+### 4.5. Blog & Content Management (Keystatic)
+
+- **CMS**: Uses `Keystatic` as Git-based CMS, all content stored in Markdown and JSON files under `content/` directory.
+- **Admin Interface**: In development environment, access `/keystatic` to enter admin dashboard. For security, this interface is disabled by default in production.
+- **Content Reading**:
+  - `@keystatic/core/reader` used for safely reading content under `content/` directory on server-side.
+  - `app/(pages)/blog/page.tsx`: Blog list page, reads all articles.
+  - `app/(pages)/blog/[slug]/page.tsx`: Blog detail page, reads single article and uses `@markdoc/markdoc` to parse Markdoc content.
+
+### 4.6. Admin Dashboard
+
+Provides a powerful, extensible data management system.
+
+- **Generic Table Manager**: `components/admin/generic-table/generic-table-manager.tsx` is a core component that can automatically generate a complete CRUD management interface for any table declared in `lib/config/admin-tables.ts`.
+- **Configuration-Driven**:
+  1. Add Drizzle table object in `lib/config/admin-tables.ts`.
+  1. Add navigation link in `genericTableNavigation` in `app/dashboard/_components/app-sidebar.tsx`.
+  1. Access new management page at `/dashboard/admin/tables/[tableName]`.
+- **Server Actions**: All CRUD operations completed through type-safe Server Actions in `lib/actions/admin-generic.ts`, no need to write additional API routes.
+- **Schema Parsing**: `lib/admin/schema-generator.ts` dynamically parses Drizzle schema, automatically generates forms and validation rules (Zod), greatly simplifying backend development.
+
+---
+
+## 5. Secondary Development Guide
+
+### 5.1. Extension Point Identification
+
+- **Add New Pages**: Create new routes in `app/(pages)` or `app/(dashboard)`.
+- **Add New Admin Management Tables**:
+  1. Define new table in `database/schema.ts`.
+  1. Register the table in `enabledTablesMap` in `lib/config/admin-tables.ts`.
+  1. Add navigation link in `app/dashboard/_components/app-sidebar.tsx`.
+- **Add New Payment Provider**:
+  1. Create new provider implementation file under `lib/billing/`, must follow `PaymentProvider` interface in `lib/billing/provider.ts`.
+  1. Modify `PAYMENT_PROVIDER` logic in `lib/billing/index.ts` to switch to new provider.
+- **Customize Email Templates**: Create or modify React Email components in `emails/` directory.
+- **Customize UI Components**: Modify `shadcn/ui` components or add new ones in `components/ui/`.
+
+### 5.2. API Reference
+
+{% table %}
+- Route
+- Method
+- Description
+---
+- `/api/auth/[...all]`
+- GET, POST
+- Handle all `better-auth` authentication requests.
+---
+- `/api/billing/checkout`
+- POST
+- Create payment session.
+---
+- `/api/billing/portal`
+- GET
+- Get customer portal URL.
+---
+- `/api/billing/webhooks/creem`
+- POST
+- Receive Creem webhook events.
+---
+- `/api/upload/presigned-url`
+- POST
+- Get presigned URL for client-side direct upload.
+---
+- `/api/upload/server-upload`
+- POST
+- Server-side proxy file upload.
+---
+- `/api/payment-status`
+- GET
+- Query payment status.
+---
+- `/api/keystatic/[...params]`
+- GET, POST
+- Keystatic CMS API interface (development only).
+{% /table %}
+
+### 5.3. Hooks and Events
+
+- **`useSidebar()`**: Used in dashboard components to control sidebar expand/collapse state.
+- **`useIsMobile()`**: Client-side hook to determine if current device is mobile size, safe for responsive components, avoiding SSR hydration errors.
+- **`useAdminTable()`**: Core hook for driving admin dashboard table components. Encapsulates data fetching, pagination, search, filtering, and loading state management logic.
+- **`onUploadComplete`**: Callback prop for `FileUploader` component, triggered after successful file upload.
+
+---
+
+## 6. Developer Toolchain
+
+### 6.1. Testing Strategy
+
+- **Framework**: Uses `Jest` and `React Testing Library`.
+- **Configuration Files**: `jest.config.ts`, `jest.setup.ts`.
+- **Examples**: Project includes unit test examples for UI components (`logo.test.tsx`), layouts (`layout.test.tsx`), schemas (`auth.schema.test.ts`), and core logic (`database/index.test.ts`).
+- **Run Tests**: `pnpm test`
+
+### 6.2. Code Quality Assurance
+
+- **ESLint**: Configured in `.eslintrc.json`, follows `eslint-config-next` best practices.
+- **Prettier**: Integrated with ESLint, uses `prettier-plugin-tailwindcss` to auto-sort Tailwind CSS classes.
+- **Run Checks**: `pnpm lint` and `pnpm prettier:check`.
+- **Auto Format**: `pnpm prettier:format`.
+
+### 6.3. Bundle Size Analysis
+
+- Uses `@next/bundle-analyzer` to analyze production build bundle size.
+- Run `pnpm analyze` to generate client and server analysis reports.
+- This is crucial for identifying and optimizing large dependencies.
+
+---
+
+## 7. Real-world Application Scenarios
+
+### 7.1. Typical Use Cases
+
+- **Enterprise SaaS**: As starting point for new projects, integrates user management, role permissions, payments, and audit logs (through webhook events) needed by enterprises.
+- **AI Applications**: Quickly build AI tools requiring user login and usage/subscription-based payments. File upload functionality can be used for processing user data.
+- **Paid Content Platforms**: Blog and content management system combined with payment functionality can easily be extended to paid content platforms.
+- **Internal Tools**: Leverage powerful admin dashboard and data management capabilities to quickly build company internal data management tools or dashboards.
+
+---
+
+## 8. Utility Tools
+
+### 8.1. CLI Commands
+
+{% table %}
+- Script
+- Description
+---
+- `pnpm dev`
+- Start development server (Turbo mode)
+---
+- `pnpm build`
+- Build production application
+---
+- `pnpm start`
+- Start production server
+---
+- `pnpm lint`
+- Run ESLint checks
+---
+- `pnpm test`
+- Run Jest unit tests
+---
+- `pnpm prettier:format`
+- Format all code
+---
+- `pnpm db:generate`
+- Generate migration files for development
+---
+- `pnpm db:generate:prod`
+- Generate migration files for production
+---
+- `pnpm db:migrate:dev`
+- Apply development migrations
+---
+- `pnpm db:migrate:prod`
+- Apply production migrations
+---
+- `pnpm db:push`
+- (Development only) Push schema to database
+---
+- `pnpm analyze`
+- Build and analyze bundle size
+---
+- `pnpm set:admin`
+- (Local) Promote user to super admin
+---
+- `pnpm set:admin:prod`
+- (Production) Promote user to super admin
+{% /table %}
+
+### 8.2. Configuration Options
+
+All required and optional environment variables are detailed in the environment configuration section of `README.md`. Be sure to completely fill out the `.env` file.
+
+### 8.3. Utility Functions
+
+`lib/utils.ts` provides some useful utility functions:
+
+- `cn(...inputs)`: Safely merge Tailwind CSS class names and resolve conflicts.
+- `formatCurrency(amount, currency)`: Format amounts in cents to currency strings.
+- `calculateReadingTime(text)`: Calculate estimated reading time based on text content.
+- `renderMarkdoc(node)`: Convert Markdoc AST nodes to plain text strings for generating summaries.
+
+---
+
+## 9. Version Management & Updates
+
+### 9.1. Dependency Management
+
+- **Package Manager**: Project uses `pnpm`, ensure you have it installed globally. `pnpm` leverages content-addressable storage to save disk space and speed up installations.
+- **Version Locking**: `pnpm-lock.yaml` file locks exact versions of all dependencies and their sub-dependencies, ensuring consistency across team members and different deployment environments.
+- **Dependency Updates**: Recommend using `pnpm up --latest` to safely update dependencies, and pay attention to major version change logs.
+
+---
+
+## 10. Best Practices
+
+### 10.1. Performance Optimization
+
+- **Code Splitting**: Use `next/dynamic` for dynamic imports of large components, like dynamic imports for each settings page in `app/dashboard/settings/_components/settings.tsx`.
+- **Image Optimization**: Prioritize using Next.js `<Image>` component, which automatically performs image size optimization, format conversion (like WebP), and lazy loading.
+- **Server Components**: Use React Server Components (RSC) as much as possible for data fetching and logic execution, reducing JavaScript code sent to client.
+- **Database Queries**: Avoid executing database queries in loops. Leverage Drizzle ORM's join and batch operation capabilities to reduce database round trips.
+
+### 10.2. Security Considerations
+
+- **Environment Variables**: **Never** commit `.env` file to Git repository. Use secret management tools from platforms like Vercel to store production environment variables.
+- **Route Protection**: `middleware.ts` is the first line of defense, but **must** use functions like `requireAuth`, `requireAdmin` in Server Actions and API routes for backend permission verification.
+- **SQL Injection**: Using Drizzle ORM effectively prevents SQL injection attacks because it automatically parameterizes queries.
+- **XSS**: Next.js and React escape JSX content by default, preventing cross-site scripting attacks. When handling user-generated content, use mature libraries (like `DOMPurify`) for sanitization.
+- **Webhook Security**: Signature verification in `lib/billing/creem/webhook.ts` is key to ensuring webhook requests come from trusted sources.
+
+### 10.3. Deployment Guide
+
+**Vercel** deployment is recommended.
+
+1. Push your code to GitHub/GitLab/Bitbucket repository.
+1. Import the Git repository in Vercel.
+1. Vercel will automatically detect Next.js project and configure build settings.
+1. In Vercel project's `Settings > Environment Variables`, add all environment variables defined in your `.env` file.
+1. Configure production database migration process in your CI/CD pipeline, ensuring `pnpm db:migrate:prod` runs after each successful deployment.
+1. Each push to main branch will automatically build and deploy your application on Vercel.
+
+---
+
+## 11. Community & Ecosystem
+
+### 11.1. Community Resources
+
+- **Official Repository**: [UllrAI SaaS Starter on GitHub](https://github.com/ullrai/saas-starter)
+- **Issues & Discussions**: Use GitHub Issues to submit bug reports and feature requests.
+- **Main Dependency Documentation**:
+  - [Next.js](https://nextjs.org/docs)
+  - [Drizzle ORM](https://orm.drizzle.team/docs)
+  - [Better-Auth](https://better-auth.com/docs)
+  - [Creem](https://creem.io/docs)
+  - [shadcn/ui](https://ui.shadcn.com/docs)
+  - [Keystatic](https://keystatic.com/docs)
+
+### 11.2. Contribution Guidelines
+
+We welcome community contributions!
+
+1. Fork this project repository.
+1. Create a new branch (`git checkout -b feature/your-feature-name`).
+1. Make changes and commit (`git commit -m 'feat: Add some feature'`).
+1. Push your branch to forked repository (`git push origin feature/your-feature-name`).
+1. Create a Pull Request.
+
+---
+
+## 12. Troubleshooting
+
+### 12.1. Common Issues FAQ
+
+**Q: Why can't I access the `/keystatic` admin dashboard?**
+
+A: Keystatic admin interface is only enabled in development environment (`NODE_ENV=development`) by default for security. You need to run `pnpm dev` locally to access it.
+
+**Q: File upload fails with CORS error.**
+
+A: This is the most common file upload issue. Make sure you have correctly configured CORS policy in your Cloudflare R2 bucket settings, allowing `PUT` and `GET` requests from your deployment domain and `http://localhost:3000`.
+
+**Q: How to set up the first admin account?**
+
+A: The system doesn't automatically set up admins. You need to:
+
+1. First register an account normally in the app with the email you want to make admin.
+1. Run `pnpm set:admin --email=your-email@example.com` (local) or `pnpm set:admin:prod --email=your-email@example.com` (production) in your project root directory.
+
+**Q: Social login doesn't work, what to do?**
+
+A: Please check the following:
+
+1. Make sure you correctly filled in the corresponding social platform's `CLIENT_ID` and `CLIENT_SECRET` in the `.env` file.
+1. Make sure in the social platform's OAuth app configuration (like Google Cloud Console, GitHub Developer Settings), you've added `http://localhost:3000/api/auth/[provider]/callback` and your production domain's callback URL to the authorized callback URL list.

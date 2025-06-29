@@ -1,236 +1,238 @@
 # UllrAI SaaS Starter Kit
 
-🚧 注意：此项目当前仍然在密集完善及修改中
+[中文版](README.zh-CN.md) | English
 
-⚠️ 暂不建议在生产环境使用
+🚧 Note: This project is currently under intensive development and modification
+
+⚠️ Not recommended for production use yet
 
 ---
 
 <!-- [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/ullrai/saas-starter) -->
 
-这是一个免费、开源、生产就绪的全栈 SaaS 入门套件，旨在帮助您以前所未有的速度启动下一个项目。它集成了现代 Web 开发中备受推崇的工具和实践，为您提供了一个坚实的基础。
+This is a free, open-source, production-ready full-stack SaaS starter kit designed to help you launch your next project at unprecedented speed. It integrates modern web development tools and practices to provide you with a solid foundation.
 
 ![UllrAI SaaS Starter Kit](./public/og.png)
 
-## ✨ 功能特性
+## ✨ Features
 
-本入门套件提供了一系列强大的功能，可帮助您快速构建功能齐全的 SaaS 应用：
+This starter kit provides a comprehensive set of powerful features to help you quickly build full-featured SaaS applications:
 
-- **身份验证 (Better-Auth + Resend):** 集成了 [Better-Auth](https://better-auth.com/)，提供安全的魔术链接登录和第三方 OAuth 功能。使用 [Resend](https://resend.com/) 提供可靠的邮件发送服务，并集成 Mailchecker 避免临时邮箱。
-- **现代 Web 框架 (Next.js 15 + TypeScript):** 基于最新的 [Next.js 15](https://nextjs.org/)，使用 App Router 和服务器组件。整个项目采用严格的 TypeScript 类型检查。
-- **数据库与 ORM (Drizzle + PostgreSQL):** 使用 [Drizzle ORM](https://orm.drizzle.team/) 进行类型安全的数据库操作，并与 PostgreSQL 深度集成。支持模式迁移和优化的查询。
-- **支付与订阅 (Creem):** 集成了 [Creem](https://creem.io/) 作为支付提供商，轻松处理订阅和一次性支付。
-- **UI 组件库 (shadcn/ui + Tailwind CSS):** 使用 [shadcn/ui](https://ui.shadcn.com/) 构建，它是一个基于 Radix UI 和 Tailwind CSS 的可访问、可组合的组件库，内置主题支持。
-- **表单处理 (Zod + React Hook Form):** 通过 [Zod](https://zod.dev/) 和 [React Hook Form](https://react-hook-form.com/) 实现强大的、类型安全的表单验证。
-- **文件上传 (Cloudflare R2):** 基于 Cloudflare R2 的安全文件上传系统，支持客户端直传和多种文件类型与大小限制。
-- **博客系统 (Keystatic):** 集成 [Keystatic](https://keystatic.com/) 作为 CMS，提供 Markdown/MDX 内容管理能力，方便创建和管理博客文章。
-- **代码质量:** 内置 ESLint 和 Prettier，确保代码风格统一和质量。
+- **Authentication (Better-Auth + Resend):** Integrated with [Better-Auth](https://better-auth.com/), providing secure magic link login and third-party OAuth functionality. Uses [Resend](https://resend.com/) for reliable email delivery with Mailchecker integration to avoid temporary emails.
+- **Modern Web Framework (Next.js 15 + TypeScript):** Built on the latest [Next.js 15](https://nextjs.org/) with App Router and Server Components. The entire project uses strict TypeScript type checking.
+- **Database & ORM (Drizzle + PostgreSQL):** Uses [Drizzle ORM](https://orm.drizzle.team/) for type-safe database operations with deep PostgreSQL integration. Supports schema migrations and optimized queries.
+- **Payments & Subscriptions (Creem):** Integrated with [Creem](https://creem.io/) as the payment provider for easy subscription and one-time payment handling.
+- **UI Component Library (shadcn/ui + Tailwind CSS):** Built with [shadcn/ui](https://ui.shadcn.com/), an accessible, composable component library based on Radix UI and Tailwind CSS with built-in theme support.
+- **Form Handling (Zod + React Hook Form):** Powerful, type-safe form validation through [Zod](https://zod.dev/) and [React Hook Form](https://react-hook-form.com/).
+- **File Upload (Cloudflare R2):** Secure file upload system based on Cloudflare R2, supporting client-side direct upload with various file type and size restrictions.
+- **Blog System (Keystatic):** Integrated [Keystatic](https://keystatic.com/) as CMS, providing Markdown/MDX content management capabilities for easy blog creation and management.
+- **Code Quality:** Built-in ESLint and Prettier to ensure consistent code style and quality.
 
-## 🛠️ 技术栈
+## 🛠️ Tech Stack
 
-| 分类       | 技术                                                                                                                                                  |
-| :--------- | :---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **框架**   | [Next.js](https://nextjs.org/) 15                                                                                                                     |
-| **语言**   | [TypeScript](https://www.typescriptlang.org/)                                                                                                         |
-| **UI**     | [React](https://react.dev/), [shadcn/ui](https://ui.shadcn.com/), [Tailwind v4](https://tailwindcss.com/), [Lucide React](https://lucide.dev/) (图标) |
-| **认证**   | [Better-Auth](https://better-auth.com/)                                                                                                               |
-| **数据库** | [PostgreSQL](https://www.postgresql.org/)                                                                                                             |
-| **ORM**    | [Drizzle ORM](https://orm.drizzle.team/)                                                                                                              |
-| **支付**   | [Creem](https://creem.io/)                                                                                                                            |
-| **邮件**   | [Resend](https://resend.com/), [React Email](https://react.email/)                                                                                    |
-| **表单**   | [React Hook Form](https://react-hook-form.com/), [Zod](https://zod.dev/)                                                                              |
-| **部署**   | [Vercel](https://vercel.com/)                                                                                                                         |
-| **包管理** | [pnpm](https://pnpm.io/)                                                                                                                              |
+| Category      | Technology                                                                                                                                              |
+| :------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Framework** | [Next.js](https://nextjs.org/) 15                                                                                                                      |
+| **Language**  | [TypeScript](https://www.typescriptlang.org/)                                                                                                          |
+| **UI**        | [React](https://react.dev/), [shadcn/ui](https://ui.shadcn.com/), [Tailwind v4](https://tailwindcss.com/), [Lucide React](https://lucide.dev/) (icons) |
+| **Auth**      | [Better-Auth](https://better-auth.com/)                                                                                                                |
+| **Database**  | [PostgreSQL](https://www.postgresql.org/)                                                                                                              |
+| **ORM**       | [Drizzle ORM](https://orm.drizzle.team/)                                                                                                               |
+| **Payments**  | [Creem](https://creem.io/)                                                                                                                             |
+| **Email**     | [Resend](https://resend.com/), [React Email](https://react.email/)                                                                                     |
+| **Forms**     | [React Hook Form](https://react-hook-form.com/), [Zod](https://zod.dev/)                                                                               |
+| **Deployment** | [Vercel](https://vercel.com/)                                                                                                                          |
+| **Package Manager** | [pnpm](https://pnpm.io/)                                                                                                                         |
 
-## 🚀 快速上手
+## 🚀 Quick Start
 
-### 1. 环境准备
+### 1. Environment Setup
 
-确保您的开发环境中已安装以下软件：
+Ensure you have the following software installed in your development environment:
 
-- [Node.js](https://nodejs.org/en/) (推荐 v20.x 或更高版本)
+- [Node.js](https://nodejs.org/en/) (recommended v20.x or higher)
 - [pnpm](https://pnpm.io/installation)
 
-### 2. 项目克隆与安装
+### 2. Project Clone & Installation
 
 ```bash
-# 克隆项目仓库
+# Clone the repository
 git clone https://github.com/ullrai/saas-starter.git
 
-# 进入项目目录
+# Enter project directory
 cd saas-starter
 
-# 使用 pnpm 安装依赖
+# Install dependencies with pnpm
 pnpm install
 ```
 
-### 3. 环境配置
+### 3. Environment Configuration
 
-项目通过环境变量进行配置。首先，复制示例文件：
+The project is configured through environment variables. First, copy the example file:
 
 ```bash
 cp .env.example .env
 ```
 
-然后，编辑 `.env` 文件，填入所有必需的值。
+Then edit the `.env` file and fill in all required values.
 
-#### 环境变量说明
+#### Environment Variables
 
-| 变量名                   | 描述                                            | 示例                                                |
-| :----------------------- | :---------------------------------------------- | :-------------------------------------------------- |
-| `DATABASE_URL`           | **必需。** PostgreSQL 连接字符串。              | `postgresql://user:password@localhost:5432/db_name` |
-| `NEXT_PUBLIC_APP_URL`    | **必需。** 您应用部署后的公开 URL。             | `http://localhost:3000` 或 `https://yourdomain.com` |
-| `BETTER_AUTH_SECRET`     | **必需。** 用于加密会话的密钥，必须是32个字符。 | `a_very_secure_random_32_char_string`               |
-| `RESEND_API_KEY`         | **必需。** 用于发送邮件的 Resend API Key。      | `re_xxxxxxxxxxxxxxxx`                               |
-| `CREEM_API_KEY`          | **必需。** Creem 的 API Key。                   | `your_creem_api_key`                                |
-| `CREEM_ENVIRONMENT`      | **必需。** Creem 环境模式。                     | `test_mode` 或 `live_mode`                          |
-| `CREEM_WEBHOOK_SECRET`   | **必需。** Creem Webhook 密钥。                 | `whsec_your_webhook_secret`                         |
-| `R2_ENDPOINT`            | **必需。** Cloudflare R2 API 端点。             | `https://<ACCOUNT_ID>.r2.cloudflarestorage.com`     |
-| `R2_ACCESS_KEY_ID`       | **必需。** R2 访问密钥 ID。                     | `your_r2_access_key_id`                             |
-| `R2_SECRET_ACCESS_KEY`   | **必需。** R2 秘密访问密钥。                    | `your_r2_secret_access_key`                         |
-| `R2_BUCKET_NAME`         | **必需。** R2 存储桶名称。                      | `your_r2_bucket_name`                               |
-| `R2_PUBLIC_URL`          | **必需。** R2 存储桶的公共访问 URL。            | `https://your-bucket.your-account.r2.dev`           |
-| `GITHUB_CLIENT_ID`       | _可选。_ 用于 GitHub OAuth 的 Client ID。       | `your_github_client_id`                             |
-| `GITHUB_CLIENT_SECRET`   | _可选。_ 用于 GitHub OAuth 的 Client Secret。   | `your_github_client_secret`                         |
-| `GOOGLE_CLIENT_ID`       | _可选。_ 用于 Google OAuth 的 Client ID。       | `your_google_client_id`                             |
-| `GOOGLE_CLIENT_SECRET`   | _可选。_ 用于 Google OAuth 的 Client Secret。   | `your_google_client_secret`                         |
-| `LINKEDIN_CLIENT_ID`     | _可选。_ 用于 LinkedIn OAuth 的 Client ID。     | `your_linkedin_client_id`                           |
-| `LINKEDIN_CLIENT_SECRET` | _可选。_ 用于 LinkedIn OAuth 的 Client Secret。 | `your_linkedin_client_secret`                       |
+| Variable Name            | Description                                         | Example                                             |
+| :----------------------- | :-------------------------------------------------- | :-------------------------------------------------- |
+| `DATABASE_URL`           | **Required.** PostgreSQL connection string.        | `postgresql://user:password@localhost:5432/db_name` |
+| `NEXT_PUBLIC_APP_URL`    | **Required.** Public URL of your deployed app.     | `http://localhost:3000` or `https://yourdomain.com` |
+| `BETTER_AUTH_SECRET`     | **Required.** Key for encrypting sessions, must be 32 characters. | `a_very_secure_random_32_char_string`         |
+| `RESEND_API_KEY`         | **Required.** Resend API Key for sending emails.   | `re_xxxxxxxxxxxxxxxx`                               |
+| `CREEM_API_KEY`          | **Required.** Creem API Key.                        | `your_creem_api_key`                                |
+| `CREEM_ENVIRONMENT`      | **Required.** Creem environment mode.               | `test_mode` or `live_mode`                          |
+| `CREEM_WEBHOOK_SECRET`   | **Required.** Creem webhook secret.                 | `whsec_your_webhook_secret`                         |
+| `R2_ENDPOINT`            | **Required.** Cloudflare R2 API endpoint.           | `https://<ACCOUNT_ID>.r2.cloudflarestorage.com`     |
+| `R2_ACCESS_KEY_ID`       | **Required.** R2 access key ID.                     | `your_r2_access_key_id`                             |
+| `R2_SECRET_ACCESS_KEY`   | **Required.** R2 secret access key.                 | `your_r2_secret_access_key`                         |
+| `R2_BUCKET_NAME`         | **Required.** R2 bucket name.                       | `your_r2_bucket_name`                               |
+| `R2_PUBLIC_URL`          | **Required.** Public access URL for R2 bucket.      | `https://your-bucket.your-account.r2.dev`           |
+| `GITHUB_CLIENT_ID`       | _Optional._ GitHub OAuth Client ID.                 | `your_github_client_id`                             |
+| `GITHUB_CLIENT_SECRET`   | _Optional._ GitHub OAuth Client Secret.             | `your_github_client_secret`                         |
+| `GOOGLE_CLIENT_ID`       | _Optional._ Google OAuth Client ID.                 | `your_google_client_id`                             |
+| `GOOGLE_CLIENT_SECRET`   | _Optional._ Google OAuth Client Secret.             | `your_google_client_secret`                         |
+| `LINKEDIN_CLIENT_ID`     | _Optional._ LinkedIn OAuth Client ID.               | `your_linkedin_client_id`                           |
+| `LINKEDIN_CLIENT_SECRET` | _Optional._ LinkedIn OAuth Client Secret.           | `your_linkedin_client_secret`                       |
 
-> **提示:** 您可以使用以下命令生成一个安全的密钥：
+> **Tip:** You can generate a secure key using the following command:
 > `openssl rand -base64 32`
 
-### 4. 数据库设置
+### 4. Database Setup
 
-本项目使用 Drizzle ORM 进行数据库迁移。为了确保开发和生产环境的隔离，项目配置了两个独立的数据库配置文件：
+This project uses Drizzle ORM for database migrations. To ensure isolation between development and production environments, the project is configured with two separate database configuration files:
 
-- `database/config.ts` - 开发环境配置，迁移文件输出到 `database/migrations/development/`
-- `database/config.prod.ts` - 生产环境配置，迁移文件输出到 `database/migrations/production/`
+- `database/config.ts` - Development environment configuration, migration files output to `database/migrations/development/`
+- `database/config.prod.ts` - Production environment configuration, migration files output to `database/migrations/production/`
 
-#### 开发环境
+#### Development Environment
 
-对于本地开发，推荐使用 `push` 命令直接将 `schema.ts` 的变更同步到数据库：
+For local development, we recommend using the `push` command to directly sync `schema.ts` changes to the database:
 
 ```bash
-# 确保本地 PostgreSQL 数据库正在运行
+# Ensure local PostgreSQL database is running
 pnpm db:push
 ```
 
-或者，您也可以使用传统的迁移文件方式：
+Alternatively, you can use the traditional migration file approach:
 
 ```bash
-pnpm db:generate  # 基于 schema 变更生成迁移文件
-pnpm db:migrate:dev # 将迁移文件应用到开发数据库
+pnpm db:generate  # Generate migration files based on schema changes
+pnpm db:migrate:dev # Apply migration files to development database
 ```
 
-#### 生产环境
+#### Production Environment
 
-**重要：** 生产环境**必须**使用基于 SQL 迁移文件的方式，以确保数据库变更的可追溯性和安全性。
+**Important:** Production environments **must** use SQL migration file-based approach to ensure traceability and security of database changes.
 
 ```bash
-# 1. 在开发环境中，基于 schema 变更生成迁移文件
+# 1. In development environment, generate migration files based on schema changes
 pnpm db:generate
 
-# 2. 为生产环境生成迁移文件（使用独立的生产配置）
+# 2. Generate migration files for production environment (using separate production config)
 pnpm db:generate:prod
 
-# 3. 将代码（包含新生成的迁移文件）部署到生产环境
+# 3. Deploy code (including newly generated migration files) to production environment
 
-# 4. 在生产环境中（通常通过 CI/CD 流程），应用迁移
+# 4. In production environment (usually through CI/CD pipeline), apply migrations
 pnpm db:migrate:prod
 ```
 
-> **安全提示：**
+> **Security Tips:**
 >
-> - **切勿**在生产环境中使用 `pnpm db:push`。
-> - 生产环境迁移应通过 CI/CD 流程自动化执行。
-> - 在应用迁移前，务必备份生产数据库。
+> - **Never** use `pnpm db:push` in production environment.
+> - Production environment migrations should be automated through CI/CD pipelines.
+> - Always backup production database before applying migrations.
 
-### 5. 内容管理 (Keystatic)
+### 5. Content Management (Keystatic)
 
-项目使用 Keystatic 作为内容管理系统 (CMS)，用于管理博客文章等内容。
+The project uses Keystatic as a Content Management System (CMS) for managing blog posts and other content.
 
-- **访问方式:** 在开发环境中，您可以通过访问 `/keystatic` 路径来进入 Keystatic 的管理界面。
-- **生产环境限制:** 为了安全起见，Keystatic 的管理界面和相关 API 在生产环境中默认是禁用的。这意味着在部署到生产服务器后，无法通过 `/keystatic` 路径访问管理后台。
+- **Access Method:** In development environment, you can access Keystatic's management interface by visiting the `/keystatic` path.
+- **Production Environment Limitation:** For security reasons, Keystatic's management interface and related APIs are disabled by default in production environment. This means you cannot access the management backend through the `/keystatic` path after deployment to production servers.
 
-### 6. 启动开发服务器
+### 6. Start Development Server
 
 ```bash
 pnpm dev
 ```
 
-现在，您的应用应该已经在 [http://localhost:3000](http://localhost:3000) 上运行了！
+Now your application should be running at [http://localhost:3000](http://localhost:3000)!
 
-### 6. 管理员账户设置
+### 7. Admin Account Setup
 
-为了安全起见，系统不再自动将第一个注册的用户设置为超级管理员。您需要通过一个安全脚本来手动指定超级管理员。
+For security reasons, the system no longer automatically sets the first registered user as super admin. You need to manually specify the super admin through a secure script.
 
-**设置流程：**
+**Setup Process:**
 
-1.  首先，确保您想要提升为管理员的用户已经通过常规方式在系统中注册了一个账户。
-2.  在您的服务器（使用环境变量）或本地开发环境中（使用.env文件作为环境变量），运行以下命令。
-    服务器环境中可用：
+1. First, ensure the user you want to promote to admin has already registered an account in the system through normal registration.
+2. In your server (using environment variables) or local development environment (using .env file as environment variables), run the following command.
+   Available in server environment:
 
-    ```bash
-    pnpm set:admin:prod --email=your-email@example.com
-    ```
+   ```bash
+   pnpm set:admin:prod --email=your-email@example.com
+   ```
 
-    本地开发环境中可用：
+   Available in local development environment:
 
-    ```bash
-    pnpm set:admin --email=your-email@example.com
-    ```
+   ```bash
+   pnpm set:admin --email=your-email@example.com
+   ```
 
-    将 `your-email@example.com` 替换为您要提升的用户的注册邮箱。
+   Replace `your-email@example.com` with the registered email of the user you want to promote.
 
-3.  脚本执行成功后，该用户将拥有超级管理员 (`super_admin`) 权限，可以访问 `/dashboard/admin` 路径下的所有管理功能。
+3. After successful script execution, the user will have super admin (`super_admin`) privileges and can access all management functions under the `/dashboard/admin` path.
 
-**安全提示：**
+**Security Tips:**
 
-- 请确保只将此权限授予受信任的用户。
-- 此命令应在安全的环境中执行，避免暴露敏感信息。
+- Please ensure this privilege is only granted to trusted users.
+- This command should be executed in a secure environment to avoid exposing sensitive information.
 
-## 📜 可用脚本
+## 📜 Available Scripts
 
-#### 应用脚本
+#### Application Scripts
 
-| 脚本                   | 描述                               |
-| :--------------------- | :--------------------------------- |
-| `pnpm dev`             | 启动开发服务器。                   |
-| `pnpm build`           | 为生产环境构建应用。               |
-| `pnpm start`           | 启动生产服务器。                   |
-| `pnpm lint`            | 检查代码中的 linting 错误。        |
-| `pnpm test`            | 运行单元测试并生成覆盖率报告。     |
-| `pnpm prettier:format` | 使用 Prettier 格式化所有代码。     |
-| `pnpm set:admin`       | 将指定邮箱的用户提升为超级管理员。 |
+| Script                 | Description                                    |
+| :--------------------- | :--------------------------------------------- |
+| `pnpm dev`             | Start development server.                      |
+| `pnpm build`           | Build application for production.              |
+| `pnpm start`           | Start production server.                       |
+| `pnpm lint`            | Check code for linting errors.                 |
+| `pnpm test`            | Run unit tests and generate coverage report.    |
+| `pnpm prettier:format` | Format all code using Prettier.               |
+| `pnpm set:admin`       | Promote specified email user to super admin.   |
 
-#### 包体积分析脚本
+#### Bundle Analysis Scripts
 
-| 脚本               | 描述                           |
-| :----------------- | :----------------------------- |
-| `pnpm analyze`     | 构建应用并生成包体积分析报告。 |
-| `pnpm analyze:dev` | 在开发模式下启用包体积分析。   |
+| Script             | Description                                    |
+| :----------------- | :--------------------------------------------- |
+| `pnpm analyze`     | Build application and generate bundle analysis report. |
+| `pnpm analyze:dev` | Enable bundle analysis in development mode.    |
 
-#### 数据库脚本
+#### Database Scripts
 
-| 脚本                    | 描述                                        | 环境 |
-| :---------------------- | :------------------------------------------ | :--- |
-| `pnpm db:generate`      | 基于模式变更生成 SQL 迁移文件。             | 开发 |
-| `pnpm db:generate:prod` | 为生产环境生成 SQL 迁移文件。               | 生产 |
-| `pnpm db:push`          | **仅用于开发。** 直接推送模式变更到数据库。 | 开发 |
-| `pnpm db:migrate:dev`   | 将迁移文件应用到开发数据库。                | 开发 |
-| `pnpm db:migrate:prod`  | **用于生产。** 将迁移文件应用到生产数据库。 | 生产 |
+| Script                  | Description                                           | Environment |
+| :---------------------- | :---------------------------------------------------- | :---------- |
+| `pnpm db:generate`      | Generate SQL migration files based on schema changes. | Development |
+| `pnpm db:generate:prod` | Generate SQL migration files for production.          | Production  |
+| `pnpm db:push`          | **Development only.** Push schema changes directly to database. | Development |
+| `pnpm db:migrate:dev`   | Apply migration files to development database.        | Development |
+| `pnpm db:migrate:prod`  | **Production use.** Apply migration files to production database. | Production |
 
-## 📁 文件上传功能
+## 📁 File Upload Feature
 
-本项目集成了基于 Cloudflare R2 的安全文件上传系统。
+This project integrates a secure file upload system based on Cloudflare R2.
 
-### 1. Cloudflare R2 配置
+### 1. Cloudflare R2 Configuration
 
-1.  **创建 R2 存储桶**：登录 Cloudflare Dashboard，导航到 R2 并创建一个新的存储桶。
-2.  **获取 API 令牌**：在 R2 概览页面，点击 "Manage R2 API Tokens"，创建一个具有“对象读写”权限的令牌。记下 `Access Key ID` 和 `Secret Access Key`。
-3.  **设置环境变量**：将您的 R2 凭证和信息填入 `.env` 文件。
-4.  **配置 CORS 策略**：为了允许浏览器直接上传文件，需要在您的 R2 存储桶的“设置”中配置 CORS 策略。添加以下配置，并将 `AllowedOrigins` 中的 URL 替换为您自己的：
+1. **Create R2 Bucket**: Log into Cloudflare Dashboard, navigate to R2 and create a new bucket.
+2. **Get API Token**: In the R2 overview page, click "Manage R2 API Tokens", create a token with "Object Read & Write" permissions. Note down the `Access Key ID` and `Secret Access Key`.
+3. **Set Environment Variables**: Fill your R2 credentials and information into the `.env` file.
+4. **Configure CORS Policy**: To allow browsers to upload files directly, you need to configure CORS policy in your R2 bucket's "Settings". Add the following configuration, replacing the URLs in `AllowedOrigins` with your own:
 
 ```json
 [
@@ -244,19 +246,19 @@ pnpm dev
 ]
 ```
 
-### 2. 使用 `FileUploader` 组件
+### 2. Using the `FileUploader` Component
 
-我们提供了一个强大的 `FileUploader` 组件，支持拖拽、进度显示、图片压缩和错误处理。
+We provide a powerful `FileUploader` component that supports drag-and-drop, progress display, image compression, and error handling.
 
-#### 基本用法
+#### Basic Usage
 
 ```tsx
 import { FileUploader } from "@/components/ui/file-uploader";
 
 function MyComponent() {
   const handleUploadComplete = (files) => {
-    console.log("上传完成:", files);
-    // 在此处理上传成功的文件信息
+    console.log("Upload complete:", files);
+    // Handle uploaded file information here
   };
 
   return (
@@ -270,65 +272,65 @@ function MyComponent() {
 }
 ```
 
-#### 图片压缩
+#### Image Compression
 
-组件内置了客户端图片压缩功能，可在上传前减小图片体积，节省带宽和存储空间。
+The component includes built-in client-side image compression functionality that can reduce image file size before upload, saving bandwidth and storage space.
 
 ```tsx
 <FileUploader
   acceptedFileTypes={["image/png", "image/jpeg", "image/webp"]}
   enableImageCompression={true}
-  imageCompressionQuality={0.7} // 压缩质量 (0.1-1.0)
-  imageCompressionMaxWidth={1200} // 压缩后最大宽度
+  imageCompressionQuality={0.7} // Compression quality (0.1-1.0)
+  imageCompressionMaxWidth={1200} // Maximum width after compression
 />
 ```
 
-## 📊 包体积监控与优化
+## 📊 Bundle Size Monitoring & Optimization
 
-本项目集成了 `@next/bundle-analyzer`，帮助您分析和优化应用的包体积。
+This project integrates `@next/bundle-analyzer` to help you analyze and optimize your application's bundle size.
 
-### 如何运行分析
+### How to Run Analysis
 
 ```bash
-# 分析生产构建
+# Analyze production build
 pnpm analyze
 
-# 在开发模式下进行分析
+# Analyze in development mode
 pnpm analyze:dev
 ```
 
-执行后，会自动在浏览器中打开客户端和服务端的包体积分析报告。
+After execution, bundle size analysis reports for both client and server will automatically open in your browser.
 
-### 优化策略
+### Optimization Strategies
 
-- **动态导入**：对非首屏必需的大型组件或库使用 `next/dynamic` 进行代码分割。
-- **依赖优化**：
-  - **Tree Shaking**: 确保只从库中导入您需要的部分，例如 `import { debounce } from 'lodash-es';` 而不是 `import _ from 'lodash';`。
-  - **轻量替代**: 考虑使用更轻量的库，例如用 `date-fns` 替代 `moment.js`。
-- **图片优化**: 优先使用 Next.js 的 `<Image>` 组件，并启用 WebP 格式。
+- **Dynamic Imports**: Use `next/dynamic` for code splitting of large components or libraries that aren't needed on first screen.
+- **Dependency Optimization**:
+  - **Tree Shaking**: Ensure you only import what you need from libraries, e.g., `import { debounce } from 'lodash-es';` instead of `import _ from 'lodash';`.
+  - **Lightweight Alternatives**: Consider using lighter libraries, e.g., replace `moment.js` with `date-fns`.
+- **Image Optimization**: Prioritize using Next.js `<Image>` component and enable WebP format.
 
-## ☁️ 部署
+## ☁️ Deployment
 
-推荐使用 [Vercel](https://vercel.com) 进行部署，因为它与 Next.js 无缝集成。
+We recommend using [Vercel](https://vercel.com) for deployment as it seamlessly integrates with Next.js.
 
-1.  **推送到 Git 仓库:**
-    将您的代码推送到 GitHub、GitLab 或 Bitbucket 仓库。
+1. **Push to Git Repository:**
+   Push your code to a GitHub, GitLab, or Bitbucket repository.
 
-2.  **在 Vercel 中导入项目:**
+2. **Import Project in Vercel:**
 
-    - 登录您的 Vercel 账户，点击 "Add New... > Project"，然后选择您的 Git 仓库。
-    - Vercel 会自动检测到这是一个 Next.js 项目并配置好构建设置。
+   - Log into your Vercel account, click "Add New... > Project", then select your Git repository.
+   - Vercel will automatically detect this is a Next.js project and configure the build settings.
 
-3.  **配置环境变量:**
+3. **Configure Environment Variables:**
 
-    - 在 Vercel 项目的 "Settings" -> "Environment Variables" 中，添加您在 `.env` 文件中定义的所有环境变量。**请勿将 `.env` 文件提交到 Git 仓库中**。
+   - In your Vercel project's "Settings" -> "Environment Variables", add all the environment variables you defined in your `.env` file. **Do not commit the `.env` file to your Git repository**.
 
-4.  **配置生产数据库迁移:**
-    在部署成功后，单独执行数据库迁移：`pnpm db:migrate:prod`
+4. **Configure Production Database Migration:**
+   After successful deployment, execute database migration separately: `pnpm db:migrate:prod`
 
-5.  **部署!**
-    完成上述步骤后，Vercel 会在您每次推送到主分支时自动构建和部署您的应用。
+5. **Deploy!**
+   After completing the above steps, Vercel will automatically build and deploy your application every time you push to the main branch.
 
-## 📄 许可证
+## 📄 License
 
-本项目采用 [MIT](https://github.com/ullrai/saas-starter/blob/main/LICENSE) 许可证。
+This project is licensed under the [MIT](https://github.com/ullrai/saas-starter/blob/main/LICENSE) license.

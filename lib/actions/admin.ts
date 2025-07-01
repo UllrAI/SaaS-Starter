@@ -35,7 +35,7 @@ import {
 } from "@/lib/config/products";
 import { createSafeActionClient } from "next-safe-action";
 import { z } from "zod";
-import { requireAdmin, requireSuperAdmin } from "../auth/permissions";
+import { requireAdmin } from "../auth/permissions";
 import { revalidatePath } from "next/cache";
 import { creemClient } from "../billing/creem/client";
 import env from "@/env";
@@ -50,12 +50,6 @@ const actionClient = createSafeActionClient();
 
 const adminAction = actionClient.use(async ({ next }) => {
   const user = await requireAdmin();
-  return next({ ctx: { user } });
-});
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const superAdminAction = actionClient.use(async ({ next }) => {
-  const user = await requireSuperAdmin();
   return next({ ctx: { user } });
 });
 

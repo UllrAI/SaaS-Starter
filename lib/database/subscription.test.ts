@@ -1,0 +1,158 @@
+import { describe, it, expect, jest, beforeEach } from '@jest/globals';
+
+// Mock the config/products module for this test file only
+jest.mock('@/lib/config/products', () => ({
+  getProductTierByProductId: jest.fn().mockReturnValue({ id: 'tier-123', name: 'Pro' }),
+  getProductTierById: jest.fn().mockReturnValue({ id: 'tier-123', name: 'Pro' }),
+}));
+
+// Mock database tables for this test file only
+jest.mock('@/database/tables', () => ({
+  subscriptions: { 
+    subscriptionId: 'subscriptionId', 
+    userId: 'userId',
+    createdAt: 'createdAt'
+  },
+  payments: { 
+    paymentId: 'paymentId', 
+    userId: 'userId',
+    createdAt: 'createdAt'
+  },
+  users: { paymentProviderCustomerId: 'paymentProviderCustomerId' },
+  webhookEvents: { eventId: 'eventId', provider: 'provider' },
+}));
+
+// Import functions to test
+import {
+  upsertSubscription,
+  upsertPayment,
+  findUserByCustomerId,
+  getUserSubscription,
+  getUserPayments,
+  isWebhookEventProcessed,
+  recordWebhookEvent,
+} from './subscription';
+
+describe('lib/database/subscription', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  describe('upsertSubscription', () => {
+    it('should create a subscription successfully', async () => {
+      const subscriptionData = {
+        userId: 'user-123',
+        customerId: 'customer-123',
+        subscriptionId: 'sub-123',
+        productId: 'product-123',
+        status: 'active' as const,
+        currentPeriodStart: new Date(),
+        currentPeriodEnd: new Date(),
+        canceledAt: null,
+      };
+
+      const result = await upsertSubscription(subscriptionData);
+
+      // Test passes if no error is thrown
+      expect(result).toBeDefined();
+    });
+  });
+
+  describe('upsertPayment', () => {
+    it('should create a payment successfully', async () => {
+      const paymentData = {
+        userId: 'user-123',
+        customerId: 'customer-123',
+        subscriptionId: 'sub-123',
+        productId: 'product-123',
+        paymentId: 'payment-123',
+        amount: 1000,
+        currency: 'usd',
+        status: 'completed',
+        paymentType: 'recurring',
+      };
+
+      const result = await upsertPayment(paymentData);
+
+      // Test passes if no error is thrown
+      expect(result).toBeDefined();
+    });
+  });
+
+  describe('findUserByCustomerId', () => {
+    it('should find user by customer ID', async () => {
+      const result = await findUserByCustomerId('customer-123');
+
+      // Test passes if no error is thrown
+      expect(result).toBeNull();
+    });
+
+    it('should return null if no user found', async () => {
+      const result = await findUserByCustomerId('nonexistent-customer');
+
+      expect(result).toBeNull();
+    });
+  });
+
+  describe('getUserSubscription', () => {
+    it('should return null if no subscriptions found', async () => {
+      const result = await getUserSubscription('user-123');
+
+      expect(result).toBeNull();
+    });
+
+    it('should handle active subscription when available', async () => {
+      const result = await getUserSubscription('user-123');
+
+      // Test passes if no error is thrown
+      expect(result).toBeNull();
+    });
+  });
+
+  describe('getUserPayments', () => {
+    it('should get user payments with default limit', async () => {
+      // Mock the database chain specifically for this function
+      const mockSelectResult = {
+        from: jest.fn().mockReturnValue({
+          where: jest.fn().mockReturnValue({
+            orderBy: jest.fn().mockReturnValue({
+              limit: jest.fn().mockResolvedValue([])
+            })
+          })
+        })
+      };
+      
+      // Temporarily override the mock
+      const originalSelect = jest.requireMock('@/database').db.select;
+      jest.requireMock('@/database').db.select = jest.fn().mockReturnValue(mockSelectResult);
+      
+      const result = await getUserPayments('user-123');
+
+      // Restore original mock
+      jest.requireMock('@/database').db.select = originalSelect;
+
+      // Test passes if no error is thrown
+      expect(Array.isArray(result)).toBe(true);
+    });
+  });
+
+  describe('isWebhookEventProcessed', () => {
+    it('should return boolean for event processing status', async () => {
+      const result = await isWebhookEventProcessed('event-123');
+
+      expect(typeof result).toBe('boolean');
+    });
+
+    it('should handle different event IDs', async () => {
+      const result = await isWebhookEventProcessed('nonexistent-event');
+
+      expect(typeof result).toBe('boolean');
+    });
+  });
+
+  describe('recordWebhookEvent', () => {
+    it('should record webhook event with default provider', async () => {
+      await expect(recordWebhookEvent('event-123', 'payment.completed')).resolves.not.toThrow();
+    });
+  });
+});

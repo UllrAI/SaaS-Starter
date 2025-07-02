@@ -31,9 +31,9 @@ const mockResponse = {
   arrayBuffer: jest.fn().mockResolvedValue(new ArrayBuffer(0)),
   blob: jest.fn().mockResolvedValue(new Blob()),
   clone: jest.fn().mockReturnThis(),
-};
+} as any;
 
-global.fetch = jest.fn().mockResolvedValue(mockResponse);
+global.fetch = jest.fn().mockResolvedValue(mockResponse) as any;
 global.Request = jest.fn().mockImplementation((url, options) => ({
   url,
   method: 'GET',
@@ -43,12 +43,12 @@ global.Request = jest.fn().mockImplementation((url, options) => ({
   json: jest.fn().mockResolvedValue({}),
   text: jest.fn().mockResolvedValue(''),
   arrayBuffer: jest.fn().mockResolvedValue(new ArrayBuffer(0)),
-}));
-global.Response = jest.fn().mockImplementation(() => mockResponse);
-global.Headers = jest.fn().mockImplementation(() => new Map());
+})) as any;
+global.Response = jest.fn().mockImplementation(() => mockResponse) as any;
+global.Headers = jest.fn().mockImplementation(() => new Map()) as any;
 
 // Mock any potential HTTP clients that Creem might use
-jest.mock('node-fetch', () => jest.fn().mockResolvedValue(mockResponse));
+jest.mock('node-fetch', () => jest.fn().mockResolvedValue(mockResponse) as any);
 jest.mock('axios', () => ({
   __esModule: true,
   default: jest.fn().mockResolvedValue({ data: {} }),
@@ -224,12 +224,20 @@ describe("Creem Provider Zod Validation", () => {
 });
 
 describe("Creem Provider Implementation", () => {
+  let consoleErrorSpy: jest.SpyInstance;
+
   beforeEach(async () => {
     jest.clearAllMocks();
+    // Mock console.error to suppress expected error logs during tests
+    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
     // Re-import the provider to ensure fresh mocks
     creemProvider = (await import("./provider")).default;
   });
 
+  afterEach(() => {
+    // Restore console.error after each test
+    consoleErrorSpy.mockRestore();
+  });
 
   describe("createCheckoutSession", () => {
     const mockCheckoutOptions: CreateCheckoutOptions = {

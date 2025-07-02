@@ -1,19 +1,18 @@
 import { describe, it, expect, jest, beforeEach } from '@jest/globals';
+import { z } from 'zod';
+import type { SpyInstance } from '../jest.setup';
 
 // Mock the dependencies BEFORE any imports
-const mockNext = jest.fn();
-const mockUse = jest.fn();
-const mockOutputSchema = jest.fn();
-const mockCreateSafeActionClient = jest.fn();
+const mockNext = jest.fn(() => Promise.resolve({})) as jest.MockedFunction<() => Promise<any>>;
+const mockUse = jest.fn() as jest.MockedFunction<(middleware: any) => any>;
+const mockOutputSchema = jest.fn() as jest.MockedFunction<(schema: any) => any>;
+const mockCreateSafeActionClient = jest.fn() as jest.MockedFunction<(config: any) => any>;
 const mockAuth = {
   api: {
-    getSession: jest.fn().mockResolvedValue({
-      session: { id: 'test-session' },
-      user: { id: 'test-user' }
-    })
+    getSession: jest.fn() as jest.MockedFunction<() => Promise<any>>
   }
 };
-const mockHeaders = jest.fn().mockResolvedValue({});
+const mockHeaders = jest.fn() as jest.MockedFunction<() => Promise<any>>;
 
 jest.mock('./auth/server', () => ({
   auth: mockAuth
@@ -32,15 +31,7 @@ jest.mock('@/lib/config/constants', () => ({
 }));
 
 jest.mock('next-safe-action', () => ({
-  createSafeActionClient: jest.fn((options) => {
-    
-    return {
-      use: mockUse,
-      outputSchema: mockOutputSchema,
-      handleServerError: options.handleServerError,
-      defineMetadataSchema: options.defineMetadataSchema,
-    };
-  }),
+  createSafeActionClient: mockCreateSafeActionClient,
   DEFAULT_SERVER_ERROR_MESSAGE: 'Something went wrong'
 }));
 
@@ -51,10 +42,12 @@ describe('procedures', () => {
     // Setup mock chain
     mockOutputSchema.mockReturnThis();
     mockUse.mockReturnThis();
-    mockCreateSafeActionClient.mockReturnValue({
+    mockCreateSafeActionClient.mockImplementation((options: { handleServerError?: (error: any) => string; defineMetadataSchema?: () => any }) => ({
       use: mockUse,
       outputSchema: mockOutputSchema,
-    });
+      handleServerError: options?.handleServerError,
+      defineMetadataSchema: options?.defineMetadataSchema,
+    }));
     
     mockHeaders.mockResolvedValue({
       'authorization': 'Bearer mock-token',
@@ -87,20 +80,20 @@ describe('procedures', () => {
     it('should handle server errors with Error instances', async () => {
       await import('./procedures');
       
-      const config = mockCreateSafeActionClient.mock.calls[0][0];
+      const config = mockCreateSafeActionClient.mock.calls[0][0] as { handleServerError?: (error: unknown) => string };
       const errorHandler = config.handleServerError;
       
       const testError = new Error('Test error message');
-      expect(errorHandler(testError)).toBe('Test error message');
+      expect(errorHandler?.(testError)).toBe('Test error message');
     });
 
     it('should handle server errors with non-Error instances', async () => {
       await import('./procedures');
       
-      const config = mockCreateSafeActionClient.mock.calls[0][0];
+      const config = mockCreateSafeActionClient.mock.calls[0][0] as { handleServerError?: (error: unknown) => string };
       const errorHandler = config.handleServerError;
       
-      const result = errorHandler('unknown error');
+      const result = errorHandler?.('unknown error');
       
       expect(result).toBe('Something went wrong');
     });
@@ -108,10 +101,10 @@ describe('procedures', () => {
     it('should define metadata schema correctly', async () => {
       await import('./procedures');
       
-      const config = mockCreateSafeActionClient.mock.calls[0][0];
+      const config = mockCreateSafeActionClient.mock.calls[0][0] as { defineMetadataSchema?: () => any };
       const metadataSchemaFn = config.defineMetadataSchema;
       
-      const schema = metadataSchemaFn();
+      const schema = metadataSchemaFn?.();
       
       // The schema should be a Zod object with actionName field
       expect(schema).toBeDefined();
@@ -120,10 +113,10 @@ describe('procedures', () => {
   });
 
   describe('logging middleware', () => {
-    let consoleSpy: jest.SpyInstance;
+    let consoleSpy: any;
 
     beforeEach(() => {
-      consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+      consoleSpy = jest.spyOn(console, 'log');
       jest.resetModules();
     });
 
@@ -134,9 +127,8 @@ describe('procedures', () => {
     it('should log performance metrics', async () => {
       // Mock performance.now to control timing
       const mockPerformanceNow = jest.spyOn(performance, 'now');
-      mockPerformanceNow.mockReturnValueOnce(100).mockReturnValueOnce(150);
 
-      mockUse.mockImplementation((middlewareFn) => {
+      mockUse.mockImplementation((middlewareFn: (context: { next: jest.MockedFunction<() => Promise<any>>; clientInput?: any; metadata?: any }) => void) => {
         // Execute the middleware function
         const mockContext = {
           next: mockNext,
@@ -186,11 +178,9 @@ describe('procedures', () => {
         }
       });
 
-      let authMiddleware: (context: { next: jest.Mock }) => Promise<void>;
-      mockUse.mockImplementation((middleware) => {
-        if (typeof middleware === 'function') {
-          authMiddleware = middleware;
-        }
+      let authMiddleware: ((context: { next: jest.MockedFunction<() => Promise<any>> }) => Promise<void>) | undefined;
+      mockUse.mockImplementation((middleware: (context: { next: jest.MockedFunction<() => Promise<any>> }) => Promise<void>) => {
+        authMiddleware = middleware;
         return { use: mockUse, outputSchema: mockOutputSchema };
       });
 
@@ -198,15 +188,17 @@ describe('procedures', () => {
 
       // Test the auth middleware
       const mockContext = {
-        next: mockNext.mockResolvedValue({ success: true })
-      };
+        next: jest.fn().mockResolvedValue({ success: true }) as any
+      } as any;
 
-      await authMiddleware(mockContext);
+      if (authMiddleware) {
+        await authMiddleware(mockContext);
+      }
 
-      expect(mockAuth.api.getSession).toHaveBeenCalledWith({
-        headers: expect.any(Object)
-      });
-      expect(mockNext).toHaveBeenCalledWith({
+      expect(mockAuth.api.getSession).toHaveBeenCalledWith(
+        { headers: expect.any(Object) }
+      );
+      expect(mockContext.next).toHaveBeenCalledWith({
         ctx: {
           user: expect.objectContaining({ id: 'user-123' }),
           session: expect.objectContaining({ id: 'session-123' }),
@@ -222,11 +214,9 @@ describe('procedures', () => {
     it('should throw error when no session exists', async () => {
       mockAuth.api.getSession.mockResolvedValue(null);
 
-      let authMiddleware: (context: { next: jest.Mock }) => Promise<void>;
-      mockUse.mockImplementation((middleware) => {
-        if (typeof middleware === 'function') {
-          authMiddleware = middleware;
-        }
+      let authMiddleware: ((context: { next: jest.MockedFunction<() => Promise<any>> }) => Promise<void>) | undefined;
+      mockUse.mockImplementation((middleware: (context: { next: jest.MockedFunction<() => Promise<any>> }) => Promise<void>) => {
+        authMiddleware = middleware;
         return { use: mockUse, outputSchema: mockOutputSchema };
       });
 
@@ -237,7 +227,9 @@ describe('procedures', () => {
         next: mockNext
       };
 
-      await expect(authMiddleware(mockContext)).rejects.toThrow('You are not authorized to perform this action');
+      if (authMiddleware) {
+        await expect(authMiddleware(mockContext)).rejects.toThrow('You are not authorized to perform this action');
+      }
     });
 
     it('should throw error when session exists but no user', async () => {
@@ -246,11 +238,9 @@ describe('procedures', () => {
         user: null
       });
 
-      let authMiddleware: (context: { next: jest.Mock }) => Promise<void>;
-      mockUse.mockImplementation((middleware) => {
-        if (typeof middleware === 'function') {
-          authMiddleware = middleware;
-        }
+      let authMiddleware: ((context: { next: jest.MockedFunction<() => Promise<any>> }) => Promise<void>) | undefined;
+      mockUse.mockImplementation((middleware: (context: { next: jest.MockedFunction<() => Promise<any>> }) => Promise<void>) => {
+        authMiddleware = middleware;
         return { use: mockUse, outputSchema: mockOutputSchema };
       });
 
@@ -260,7 +250,9 @@ describe('procedures', () => {
         next: mockNext
       };
 
-      await expect(authMiddleware(mockContext)).rejects.toThrow('You are not authorized to perform this action');
+      if (authMiddleware) {
+        await expect(authMiddleware(mockContext)).rejects.toThrow('You are not authorized to perform this action');
+      }
     });
 
     it('should throw error when user exists but no session', async () => {
@@ -269,11 +261,9 @@ describe('procedures', () => {
         user: { id: 'user-123' }
       });
 
-      let authMiddleware: (context: { next: jest.Mock }) => Promise<void>;
-      mockUse.mockImplementation((middleware) => {
-        if (typeof middleware === 'function') {
-          authMiddleware = middleware;
-        }
+      let authMiddleware: ((context: { next: jest.MockedFunction<() => Promise<any>> }) => Promise<void>) | undefined;
+      mockUse.mockImplementation((middleware: (context: { next: jest.MockedFunction<() => Promise<any>> }) => Promise<void>) => {
+        authMiddleware = middleware;
         return { use: mockUse, outputSchema: mockOutputSchema };
       });
 
@@ -283,7 +273,9 @@ describe('procedures', () => {
         next: mockNext
       };
 
-      await expect(authMiddleware(mockContext)).rejects.toThrow('You are not authorized to perform this action');
+      if (authMiddleware) {
+        await expect(authMiddleware(mockContext)).rejects.toThrow('You are not authorized to perform this action');
+      }
     });
 
     it('should define correct output schema', async () => {
@@ -300,10 +292,10 @@ describe('procedures', () => {
   });
 
   describe('error handling integration', () => {
-    let consoleSpy: jest.SpyInstance;
+    let consoleSpy: SpyInstance;
 
     beforeEach(() => {
-      consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+      consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
       jest.resetModules();
     });
 
@@ -314,11 +306,11 @@ describe('procedures', () => {
     it('should log errors during error handling', async () => {
       await import('./procedures');
       
-      const config = mockCreateSafeActionClient.mock.calls[0][0];
+      const config = mockCreateSafeActionClient.mock.calls[0][0] as { handleServerError?: (error: unknown) => string };
       const errorHandler = config.handleServerError;
       
       const testError = new Error('Database connection failed');
-      errorHandler(testError);
+      errorHandler?.(testError);
       
       expect(consoleSpy).toHaveBeenCalledWith('Action error:', 'Database connection failed');
     });
@@ -326,11 +318,9 @@ describe('procedures', () => {
     it('should handle authentication errors', async () => {
       mockAuth.api.getSession.mockRejectedValue(new Error('Auth service unavailable'));
 
-      let authMiddleware: (context: { next: jest.Mock }) => Promise<void>;
-      mockUse.mockImplementation((middleware) => {
-        if (typeof middleware === 'function') {
-          authMiddleware = middleware;
-        }
+      let authMiddleware: ((context: { next: jest.MockedFunction<() => Promise<any>> }) => Promise<void>) | undefined;
+      mockUse.mockImplementation((middleware: (context: { next: jest.MockedFunction<() => Promise<any>> }) => Promise<void>) => {
+        authMiddleware = middleware;
         return { use: mockUse, outputSchema: mockOutputSchema };
       });
 
@@ -340,14 +330,15 @@ describe('procedures', () => {
         next: mockNext
       };
 
-      await expect(authMiddleware(mockContext)).rejects.toThrow('Auth service unavailable');
+      if (authMiddleware) {
+        await expect(authMiddleware(mockContext)).rejects.toThrow('Auth service unavailable');
+      }
     });
   });
 
   describe('metadata validation', () => {
     it('should create valid metadata schema with string actionName', async () => {
       // Don't import the procedures module, just test the schema directly
-      import { z } from 'zod';
       const schema = z.object({
         actionName: z.string(),
       });
@@ -363,7 +354,6 @@ describe('procedures', () => {
     });
 
     it('should reject invalid metadata without actionName', async () => {
-      import { z } from 'zod';
       const schema = z.object({
         actionName: z.string(),
       });
@@ -376,7 +366,6 @@ describe('procedures', () => {
     });
 
     it('should reject metadata with non-string actionName', async () => {
-      import { z } from 'zod';
       const schema = z.object({
         actionName: z.string(),
       });

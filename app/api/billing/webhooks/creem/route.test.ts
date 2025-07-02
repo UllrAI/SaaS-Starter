@@ -1,27 +1,27 @@
 import { describe, it, expect, jest, beforeEach } from "@jest/globals";
+import type { NextRequest } from "next/server";
 
 // Mock NextResponse
+const mockJson = jest.fn() as any;
+
 jest.mock("next/server", () => ({
   NextRequest: jest.fn(),
   NextResponse: {
-    json: jest.fn((data: unknown, init?: { status?: number }) => ({
-      json: () => Promise.resolve(data),
-      status: init?.status || 200,
-      ok: (init?.status || 200) >= 200 && (init?.status || 200) < 300,
-    })),
+    json: mockJson,
   },
 }));
 
-// Mock next/headers
+// Mock next/headers with proper return value
 const mockHeadersList = {
-  get: jest.fn(),
+  get: jest.fn() as any,
 };
+const mockHeaders = jest.fn() as any;
 jest.mock("next/headers", () => ({
-  headers: jest.fn().mockResolvedValue(mockHeadersList),
+  headers: mockHeaders,
 }));
 
 // Mock billing
-const mockHandleWebhook = jest.fn();
+const mockHandleWebhook = jest.fn() as any;
 jest.mock("@/lib/billing", () => ({
   billing: {
     handleWebhook: mockHandleWebhook,
@@ -31,16 +31,25 @@ jest.mock("@/lib/billing", () => ({
 describe("Billing Webhooks Creem API", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    
+    // Reset headers mock to return the mockHeadersList
+    mockHeaders.mockResolvedValue(mockHeadersList);
+    
+    mockJson.mockImplementation((data: any, init: { status?: number } = {}) => ({
+      json: () => Promise.resolve(data),
+      status: init.status || 200,
+      ok: (init.status || 200) >= 200 && (init.status || 200) < 300,
+    }));
   });
 
-  const createMockRequest = (payload: string) => {
+  const createMockRequest = (payload: string): NextRequest => {
     return {
-      text: jest.fn().mockResolvedValue(payload),
+      text: jest.fn().mockResolvedValue(payload) as any,
       headers: { get: () => '', has: () => false, set: () => {}, entries: () => [] },
       cookies: { get: () => null, has: () => false },
       nextUrl: { pathname: '/api/billing/webhooks/creem' },
       url: 'http://localhost:3000/api/billing/webhooks/creem',
-    } as unknown as import('next/server').NextRequest;
+    } as any as NextRequest;
   };
 
   describe("POST /api/billing/webhooks/creem", () => {
@@ -145,12 +154,12 @@ describe("Billing Webhooks Creem API", () => {
       mockHeadersList.get.mockReturnValue("valid-signature");
       
       const request = {
-        text: jest.fn().mockRejectedValue(new Error("Failed to read request body")),
+        text: jest.fn().mockRejectedValue(new Error("Failed to read request body")) as any,
         headers: { get: () => '', has: () => false, set: () => {}, entries: () => [] },
         cookies: { get: () => null, has: () => false },
         nextUrl: { pathname: '/api/billing/webhooks/creem' },
         url: 'http://localhost:3000/api/billing/webhooks/creem',
-      } as unknown as import('next/server').NextRequest;
+      } as any as NextRequest;
       
       const { POST } = await import("./route");
       
@@ -163,8 +172,7 @@ describe("Billing Webhooks Creem API", () => {
 
     it("should handle headers() function failure", async () => {
       // Mock headers to throw an error
-      const { headers } = await import("next/headers");
-      (headers as jest.MockedFunction<typeof headers>).mockRejectedValue(new Error("Headers not available"));
+      mockHeaders.mockRejectedValue(new Error("Headers not available"));
       
       const { POST } = await import("./route");
       const request = createMockRequest('{"event": "test"}');
@@ -176,7 +184,7 @@ describe("Billing Webhooks Creem API", () => {
       expect(data.error).toBe("Headers not available");
       
       // Restore headers mock
-      headers.mockResolvedValue(mockHeadersList);
+      mockHeaders.mockResolvedValue(mockHeadersList);
     });
 
     it("should pass raw payload string to handleWebhook", async () => {

@@ -1,6 +1,9 @@
 import { describe, it, expect } from "@jest/globals";
 import { createMetadata } from "./metadata";
-import type { Metadata } from "next/types";
+import type { Metadata } from "next";
+import type { OpenGraph } from "next/dist/lib/metadata/types/opengraph-types";
+
+type OpenGraphMetadata = OpenGraph;
 
 describe("createMetadata", () => {
   // Use the actual values from the global mocks/constants
@@ -18,9 +21,9 @@ describe("createMetadata", () => {
     expect(result.openGraph?.url).toBe(mockAppUrl);
     expect(result.openGraph?.images).toBe(mockOGImage);
     expect(result.openGraph?.siteName).toBe(expectedAppName);
-    expect(result.openGraph?.type).toBe("website");
+    expect((result.openGraph as Record<string, unknown>)?.type).toBe("website");
     expect(result.openGraph?.locale).toBe("en_US");
-    expect(result.twitter?.card).toBe("summary_large_image");
+    expect((result.twitter as Record<string, unknown>)?.card).toBe("summary_large_image");
     expect(result.twitter?.creator).toBe(mockTwitterAccount);
     expect(result.twitter?.title).toBe(expectedAppName);
     expect(result.twitter?.description).toBe("");
@@ -73,7 +76,7 @@ describe("createMetadata", () => {
       title: "Custom Title",
       openGraph: {
         title: "Custom OG Title",
-        type: "article",
+        type: "article" as const,
         locale: "fr_FR",
         images: "https://custom.com/image.jpg",
       },
@@ -81,7 +84,7 @@ describe("createMetadata", () => {
     const result = createMetadata(override);
 
     expect(result.openGraph?.title).toBe("Custom OG Title");
-    expect(result.openGraph?.type).toBe("article");
+    expect((result.openGraph as OpenGraphMetadata)?.type).toBe("article");
     expect(result.openGraph?.locale).toBe("fr_FR");
     expect(result.openGraph?.images).toBe("https://custom.com/image.jpg");
   });
@@ -91,7 +94,7 @@ describe("createMetadata", () => {
       title: "Custom Title",
       twitter: {
         title: "Custom Twitter Title",
-        card: "summary",
+        card: "summary" as const,
         creator: "@customcreator",
         images: "https://custom.com/twitter-image.jpg",
       },
@@ -99,7 +102,7 @@ describe("createMetadata", () => {
     const result = createMetadata(override);
 
     expect(result.twitter?.title).toBe("Custom Twitter Title");
-    expect(result.twitter?.card).toBe("summary");
+    expect((result.twitter as Record<string, unknown>)?.card).toBe("summary");
     expect(result.twitter?.creator).toBe("@customcreator");
     expect(result.twitter?.images).toBe("https://custom.com/twitter-image.jpg");
   });
@@ -145,6 +148,7 @@ describe("createMetadata", () => {
     const override: Metadata = {
       title: {
         template: "%s | App",
+        absolute: undefined as any,
       },
     };
     const result = createMetadata(override);
@@ -162,7 +166,7 @@ describe("createMetadata", () => {
 
     expect(result.openGraph?.url).toBe(mockAppUrl);
     expect(result.openGraph?.siteName).toBe(expectedAppName);
-    expect(result.openGraph?.type).toBe("website");
+    expect((result.openGraph as Record<string, unknown>)?.type).toBe("website");
     expect(result.openGraph?.locale).toBe("en_US");
   });
 
@@ -172,7 +176,7 @@ describe("createMetadata", () => {
     };
     const result = createMetadata(override);
 
-    expect(result.twitter?.card).toBe("summary_large_image");
+    expect((result.twitter as Record<string, unknown>)?.card).toBe("summary_large_image");
     expect(result.twitter?.creator).toBe(mockTwitterAccount);
   });
 });

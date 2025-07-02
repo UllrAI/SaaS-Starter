@@ -15,14 +15,14 @@ jest.mock("@/env", () => ({
 
 // Mock postgres
 jest.mock("postgres", () => {
-  const mockSql = jest.fn(() => Promise.resolve([{ testValue: 1 }]));
-  (mockSql as unknown as { end: jest.MockedFunction<() => Promise<void>> }).end = jest.fn(() => Promise.resolve());
-  return jest.fn(() => mockSql);
+  const mockSql = jest.fn(() => Promise.resolve([{ testValue: 1 }])) as any;
+  mockSql.end = jest.fn(() => Promise.resolve()) as any;
+  return jest.fn(() => mockSql) as any;
 });
 
 // Mock drizzle
 jest.mock("drizzle-orm/postgres-js", () => ({
-  drizzle: jest.fn(() => ({})),
+  drizzle: jest.fn(() => ({})) as any,
 }));
 
 import { db, sql, closeDatabase } from "./index";
@@ -148,7 +148,7 @@ describe("Database Connection Configuration", () => {
 
     it("should not call validateDatabaseConfig in non-development environment", async () => {
       // Mock the validateDatabaseConfig function to spy on it
-      const validateDatabaseConfigSpy = jest.fn();
+      const validateDatabaseConfigSpy = jest.fn() as any;
       
       // Mock the production environment
       const originalNodeEnv = process.env.NODE_ENV;
@@ -156,7 +156,7 @@ describe("Database Connection Configuration", () => {
       
       // Mock the connection module
       jest.doMock("@/lib/database/connection", () => ({
-        getConnectionConfig: jest.fn(() => ({ max: 10 })),
+        getConnectionConfig: jest.fn(() => ({ max: 10 })) as any,
         validateDatabaseConfig: validateDatabaseConfigSpy,
       }));
       

@@ -8,8 +8,8 @@ process.env.R2_BUCKET_NAME = 'mock-bucket';
 process.env.R2_PUBLIC_URL = 'https://mock-public-url.com';
 
 // Mock AWS SDK and other dependencies
-const mockSend = jest.fn().mockResolvedValue({});
-const mockGetSignedUrl = jest.fn().mockResolvedValue('https://mock-presigned-url.com');
+const mockSend = jest.fn() as jest.MockedFunction<(...args: any[]) => Promise<any>>;
+const mockGetSignedUrl = jest.fn() as jest.MockedFunction<(...args: any[]) => Promise<string>>;
 
 jest.mock('@aws-sdk/client-s3', () => ({
   S3Client: jest.fn().mockImplementation(() => ({
@@ -26,9 +26,9 @@ jest.mock('@aws-sdk/s3-request-presigner', () => ({
 }));
 
 // Mock upload config functions
-const mockIsFileTypeAllowed = jest.fn().mockReturnValue(true);
-const mockIsFileSizeAllowed = jest.fn().mockReturnValue(true);
-const mockGetFileExtension = jest.fn().mockReturnValue('jpeg');
+const mockIsFileTypeAllowed = jest.fn() as jest.MockedFunction<(...args: any[]) => boolean>;
+const mockIsFileSizeAllowed = jest.fn() as jest.MockedFunction<(...args: any[]) => boolean>;
+const mockGetFileExtension = jest.fn() as jest.MockedFunction<(...args: any[]) => string>;
 
 jest.mock('./config/upload', () => ({
   UPLOAD_CONFIG: {
@@ -41,13 +41,14 @@ jest.mock('./config/upload', () => ({
 }));
 
 // Mock crypto
+const mockRandomUUID = jest.fn() as jest.MockedFunction<() => string>;
 jest.mock('crypto', () => ({
-  randomUUID: jest.fn(() => 'mock-uuid-123'),
+  randomUUID: mockRandomUUID,
 }));
 
 // Mock fetch
-const mockFetch = jest.fn();
-global.fetch = mockFetch;
+const mockFetch = jest.fn() as jest.MockedFunction<typeof fetch>;
+global.fetch = mockFetch as typeof fetch;
 
 describe('R2 Storage Functions', () => {
   beforeEach(() => {
@@ -59,6 +60,7 @@ describe('R2 Storage Functions', () => {
     mockGetFileExtension.mockReturnValue('jpeg');
     mockGetSignedUrl.mockResolvedValue('https://mock-presigned-url.com');
     mockSend.mockResolvedValue({});
+    mockRandomUUID.mockReturnValue('mock-uuid-123');
     
     // Mock Date.now for consistent testing
     jest.spyOn(Date, 'now').mockReturnValue(1234567890000);
@@ -81,6 +83,7 @@ describe('R2 Storage Functions', () => {
       
       const result = await createPresignedUrl({
         userId: 'user-123',
+        fileName: 'test.jpeg',
         contentType: 'image/jpeg',
         size: 1024,
       });
@@ -98,6 +101,7 @@ describe('R2 Storage Functions', () => {
       
       const result = await createPresignedUrl({
         userId: 'user-123',
+        fileName: 'test.exe',
         contentType: 'application/exe',
         size: 1024,
       });
@@ -113,6 +117,7 @@ describe('R2 Storage Functions', () => {
       
       const result = await createPresignedUrl({
         userId: 'user-123',
+        fileName: 'test.jpeg',
         contentType: 'image/jpeg',
         size: 100 * 1024 * 1024,
       });
@@ -125,10 +130,11 @@ describe('R2 Storage Functions', () => {
       const { createPresignedUrl } = await import('./r2');
       
       mockGetSignedUrl.mockRejectedValue(new Error('Test error'));
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
 
       const result = await createPresignedUrl({
         userId: 'user-123',
+        fileName: 'test.jpeg',
         contentType: 'image/jpeg',
         size: 1024,
       });
@@ -144,11 +150,11 @@ describe('R2 Storage Functions', () => {
     beforeEach(() => {
       mockFetch.mockResolvedValue({
         ok: true,
-        arrayBuffer: jest.fn().mockResolvedValue(new ArrayBuffer(1024)),
+        arrayBuffer: jest.fn().mockResolvedValue(new ArrayBuffer(1024)) as any,
         headers: {
           get: jest.fn().mockReturnValue('image/jpeg'),
         },
-      });
+      } as any as Response);
     });
 
     it('should upload file from URL successfully', async () => {
@@ -167,7 +173,7 @@ describe('R2 Storage Functions', () => {
       mockFetch.mockResolvedValue({
         ok: false,
         statusText: 'Not Found',
-      });
+      } as Response);
 
       const result = await uploadFromUrl('https://example.com/missing.jpg', 'test-key');
 
@@ -227,7 +233,7 @@ describe('R2 Storage Functions', () => {
       const { deleteFile } = await import('./r2');
       
       mockSend.mockRejectedValue(new Error('Delete failed'));
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
 
       const result = await deleteFile('test-key');
 
@@ -260,7 +266,7 @@ describe('R2 Storage Functions', () => {
       const { deleteFiles } = await import('./r2');
       
       mockSend.mockRejectedValue(new Error('Batch delete failed'));
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
 
       const result = await deleteFiles(['key1', 'key2']);
 
@@ -285,7 +291,7 @@ describe('R2 Storage Functions', () => {
       const { getDownloadUrl } = await import('./r2');
       
       mockGetSignedUrl.mockRejectedValue(new Error('Download error'));
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
 
       const result = await getDownloadUrl('test-key');
 

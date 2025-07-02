@@ -1,19 +1,20 @@
 import { describe, it, expect, jest, beforeEach } from "@jest/globals";
+import type { NextRequest } from "next/server";
 
 // Mock NextResponse
 jest.mock("next/server", () => ({
   NextRequest: jest.fn(),
   NextResponse: {
-    json: jest.fn((data: unknown, init?: { status?: number }) => ({
+    json: jest.fn((data: unknown, init: { status?: number } = {}) => ({
       json: () => Promise.resolve(data),
       status: init?.status || 200,
-      ok: (init?.status || 200) >= 200 && (init?.status || 200) < 300,
+      ok: (init.status || 200) >= 200 && (init.status || 200) < 300,
     })),
   },
 }));
 
 // Mock dependencies
-const mockGetSession = jest.fn();
+const mockGetSession = jest.fn() as any;
 jest.mock("@/lib/auth/server", () => ({
   auth: {
     api: {
@@ -22,15 +23,15 @@ jest.mock("@/lib/auth/server", () => ({
   },
 }));
 
-const mockCreatePresignedUrl = jest.fn();
+const mockCreatePresignedUrl = jest.fn() as any;
 jest.mock("@/lib/r2", () => ({
   createPresignedUrl: mockCreatePresignedUrl,
 }));
 
 const mockDb = {
   insert: jest.fn().mockReturnValue({
-    values: jest.fn().mockResolvedValue(undefined),
-  }),
+    values: jest.fn() as any,
+  }) as any,
 };
 jest.mock("@/database", () => ({
   db: mockDb,
@@ -40,11 +41,11 @@ jest.mock("@/database/schema", () => ({
   uploads: "uploads-table",
 }));
 
-const mockIsFileTypeAllowed = jest.fn();
-const mockIsFileSizeAllowed = jest.fn();
-const mockFormatFileSize = jest.fn();
+const mockIsFileTypeAllowed = jest.fn() as any;
+const mockIsFileSizeAllowed = jest.fn() as any;
+const mockFormatFileSize = jest.fn() as any;
 const mockPresignedUrlRequestSchema = {
-  safeParse: jest.fn(),
+  safeParse: jest.fn() as any,
 };
 
 jest.mock("@/lib/config/upload", () => ({
@@ -62,14 +63,14 @@ describe("Upload Presigned URL API", () => {
     jest.clearAllMocks();
   });
 
-  const createMockRequest = (body: unknown) => {
+  const createMockRequest = (body: unknown): NextRequest => {
     return {
       headers: { get: () => '', has: () => false, set: () => {}, entries: () => [] },
-      json: jest.fn().mockResolvedValue(body),
+      json: jest.fn().mockResolvedValue(body) as any,
       cookies: { get: () => null, has: () => false },
       nextUrl: { pathname: '/api/upload/presigned-url' },
       url: 'http://localhost:3000/api/upload/presigned-url',
-    } as unknown as import('next/server').NextRequest;
+    } as any as NextRequest;
   };
 
   const mockSession = {
@@ -168,7 +169,7 @@ describe("Upload Presigned URL API", () => {
       });
       mockIsFileTypeAllowed.mockReturnValue(true);
       mockIsFileSizeAllowed.mockReturnValue(false);
-      mockFormatFileSize.mockImplementation((size) => `${size} bytes`);
+      mockFormatFileSize.mockImplementation((size: number) => `${size} bytes`);
       
       const { POST } = await import("./route");
       const request = createMockRequest(validRequestBody);
@@ -291,11 +292,11 @@ describe("Upload Presigned URL API", () => {
       
       const request = {
         headers: { get: () => '', has: () => false, set: () => {}, entries: () => [] },
-        json: jest.fn().mockRejectedValue(new Error("Invalid JSON")),
+        json: jest.fn().mockRejectedValue(new Error("Invalid JSON")) as any,
         cookies: { get: () => null, has: () => false },
         nextUrl: { pathname: '/api/upload/presigned-url' },
         url: 'http://localhost:3000/api/upload/presigned-url',
-      } as unknown as import('next/server').NextRequest;
+      } as any as NextRequest;
       
       const { POST } = await import("./route");
       

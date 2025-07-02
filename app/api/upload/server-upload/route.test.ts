@@ -1,27 +1,43 @@
 import { describe, it, expect, jest, beforeEach } from "@jest/globals";
+import type { NextRequest } from "next/server";
+
+// Type definitions for mock responses
+type MockResponseInit = { status?: number; headers?: Record<string, string> };
+type MockResponse = {
+  json: () => Promise<unknown>;
+  status: number;
+  ok: boolean;
+  headers?: Map<string, string>;
+};
 
 // Mock NextResponse and NextRequest
-const mockNextResponse = jest.fn().mockImplementation((body: unknown, init?: { status?: number }) => ({
-  json: () => Promise.resolve(body),
-  status: init?.status || 200,
-  ok: (init?.status || 200) >= 200 && (init?.status || 200) < 300,
-  body,
-  ...(init || {}),
-}));
-
-mockNextResponse.json = jest.fn((data: unknown, init?: { status?: number }) => ({
+const mockJson = jest.fn().mockImplementation((data: unknown, init: MockResponseInit = {}): MockResponse => ({
   json: () => Promise.resolve(data),
   status: init?.status || 200,
-  ok: (init?.status || 200) >= 200 && (init?.status || 200) < 300,
-}));
+  ok: (init.status || 200) >= 200 && (init.status || 200) < 300,
+})) as any;
+
+const mockNextResponse = jest.fn().mockImplementation((body: unknown, init: MockResponseInit = {}): MockResponse => ({
+  json: () => Promise.resolve(body),
+  status: init?.status || 200,
+  ok: (init.status || 200) >= 200 && (init.status || 200) < 300,
+  headers: new Map(Object.entries(init.headers || {})),
+})) as any;
 
 jest.mock("next/server", () => ({
   NextRequest: jest.fn(),
-  NextResponse: mockNextResponse,
+  NextResponse: Object.assign(mockNextResponse, {
+    json: mockJson,
+  }),
 }));
 
+// Type definitions for mocked functions
+type SessionFunction = (...args: unknown[]) => Promise<unknown>;
+type UploadFunction = (...args: unknown[]) => Promise<unknown>;
+type DatabaseFunction = (...args: unknown[]) => unknown;
+
 // Mock dependencies
-const mockGetSession = jest.fn();
+const mockGetSession = jest.fn() as any;
 jest.mock("@/lib/auth/server", () => ({
   auth: {
     api: {
@@ -32,10 +48,10 @@ jest.mock("@/lib/auth/server", () => ({
 
 // Mock AWS SDK
 const mockUpload = {
-  done: jest.fn(),
+  done: jest.fn() as any,
 };
 jest.mock("@aws-sdk/client-s3", () => ({
-  S3Client: jest.fn(),
+  S3Client: jest.fn() as any,
 }));
 jest.mock("@aws-sdk/lib-storage", () => ({
   Upload: jest.fn(() => mockUpload),
@@ -44,8 +60,8 @@ jest.mock("@aws-sdk/lib-storage", () => ({
 // Mock database
 const mockDb = {
   insert: jest.fn().mockReturnValue({
-    values: jest.fn().mockResolvedValue(undefined),
-  }),
+    values: jest.fn() as any,
+  }) as any,
 };
 jest.mock("@/database", () => ({
   db: mockDb,
@@ -71,9 +87,9 @@ jest.mock("@/env", () => ({
 }));
 
 // Mock upload config
-const mockIsFileTypeAllowed = jest.fn();
-const mockIsFileSizeAllowed = jest.fn();
-const mockGetFileExtension = jest.fn();
+const mockIsFileTypeAllowed = jest.fn() as any;
+const mockIsFileSizeAllowed = jest.fn() as any;
+const mockGetFileExtension = jest.fn() as any;
 
 jest.mock("@/lib/config/upload", () => ({
   UPLOAD_CONFIG: {
@@ -107,7 +123,7 @@ describe("Upload Server Upload API", () => {
       cookies: { get: () => null, has: () => false },
       nextUrl: { pathname: '/api/upload/server-upload' },
       url: 'http://localhost:3000/api/upload/server-upload',
-    } as unknown as import('next/server').NextRequest;
+    } as unknown as NextRequest;
   };
 
   const createMockFile = (name: string, type: string, size: number) => {
@@ -330,13 +346,13 @@ describe("Upload Server Upload API", () => {
       
       // Ensure database insert succeeds for successful uploads
       mockDb.insert.mockReturnValue({
-        values: jest.fn().mockResolvedValue(undefined),
+        values: jest.fn().mockResolvedValue(undefined) as any,
       });
       
       const file1 = createMockFile("success.jpg", "image/jpeg", 1024);
       const file2 = createMockFile("fail.exe", "application/x-executable", 1024);
       
-      mockIsFileTypeAllowed.mockImplementation((type) => type === "image/jpeg");
+      mockIsFileTypeAllowed.mockImplementation((type: string) => type === "image/jpeg");
       mockIsFileSizeAllowed.mockReturnValue(true);
       
       const mockFormData = {
@@ -372,7 +388,7 @@ describe("Upload Server Upload API", () => {
         cookies: { get: () => null, has: () => false },
         nextUrl: { pathname: '/api/upload/server-upload' },
         url: 'http://localhost:3000/api/upload/server-upload',
-      } as unknown as import('next/server').NextRequest;
+      } as unknown as NextRequest;
       
       const { POST } = await import("./route");
       

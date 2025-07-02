@@ -112,15 +112,11 @@ describe('lib/database/subscription', () => {
   describe('getUserPayments', () => {
     it('should get user payments with default limit', async () => {
       // Mock the database chain specifically for this function
-      const mockSelectResult = {
-        from: jest.fn().mockReturnValue({
-          where: jest.fn().mockReturnValue({
-            orderBy: jest.fn().mockReturnValue({
-              limit: jest.fn().mockResolvedValue([])
-            })
-          })
-        })
-      };
+      const mockLimitFn = jest.fn().mockResolvedValue([]) as any;
+      const mockOrderByFn = jest.fn().mockReturnValue({ limit: mockLimitFn });
+      const mockWhereFn = jest.fn().mockReturnValue({ orderBy: mockOrderByFn });
+      const mockFromFn = jest.fn().mockReturnValue({ where: mockWhereFn });
+      const mockSelectResult = { from: mockFromFn };
       
       // Temporarily override the mock
       const originalSelect = jest.requireMock('@/database').db.select;

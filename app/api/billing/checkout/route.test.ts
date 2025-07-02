@@ -1,19 +1,22 @@
 import { describe, it, expect, jest, beforeEach, afterEach } from "@jest/globals";
+import type { NextRequest } from "next/server";
 
 // Mock NextResponse
+const mockJson = jest.fn() as any;
+
 jest.mock("next/server", () => ({
   NextRequest: jest.fn(),
   NextResponse: {
-    json: jest.fn((data: unknown, init?: { status?: number }) => ({
-      json: () => Promise.resolve(data),
-      status: init?.status || 200,
-      ok: (init?.status || 200) >= 200 && (init?.status || 200) < 300,
-    })),
+    json: mockJson,
   },
 }));
 
-// Mock dependencies
-const mockGetSession = jest.fn();
+// Mock dependencies with proper Jest mock functions
+const mockGetSession = jest.fn() as jest.MockedFunction<() => Promise<any>>;
+const mockCreateCheckoutSession = jest.fn() as jest.MockedFunction<(...args: any[]) => Promise<any>>;
+const mockCreateCustomerPortalUrl = jest.fn() as jest.MockedFunction<(...args: any[]) => Promise<any>>;
+const mockGetUserSubscription = jest.fn() as jest.MockedFunction<(...args: any[]) => Promise<any>>;
+
 jest.mock("@/lib/auth/server", () => ({
   auth: {
     api: {
@@ -22,8 +25,6 @@ jest.mock("@/lib/auth/server", () => ({
   },
 }));
 
-const mockCreateCheckoutSession = jest.fn();
-const mockCreateCustomerPortalUrl = jest.fn();
 jest.mock("@/lib/billing", () => ({
   billing: {
     createCheckoutSession: mockCreateCheckoutSession,
@@ -31,7 +32,6 @@ jest.mock("@/lib/billing", () => ({
   },
 }));
 
-const mockGetUserSubscription = jest.fn();
 jest.mock("@/lib/database/subscription", () => ({
   getUserSubscription: mockGetUserSubscription,
 }));
@@ -42,6 +42,14 @@ const originalEnv = process.env;
 describe("Billing Checkout API", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    
+    // Setup mock implementations
+    mockJson.mockImplementation((data: any, init: { status?: number } = {}) => ({
+      json: () => Promise.resolve(data),
+      status: init?.status || 200,
+      ok: (init.status || 200) >= 200 && (init.status || 200) < 300,
+    }));
+    
     process.env = {
       ...originalEnv,
       NEXT_PUBLIC_APP_URL: "https://example.com",
@@ -52,14 +60,14 @@ describe("Billing Checkout API", () => {
     process.env = originalEnv;
   });
 
-  const createMockRequest = (body: unknown) => {
+  const createMockRequest = (body: any): NextRequest => {
     return {
       headers: { get: () => '', has: () => false, set: () => {}, entries: () => [] },
-      json: jest.fn().mockResolvedValue(body),
+      json: jest.fn().mockResolvedValue(body) as any,
       cookies: { get: () => null, has: () => false },
       nextUrl: { pathname: '/api/billing/checkout' },
       url: 'http://localhost:3000/api/billing/checkout',
-    } as unknown as import('next/server').NextRequest;
+    } as any as NextRequest;
   };
 
   const mockSession = {
@@ -310,11 +318,11 @@ describe("Billing Checkout API", () => {
       
       const request = {
         headers: { get: () => '', has: () => false, set: () => {}, entries: () => [] },
-        json: jest.fn().mockRejectedValue(new Error("Invalid JSON")),
+        json: jest.fn().mockRejectedValue(new Error("Invalid JSON")) as any,
         cookies: { get: () => null, has: () => false },
         nextUrl: { pathname: '/api/billing/checkout' },
         url: 'http://localhost:3000/api/billing/checkout',
-      } as unknown as import('next/server').NextRequest;
+      } as any as NextRequest;
       
       const { POST } = await import("./route");
       

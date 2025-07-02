@@ -1,19 +1,26 @@
 import { describe, it, expect, jest, beforeEach } from "@jest/globals";
+import type { NextRequest } from "next/server";
+
+// Type definitions for mock responses
+type MockResponseInit = { status?: number };
 
 // Mock NextResponse
+const mockJson = jest.fn() as any;
+
 jest.mock("next/server", () => ({
   NextRequest: jest.fn(),
   NextResponse: {
-    json: jest.fn((data: unknown, init?: { status?: number }) => ({
-      json: () => Promise.resolve(data),
-      status: init?.status || 200,
-      ok: (init?.status || 200) >= 200 && (init?.status || 200) < 300,
-    })),
+    json: mockJson,
   },
 }));
 
+// Type definitions for mocked functions
+type SessionFunction = (...args: any[]) => Promise<any>;
+type BillingFunction = (...args: any[]) => Promise<any>;
+type SubscriptionFunction = (...args: any[]) => Promise<any>;
+
 // Mock dependencies
-const mockGetSession = jest.fn();
+const mockGetSession = jest.fn() as jest.MockedFunction<SessionFunction>;
 jest.mock("@/lib/auth/server", () => ({
   auth: {
     api: {
@@ -22,14 +29,14 @@ jest.mock("@/lib/auth/server", () => ({
   },
 }));
 
-const mockCreateCustomerPortalUrl = jest.fn();
+const mockCreateCustomerPortalUrl = jest.fn() as jest.MockedFunction<BillingFunction>;
 jest.mock("@/lib/billing", () => ({
   billing: {
     createCustomerPortalUrl: mockCreateCustomerPortalUrl,
   },
 }));
 
-const mockGetUserSubscription = jest.fn();
+const mockGetUserSubscription = jest.fn() as jest.MockedFunction<SubscriptionFunction>;
 jest.mock("@/lib/database/subscription", () => ({
   getUserSubscription: mockGetUserSubscription,
 }));
@@ -37,6 +44,11 @@ jest.mock("@/lib/database/subscription", () => ({
 describe("Billing Portal API", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockJson.mockImplementation((data: any, init: MockResponseInit = {}) => ({
+      json: () => Promise.resolve(data),
+      status: init.status || 200,
+      ok: (init.status || 200) >= 200 && (init.status || 200) < 300,
+    }));
   });
 
   const createMockRequest = () => {
@@ -45,7 +57,7 @@ describe("Billing Portal API", () => {
       cookies: { get: () => null, has: () => false },
       nextUrl: { pathname: '/api/billing/portal' },
       url: 'http://localhost:3000/api/billing/portal',
-    } as unknown as import('next/server').NextRequest;
+    } as unknown as NextRequest;
   };
 
   const mockSession = {
@@ -100,8 +112,8 @@ describe("Billing Portal API", () => {
     it("should return 404 when subscription exists but has no customerId", async () => {
       mockGetSession.mockResolvedValue(mockSession);
       mockGetUserSubscription.mockResolvedValue({
-        id: "sub-123",
         customerId: null,
+        status: "active",
       });
       
       const { GET } = await import("./route");
@@ -117,8 +129,8 @@ describe("Billing Portal API", () => {
     it("should return 404 when subscription exists but has empty customerId", async () => {
       mockGetSession.mockResolvedValue(mockSession);
       mockGetUserSubscription.mockResolvedValue({
-        id: "sub-123",
         customerId: "",
+        status: "active",
       });
       
       const { GET } = await import("./route");
@@ -134,8 +146,8 @@ describe("Billing Portal API", () => {
     it("should return portal URL when subscription exists", async () => {
       mockGetSession.mockResolvedValue(mockSession);
       mockGetUserSubscription.mockResolvedValue({
-        id: "sub-123",
         customerId: "cus-123",
+        status: "active",
       });
       mockCreateCustomerPortalUrl.mockResolvedValue({
         portalUrl: "https://portal.example.com",
@@ -182,8 +194,8 @@ describe("Billing Portal API", () => {
     it("should handle billing.createCustomerPortalUrl failure", async () => {
       mockGetSession.mockResolvedValue(mockSession);
       mockGetUserSubscription.mockResolvedValue({
-        id: "sub-123",
         customerId: "cus-123",
+        status: "active",
       });
       mockCreateCustomerPortalUrl.mockRejectedValue(new Error("Billing service error"));
       
@@ -200,8 +212,8 @@ describe("Billing Portal API", () => {
     it("should handle non-Error exceptions", async () => {
       mockGetSession.mockResolvedValue(mockSession);
       mockGetUserSubscription.mockResolvedValue({
-        id: "sub-123",
         customerId: "cus-123",
+        status: "active",
       });
       mockCreateCustomerPortalUrl.mockRejectedValue("String error");
       
@@ -218,8 +230,8 @@ describe("Billing Portal API", () => {
     it("should call getUserSubscription with correct user ID", async () => {
       mockGetSession.mockResolvedValue(mockSession);
       mockGetUserSubscription.mockResolvedValue({
-        id: "sub-123",
         customerId: "cus-123",
+        status: "active",
       });
       mockCreateCustomerPortalUrl.mockResolvedValue({
         portalUrl: "https://portal.example.com",
@@ -236,8 +248,8 @@ describe("Billing Portal API", () => {
     it("should pass request headers to auth.api.getSession", async () => {
       mockGetSession.mockResolvedValue(mockSession);
       mockGetUserSubscription.mockResolvedValue({
-        id: "sub-123",
         customerId: "cus-123",
+        status: "active",
       });
       mockCreateCustomerPortalUrl.mockResolvedValue({
         portalUrl: "https://portal.example.com",

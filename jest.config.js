@@ -6,7 +6,6 @@ const createJestConfig = nextJest({
 
 /** @type {import('jest').Config} */
 const config = {
-  preset: "ts-jest",
   testEnvironment: "jest-environment-jsdom",
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/$1",
@@ -40,10 +39,22 @@ const config = {
     "!**/components/homepage/**",
     "!**/components/blog/**",
     "!**/components/logo.tsx",
+    "!**/components/auth/auth-form-base.tsx", // Base UI component with minimal logic
+    "!**/components/auth/link-sent-card.tsx", // Pure UI component
+    "!**/components/auth/social-login-buttons.tsx", // UI interaction component
     "!**/app/(pages)/**", // Exclude all pages under app/(pages)
+    "!**/app/(auth)/**", // Exclude auth pages (mostly UI)
+    "!**/app/dashboard/**/page.tsx", // Exclude dashboard page components
+    "!**/app/**/layout.tsx", // Exclude layout components
     "!**/app/loading.tsx",
     "!**/app/not-found.tsx",
-    "!**/providers/theme-provider.tsx"
+    "!**/app/layout.tsx", // Main layout
+    "!**/emails/**", // Email templates
+    "!**/providers/theme-provider.tsx",
+    "!**/hooks/use-mobile.tsx", // Simple hook
+    "!**/components/cookie-consent.tsx", // UI component
+    "!**/components/mode-toggle.tsx", // Theme toggle UI
+    "!**/components/payment-options.tsx" // UI component
   ],
   coverageReporters: ["text", "lcov", "html"]
 };

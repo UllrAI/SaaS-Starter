@@ -4,7 +4,7 @@ import { getSessionCookie } from "better-auth/cookies";
 
 // Mock better-auth/cookies
 jest.mock("better-auth/cookies", () => ({
-  getSessionCookie: jest.fn(),
+  getSessionCookie: jest.fn() as jest.MockedFunction<(cookies: { get: (name: string) => { value: string } | undefined }) => string | null>,
 }));
 
 // Mock Next.js server components
@@ -17,7 +17,7 @@ jest.mock("next/server", () => ({
     url: url, // Ensure url is a full string
     nextUrl: new URL(url),
     cookies: {
-      get: jest.fn(),
+      get: jest.fn() as jest.MockedFunction<(name: string) => { value: string } | undefined>,
     },
   })),
 }));

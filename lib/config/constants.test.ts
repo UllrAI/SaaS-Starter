@@ -20,25 +20,41 @@ describe("Constants Configuration", () => {
     });
 
     it("should set APP_NAME for development environment", async () => {
-      process.env.NODE_ENV = "development";
+      Object.defineProperty(process.env, 'NODE_ENV', {
+        value: 'development',
+        writable: true,
+        configurable: true
+      });
       const { APP_NAME } = await import("./constants");
       expect(APP_NAME).toBe("DEV - SaaS Starter");
     });
 
     it("should set APP_NAME for production environment", async () => {
-      process.env.NODE_ENV = "production";
+      Object.defineProperty(process.env, 'NODE_ENV', {
+        value: 'production',
+        writable: true,
+        configurable: true
+      });
       const { APP_NAME } = await import("./constants");
       expect(APP_NAME).toBe("SaaS Starter");
     });
 
     it("should set APP_NAME for test environment", async () => {
-      process.env.NODE_ENV = "test";
+      Object.defineProperty(process.env, 'NODE_ENV', {
+        value: 'test',
+        writable: true,
+        configurable: true
+      });
       const { APP_NAME } = await import("./constants");
       expect(APP_NAME).toBe("SaaS Starter");
     });
 
     it("should set APP_NAME for undefined environment", async () => {
-      delete process.env.NODE_ENV;
+      Object.defineProperty(process.env, 'NODE_ENV', {
+        value: undefined,
+        writable: true,
+        configurable: true
+      });
       const { APP_NAME } = await import("./constants");
       expect(APP_NAME).toBe("SaaS Starter");
     });

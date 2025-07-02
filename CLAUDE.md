@@ -137,7 +137,7 @@ Better-Auth handles all authentication through magic links sent via Resend. OAut
 Keystatic CMS is configured for local development only (security measure). Blog content uses Markdoc for rendering. Production deployments should use headless CMS or static content.
 
 ### Testing Strategy
-Jest with React Testing Library. Tests are co-located with source files. Coverage excludes UI-only components. Run `pnpm run test:coverage` to see current coverage metrics.
+Jest with React Testing Library. Tests are co-located with source files. Coverage excludes UI-only components. Run `pnpm test` to see current coverage metrics.
 
 ### Important Configuration Files
 - `env.js` - Environment variable validation

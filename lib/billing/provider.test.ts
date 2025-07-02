@@ -1,20 +1,21 @@
 import { describe, it, expect, jest } from "@jest/globals";
+import { createMockAsyncFunction } from "../../jest.setup";
 
 // Mock types to avoid external dependencies
 jest.mock("@/types/billing", () => ({
   CreateCheckoutOptions: {},
 }));
 
-import type { PaymentProvider } from "./provider";
+import type { PaymentProvider, CreateCheckoutOptions } from "./provider";
 
 describe("lib/billing/provider", () => {
   describe("PaymentProvider interface", () => {
     it("should define correct method signatures", () => {
       // Mock implementation of PaymentProvider
       const mockProvider: PaymentProvider = {
-        createCheckoutSession: jest.fn() as any,
-        createCustomerPortalUrl: jest.fn() as any,
-        handleWebhook: jest.fn() as any,
+        createCheckoutSession: createMockAsyncFunction<[CreateCheckoutOptions], { checkoutUrl: string }>({ checkoutUrl: "test" }),
+        createCustomerPortalUrl: createMockAsyncFunction<[string], { portalUrl: string }>({ portalUrl: "test" }),
+        handleWebhook: createMockAsyncFunction<[string, string], { received: boolean; message?: string }>({ received: true }),
       };
 
       // Verify interface methods exist
@@ -26,16 +27,20 @@ describe("lib/billing/provider", () => {
     describe("createCheckoutSession", () => {
       it("should have correct method signature", async () => {
         const mockProvider: PaymentProvider = {
-          createCheckoutSession: jest.fn().mockResolvedValue({
+          createCheckoutSession: createMockAsyncFunction<[CreateCheckoutOptions], { checkoutUrl: string }>({
             checkoutUrl: "https://checkout.example.com/session123"
-          }) as any,
-          createCustomerPortalUrl: jest.fn() as any,
-          handleWebhook: jest.fn() as any,
+          }),
+          createCustomerPortalUrl: createMockAsyncFunction<[string], { portalUrl: string }>({ portalUrl: "test" }),
+          handleWebhook: createMockAsyncFunction<[string, string], { received: boolean; message?: string }>({ received: true }),
         };
 
-        const mockOptions = {
-          productId: "prod_123",
-          customerId: "cust_456",
+        const mockOptions: CreateCheckoutOptions = {
+          userId: "user_123",
+          userEmail: "test@example.com",
+          userName: "Test User",
+          tierId: "tier_123",
+          paymentMode: "subscription",
+          billingCycle: "monthly",
           successUrl: "https://app.example.com/success",
           cancelUrl: "https://app.example.com/cancel",
         };

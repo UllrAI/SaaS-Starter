@@ -2,13 +2,13 @@ import { describe, it, expect, jest, beforeEach, afterEach } from "@jest/globals
 
 // Mock next/bundle-analyzer
 jest.mock("@next/bundle-analyzer", () => {
-  const mockAnalyzer = jest.fn((config) => ({ ...config, analyzed: true }));
-  return jest.fn(() => mockAnalyzer);
+  const mockWithBundleAnalyzer = jest.fn((config: { enabled: boolean }) => (nextConfig: Record<string, unknown>) => ({ ...nextConfig, analyzed: true }));
+  return mockWithBundleAnalyzer;
 });
 
 describe("next.config.ts", () => {
   let originalEnv: NodeJS.ProcessEnv;
-  let consoleErrorSpy: jest.SpyInstance;
+  let consoleErrorSpy: any;
 
   beforeEach(() => {
     jest.resetModules(); // Clear module cache before each test
@@ -31,7 +31,7 @@ describe("next.config.ts", () => {
         R2_PUBLIC_URL: "https://test-r2.example.com",
       },
     }));
-    const nextConfig = (await import("./next.config")).default;
+    const nextConfig = await import("./next.config");
     expect(nextConfig).toHaveProperty("analyzed", true);
   });
 
@@ -44,7 +44,7 @@ describe("next.config.ts", () => {
         R2_PUBLIC_URL: "https://test-r2.example.com",
       },
     }));
-    const nextConfig = (await import("./next.config")).default;
+    const nextConfig = await import("./next.config");
     expect(nextConfig).not.toHaveProperty("analyzed");
   });
 
@@ -56,12 +56,12 @@ describe("next.config.ts", () => {
       },
     }));
 
-    const nextConfig = (await import("./next.config")).default;
+    const nextConfig = await import("./next.config");
     expect(consoleErrorSpy).toHaveBeenCalledWith(
       "\x1b[33m%s\x1b[0m",
       "Warning: Invalid R2_PUBLIC_URL found in environment variables. Skipping R2 remote pattern.",
     );
-    expect(nextConfig.images.remotePatterns).not.toContainEqual({
+    expect((nextConfig as any).images.remotePatterns).not.toContainEqual({
       protocol: "https",
       hostname: "invalid-url",
     });
@@ -75,8 +75,8 @@ describe("next.config.ts", () => {
         R2_PUBLIC_URL: "https://valid-r2.example.com",
       },
     }));
-    const nextConfig = (await import("./next.config")).default;
-    expect(nextConfig.images.remotePatterns).toEqual([
+    const nextConfig = await import("./next.config");
+    expect((nextConfig as any).images.remotePatterns).toEqual([
       {
         protocol: "https",
         hostname: "images.unsplash.com",
@@ -100,8 +100,8 @@ describe("next.config.ts", () => {
         R2_PUBLIC_URL: undefined,
       },
     }));
-    const nextConfig = (await import("./next.config")).default;
-    expect(nextConfig.images.remotePatterns).toEqual([
+    const nextConfig = await import("./next.config");
+    expect((nextConfig as any).images.remotePatterns).toEqual([
       {
         protocol: "https",
         hostname: "images.unsplash.com",

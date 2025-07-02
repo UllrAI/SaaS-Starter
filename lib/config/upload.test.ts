@@ -359,10 +359,10 @@ describe("Upload Configuration", () => {
 
   describe("Error Conditions and Edge Cases", () => {
     it("should handle null and undefined inputs gracefully", () => {
-      expect(isFileTypeAllowed(null)).toBe(false);
-      expect(isFileTypeAllowed(undefined)).toBe(false);
-      expect(isFileSizeAllowed(null)).toBe(true); // null <= MAX_FILE_SIZE is true
-      expect(isFileSizeAllowed(undefined)).toBe(false); // undefined <= MAX_FILE_SIZE is false
+      expect(isFileTypeAllowed(null as unknown as string)).toBe(false);
+      expect(isFileTypeAllowed(undefined as unknown as string)).toBe(false);
+      expect(isFileSizeAllowed(null as unknown as number)).toBe(true); // null <= MAX_FILE_SIZE is true
+      expect(isFileSizeAllowed(undefined as unknown as number)).toBe(false); // undefined <= MAX_FILE_SIZE is false
     });
 
     it("should handle very small files", () => {

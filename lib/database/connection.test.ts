@@ -14,7 +14,7 @@ jest.mock("@/env", () => mockEnv);
 const originalEnv = { ...process.env };
 
 describe("Database Connection Configuration", () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     // Clear all serverless environment variables
     delete process.env.VERCEL;
     delete process.env.AWS_LAMBDA_FUNCTION_NAME;
@@ -26,25 +26,30 @@ describe("Database Connection Configuration", () => {
     // Reset NODE_ENV to test
     (process.env as Record<string, string>).NODE_ENV = "test";
     
-    // Mock console methods to avoid output during tests
+    // Create fresh console spies for each test
     jest.spyOn(console, "log").mockImplementation(() => {});
     jest.spyOn(console, "warn").mockImplementation(() => {});
+    jest.spyOn(console, "error").mockImplementation(() => {});
     
-    // Reset environment mock completely
+    // Reset environment mock completely with safe default values
     Object.keys(mockEnv).forEach(key => delete (mockEnv as Record<string, unknown>)[key]);
     Object.assign(mockEnv, {
-      DB_POOL_SIZE: 10,
+      DB_POOL_SIZE: 10, // Safe value that won't trigger warnings
       DB_IDLE_TIMEOUT: 300,
       DB_MAX_LIFETIME: 14400,
       DB_CONNECT_TIMEOUT: 30,
     });
+    
+    // Reset modules and configuration validation flag
+    jest.resetModules();
+    const { resetConfigValidation } = await import("./connection");
+    resetConfigValidation();
   });
 
   afterEach(() => {
     // Restore original environment
     process.env = { ...originalEnv };
     jest.restoreAllMocks();
-    jest.resetModules();
   });
 
   describe("Serverless Environment Detection", () => {
@@ -189,32 +194,59 @@ describe("Database Connection Configuration", () => {
 
     it("should not warn about serverless with normal connection count", async () => {
       process.env.VERCEL = "1";
-      const { validateDatabaseConfig } = await import("./connection");
+      
+      // Ensure we have a fresh mock and module state
+      jest.clearAllMocks();
+      jest.resetModules();
+      
+      const { validateDatabaseConfig, resetConfigValidation, getConnectionConfig } = await import("./connection");
+      resetConfigValidation();
+      
+      // Verify that serverless config has max: 1 (won't trigger warning since it's <= 2)
+      const config = getConnectionConfig();
+      expect(config.max).toBe(1);
+      
       validateDatabaseConfig();
 
-      // Should not warn since serverless typically uses max: 1
+      // Should not warn since serverless with max: 1 is acceptable (warning only triggers if > 2)
       expect(console.warn).not.toHaveBeenCalled();
     });
 
     it("should only validate configuration once", async () => {
-      const { validateDatabaseConfig } = await import("./connection");
+      // Clear all mocks first
+      jest.clearAllMocks();
+      jest.resetModules();
+      
+      const { validateDatabaseConfig, resetConfigValidation } = await import("./connection");
+      resetConfigValidation();
       
       validateDatabaseConfig();
       validateDatabaseConfig();
       validateDatabaseConfig();
 
-      // Should only log once
+      // Should only log once due to configValidated flag
       expect(console.log).toHaveBeenCalledTimes(1);
+      expect(console.log).toHaveBeenCalledWith("Database configuration loaded for traditional environment.");
     });
 
     it("should not warn if max is undefined", async () => {
       // Test with undefined max - this is unlikely in practice but tests the condition
       Object.assign(mockEnv, { DB_POOL_SIZE: undefined });
       
+      // Clear all mocks first
+      jest.clearAllMocks();
       jest.resetModules();
-      const { validateDatabaseConfig } = await import("./connection");
+      
+      const { validateDatabaseConfig, resetConfigValidation, getConnectionConfig } = await import("./connection");
+      resetConfigValidation();
+      
+      // Verify that config.max is undefined
+      const config = getConnectionConfig();
+      expect(config.max).toBeUndefined();
+      
       validateDatabaseConfig();
 
+      // Should not warn when max is undefined (condition checks config.max && config.max < 5)
       expect(console.warn).not.toHaveBeenCalled();
     });
   });
@@ -496,6 +528,9 @@ describe("Database Connection Configuration", () => {
 
   describe("Development vs Production Configuration", () => {
     it("should log notices in development but not in production", async () => {
+      // Clear all previous mock calls first
+      jest.clearAllMocks();
+      
       // Test development environment
       (process.env as Record<string, string>).NODE_ENV = "development";
       jest.resetModules();
@@ -505,6 +540,9 @@ describe("Database Connection Configuration", () => {
       // In development, onnotice should be console.log
       expect(devConfig.onnotice).toBe(console.log);
 
+      // Clear mocks before testing production
+      jest.clearAllMocks();
+      
       // Test production environment
       (process.env as Record<string, string>).NODE_ENV = "production";
       jest.resetModules();

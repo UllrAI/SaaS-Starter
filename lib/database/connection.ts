@@ -118,3 +118,10 @@ export function validateDatabaseConfig(): void {
   // Mark as validated to prevent repeated logging
   configValidated = true;
 }
+
+/**
+ * Resets the configuration validation flag (for testing purposes)
+ */
+export function resetConfigValidation(): void {
+  configValidated = false;
+}

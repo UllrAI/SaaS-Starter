@@ -24,7 +24,7 @@ jest.mock("@/env", () => ({
 // Mock dependencies
 jest.mock("@/lib/auth/client", () => ({
   signIn: {
-    magicLink: jest.fn(),
+    magicLink: jest.fn() as jest.MockedFunction<any>,
   },
 }));
 
@@ -37,7 +37,7 @@ jest.mock("@/components/auth/auth-form-base", () => ({
     form?: unknown;
     onSubmit: (data: { email: string }) => Promise<void>;
     config: { title: string; submitButtonText: string; alternativeActionText: string; alternativeActionLink: React.ReactNode };
-    fields: Array<{ name: string; type: string; placeholder: string }>;
+    fields: Array<{ name: string; type?: string; placeholder: string }>;
   }) => (
     <div data-testid="auth-form-base">
       <h1>{config.title}</h1>
@@ -47,7 +47,7 @@ jest.mock("@/components/auth/auth-form-base", () => ({
         const email = formData.get('email') as string;
         await onSubmit({ email });
       }}>
-        {fields.map((field: { name: string; type: string; placeholder: string }) => (
+        {fields.map((field) => (
           <input
             key={field.name}
             name={field.name}
@@ -78,18 +78,18 @@ const mockSignIn = signIn as jest.Mocked<typeof signIn>;
 const mockUseRouter = useRouter as jest.MockedFunction<typeof useRouter>;
 const mockToast = toast as jest.Mocked<typeof toast>;
 
-const mockPush = jest.fn();
+const mockPush = jest.fn() as jest.MockedFunction<any>;
 
 describe("AuthForm", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockUseRouter.mockReturnValue({
       push: mockPush,
-      back: jest.fn(),
-      forward: jest.fn(),
-      refresh: jest.fn(),
-      replace: jest.fn(),
-      prefetch: jest.fn(),
+      back: jest.fn() as jest.MockedFunction<any>,
+      forward: jest.fn() as jest.MockedFunction<any>,
+      refresh: jest.fn() as jest.MockedFunction<any>,
+      replace: jest.fn() as jest.MockedFunction<any>,
+      prefetch: jest.fn() as jest.MockedFunction<any>,
     });
   });
 
@@ -143,7 +143,7 @@ describe("AuthForm", () => {
 
   describe("Form Submission", () => {
     it("submits form with email and navigates to sent page on success", async () => {
-      mockSignIn.magicLink = jest.fn().mockResolvedValue({ error: null });
+      mockSignIn.magicLink = jest.fn() as jest.MockedFunction<any>.mockResolvedValue({ error: null });
 
       render(<AuthForm mode="login" />);
 
@@ -166,7 +166,7 @@ describe("AuthForm", () => {
 
     it("shows error toast on submission failure", async () => {
       const errorMessage = "Invalid email address";
-      mockSignIn.magicLink = jest.fn().mockResolvedValue({
+      mockSignIn.magicLink = jest.fn() as jest.MockedFunction<any>.mockResolvedValue({
         error: { message: errorMessage },
       });
 

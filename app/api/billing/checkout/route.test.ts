@@ -2,7 +2,7 @@ import { describe, it, expect, jest, beforeEach, afterEach } from "@jest/globals
 import type { NextRequest } from "next/server";
 
 // Mock NextResponse
-const mockJson = jest.fn() as any;
+const mockJson = jest.fn();
 
 jest.mock("next/server", () => ({
   NextRequest: jest.fn(),
@@ -12,10 +12,10 @@ jest.mock("next/server", () => ({
 }));
 
 // Mock dependencies with proper Jest mock functions
-const mockGetSession = jest.fn() as jest.MockedFunction<() => Promise<any>>;
-const mockCreateCheckoutSession = jest.fn() as jest.MockedFunction<(...args: any[]) => Promise<any>>;
-const mockCreateCustomerPortalUrl = jest.fn() as jest.MockedFunction<(...args: any[]) => Promise<any>>;
-const mockGetUserSubscription = jest.fn() as jest.MockedFunction<(...args: any[]) => Promise<any>>;
+const mockGetSession = jest.fn();
+const mockCreateCheckoutSession = jest.fn();
+const mockCreateCustomerPortalUrl = jest.fn();
+const mockGetUserSubscription = jest.fn();
 
 jest.mock("@/lib/auth/server", () => ({
   auth: {
@@ -44,10 +44,10 @@ describe("Billing Checkout API", () => {
     jest.clearAllMocks();
     
     // Setup mock implementations
-    mockJson.mockImplementation((data: any, init: { status?: number } = {}) => ({
+    mockJson.mockImplementation((data: any, init?: { status?: number }) => ({
       json: () => Promise.resolve(data),
       status: init?.status || 200,
-      ok: (init.status || 200) >= 200 && (init.status || 200) < 300,
+      ok: (init?.status || 200) >= 200 && (init?.status || 200) < 300,
     }));
     
     process.env = {
@@ -60,14 +60,14 @@ describe("Billing Checkout API", () => {
     process.env = originalEnv;
   });
 
-  const createMockRequest = (body: any): NextRequest => {
+  const createMockRequest = (body: any) => {
     return {
       headers: { get: () => '', has: () => false, set: () => {}, entries: () => [] },
-      json: jest.fn().mockResolvedValue(body) as any,
+      json: jest.fn().mockResolvedValue(body),
       cookies: { get: () => null, has: () => false },
       nextUrl: { pathname: '/api/billing/checkout' },
       url: 'http://localhost:3000/api/billing/checkout',
-    } as any as NextRequest;
+    };
   };
 
   const mockSession = {

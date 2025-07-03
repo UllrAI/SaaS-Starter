@@ -405,16 +405,9 @@ Object.assign(global, {
   WritableStream: global.WritableStream || class MockWritableStream {
     constructor() {}
     getWriter() { return { write: () => Promise.resolve(), close: () => Promise.resolve() }; }
-  },
-  TransformStream: global.TransformStream || class MockTransformStream {
-    readable: ReadableStream<unknown>;
-    writable: WritableStream<unknown>;
-    constructor() {
-      this.readable = new (global.ReadableStream as new () => ReadableStream<unknown>)();
-      this.writable = new (global.WritableStream as new () => WritableStream<unknown>)();
-    }
-  },
+  }
 });
+
 
 // Add URL if not present
 if (typeof global.URL === 'undefined') {
@@ -830,4 +823,9 @@ jest.mock('./env.js', () => ({
     DB_MAX_LIFETIME: 14400,
     DB_CONNECT_TIMEOUT: 30,
   },
+}));
+
+// Mock @react-email/render to prevent rendering issues in tests
+jest.mock('@react-email/render', () => ({
+  render: jest.fn(() => '<html><body>Mock rendered email</body></html>'),
 }));

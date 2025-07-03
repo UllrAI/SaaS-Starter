@@ -12,7 +12,7 @@ const config = {
   },
   setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
   transformIgnorePatterns: [
-    "node_modules/(?!(@t3-oss/env-nextjs|@t3-oss/env-core|postgres|better-auth|better-call|uncrypto|clsx|class-variance-authority|jose|standardwebhooks|next-safe-action)/)"
+    "node_modules/(?!(@t3-oss/env-nextjs|@t3-oss/env-core|postgres|better-auth|better-call|uncrypto|clsx|class-variance-authority|jose|standardwebhooks|next-safe-action|nanostores)/)"
   ],
   collectCoverageFrom: [
     "**/*.{ts,tsx}",
@@ -53,8 +53,6 @@ const config = {
     "!**/providers/theme-provider.tsx",
     "!**/hooks/use-mobile.tsx", // Simple hook
     "!**/components/cookie-consent.tsx", // UI component
-    "!**/components/mode-toggle.tsx", // Theme toggle UI
-    "!**/components/payment-options.tsx" // UI component
   ],
   coverageReporters: ["text", "lcov", "html"]
 };

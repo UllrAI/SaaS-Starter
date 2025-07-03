@@ -47,16 +47,8 @@ global.Request = jest.fn().mockImplementation((url, options) => ({
 global.Response = jest.fn().mockImplementation(() => mockResponse) as any;
 global.Headers = jest.fn().mockImplementation(() => new Map()) as any;
 
-// Mock any potential HTTP clients that Creem might use
-jest.mock('node-fetch', () => jest.fn().mockResolvedValue(mockResponse) as any);
-jest.mock('axios', () => ({
-  __esModule: true,
-  default: jest.fn().mockResolvedValue({ data: {} }),
-  get: jest.fn().mockResolvedValue({ data: {} }),
-  post: jest.fn().mockResolvedValue({ data: {} }),
-  put: jest.fn().mockResolvedValue({ data: {} }),
-  delete: jest.fn().mockResolvedValue({ data: {} }),
-}));
+// Mock any potential HTTP clients that Creem might use internally
+// (removed axios and node-fetch as they are not used in actual code)
 
 
 // Mock the Creem SDK completely - this must come before importing any modules that use it

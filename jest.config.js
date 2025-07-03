@@ -82,7 +82,7 @@ const config = {
     // Next.js App Router pages (UI-only)
     "app/\\(pages\\)/",           // Marketing pages
     "app/\\(auth\\)/",            // Auth pages  
-    "app/dashboard/.*/_components/", // Dashboard UI components
+    "app/dashboard/.*/_components/(?!session-guard)", // Dashboard UI components (except session-guard)
     "app/dashboard/.*/page\\.tsx",   // Dashboard pages
     "app/keystatic/",            // CMS pages
     

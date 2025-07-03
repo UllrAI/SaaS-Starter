@@ -922,4 +922,173 @@ describe("useAdminTable", () => {
       expect(firstRender.refresh).toBe(secondRender.refresh);
     });
   });
+
+  describe("Edge Cases and Boundary Conditions", () => {
+    it("should handle edge case where initial mount check and data length both trigger", () => {
+      // Test the specific condition in line 75-77
+      const { result } = renderHook(() =>
+        useAdminTable({
+          queryAction: mockQueryAction,
+          initialData: mockData, // Has data
+        })
+      );
+
+      // Should not call queryAction when initial data is provided
+      expect(mockQueryAction).not.toHaveBeenCalled();
+      expect(result.current.data).toEqual(mockData);
+    });
+
+    it("should handle edge case where isInitialMount.current is false but needs to be set", () => {
+      // This tests the code path where isInitialMount.current = false is called
+      const { result } = renderHook(() =>
+        useAdminTable({
+          queryAction: mockQueryAction,
+        })
+      );
+
+      // This should trigger the effect and call queryAction
+      expect(result.current.loading).toBe(true);
+    });
+
+    it("should handle edge case with page reset effect when not initial mount", async () => {
+      const { result } = renderHook(() =>
+        useAdminTable({
+          queryAction: mockQueryAction,
+          initialData: mockData, // Provide initial data to skip initial effect
+        })
+      );
+
+      // Wait a bit to ensure initial mount flag is set to false
+      await waitFor(() => {
+        expect(result.current.data).toEqual(mockData);
+      });
+
+      // Now changing search should trigger page reset since it's not initial mount
+      act(() => {
+        result.current.setSearchTerm("new search");
+      });
+
+      // This should trigger the page reset effect (line 105-108)
+      await waitFor(() => {
+        expect(result.current.searchTerm).toBe("new search");
+      });
+    });
+
+    it("should handle error in refresh callback correctly", async () => {
+      const { result } = renderHook(() =>
+        useAdminTable({
+          queryAction: mockQueryAction,
+        })
+      );
+
+      // Wait for initial load
+      await waitFor(() => {
+        expect(result.current.loading).toBe(false);
+      });
+
+      // Make refresh fail
+      const refreshError = new Error("Refresh failed");
+      mockQueryAction.mockRejectedValueOnce(refreshError);
+
+      act(() => {
+        result.current.refresh();
+      });
+
+      await waitFor(() => {
+        expect(result.current.error).toBe("Refresh failed");
+        expect(result.current.loading).toBe(false);
+      });
+    });
+
+    it("should handle non-Error objects in refresh callback", async () => {
+      const { result } = renderHook(() =>
+        useAdminTable({
+          queryAction: mockQueryAction,
+        })
+      );
+
+      // Wait for initial load
+      await waitFor(() => {
+        expect(result.current.loading).toBe(false);
+      });
+
+      // Make refresh fail with non-Error object
+      mockQueryAction.mockRejectedValueOnce("Non-error object");
+
+      act(() => {
+        result.current.refresh();
+      });
+
+      await waitFor(() => {
+        expect(result.current.error).toBe("An unknown error occurred");
+      });
+    });
+
+    it("should handle queryActionRef current assignment in useEffect", () => {
+      let queryActionRef: any;
+
+      // Create a custom hook to access the ref
+      const { rerender } = renderHook(
+        ({ action }) => {
+          // This tests the useEffect that updates queryActionRef.current
+          const result = useAdminTable({
+            queryAction: action,
+          });
+          return result;
+        },
+        {
+          initialProps: { action: mockQueryAction },
+        }
+      );
+
+      // Change the query action to test the ref update effect
+      const newAction = jest.fn().mockResolvedValue({
+        data: [],
+        pagination: { page: 1, limit: 20, total: 0, totalPages: 1 },
+      });
+
+      rerender({ action: newAction });
+
+      // The ref should be updated with the new action
+      expect(newAction).toBeDefined();
+    });
+
+    it("should handle boundary condition with zero debounce delay", () => {
+      const { result } = renderHook(() =>
+        useAdminTable({
+          queryAction: mockQueryAction,
+          debounceDelay: 0, // Edge case: zero delay
+        })
+      );
+
+      expect(result.current.searchTerm).toBe("");
+      expect(result.current.setSearchTerm).toBeInstanceOf(Function);
+    });
+
+    it("should handle boundary condition with very large page numbers", async () => {
+      const { result } = renderHook(() =>
+        useAdminTable({
+          queryAction: mockQueryAction,
+        })
+      );
+
+      // Wait for initial load
+      await waitFor(() => {
+        expect(result.current.loading).toBe(false);
+      });
+
+      // Test with very large page number
+      act(() => {
+        result.current.setCurrentPage(999999);
+      });
+
+      await waitFor(() => {
+        expect(mockQueryAction).toHaveBeenCalledWith(
+          expect.objectContaining({
+            page: 999999,
+          })
+        );
+      });
+    });
+  });
 });

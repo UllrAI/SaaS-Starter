@@ -212,6 +212,49 @@ describe("renderMarkdoc", () => {
     });
     expect(renderMarkdoc(nonTextNode)).toBe("");
   });
+
+  it("should handle array of nodes", () => {
+    const nodeArray = [
+      createNode({
+        type: "text",
+        attributes: { content: "First " }
+      }),
+      createNode({
+        type: "text",
+        attributes: { content: "Second" }
+      })
+    ];
+    expect(renderMarkdoc(nodeArray as unknown as Node)).toBe("First Second");
+  });
+
+  it("should handle array with mixed node types", () => {
+    const mixedArray = [
+      createNode({
+        type: "text",
+        attributes: { content: "Text node " }
+      }),
+      createNode({
+        type: "paragraph",
+        children: [
+          createNode({
+            type: "text",
+            attributes: { content: "in paragraph" }
+          })
+        ]
+      })
+    ];
+    expect(renderMarkdoc(mixedArray as unknown as Node)).toBe("Text node in paragraph");
+  });
+
+  it("should handle nodes without children property but still object type", () => {
+    const nodeWithoutChildren = createNode({
+      type: "image",
+      attributes: { src: "image.jpg" }
+      // No children property
+    });
+    // This should hit the final return "" case
+    expect(renderMarkdoc(nodeWithoutChildren)).toBe("");
+  });
 });
 
 describe("calculateReadingTime", () => {

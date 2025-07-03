@@ -317,6 +317,195 @@ describe("Auth Permissions", () => {
     });
   });
 
+  describe("hasRole", () => {
+    it("should return true for user with required role", async () => {
+      const { hasRole } = await import("./permissions");
+      
+      mockCheckRole.mockReturnValue(true);
+      const result = hasRole("admin", "admin");
+      
+      expect(result).toBe(true);
+      expect(mockCheckRole).toHaveBeenCalledWith("admin", "admin");
+    });
+    
+    it("should return false for user without required role", async () => {
+      const { hasRole } = await import("./permissions");
+      
+      mockCheckRole.mockReturnValue(false);
+      const result = hasRole("user", "admin");
+      
+      expect(result).toBe(false);
+      expect(mockCheckRole).toHaveBeenCalledWith("user", "admin");
+    });
+    
+    it("should handle role hierarchy correctly", async () => {
+      const { hasRole } = await import("./permissions");
+      
+      mockCheckRole.mockImplementation((userRole, requiredRole) => {
+        const roleHierarchy = { user: 0, admin: 1, super_admin: 2 };
+        return roleHierarchy[userRole] >= roleHierarchy[requiredRole];
+      });
+      
+      expect(hasRole("super_admin", "admin")).toBe(true);
+      expect(hasRole("admin", "user")).toBe(true);
+      expect(hasRole("user", "admin")).toBe(false);
+    });
+  });
+
+  describe("isAdmin", () => {
+    it("should return true for admin user", async () => {
+      const mockAdmin = {
+        id: "admin-123",
+        email: "admin@example.com",
+        role: "admin",
+        name: "Admin User",
+        image: "https://example.com/admin.jpg",
+      };
+      
+      mockAuth.api.getSession.mockResolvedValue({
+        session: { userId: "admin-123" },
+        user: mockAdmin,
+      });
+      
+      const { isAdmin } = await import("./permissions");
+      const result = await isAdmin();
+      
+      expect(result).toBe(true);
+      expect(mockCheckRole).toHaveBeenCalledWith("admin", "admin");
+    });
+    
+    it("should return true for super_admin user", async () => {
+      const mockSuperAdmin = {
+        id: "super-123",
+        email: "super@example.com",
+        role: "super_admin",
+        name: "Super Admin",
+        image: "https://example.com/super.jpg",
+      };
+      
+      mockAuth.api.getSession.mockResolvedValue({
+        session: { userId: "super-123" },
+        user: mockSuperAdmin,
+      });
+      
+      const { isAdmin } = await import("./permissions");
+      const result = await isAdmin();
+      
+      expect(result).toBe(true);
+      expect(mockCheckRole).toHaveBeenCalledWith("super_admin", "admin");
+    });
+    
+    it("should return false for regular user", async () => {
+      const mockUser = {
+        id: "user-123",
+        email: "user@example.com",
+        role: "user",
+        name: "Test User",
+        image: "https://example.com/avatar.jpg",
+      };
+      
+      mockAuth.api.getSession.mockResolvedValue({
+        session: { userId: "user-123" },
+        user: mockUser,
+      });
+      
+      mockCheckRole.mockReturnValue(false);
+      
+      const { isAdmin } = await import("./permissions");
+      const result = await isAdmin();
+      
+      expect(result).toBe(false);
+      expect(mockCheckRole).toHaveBeenCalledWith("user", "admin");
+    });
+    
+    it("should return false when not authenticated", async () => {
+      mockAuth.api.getSession.mockResolvedValue({ session: null, user: null });
+      
+      const { isAdmin } = await import("./permissions");
+      const result = await isAdmin();
+      
+      expect(result).toBe(false);
+    });
+  });
+
+  describe("isSuperAdmin", () => {
+    it("should return true for super_admin user", async () => {
+      const mockSuperAdmin = {
+        id: "super-123",
+        email: "super@example.com",
+        role: "super_admin",
+        name: "Super Admin",
+        image: "https://example.com/super.jpg",
+      };
+      
+      mockAuth.api.getSession.mockResolvedValue({
+        session: { userId: "super-123" },
+        user: mockSuperAdmin,
+      });
+      
+      const { isSuperAdmin } = await import("./permissions");
+      const result = await isSuperAdmin();
+      
+      expect(result).toBe(true);
+      expect(mockCheckRole).toHaveBeenCalledWith("super_admin", "super_admin");
+    });
+    
+    it("should return false for admin user", async () => {
+      const mockAdmin = {
+        id: "admin-123",
+        email: "admin@example.com",
+        role: "admin",
+        name: "Admin User",
+        image: "https://example.com/admin.jpg",
+      };
+      
+      mockAuth.api.getSession.mockResolvedValue({
+        session: { userId: "admin-123" },
+        user: mockAdmin,
+      });
+      
+      mockCheckRole.mockReturnValue(false);
+      
+      const { isSuperAdmin } = await import("./permissions");
+      const result = await isSuperAdmin();
+      
+      expect(result).toBe(false);
+      expect(mockCheckRole).toHaveBeenCalledWith("admin", "super_admin");
+    });
+    
+    it("should return false for regular user", async () => {
+      const mockUser = {
+        id: "user-123",
+        email: "user@example.com",
+        role: "user",
+        name: "Test User",
+        image: "https://example.com/avatar.jpg",
+      };
+      
+      mockAuth.api.getSession.mockResolvedValue({
+        session: { userId: "user-123" },
+        user: mockUser,
+      });
+      
+      mockCheckRole.mockReturnValue(false);
+      
+      const { isSuperAdmin } = await import("./permissions");
+      const result = await isSuperAdmin();
+      
+      expect(result).toBe(false);
+      expect(mockCheckRole).toHaveBeenCalledWith("user", "super_admin");
+    });
+    
+    it("should return false when not authenticated", async () => {
+      mockAuth.api.getSession.mockResolvedValue({ session: null, user: null });
+      
+      const { isSuperAdmin } = await import("./permissions");
+      const result = await isSuperAdmin();
+      
+      expect(result).toBe(false);
+    });
+  });
+
   describe("Edge cases and security scenarios", () => {
     it("should handle malformed user data", async () => {
       mockAuth.api.getSession.mockResolvedValue({

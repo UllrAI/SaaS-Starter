@@ -559,6 +559,105 @@ describe('Database Subscription Functions', () => {
 
       expect(result?.tierId).toBe('unknown-product');
     });
+
+    it('should handle edge case with empty subscriptions array after sorting', async () => {
+      // Test the line "if (!subToReturn) return null;" at line 139
+      mockDb.select.mockReturnValue({
+        from: jest.fn().mockReturnValue({
+          where: jest.fn().mockReturnValue({
+            orderBy: jest.fn().mockResolvedValue([]), // Empty array
+          }),
+        }),
+      });
+
+      const { getUserSubscription } = await import('./subscription');
+      
+      const result = await getUserSubscription('user-123');
+
+      expect(result).toBeNull();
+    });
+
+    it('should return most recent subscription when no active/trialing ones exist', async () => {
+      const mockSubscriptions = [
+        {
+          id: 'sub-canceled-recent',
+          userId: 'user-123',
+          subscriptionId: 'sub-canceled-recent',
+          productId: 'product-123',
+          status: 'canceled',
+          createdAt: new Date('2024-01-02'),
+        },
+        {
+          id: 'sub-expired-old',
+          userId: 'user-123',
+          subscriptionId: 'sub-expired-old',
+          productId: 'product-123',
+          status: 'expired',
+          createdAt: new Date('2024-01-01'),
+        },
+      ];
+      
+      mockDb.select.mockReturnValue({
+        from: jest.fn().mockReturnValue({
+          where: jest.fn().mockReturnValue({
+            orderBy: jest.fn().mockResolvedValue(mockSubscriptions),
+          }),
+        }),
+      });
+
+      const { getUserSubscription } = await import('./subscription');
+      
+      const result = await getUserSubscription('user-123');
+
+      // Should return the most recent subscription even if not active
+      expect(result?.subscriptionId).toBe('sub-canceled-recent');
+      expect(result?.status).toBe('canceled');
+    });
+
+    it('should handle mixed trialing and active subscriptions', async () => {
+      const mockSubscriptions = [
+        {
+          id: 'sub-trialing',
+          userId: 'user-123',
+          subscriptionId: 'sub-trialing',
+          productId: 'product-123',
+          status: 'trialing',
+          createdAt: new Date('2024-01-03'),
+        },
+        {
+          id: 'sub-active',
+          userId: 'user-123',
+          subscriptionId: 'sub-active',
+          productId: 'product-123',
+          status: 'active',
+          createdAt: new Date('2024-01-02'),
+        },
+        {
+          id: 'sub-canceled',
+          userId: 'user-123',
+          subscriptionId: 'sub-canceled',
+          productId: 'product-123',
+          status: 'canceled',
+          createdAt: new Date('2024-01-01'),
+        },
+      ];
+      
+      mockDb.select.mockReturnValue({
+        from: jest.fn().mockReturnValue({
+          where: jest.fn().mockReturnValue({
+            orderBy: jest.fn().mockResolvedValue(mockSubscriptions),
+          }),
+        }),
+      });
+
+      const { getUserSubscription } = await import('./subscription');
+      
+      const result = await getUserSubscription('user-123');
+
+      // Should return the most recent active/trialing subscription
+      expect(result?.subscriptionId).toBe('sub-trialing');
+      expect(result?.status).toBe('trialing');
+    });
   });
 
   describe('getUserPayments', () => {

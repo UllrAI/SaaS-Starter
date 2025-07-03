@@ -425,6 +425,7 @@ describe("Admin Stats", () => {
       
       expect(mockConsoleError).toHaveBeenCalledWith("Error fetching user stats:", expect.any(Error));
     });
+
   });
 
   describe("getAdminStatsWithCharts", () => {

@@ -217,6 +217,36 @@ describe('R2 Storage Functions', () => {
       expect(result.success).toBe(false);
       expect(result.error).toBe('File size 12 bytes exceeds maximum allowed size of 52428800 bytes');
     });
+
+    it('should handle upload errors gracefully', async () => {
+      const { uploadBuffer } = await import('./r2');
+      
+      mockSend.mockRejectedValue(new Error('Upload failed'));
+      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+
+      const buffer = Buffer.from('test content');
+      const result = await uploadBuffer(buffer, 'test-key', 'text/plain');
+
+      expect(result.success).toBe(false);
+      expect(result.error).toBe('Upload failed');
+      
+      consoleSpy.mockRestore();
+    });
+
+    it('should handle non-Error exceptions in upload', async () => {
+      const { uploadBuffer } = await import('./r2');
+      
+      mockSend.mockRejectedValue('String error');
+      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+
+      const buffer = Buffer.from('test content');
+      const result = await uploadBuffer(buffer, 'test-key', 'text/plain');
+
+      expect(result.success).toBe(false);
+      expect(result.error).toBe('Failed to upload buffer');
+      
+      consoleSpy.mockRestore();
+    });
   });
 
   describe('deleteFile', () => {

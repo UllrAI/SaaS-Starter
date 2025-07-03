@@ -1044,4 +1044,237 @@ describe("Admin Actions", () => {
       ).rejects.toThrow("R2 service unavailable");
     });
   });
+
+  describe("Edge Cases and Error Handling", () => {
+    beforeEach(() => {
+      jest.clearAllMocks();
+    });
+
+    it("should handle empty search results", async () => {
+      const mockQuery = {
+        from: jest.fn().mockReturnThis(),
+        leftJoin: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
+        limit: jest.fn().mockReturnThis(),
+        offset: jest.fn().mockResolvedValue([]),
+      };
+      
+      const mockTotalQuery = {
+        from: jest.fn().mockReturnThis(),
+        where: jest.fn().mockResolvedValue([{ total: 0 }]),
+      };
+      
+      mockDb.select.mockReturnValueOnce(mockQuery).mockReturnValueOnce(mockTotalQuery);
+      mockOr.mockReturnValue("search-condition");
+      mockIlike.mockReturnValue("ilike-condition");
+
+      const { getUsers } = await import("./admin");
+      
+      // Test search functionality - this should cover line 192
+      const result = await getUsers({ search: "nonexistent@example.com" });
+      
+      expect(mockOr).toHaveBeenCalled();
+      expect(mockIlike).toHaveBeenCalledWith(expect.anything(), "%nonexistent@example.com%");
+      expect(result.data).toHaveLength(0);
+      expect(result.pagination.total).toBe(0);
+    });
+
+    it("should handle pagination with large offset", async () => {
+      const mockQuery = {
+        from: jest.fn().mockReturnThis(),
+        leftJoin: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
+        limit: jest.fn().mockReturnThis(),
+        offset: jest.fn().mockResolvedValue([]),
+      };
+      
+      const mockTotalQuery = {
+        from: jest.fn().mockReturnThis(),
+        where: jest.fn().mockResolvedValue([{ total: 1000 }]),
+      };
+      
+      mockDb.select.mockReturnValueOnce(mockQuery).mockReturnValueOnce(mockTotalQuery);
+
+      const { getUsers } = await import("./admin");
+      
+      const result = await getUsers({ page: 100, limit: 10 });
+      
+      expect(mockQuery.offset).toHaveBeenCalledWith(990); // (100 - 1) * 10
+      expect(result.pagination.total).toBe(1000);
+      expect(result.pagination.totalPages).toBe(100);
+    });
+
+    it("should handle complex search with special characters", async () => {
+      const mockQuery = {
+        from: jest.fn().mockReturnThis(),
+        leftJoin: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
+        limit: jest.fn().mockReturnThis(),
+        offset: jest.fn().mockResolvedValue([]),
+      };
+      
+      const mockTotalQuery = {
+        from: jest.fn().mockReturnThis(),
+        where: jest.fn().mockResolvedValue([{ total: 0 }]),
+      };
+      
+      mockDb.select.mockReturnValueOnce(mockQuery).mockReturnValueOnce(mockTotalQuery);
+      mockOr.mockReturnValue("search-condition");
+      mockIlike.mockReturnValue("ilike-condition");
+
+      const { getUsers } = await import("./admin");
+      
+      // Test search with special characters
+      await getUsers({ search: "user@domain-with-special.chars_123" });
+      
+      expect(mockOr).toHaveBeenCalled();
+      expect(mockIlike).toHaveBeenCalledWith(expect.anything(), "%user@domain-with-special.chars_123%");
+    });
+
+    it("should handle all specific file type categories", async () => {
+      const fileTypes = ["video", "audio", "pdf", "text", "archive"];
+      
+      for (const fileType of fileTypes) {
+        const mockQuery = {
+          from: jest.fn().mockReturnThis(),
+          innerJoin: jest.fn().mockReturnThis(),
+          where: jest.fn().mockReturnThis(),
+          orderBy: jest.fn().mockReturnThis(),
+          limit: jest.fn().mockReturnThis(),
+          offset: jest.fn().mockResolvedValue([]),
+        };
+        
+        const mockTotalQuery = {
+          from: jest.fn().mockReturnThis(),
+          innerJoin: jest.fn().mockReturnThis(),
+          where: jest.fn().mockResolvedValue([{ total: 0 }]),
+        };
+        
+        mockDb.select.mockReturnValueOnce(mockQuery).mockReturnValueOnce(mockTotalQuery);
+        
+        const { getUploads } = await import("./admin");
+        
+        await getUploads({ fileType });
+      }
+      
+      expect(mockDb.select).toHaveBeenCalled();
+    });
+
+    it("should handle unknown file type gracefully", async () => {
+      const mockQuery = {
+        from: jest.fn().mockReturnThis(),
+        innerJoin: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
+        limit: jest.fn().mockReturnThis(),
+        offset: jest.fn().mockResolvedValue([]),
+      };
+      
+      const mockTotalQuery = {
+        from: jest.fn().mockReturnThis(),
+        innerJoin: jest.fn().mockReturnThis(),
+        where: jest.fn().mockResolvedValue([{ total: 0 }]),
+      };
+      
+      mockDb.select.mockReturnValueOnce(mockQuery).mockReturnValueOnce(mockTotalQuery);
+      
+      const { getUploads } = await import("./admin");
+      
+      await getUploads({ fileType: "unknown-type" });
+      
+      expect(mockDb.select).toHaveBeenCalled();
+    });
+
+    it("should handle conditional where clause combinations in payments", async () => {
+      const mockQuery = {
+        from: jest.fn().mockReturnThis(),
+        leftJoin: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
+        limit: jest.fn().mockReturnThis(),
+        offset: jest.fn().mockResolvedValue([]),
+      };
+      
+      const mockTotalQuery = {
+        from: jest.fn().mockReturnThis(),
+        leftJoin: jest.fn().mockReturnThis(),
+        where: jest.fn().mockResolvedValue([{ total: 0 }]),
+      };
+      
+      mockDb.select.mockReturnValueOnce(mockQuery).mockReturnValueOnce(mockTotalQuery);
+      
+      const { getPayments } = await import("./admin");
+      
+      // Test with all conditions set
+      await getPayments({ 
+        search: "test", 
+        status: "succeeded", 
+        dateFrom: "2023-01-01", 
+        dateTo: "2023-12-31" 
+      });
+      
+      expect(mockGte).toHaveBeenCalled();
+      expect(mockLte).toHaveBeenCalled();
+      expect(mockEq).toHaveBeenCalled();
+    });
+
+    it("should handle payment filtering with multiple conditions", async () => {
+      const mockQuery = {
+        from: jest.fn().mockReturnThis(),
+        leftJoin: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
+        limit: jest.fn().mockReturnThis(),
+        offset: jest.fn().mockResolvedValue([]),
+      };
+      
+      const mockTotalQuery = {
+        from: jest.fn().mockReturnThis(),
+        leftJoin: jest.fn().mockReturnThis(),
+        where: jest.fn().mockResolvedValue([{ total: 0 }]),
+      };
+      
+      mockDb.select.mockReturnValueOnce(mockQuery).mockReturnValueOnce(mockTotalQuery);
+      mockOr.mockReturnValue("search-condition");
+      mockIlike.mockReturnValue("ilike-condition");
+      
+      const { getPayments } = await import("./admin");
+      
+      // Test payment search with paymentId search
+      await getPayments({ search: "pay_123abc" });
+      
+      expect(mockIlike).toHaveBeenCalledWith(mockPayments.paymentId, "%pay_123abc%");
+      expect(mockOr).toHaveBeenCalled();
+    });
+
+    it("should handle file upload conditions with empty conditions array", async () => {
+      const mockQuery = {
+        from: jest.fn().mockReturnThis(),
+        innerJoin: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
+        limit: jest.fn().mockReturnThis(),
+        offset: jest.fn().mockResolvedValue([]),
+      };
+      
+      const mockTotalQuery = {
+        from: jest.fn().mockReturnThis(),
+        innerJoin: jest.fn().mockReturnThis(),
+        where: jest.fn().mockResolvedValue([{ total: 0 }]),
+      };
+      
+      mockDb.select.mockReturnValueOnce(mockQuery).mockReturnValueOnce(mockTotalQuery);
+      mockAnd.mockReturnValue("and-condition");
+      
+      const { getUploads } = await import("./admin");
+      
+      // Test with no search and fileType "all" to test empty conditions
+      await getUploads({ search: "", fileType: "all" });
+      
+      expect(mockQuery.where).toHaveBeenCalledWith(undefined);
+    });
+  });
 });

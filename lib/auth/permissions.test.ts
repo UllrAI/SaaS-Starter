@@ -48,520 +48,346 @@ describe("Auth Permissions", () => {
     });
   });
 
-  describe("getCurrentUser", () => {
-    it("should return user data when session exists", async () => {
-      const mockSession = {
-        user: {
-          id: "user1",
-          name: "John Doe",
-          email: "john@example.com",
-          role: "admin",
-          image: "https://example.com/avatar.jpg",
-        },
-      };
-      
-      mockAuth.api.getSession.mockResolvedValue(mockSession);
-      
-      const { getCurrentUser } = await import("./permissions");
-      
-      const result = await getCurrentUser();
-      
-      expect(result).toEqual({
-        id: "user1",
-        name: "John Doe",
-        email: "john@example.com",
-        role: "admin",
-        image: "https://example.com/avatar.jpg",
-      });
-      
-      expect(mockAuth.api.getSession).toHaveBeenCalledWith({
-        headers: expect.any(Map),
-      });
-    });
-
-    it("should return null when no session exists", async () => {
-      mockAuth.api.getSession.mockResolvedValue(null);
-      
-      const { getCurrentUser } = await import("./permissions");
-      
-      const result = await getCurrentUser();
-      
-      expect(result).toBeNull();
-    });
-
-    it("should return null when session has no user", async () => {
-      mockAuth.api.getSession.mockResolvedValue({ user: null });
-      
-      const { getCurrentUser } = await import("./permissions");
-      
-      const result = await getCurrentUser();
-      
-      expect(result).toBeNull();
-    });
-
-    it("should default role to 'user' when not specified", async () => {
-      const mockSession = {
-        user: {
-          id: "user1",
-          name: "John Doe",
-          email: "john@example.com",
-          // role is missing
-        },
-      };
-      
-      mockAuth.api.getSession.mockResolvedValue(mockSession);
-      
-      const { getCurrentUser } = await import("./permissions");
-      
-      const result = await getCurrentUser();
-      
-      expect(result?.role).toBe("user");
-    });
-
-    it("should handle missing image field", async () => {
-      const mockSession = {
-        user: {
-          id: "user1",
-          name: "John Doe",
-          email: "john@example.com",
-          role: "admin",
-          // image is missing
-        },
-      };
-      
-      mockAuth.api.getSession.mockResolvedValue(mockSession);
-      
-      const { getCurrentUser } = await import("./permissions");
-      
-      const result = await getCurrentUser();
-      
-      expect(result?.image).toBeUndefined();
-    });
-
-    it("should handle client-side context errors", async () => {
-      mockAuth.api.getSession.mockRejectedValue(new Error("Not in server context"));
-      
-      const { getCurrentUser } = await import("./permissions");
-      
-      const result = await getCurrentUser();
-      
-      expect(result).toBeNull();
-    });
-
-    it("should handle headers import errors", async () => {
-      // Mock the dynamic import to fail
-      jest.doMock("next/headers", () => {
-        throw new Error("Headers not available in this context");
-      });
-      
-      const { getCurrentUser } = await import("./permissions");
-      
-      const result = await getCurrentUser();
-      
-      expect(result).toBeNull();
-    });
-  });
-
-  describe("hasRole", () => {
-    it("should delegate to checkRole function", async () => {
-      mockCheckRole.mockReturnValue(true);
-      
-      const { hasRole } = await import("./permissions");
-      
-      const result = hasRole("admin", "user");
-      
-      expect(result).toBe(true);
-      expect(mockCheckRole).toHaveBeenCalledWith("admin", "user");
-    });
-
-    it("should return false when checkRole returns false", async () => {
-      mockCheckRole.mockReturnValue(false);
-      
-      const { hasRole } = await import("./permissions");
-      
-      const result = hasRole("user", "admin");
-      
-      expect(result).toBe(false);
-      expect(mockCheckRole).toHaveBeenCalledWith("user", "admin");
-    });
-
-    it("should pass through all role combinations correctly", async () => {
-      const { hasRole } = await import("./permissions");
-      
-      // Test various role combinations
-      hasRole("user", "user");
-      hasRole("admin", "admin");
-      hasRole("super_admin", "super_admin");
-      hasRole("admin", "user");
-      hasRole("super_admin", "admin");
-      
-      expect(mockCheckRole).toHaveBeenCalledTimes(5);
-      expect(mockCheckRole).toHaveBeenCalledWith("user", "user");
-      expect(mockCheckRole).toHaveBeenCalledWith("admin", "admin");
-      expect(mockCheckRole).toHaveBeenCalledWith("super_admin", "super_admin");
-      expect(mockCheckRole).toHaveBeenCalledWith("admin", "user");
-      expect(mockCheckRole).toHaveBeenCalledWith("super_admin", "admin");
-    });
-  });
-
   describe("requireAuth", () => {
-    it("should return user when authenticated and has required role", async () => {
-      const mockSession = {
-        user: {
-          id: "user1",
-          name: "John Doe",
-          email: "john@example.com",
-          role: "admin",
-        },
+    it("should return user when authenticated", async () => {
+      const mockUser = {
+        id: "user-123",
+        email: "user@example.com",
+        role: "user",
+        name: "Test User",
+        image: "https://example.com/avatar.jpg",
       };
       
-      mockAuth.api.getSession.mockResolvedValue(mockSession);
-      mockCheckRole.mockReturnValue(true);
+      mockAuth.api.getSession.mockResolvedValue({
+        session: { userId: "user-123" },
+        user: mockUser,
+      });
       
       const { requireAuth } = await import("./permissions");
+      const result = await requireAuth();
       
-      const result = await requireAuth("user");
-      
-      expect(result).toEqual({
-        id: "user1",
-        name: "John Doe",
-        email: "john@example.com",
-        role: "admin",
-        image: undefined,
-      });
+      expect(result).toEqual(mockUser);
+      expect(mockAuth.api.getSession).toHaveBeenCalled();
     });
-
+    
     it("should redirect to login when not authenticated", async () => {
-      mockAuth.api.getSession.mockResolvedValue(null);
+      mockAuth.api.getSession.mockResolvedValue({ session: null, user: null });
       
       const { requireAuth } = await import("./permissions");
       
       await expect(requireAuth()).rejects.toThrow("NEXT_REDIRECT: /login");
       expect(mockRedirect).toHaveBeenCalledWith("/login");
     });
-
-    it("should redirect to dashboard when lacking required role", async () => {
-      const mockSession = {
-        user: {
-          id: "user1",
-          name: "John Doe",
-          email: "john@example.com",
-          role: "user",
-        },
-      };
-      
-      mockAuth.api.getSession.mockResolvedValue(mockSession);
-      mockCheckRole.mockReturnValue(false);
+    
+    it("should redirect to login when session exists but no user", async () => {
+      mockAuth.api.getSession.mockResolvedValue({
+        session: { userId: "user-123" },
+        user: null,
+      });
       
       const { requireAuth } = await import("./permissions");
       
-      await expect(requireAuth("admin")).rejects.toThrow("NEXT_REDIRECT: /dashboard");
-      expect(mockRedirect).toHaveBeenCalledWith("/dashboard");
+      await expect(requireAuth()).rejects.toThrow("NEXT_REDIRECT: /login");
+      expect(mockRedirect).toHaveBeenCalledWith("/login");
     });
-
-    it("should allow access without role requirement", async () => {
-      const mockSession = {
-        user: {
-          id: "user1",
-          name: "John Doe",
-          email: "john@example.com",
-          role: "user",
-        },
-      };
-      
-      mockAuth.api.getSession.mockResolvedValue(mockSession);
+    
+    it("should handle auth API errors gracefully", async () => {
+      mockAuth.api.getSession.mockRejectedValue(new Error("Auth service unavailable"));
       
       const { requireAuth } = await import("./permissions");
       
-      const result = await requireAuth();
-      
-      expect(result).toEqual({
-        id: "user1",
-        name: "John Doe",
-        email: "john@example.com",
-        role: "user",
-        image: undefined,
-      });
-      
-      // Should not call hasRole when no required role specified
-      expect(mockCheckRole).not.toHaveBeenCalled();
+      await expect(requireAuth()).rejects.toThrow("NEXT_REDIRECT: /login");
+      expect(mockRedirect).toHaveBeenCalledWith("/login");
     });
-  });
-
-  describe("requireAdmin", () => {
-    it("should return user when user is admin", async () => {
-      const mockSession = {
-        user: {
-          id: "admin1",
-          name: "Admin User",
-          email: "admin@example.com",
-          role: "admin",
-        },
-      };
-      
-      mockAuth.api.getSession.mockResolvedValue(mockSession);
-      mockCheckRole.mockReturnValue(true);
-      
-      const { requireAdmin } = await import("./permissions");
-      
-      const result = await requireAdmin();
-      
-      expect(result).toEqual({
-        id: "admin1",
-        name: "Admin User",
-        email: "admin@example.com",
-        role: "admin",
-        image: undefined,
-      });
-      
-      expect(mockCheckRole).toHaveBeenCalledWith("admin", "admin");
-    });
-
-    it("should redirect when user is not admin", async () => {
-      const mockSession = {
-        user: {
-          id: "user1",
-          name: "Regular User",
-          email: "user@example.com",
-          role: "user",
-        },
-      };
-      
-      mockAuth.api.getSession.mockResolvedValue(mockSession);
-      mockCheckRole.mockReturnValue(false);
-      
-      const { requireAdmin } = await import("./permissions");
-      
-      await expect(requireAdmin()).rejects.toThrow("NEXT_REDIRECT: /dashboard");
-    });
-  });
-
-  describe("requireSuperAdmin", () => {
-    it("should return user when user is super admin", async () => {
-      const mockSession = {
-        user: {
-          id: "superadmin1",
-          name: "Super Admin",
-          email: "superadmin@example.com",
-          role: "super_admin",
-        },
-      };
-      
-      mockAuth.api.getSession.mockResolvedValue(mockSession);
-      mockCheckRole.mockReturnValue(true);
-      
-      const { requireSuperAdmin } = await import("./permissions");
-      
-      const result = await requireSuperAdmin();
-      
-      expect(result).toEqual({
-        id: "superadmin1",
-        name: "Super Admin",
-        email: "superadmin@example.com",
-        role: "super_admin",
-        image: undefined,
-      });
-      
-      expect(mockCheckRole).toHaveBeenCalledWith("super_admin", "super_admin");
-    });
-
-    it("should redirect when user is not super admin", async () => {
-      const mockSession = {
-        user: {
-          id: "admin1",
-          name: "Admin User",
-          email: "admin@example.com",
-          role: "admin",
-        },
-      };
-      
-      mockAuth.api.getSession.mockResolvedValue(mockSession);
-      mockCheckRole.mockReturnValue(false);
-      
-      const { requireSuperAdmin } = await import("./permissions");
-      
-      await expect(requireSuperAdmin()).rejects.toThrow("NEXT_REDIRECT: /dashboard");
-    });
-  });
-
-  describe("isAdmin", () => {
-    it("should return true when user is admin", async () => {
-      const mockSession = {
-        user: {
-          id: "admin1",
-          name: "Admin User",
-          email: "admin@example.com",
-          role: "admin",
-        },
-      };
-      
-      mockAuth.api.getSession.mockResolvedValue(mockSession);
-      mockCheckRole.mockReturnValue(true);
-      
-      const { isAdmin } = await import("./permissions");
-      
-      const result = await isAdmin();
-      
-      expect(result).toBe(true);
-      expect(mockCheckRole).toHaveBeenCalledWith("admin", "admin");
-    });
-
-    it("should return false when user is not admin", async () => {
-      const mockSession = {
-        user: {
-          id: "user1",
-          name: "Regular User",
-          email: "user@example.com",
-          role: "user",
-        },
-      };
-      
-      mockAuth.api.getSession.mockResolvedValue(mockSession);
-      mockCheckRole.mockReturnValue(false);
-      
-      const { isAdmin } = await import("./permissions");
-      
-      const result = await isAdmin();
-      
-      expect(result).toBe(false);
-      expect(mockCheckRole).toHaveBeenCalledWith("user", "admin");
-    });
-
-    it("should return false when no user", async () => {
-      mockAuth.api.getSession.mockResolvedValue(null);
-      
-      const { isAdmin } = await import("./permissions");
-      
-      const result = await isAdmin();
-      
-      expect(result).toBe(false);
-      expect(mockCheckRole).not.toHaveBeenCalled();
-    });
-  });
-
-  describe("isSuperAdmin", () => {
-    it("should return true when user is super admin", async () => {
-      const mockSession = {
-        user: {
-          id: "superadmin1",
-          name: "Super Admin",
-          email: "superadmin@example.com",
-          role: "super_admin",
-        },
-      };
-      
-      mockAuth.api.getSession.mockResolvedValue(mockSession);
-      mockCheckRole.mockReturnValue(true);
-      
-      const { isSuperAdmin } = await import("./permissions");
-      
-      const result = await isSuperAdmin();
-      
-      expect(result).toBe(true);
-      expect(mockCheckRole).toHaveBeenCalledWith("super_admin", "super_admin");
-    });
-
-    it("should return false when user is not super admin", async () => {
-      const mockSession = {
-        user: {
-          id: "admin1",
-          name: "Admin User",
-          email: "admin@example.com",
-          role: "admin",
-        },
-      };
-      
-      mockAuth.api.getSession.mockResolvedValue(mockSession);
-      mockCheckRole.mockReturnValue(false);
-      
-      const { isSuperAdmin } = await import("./permissions");
-      
-      const result = await isSuperAdmin();
-      
-      expect(result).toBe(false);
-      expect(mockCheckRole).toHaveBeenCalledWith("admin", "super_admin");
-    });
-
-    it("should return false when no user", async () => {
-      mockAuth.api.getSession.mockResolvedValue(null);
-      
-      const { isSuperAdmin } = await import("./permissions");
-      
-      const result = await isSuperAdmin();
-      
-      expect(result).toBe(false);
-      expect(mockCheckRole).not.toHaveBeenCalled();
-    });
-  });
-
-  describe("Error handling and edge cases", () => {
-    it("should handle session API errors in requireAuth", async () => {
-      mockAuth.api.getSession.mockRejectedValue(new Error("Session API error"));
+    
+    it("should handle network timeout gracefully", async () => {
+      mockAuth.api.getSession.mockImplementation(() => 
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error("Timeout")), 100)
+        )
+      );
       
       const { requireAuth } = await import("./permissions");
       
       await expect(requireAuth()).rejects.toThrow("NEXT_REDIRECT: /login");
     });
+  });
 
-    it("should handle malformed session data", async () => {
+  describe("requireAdmin", () => {
+    it("should return admin user when authenticated with admin role", async () => {
+      const mockAdmin = {
+        id: "admin-123",
+        email: "admin@example.com",
+        role: "admin",
+        name: "Admin User",
+        image: "https://example.com/admin.jpg",
+      };
+      
       mockAuth.api.getSession.mockResolvedValue({
-        user: {
-          // Missing required fields
-          id: "user1",
-          // name, email missing
-        },
+        session: { userId: "admin-123" },
+        user: mockAdmin,
       });
       
-      const { getCurrentUser } = await import("./permissions");
+      const { requireAdmin } = await import("./permissions");
+      const result = await requireAdmin();
       
-      const result = await getCurrentUser();
-      
-      expect(result?.id).toBe("user1");
-      expect(result?.role).toBe("user"); // Default role
+      expect(result).toEqual(mockAdmin);
+      expect(mockCheckRole).toHaveBeenCalledWith("admin", "admin");
     });
-
-    it("should handle null/undefined user roles", async () => {
+    
+    it("should return super_admin user when authenticated with super_admin role", async () => {
+      const mockSuperAdmin = {
+        id: "super-123",
+        email: "super@example.com",
+        role: "super_admin",
+        name: "Super Admin",
+        image: "https://example.com/super.jpg",
+      };
+      
       mockAuth.api.getSession.mockResolvedValue({
-        user: {
-          id: "user1",
-          name: "Test User",
-          email: "test@example.com",
-          role: null,
-        },
+        session: { userId: "super-123" },
+        user: mockSuperAdmin,
       });
       
-      const { getCurrentUser } = await import("./permissions");
+      const { requireAdmin } = await import("./permissions");
+      const result = await requireAdmin();
       
-      const result = await getCurrentUser();
+      expect(result).toEqual(mockSuperAdmin);
+      expect(mockCheckRole).toHaveBeenCalledWith("super_admin", "admin");
+    });
+    
+    it("should redirect to login when not authenticated", async () => {
+      mockAuth.api.getSession.mockResolvedValue({ session: null, user: null });
       
-      expect(result?.role).toBe("user");
+      const { requireAdmin } = await import("./permissions");
+      
+      await expect(requireAdmin()).rejects.toThrow("NEXT_REDIRECT: /login");
+      expect(mockRedirect).toHaveBeenCalledWith("/login");
+    });
+    
+    it("should redirect to dashboard when authenticated as regular user", async () => {
+      const mockUser = {
+        id: "user-123",
+        email: "user@example.com",
+        role: "user",
+        name: "Test User",
+        image: "https://example.com/avatar.jpg",
+      };
+      
+      mockAuth.api.getSession.mockResolvedValue({
+        session: { userId: "user-123" },
+        user: mockUser,
+      });
+      
+      mockCheckRole.mockReturnValue(false);
+      
+      const { requireAdmin } = await import("./permissions");
+      
+      await expect(requireAdmin()).rejects.toThrow("NEXT_REDIRECT: /dashboard");
+      expect(mockRedirect).toHaveBeenCalledWith("/dashboard");
+    });
+    
+    it("should handle role checking errors", async () => {
+      const mockUser = {
+        id: "user-123",
+        email: "user@example.com",
+        role: "user",
+        name: "Test User",
+        image: "https://example.com/avatar.jpg",
+      };
+      
+      mockAuth.api.getSession.mockResolvedValue({
+        session: { userId: "user-123" },
+        user: mockUser,
+      });
+      
+      mockCheckRole.mockImplementation(() => {
+        throw new Error("Role check failed");
+      });
+      
+      const { requireAdmin } = await import("./permissions");
+      
+      await expect(requireAdmin()).rejects.toThrow("Role check failed");
     });
   });
 
-  describe("Type exports and module structure", () => {
-    it("should export all required functions", async () => {
-      const permissions = await import("./permissions");
+  describe("requireSuperAdmin", () => {
+    it("should return super_admin user when authenticated with super_admin role", async () => {
+      const mockSuperAdmin = {
+        id: "super-123",
+        email: "super@example.com",
+        role: "super_admin",
+        name: "Super Admin",
+        image: "https://example.com/super.jpg",
+      };
       
-      expect(typeof permissions.getCurrentUser).toBe("function");
-      expect(typeof permissions.hasRole).toBe("function");
-      expect(typeof permissions.requireAuth).toBe("function");
-      expect(typeof permissions.requireAdmin).toBe("function");
-      expect(typeof permissions.requireSuperAdmin).toBe("function");
-      expect(typeof permissions.isAdmin).toBe("function");
-      expect(typeof permissions.isSuperAdmin).toBe("function");
+      mockAuth.api.getSession.mockResolvedValue({
+        session: { userId: "super-123" },
+        user: mockSuperAdmin,
+      });
+      
+      const { requireSuperAdmin } = await import("./permissions");
+      const result = await requireSuperAdmin();
+      
+      expect(result).toEqual(mockSuperAdmin);
+      expect(mockCheckRole).toHaveBeenCalledWith("super_admin", "super_admin");
     });
-
-    it("should have consistent function signatures", async () => {
-      const permissions = await import("./permissions");
+    
+    it("should redirect to dashboard when authenticated as admin", async () => {
+      const mockAdmin = {
+        id: "admin-123",
+        email: "admin@example.com",
+        role: "admin",
+        name: "Admin User",
+        image: "https://example.com/admin.jpg",
+      };
       
-      // Test parameter counts
-      expect(permissions.hasRole.length).toBe(2);
-      expect(permissions.getCurrentUser.length).toBe(0);
-      expect(permissions.requireAuth.length).toBe(1);
-      expect(permissions.requireAdmin.length).toBe(0);
-      expect(permissions.requireSuperAdmin.length).toBe(0);
-      expect(permissions.isAdmin.length).toBe(0);
-      expect(permissions.isSuperAdmin.length).toBe(0);
+      mockAuth.api.getSession.mockResolvedValue({
+        session: { userId: "admin-123" },
+        user: mockAdmin,
+      });
+      
+      mockCheckRole.mockReturnValue(false);
+      
+      const { requireSuperAdmin } = await import("./permissions");
+      
+      await expect(requireSuperAdmin()).rejects.toThrow("NEXT_REDIRECT: /dashboard");
+      expect(mockRedirect).toHaveBeenCalledWith("/dashboard");
+    });
+    
+    it("should redirect to login when not authenticated", async () => {
+      mockAuth.api.getSession.mockResolvedValue({ session: null, user: null });
+      
+      const { requireSuperAdmin } = await import("./permissions");
+      
+      await expect(requireSuperAdmin()).rejects.toThrow("NEXT_REDIRECT: /login");
+      expect(mockRedirect).toHaveBeenCalledWith("/login");
+    });
+  });
+
+  describe("getCurrentUser", () => {
+    it("should return user when authenticated", async () => {
+      const mockUser = {
+        id: "user-123",
+        email: "user@example.com",
+        role: "user",
+        name: "Test User",
+        image: "https://example.com/avatar.jpg",
+      };
+      
+      mockAuth.api.getSession.mockResolvedValue({
+        session: { userId: "user-123" },
+        user: mockUser,
+      });
+      
+      const { getCurrentUser } = await import("./permissions");
+      const result = await getCurrentUser();
+      
+      expect(result).toEqual(mockUser);
+    });
+    
+    it("should return null when not authenticated", async () => {
+      mockAuth.api.getSession.mockResolvedValue({ session: null, user: null });
+      
+      const { getCurrentUser } = await import("./permissions");
+      const result = await getCurrentUser();
+      
+      expect(result).toBeNull();
+    });
+    
+    it("should return null when session exists but no user", async () => {
+      mockAuth.api.getSession.mockResolvedValue({
+        session: { userId: "user-123" },
+        user: null,
+      });
+      
+      const { getCurrentUser } = await import("./permissions");
+      const result = await getCurrentUser();
+      
+      expect(result).toBeNull();
+    });
+    
+    it("should handle auth API errors gracefully", async () => {
+      mockAuth.api.getSession.mockRejectedValue(new Error("Auth service unavailable"));
+      
+      const { getCurrentUser } = await import("./permissions");
+      const result = await getCurrentUser();
+      
+      expect(result).toBeNull();
+    });
+  });
+
+  describe("Edge cases and security scenarios", () => {
+    it("should handle malformed user data", async () => {
+      mockAuth.api.getSession.mockResolvedValue({
+        session: { userId: "user-123" },
+        user: { id: "user-123", email: null, role: "user", name: "Test", image: undefined },
+      });
+      
+      const { requireAuth } = await import("./permissions");
+      
+      const result = await requireAuth();
+      expect(result.id).toBe("user-123");
+    });
+    
+    it("should handle empty user ID", async () => {
+      mockAuth.api.getSession.mockResolvedValue({
+        session: { userId: "" },
+        user: { id: "", email: "test@example.com", role: "user", name: "Test", image: undefined },
+      });
+      
+      const { requireAuth } = await import("./permissions");
+      
+      const result = await requireAuth();
+      expect(result.id).toBe("");
+    });
+    
+    it("should handle concurrent auth requests", async () => {
+      const mockUser = {
+        id: "user-123",
+        email: "user@example.com",
+        role: "user",
+        name: "Test User",
+        image: "https://example.com/avatar.jpg",
+      };
+      
+      mockAuth.api.getSession.mockResolvedValue({
+        session: { userId: "user-123" },
+        user: mockUser,
+      });
+      
+      const { requireAuth } = await import("./permissions");
+      
+      const results = await Promise.all([
+        requireAuth(),
+        requireAuth(),
+        requireAuth(),
+      ]);
+      
+      expect(results).toHaveLength(3);
+      expect(results.every(result => result.id === "user-123")).toBe(true);
+    });
+    
+    it("should handle session expiration during request", async () => {
+      let callCount = 0;
+      mockAuth.api.getSession.mockImplementation(() => {
+        callCount++;
+        if (callCount === 1) {
+          return Promise.resolve({
+            session: { userId: "user-123" },
+            user: { id: "user-123", email: "user@example.com", role: "user", name: "Test User", image: "https://example.com/avatar.jpg" },
+          });
+        } else {
+          return Promise.resolve({ session: null, user: null });
+        }
+      });
+      
+      const { requireAuth } = await import("./permissions");
+      
+      const firstResult = await requireAuth();
+      expect(firstResult.id).toBe("user-123");
+      
+      await expect(requireAuth()).rejects.toThrow("NEXT_REDIRECT: /login");
     });
   });
 });

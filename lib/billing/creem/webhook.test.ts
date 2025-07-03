@@ -22,8 +22,10 @@ const mockGetProductTierByProductId = jest.fn();
 
 const mockEq = jest.fn();
 
-// Mock all imports
-jest.mock("crypto");
+// Mock crypto module
+const mockTimingSafeEqual = jest.fn();
+const mockCreateHmacFunction = jest.fn();
+
 jest.mock("@/database", () => ({
   db: mockDb,
 }));
@@ -52,22 +54,15 @@ jest.mock("@/lib/config/products", () => ({
   getProductTierByProductId: mockGetProductTierByProductId,
 }));
 
-// Mock crypto functions
-const mockCreateHmac = jest.fn();
-const mockUpdate = jest.fn();
-const mockDigest = jest.fn();
-const mockTimingSafeEqual = jest.fn();
-
-// Create a complete crypto mock
-const cryptoMock = {
-  createHmac: mockCreateHmac,
+jest.mock("crypto", () => ({
+  createHmac: mockCreateHmacFunction,
   timingSafeEqual: mockTimingSafeEqual,
-};
-
-// Replace the crypto module
-jest.mock("crypto", () => cryptoMock);
+}));
 
 describe("Creem Webhook Handler", () => {
+  const mockUpdate = jest.fn();
+  const mockDigest = jest.fn();
+  
   beforeEach(() => {
     jest.clearAllMocks();
     
@@ -77,7 +72,7 @@ describe("Creem Webhook Handler", () => {
     jest.spyOn(console, 'error').mockImplementation(() => {});
     
     // Setup default mock implementations
-    mockCreateHmac.mockReturnValue({
+    mockCreateHmacFunction.mockReturnValue({
       update: mockUpdate.mockReturnValue({
         digest: mockDigest.mockReturnValue("computed-signature"),
       }),
@@ -195,6 +190,52 @@ describe("Creem Webhook Handler", () => {
         }),
         expect.any(Object)
       );
+    });
+
+    it("should reject invalid signature", async () => {
+      mockTimingSafeEqual.mockReturnValue(false);
+      
+      const payload = JSON.stringify({
+        eventType: "checkout.completed",
+        object: { id: "checkout_123" },
+      });
+      
+      const { handleCreemWebhook } = await import("./webhook");
+      
+      await expect(handleCreemWebhook(payload, "invalid-signature")).rejects.toThrow("Invalid signature.");
+    });
+
+
+    it("should handle duplicate webhook events", async () => {
+      mockIsWebhookEventProcessed.mockResolvedValue(true);
+      
+      const payload = JSON.stringify({
+        eventType: "checkout.completed",
+        object: { id: "checkout_123" },
+      });
+      
+      const { handleCreemWebhook } = await import("./webhook");
+      
+      const result = await handleCreemWebhook(payload, "test-signature");
+      
+      expect(result).toEqual({ received: true });
+      expect(mockUpsertSubscription).not.toHaveBeenCalled();
+      expect(mockUpsertPayment).not.toHaveBeenCalled();
+    });
+
+    it("should handle error during signature verification", async () => {
+      mockTimingSafeEqual.mockImplementation(() => {
+        throw new Error("Buffer length mismatch");
+      });
+      
+      const payload = JSON.stringify({
+        eventType: "checkout.completed",
+        object: { id: "checkout_123" },
+      });
+      
+      const { handleCreemWebhook } = await import("./webhook");
+      
+      await expect(handleCreemWebhook(payload, "test-signature")).rejects.toThrow("Invalid signature.");
     });
 
     it("should handle subscription.active event", async () => {

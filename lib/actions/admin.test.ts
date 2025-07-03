@@ -383,6 +383,52 @@ describe("Admin Actions", () => {
       await getUsers({ sortBy: "email", sortOrder: "desc" });
       expect(mockDesc).toHaveBeenCalledWith(mockUsers.email);
     });
+
+    it("should handle users with existing subscriptions and new subscription data", async () => {
+      const mockUsersData = [
+        {
+          id: "user1",
+          name: "John Doe",
+          email: "john@example.com",
+          emailVerified: true,
+          image: null,
+          role: "user",
+          createdAt: new Date("2024-01-01"),
+          updatedAt: new Date("2024-01-01"),
+          subscriptionStatus: "active",
+          subscriptionId: "sub2", // Different subscription ID
+        },
+      ];
+      
+      const mockTotalData = [{ total: 1 }];
+      
+      const mockQuery = {
+        from: jest.fn().mockReturnThis(),
+        leftJoin: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
+        limit: jest.fn().mockReturnThis(),
+        offset: jest.fn().mockResolvedValue(mockUsersData),
+      };
+      
+      const mockTotalQuery = {
+        from: jest.fn().mockReturnThis(),
+        where: jest.fn().mockResolvedValue(mockTotalData),
+      };
+      
+      mockDb.select.mockReturnValueOnce(mockQuery).mockReturnValueOnce(mockTotalQuery);
+      
+      const { getUsers } = await import("./admin");
+      
+      const result = await getUsers({});
+      
+      // Should add the new subscription to existing subscriptions array
+      expect(result.data[0].subscriptions).toHaveLength(1);
+      expect(result.data[0].subscriptions[0]).toEqual({
+        subscriptionId: "sub2",
+        status: "active",
+      });
+    });
   });
 
   describe("getPayments", () => {
@@ -667,6 +713,66 @@ describe("Admin Actions", () => {
       await getUploads({ fileType: "image" });
       
       expect(mockLike).toHaveBeenCalledWith(mockUploads.contentType, "image/%");
+    });
+
+    it("should handle search parameter", async () => {
+      const mockQuery = {
+        from: jest.fn().mockReturnThis(),
+        innerJoin: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
+        limit: jest.fn().mockReturnThis(),
+        offset: jest.fn().mockResolvedValue([]),
+      };
+      
+      const mockTotalQuery = {
+        from: jest.fn().mockReturnThis(),
+        innerJoin: jest.fn().mockReturnThis(),
+        where: jest.fn().mockResolvedValue([{ total: 0 }]),
+      };
+      
+      mockDb.select.mockReturnValueOnce(mockQuery).mockReturnValueOnce(mockTotalQuery);
+      mockOr.mockReturnValue("search-condition");
+      mockIlike.mockReturnValue("like-condition");
+      
+      const { getUploads } = await import("./admin");
+      
+      await getUploads({ search: "test.jpg" });
+      
+      expect(mockIlike).toHaveBeenCalledWith(mockUploads.fileName, "%test.jpg%");
+      expect(mockIlike).toHaveBeenCalledWith(mockUsers.email, "%test.jpg%");
+      expect(mockIlike).toHaveBeenCalledWith(mockUsers.name, "%test.jpg%");
+      expect(mockOr).toHaveBeenCalled();
+    });
+
+    it("should handle 'other' file type filter", async () => {
+      const mockQuery = {
+        from: jest.fn().mockReturnThis(),
+        innerJoin: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
+        limit: jest.fn().mockReturnThis(),
+        offset: jest.fn().mockResolvedValue([]),
+      };
+      
+      const mockTotalQuery = {
+        from: jest.fn().mockReturnThis(),
+        innerJoin: jest.fn().mockReturnThis(),
+        where: jest.fn().mockResolvedValue([{ total: 0 }]),
+      };
+      
+      mockDb.select.mockReturnValueOnce(mockQuery).mockReturnValueOnce(mockTotalQuery);
+      mockLike.mockReturnValue("like-condition");
+      mockNot.mockReturnValue("not-condition");
+      mockAnd.mockReturnValue("and-condition");
+      
+      const { getUploads } = await import("./admin");
+      
+      await getUploads({ fileType: "other" });
+      
+      // Should use not() to exclude all standard file types
+      expect(mockNot).toHaveBeenCalled();
+      expect(mockAnd).toHaveBeenCalled();
     });
   });
 

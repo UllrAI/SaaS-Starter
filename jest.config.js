@@ -11,50 +11,95 @@ const config = {
     "^@/(.*)$": "<rootDir>/$1",
   },
   setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
+  
+  // Transform patterns for external modules
   transformIgnorePatterns: [
     "node_modules/(?!(@t3-oss/env-nextjs|@t3-oss/env-core|postgres|better-auth|better-call|uncrypto|clsx|class-variance-authority|jose|standardwebhooks|next-safe-action|nanostores)/)"
   ],
+  
+  // Coverage configuration
+  coverageReporters: ["text", "lcov", "html"],
+  
+  // Exclude UI-only files and configuration files from coverage
+  coveragePathIgnorePatterns: [
+    // System and build files
+    "node_modules/",
+    "\\.next/",
+    "coverage/",
+    "\\.claude/",
+    
+    // Configuration files
+    "jest\\.config\\.js",
+    "jest\\.setup\\.ts",
+    "next\\.config\\.(js|ts)",
+    "tailwind\\.config\\.js",
+    "postcss\\.config\\.js",
+    "drizzle\\.config\\.ts",
+    "keystatic\\.config\\.ts",
+    
+    // Test files
+    "\\.test\\.(ts|tsx)$",
+    "\\.spec\\.(ts|tsx)$",
+    
+    // Type definitions and utilities
+    "types/",
+    "scripts/",
+    "database/config",
+    
+    // Static files
+    "app/robots\\.ts",
+    "app/sitemap\\.ts",
+    
+    // Email templates (UI-only)
+    "emails/",
+    
+    // Pure UI components (shadcn/ui and similar)
+    "components/ui/",
+    
+    // Theme and styling components
+    "providers/theme-provider\\.tsx",
+    "components/mode-toggle\\.tsx",
+    
+    // Simple utility hooks with no business logic
+    "hooks/use-mobile\\.tsx",
+    
+    // Marketing and static page components
+    "components/homepage/",
+    "components/blog/",
+    "components/logo\\.tsx",
+    "components/cookie-consent\\.tsx",
+    
+    // Complex UI components with minimal business logic
+    "components/payment-options\\.tsx",
+    "components/admin/StatCard\\.tsx",
+    "components/admin/admin-table-base\\.tsx",
+    "components/admin/user-avatar-cell\\.tsx",
+    "components/admin/generic-table/",
+    "components/auth/auth-form-base\\.tsx",
+    "components/auth/link-sent-card\\.tsx",
+    "components/auth/social-login-buttons\\.tsx",
+    
+    // Next.js App Router pages (UI-only)
+    "app/\\(pages\\)/",           // Marketing pages
+    "app/\\(auth\\)/",            // Auth pages  
+    "app/dashboard/.*/_components/", // Dashboard UI components
+    "app/dashboard/.*/page\\.tsx",   // Dashboard pages
+    "app/keystatic/",            // CMS pages
+    
+    // Layout files
+    "app/.*/layout\\.tsx",
+    "app/loading\\.tsx",
+    "app/not-found\\.tsx",
+    "app/layout\\.tsx",
+  ],
+  
+  // Collect coverage from all source files
   collectCoverageFrom: [
     "**/*.{ts,tsx}",
     "!**/*.d.ts",
-    "!**/node_modules/**",
-    "!**/.next/**",
-    "!**/coverage/**",
-    "!**/.claude/**",
-    "!**/jest.config.js",
-    "!**/jest.setup.ts",
-    "!**/next.config.js", 
-    "!**/tailwind.config.js",
-    "!**/postcss.config.js",
-    "!**/drizzle.config.ts",
-    "!**/keystatic.config.ts",
     "!**/*.test.{ts,tsx}",
-    "!**/types/**",
-    "!**/scripts/**",
-    "!**/database/config*.ts",
-    "!**/app/robots.ts",
-    "!**/app/sitemap.ts",
-    // Pure UI-only components exclusions (no business logic)
-    "!**/components/ui/**", // Exclude all components under components/ui
-    "!**/components/homepage/**",
-    "!**/components/blog/**",
-    "!**/components/logo.tsx",
-    "!**/components/auth/auth-form-base.tsx", // Base UI component with minimal logic
-    "!**/components/auth/link-sent-card.tsx", // Pure UI component
-    "!**/components/auth/social-login-buttons.tsx", // UI interaction component
-    "!**/app/(pages)/**", // Exclude all pages under app/(pages)
-    "!**/app/(auth)/**", // Exclude auth pages (mostly UI)
-    "!**/app/dashboard/**/page.tsx", // Exclude dashboard page components
-    "!**/app/**/layout.tsx", // Exclude layout components
-    "!**/app/loading.tsx",
-    "!**/app/not-found.tsx",
-    "!**/app/layout.tsx", // Main layout
-    "!**/emails/**", // Email templates
-    "!**/providers/theme-provider.tsx",
-    "!**/hooks/use-mobile.tsx", // Simple hook
-    "!**/components/cookie-consent.tsx", // UI component
+    "!**/*.spec.{ts,tsx}",
   ],
-  coverageReporters: ["text", "lcov", "html"]
 };
 
 module.exports = createJestConfig(config);

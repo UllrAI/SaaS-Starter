@@ -116,7 +116,7 @@ describe('procedures', () => {
     let consoleSpy: any;
 
     beforeEach(() => {
-      consoleSpy = jest.spyOn(console, 'log');
+      consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
       jest.resetModules();
     });
 

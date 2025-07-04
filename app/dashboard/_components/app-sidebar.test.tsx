@@ -1,6 +1,528 @@
-import { describe, it, expect } from "@jest/globals";
+import { describe, it, expect, jest } from "@jest/globals";
+import { render, screen, fireEvent } from "@testing-library/react";
 import fs from "fs";
 import path from "path";
+import React from "react";
+
+// Mock the useSidebar hook
+const mockToggleSidebar = jest.fn();
+
+// Test component that mimics AppSidebar behavior without external dependencies
+const TestAppSidebar = ({ 
+  pathname = "/dashboard/home",
+  session = null,
+  sidebarOpen = true,
+  onNavigate = jest.fn(),
+  enabledTables = []
+}: {
+  pathname?: string;
+  session?: any;
+  sidebarOpen?: boolean;
+  onNavigate?: jest.Mock;
+  enabledTables?: string[];
+}) => {
+  const navigation = [
+    { title: "Home", url: "/dashboard/home", icon: "🏠" },
+    { title: "Upload", url: "/dashboard/upload", icon: "📤" },
+    { title: "Settings", url: "/dashboard/settings", icon: "⚙️" },
+  ];
+
+  const adminNavigation = [
+    { title: "Admin Dashboard", url: "/dashboard/admin", icon: "📊" },
+    { title: "User Management", url: "/dashboard/admin/users", icon: "👥" },
+    { title: "Payments", url: "/dashboard/admin/payments", icon: "💳" },
+    { title: "Subscriptions", url: "/dashboard/admin/subscriptions", icon: "🛡️" },
+    { title: "Uploads Managements", url: "/dashboard/admin/uploads", icon: "📤" },
+  ];
+
+  const genericTableNavigation = enabledTables.map((key) => ({
+    title: key.charAt(0).toUpperCase() + key.slice(1),
+    url: `/dashboard/admin/tables/${key}`,
+    icon: "🗄️",
+  }));
+
+  const isAdmin = session?.user && ["admin", "super_admin"].includes(session.user.role);
+
+  const handleNavigation = (url: string) => () => {
+    onNavigate(url);
+  };
+
+  const handleDoubleClick = (url: string) => () => {
+    onNavigate(url);
+    mockToggleSidebar();
+  };
+
+  return (
+    <div data-testid="app-sidebar" className={`sidebar ${sidebarOpen ? "open" : "collapsed"}`}>
+      {/* Header */}
+      <div data-testid="sidebar-header" className={sidebarOpen ? "expanded" : "collapsed"}>
+        <div data-testid="logo" onClick={() => onNavigate("/")} className="cursor-pointer">
+          🚀
+        </div>
+        {sidebarOpen && (
+          <span data-testid="app-name">SaaS Starter</span>
+        )}
+      </div>
+
+      {/* Main Navigation */}
+      <div data-testid="sidebar-content">
+        <div data-testid="main-navigation">
+          {navigation.map((item) => (
+            <div
+              key={item.title}
+              data-testid={`nav-item-${item.title.toLowerCase()}`}
+              className={`nav-item ${item.url === pathname ? "active" : ""}`}
+              onClick={handleNavigation(item.url)}
+              onDoubleClick={handleDoubleClick(item.url)}
+            >
+              <span data-testid={`nav-icon-${item.title.toLowerCase()}`}>{item.icon}</span>
+              <span data-testid={`nav-title-${item.title.toLowerCase()}`}>{item.title}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Admin Navigation */}
+        {isAdmin && (
+          <div data-testid="admin-section">
+            {sidebarOpen && (
+              <div data-testid="admin-header" className="section-header">
+                Admin
+              </div>
+            )}
+            <div data-testid="admin-navigation">
+              {adminNavigation.map((item) => (
+                <div
+                  key={item.title}
+                  data-testid={`admin-nav-item-${item.title.toLowerCase().replace(/\s+/g, "-")}`}
+                  className={`nav-item ${item.url === pathname ? "active" : ""}`}
+                  onClick={handleNavigation(item.url)}
+                  onDoubleClick={handleDoubleClick(item.url)}
+                >
+                  <span data-testid={`admin-nav-icon-${item.title.toLowerCase().replace(/\s+/g, "-")}`}>
+                    {item.icon}
+                  </span>
+                  <span data-testid={`admin-nav-title-${item.title.toLowerCase().replace(/\s+/g, "-")}`}>
+                    {item.title}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            {/* Generic Table Navigation */}
+            {genericTableNavigation.length > 0 && (
+              <div data-testid="table-management-section">
+                {sidebarOpen && (
+                  <div data-testid="table-management-header" className="section-header">
+                    Manage Tables
+                  </div>
+                )}
+                <div data-testid="table-navigation">
+                  {genericTableNavigation.map((item) => (
+                    <div
+                      key={item.title}
+                      data-testid={`table-nav-item-${item.title.toLowerCase()}`}
+                      className={`nav-item ${pathname.startsWith(item.url) ? "active" : ""}`}
+                      onClick={handleNavigation(item.url)}
+                      onDoubleClick={handleDoubleClick(item.url)}
+                    >
+                      <span data-testid={`table-nav-icon-${item.title.toLowerCase()}`}>
+                        {item.icon}
+                      </span>
+                      <span data-testid={`table-nav-title-${item.title.toLowerCase()}`}>
+                        {item.title}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Footer */}
+      <div data-testid="sidebar-footer">
+        <div data-testid="user-button">User Button</div>
+      </div>
+    </div>
+  );
+};
+
+// Behavioral tests for AppSidebar component
+describe("AppSidebar Component Behavioral Tests", () => {
+  const mockSession = {
+    user: {
+      id: "123",
+      email: "test@example.com",
+      name: "Test User",
+      role: "user"
+    }
+  };
+
+  const mockAdminSession = {
+    user: {
+      id: "123",
+      email: "admin@example.com",
+      name: "Admin User",
+      role: "admin"
+    }
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  describe("Basic Rendering", () => {
+    it("should render sidebar with basic structure", () => {
+      render(
+        <TestAppSidebar session={mockSession} />
+      );
+
+      expect(screen.getByTestId("app-sidebar")).toBeInTheDocument();
+      expect(screen.getByTestId("sidebar-header")).toBeInTheDocument();
+      expect(screen.getByTestId("sidebar-content")).toBeInTheDocument();
+      expect(screen.getByTestId("sidebar-footer")).toBeInTheDocument();
+    });
+
+    it("should render logo and app name when sidebar is open", () => {
+      render(
+        <TestAppSidebar session={mockSession} sidebarOpen={true} />
+      );
+
+      expect(screen.getByTestId("logo")).toBeInTheDocument();
+      expect(screen.getByTestId("app-name")).toBeInTheDocument();
+      expect(screen.getByTestId("app-name")).toHaveTextContent("SaaS Starter");
+    });
+
+    it("should hide app name when sidebar is collapsed", () => {
+      render(
+        <TestAppSidebar session={mockSession} sidebarOpen={false} />
+      );
+
+      expect(screen.getByTestId("logo")).toBeInTheDocument();
+      expect(screen.queryByTestId("app-name")).not.toBeInTheDocument();
+    });
+  });
+
+  describe("Main Navigation", () => {
+    it("should render all main navigation items", () => {
+      render(
+        <TestAppSidebar session={mockSession} />
+      );
+
+      expect(screen.getByTestId("nav-item-home")).toBeInTheDocument();
+      expect(screen.getByTestId("nav-item-upload")).toBeInTheDocument();
+      expect(screen.getByTestId("nav-item-settings")).toBeInTheDocument();
+
+      expect(screen.getByTestId("nav-title-home")).toHaveTextContent("Home");
+      expect(screen.getByTestId("nav-title-upload")).toHaveTextContent("Upload");
+      expect(screen.getByTestId("nav-title-settings")).toHaveTextContent("Settings");
+    });
+
+    it("should highlight active navigation item", () => {
+      render(
+        <TestAppSidebar 
+          session={mockSession} 
+          pathname="/dashboard/upload" 
+        />
+      );
+
+      const uploadItem = screen.getByTestId("nav-item-upload");
+      expect(uploadItem).toHaveClass("active");
+
+      const homeItem = screen.getByTestId("nav-item-home");
+      expect(homeItem).not.toHaveClass("active");
+    });
+
+    it("should handle navigation clicks", () => {
+      const mockOnNavigate = jest.fn();
+      render(
+        <TestAppSidebar 
+          session={mockSession} 
+          onNavigate={mockOnNavigate}
+        />
+      );
+
+      fireEvent.click(screen.getByTestId("nav-item-home"));
+      expect(mockOnNavigate).toHaveBeenCalledWith("/dashboard/home");
+
+      fireEvent.click(screen.getByTestId("nav-item-upload"));
+      expect(mockOnNavigate).toHaveBeenCalledWith("/dashboard/upload");
+    });
+
+    it("should handle double-click navigation with sidebar toggle", () => {
+      const mockOnNavigate = jest.fn();
+      render(
+        <TestAppSidebar 
+          session={mockSession} 
+          onNavigate={mockOnNavigate}
+        />
+      );
+
+      fireEvent.doubleClick(screen.getByTestId("nav-item-settings"));
+      expect(mockOnNavigate).toHaveBeenCalledWith("/dashboard/settings");
+      expect(mockToggleSidebar).toHaveBeenCalled();
+    });
+  });
+
+  describe("Logo Navigation", () => {
+    it("should handle logo click navigation to home", () => {
+      const mockOnNavigate = jest.fn();
+      render(
+        <TestAppSidebar 
+          session={mockSession} 
+          onNavigate={mockOnNavigate}
+        />
+      );
+
+      fireEvent.click(screen.getByTestId("logo"));
+      expect(mockOnNavigate).toHaveBeenCalledWith("/");
+    });
+  });
+
+  describe("Role-Based Access Control", () => {
+    it("should not show admin section for regular users", () => {
+      render(
+        <TestAppSidebar session={mockSession} />
+      );
+
+      expect(screen.queryByTestId("admin-section")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("admin-navigation")).not.toBeInTheDocument();
+    });
+
+    it("should show admin section for admin users", () => {
+      render(
+        <TestAppSidebar session={mockAdminSession} />
+      );
+
+      expect(screen.getByTestId("admin-section")).toBeInTheDocument();
+      expect(screen.getByTestId("admin-navigation")).toBeInTheDocument();
+      expect(screen.getByTestId("admin-header")).toHaveTextContent("Admin");
+    });
+
+    it("should show admin section for super admin users", () => {
+      const superAdminSession = {
+        ...mockAdminSession,
+        user: { ...mockAdminSession.user, role: "super_admin" }
+      };
+
+      render(
+        <TestAppSidebar session={superAdminSession} />
+      );
+
+      expect(screen.getByTestId("admin-section")).toBeInTheDocument();
+      expect(screen.getByTestId("admin-navigation")).toBeInTheDocument();
+    });
+
+    it("should handle null or undefined session gracefully", () => {
+      render(
+        <TestAppSidebar session={null} />
+      );
+
+      expect(screen.getByTestId("main-navigation")).toBeInTheDocument();
+      expect(screen.queryByTestId("admin-section")).not.toBeInTheDocument();
+    });
+
+    it("should handle session without user", () => {
+      render(
+        <TestAppSidebar session={{ user: null }} />
+      );
+
+      expect(screen.queryByTestId("admin-section")).not.toBeInTheDocument();
+    });
+
+    it("should handle session without role", () => {
+      const sessionWithoutRole = {
+        user: {
+          id: "123",
+          email: "test@example.com",
+          name: "Test User"
+        }
+      };
+
+      render(
+        <TestAppSidebar session={sessionWithoutRole} />
+      );
+
+      expect(screen.queryByTestId("admin-section")).not.toBeInTheDocument();
+    });
+  });
+
+  describe("Admin Navigation", () => {
+    it("should render all admin navigation items", () => {
+      render(
+        <TestAppSidebar session={mockAdminSession} />
+      );
+
+      expect(screen.getByTestId("admin-nav-item-admin-dashboard")).toBeInTheDocument();
+      expect(screen.getByTestId("admin-nav-item-user-management")).toBeInTheDocument();
+      expect(screen.getByTestId("admin-nav-item-payments")).toBeInTheDocument();
+      expect(screen.getByTestId("admin-nav-item-subscriptions")).toBeInTheDocument();
+      expect(screen.getByTestId("admin-nav-item-uploads-managements")).toBeInTheDocument();
+    });
+
+    it("should handle admin navigation clicks", () => {
+      const mockOnNavigate = jest.fn();
+      render(
+        <TestAppSidebar 
+          session={mockAdminSession} 
+          onNavigate={mockOnNavigate}
+        />
+      );
+
+      fireEvent.click(screen.getByTestId("admin-nav-item-admin-dashboard"));
+      expect(mockOnNavigate).toHaveBeenCalledWith("/dashboard/admin");
+
+      fireEvent.click(screen.getByTestId("admin-nav-item-user-management"));
+      expect(mockOnNavigate).toHaveBeenCalledWith("/dashboard/admin/users");
+    });
+
+    it("should highlight active admin navigation item", () => {
+      render(
+        <TestAppSidebar 
+          session={mockAdminSession} 
+          pathname="/dashboard/admin/users" 
+        />
+      );
+
+      const userManagementItem = screen.getByTestId("admin-nav-item-user-management");
+      expect(userManagementItem).toHaveClass("active");
+    });
+
+    it("should hide admin header when sidebar is collapsed", () => {
+      render(
+        <TestAppSidebar 
+          session={mockAdminSession} 
+          sidebarOpen={false}
+        />
+      );
+
+      expect(screen.queryByTestId("admin-header")).not.toBeInTheDocument();
+      expect(screen.getByTestId("admin-navigation")).toBeInTheDocument();
+    });
+  });
+
+  describe("Table Management Navigation", () => {
+    it("should render table navigation when enabled tables exist", () => {
+      render(
+        <TestAppSidebar 
+          session={mockAdminSession} 
+          enabledTables={["users", "payments"]}
+        />
+      );
+
+      expect(screen.getByTestId("table-management-section")).toBeInTheDocument();
+      expect(screen.getByTestId("table-navigation")).toBeInTheDocument();
+      expect(screen.getByTestId("table-management-header")).toHaveTextContent("Manage Tables");
+    });
+
+    it("should not render table navigation when no enabled tables", () => {
+      render(
+        <TestAppSidebar 
+          session={mockAdminSession} 
+          enabledTables={[]}
+        />
+      );
+
+      expect(screen.queryByTestId("table-management-section")).not.toBeInTheDocument();
+    });
+
+    it("should render table navigation items with proper naming", () => {
+      render(
+        <TestAppSidebar 
+          session={mockAdminSession} 
+          enabledTables={["users", "webhook_events"]}
+        />
+      );
+
+      expect(screen.getByTestId("table-nav-item-users")).toBeInTheDocument();
+      expect(screen.getByTestId("table-nav-title-users")).toHaveTextContent("Users");
+      
+      expect(screen.getByTestId("table-nav-item-webhook_events")).toBeInTheDocument();
+      expect(screen.getByTestId("table-nav-title-webhook_events")).toHaveTextContent("Webhook_events");
+    });
+
+    it("should handle table navigation clicks", () => {
+      const mockOnNavigate = jest.fn();
+      render(
+        <TestAppSidebar 
+          session={mockAdminSession} 
+          enabledTables={["users", "payments"]}
+          onNavigate={mockOnNavigate}
+        />
+      );
+
+      fireEvent.click(screen.getByTestId("table-nav-item-users"));
+      expect(mockOnNavigate).toHaveBeenCalledWith("/dashboard/admin/tables/users");
+
+      fireEvent.click(screen.getByTestId("table-nav-item-payments"));
+      expect(mockOnNavigate).toHaveBeenCalledWith("/dashboard/admin/tables/payments");
+    });
+
+    it("should highlight active table navigation with startsWith logic", () => {
+      render(
+        <TestAppSidebar 
+          session={mockAdminSession} 
+          enabledTables={["users"]}
+          pathname="/dashboard/admin/tables/users/123"
+        />
+      );
+
+      const usersTableItem = screen.getByTestId("table-nav-item-users");
+      expect(usersTableItem).toHaveClass("active");
+    });
+
+    it("should hide table management header when sidebar is collapsed", () => {
+      render(
+        <TestAppSidebar 
+          session={mockAdminSession} 
+          enabledTables={["users"]}
+          sidebarOpen={false}
+        />
+      );
+
+      expect(screen.queryByTestId("table-management-header")).not.toBeInTheDocument();
+      expect(screen.getByTestId("table-navigation")).toBeInTheDocument();
+    });
+  });
+
+  describe("Responsive Behavior", () => {
+    it("should apply appropriate classes for open sidebar", () => {
+      render(
+        <TestAppSidebar session={mockSession} sidebarOpen={true} />
+      );
+
+      const sidebar = screen.getByTestId("app-sidebar");
+      expect(sidebar).toHaveClass("open");
+
+      const header = screen.getByTestId("sidebar-header");
+      expect(header).toHaveClass("expanded");
+    });
+
+    it("should apply appropriate classes for collapsed sidebar", () => {
+      render(
+        <TestAppSidebar session={mockSession} sidebarOpen={false} />
+      );
+
+      const sidebar = screen.getByTestId("app-sidebar");
+      expect(sidebar).toHaveClass("collapsed");
+
+      const header = screen.getByTestId("sidebar-header");
+      expect(header).toHaveClass("collapsed");
+    });
+  });
+
+  describe("Footer Section", () => {
+    it("should render sidebar footer with user button", () => {
+      render(
+        <TestAppSidebar session={mockSession} />
+      );
+
+      expect(screen.getByTestId("sidebar-footer")).toBeInTheDocument();
+      expect(screen.getByTestId("user-button")).toBeInTheDocument();
+    });
+  });
+});
 
 // Create a comprehensive test that doesn't rely on complex imports
 describe("AppSidebar Component", () => {

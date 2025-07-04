@@ -193,10 +193,16 @@ describe("Admin Index Module", () => {
 
   it("should be importable as a module", async () => {
     // Test that the module can be imported without errors
-    expect(async () => {
-      const indexModule = await import("./index");
-      expect(typeof indexModule).toBe("object");
-    }).not.toThrow();
+    const indexModule = await import("./index");
+    expect(typeof indexModule).toBe("object");
+    
+    // Verify the module exports exist
+    expect(indexModule).toHaveProperty("adminTableConfig");
+    expect(indexModule).toHaveProperty("getTableConfig");
+    expect(indexModule).toHaveProperty("isUserRelatedTable");
+    expect(indexModule).toHaveProperty("getUserRelatedColumn");
+    expect(indexModule).toHaveProperty("getTableSchema");
+    expect(indexModule).toHaveProperty("getAdminStats");
   });
 
   it("should have proper relative import paths", () => {
@@ -242,5 +248,68 @@ describe("Admin Index Module", () => {
     
     // Should have proper formatting
     expect(content).toMatch(/export\s*{\s*type\s+\w+/); // Proper spacing
+  });
+  
+  it("should execute all exports successfully", async () => {
+    // Import and test all exported functions
+    const {
+      adminTableConfig,
+      getTableConfig,
+      isUserRelatedTable,
+      getUserRelatedColumn,
+      getTableSchema,
+      getAdminStats
+    } = await import("./index");
+    
+    // Verify functions are callable
+    expect(typeof getTableConfig).toBe("function");
+    expect(typeof isUserRelatedTable).toBe("function");
+    expect(typeof getUserRelatedColumn).toBe("function");
+    expect(typeof getTableSchema).toBe("function");
+    expect(typeof getAdminStats).toBe("function");
+    
+    // Verify config object exists
+    expect(typeof adminTableConfig).toBe("object");
+    expect(adminTableConfig).toBeDefined();
+  });
+  
+  it("should provide type exports that can be used in TypeScript", () => {
+    const indexPath = path.join(__dirname, "index.ts");
+    const content = fs.readFileSync(indexPath, "utf8");
+    
+    // Verify all type exports are present
+    const typeExports = [
+      "TableConfig",
+      "ColumnType",
+      "ColumnInfo", 
+      "SchemaInfo",
+      "AdminStatsWithCharts",
+      "ChartData",
+      "UploadStatsDetails"
+    ];
+    
+    typeExports.forEach(typeExport => {
+      expect(content).toContain(`type ${typeExport}`);
+    });
+  });
+  
+  it("should maintain proper module boundaries", async () => {
+    // Test that all modules are accessible through the index
+    const indexModule = await import("./index");
+    
+    // Each module's key exports should be available
+    const coreExports = [
+      "adminTableConfig",
+      "getTableConfig", 
+      "isUserRelatedTable",
+      "getUserRelatedColumn",
+      "getTableSchema",
+      "getAdminStats"
+    ];
+    
+    coreExports.forEach(exportName => {
+      expect(indexModule).toHaveProperty(exportName);
+      expect(indexModule[exportName as keyof typeof indexModule]).toBeDefined();
+    });
   });
 });

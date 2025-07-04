@@ -26,18 +26,18 @@ const TestUserButton = ({
       const result = await mockAuthClient.signOut({
         fetchOptions: {
           onSuccess: () => {
-            console.log("Redirecting to login");
+            // console.log("Redirecting to login");
           },
         },
       });
       if (result?.error) {
-        console.error("Logout error:", result.error.message);
+        // console.error("Logout error:", result.error.message);
         return;
       }
-      console.log("Logout successful");
+      // console.log("Logout successful");
       onLogout();
     } catch {
-      console.log("Logout failed");
+      // console.log("Logout failed");
     } finally {
       setLoggingOut(false);
     }

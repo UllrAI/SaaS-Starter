@@ -28,7 +28,7 @@ export function renderMarkdoc(nodeOrNodes: Node | Node[]): string {
 
   // Handle nodes with children
   if ("children" in node && Array.isArray(node.children)) {
-    return node.children.map((child: Node) => renderMarkdoc(child)).join(" ");
+    return node.children.map((child: Node) => renderMarkdoc(child)).join("");
   }
 
   return "";

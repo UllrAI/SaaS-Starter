@@ -102,8 +102,7 @@ describe("useIsMobile", () => {
   it("should return false for SSR (when window is undefined)", () => {
     // Mock SSR environment
     const originalWindow = global.window;
-    // @ts-ignore
-    delete global.window;
+    (global as { window?: Window }).window = undefined;
 
     const { result } = renderHook(() => useIsMobile());
     expect(result.current).toBe(false);

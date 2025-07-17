@@ -44,53 +44,53 @@ const config = {
     // Type definitions and utilities
     "types/",
     "scripts/",
-    "database/config",
+    "src/database/config",
 
     // Static files
-    "app/robots\\.ts",
-    "app/sitemap\\.ts",
+    "src/app/robots\\.ts",
+    "src/app/sitemap\\.ts",
 
     // Email templates (UI-only)
-    "emails/",
+    "src/emails/",
 
     // Pure UI components (shadcn/ui and similar)
-    "components/ui/",
+    "src/components/ui/",
 
     // Theme and styling components
-    "providers/theme-provider\\.tsx",
-    "components/mode-toggle\\.tsx",
+    "src/providers/theme-provider\\.tsx",
+    "src/components/mode-toggle\\.tsx",
 
     // Simple utility hooks with no business logic
-    "hooks/use-mobile\\.tsx",
+    "src/hooks/use-mobile\\.tsx",
 
     // Marketing and static page components
-    "components/homepage/",
-    "components/blog/",
-    "components/logo\\.tsx",
-    "components/cookie-consent\\.tsx",
+    "src/components/homepage/",
+    "src/components/blog/",
+    "src/components/logo\\.tsx",
+    "src/components/cookie-consent\\.tsx",
 
     // Complex UI components with minimal business logic
-    "components/payment-options\\.tsx",
-    "components/admin/StatCard\\.tsx",
-    "components/admin/admin-table-base\\.tsx",
-    "components/admin/user-avatar-cell\\.tsx",
-    "components/admin/generic-table/",
-    "components/auth/auth-form-base\\.tsx",
-    "components/auth/link-sent-card\\.tsx",
-    "components/auth/social-login-buttons\\.tsx",
+    "src/components/payment-options\\.tsx",
+    "src/components/admin/StatCard\\.tsx",
+    "src/components/admin/admin-table-base\\.tsx",
+    "src/components/admin/user-avatar-cell\\.tsx",
+    "src/components/admin/generic-table/",
+    "src/components/auth/auth-form-base\\.tsx",
+    "src/components/auth/link-sent-card\\.tsx",
+    "src/components/auth/social-login-buttons\\.tsx",
 
     // Next.js App Router pages (UI-only)
-    "app/\\(pages\\)/", // Marketing pages
-    "app/\\(auth\\)/", // Auth pages
-    "app/dashboard/.*/_components/(?!session-guard)", // Dashboard UI components (except session-guard)
-    "app/dashboard/.*/page\\.tsx", // Dashboard pages
-    "app/keystatic/", // CMS pages
+    "src/app/\\(pages\\)/", // Marketing pages
+    "src/app/\\(auth\\)/", // Auth pages
+    "src/app/dashboard/.*/_components/(?!session-guard)", // Dashboard UI components (except session-guard)
+    "src/app/dashboard/.*/page\\.tsx", // Dashboard pages
+    "src/app/keystatic/", // CMS pages
 
     // Layout files
-    "app/.*/layout\\.tsx",
-    "app/loading\\.tsx",
-    "app/not-found\\.tsx",
-    "app/layout\\.tsx",
+    "src/app/.*/layout\\.tsx",
+    "src/app/loading\\.tsx",
+    "src/app/not-found\\.tsx",
+    "src/app/layout\\.tsx",
   ],
 
   // Collect coverage from all source files

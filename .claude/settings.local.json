@@ -41,7 +41,8 @@
       "Bash(node:*)",
       "Bash(pnpm build:*)",
       "Bash(pnpm test:*)",
-      "Bash(pnpm dev:*)"
+      "Bash(pnpm dev:*)",
+      "Bash(sed:*)"
     ],
     "deny": []
   }

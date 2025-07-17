@@ -106,8 +106,8 @@ Then edit the `.env` file and fill in all required values.
 
 This project uses Drizzle ORM for database migrations. To ensure isolation between development and production environments, the project is configured with two separate database configuration files:
 
-- `database/config.ts` - Development environment configuration, migration files output to `database/migrations/development/`
-- `database/config.prod.ts` - Production environment configuration, migration files output to `database/migrations/production/`
+- `src/database/config.ts` - Development environment configuration, migration files output to `src/database/migrations/development/`
+- `src/database/config.prod.ts` - Production environment configuration, migration files output to `src/database/migrations/production/`
 
 #### Development Environment
 
@@ -271,6 +271,8 @@ function MyComponent() {
   );
 }
 ```
+
+> **Note**: This project uses a `src` directory structure. All components and library files are located in the `src/` directory and can be accessed through the `@/` path mapping which resolves to `src/`.
 
 #### Image Compression
 

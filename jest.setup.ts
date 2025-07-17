@@ -12,7 +12,7 @@ export interface MockSession {
     id: string;
     email: string;
     name?: string;
-    role?: 'user' | 'admin' | 'super_admin';
+    role?: "user" | "admin" | "super_admin";
   };
   sessionId?: string;
   expiresAt?: Date;
@@ -21,10 +21,10 @@ export interface MockSession {
 export interface MockSubscription {
   id: string;
   userId: string;
-  status: 'active' | 'canceled' | 'past_due' | 'unpaid' | 'trialing';
+  status: "active" | "canceled" | "past_due" | "unpaid" | "trialing";
   tier: string;
-  mode: 'subscription' | 'one_time';
-  cycle: 'monthly' | 'yearly';
+  mode: "subscription" | "one_time";
+  cycle: "monthly" | "yearly";
   createdAt: Date;
   updatedAt: Date;
   currentPeriodStart?: Date;
@@ -35,14 +35,22 @@ export interface MockUser {
   id: string;
   email: string;
   name?: string;
-  role: 'user' | 'admin' | 'super_admin';
+  role: "user" | "admin" | "super_admin";
   createdAt: Date;
   updatedAt: Date;
 }
 
 export interface MockCreemCheckout {
   id: string;
-  status?: 'open' | 'completed' | 'expired' | 'canceled' | 'failed' | 'pending' | 'processing' | string;
+  status?:
+    | "open"
+    | "completed"
+    | "expired"
+    | "canceled"
+    | "failed"
+    | "pending"
+    | "processing"
+    | string;
   url?: string;
   customerId?: string;
   metadata?: Record<string, string>;
@@ -64,33 +72,59 @@ export interface MockRequestInit extends RequestInit {
 
 // Type-safe mock function creators with proper generic constraints
 export function createMockFunction<T extends (...args: any[]) => any>(
-  implementation?: T
+  implementation?: T,
 ): jest.MockedFunction<T> {
-  return (implementation ? jest.fn(implementation) : jest.fn()) as unknown as jest.MockedFunction<T>;
+  return (implementation
+    ? jest.fn(implementation)
+    : jest.fn()) as unknown as jest.MockedFunction<T>;
 }
 
 // Specific typed mock creators for common API patterns
-export type MockApiHandler = jest.MockedFunction<(data: any, init?: { status?: number }) => any>;
-export type MockSessionFunction = jest.MockedFunction<() => Promise<MockSession | null>>;
-export type MockDatabaseFunction = jest.MockedFunction<(...args: any[]) => Promise<any[]>>;
-export type MockBillingFunction = jest.MockedFunction<(...args: any[]) => Promise<any>>;
-export type MockHeadersFunction = jest.MockedFunction<(name: string) => string | null>;
+export type MockApiHandler = jest.MockedFunction<
+  (data: any, init?: { status?: number }) => any
+>;
+export type MockSessionFunction = jest.MockedFunction<
+  () => Promise<MockSession | null>
+>;
+export type MockDatabaseFunction = jest.MockedFunction<
+  (...args: any[]) => Promise<any[]>
+>;
+export type MockBillingFunction = jest.MockedFunction<
+  (...args: any[]) => Promise<any>
+>;
+export type MockHeadersFunction = jest.MockedFunction<
+  (name: string) => string | null
+>;
 
 // Type-safe mock creators for common patterns
-export function createMockPromiseFunction<T>(resolvedValue: T): jest.MockedFunction<() => Promise<T>> {
-  return jest.fn().mockResolvedValue(resolvedValue) as unknown as jest.MockedFunction<() => Promise<T>>;
+export function createMockPromiseFunction<T>(
+  resolvedValue: T,
+): jest.MockedFunction<() => Promise<T>> {
+  return jest
+    .fn()
+    .mockResolvedValue(resolvedValue) as unknown as jest.MockedFunction<
+    () => Promise<T>
+  >;
 }
 
 export function createMockAsyncFunction<TArgs extends any[], TReturn>(
-  resolvedValue: TReturn
+  resolvedValue: TReturn,
 ): jest.MockedFunction<(...args: TArgs) => Promise<TReturn>> {
-  return jest.fn().mockResolvedValue(resolvedValue) as unknown as jest.MockedFunction<(...args: TArgs) => Promise<TReturn>>;
+  return jest
+    .fn()
+    .mockResolvedValue(resolvedValue) as unknown as jest.MockedFunction<
+    (...args: TArgs) => Promise<TReturn>
+  >;
 }
 
 export function createMockSyncFunction<TArgs extends any[], TReturn>(
-  returnValue: TReturn
+  returnValue: TReturn,
 ): jest.MockedFunction<(...args: TArgs) => TReturn> {
-  return jest.fn().mockReturnValue(returnValue) as unknown as jest.MockedFunction<(...args: TArgs) => TReturn>;
+  return jest
+    .fn()
+    .mockReturnValue(returnValue) as unknown as jest.MockedFunction<
+    (...args: TArgs) => TReturn
+  >;
 }
 
 // Specific mock creators for NextJS API testing will be defined below
@@ -109,7 +143,7 @@ export function createMockConsole() {
 export function mockConsoleFor(testFn: () => void | Promise<void>) {
   const originalConsoleCopy = global.console;
   const mockConsole = createMockConsole();
-  
+
   return async () => {
     global.console = { ...originalConsoleCopy, ...mockConsole };
     try {
@@ -125,11 +159,14 @@ const originalConsole = global.console;
 global.console = {
   ...originalConsole,
   error: jest.fn(), // Suppress console.error in tests
-  warn: jest.fn(),  // Suppress console.warn in tests
+  warn: jest.fn(), // Suppress console.warn in tests
 };
 
 // Create type-safe API response mock
-export function createMockApiResponse<T = unknown>(data: T, status = 200): {
+export function createMockApiResponse<T = unknown>(
+  data: T,
+  status = 200,
+): {
   json: () => Promise<T>;
   status: number;
   ok: boolean;
@@ -142,25 +179,29 @@ export function createMockApiResponse<T = unknown>(data: T, status = 200): {
 }
 
 // Typed mock creators
-export const createMockSession = (overrides: Partial<MockSession> = {}): MockSession => ({
+export const createMockSession = (
+  overrides: Partial<MockSession> = {},
+): MockSession => ({
   user: {
-    id: 'test-user-id',
-    email: 'test@example.com',
-    role: 'user',
+    id: "test-user-id",
+    email: "test@example.com",
+    role: "user",
     ...overrides.user,
   },
-  sessionId: 'test-session-id',
+  sessionId: "test-session-id",
   expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours from now
   ...overrides,
 });
 
-export const createMockSubscription = (overrides: Partial<MockSubscription> = {}): MockSubscription => ({
-  id: 'test-subscription-id',
-  userId: 'test-user-id',
-  status: 'active',
-  tier: 'pro',
-  mode: 'subscription',
-  cycle: 'monthly',
+export const createMockSubscription = (
+  overrides: Partial<MockSubscription> = {},
+): MockSubscription => ({
+  id: "test-subscription-id",
+  userId: "test-user-id",
+  status: "active",
+  tier: "pro",
+  mode: "subscription",
+  cycle: "monthly",
   createdAt: new Date(),
   updatedAt: new Date(),
   currentPeriodStart: new Date(),
@@ -168,36 +209,40 @@ export const createMockSubscription = (overrides: Partial<MockSubscription> = {}
   ...overrides,
 });
 
-export const createMockUser = (overrides: Partial<MockUser> = {}): MockUser => ({
-  id: 'test-user-id',
-  email: 'test@example.com',
-  role: 'user',
+export const createMockUser = (
+  overrides: Partial<MockUser> = {},
+): MockUser => ({
+  id: "test-user-id",
+  email: "test@example.com",
+  role: "user",
   createdAt: new Date(),
   updatedAt: new Date(),
   ...overrides,
 });
 
-export const createMockCreemCheckout = (overrides: Partial<MockCreemCheckout> = {}): MockCreemCheckout => ({
-  id: 'test-checkout-id',
-  status: 'open',
-  url: 'https://test-checkout-url.com',
-  customerId: 'test-customer-id',
+export const createMockCreemCheckout = (
+  overrides: Partial<MockCreemCheckout> = {},
+): MockCreemCheckout => ({
+  id: "test-checkout-id",
+  status: "open",
+  url: "https://test-checkout-url.com",
+  customerId: "test-customer-id",
   metadata: {},
   ...overrides,
 });
 
 // Additional type-safe mock creators for common test patterns
 export function createMockNextRequest(
-  url: string = 'http://localhost:3000',
+  url: string = "http://localhost:3000",
   options: {
     method?: string;
     body?: any;
     headers?: Record<string, string>;
     nextUrl?: { pathname: string };
-  } = {}
+  } = {},
 ): MockNextRequest {
   return new MockNextRequest(url, {
-    method: options.method || 'GET',
+    method: options.method || "GET",
     headers: options.headers,
     body: options.body ? JSON.stringify(options.body) : null,
     nextUrl: options.nextUrl,
@@ -206,7 +251,7 @@ export function createMockNextRequest(
 
 export function createMockResponse<T = any>(
   data: T,
-  options: { status?: number; headers?: Record<string, string> } = {}
+  options: { status?: number; headers?: Record<string, string> } = {},
 ): {
   json: () => Promise<T>;
   status: number;
@@ -222,7 +267,9 @@ export function createMockResponse<T = any>(
 }
 
 // Type-safe jest mock function creators
-export function createTypedMockFunction<T extends (...args: any[]) => any>(): jest.MockedFunction<T> {
+export function createTypedMockFunction<
+  T extends (...args: any[]) => any,
+>(): jest.MockedFunction<T> {
   return jest.fn() as unknown as jest.MockedFunction<T>;
 }
 
@@ -230,7 +277,7 @@ export function createTypedMockFunction<T extends (...args: any[]) => any>(): je
 export type SpyInstance = jest.SpyInstance<any, any>;
 
 // Setup Web APIs for Node.js environment
-const { TextEncoder, TextDecoder } = require('util');
+const { TextEncoder, TextDecoder } = require("util");
 
 // Simplified Mock Headers implementation
 class MockHeaders {
@@ -242,7 +289,7 @@ class MockHeaders {
         init.forEach(([key, value]) => this.set(key, value));
       } else if (init instanceof Headers) {
         init.forEach((value, key) => this.set(key, value));
-      } else if (typeof init === 'object') {
+      } else if (typeof init === "object") {
         Object.entries(init).forEach(([key, value]) => this.set(key, value));
       }
     }
@@ -292,13 +339,18 @@ class MockHeaders {
 
 // Mock ResponseCookies (for Next.js 15 compatibility)
 class MockResponseCookies {
-  private cookies = new Map<string, { value: string; options?: Record<string, unknown> }>();
+  private cookies = new Map<
+    string,
+    { value: string; options?: Record<string, unknown> }
+  >();
 
   set(name: string, value: string, options?: Record<string, unknown>): void {
     this.cookies.set(name, { value, options });
   }
 
-  get(name: string): { value: string; options?: Record<string, unknown> } | undefined {
+  get(
+    name: string,
+  ): { value: string; options?: Record<string, unknown> } | undefined {
     return this.cookies.get(name);
   }
 
@@ -307,15 +359,17 @@ class MockResponseCookies {
   }
 
   getSetCookie(): string[] {
-    return Array.from(this.cookies.entries()).map(([name, { value, options }]) => {
-      let cookie = `${name}=${value}`;
-      if (options) {
-        Object.entries(options).forEach(([key, val]) => {
-          cookie += `; ${key}=${val}`;
-        });
-      }
-      return cookie;
-    });
+    return Array.from(this.cookies.entries()).map(
+      ([name, { value, options }]) => {
+        let cookie = `${name}=${value}`;
+        if (options) {
+          Object.entries(options).forEach(([key, val]) => {
+            cookie += `; ${key}=${val}`;
+          });
+        }
+        return cookie;
+      },
+    );
   }
 }
 
@@ -329,25 +383,25 @@ class MockResponse {
   bodyUsed: boolean = false;
   ok: boolean;
   redirected: boolean = false;
-  type: ResponseType = 'basic';
-  url: string = '';
+  type: ResponseType = "basic";
+  url: string = "";
   private _bodyData: string;
 
   constructor(body?: BodyInit | null, init?: ResponseInit) {
     this.status = init?.status || 200;
-    this.statusText = init?.statusText || 'OK';
+    this.statusText = init?.statusText || "OK";
     this.headers = new MockHeaders(init?.headers);
     this.cookies = new MockResponseCookies();
     this.ok = this.status >= 200 && this.status < 300;
     this.body = body ? new ReadableStream() : null;
-    this._bodyData = typeof body === 'string' ? body : '';
+    this._bodyData = typeof body === "string" ? body : "";
   }
 
   static json(data: unknown, init?: ResponseInit) {
     const response = new MockResponse(JSON.stringify(data), {
       ...init,
       headers: {
-        'content-type': 'application/json',
+        "content-type": "application/json",
         ...init?.headers,
       },
     });
@@ -398,24 +452,37 @@ Object.assign(global, {
   Response: global.Response || MockResponse,
   Headers: global.Headers || MockHeaders,
   fetch: global.fetch || jest.fn(),
-  ReadableStream: global.ReadableStream || class MockReadableStream {
-    constructor() {}
-    getReader() { return { read: () => Promise.resolve({ done: true }), releaseLock: () => {} }; }
-  },
-  WritableStream: global.WritableStream || class MockWritableStream {
-    constructor() {}
-    getWriter() { return { write: () => Promise.resolve(), close: () => Promise.resolve() }; }
-  }
+  ReadableStream:
+    global.ReadableStream ||
+    class MockReadableStream {
+      constructor() {}
+      getReader() {
+        return {
+          read: () => Promise.resolve({ done: true }),
+          releaseLock: () => {},
+        };
+      }
+    },
+  WritableStream:
+    global.WritableStream ||
+    class MockWritableStream {
+      constructor() {}
+      getWriter() {
+        return {
+          write: () => Promise.resolve(),
+          close: () => Promise.resolve(),
+        };
+      }
+    },
 });
 
-
 // Add URL if not present
-if (typeof global.URL === 'undefined') {
-  global.URL = require('url').URL;
+if (typeof global.URL === "undefined") {
+  global.URL = require("url").URL;
 }
 
-if (typeof global.URLSearchParams === 'undefined') {
-  global.URLSearchParams = require('url').URLSearchParams;
+if (typeof global.URLSearchParams === "undefined") {
+  global.URLSearchParams = require("url").URLSearchParams;
 }
 
 // Type-safe crypto module mock
@@ -427,12 +494,12 @@ type MockCrypto = {
 
 const mockCrypto: MockCrypto = {
   getRandomValues: jest.fn(),
-  randomUUID: jest.fn(() => 'mock-uuid'),
+  randomUUID: jest.fn(() => "mock-uuid"),
   subtle: {},
 };
 
 // Mock crypto module to avoid ES module issues
-jest.mock('uncrypto', () => mockCrypto);
+jest.mock("uncrypto", () => mockCrypto);
 
 // Type-safe better-auth mock
 type BetterAuthConfig = Record<string, unknown>;
@@ -447,36 +514,45 @@ type BetterAuthInstance = {
   options: BetterAuthConfig;
 };
 
-const mockBetterAuth = jest.fn((config: BetterAuthConfig): BetterAuthInstance => ({
-  api: {
-    getSession: jest.fn(),
-    signIn: jest.fn(),
-    signOut: jest.fn(),
-    signUp: jest.fn(),
-  },
-  handler: jest.fn(),
-  options: config,
-}));
+const mockBetterAuth = jest.fn(
+  (config: BetterAuthConfig): BetterAuthInstance => ({
+    api: {
+      getSession: jest.fn(),
+      signIn: jest.fn(),
+      signOut: jest.fn(),
+      signUp: jest.fn(),
+    },
+    handler: jest.fn(),
+    options: config,
+  }),
+);
 
 // Mock better-auth to avoid ES module issues - comprehensive mock
-jest.mock('better-auth', () => ({
+jest.mock("better-auth", () => ({
   betterAuth: mockBetterAuth,
 }));
 
 // Mock better-auth plugins
-jest.mock('better-auth/plugins', () => ({
+jest.mock("better-auth/plugins", () => ({
   magicLink: jest.fn(() => ({})),
 }));
 
 // Mock better-auth adapters
-jest.mock('better-auth/adapters/drizzle', () => ({
+jest.mock("better-auth/adapters/drizzle", () => ({
   drizzleAdapter: jest.fn(() => ({})),
 }));
 
 // Type-safe postgres mock
 type PostgresConnection = {
-  unsafe: jest.MockedFunction<() => { values: jest.MockedFunction<() => Promise<unknown[]>> }>;
-  begin: jest.MockedFunction<() => Promise<{ commit: jest.MockedFunction<() => Promise<void>>; rollback: jest.MockedFunction<() => Promise<void>> }>>;
+  unsafe: jest.MockedFunction<
+    () => { values: jest.MockedFunction<() => Promise<unknown[]>> }
+  >;
+  begin: jest.MockedFunction<
+    () => Promise<{
+      commit: jest.MockedFunction<() => Promise<void>>;
+      rollback: jest.MockedFunction<() => Promise<void>>;
+    }>
+  >;
   end: jest.MockedFunction<() => Promise<void>>;
   options: Record<string, unknown>;
   parsers: Record<string, unknown>;
@@ -486,12 +562,16 @@ type PostgresConnection = {
 
 const createMockPostgresConnection = (): PostgresConnection => {
   const mockSql = Object.assign(
-    jest.fn(() => Promise.resolve([{ testValue: 1 }])) as jest.MockedFunction<() => Promise<{ testValue: number }[]>>,
+    jest.fn(() => Promise.resolve([{ testValue: 1 }])) as jest.MockedFunction<
+      () => Promise<{ testValue: number }[]>
+    >,
     {
       unsafe: jest.fn().mockReturnValue({
         values: jest.fn(() => Promise.resolve([])),
       }),
-      begin: jest.fn(() => Promise.resolve({ commit: jest.fn(), rollback: jest.fn() })),
+      begin: jest.fn(() =>
+        Promise.resolve({ commit: jest.fn(), rollback: jest.fn() }),
+      ),
       end: jest.fn(() => Promise.resolve()),
       options: {
         parsers: {},
@@ -501,7 +581,7 @@ const createMockPostgresConnection = (): PostgresConnection => {
       parsers: {},
       serializers: {},
       transform: {},
-    }
+    },
   ) as PostgresConnection;
   return mockSql;
 };
@@ -509,7 +589,7 @@ const createMockPostgresConnection = (): PostgresConnection => {
 const mockPostgres = jest.fn(createMockPostgresConnection) as any;
 
 // Mock postgres to prevent actual database connections
-jest.mock('postgres', () => mockPostgres);
+jest.mock("postgres", () => mockPostgres);
 
 // Type-safe Drizzle ORM mocks
 type MockQueryResult<T = unknown> = Promise<T[]>;
@@ -517,50 +597,91 @@ type MockQueryBuilder = {
   returning: jest.MockedFunction<() => MockQueryResult>;
 };
 type MockInsertBuilder = {
-  values: jest.MockedFunction<(values: unknown) => {
-    onConflictDoUpdate: jest.MockedFunction<(config: unknown) => MockQueryBuilder>;
-    onConflictDoNothing: jest.MockedFunction<() => MockQueryResult>;
-  }>;
+  values: jest.MockedFunction<
+    (values: unknown) => {
+      onConflictDoUpdate: jest.MockedFunction<
+        (config: unknown) => MockQueryBuilder
+      >;
+      onConflictDoNothing: jest.MockedFunction<() => MockQueryResult>;
+    }
+  >;
 };
 type MockSelectBuilder = {
-  from: jest.MockedFunction<(table: unknown) => {
-    where: jest.MockedFunction<(condition: unknown) => {
-      orderBy: jest.MockedFunction<(field: unknown) => {
-        limit: jest.MockedFunction<(count: number) => MockQueryResult>;
-      }>;
+  from: jest.MockedFunction<
+    (table: unknown) => {
+      where: jest.MockedFunction<
+        (condition: unknown) => {
+          orderBy: jest.MockedFunction<
+            (field: unknown) => {
+              limit: jest.MockedFunction<(count: number) => MockQueryResult>;
+            }
+          >;
+          limit: jest.MockedFunction<(count: number) => MockQueryResult>;
+        }
+      >;
+      orderBy: jest.MockedFunction<
+        (field: unknown) => {
+          limit: jest.MockedFunction<(count: number) => MockQueryResult>;
+        }
+      >;
+    }
+  >;
+  orderBy: jest.MockedFunction<
+    (field: unknown) => {
       limit: jest.MockedFunction<(count: number) => MockQueryResult>;
-    }>;
-    orderBy: jest.MockedFunction<(field: unknown) => {
-      limit: jest.MockedFunction<(count: number) => MockQueryResult>;
-    }>;
-  }>;
-  orderBy: jest.MockedFunction<(field: unknown) => {
-    limit: jest.MockedFunction<(count: number) => MockQueryResult>;
-  }>;
+    }
+  >;
 };
 
-const mockReturning: jest.MockedFunction<() => MockQueryResult> = jest.fn().mockResolvedValue([]);
-const mockOnConflictDoUpdate: jest.MockedFunction<(config: unknown) => MockQueryBuilder> = jest.fn().mockReturnValue({ returning: mockReturning });
-const mockOnConflictDoNothing: jest.MockedFunction<() => MockQueryResult> = jest.fn().mockResolvedValue([]);
-const mockValues: jest.MockedFunction<(values: unknown) => { onConflictDoUpdate: typeof mockOnConflictDoUpdate; onConflictDoNothing: typeof mockOnConflictDoNothing }> = jest.fn().mockReturnValue({ 
+const mockReturning: jest.MockedFunction<() => MockQueryResult> = jest
+  .fn()
+  .mockResolvedValue([]);
+const mockOnConflictDoUpdate: jest.MockedFunction<
+  (config: unknown) => MockQueryBuilder
+> = jest.fn().mockReturnValue({ returning: mockReturning });
+const mockOnConflictDoNothing: jest.MockedFunction<() => MockQueryResult> = jest
+  .fn()
+  .mockResolvedValue([]);
+const mockValues: jest.MockedFunction<
+  (values: unknown) => {
+    onConflictDoUpdate: typeof mockOnConflictDoUpdate;
+    onConflictDoNothing: typeof mockOnConflictDoNothing;
+  }
+> = jest.fn().mockReturnValue({
   onConflictDoUpdate: mockOnConflictDoUpdate,
-  onConflictDoNothing: mockOnConflictDoNothing
+  onConflictDoNothing: mockOnConflictDoNothing,
 });
-const mockInsert: jest.MockedFunction<() => { values: typeof mockValues }> = jest.fn().mockReturnValue({ values: mockValues });
-const mockLimit: jest.MockedFunction<(count: number) => MockQueryResult> = jest.fn().mockResolvedValue([]);
-const mockOrderBy: jest.MockedFunction<(field: unknown) => { limit: typeof mockLimit }> = jest.fn().mockReturnValue({ limit: mockLimit });
-const mockOrderByDirect: jest.MockedFunction<(field: unknown) => MockQueryResult> = jest.fn().mockResolvedValue([]);
-const mockWhere: jest.MockedFunction<(condition: unknown) => { orderBy: typeof mockOrderByDirect; limit: typeof mockLimit }> = jest.fn().mockReturnValue({ 
+const mockInsert: jest.MockedFunction<() => { values: typeof mockValues }> =
+  jest.fn().mockReturnValue({ values: mockValues });
+const mockLimit: jest.MockedFunction<(count: number) => MockQueryResult> = jest
+  .fn()
+  .mockResolvedValue([]);
+const mockOrderBy: jest.MockedFunction<
+  (field: unknown) => { limit: typeof mockLimit }
+> = jest.fn().mockReturnValue({ limit: mockLimit });
+const mockOrderByDirect: jest.MockedFunction<
+  (field: unknown) => MockQueryResult
+> = jest.fn().mockResolvedValue([]);
+const mockWhere: jest.MockedFunction<
+  (condition: unknown) => {
+    orderBy: typeof mockOrderByDirect;
+    limit: typeof mockLimit;
+  }
+> = jest.fn().mockReturnValue({
   orderBy: mockOrderByDirect,
-  limit: mockLimit
+  limit: mockLimit,
 });
-const mockFrom: jest.MockedFunction<(table: unknown) => { where: typeof mockWhere; orderBy: typeof mockOrderBy }> = jest.fn().mockReturnValue({ 
+const mockFrom: jest.MockedFunction<
+  (table: unknown) => { where: typeof mockWhere; orderBy: typeof mockOrderBy }
+> = jest.fn().mockReturnValue({
   where: mockWhere,
-  orderBy: mockOrderBy
+  orderBy: mockOrderBy,
 });
-const mockSelect: jest.MockedFunction<() => { from: typeof mockFrom; orderBy: typeof mockOrderBy }> = jest.fn().mockReturnValue({ 
+const mockSelect: jest.MockedFunction<
+  () => { from: typeof mockFrom; orderBy: typeof mockOrderBy }
+> = jest.fn().mockReturnValue({
   from: mockFrom,
-  orderBy: mockOrderBy
+  orderBy: mockOrderBy,
 });
 
 // Type-safe database connection mocks
@@ -569,14 +690,20 @@ type MockDatabase = {
   select: typeof mockSelect;
 };
 
-type MockSqlFunction = jest.MockedFunction<() => Promise<{ testValue: number }[]>>;
+type MockSqlFunction = jest.MockedFunction<
+  () => Promise<{ testValue: number }[]>
+>;
 type MockCloseDatabaseFunction = jest.MockedFunction<() => Promise<void>>;
 
-const mockSql: MockSqlFunction = jest.fn(() => Promise.resolve([{ testValue: 1 }]));
-const mockCloseDatabase: MockCloseDatabaseFunction = jest.fn(() => Promise.resolve());
+const mockSql: MockSqlFunction = jest.fn(() =>
+  Promise.resolve([{ testValue: 1 }]),
+);
+const mockCloseDatabase: MockCloseDatabaseFunction = jest.fn(() =>
+  Promise.resolve(),
+);
 
 // Mock database connection to prevent real database access
-jest.mock('./database', () => ({
+jest.mock("./src/database", () => ({
   db: {
     insert: mockInsert,
     select: mockSelect,
@@ -585,7 +712,7 @@ jest.mock('./database', () => ({
   closeDatabase: mockCloseDatabase,
 }));
 
-jest.mock('./database/index', () => ({
+jest.mock("./src/database/index", () => ({
   db: {
     insert: mockInsert,
     select: mockSelect,
@@ -593,22 +720,44 @@ jest.mock('./database/index', () => ({
   sql: mockSql,
   closeDatabase: mockCloseDatabase,
 }));
-
 
 // Type-safe Drizzle ORM function mocks
-type DrizzleCondition = { field?: unknown; value?: unknown; type: string; conditions?: unknown[] };
+type DrizzleCondition = {
+  field?: unknown;
+  value?: unknown;
+  type: string;
+  conditions?: unknown[];
+};
 
-const mockEq = jest.fn().mockImplementation((field: unknown, value: unknown): DrizzleCondition => ({ field, value, type: 'eq' }));
-const mockDesc = jest.fn().mockImplementation((field: unknown): DrizzleCondition => ({ field, type: 'desc' }));
-const mockAnd = jest.fn().mockImplementation((...conditions: unknown[]): DrizzleCondition => ({ conditions, type: 'and' }));
+const mockEq = jest
+  .fn()
+  .mockImplementation(
+    (field: unknown, value: unknown): DrizzleCondition => ({
+      field,
+      value,
+      type: "eq",
+    }),
+  );
+const mockDesc = jest
+  .fn()
+  .mockImplementation(
+    (field: unknown): DrizzleCondition => ({ field, type: "desc" }),
+  );
+const mockAnd = jest
+  .fn()
+  .mockImplementation(
+    (...conditions: unknown[]): DrizzleCondition => ({
+      conditions,
+      type: "and",
+    }),
+  );
 
 // Mock Drizzle ORM functions
-jest.mock('drizzle-orm', () => ({
+jest.mock("drizzle-orm", () => ({
   eq: mockEq,
   desc: mockDesc,
   and: mockAnd,
 }));
-
 
 // Type-safe environment configuration mock
 type MockEnvironment = {
@@ -633,20 +782,20 @@ type MockEnvironment = {
 };
 
 const mockEnvConfig: MockEnvironment = {
-  DATABASE_URL: 'postgresql://test:test@localhost:5432/test_db',
-  BETTER_AUTH_SECRET: 'mock-secret',
-  NEXT_PUBLIC_APP_URL: 'http://localhost:3000',
-  RESEND_API_KEY: 'mock-resend-key',
-  AWS_S3_BUCKET: 'mock-bucket',
-  AWS_S3_REGION: 'us-east-1',
-  AWS_ACCESS_KEY_ID: 'mock-access-key',
-  AWS_SECRET_ACCESS_KEY: 'mock-secret-key',
-  CLOUDFLARE_R2_ENDPOINT: 'mock-endpoint',
-  CLOUDFLARE_R2_ACCESS_KEY_ID: 'mock-r2-key',
-  CLOUDFLARE_R2_SECRET_ACCESS_KEY: 'mock-r2-secret',
-  CREEM_API_KEY: 'mock-creem-api-key',
-  CREEM_SECRET_KEY: 'mock-creem-secret',
-  CREEM_WEBHOOK_SECRET: 'mock-webhook-secret',
+  DATABASE_URL: "postgresql://test:test@localhost:5432/test_db",
+  BETTER_AUTH_SECRET: "mock-secret",
+  NEXT_PUBLIC_APP_URL: "http://localhost:3000",
+  RESEND_API_KEY: "mock-resend-key",
+  AWS_S3_BUCKET: "mock-bucket",
+  AWS_S3_REGION: "us-east-1",
+  AWS_ACCESS_KEY_ID: "mock-access-key",
+  AWS_SECRET_ACCESS_KEY: "mock-secret-key",
+  CLOUDFLARE_R2_ENDPOINT: "mock-endpoint",
+  CLOUDFLARE_R2_ACCESS_KEY_ID: "mock-r2-key",
+  CLOUDFLARE_R2_SECRET_ACCESS_KEY: "mock-r2-secret",
+  CREEM_API_KEY: "mock-creem-api-key",
+  CREEM_SECRET_KEY: "mock-creem-secret",
+  CREEM_WEBHOOK_SECRET: "mock-webhook-secret",
   DB_POOL_SIZE: 20,
   DB_IDLE_TIMEOUT: 300,
   DB_MAX_LIFETIME: 14400,
@@ -656,7 +805,7 @@ const mockEnvConfig: MockEnvironment = {
 const mockCreateEnv = jest.fn(() => mockEnvConfig);
 
 // Mock env configuration
-jest.mock('@t3-oss/env-nextjs', () => ({
+jest.mock("@t3-oss/env-nextjs", () => ({
   createEnv: mockCreateEnv,
 }));
 
@@ -666,7 +815,7 @@ class MockNextResponse extends MockResponse {
     const response = new MockNextResponse(JSON.stringify(data), {
       ...init,
       headers: {
-        'content-type': 'application/json',
+        "content-type": "application/json",
         ...init?.headers,
       },
     });
@@ -687,7 +836,7 @@ class MockNextResponse extends MockResponse {
   static rewrite(destination: string | URL) {
     return new MockNextResponse(null, {
       headers: {
-        'x-middleware-rewrite': destination.toString(),
+        "x-middleware-rewrite": destination.toString(),
       },
     });
   }
@@ -695,7 +844,7 @@ class MockNextResponse extends MockResponse {
   static next() {
     return new MockNextResponse(null, {
       headers: {
-        'x-middleware-next': '1',
+        "x-middleware-next": "1",
       },
     });
   }
@@ -726,13 +875,16 @@ class MockNextRequest {
     region?: string;
   };
   ip?: string;
-  
-  constructor(input: string | URL, init?: RequestInit & { nextUrl?: { pathname: string } }) {
-    this.url = typeof input === 'string' ? input : input.toString();
-    this.method = init?.method || 'GET';
+
+  constructor(
+    input: string | URL,
+    init?: RequestInit & { nextUrl?: { pathname: string } },
+  ) {
+    this.url = typeof input === "string" ? input : input.toString();
+    this.method = init?.method || "GET";
     this.headers = new MockHeaders(init?.headers);
     this.body = init?.body as ReadableStream<Uint8Array> | null;
-    
+
     const url = new URL(this.url);
     this.nextUrl = {
       pathname: init?.nextUrl?.pathname || url.pathname,
@@ -740,7 +892,7 @@ class MockNextRequest {
       href: this.url,
       origin: url.origin,
     };
-    
+
     this.cookies = {
       get: (name: string) => null,
       getAll: () => [],
@@ -755,7 +907,7 @@ class MockNextRequest {
   }
 
   async text(): Promise<string> {
-    return Promise.resolve('');
+    return Promise.resolve("");
   }
 
   async formData(): Promise<FormData> {
@@ -772,7 +924,7 @@ class MockNextRequest {
 }
 
 // Mock next/server module
-jest.mock('next/server', () => ({
+jest.mock("next/server", () => ({
   NextRequest: MockNextRequest,
   NextResponse: MockNextResponse,
 }));
@@ -797,27 +949,27 @@ const createMockSafeActionClient = (): SafeActionClient => {
 const mockCreateSafeActionClient = jest.fn(createMockSafeActionClient);
 
 // Mock next-safe-action to avoid ES module issues
-jest.mock('next-safe-action', () => ({
+jest.mock("next-safe-action", () => ({
   createSafeActionClient: mockCreateSafeActionClient,
-  DEFAULT_SERVER_ERROR_MESSAGE: 'Something went wrong',
+  DEFAULT_SERVER_ERROR_MESSAGE: "Something went wrong",
 }));
 
 // Mock the env.js file
-jest.mock('./env.js', () => ({
+jest.mock("./env.js", () => ({
   __esModule: true,
   default: {
-    DATABASE_URL: 'postgresql://test:test@localhost:5432/test_db',
-    BETTER_AUTH_SECRET: 'mock-secret',
-    NEXT_PUBLIC_APP_URL: 'http://localhost:3000',
-    RESEND_API_KEY: 'mock-resend-key',
-    R2_ENDPOINT: 'https://mock-endpoint.r2.cloudflarestorage.com',
-    R2_ACCESS_KEY_ID: 'mock-access-key',
-    R2_SECRET_ACCESS_KEY: 'mock-secret-key',
-    R2_BUCKET_NAME: 'mock-bucket',
-    R2_PUBLIC_URL: 'https://mock-public-url.com',
-    CREEM_API_KEY: 'mock-creem-api-key',
-    CREEM_ENVIRONMENT: 'test_mode',
-    CREEM_WEBHOOK_SECRET: 'mock-webhook-secret',
+    DATABASE_URL: "postgresql://test:test@localhost:5432/test_db",
+    BETTER_AUTH_SECRET: "mock-secret",
+    NEXT_PUBLIC_APP_URL: "http://localhost:3000",
+    RESEND_API_KEY: "mock-resend-key",
+    R2_ENDPOINT: "https://mock-endpoint.r2.cloudflarestorage.com",
+    R2_ACCESS_KEY_ID: "mock-access-key",
+    R2_SECRET_ACCESS_KEY: "mock-secret-key",
+    R2_BUCKET_NAME: "mock-bucket",
+    R2_PUBLIC_URL: "https://mock-public-url.com",
+    CREEM_API_KEY: "mock-creem-api-key",
+    CREEM_ENVIRONMENT: "test_mode",
+    CREEM_WEBHOOK_SECRET: "mock-webhook-secret",
     DB_POOL_SIZE: 20,
     DB_IDLE_TIMEOUT: 300,
     DB_MAX_LIFETIME: 14400,
@@ -826,6 +978,6 @@ jest.mock('./env.js', () => ({
 }));
 
 // Mock @react-email/render to prevent rendering issues in tests
-jest.mock('@react-email/render', () => ({
-  render: jest.fn(() => '<html><body>Mock rendered email</body></html>'),
+jest.mock("@react-email/render", () => ({
+  render: jest.fn(() => "<html><body>Mock rendered email</body></html>"),
 }));

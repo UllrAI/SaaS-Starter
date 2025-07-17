@@ -90,7 +90,15 @@ All uploads go through:
 
 ### Directory Structure
 
-#### App Router Organization
+This project uses Next.js App Router with a `src` directory structure for better organization and consistency.
+
+#### Core Structure
+- `src/` - All application source code
+- `styles/` - Global CSS and styling (at root level)
+- `public/` - Static assets
+- `content/` - CMS content files
+
+#### App Router Organization (src/app/)
 
 - `app/(auth)/` - Authentication pages
 - `app/(pages)/` - Public marketing pages
@@ -98,18 +106,28 @@ All uploads go through:
 - `app/keystatic/` - CMS interface (development only)
 - `app/api/` - API routes and webhooks
 
-#### Library Organization
+#### Library Organization (src/lib/)
 
 - `lib/auth/` - Better-Auth configuration and utilities
 - `lib/billing/` - Payment provider abstractions
 - `lib/config/` - Application constants and configuration
 - `lib/database/` - Database utilities and queries
 
-#### Component Co-location
+#### Component Co-location (src/components/)
 
 - Page-specific components in `_components/` directories
 - Shared UI components in `components/ui/`
 - Form components in `components/forms/`
+
+#### Database (src/database/)
+- `database/schema.ts` - Database schema definitions
+- `database/migrations/` - Migration files
+- `database/config.ts` - Database configuration
+
+#### Key Files
+- `tsconfig.json` - TypeScript configuration with path mappings for `@/*` to `src/*`
+- `jest.config.js` - Jest configuration with proper module resolution for src structure
+- `styles/globals.css` - Global styles and Tailwind configuration
 
 ## Code Quality Standards
 

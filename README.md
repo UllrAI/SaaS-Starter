@@ -272,6 +272,8 @@ function MyComponent() {
 }
 ```
 
+> **Note**: This project uses a `src` directory structure. All components and library files are located in the `src/` directory and can be accessed through the `@/` path mapping which resolves to `src/`.
+
 #### Image Compression
 
 The component includes built-in client-side image compression functionality that can reduce image file size before upload, saving bandwidth and storage space.

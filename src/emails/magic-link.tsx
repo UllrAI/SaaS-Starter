@@ -42,14 +42,10 @@ const MagicLinkEmailBody = ({
       <Head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta httpEquiv="Content-Type" content="text/html; charset=UTF-8" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-          rel="stylesheet"
-        />
         <style>
           {`
             * {
-              font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
               box-sizing: border-box;
             }
 
@@ -285,7 +281,7 @@ const MagicLinkEmailBody = ({
                 }}
               >
                 <strong>Security Notice:</strong> This link will expire in 15
-                minutes for your security. If you didn't request this sign-in,
+                minutes for your security. If you didn&apos;t request this sign-in,
                 please ignore this email.
               </Text>
 
@@ -298,7 +294,7 @@ const MagicLinkEmailBody = ({
                   textAlign: "left",
                 }}
               >
-                If the button doesn't work, you can copy and paste this link
+                If the button doesn&apos;t work, you can copy and paste this link
                 into your browser:
               </Text>
 

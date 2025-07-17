@@ -1025,6 +1025,7 @@ describe("useAdminTable", () => {
     });
 
     it("should handle queryActionRef current assignment in useEffect", () => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       let queryActionRef: any;
 
       // Create a custom hook to access the ref

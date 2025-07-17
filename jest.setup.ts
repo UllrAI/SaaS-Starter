@@ -576,7 +576,7 @@ const mockSql: MockSqlFunction = jest.fn(() => Promise.resolve([{ testValue: 1 }
 const mockCloseDatabase: MockCloseDatabaseFunction = jest.fn(() => Promise.resolve());
 
 // Mock database connection to prevent real database access
-jest.mock('./database', () => ({
+jest.mock('./src/database', () => ({
   db: {
     insert: mockInsert,
     select: mockSelect,
@@ -585,7 +585,7 @@ jest.mock('./database', () => ({
   closeDatabase: mockCloseDatabase,
 }));
 
-jest.mock('./database/index', () => ({
+jest.mock('./src/database/index', () => ({
   db: {
     insert: mockInsert,
     select: mockSelect,

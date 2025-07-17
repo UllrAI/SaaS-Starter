@@ -1168,7 +1168,7 @@ describe("Database Schema", () => {
         { table: uploads, name: "uploads" }
       ];
       
-      tablesWithIndexes.forEach(({ table, name }) => {
+      tablesWithIndexes.forEach(({ table }) => {
         expect(table).toBeDefined();
         expect(typeof table).toBe("object");
         
@@ -1224,7 +1224,7 @@ describe("Database Schema", () => {
         { table: uploads, name: "uploads" }
       ];
       
-      allTables.forEach(({ table, name }) => {
+      allTables.forEach(({ table }) => {
         // Access all properties to trigger complete table definition
         const allProperties = Object.keys(table);
         expect(allProperties.length).toBeGreaterThan(0);

@@ -15,7 +15,7 @@ interface AdminTableQueryArgs {
   limit: number;
   search?: string;
   filter?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 interface UseAdminTableProps<T> {
@@ -98,7 +98,7 @@ export function useAdminTable<T>({
       }
     });
     // FIX: The dependency array is now stable and correct.
-  }, [currentPage, debouncedSearchTerm, filter, initialPagination.limit]);
+  }, [currentPage, debouncedSearchTerm, filter, initialPagination.limit, initialData.length]);
 
   // Reset page to 1 when search or filter changes
   useEffect(() => {

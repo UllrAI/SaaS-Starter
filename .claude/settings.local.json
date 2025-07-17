@@ -10,7 +10,6 @@
       "Bash(pnpm start:*)",
       "Bash(pnpm stop:*)",
       "Bash(pnpm restart:*)",
-      "Bash(pnpm restart:*)",
       "Bash(curl:*)",
       "Bash(npm test)",
       "Bash(npm run:*)",

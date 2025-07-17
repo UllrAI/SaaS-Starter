@@ -7,7 +7,10 @@ type OpenGraphMetadata = OpenGraph;
 
 describe("createMetadata", () => {
   // Use the actual values from the global mocks/constants
-  const expectedAppName = process.env.NODE_ENV === "development" ? "DEV - SaaS Starter" : "SaaS Starter";
+  const expectedAppName =
+    process.env.NODE_ENV === "development"
+      ? "DEV - SaaS Starter"
+      : "SaaS Starter";
   const mockOGImage = "https://starter.ullrai.com/og.png";
   const mockAppUrl = "http://localhost:3000";
   const mockTwitterAccount = "@ullr_ai";
@@ -23,7 +26,9 @@ describe("createMetadata", () => {
     expect(result.openGraph?.siteName).toBe(expectedAppName);
     expect((result.openGraph as Record<string, unknown>)?.type).toBe("website");
     expect(result.openGraph?.locale).toBe("en_US");
-    expect((result.twitter as Record<string, unknown>)?.card).toBe("summary_large_image");
+    expect((result.twitter as Record<string, unknown>)?.card).toBe(
+      "summary_large_image",
+    );
     expect(result.twitter?.creator).toBe(mockTwitterAccount);
     expect(result.twitter?.title).toBe(expectedAppName);
     expect(result.twitter?.description).toBe("");
@@ -176,7 +181,9 @@ describe("createMetadata", () => {
     };
     const result = createMetadata(override);
 
-    expect((result.twitter as Record<string, unknown>)?.card).toBe("summary_large_image");
+    expect((result.twitter as Record<string, unknown>)?.card).toBe(
+      "summary_large_image",
+    );
     expect(result.twitter?.creator).toBe(mockTwitterAccount);
   });
 });

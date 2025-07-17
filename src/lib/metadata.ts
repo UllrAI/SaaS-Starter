@@ -11,9 +11,17 @@ export function createMetadata(override: Metadata): Metadata {
   let title = APP_NAME;
   if (typeof override.title === "string") {
     title = override.title;
-  } else if (override.title && "absolute" in override.title && (override.title as AbsoluteTemplateString).absolute) {
+  } else if (
+    override.title &&
+    "absolute" in override.title &&
+    (override.title as AbsoluteTemplateString).absolute
+  ) {
     title = (override.title as AbsoluteTemplateString).absolute;
-  } else if (override.title && "default" in override.title && (override.title as DefaultTemplateString).default) {
+  } else if (
+    override.title &&
+    "default" in override.title &&
+    (override.title as DefaultTemplateString).default
+  ) {
     title = (override.title as DefaultTemplateString).default;
   }
 

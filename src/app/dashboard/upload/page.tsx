@@ -264,7 +264,7 @@ export default function UploadPage() {
                     isServerUploading ? "cursor-not-allowed opacity-50" : ""
                   }`}
                 >
-                  <Server className="h-12 w-12 text-muted-foreground" />
+                  <Server className="text-muted-foreground h-12 w-12" />
                   <p className="text-lg font-medium">
                     {isServerUploading
                       ? "Uploading..."
@@ -328,7 +328,7 @@ export default function UploadPage() {
               />
               <div className="mt-4 rounded-lg border bg-gray-50 p-4">
                 <h4 className="mb-2 font-medium">Compression Settings:</h4>
-                <ul className="space-y-1 text-sm text-muted-foreground">
+                <ul className="text-muted-foreground space-y-1 text-sm">
                   <li>• Quality: 60%</li>
                   <li>• Max Width: 1280px</li>
                   <li>• Max Height: 720px</li>

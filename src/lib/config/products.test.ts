@@ -168,15 +168,21 @@ describe("Product Configuration", () => {
   describe("getProductTierByProductId", () => {
     it("should return correct tier for valid Creem product IDs", () => {
       // Test with known product IDs from the configuration
-      const plusTierOneTime = getProductTierByProductId("prod_1HVwfBIaKkJh9CgS7zD37h");
+      const plusTierOneTime = getProductTierByProductId(
+        "prod_1HVwfBIaKkJh9CgS7zD37h",
+      );
       expect(plusTierOneTime).toBeDefined();
       expect(plusTierOneTime?.id).toBe("plus");
 
-      const plusTierMonthly = getProductTierByProductId("prod_6uhcfBUcRxprqDvep0U5Jw");
+      const plusTierMonthly = getProductTierByProductId(
+        "prod_6uhcfBUcRxprqDvep0U5Jw",
+      );
       expect(plusTierMonthly).toBeDefined();
       // Note: This product ID is used by multiple tiers due to example data
 
-      const plusTierYearly = getProductTierByProductId("prod_7LJkGVgv4LOBuucrxANo2b");
+      const plusTierYearly = getProductTierByProductId(
+        "prod_7LJkGVgv4LOBuucrxANo2b",
+      );
       expect(plusTierYearly).toBeDefined();
       expect(plusTierYearly?.id).toBe("plus");
     });
@@ -198,7 +204,7 @@ describe("Product Configuration", () => {
       // Since multiple tiers use the same example product ID, test that it returns consistently
       const result1 = getProductTierByProductId("prod_6uhcfBUcRxprqDvep0U5Jw");
       const result2 = getProductTierByProductId("prod_6uhcfBUcRxprqDvep0U5Jw");
-      
+
       expect(result1).toBeDefined();
       expect(result2).toBeDefined();
       expect(result1?.id).toBe(result2?.id); // Should be consistent
@@ -207,9 +213,15 @@ describe("Product Configuration", () => {
     it("should find tiers by all billing cycle product IDs", () => {
       // Test that we can find tiers by oneTime, monthly, and yearly product IDs
       PRODUCT_TIERS.forEach((tier) => {
-        const foundByOneTime = getProductTierByProductId(tier.pricing.creem.oneTime);
-        const foundByMonthly = getProductTierByProductId(tier.pricing.creem.monthly);
-        const foundByYearly = getProductTierByProductId(tier.pricing.creem.yearly);
+        const foundByOneTime = getProductTierByProductId(
+          tier.pricing.creem.oneTime,
+        );
+        const foundByMonthly = getProductTierByProductId(
+          tier.pricing.creem.monthly,
+        );
+        const foundByYearly = getProductTierByProductId(
+          tier.pricing.creem.yearly,
+        );
 
         // Each product ID should find a tier (though might not be the original due to duplicates in test data)
         expect(foundByOneTime).toBeDefined();
@@ -288,10 +300,10 @@ describe("Product Configuration", () => {
         // Prices should be reasonable (between $1 and $10000)
         expect(tier.prices.oneTime).toBeGreaterThan(1);
         expect(tier.prices.oneTime).toBeLessThan(10000);
-        
+
         expect(tier.prices.monthly).toBeGreaterThan(1);
         expect(tier.prices.monthly).toBeLessThan(1000);
-        
+
         expect(tier.prices.yearly).toBeGreaterThan(1);
         expect(tier.prices.yearly).toBeLessThan(10000);
       });

@@ -1,21 +1,44 @@
-import { describe, it, expect, jest, beforeEach, afterEach, beforeAll } from "@jest/globals";
+import {
+  describe,
+  it,
+  expect,
+  jest,
+  beforeEach,
+  afterEach,
+  beforeAll,
+} from "@jest/globals";
 import type { SpyInstance } from "../../../jest.setup";
-import { MockSession, MockSubscription, MockCreemCheckout, createMockSession, createMockSubscription, createMockCreemCheckout } from "../../../jest.setup";
+import {
+  MockSession,
+  MockSubscription,
+  MockCreemCheckout,
+  createMockSession,
+  createMockSubscription,
+  createMockCreemCheckout,
+} from "../../../jest.setup";
 
 // Type definitions for mocked functions
-type SessionFunction = (options: { headers: Headers }) => Promise<MockSession | null>;
-type SubscriptionFunction = (userId: string) => Promise<MockSubscription | null>;
-type CheckoutFunction = (params: { xApiKey: string; checkoutId: string }) => Promise<MockCreemCheckout>;
+type SessionFunction = (options: {
+  headers: Headers;
+}) => Promise<MockSession | null>;
+type SubscriptionFunction = (
+  userId: string,
+) => Promise<MockSubscription | null>;
+type CheckoutFunction = (params: {
+  xApiKey: string;
+  checkoutId: string;
+}) => Promise<MockCreemCheckout>;
 
 // Mock external dependencies with proper types
 const mockGetSession = jest.fn() as jest.MockedFunction<SessionFunction>;
-const mockGetUserSubscription = jest.fn() as jest.MockedFunction<SubscriptionFunction>;
+const mockGetUserSubscription =
+  jest.fn() as jest.MockedFunction<SubscriptionFunction>;
 const mockRetrieveCheckout = jest.fn() as jest.MockedFunction<CheckoutFunction>;
 
 // Reset and set up fresh mocks
 beforeAll(() => {
   jest.resetModules();
-  
+
   jest.doMock("@/lib/auth/server", () => ({
     auth: {
       api: {
@@ -40,7 +63,7 @@ beforeAll(() => {
 
 describe("Payment Status API", () => {
   let consoleErrorSpy: SpyInstance;
-  let GET: (request: import('next/server').NextRequest) => Promise<Response>;
+  let GET: (request: import("next/server").NextRequest) => Promise<Response>;
 
   beforeAll(async () => {
     // Import the route handler after mocks are set up
@@ -51,10 +74,15 @@ describe("Payment Status API", () => {
   const createMockRequest = (url: string) => {
     return {
       url: url,
-      headers: { get: () => '', has: () => false, set: () => {}, entries: () => [] },
+      headers: {
+        get: () => "",
+        has: () => false,
+        set: () => {},
+        entries: () => [],
+      },
       cookies: { get: () => null, has: () => false },
       nextUrl: new URL(url),
-    } as unknown as import('next/server').NextRequest;
+    } as unknown as import("next/server").NextRequest;
   };
 
   // Helper to convert subscription dates to ISO strings for comparison
@@ -71,13 +99,14 @@ describe("Payment Status API", () => {
     consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
   });
 
-
   afterEach(() => {
     consoleErrorSpy.mockRestore();
   });
 
   it("should return 400 if no sessionId is provided", async () => {
-    const request = createMockRequest("http://localhost:3000/api/payment-status");
+    const request = createMockRequest(
+      "http://localhost:3000/api/payment-status",
+    );
 
     const response = await GET(request);
     const data = await response.json();
@@ -89,15 +118,17 @@ describe("Payment Status API", () => {
   });
 
   it("should return success when user has active subscription", async () => {
-    const request = createMockRequest("http://localhost:3000/api/payment-status?sessionId=test-session-id");
-    
-    const mockSession = createMockSession({ 
-      user: { id: "user-123", email: "test@example.com", role: "user" } 
+    const request = createMockRequest(
+      "http://localhost:3000/api/payment-status?sessionId=test-session-id",
+    );
+
+    const mockSession = createMockSession({
+      user: { id: "user-123", email: "test@example.com", role: "user" },
     });
     const mockSubscription = createMockSubscription({
       id: "sub-123",
       status: "active",
-      userId: "user-123"
+      userId: "user-123",
     });
 
     mockGetSession.mockResolvedValue(mockSession);
@@ -119,15 +150,17 @@ describe("Payment Status API", () => {
   });
 
   it("should return success when user has trialing subscription", async () => {
-    const request = createMockRequest("http://localhost:3000/api/payment-status?sessionId=test-session-id");
-    
-    const mockSession = createMockSession({ 
-      user: { id: "user-123", email: "test@example.com", role: "user" } 
+    const request = createMockRequest(
+      "http://localhost:3000/api/payment-status?sessionId=test-session-id",
+    );
+
+    const mockSession = createMockSession({
+      user: { id: "user-123", email: "test@example.com", role: "user" },
     });
     const mockSubscription = createMockSubscription({
       id: "sub-123",
       status: "trialing",
-      userId: "user-123"
+      userId: "user-123",
     });
 
     mockGetSession.mockResolvedValue(mockSession);
@@ -145,15 +178,17 @@ describe("Payment Status API", () => {
   });
 
   it("should return failed when user has past_due subscription", async () => {
-    const request = createMockRequest("http://localhost:3000/api/payment-status?sessionId=test-session-id");
-    
-    const mockSession = createMockSession({ 
-      user: { id: "user-123", email: "test@example.com", role: "user" } 
+    const request = createMockRequest(
+      "http://localhost:3000/api/payment-status?sessionId=test-session-id",
+    );
+
+    const mockSession = createMockSession({
+      user: { id: "user-123", email: "test@example.com", role: "user" },
     });
     const mockSubscription = createMockSubscription({
       id: "sub-123",
       status: "past_due",
-      userId: "user-123"
+      userId: "user-123",
     });
 
     mockGetSession.mockResolvedValue(mockSession);
@@ -171,15 +206,17 @@ describe("Payment Status API", () => {
   });
 
   it("should return failed when user has unpaid subscription", async () => {
-    const request = createMockRequest("http://localhost:3000/api/payment-status?sessionId=test-session-id");
-    
-    const mockSession = createMockSession({ 
-      user: { id: "user-123", email: "test@example.com", role: "user" } 
+    const request = createMockRequest(
+      "http://localhost:3000/api/payment-status?sessionId=test-session-id",
+    );
+
+    const mockSession = createMockSession({
+      user: { id: "user-123", email: "test@example.com", role: "user" },
     });
     const mockSubscription = createMockSubscription({
       id: "sub-123",
       status: "unpaid",
-      userId: "user-123"
+      userId: "user-123",
     });
 
     mockGetSession.mockResolvedValue(mockSession);
@@ -197,15 +234,17 @@ describe("Payment Status API", () => {
   });
 
   it("should return pending when user has canceled subscription with sessionId", async () => {
-    const request = createMockRequest("http://localhost:3000/api/payment-status?sessionId=test-session-id");
-    
-    const mockSession = createMockSession({ 
-      user: { id: "user-123", email: "test@example.com", role: "user" } 
+    const request = createMockRequest(
+      "http://localhost:3000/api/payment-status?sessionId=test-session-id",
+    );
+
+    const mockSession = createMockSession({
+      user: { id: "user-123", email: "test@example.com", role: "user" },
     });
     const mockSubscription = createMockSubscription({
       id: "sub-123",
       status: "canceled",
-      userId: "user-123"
+      userId: "user-123",
     });
 
     mockGetSession.mockResolvedValue(mockSession);
@@ -223,24 +262,28 @@ describe("Payment Status API", () => {
   });
 
   it("should handle unusual subscription status gracefully", async () => {
-    const request = createMockRequest("http://localhost:3000/api/payment-status?sessionId=test-session-id");
-    
-    const mockSession = createMockSession({ 
-      user: { id: "user-123", email: "test@example.com", role: "user" } 
+    const request = createMockRequest(
+      "http://localhost:3000/api/payment-status?sessionId=test-session-id",
+    );
+
+    const mockSession = createMockSession({
+      user: { id: "user-123", email: "test@example.com", role: "user" },
     });
     const mockSubscription = createMockSubscription({
       id: "sub-123",
       status: "unknown_status" as any, // Force unusual status
-      userId: "user-123"
+      userId: "user-123",
     });
 
     mockGetSession.mockResolvedValue(mockSession);
     mockGetUserSubscription.mockResolvedValue(mockSubscription);
 
     // Mock Creem to handle fallback
-    mockRetrieveCheckout.mockResolvedValue(createMockCreemCheckout({
-      status: "completed"
-    }));
+    mockRetrieveCheckout.mockResolvedValue(
+      createMockCreemCheckout({
+        status: "completed",
+      }),
+    );
 
     const response = await GET(request);
     const data = await response.json();
@@ -254,10 +297,12 @@ describe("Payment Status API", () => {
   });
 
   it("should check with Creem when no subscription found and sessionId provided", async () => {
-    const request = createMockRequest("http://localhost:3000/api/payment-status?sessionId=test-session-id");
-    
-    const mockSession = createMockSession({ 
-      user: { id: "user-123", email: "test@example.com", role: "user" } 
+    const request = createMockRequest(
+      "http://localhost:3000/api/payment-status?sessionId=test-session-id",
+    );
+
+    const mockSession = createMockSession({
+      user: { id: "user-123", email: "test@example.com", role: "user" },
     });
 
     mockGetSession.mockResolvedValue(mockSession);
@@ -265,7 +310,7 @@ describe("Payment Status API", () => {
 
     // Mock Creem client response
     const mockCheckout = createMockCreemCheckout({
-      status: "completed"
+      status: "completed",
     });
     mockRetrieveCheckout.mockResolvedValue(mockCheckout);
 
@@ -281,14 +326,16 @@ describe("Payment Status API", () => {
   });
 
   it("should handle Creem failed status", async () => {
-    const request = createMockRequest("http://localhost:3000/api/payment-status?sessionId=test-session-id");
-    
+    const request = createMockRequest(
+      "http://localhost:3000/api/payment-status?sessionId=test-session-id",
+    );
+
     mockGetSession.mockResolvedValue(null);
     mockGetUserSubscription.mockResolvedValue(null);
 
     // Mock Creem client response with failed status
     const mockCheckout = createMockCreemCheckout({
-      status: "failed" as const
+      status: "failed" as const,
     });
     mockRetrieveCheckout.mockResolvedValue(mockCheckout);
 
@@ -304,14 +351,16 @@ describe("Payment Status API", () => {
   });
 
   it("should handle Creem canceled status", async () => {
-    const request = createMockRequest("http://localhost:3000/api/payment-status?sessionId=test-session-id");
-    
+    const request = createMockRequest(
+      "http://localhost:3000/api/payment-status?sessionId=test-session-id",
+    );
+
     mockGetSession.mockResolvedValue(null);
     mockGetUserSubscription.mockResolvedValue(null);
 
     // Mock Creem client response with canceled status
     const mockCheckout = createMockCreemCheckout({
-      status: "canceled" as const
+      status: "canceled" as const,
     });
     mockRetrieveCheckout.mockResolvedValue(mockCheckout);
 
@@ -327,14 +376,16 @@ describe("Payment Status API", () => {
   });
 
   it("should handle Creem pending status", async () => {
-    const request = createMockRequest("http://localhost:3000/api/payment-status?sessionId=test-session-id");
-    
+    const request = createMockRequest(
+      "http://localhost:3000/api/payment-status?sessionId=test-session-id",
+    );
+
     mockGetSession.mockResolvedValue(null);
     mockGetUserSubscription.mockResolvedValue(null);
 
     // Mock Creem client response with pending status
     const mockCheckout = createMockCreemCheckout({
-      status: "open" // Using 'open' as it's the closest to 'pending' in our type
+      status: "open", // Using 'open' as it's the closest to 'pending' in our type
     });
     mockRetrieveCheckout.mockResolvedValue(mockCheckout);
 
@@ -350,15 +401,19 @@ describe("Payment Status API", () => {
   });
 
   it("should handle Creem processing status", async () => {
-    const request = createMockRequest("http://localhost:3000/api/payment-status?sessionId=test-session-id");
-    
+    const request = createMockRequest(
+      "http://localhost:3000/api/payment-status?sessionId=test-session-id",
+    );
+
     mockGetSession.mockResolvedValue(null);
     mockGetUserSubscription.mockResolvedValue(null);
 
     // Mock Creem client response with processing status
-    mockRetrieveCheckout.mockResolvedValue(createMockCreemCheckout({
-      status: "processing"
-    }));
+    mockRetrieveCheckout.mockResolvedValue(
+      createMockCreemCheckout({
+        status: "processing",
+      }),
+    );
 
     const response = await GET(request);
     const data = await response.json();
@@ -372,15 +427,19 @@ describe("Payment Status API", () => {
   });
 
   it("should handle unknown Creem status as pending", async () => {
-    const request = createMockRequest("http://localhost:3000/api/payment-status?sessionId=test-session-id");
-    
+    const request = createMockRequest(
+      "http://localhost:3000/api/payment-status?sessionId=test-session-id",
+    );
+
     mockGetSession.mockResolvedValue(null);
     mockGetUserSubscription.mockResolvedValue(null);
 
     // Mock Creem client response with unknown status
-    mockRetrieveCheckout.mockResolvedValue(createMockCreemCheckout({
-      status: "unknown-status"
-    }));
+    mockRetrieveCheckout.mockResolvedValue(
+      createMockCreemCheckout({
+        status: "unknown-status",
+      }),
+    );
 
     const response = await GET(request);
     const data = await response.json();
@@ -394,8 +453,10 @@ describe("Payment Status API", () => {
   });
 
   it("should handle Creem response without status", async () => {
-    const request = createMockRequest("http://localhost:3000/api/payment-status?sessionId=test-session-id");
-    
+    const request = createMockRequest(
+      "http://localhost:3000/api/payment-status?sessionId=test-session-id",
+    );
+
     mockGetSession.mockResolvedValue(null);
     mockGetUserSubscription.mockResolvedValue(null);
 
@@ -417,8 +478,10 @@ describe("Payment Status API", () => {
   });
 
   it("should handle Creem API error gracefully", async () => {
-    const request = createMockRequest("http://localhost:3000/api/payment-status?sessionId=test-session-id");
-    
+    const request = createMockRequest(
+      "http://localhost:3000/api/payment-status?sessionId=test-session-id",
+    );
+
     mockGetSession.mockResolvedValue(null);
     mockGetUserSubscription.mockResolvedValue(null);
 
@@ -436,20 +499,24 @@ describe("Payment Status API", () => {
     });
     expect(console.error).toHaveBeenCalledWith(
       "Error checking Creem payment status:",
-      expect.any(Error)
+      expect.any(Error),
     );
   });
 
   it("should use checkout_id parameter as sessionId", async () => {
-    const request = createMockRequest("http://localhost:3000/api/payment-status?checkout_id=checkout-123");
-    
+    const request = createMockRequest(
+      "http://localhost:3000/api/payment-status?checkout_id=checkout-123",
+    );
+
     mockGetSession.mockResolvedValue(null);
     mockGetUserSubscription.mockResolvedValue(null);
 
     // Mock Creem client response
-    mockRetrieveCheckout.mockResolvedValue(createMockCreemCheckout({
-      status: "completed"
-    }));
+    mockRetrieveCheckout.mockResolvedValue(
+      createMockCreemCheckout({
+        status: "completed",
+      }),
+    );
 
     const response = await GET(request);
     const data = await response.json();
@@ -459,15 +526,19 @@ describe("Payment Status API", () => {
   });
 
   it("should handle non-logged-in user checking payment status", async () => {
-    const request = createMockRequest("http://localhost:3000/api/payment-status?sessionId=test-session-id");
-    
+    const request = createMockRequest(
+      "http://localhost:3000/api/payment-status?sessionId=test-session-id",
+    );
+
     mockGetSession.mockResolvedValue(null); // No user session
     mockGetUserSubscription.mockResolvedValue(null);
 
     // Mock Creem client response
-    mockRetrieveCheckout.mockResolvedValue(createMockCreemCheckout({
-      status: "completed"
-    }));
+    mockRetrieveCheckout.mockResolvedValue(
+      createMockCreemCheckout({
+        status: "completed",
+      }),
+    );
 
     const response = await GET(request);
     const data = await response.json();
@@ -482,8 +553,10 @@ describe("Payment Status API", () => {
   });
 
   it("should handle general API error", async () => {
-    const request = createMockRequest("http://localhost:3000/api/payment-status?sessionId=test-session-id");
-    
+    const request = createMockRequest(
+      "http://localhost:3000/api/payment-status?sessionId=test-session-id",
+    );
+
     // Force an error in the main try block
     mockGetSession.mockRejectedValue(new Error("Database connection error"));
 
@@ -496,13 +569,15 @@ describe("Payment Status API", () => {
     });
     expect(console.error).toHaveBeenCalledWith(
       "[Payment Status API Error]",
-      expect.any(Error)
+      expect.any(Error),
     );
   });
 
   it("should return 400 when no sessionId and no subscription", async () => {
-    const request = createMockRequest("http://localhost:3000/api/payment-status");
-    
+    const request = createMockRequest(
+      "http://localhost:3000/api/payment-status",
+    );
+
     mockGetSession.mockResolvedValue(null);
     mockGetUserSubscription.mockResolvedValue(null);
 
@@ -529,21 +604,23 @@ describe("Payment Status API", () => {
               return null; // This should trigger line 55
             }
             return realURL.searchParams.get(key);
-          })
-        }
+          }),
+        },
       };
     });
     global.URL = mockURLConstructor as any;
 
-    const request = createMockRequest("http://localhost:3000/api/payment-status");
-    
-    const mockSession = createMockSession({ 
-      user: { id: "user-123", email: "test@example.com", role: "user" } 
+    const request = createMockRequest(
+      "http://localhost:3000/api/payment-status",
+    );
+
+    const mockSession = createMockSession({
+      user: { id: "user-123", email: "test@example.com", role: "user" },
     });
     const mockSubscription = createMockSubscription({
       id: "sub-123",
       status: "canceled",
-      userId: "user-123"
+      userId: "user-123",
     });
 
     mockGetSession.mockResolvedValue(mockSession);

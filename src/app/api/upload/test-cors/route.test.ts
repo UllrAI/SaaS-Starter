@@ -1,4 +1,11 @@
-import { describe, it, expect, jest, beforeEach, afterEach } from "@jest/globals";
+import {
+  describe,
+  it,
+  expect,
+  jest,
+  beforeEach,
+  afterEach,
+} from "@jest/globals";
 
 // Mock environment variables
 const mockEnv = {
@@ -14,7 +21,7 @@ describe("CORS Test Route", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    
+
     // Reset mock environment to default values
     mockEnv.NEXT_PUBLIC_APP_URL = "https://example.com";
   });
@@ -42,20 +49,26 @@ describe("CORS Test Route", () => {
       const result = await GET(mockRequest);
 
       expect(mockRequest.headers.get).toHaveBeenCalledWith("origin");
-      
+
       // Convert response to JSON to verify
       const responseJson = await result.json();
-      
+
       expect(responseJson).toEqual({
         message: "CORS test successful",
         timestamp: "2023-12-01T10:00:00.000Z",
         origin: "https://client.example.com",
       });
-      
+
       expect(result.status).toBe(200);
-      expect(result.headers.get("Access-Control-Allow-Origin")).toBe(mockEnv.NEXT_PUBLIC_APP_URL);
-      expect(result.headers.get("Access-Control-Allow-Methods")).toBe("GET, POST, PUT, DELETE, OPTIONS");
-      expect(result.headers.get("Access-Control-Allow-Headers")).toBe("Content-Type, Authorization");
+      expect(result.headers.get("Access-Control-Allow-Origin")).toBe(
+        mockEnv.NEXT_PUBLIC_APP_URL,
+      );
+      expect(result.headers.get("Access-Control-Allow-Methods")).toBe(
+        "GET, POST, PUT, DELETE, OPTIONS",
+      );
+      expect(result.headers.get("Access-Control-Allow-Headers")).toBe(
+        "Content-Type, Authorization",
+      );
     });
 
     it("should handle request with no origin header", async () => {
@@ -69,7 +82,7 @@ describe("CORS Test Route", () => {
       const result = await GET(mockRequest);
 
       const responseJson = await result.json();
-      
+
       expect(responseJson.origin).toBe("unknown");
       expect(responseJson.message).toBe("CORS test successful");
       expect(typeof responseJson.timestamp).toBe("string");
@@ -86,7 +99,7 @@ describe("CORS Test Route", () => {
       const result = await GET(mockRequest);
 
       const responseJson = await result.json();
-      
+
       expect(responseJson.origin).toBe("unknown");
     });
 
@@ -100,9 +113,15 @@ describe("CORS Test Route", () => {
       const { GET } = await import("./route");
       const result = await GET(mockRequest);
 
-      expect(result.headers.get("Access-Control-Allow-Origin")).toBe(mockEnv.NEXT_PUBLIC_APP_URL);
-      expect(result.headers.get("Access-Control-Allow-Methods")).toBe("GET, POST, PUT, DELETE, OPTIONS");
-      expect(result.headers.get("Access-Control-Allow-Headers")).toBe("Content-Type, Authorization");
+      expect(result.headers.get("Access-Control-Allow-Origin")).toBe(
+        mockEnv.NEXT_PUBLIC_APP_URL,
+      );
+      expect(result.headers.get("Access-Control-Allow-Methods")).toBe(
+        "GET, POST, PUT, DELETE, OPTIONS",
+      );
+      expect(result.headers.get("Access-Control-Allow-Headers")).toBe(
+        "Content-Type, Authorization",
+      );
     });
 
     it("should return 200 status code", async () => {
@@ -130,10 +149,12 @@ describe("CORS Test Route", () => {
 
       const responseJson = await result.json();
       const timestamp = responseJson.timestamp;
-      
+
       // Check if it's a valid ISO 8601 string
-      expect(timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
-      
+      expect(timestamp).toMatch(
+        /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
+      );
+
       // Check if it can be parsed as a valid date
       const parsedDate = new Date(timestamp);
       expect(parsedDate.toISOString()).toBe(timestamp);
@@ -180,7 +201,9 @@ describe("CORS Test Route", () => {
       const { GET } = await import("./route");
       const result = await GET(mockRequest);
 
-      expect(result.headers.get("Access-Control-Allow-Origin")).toBe(customAppUrl);
+      expect(result.headers.get("Access-Control-Allow-Origin")).toBe(
+        customAppUrl,
+      );
     });
   });
 
@@ -190,9 +213,15 @@ describe("CORS Test Route", () => {
       const result = await OPTIONS();
 
       expect(result.status).toBe(200);
-      expect(result.headers.get("Access-Control-Allow-Origin")).toBe(mockEnv.NEXT_PUBLIC_APP_URL);
-      expect(result.headers.get("Access-Control-Allow-Methods")).toBe("GET, POST, PUT, DELETE, OPTIONS");
-      expect(result.headers.get("Access-Control-Allow-Headers")).toBe("Content-Type, Authorization");
+      expect(result.headers.get("Access-Control-Allow-Origin")).toBe(
+        mockEnv.NEXT_PUBLIC_APP_URL,
+      );
+      expect(result.headers.get("Access-Control-Allow-Methods")).toBe(
+        "GET, POST, PUT, DELETE, OPTIONS",
+      );
+      expect(result.headers.get("Access-Control-Allow-Headers")).toBe(
+        "Content-Type, Authorization",
+      );
       expect(result.headers.get("Access-Control-Max-Age")).toBe("86400");
     });
 
@@ -207,9 +236,15 @@ describe("CORS Test Route", () => {
       const { OPTIONS } = await import("./route");
       const result = await OPTIONS();
 
-      expect(result.headers.get("Access-Control-Allow-Origin")).toBe(mockEnv.NEXT_PUBLIC_APP_URL);
-      expect(result.headers.get("Access-Control-Allow-Methods")).toBe("GET, POST, PUT, DELETE, OPTIONS");
-      expect(result.headers.get("Access-Control-Allow-Headers")).toBe("Content-Type, Authorization");
+      expect(result.headers.get("Access-Control-Allow-Origin")).toBe(
+        mockEnv.NEXT_PUBLIC_APP_URL,
+      );
+      expect(result.headers.get("Access-Control-Allow-Methods")).toBe(
+        "GET, POST, PUT, DELETE, OPTIONS",
+      );
+      expect(result.headers.get("Access-Control-Allow-Headers")).toBe(
+        "Content-Type, Authorization",
+      );
       expect(result.headers.get("Access-Control-Max-Age")).toBe("86400");
     });
 
@@ -237,7 +272,9 @@ describe("CORS Test Route", () => {
       const { OPTIONS } = await import("./route");
       const result = await OPTIONS();
 
-      expect(result.headers.get("Access-Control-Allow-Origin")).toBe(customAppUrl);
+      expect(result.headers.get("Access-Control-Allow-Origin")).toBe(
+        customAppUrl,
+      );
     });
   });
 
@@ -255,13 +292,13 @@ describe("CORS Test Route", () => {
 
       // Check that common CORS headers are consistent
       expect(getResult.headers.get("Access-Control-Allow-Origin")).toBe(
-        optionsResult.headers.get("Access-Control-Allow-Origin")
+        optionsResult.headers.get("Access-Control-Allow-Origin"),
       );
       expect(getResult.headers.get("Access-Control-Allow-Methods")).toBe(
-        optionsResult.headers.get("Access-Control-Allow-Methods")
+        optionsResult.headers.get("Access-Control-Allow-Methods"),
       );
       expect(getResult.headers.get("Access-Control-Allow-Headers")).toBe(
-        optionsResult.headers.get("Access-Control-Allow-Headers")
+        optionsResult.headers.get("Access-Control-Allow-Headers"),
       );
     });
 
@@ -361,7 +398,9 @@ describe("CORS Test Route", () => {
         expect(getResult.headers.get("Access-Control-Allow-Origin")).toBe(url);
 
         // Check OPTIONS response
-        expect(optionsResult.headers.get("Access-Control-Allow-Origin")).toBe(url);
+        expect(optionsResult.headers.get("Access-Control-Allow-Origin")).toBe(
+          url,
+        );
       }
     });
   });
@@ -385,7 +424,7 @@ describe("CORS Test Route", () => {
         const result = await GET(mockRequest);
 
         expect(mockRequest.headers.get).toHaveBeenCalledWith("origin");
-        
+
         const responseJson = await result.json();
         expect(responseJson.origin).toBe(origin);
       }
@@ -468,7 +507,9 @@ describe("CORS Test Route", () => {
       const timestamp = responseJson.timestamp;
 
       // Check if it's a valid ISO 8601 string
-      expect(timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
+      expect(timestamp).toMatch(
+        /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
+      );
 
       // Check if it can be parsed as a valid date
       const parsedDate = new Date(timestamp);
@@ -479,7 +520,7 @@ describe("CORS Test Route", () => {
   describe("Integration Tests", () => {
     it("should handle a complete CORS preflight flow", async () => {
       const { GET, OPTIONS } = await import("./route");
-      
+
       // Simulate preflight OPTIONS request
       const optionsResult = await OPTIONS();
 
@@ -494,14 +535,20 @@ describe("CORS Test Route", () => {
 
       // Verify OPTIONS response
       expect(optionsResult.status).toBe(200);
-      expect(optionsResult.headers.get("Access-Control-Allow-Origin")).toBe(mockEnv.NEXT_PUBLIC_APP_URL);
-      expect(optionsResult.headers.get("Access-Control-Allow-Methods")).toContain("GET");
+      expect(optionsResult.headers.get("Access-Control-Allow-Origin")).toBe(
+        mockEnv.NEXT_PUBLIC_APP_URL,
+      );
+      expect(
+        optionsResult.headers.get("Access-Control-Allow-Methods"),
+      ).toContain("GET");
       expect(optionsResult.headers.get("Access-Control-Max-Age")).toBe("86400");
 
       // Verify GET response
       expect(getResult.status).toBe(200);
-      expect(getResult.headers.get("Access-Control-Allow-Origin")).toBe(mockEnv.NEXT_PUBLIC_APP_URL);
-      
+      expect(getResult.headers.get("Access-Control-Allow-Origin")).toBe(
+        mockEnv.NEXT_PUBLIC_APP_URL,
+      );
+
       const responseJson = await getResult.json();
       expect(responseJson.message).toBe("CORS test successful");
       expect(responseJson.origin).toBe("https://client.example.com");
@@ -514,8 +561,12 @@ describe("CORS Test Route", () => {
 
       // Verify preflight allows the actual request
       expect(preflightResult.status).toBe(200);
-      expect(preflightResult.headers.get("Access-Control-Allow-Methods")).toContain("GET");
-      expect(preflightResult.headers.get("Access-Control-Allow-Headers")).toContain("Content-Type");
+      expect(
+        preflightResult.headers.get("Access-Control-Allow-Methods"),
+      ).toContain("GET");
+      expect(
+        preflightResult.headers.get("Access-Control-Allow-Headers"),
+      ).toContain("Content-Type");
 
       // Simulate the actual request from the browser
       const mockRequest = {

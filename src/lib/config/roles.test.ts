@@ -2,11 +2,11 @@ import { describe, it, expect, jest } from "@jest/globals";
 
 // Mock the database schema
 const mockUserRoleEnum = {
-  enumValues: ["user", "admin", "super_admin"] as const
+  enumValues: ["user", "admin", "super_admin"] as const,
 };
 
 jest.mock("@/database/schema", () => ({
-  userRoleEnum: mockUserRoleEnum
+  userRoleEnum: mockUserRoleEnum,
 }));
 
 // Import after mocking
@@ -17,7 +17,7 @@ import {
   getAllRoles,
   getRoleLevel,
   isAdminRole,
-  isSuperAdminRole
+  isSuperAdminRole,
 } from "./roles";
 
 describe("Config Roles", () => {
@@ -39,7 +39,7 @@ describe("Config Roles", () => {
       expect(ROLE_HIERARCHY).toEqual({
         user: 1,
         admin: 2,
-        super_admin: 3
+        super_admin: 3,
       });
     });
 
@@ -54,7 +54,7 @@ describe("Config Roles", () => {
       const hierarchyRoles = Object.keys(ROLE_HIERARCHY);
 
       expect(hierarchyRoles).toHaveLength(enumRoles.length);
-      enumRoles.forEach(role => {
+      enumRoles.forEach((role) => {
         expect(ROLE_HIERARCHY).toHaveProperty(role);
       });
     });
@@ -65,7 +65,7 @@ describe("Config Roles", () => {
     });
 
     it("should have positive hierarchy values", () => {
-      Object.values(ROLE_HIERARCHY).forEach(value => {
+      Object.values(ROLE_HIERARCHY).forEach((value) => {
         expect(value).toBeGreaterThan(0);
         expect(Number.isInteger(value)).toBe(true);
       });
@@ -93,10 +93,11 @@ describe("Config Roles", () => {
 
     it("should handle all role combinations correctly", () => {
       const roles: UserRole[] = ["user", "admin", "super_admin"];
-      
-      roles.forEach(userRole => {
-        roles.forEach(requiredRole => {
-          const expected = ROLE_HIERARCHY[userRole] >= ROLE_HIERARCHY[requiredRole];
+
+      roles.forEach((userRole) => {
+        roles.forEach((requiredRole) => {
+          const expected =
+            ROLE_HIERARCHY[userRole] >= ROLE_HIERARCHY[requiredRole];
           expect(hasRole(userRole, requiredRole)).toBe(expected);
         });
       });
@@ -107,11 +108,11 @@ describe("Config Roles", () => {
       expect(hasRole("user", "user")).toBe(true);
       expect(hasRole("admin", "user")).toBe(true);
       expect(hasRole("super_admin", "user")).toBe(true);
-      
+
       expect(hasRole("user", "admin")).toBe(false);
       expect(hasRole("admin", "admin")).toBe(true);
       expect(hasRole("super_admin", "admin")).toBe(true);
-      
+
       expect(hasRole("user", "super_admin")).toBe(false);
       expect(hasRole("admin", "super_admin")).toBe(false);
       expect(hasRole("super_admin", "super_admin")).toBe(true);
@@ -143,7 +144,7 @@ describe("Config Roles", () => {
 
     it("should contain only valid UserRole types", () => {
       const roles = getAllRoles();
-      roles.forEach(role => {
+      roles.forEach((role) => {
         expect(typeof role).toBe("string");
         expect(["user", "admin", "super_admin"]).toContain(role);
       });
@@ -159,16 +160,16 @@ describe("Config Roles", () => {
 
     it("should return values matching ROLE_HIERARCHY", () => {
       const roles: UserRole[] = ["user", "admin", "super_admin"];
-      
-      roles.forEach(role => {
+
+      roles.forEach((role) => {
         expect(getRoleLevel(role)).toBe(ROLE_HIERARCHY[role]);
       });
     });
 
     it("should return integer values", () => {
       const roles: UserRole[] = ["user", "admin", "super_admin"];
-      
-      roles.forEach(role => {
+
+      roles.forEach((role) => {
         const level = getRoleLevel(role);
         expect(Number.isInteger(level)).toBe(true);
         expect(level).toBeGreaterThan(0);
@@ -200,19 +201,19 @@ describe("Config Roles", () => {
 
     it("should be consistent with hasRole function", () => {
       const roles: UserRole[] = ["user", "admin", "super_admin"];
-      
-      roles.forEach(role => {
+
+      roles.forEach((role) => {
         expect(isAdminRole(role)).toBe(hasRole(role, "admin"));
       });
     });
 
     it("should identify all administrative roles", () => {
-      const adminRoles = getAllRoles().filter(role => isAdminRole(role));
+      const adminRoles = getAllRoles().filter((role) => isAdminRole(role));
       expect(adminRoles).toEqual(["admin", "super_admin"]);
     });
 
     it("should exclude non-administrative roles", () => {
-      const nonAdminRoles = getAllRoles().filter(role => !isAdminRole(role));
+      const nonAdminRoles = getAllRoles().filter((role) => !isAdminRole(role));
       expect(nonAdminRoles).toEqual(["user"]);
     });
   });
@@ -232,8 +233,8 @@ describe("Config Roles", () => {
 
     it("should only return true for super_admin", () => {
       const roles: UserRole[] = ["user", "admin", "super_admin"];
-      
-      roles.forEach(role => {
+
+      roles.forEach((role) => {
         if (role === "super_admin") {
           expect(isSuperAdminRole(role)).toBe(true);
         } else {
@@ -243,15 +244,17 @@ describe("Config Roles", () => {
     });
 
     it("should identify only the highest privilege role", () => {
-      const superAdminRoles = getAllRoles().filter(role => isSuperAdminRole(role));
+      const superAdminRoles = getAllRoles().filter((role) =>
+        isSuperAdminRole(role),
+      );
       expect(superAdminRoles).toEqual(["super_admin"]);
       expect(superAdminRoles).toHaveLength(1);
     });
 
     it("should be more restrictive than isAdminRole", () => {
       const roles: UserRole[] = ["user", "admin", "super_admin"];
-      
-      roles.forEach(role => {
+
+      roles.forEach((role) => {
         if (isSuperAdminRole(role)) {
           expect(isAdminRole(role)).toBe(true);
         }
@@ -263,23 +266,23 @@ describe("Config Roles", () => {
   describe("Integration Tests", () => {
     it("should have consistent behavior across all functions", () => {
       const roles: UserRole[] = ["user", "admin", "super_admin"];
-      
-      roles.forEach(role => {
+
+      roles.forEach((role) => {
         const level = getRoleLevel(role);
         const isAdmin = isAdminRole(role);
         const isSuperAdmin = isSuperAdminRole(role);
-        
+
         // Super admin should always be admin
         if (isSuperAdmin) {
           expect(isAdmin).toBe(true);
         }
-        
+
         // Level should match hierarchy
         expect(level).toBe(ROLE_HIERARCHY[role]);
-        
+
         // hasRole should be consistent with levels
         expect(hasRole(role, role)).toBe(true);
-        
+
         // Admin check should match hasRole
         expect(isAdmin).toBe(hasRole(role, "admin"));
       });
@@ -290,10 +293,10 @@ describe("Config Roles", () => {
       expect(hasRole("super_admin", "admin")).toBe(true);
       expect(hasRole("super_admin", "user")).toBe(true);
       expect(hasRole("admin", "user")).toBe(true);
-      
+
       expect(isAdminRole("super_admin")).toBe(true);
       expect(isAdminRole("admin")).toBe(true);
-      
+
       expect(isSuperAdminRole("super_admin")).toBe(true);
       expect(isSuperAdminRole("admin")).toBe(false);
     });
@@ -304,13 +307,14 @@ describe("Config Roles", () => {
       expect(canManageUsers("user")).toBe(false);
       expect(canManageUsers("admin")).toBe(true);
       expect(canManageUsers("super_admin")).toBe(true);
-      
+
       // Scenario: System settings permissions
-      const canManageSystem = (userRole: UserRole) => isSuperAdminRole(userRole);
+      const canManageSystem = (userRole: UserRole) =>
+        isSuperAdminRole(userRole);
       expect(canManageSystem("user")).toBe(false);
       expect(canManageSystem("admin")).toBe(false);
       expect(canManageSystem("super_admin")).toBe(true);
-      
+
       // Scenario: Content permissions
       const canViewContent = (userRole: UserRole) => hasRole(userRole, "user");
       expect(canViewContent("user")).toBe(true);
@@ -323,15 +327,15 @@ describe("Config Roles", () => {
     it("should handle all enum values consistently", () => {
       const enumValues = getAllRoles();
       const hierarchyKeys = Object.keys(ROLE_HIERARCHY) as UserRole[];
-      
+
       expect(enumValues.sort()).toEqual(hierarchyKeys.sort());
     });
 
     it("should maintain type safety", () => {
       // These should not cause TypeScript errors
       const roles: UserRole[] = getAllRoles();
-      
-      roles.forEach(role => {
+
+      roles.forEach((role) => {
         expect(typeof getRoleLevel(role)).toBe("number");
         expect(typeof isAdminRole(role)).toBe("boolean");
         expect(typeof isSuperAdminRole(role)).toBe("boolean");
@@ -343,7 +347,7 @@ describe("Config Roles", () => {
       const checkPermission = (userRole: UserRole, requiredRole: UserRole) => {
         return hasRole(userRole, requiredRole);
       };
-      
+
       expect(checkPermission("admin", "user")).toBe(true);
       expect(checkPermission("user", "admin")).toBe(false);
     });
@@ -353,7 +357,7 @@ describe("Config Roles", () => {
       expect(hasRole("user", "user")).toBe(true);
       expect(hasRole("admin", "admin")).toBe(true);
       expect(hasRole("super_admin", "super_admin")).toBe(true);
-      
+
       // Extreme hierarchy differences
       expect(hasRole("super_admin", "user")).toBe(true);
       expect(hasRole("user", "super_admin")).toBe(false);
@@ -363,7 +367,7 @@ describe("Config Roles", () => {
   describe("Performance and Efficiency", () => {
     it("should execute role checks efficiently", () => {
       const start = performance.now();
-      
+
       // Perform many role checks
       for (let i = 0; i < 1000; i++) {
         hasRole("admin", "user");
@@ -372,10 +376,10 @@ describe("Config Roles", () => {
         isSuperAdminRole("admin");
         getRoleLevel("user");
       }
-      
+
       const end = performance.now();
       const duration = end - start;
-      
+
       // Should complete quickly (less than 100ms for 1000 operations)
       expect(duration).toBeLessThan(100);
     });

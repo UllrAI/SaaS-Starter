@@ -30,19 +30,19 @@ This starter kit provides a comprehensive set of powerful features to help you q
 
 ## 🛠️ Tech Stack
 
-| Category      | Technology                                                                                                                                              |
-| :------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Framework** | [Next.js](https://nextjs.org/) 15                                                                                                                      |
-| **Language**  | [TypeScript](https://www.typescriptlang.org/)                                                                                                          |
-| **UI**        | [React](https://react.dev/), [shadcn/ui](https://ui.shadcn.com/), [Tailwind v4](https://tailwindcss.com/), [Lucide React](https://lucide.dev/) (icons) |
-| **Auth**      | [Better-Auth](https://better-auth.com/)                                                                                                                |
-| **Database**  | [PostgreSQL](https://www.postgresql.org/)                                                                                                              |
-| **ORM**       | [Drizzle ORM](https://orm.drizzle.team/)                                                                                                               |
-| **Payments**  | [Creem](https://creem.io/)                                                                                                                             |
-| **Email**     | [Resend](https://resend.com/), [React Email](https://react.email/)                                                                                     |
-| **Forms**     | [React Hook Form](https://react-hook-form.com/), [Zod](https://zod.dev/)                                                                               |
-| **Deployment** | [Vercel](https://vercel.com/)                                                                                                                          |
-| **Package Manager** | [pnpm](https://pnpm.io/)                                                                                                                         |
+| Category            | Technology                                                                                                                                             |
+| :------------------ | :----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Framework**       | [Next.js](https://nextjs.org/) 15                                                                                                                      |
+| **Language**        | [TypeScript](https://www.typescriptlang.org/)                                                                                                          |
+| **UI**              | [React](https://react.dev/), [shadcn/ui](https://ui.shadcn.com/), [Tailwind v4](https://tailwindcss.com/), [Lucide React](https://lucide.dev/) (icons) |
+| **Auth**            | [Better-Auth](https://better-auth.com/)                                                                                                                |
+| **Database**        | [PostgreSQL](https://www.postgresql.org/)                                                                                                              |
+| **ORM**             | [Drizzle ORM](https://orm.drizzle.team/)                                                                                                               |
+| **Payments**        | [Creem](https://creem.io/)                                                                                                                             |
+| **Email**           | [Resend](https://resend.com/), [React Email](https://react.email/)                                                                                     |
+| **Forms**           | [React Hook Form](https://react-hook-form.com/), [Zod](https://zod.dev/)                                                                               |
+| **Deployment**      | [Vercel](https://vercel.com/)                                                                                                                          |
+| **Package Manager** | [pnpm](https://pnpm.io/)                                                                                                                               |
 
 ## 🚀 Quick Start
 
@@ -78,26 +78,26 @@ Then edit the `.env` file and fill in all required values.
 
 #### Environment Variables
 
-| Variable Name            | Description                                         | Example                                             |
-| :----------------------- | :-------------------------------------------------- | :-------------------------------------------------- |
-| `DATABASE_URL`           | **Required.** PostgreSQL connection string.        | `postgresql://user:password@localhost:5432/db_name` |
-| `NEXT_PUBLIC_APP_URL`    | **Required.** Public URL of your deployed app.     | `http://localhost:3000` or `https://yourdomain.com` |
-| `BETTER_AUTH_SECRET`     | **Required.** Key for encrypting sessions, must be 32 characters. | `a_very_secure_random_32_char_string`         |
-| `RESEND_API_KEY`         | **Required.** Resend API Key for sending emails.   | `re_xxxxxxxxxxxxxxxx`                               |
-| `CREEM_API_KEY`          | **Required.** Creem API Key.                        | `your_creem_api_key`                                |
-| `CREEM_ENVIRONMENT`      | **Required.** Creem environment mode.               | `test_mode` or `live_mode`                          |
-| `CREEM_WEBHOOK_SECRET`   | **Required.** Creem webhook secret.                 | `whsec_your_webhook_secret`                         |
-| `R2_ENDPOINT`            | **Required.** Cloudflare R2 API endpoint.           | `https://<ACCOUNT_ID>.r2.cloudflarestorage.com`     |
-| `R2_ACCESS_KEY_ID`       | **Required.** R2 access key ID.                     | `your_r2_access_key_id`                             |
-| `R2_SECRET_ACCESS_KEY`   | **Required.** R2 secret access key.                 | `your_r2_secret_access_key`                         |
-| `R2_BUCKET_NAME`         | **Required.** R2 bucket name.                       | `your_r2_bucket_name`                               |
-| `R2_PUBLIC_URL`          | **Required.** Public access URL for R2 bucket.      | `https://your-bucket.your-account.r2.dev`           |
-| `GITHUB_CLIENT_ID`       | _Optional._ GitHub OAuth Client ID.                 | `your_github_client_id`                             |
-| `GITHUB_CLIENT_SECRET`   | _Optional._ GitHub OAuth Client Secret.             | `your_github_client_secret`                         |
-| `GOOGLE_CLIENT_ID`       | _Optional._ Google OAuth Client ID.                 | `your_google_client_id`                             |
-| `GOOGLE_CLIENT_SECRET`   | _Optional._ Google OAuth Client Secret.             | `your_google_client_secret`                         |
-| `LINKEDIN_CLIENT_ID`     | _Optional._ LinkedIn OAuth Client ID.               | `your_linkedin_client_id`                           |
-| `LINKEDIN_CLIENT_SECRET` | _Optional._ LinkedIn OAuth Client Secret.           | `your_linkedin_client_secret`                       |
+| Variable Name            | Description                                                       | Example                                             |
+| :----------------------- | :---------------------------------------------------------------- | :-------------------------------------------------- |
+| `DATABASE_URL`           | **Required.** PostgreSQL connection string.                       | `postgresql://user:password@localhost:5432/db_name` |
+| `NEXT_PUBLIC_APP_URL`    | **Required.** Public URL of your deployed app.                    | `http://localhost:3000` or `https://yourdomain.com` |
+| `BETTER_AUTH_SECRET`     | **Required.** Key for encrypting sessions, must be 32 characters. | `a_very_secure_random_32_char_string`               |
+| `RESEND_API_KEY`         | **Required.** Resend API Key for sending emails.                  | `re_xxxxxxxxxxxxxxxx`                               |
+| `CREEM_API_KEY`          | **Required.** Creem API Key.                                      | `your_creem_api_key`                                |
+| `CREEM_ENVIRONMENT`      | **Required.** Creem environment mode.                             | `test_mode` or `live_mode`                          |
+| `CREEM_WEBHOOK_SECRET`   | **Required.** Creem webhook secret.                               | `whsec_your_webhook_secret`                         |
+| `R2_ENDPOINT`            | **Required.** Cloudflare R2 API endpoint.                         | `https://<ACCOUNT_ID>.r2.cloudflarestorage.com`     |
+| `R2_ACCESS_KEY_ID`       | **Required.** R2 access key ID.                                   | `your_r2_access_key_id`                             |
+| `R2_SECRET_ACCESS_KEY`   | **Required.** R2 secret access key.                               | `your_r2_secret_access_key`                         |
+| `R2_BUCKET_NAME`         | **Required.** R2 bucket name.                                     | `your_r2_bucket_name`                               |
+| `R2_PUBLIC_URL`          | **Required.** Public access URL for R2 bucket.                    | `https://your-bucket.your-account.r2.dev`           |
+| `GITHUB_CLIENT_ID`       | _Optional._ GitHub OAuth Client ID.                               | `your_github_client_id`                             |
+| `GITHUB_CLIENT_SECRET`   | _Optional._ GitHub OAuth Client Secret.                           | `your_github_client_secret`                         |
+| `GOOGLE_CLIENT_ID`       | _Optional._ Google OAuth Client ID.                               | `your_google_client_id`                             |
+| `GOOGLE_CLIENT_SECRET`   | _Optional._ Google OAuth Client Secret.                           | `your_google_client_secret`                         |
+| `LINKEDIN_CLIENT_ID`     | _Optional._ LinkedIn OAuth Client ID.                             | `your_linkedin_client_id`                           |
+| `LINKEDIN_CLIENT_SECRET` | _Optional._ LinkedIn OAuth Client Secret.                         | `your_linkedin_client_secret`                       |
 
 > **Tip:** You can generate a secure key using the following command:
 > `openssl rand -base64 32`
@@ -196,32 +196,32 @@ For security reasons, the system no longer automatically sets the first register
 
 #### Application Scripts
 
-| Script                 | Description                                    |
-| :--------------------- | :--------------------------------------------- |
-| `pnpm dev`             | Start development server.                      |
-| `pnpm build`           | Build application for production.              |
-| `pnpm start`           | Start production server.                       |
-| `pnpm lint`            | Check code for linting errors.                 |
-| `pnpm test`            | Run unit tests and generate coverage report.    |
-| `pnpm prettier:format` | Format all code using Prettier.               |
-| `pnpm set:admin`       | Promote specified email user to super admin.   |
+| Script                 | Description                                  |
+| :--------------------- | :------------------------------------------- |
+| `pnpm dev`             | Start development server.                    |
+| `pnpm build`           | Build application for production.            |
+| `pnpm start`           | Start production server.                     |
+| `pnpm lint`            | Check code for linting errors.               |
+| `pnpm test`            | Run unit tests and generate coverage report. |
+| `pnpm prettier:format` | Format all code using Prettier.              |
+| `pnpm set:admin`       | Promote specified email user to super admin. |
 
 #### Bundle Analysis Scripts
 
-| Script             | Description                                    |
-| :----------------- | :--------------------------------------------- |
+| Script             | Description                                            |
+| :----------------- | :----------------------------------------------------- |
 | `pnpm analyze`     | Build application and generate bundle analysis report. |
-| `pnpm analyze:dev` | Enable bundle analysis in development mode.    |
+| `pnpm analyze:dev` | Enable bundle analysis in development mode.            |
 
 #### Database Scripts
 
-| Script                  | Description                                           | Environment |
-| :---------------------- | :---------------------------------------------------- | :---------- |
-| `pnpm db:generate`      | Generate SQL migration files based on schema changes. | Development |
-| `pnpm db:generate:prod` | Generate SQL migration files for production.          | Production  |
-| `pnpm db:push`          | **Development only.** Push schema changes directly to database. | Development |
-| `pnpm db:migrate:dev`   | Apply migration files to development database.        | Development |
-| `pnpm db:migrate:prod`  | **Production use.** Apply migration files to production database. | Production |
+| Script                  | Description                                                       | Environment |
+| :---------------------- | :---------------------------------------------------------------- | :---------- |
+| `pnpm db:generate`      | Generate SQL migration files based on schema changes.             | Development |
+| `pnpm db:generate:prod` | Generate SQL migration files for production.                      | Production  |
+| `pnpm db:push`          | **Development only.** Push schema changes directly to database.   | Development |
+| `pnpm db:migrate:dev`   | Apply migration files to development database.                    | Development |
+| `pnpm db:migrate:prod`  | **Production use.** Apply migration files to production database. | Production  |
 
 ## 📁 File Upload Feature
 

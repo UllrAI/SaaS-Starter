@@ -20,40 +20,40 @@ describe("Constants Configuration", () => {
     });
 
     it("should set APP_NAME for development environment", async () => {
-      Object.defineProperty(process.env, 'NODE_ENV', {
-        value: 'development',
+      Object.defineProperty(process.env, "NODE_ENV", {
+        value: "development",
         writable: true,
-        configurable: true
+        configurable: true,
       });
       const { APP_NAME } = await import("./constants");
       expect(APP_NAME).toBe("DEV - SaaS Starter");
     });
 
     it("should set APP_NAME for production environment", async () => {
-      Object.defineProperty(process.env, 'NODE_ENV', {
-        value: 'production',
+      Object.defineProperty(process.env, "NODE_ENV", {
+        value: "production",
         writable: true,
-        configurable: true
+        configurable: true,
       });
       const { APP_NAME } = await import("./constants");
       expect(APP_NAME).toBe("SaaS Starter");
     });
 
     it("should set APP_NAME for test environment", async () => {
-      Object.defineProperty(process.env, 'NODE_ENV', {
-        value: 'test',
+      Object.defineProperty(process.env, "NODE_ENV", {
+        value: "test",
         writable: true,
-        configurable: true
+        configurable: true,
       });
       const { APP_NAME } = await import("./constants");
       expect(APP_NAME).toBe("SaaS Starter");
     });
 
     it("should set APP_NAME for undefined environment", async () => {
-      Object.defineProperty(process.env, 'NODE_ENV', {
+      Object.defineProperty(process.env, "NODE_ENV", {
         value: undefined,
         writable: true,
-        configurable: true
+        configurable: true,
       });
       const { APP_NAME } = await import("./constants");
       expect(APP_NAME).toBe("SaaS Starter");
@@ -63,9 +63,9 @@ describe("Constants Configuration", () => {
   describe("Static constants", () => {
     it("should export correct brand configuration", async () => {
       const constants = await import("./constants");
-      
+
       expect(constants.APP_DESCRIPTION).toBe(
-        "Complete UllrAI SaaS starter with authentication, payments, database, and deployment."
+        "Complete UllrAI SaaS starter with authentication, payments, database, and deployment.",
       );
       expect(constants.COMPANY_NAME).toBe("UllrAI Lab");
       expect(constants.COMPANY_TAGLINE).toBe("by UllrAI, for developers");
@@ -85,12 +85,12 @@ describe("Constants Configuration", () => {
 
     it("should export correct contact information", async () => {
       const constants = await import("./constants");
-      
+
       expect(constants.CONTACT_EMAIL).toBe("support@ullrai.com");
       expect(constants.LEGAL_EMAIL).toBe("legal@ullrai.com");
       expect(constants.PRIVACY_EMAIL).toBe("privacy@ullrai.com");
       expect(constants.RESEND_EMAIL_FROM).toBe("noreply@mail.ullrai.com");
-      
+
       // Validate email format
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       expect(emailRegex.test(constants.CONTACT_EMAIL)).toBe(true);
@@ -101,12 +101,14 @@ describe("Constants Configuration", () => {
 
     it("should export correct external links", async () => {
       const constants = await import("./constants");
-      
-      expect(constants.GITHUB_URL).toBe("https://github.com/ullrai/saas-starter");
-      expect(constants.VERCEL_DEPLOY_URL).toBe(
-        "https://vercel.com/new/clone?repository-url=https://github.com/ullrai/saas-starter"
+
+      expect(constants.GITHUB_URL).toBe(
+        "https://github.com/ullrai/saas-starter",
       );
-      
+      expect(constants.VERCEL_DEPLOY_URL).toBe(
+        "https://vercel.com/new/clone?repository-url=https://github.com/ullrai/saas-starter",
+      );
+
       // Validate URL format
       const urlRegex = /^https?:\/\/.+/;
       expect(urlRegex.test(constants.GITHUB_URL)).toBe(true);
@@ -121,14 +123,14 @@ describe("Constants Configuration", () => {
 
     it("should export correct SEO configuration", async () => {
       const constants = await import("./constants");
-      
+
       expect(constants.OGIMAGE).toBe("https://starter.ullrai.com/og.png");
       expect(constants.TWITTERACCOUNT).toBe("@ullr_ai");
-      
+
       // Validate URL format for OG image
       const urlRegex = /^https?:\/\/.+/;
       expect(urlRegex.test(constants.OGIMAGE)).toBe(true);
-      
+
       // Validate Twitter handle format
       expect(constants.TWITTERACCOUNT.startsWith("@")).toBe(true);
     });
@@ -137,7 +139,7 @@ describe("Constants Configuration", () => {
   describe("Constants types and immutability", () => {
     it("should have correct types for all constants", async () => {
       const constants = await import("./constants");
-      
+
       expect(typeof constants.APP_NAME).toBe("string");
       expect(typeof constants.APP_DESCRIPTION).toBe("string");
       expect(typeof constants.COMPANY_NAME).toBe("string");
@@ -157,7 +159,7 @@ describe("Constants Configuration", () => {
 
     it("should not have empty or null values", async () => {
       const constants = await import("./constants");
-      
+
       const allConstants = [
         constants.APP_NAME,
         constants.APP_DESCRIPTION,
@@ -172,10 +174,10 @@ describe("Constants Configuration", () => {
         constants.VERCEL_DEPLOY_URL,
         constants.PAYMENT_PROVIDER,
         constants.OGIMAGE,
-        constants.TWITTERACCOUNT
+        constants.TWITTERACCOUNT,
       ];
 
-      allConstants.forEach(constant => {
+      allConstants.forEach((constant) => {
         expect(constant).toBeDefined();
         expect(constant).not.toBeNull();
         if (typeof constant === "string") {
@@ -188,20 +190,22 @@ describe("Constants Configuration", () => {
 
     it("should have valid values for domain-specific constants", async () => {
       const constants = await import("./constants");
-      
+
       // Trial days should be a reasonable value
       expect(constants.TRIAL_DAYS).toBeGreaterThanOrEqual(1);
       expect(constants.TRIAL_DAYS).toBeLessThanOrEqual(365);
-      
+
       // Payment provider should be supported
-      expect(["creem", "stripe"].includes(constants.PAYMENT_PROVIDER)).toBe(true);
-      
+      expect(["creem", "stripe"].includes(constants.PAYMENT_PROVIDER)).toBe(
+        true,
+      );
+
       // Avatar style should be a valid DiceBear style
       expect(constants.AVATAR_STYLE).toMatch(/^[a-z-]+$/);
-      
+
       // Company name should be properly formatted
       expect(constants.COMPANY_NAME).not.toMatch(/^\s|\s$/); // No leading/trailing spaces
-      
+
       // URLs should start with https
       expect(constants.GITHUB_URL.startsWith("https://")).toBe(true);
       expect(constants.VERCEL_DEPLOY_URL.startsWith("https://")).toBe(true);
@@ -212,17 +216,17 @@ describe("Constants Configuration", () => {
   describe("Configuration consistency", () => {
     it("should have consistent branding across constants", async () => {
       const constants = await import("./constants");
-      
+
       // Both GitHub URL and Vercel URL should reference the same repository
       expect(constants.GITHUB_URL).toContain("ullrai/saas-starter");
       expect(constants.VERCEL_DEPLOY_URL).toContain("ullrai/saas-starter");
-      
+
       // All emails should be from ullrai.com domain
       expect(constants.CONTACT_EMAIL).toContain("ullrai.com");
       expect(constants.LEGAL_EMAIL).toContain("ullrai.com");
       expect(constants.PRIVACY_EMAIL).toContain("ullrai.com");
       expect(constants.RESEND_EMAIL_FROM).toContain("ullrai.com");
-      
+
       // Company name should be consistent with domain
       expect(constants.COMPANY_NAME).toContain("UllrAI");
       expect(constants.TWITTERACCOUNT).toContain("ullr");
@@ -230,9 +234,9 @@ describe("Constants Configuration", () => {
 
     it("should have APP_NAME that includes base name", async () => {
       const constants = await import("./constants");
-      
+
       expect(constants.APP_NAME).toContain("SaaS Starter");
-      
+
       if (process.env.NODE_ENV === "development") {
         expect(constants.APP_NAME).toContain("DEV");
       }
@@ -240,10 +244,12 @@ describe("Constants Configuration", () => {
 
     it("should have description that matches the product", async () => {
       const constants = await import("./constants");
-      
+
       expect(constants.APP_DESCRIPTION.toLowerCase()).toContain("saas");
       expect(constants.APP_DESCRIPTION.toLowerCase()).toContain("starter");
-      expect(constants.APP_DESCRIPTION.toLowerCase()).toContain("authentication");
+      expect(constants.APP_DESCRIPTION.toLowerCase()).toContain(
+        "authentication",
+      );
       expect(constants.APP_DESCRIPTION.toLowerCase()).toContain("payments");
       expect(constants.APP_DESCRIPTION.toLowerCase()).toContain("database");
     });

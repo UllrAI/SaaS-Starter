@@ -281,8 +281,8 @@ const MagicLinkEmailBody = ({
                 }}
               >
                 <strong>Security Notice:</strong> This link will expire in 15
-                minutes for your security. If you didn&apos;t request this sign-in,
-                please ignore this email.
+                minutes for your security. If you didn&apos;t request this
+                sign-in, please ignore this email.
               </Text>
 
               <Text
@@ -294,8 +294,8 @@ const MagicLinkEmailBody = ({
                   textAlign: "left",
                 }}
               >
-                If the button doesn&apos;t work, you can copy and paste this link
-                into your browser:
+                If the button doesn&apos;t work, you can copy and paste this
+                link into your browser:
               </Text>
 
               <Text

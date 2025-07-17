@@ -8,7 +8,7 @@ jest.mock("@/env", () => ({
     CREEM_API_KEY: "test_api_key",
     CREEM_WEBHOOK_SECRET: "test_webhook_secret",
     CREEM_ENVIRONMENT: "test_mode",
-  }
+  },
 }));
 
 // Mock all dependencies before importing anything
@@ -24,10 +24,10 @@ const mockHandleCreemWebhook = jest.fn();
 const mockResponse = {
   ok: true,
   status: 200,
-  statusText: 'OK',
+  statusText: "OK",
   headers: new Map(),
   json: jest.fn().mockResolvedValue({}),
-  text: jest.fn().mockResolvedValue(''),
+  text: jest.fn().mockResolvedValue(""),
   arrayBuffer: jest.fn().mockResolvedValue(new ArrayBuffer(0)),
   blob: jest.fn().mockResolvedValue(new Blob()),
   clone: jest.fn().mockReturnThis(),
@@ -36,12 +36,12 @@ const mockResponse = {
 global.fetch = jest.fn().mockResolvedValue(mockResponse) as any;
 global.Request = jest.fn().mockImplementation((url, options) => ({
   url,
-  method: 'GET',
+  method: "GET",
   headers: new Map(),
   ...options,
   clone: jest.fn().mockReturnThis(),
   json: jest.fn().mockResolvedValue({}),
-  text: jest.fn().mockResolvedValue(''),
+  text: jest.fn().mockResolvedValue(""),
   arrayBuffer: jest.fn().mockResolvedValue(new ArrayBuffer(0)),
 })) as any;
 global.Response = jest.fn().mockImplementation(() => mockResponse) as any;
@@ -49,7 +49,6 @@ global.Headers = jest.fn().mockImplementation(() => new Map()) as any;
 
 // Mock any potential HTTP clients that Creem might use internally
 // (removed axios and node-fetch as they are not used in actual code)
-
 
 // Mock the Creem SDK completely - this must come before importing any modules that use it
 jest.mock("creem", () => {
@@ -221,7 +220,7 @@ describe("Creem Provider Implementation", () => {
   beforeEach(async () => {
     jest.clearAllMocks();
     // Mock console.error to suppress expected error logs during tests
-    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
     // Re-import the provider to ensure fresh mocks
     creemProvider = (await import("./provider")).default;
   });
@@ -264,7 +263,8 @@ describe("Creem Provider Implementation", () => {
       mockGetProductTierById.mockReturnValue(mockTier);
       mockCreemClient.createCheckout.mockResolvedValue(mockCheckoutResponse);
 
-      const result = await creemProvider.createCheckoutSession(mockCheckoutOptions);
+      const result =
+        await creemProvider.createCheckoutSession(mockCheckoutOptions);
 
       expect(mockGetProductTierById).toHaveBeenCalledWith("pro");
       expect(mockCreemClient.createCheckout).toHaveBeenCalledWith({
@@ -286,7 +286,9 @@ describe("Creem Provider Implementation", () => {
           },
         },
       });
-      expect(result).toEqual({ checkoutUrl: "https://checkout.creem.io/session-123" });
+      expect(result).toEqual({
+        checkoutUrl: "https://checkout.creem.io/session-123",
+      });
     });
 
     it("should handle yearly billing cycle", async () => {
@@ -318,7 +320,7 @@ describe("Creem Provider Implementation", () => {
           createCheckoutRequest: expect.objectContaining({
             productId: "prod_yearly",
           }),
-        })
+        }),
       );
     });
 
@@ -351,7 +353,7 @@ describe("Creem Provider Implementation", () => {
           createCheckoutRequest: expect.objectContaining({
             productId: "prod_one_time",
           }),
-        })
+        }),
       );
     });
 
@@ -387,7 +389,7 @@ describe("Creem Provider Implementation", () => {
               name: undefined,
             },
           }),
-        })
+        }),
       );
     });
 
@@ -395,7 +397,7 @@ describe("Creem Provider Implementation", () => {
       mockGetProductTierById.mockReturnValue(null);
 
       await expect(
-        creemProvider.createCheckoutSession(mockCheckoutOptions)
+        creemProvider.createCheckoutSession(mockCheckoutOptions),
       ).rejects.toThrow('Pricing tier with id "pro" not found.');
 
       expect(mockCreemClient.createCheckout).not.toHaveBeenCalled();
@@ -421,9 +423,9 @@ describe("Creem Provider Implementation", () => {
       mockGetProductTierById.mockReturnValue(mockTier);
 
       await expect(
-        creemProvider.createCheckoutSession(oneTimeOptions)
+        creemProvider.createCheckoutSession(oneTimeOptions),
       ).rejects.toThrow(
-        'Creem product ID not found for tier "pro" with mode "one_time" and cycle "monthly".'
+        'Creem product ID not found for tier "pro" with mode "one_time" and cycle "monthly".',
       );
     });
 
@@ -447,7 +449,7 @@ describe("Creem Provider Implementation", () => {
       mockCreemClient.createCheckout.mockResolvedValue(invalidApiResponse);
 
       await expect(
-        creemProvider.createCheckoutSession(mockCheckoutOptions)
+        creemProvider.createCheckoutSession(mockCheckoutOptions),
       ).rejects.toThrow("Failed to parse checkout response from Creem");
     });
 
@@ -467,7 +469,7 @@ describe("Creem Provider Implementation", () => {
       mockCreemClient.createCheckout.mockRejectedValue(new Error("API Error"));
 
       await expect(
-        creemProvider.createCheckoutSession(mockCheckoutOptions)
+        creemProvider.createCheckoutSession(mockCheckoutOptions),
       ).rejects.toThrow("Failed to create checkout session: API Error");
     });
   });
@@ -478,9 +480,12 @@ describe("Creem Provider Implementation", () => {
         customerPortalLink: "https://portal.creem.io/customer-123",
       };
 
-      mockCreemClient.generateCustomerLinks.mockResolvedValue(mockPortalResponse);
+      mockCreemClient.generateCustomerLinks.mockResolvedValue(
+        mockPortalResponse,
+      );
 
-      const result = await creemProvider.createCustomerPortalUrl("customer-123");
+      const result =
+        await creemProvider.createCustomerPortalUrl("customer-123");
 
       expect(mockCreemClient.generateCustomerLinks).toHaveBeenCalledWith({
         xApiKey: "test_api_key",
@@ -488,7 +493,9 @@ describe("Creem Provider Implementation", () => {
           customerId: "customer-123",
         },
       });
-      expect(result).toEqual({ portalUrl: "https://portal.creem.io/customer-123" });
+      expect(result).toEqual({
+        portalUrl: "https://portal.creem.io/customer-123",
+      });
     });
 
     it("should handle invalid Creem portal API response", async () => {
@@ -496,19 +503,25 @@ describe("Creem Provider Implementation", () => {
         someOtherField: "value",
       };
 
-      mockCreemClient.generateCustomerLinks.mockResolvedValue(invalidApiResponse);
+      mockCreemClient.generateCustomerLinks.mockResolvedValue(
+        invalidApiResponse,
+      );
 
       await expect(
-        creemProvider.createCustomerPortalUrl("customer-123")
+        creemProvider.createCustomerPortalUrl("customer-123"),
       ).rejects.toThrow("Failed to parse customer portal response from Creem");
     });
 
     it("should handle Creem portal API errors", async () => {
-      mockCreemClient.generateCustomerLinks.mockRejectedValue(new Error("Portal API Error"));
+      mockCreemClient.generateCustomerLinks.mockRejectedValue(
+        new Error("Portal API Error"),
+      );
 
       await expect(
-        creemProvider.createCustomerPortalUrl("customer-123")
-      ).rejects.toThrow("Failed to create customer portal session: Portal API Error");
+        creemProvider.createCustomerPortalUrl("customer-123"),
+      ).rejects.toThrow(
+        "Failed to create customer portal session: Portal API Error",
+      );
     });
   });
 
@@ -523,12 +536,17 @@ describe("Creem Provider Implementation", () => {
 
       const result = await creemProvider.handleWebhook("payload", "signature");
 
-      expect(mockHandleCreemWebhook).toHaveBeenCalledWith("payload", "signature");
+      expect(mockHandleCreemWebhook).toHaveBeenCalledWith(
+        "payload",
+        "signature",
+      );
       expect(result).toEqual(mockWebhookResult);
     });
 
     it("should handle webhook processing errors", async () => {
-      mockHandleCreemWebhook.mockRejectedValue(new Error("Webhook processing failed"));
+      mockHandleCreemWebhook.mockRejectedValue(
+        new Error("Webhook processing failed"),
+      );
 
       const result = await creemProvider.handleWebhook("payload", "signature");
 
@@ -550,8 +568,11 @@ describe("Creem Provider Implementation", () => {
       // Clear the module cache and re-import
       jest.resetModules();
       const { default: providerWithoutSecret } = await import("./provider");
-      
-      const result = await providerWithoutSecret.handleWebhook("payload", "signature");
+
+      const result = await providerWithoutSecret.handleWebhook(
+        "payload",
+        "signature",
+      );
 
       expect(result).toEqual({
         received: false,
@@ -567,13 +588,16 @@ describe("Creem Provider Implementation", () => {
         creemApiKey: "test_api_key",
         creemWebhookSecret: "test_webhook_secret",
       }));
-      
+
       jest.resetModules();
       const { default: providerWithSecret } = await import("./provider");
-      
+
       mockHandleCreemWebhook.mockRejectedValue("String error");
 
-      const result = await providerWithSecret.handleWebhook("payload", "signature");
+      const result = await providerWithSecret.handleWebhook(
+        "payload",
+        "signature",
+      );
 
       expect(result).toEqual({
         received: false,

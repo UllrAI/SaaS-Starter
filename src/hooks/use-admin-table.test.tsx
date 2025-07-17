@@ -1,4 +1,11 @@
-import { describe, it, expect, jest, beforeEach, afterEach } from "@jest/globals";
+import {
+  describe,
+  it,
+  expect,
+  jest,
+  beforeEach,
+  afterEach,
+} from "@jest/globals";
 import { renderHook, act, waitFor } from "@testing-library/react";
 
 // Mock use-debounce
@@ -35,7 +42,7 @@ describe("useAdminTable", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    
+
     // Setup mock query action
     mockQueryAction = jest.fn();
     mockQueryAction.mockResolvedValue({
@@ -56,7 +63,7 @@ describe("useAdminTable", () => {
       const { result } = renderHook(() =>
         useAdminTable({
           queryAction: mockQueryAction,
-        })
+        }),
       );
 
       expect(result.current.data).toEqual([]);
@@ -87,7 +94,7 @@ describe("useAdminTable", () => {
           queryAction: mockQueryAction,
           initialData,
           initialPagination,
-        })
+        }),
       );
 
       expect(result.current.data).toEqual(initialData);
@@ -100,7 +107,7 @@ describe("useAdminTable", () => {
           queryAction: mockQueryAction,
           initialSearch: "test search",
           initialFilter: "active",
-        })
+        }),
       );
 
       expect(result.current.searchTerm).toBe("test search");
@@ -112,7 +119,7 @@ describe("useAdminTable", () => {
         useAdminTable({
           queryAction: mockQueryAction,
           debounceDelay: 1000,
-        })
+        }),
       );
 
       // Test that hook works with custom debounce delay
@@ -127,7 +134,7 @@ describe("useAdminTable", () => {
       renderHook(() =>
         useAdminTable({
           queryAction: mockQueryAction,
-        })
+        }),
       );
 
       await waitFor(() => {
@@ -145,7 +152,7 @@ describe("useAdminTable", () => {
         useAdminTable({
           queryAction: mockQueryAction,
           initialData: mockData,
-        })
+        }),
       );
 
       // Should not call queryAction immediately when initial data is provided
@@ -156,7 +163,7 @@ describe("useAdminTable", () => {
       const { result } = renderHook(() =>
         useAdminTable({
           queryAction: mockQueryAction,
-        })
+        }),
       );
 
       await waitFor(() => {
@@ -173,7 +180,7 @@ describe("useAdminTable", () => {
       const { result } = renderHook(() =>
         useAdminTable({
           queryAction: mockQueryAction,
-        })
+        }),
       );
 
       await waitFor(() => {
@@ -188,7 +195,7 @@ describe("useAdminTable", () => {
       const { result } = renderHook(() =>
         useAdminTable({
           queryAction: mockQueryAction,
-        })
+        }),
       );
 
       await waitFor(() => {
@@ -202,7 +209,7 @@ describe("useAdminTable", () => {
       const { result } = renderHook(() =>
         useAdminTable({
           queryAction: mockQueryAction,
-        })
+        }),
       );
 
       act(() => {
@@ -221,7 +228,7 @@ describe("useAdminTable", () => {
       const { result } = renderHook(() =>
         useAdminTable({
           queryAction: mockQueryAction,
-        })
+        }),
       );
 
       act(() => {
@@ -232,7 +239,7 @@ describe("useAdminTable", () => {
         expect(mockQueryAction).toHaveBeenCalledWith(
           expect.objectContaining({
             search: "test",
-          })
+          }),
         );
       });
     });
@@ -241,7 +248,7 @@ describe("useAdminTable", () => {
       const { result } = renderHook(() =>
         useAdminTable({
           queryAction: mockQueryAction,
-        })
+        }),
       );
 
       // Wait for initial fetch to complete
@@ -257,7 +264,7 @@ describe("useAdminTable", () => {
       // Wait for the page change effect
       await waitFor(() => {
         expect(mockQueryAction).toHaveBeenCalledWith(
-          expect.objectContaining({ page: 2 })
+          expect.objectContaining({ page: 2 }),
         );
       });
 
@@ -269,10 +276,10 @@ describe("useAdminTable", () => {
       // Wait for the search term to trigger page reset and new query
       await waitFor(() => {
         expect(mockQueryAction).toHaveBeenCalledWith(
-          expect.objectContaining({ 
+          expect.objectContaining({
             page: 1,
-            search: "search" 
-          })
+            search: "search",
+          }),
         );
       });
     });
@@ -283,7 +290,7 @@ describe("useAdminTable", () => {
       const { result } = renderHook(() =>
         useAdminTable({
           queryAction: mockQueryAction,
-        })
+        }),
       );
 
       act(() => {
@@ -297,7 +304,7 @@ describe("useAdminTable", () => {
       const { result } = renderHook(() =>
         useAdminTable({
           queryAction: mockQueryAction,
-        })
+        }),
       );
 
       act(() => {
@@ -308,7 +315,7 @@ describe("useAdminTable", () => {
         expect(mockQueryAction).toHaveBeenCalledWith(
           expect.objectContaining({
             filter: "inactive",
-          })
+          }),
         );
       });
     });
@@ -317,7 +324,7 @@ describe("useAdminTable", () => {
       const { result } = renderHook(() =>
         useAdminTable({
           queryAction: mockQueryAction,
-        })
+        }),
       );
 
       // Wait for initial fetch to complete
@@ -333,7 +340,7 @@ describe("useAdminTable", () => {
       // Wait for the page change effect
       await waitFor(() => {
         expect(mockQueryAction).toHaveBeenCalledWith(
-          expect.objectContaining({ page: 3 })
+          expect.objectContaining({ page: 3 }),
         );
       });
 
@@ -345,10 +352,10 @@ describe("useAdminTable", () => {
       // Wait for the filter to trigger page reset and new query
       await waitFor(() => {
         expect(mockQueryAction).toHaveBeenCalledWith(
-          expect.objectContaining({ 
+          expect.objectContaining({
             page: 1,
-            filter: "archived" 
-          })
+            filter: "archived",
+          }),
         );
       });
     });
@@ -359,7 +366,7 @@ describe("useAdminTable", () => {
       const { result } = renderHook(() =>
         useAdminTable({
           queryAction: mockQueryAction,
-        })
+        }),
       );
 
       // Wait for initial fetch to complete
@@ -374,7 +381,7 @@ describe("useAdminTable", () => {
       // The page change should trigger a new query with page 5
       await waitFor(() => {
         expect(mockQueryAction).toHaveBeenCalledWith(
-          expect.objectContaining({ page: 5 })
+          expect.objectContaining({ page: 5 }),
         );
       });
     });
@@ -383,7 +390,7 @@ describe("useAdminTable", () => {
       const { result } = renderHook(() =>
         useAdminTable({
           queryAction: mockQueryAction,
-        })
+        }),
       );
 
       act(() => {
@@ -394,7 +401,7 @@ describe("useAdminTable", () => {
         expect(mockQueryAction).toHaveBeenCalledWith(
           expect.objectContaining({
             page: 3,
-          })
+          }),
         );
       });
     });
@@ -406,14 +413,14 @@ describe("useAdminTable", () => {
         useAdminTable({
           queryAction: mockQueryAction,
           initialPagination: customPagination,
-        })
+        }),
       );
 
       await waitFor(() => {
         expect(mockQueryAction).toHaveBeenCalledWith(
           expect.objectContaining({
             limit: 50,
-          })
+          }),
         );
       });
     });
@@ -424,7 +431,7 @@ describe("useAdminTable", () => {
       const { result } = renderHook(() =>
         useAdminTable({
           queryAction: mockQueryAction,
-        })
+        }),
       );
 
       // Wait for initial fetch
@@ -449,7 +456,7 @@ describe("useAdminTable", () => {
       const { result } = renderHook(() =>
         useAdminTable({
           queryAction: mockQueryAction,
-        })
+        }),
       );
 
       // Wait for error to be set
@@ -477,7 +484,7 @@ describe("useAdminTable", () => {
       const { result } = renderHook(() =>
         useAdminTable({
           queryAction: mockQueryAction,
-        })
+        }),
       );
 
       // Wait for initial fetch to complete
@@ -499,7 +506,7 @@ describe("useAdminTable", () => {
             page: 1, // page resets due to search/filter change
             search: "test search",
             filter: "custom",
-          })
+          }),
         );
       });
 
@@ -533,7 +540,7 @@ describe("useAdminTable", () => {
       const { result } = renderHook(() =>
         useAdminTable({
           queryAction: mockQueryAction,
-        })
+        }),
       );
 
       // Should be loading while query is pending
@@ -553,7 +560,7 @@ describe("useAdminTable", () => {
       const { result } = renderHook(() =>
         useAdminTable({
           queryAction: mockQueryAction,
-        })
+        }),
       );
 
       // Wait for initial fetch to complete
@@ -593,7 +600,7 @@ describe("useAdminTable", () => {
         useAdminTable({
           queryAction: mockQueryAction,
           debounceDelay: 750,
-        })
+        }),
       );
 
       // Test that hook works correctly with custom debounce configuration
@@ -606,7 +613,7 @@ describe("useAdminTable", () => {
       const { result } = renderHook(() =>
         useAdminTable({
           queryAction: mockQueryAction,
-        })
+        }),
       );
 
       // Test that hook works correctly with default debounce configuration
@@ -620,7 +627,7 @@ describe("useAdminTable", () => {
         useAdminTable({
           queryAction: mockQueryAction,
           initialSearch: "initial search",
-        })
+        }),
       );
 
       expect(result.current.searchTerm).toBe("initial search");
@@ -630,7 +637,7 @@ describe("useAdminTable", () => {
       });
 
       expect(result.current.searchTerm).toBe("new search");
-      
+
       // The debounced search should eventually trigger a query
       await waitFor(() => {
         expect(mockQueryAction).toHaveBeenCalled();
@@ -646,7 +653,7 @@ describe("useAdminTable", () => {
       const { result } = renderHook(() =>
         useAdminTable({
           queryAction: mockQueryAction,
-        })
+        }),
       );
 
       await waitFor(() => {
@@ -660,7 +667,7 @@ describe("useAdminTable", () => {
       const { result } = renderHook(() =>
         useAdminTable({
           queryAction: mockQueryAction,
-        })
+        }),
       );
 
       await waitFor(() => {
@@ -674,7 +681,7 @@ describe("useAdminTable", () => {
       const { result } = renderHook(() =>
         useAdminTable({
           queryAction: mockQueryAction,
-        })
+        }),
       );
 
       await waitFor(() => {
@@ -689,7 +696,7 @@ describe("useAdminTable", () => {
       const { result } = renderHook(() =>
         useAdminTable({
           queryAction: mockQueryAction,
-        })
+        }),
       );
 
       await waitFor(() => {
@@ -726,7 +733,7 @@ describe("useAdminTable", () => {
           }),
         {
           initialProps: { queryAction: queryAction1 },
-        }
+        },
       );
 
       // Wait for initial call
@@ -759,7 +766,7 @@ describe("useAdminTable", () => {
       const { result } = renderHook(() =>
         useAdminTable({
           queryAction: mockQueryAction,
-        })
+        }),
       );
 
       // Rapid state changes
@@ -808,7 +815,7 @@ describe("useAdminTable", () => {
       const { result } = renderHook(() =>
         useAdminTable<ComplexData>({
           queryAction: mockQueryAction,
-        })
+        }),
       );
 
       await waitFor(() => {
@@ -825,7 +832,7 @@ describe("useAdminTable", () => {
       const { result } = renderHook(() =>
         useAdminTable({
           queryAction: mockQueryAction,
-        })
+        }),
       );
 
       await waitFor(() => {
@@ -841,7 +848,7 @@ describe("useAdminTable", () => {
       const { result } = renderHook(() =>
         useAdminTable({
           queryAction: mockQueryAction,
-        })
+        }),
       );
 
       // The hook uses useTransition internally
@@ -857,7 +864,7 @@ describe("useAdminTable", () => {
       const { unmount } = renderHook(() =>
         useAdminTable({
           queryAction: mockQueryAction,
-        })
+        }),
       );
 
       // Should not throw error when unmounting
@@ -870,7 +877,7 @@ describe("useAdminTable", () => {
       const { result } = renderHook(() =>
         useAdminTable({
           queryAction: mockQueryAction,
-        })
+        }),
       );
 
       const returnValue = result.current;
@@ -896,7 +903,7 @@ describe("useAdminTable", () => {
       const { result, rerender } = renderHook(() =>
         useAdminTable({
           queryAction: mockQueryAction,
-        })
+        }),
       );
 
       const firstRender = {
@@ -930,7 +937,7 @@ describe("useAdminTable", () => {
         useAdminTable({
           queryAction: mockQueryAction,
           initialData: mockData, // Has data
-        })
+        }),
       );
 
       // Should not call queryAction when initial data is provided
@@ -943,7 +950,7 @@ describe("useAdminTable", () => {
       const { result } = renderHook(() =>
         useAdminTable({
           queryAction: mockQueryAction,
-        })
+        }),
       );
 
       // This should trigger the effect and call queryAction
@@ -955,7 +962,7 @@ describe("useAdminTable", () => {
         useAdminTable({
           queryAction: mockQueryAction,
           initialData: mockData, // Provide initial data to skip initial effect
-        })
+        }),
       );
 
       // Wait a bit to ensure initial mount flag is set to false
@@ -978,7 +985,7 @@ describe("useAdminTable", () => {
       const { result } = renderHook(() =>
         useAdminTable({
           queryAction: mockQueryAction,
-        })
+        }),
       );
 
       // Wait for initial load
@@ -1004,7 +1011,7 @@ describe("useAdminTable", () => {
       const { result } = renderHook(() =>
         useAdminTable({
           queryAction: mockQueryAction,
-        })
+        }),
       );
 
       // Wait for initial load
@@ -1039,7 +1046,7 @@ describe("useAdminTable", () => {
         },
         {
           initialProps: { action: mockQueryAction },
-        }
+        },
       );
 
       // Change the query action to test the ref update effect
@@ -1059,7 +1066,7 @@ describe("useAdminTable", () => {
         useAdminTable({
           queryAction: mockQueryAction,
           debounceDelay: 0, // Edge case: zero delay
-        })
+        }),
       );
 
       expect(result.current.searchTerm).toBe("");
@@ -1070,7 +1077,7 @@ describe("useAdminTable", () => {
       const { result } = renderHook(() =>
         useAdminTable({
           queryAction: mockQueryAction,
-        })
+        }),
       );
 
       // Wait for initial load
@@ -1087,7 +1094,7 @@ describe("useAdminTable", () => {
         expect(mockQueryAction).toHaveBeenCalledWith(
           expect.objectContaining({
             page: 999999,
-          })
+          }),
         );
       });
     });

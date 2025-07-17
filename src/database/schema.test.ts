@@ -10,7 +10,7 @@ import {
   subscriptions,
   payments,
   webhookEvents,
-  uploads
+  uploads,
 } from "./schema";
 
 describe("Database Schema", () => {
@@ -22,7 +22,9 @@ describe("Database Schema", () => {
 
     it("should have valid role values", () => {
       const validRoles = ["user", "admin", "super_admin"];
-      expect(userRoleEnum.enumValues).toEqual(expect.arrayContaining(validRoles));
+      expect(userRoleEnum.enumValues).toEqual(
+        expect.arrayContaining(validRoles),
+      );
       expect(userRoleEnum.enumValues).toHaveLength(3);
     });
 
@@ -45,9 +47,18 @@ describe("Database Schema", () => {
     });
 
     it("should have table objects with proper structure", () => {
-      const tables = [users, sessions, accounts, verifications, subscriptions, payments, webhookEvents, uploads];
-      
-      tables.forEach(table => {
+      const tables = [
+        users,
+        sessions,
+        accounts,
+        verifications,
+        subscriptions,
+        payments,
+        webhookEvents,
+        uploads,
+      ];
+
+      tables.forEach((table) => {
         expect(table).toBeDefined();
         expect(typeof table).toBe("object");
         expect(table).not.toBeNull();
@@ -72,11 +83,11 @@ describe("Database Schema", () => {
       expect(users.id.name).toBe("id");
       expect(users.id.primary).toBe(true);
       expect(users.id.notNull).toBe(true);
-      
+
       expect(users.email.name).toBe("email");
       expect(users.email.notNull).toBe(true);
       expect(users.email.isUnique).toBe(true);
-      
+
       expect(users.role.name).toBe("role");
       expect(users.role.notNull).toBe(true);
       expect(users.role.default).toBe("user");
@@ -101,10 +112,10 @@ describe("Database Schema", () => {
     it("should have proper column constraints", () => {
       expect(sessions.id.primary).toBe(true);
       expect(sessions.id.notNull).toBe(true);
-      
+
       expect(sessions.token.notNull).toBe(true);
       expect(sessions.token.isUnique).toBe(true);
-      
+
       expect(sessions.userId.notNull).toBe(true);
     });
   });
@@ -264,19 +275,19 @@ describe("Database Schema", () => {
       // Check sessions table has userId foreign key
       expect(sessions.userId.name).toBe("userId");
       expect(sessions.userId.notNull).toBe(true);
-      
+
       // Check accounts table has userId foreign key
       expect(accounts.userId.name).toBe("userId");
       expect(accounts.userId.notNull).toBe(true);
-      
+
       // Check subscriptions table has userId foreign key
       expect(subscriptions.userId.name).toBe("userId");
       expect(subscriptions.userId.notNull).toBe(true);
-      
+
       // Check payments table has userId foreign key
       expect(payments.userId.name).toBe("userId");
       expect(payments.userId.notNull).toBe(true);
-      
+
       // Check uploads table has userId foreign key
       expect(uploads.userId.name).toBe("userId");
       expect(uploads.userId.notNull).toBe(true);
@@ -296,23 +307,23 @@ describe("Database Schema", () => {
     it("should have proper foreign key constraints", () => {
       // Test foreign key relationship constraints are properly set up
       // These checks verify the table schema structure has foreign keys
-      
+
       // Sessions table should reference users
       expect(sessions.userId.notNull).toBe(true);
       expect(sessions.userId.name).toBe("userId");
-      
-      // Accounts table should reference users  
+
+      // Accounts table should reference users
       expect(accounts.userId.notNull).toBe(true);
       expect(accounts.userId.name).toBe("userId");
-      
+
       // Subscriptions table should reference users
       expect(subscriptions.userId.notNull).toBe(true);
       expect(subscriptions.userId.name).toBe("userId");
-      
+
       // Payments table should reference users
       expect(payments.userId.notNull).toBe(true);
       expect(payments.userId.name).toBe("userId");
-      
+
       // Uploads table should reference users
       expect(uploads.userId.notNull).toBe(true);
       expect(uploads.userId.name).toBe("userId");
@@ -326,7 +337,7 @@ describe("Database Schema", () => {
       expect(sessions).toBeDefined();
       expect(accounts).toBeDefined();
       expect(verifications).toBeDefined();
-      
+
       // Should have role-based access control
       expect(userRoleEnum.enumValues).toContain("user");
       expect(userRoleEnum.enumValues).toContain("admin");
@@ -338,7 +349,7 @@ describe("Database Schema", () => {
       expect(subscriptions).toBeDefined();
       expect(payments).toBeDefined();
       expect(webhookEvents).toBeDefined();
-      
+
       // Should have required payment columns
       expect(payments.amount).toBeDefined();
       expect(payments.currency).toBeDefined();
@@ -348,7 +359,7 @@ describe("Database Schema", () => {
     it("should support file management", () => {
       // Should have uploads table
       expect(uploads).toBeDefined();
-      
+
       // Should have required file columns
       expect(uploads.fileKey).toBeDefined();
       expect(uploads.url).toBeDefined();
@@ -358,9 +369,15 @@ describe("Database Schema", () => {
     });
 
     it("should support multi-tenancy with user isolation", () => {
-      const userRelatedTables = [sessions, accounts, subscriptions, payments, uploads];
-      
-      userRelatedTables.forEach(table => {
+      const userRelatedTables = [
+        sessions,
+        accounts,
+        subscriptions,
+        payments,
+        uploads,
+      ];
+
+      userRelatedTables.forEach((table) => {
         expect(table.userId).toBeDefined();
         expect(table.userId.notNull).toBe(true);
       });
@@ -371,16 +388,16 @@ describe("Database Schema", () => {
     it("should have unique constraints where needed", () => {
       // Users table should have unique email constraint
       expect(users.email.isUnique).toBe(true);
-      
+
       // Sessions table should have unique token constraint
       expect(sessions.token.isUnique).toBe(true);
-      
+
       // Subscriptions should have unique subscriptionId
       expect(subscriptions.subscriptionId.isUnique).toBe(true);
-      
+
       // Payments should have unique paymentId
       expect(payments.paymentId.isUnique).toBe(true);
-      
+
       // Webhook events should have unique eventId
       expect(webhookEvents.eventId.isUnique).toBe(true);
 
@@ -389,16 +406,30 @@ describe("Database Schema", () => {
     });
 
     it("should have proper timestamp fields", () => {
-      const tablesWithCreatedAt = [users, sessions, accounts, subscriptions, payments, webhookEvents, uploads];
-      
-      tablesWithCreatedAt.forEach(table => {
+      const tablesWithCreatedAt = [
+        users,
+        sessions,
+        accounts,
+        subscriptions,
+        payments,
+        webhookEvents,
+        uploads,
+      ];
+
+      tablesWithCreatedAt.forEach((table) => {
         expect(table.createdAt).toBeDefined();
         expect(table.createdAt.notNull).toBe(true);
       });
 
-      const tablesWithUpdatedAt = [users, sessions, accounts, subscriptions, payments];
-      
-      tablesWithUpdatedAt.forEach(table => {
+      const tablesWithUpdatedAt = [
+        users,
+        sessions,
+        accounts,
+        subscriptions,
+        payments,
+      ];
+
+      tablesWithUpdatedAt.forEach((table) => {
         expect(table.updatedAt).toBeDefined();
         expect(table.updatedAt.notNull).toBe(true);
       });
@@ -418,19 +449,19 @@ describe("Database Schema", () => {
       expect(users.id.dataType).toBe("string");
       expect(users.name.dataType).toBe("string");
       expect(users.email.dataType).toBe("string");
-      
+
       // Boolean columns
       expect(users.emailVerified.dataType).toBe("boolean");
       expect(webhookEvents.processed.dataType).toBe("boolean");
-      
+
       // Integer columns
       expect(payments.amount.dataType).toBe("number");
       expect(uploads.fileSize.dataType).toBe("number");
-      
+
       // Date columns
       expect(users.createdAt.dataType).toBe("date");
       expect(sessions.expiresAt.dataType).toBe("date");
-      
+
       // Enum columns
       expect(users.role.dataType).toBe("string");
       expect(users.role.enumValues).toEqual(["user", "admin", "super_admin"]);
@@ -443,7 +474,7 @@ describe("Database Schema", () => {
       expect(users.email.notNull).toBe(true);
       expect(users.emailVerified.notNull).toBe(true);
       expect(users.role.notNull).toBe(true);
-      
+
       // Optional fields should allow null
       expect(users.image.notNull).toBe(false);
       expect(users.paymentProviderCustomerId.notNull).toBe(false);
@@ -467,11 +498,24 @@ describe("Database Schema", () => {
     });
 
     it("should have column objects with proper structure", () => {
-      const tables = [users, sessions, accounts, verifications, subscriptions, payments, webhookEvents, uploads];
-      
-      tables.forEach(table => {
-        Object.values(table).forEach(column => {
-          if (typeof column === "object" && column !== null && "name" in column) {
+      const tables = [
+        users,
+        sessions,
+        accounts,
+        verifications,
+        subscriptions,
+        payments,
+        webhookEvents,
+        uploads,
+      ];
+
+      tables.forEach((table) => {
+        Object.values(table).forEach((column) => {
+          if (
+            typeof column === "object" &&
+            column !== null &&
+            "name" in column
+          ) {
             expect(column).toHaveProperty("name");
             expect(column).toHaveProperty("dataType");
             expect(column).toHaveProperty("notNull");
@@ -490,16 +534,16 @@ describe("Database Schema", () => {
       // Force evaluation of the index function by accessing table metadata
       expect(accounts).toBeDefined();
       expect(accounts.userId).toBeDefined();
-      
+
       // Check that the table has the expected structure that would create indexes
       expect(accounts.userId.name).toBe("userId");
       expect(accounts.userId.notNull).toBe(true);
-      
+
       // Check if the table references the users table correctly
       const userIdCol = accounts.userId;
       expect(userIdCol).toBeDefined();
       expect(userIdCol.name).toBe("userId");
-      
+
       // Access the table's internal structure to trigger index creation
       const tableSymbol = accounts as unknown as { [key: symbol]: unknown };
       const tableKeys = Object.getOwnPropertySymbols(tableSymbol);
@@ -512,13 +556,13 @@ describe("Database Schema", () => {
       expect(subscriptions).toBeDefined();
       expect(subscriptions.userId).toBeDefined();
       expect(subscriptions.customerId).toBeDefined();
-      
+
       // Verify the indexed columns exist and have proper structure
       expect(subscriptions.userId.name).toBe("userId");
       expect(subscriptions.customerId.name).toBe("customerId");
       expect(subscriptions.userId.notNull).toBe(true);
       expect(subscriptions.customerId.notNull).toBe(true);
-      
+
       // Access the table's metadata if available
       if ((subscriptions as any)._ || typeof subscriptions === "object") {
         expect(subscriptions).toBeTruthy();
@@ -528,11 +572,11 @@ describe("Database Schema", () => {
     it("should have indexes metadata available on payments table", () => {
       expect(payments).toBeDefined();
       expect(payments.userId).toBeDefined();
-      
+
       // Verify the indexed column exists and has proper structure
       expect(payments.userId.name).toBe("userId");
       expect(payments.userId.notNull).toBe(true);
-      
+
       // Access the table's metadata if available
       if ((payments as any)._ || typeof payments === "object") {
         expect(payments).toBeTruthy();
@@ -543,13 +587,13 @@ describe("Database Schema", () => {
       expect(webhookEvents).toBeDefined();
       expect(webhookEvents.eventId).toBeDefined();
       expect(webhookEvents.provider).toBeDefined();
-      
+
       // Verify the indexed columns exist and have proper structure
       expect(webhookEvents.eventId.name).toBe("eventId");
       expect(webhookEvents.provider.name).toBe("provider");
       expect(webhookEvents.eventId.notNull).toBe(true);
       expect(webhookEvents.provider.notNull).toBe(true);
-      
+
       // Access the table's metadata if available
       if ((webhookEvents as any)._ || typeof webhookEvents === "object") {
         expect(webhookEvents).toBeTruthy();
@@ -560,13 +604,13 @@ describe("Database Schema", () => {
       expect(uploads).toBeDefined();
       expect(uploads.userId).toBeDefined();
       expect(uploads.fileKey).toBeDefined();
-      
+
       // Verify the indexed columns exist and have proper structure
       expect(uploads.userId.name).toBe("userId");
       expect(uploads.fileKey.name).toBe("fileKey");
       expect(uploads.userId.notNull).toBe(true);
       expect(uploads.fileKey.notNull).toBe(true);
-      
+
       // Access the table's metadata if available
       if ((uploads as any)._ || typeof uploads === "object") {
         expect(uploads).toBeTruthy();
@@ -575,21 +619,27 @@ describe("Database Schema", () => {
 
     it("should verify all tables with indexes are valid drizzle table objects", () => {
       // Test to ensure the table definitions with index functions are executed
-      const tablesWithIndexes = [accounts, subscriptions, payments, webhookEvents, uploads];
-      
-      tablesWithIndexes.forEach(table => {
+      const tablesWithIndexes = [
+        accounts,
+        subscriptions,
+        payments,
+        webhookEvents,
+        uploads,
+      ];
+
+      tablesWithIndexes.forEach((table) => {
         expect(table).toBeDefined();
         expect(typeof table).toBe("object");
         expect(table).not.toBeNull();
-        
+
         // Check that tables have the basic structure expected
         expect(table.id).toBeDefined();
         expect(table.id.primary).toBe(true);
-        
+
         // Try to access internal drizzle table properties
         const tableKeys = Object.keys(table);
         expect(tableKeys.length).toBeGreaterThan(0);
-        
+
         // Verify it's a proper table object
         expect(table.id).toHaveProperty("name");
         expect(table.id.name).toBe("id");
@@ -602,32 +652,34 @@ describe("Database Schema", () => {
       // Force execution of the specific index function for accounts table
       // This covers lines 67-71 in the original schema
       const accountsTable = accounts;
-      
+
       // Access the table's internal structure to trigger index function execution
       expect(accountsTable).toBeDefined();
       expect(typeof accountsTable).toBe("object");
-      
+
       // Verify the table definition includes the userId column that should be indexed
       expect(accountsTable.userId).toBeDefined();
       expect(accountsTable.userId.name).toBe("userId");
       expect(accountsTable.userId.notNull).toBe(true);
-      
+
       // Force evaluation of the table structure which includes the index definition
       const tableKeys = Object.keys(accountsTable);
       expect(tableKeys).toContain("userId");
       expect(tableKeys.length).toBeGreaterThan(10); // Should have all columns
-      
+
       // Additional property access to ensure full table definition is executed
       expect(accountsTable.id).toBeDefined();
       expect(accountsTable.accountId).toBeDefined();
       expect(accountsTable.providerId).toBeDefined();
-      
+
       // Access internal table metadata to trigger index creation
-      if ((accountsTable as any)[Symbol.for('drizzle:Columns')]) {
-        const columnsMetadata = (accountsTable as any)[Symbol.for('drizzle:Columns')];
+      if ((accountsTable as any)[Symbol.for("drizzle:Columns")]) {
+        const columnsMetadata = (accountsTable as any)[
+          Symbol.for("drizzle:Columns")
+        ];
         expect(columnsMetadata).toBeDefined();
       }
-      
+
       // Access table config metadata
       if ((accountsTable as any)._ && (accountsTable as any)._.config) {
         expect((accountsTable as any)._.config).toBeDefined();
@@ -638,22 +690,22 @@ describe("Database Schema", () => {
       // Force execution of the subscriptions table index functions
       // This covers lines 101-106 in the original schema
       const subscriptionsTable = subscriptions;
-      
+
       expect(subscriptionsTable).toBeDefined();
       expect(typeof subscriptionsTable).toBe("object");
-      
+
       // Verify both indexed columns exist
       expect(subscriptionsTable.userId).toBeDefined();
       expect(subscriptionsTable.userId.name).toBe("userId");
       expect(subscriptionsTable.customerId).toBeDefined();
       expect(subscriptionsTable.customerId.name).toBe("customerId");
-      
+
       // Force evaluation of the complete table structure
       const tableKeys = Object.keys(subscriptionsTable);
       expect(tableKeys).toContain("userId");
       expect(tableKeys).toContain("customerId");
       expect(tableKeys.length).toBeGreaterThan(8); // Should have all columns
-      
+
       // Access additional properties to ensure full definition
       expect(subscriptionsTable.subscriptionId).toBeDefined();
       expect(subscriptionsTable.status).toBeDefined();
@@ -664,20 +716,20 @@ describe("Database Schema", () => {
       // Force execution of the payments table index function
       // This covers lines 128-132 in the original schema
       const paymentsTable = payments;
-      
+
       expect(paymentsTable).toBeDefined();
       expect(typeof paymentsTable).toBe("object");
-      
+
       // Verify the indexed column exists
       expect(paymentsTable.userId).toBeDefined();
       expect(paymentsTable.userId.name).toBe("userId");
       expect(paymentsTable.userId.notNull).toBe(true);
-      
+
       // Force evaluation of the complete table structure
       const tableKeys = Object.keys(paymentsTable);
       expect(tableKeys).toContain("userId");
       expect(tableKeys.length).toBeGreaterThan(10); // Should have all columns
-      
+
       // Access additional properties to ensure full definition
       expect(paymentsTable.paymentId).toBeDefined();
       expect(paymentsTable.amount).toBeDefined();
@@ -688,22 +740,22 @@ describe("Database Schema", () => {
       // Force execution of the webhookEvents table index functions
       // This covers lines 148-153 in the original schema
       const webhookEventsTable = webhookEvents;
-      
+
       expect(webhookEventsTable).toBeDefined();
       expect(typeof webhookEventsTable).toBe("object");
-      
+
       // Verify both indexed columns exist
       expect(webhookEventsTable.eventId).toBeDefined();
       expect(webhookEventsTable.eventId.name).toBe("eventId");
       expect(webhookEventsTable.provider).toBeDefined();
       expect(webhookEventsTable.provider.name).toBe("provider");
-      
+
       // Force evaluation of the complete table structure
       const tableKeys = Object.keys(webhookEventsTable);
       expect(tableKeys).toContain("eventId");
       expect(tableKeys).toContain("provider");
       expect(tableKeys.length).toBeGreaterThan(6); // Should have all columns
-      
+
       // Access additional properties to ensure full definition
       expect(webhookEventsTable.processed).toBeDefined();
       expect(webhookEventsTable.payload).toBeDefined();
@@ -713,22 +765,22 @@ describe("Database Schema", () => {
       // Force execution of the uploads table index functions
       // This covers lines 171-176 in the original schema
       const uploadsTable = uploads;
-      
+
       expect(uploadsTable).toBeDefined();
       expect(typeof uploadsTable).toBe("object");
-      
+
       // Verify both indexed columns exist
       expect(uploadsTable.userId).toBeDefined();
       expect(uploadsTable.userId.name).toBe("userId");
       expect(uploadsTable.fileKey).toBeDefined();
       expect(uploadsTable.fileKey.name).toBe("fileKey");
-      
+
       // Force evaluation of the complete table structure
       const tableKeys = Object.keys(uploadsTable);
       expect(tableKeys).toContain("userId");
       expect(tableKeys).toContain("fileKey");
       expect(tableKeys.length).toBeGreaterThan(7); // Should have all columns
-      
+
       // Access additional properties to ensure full definition
       expect(uploadsTable.fileName).toBeDefined();
       expect(uploadsTable.fileSize).toBeDefined();
@@ -738,33 +790,33 @@ describe("Database Schema", () => {
     it("should access all table callback functions that return index definitions", () => {
       // This test specifically targets the callback functions in table definitions
       // to ensure they execute and return the index objects
-      
+
       // Each table with indexes has a second parameter that's a function
       // We need to ensure these functions are executed by accessing the tables
-      
+
       // Test all tables that have index definitions
       const tablesWithIndexes = [
         { table: accounts, indexColumns: ["userId"] },
         { table: subscriptions, indexColumns: ["userId", "customerId"] },
         { table: payments, indexColumns: ["userId"] },
         { table: webhookEvents, indexColumns: ["eventId", "provider"] },
-        { table: uploads, indexColumns: ["userId", "fileKey"] }
+        { table: uploads, indexColumns: ["userId", "fileKey"] },
       ];
-      
+
       tablesWithIndexes.forEach(({ table, indexColumns }) => {
         expect(table).toBeDefined();
         expect(typeof table).toBe("object");
-        
+
         // Verify all index columns exist
-        indexColumns.forEach(columnName => {
+        indexColumns.forEach((columnName) => {
           expect((table as any)[columnName]).toBeDefined();
           expect((table as any)[columnName].name).toBe(columnName);
         });
-        
+
         // Access the table structure to trigger index function execution
         const tableProperties = Object.keys(table);
         expect(tableProperties.length).toBeGreaterThan(0);
-        
+
         // Verify table has expected structure
         expect((table as any).id).toBeDefined();
         expect((table as any).id.primary).toBe(true);
@@ -775,14 +827,23 @@ describe("Database Schema", () => {
   describe("Complete Table Definition Coverage", () => {
     it("should cover all remaining uncovered lines in schema definitions", () => {
       // This test specifically targets any remaining uncovered lines in the schema
-      
+
       // Access all table definitions to ensure complete coverage
-      const allTables = [users, sessions, accounts, verifications, subscriptions, payments, webhookEvents, uploads];
-      
-      allTables.forEach(table => {
+      const allTables = [
+        users,
+        sessions,
+        accounts,
+        verifications,
+        subscriptions,
+        payments,
+        webhookEvents,
+        uploads,
+      ];
+
+      allTables.forEach((table) => {
         // Force complete evaluation of table definition
         const allColumns = Object.keys(table);
-        allColumns.forEach(columnName => {
+        allColumns.forEach((columnName) => {
           const column = (table as any)[columnName];
           if (column && typeof column === "object" && "name" in column) {
             // Access all column properties to ensure full definition coverage
@@ -796,37 +857,37 @@ describe("Database Schema", () => {
             if ("isUnique" in column) {
               expect(typeof column.isUnique).toBe("boolean");
             }
-            
+
             // Access dataType to trigger column type definitions
             if (column.dataType) {
               expect(typeof column.dataType).toBe("string");
             }
-            
+
             // Access column config to trigger all column properties
             if ((column as any).config) {
               expect((column as any).config).toBeDefined();
             }
           }
         });
-        
+
         // Force access to table metadata to trigger index definitions
         if ((table as any)._ && (table as any)._.config) {
           const tableConfig = (table as any)._.config;
           expect(tableConfig).toBeDefined();
-          
+
           // Access indexes if they exist
           if (tableConfig.indexes) {
             expect(tableConfig.indexes).toBeDefined();
           }
         }
       });
-      
+
       // Specifically test enum definition
       expect(userRoleEnum).toBeDefined();
       expect(userRoleEnum.enumValues).toBeDefined();
       expect(Array.isArray(userRoleEnum.enumValues)).toBe(true);
       expect(userRoleEnum.enumValues.length).toBe(3);
-      
+
       // Test each enum value specifically
       expect(userRoleEnum.enumValues[0]).toBe("user");
       expect(userRoleEnum.enumValues[1]).toBe("admin");
@@ -836,20 +897,20 @@ describe("Database Schema", () => {
     it("should execute foreign key reference functions", () => {
       // This targets the .references() function calls in the schema
       // Lines like: .references(() => users.id, { onDelete: "cascade" })
-      
+
       const tablesWithReferences = [
         sessions.userId,
         accounts.userId,
         subscriptions.userId,
         payments.userId,
-        uploads.userId
+        uploads.userId,
       ];
-      
-      tablesWithReferences.forEach(column => {
+
+      tablesWithReferences.forEach((column) => {
         expect(column).toBeDefined();
         expect(column.name).toBe("userId");
         expect(column.notNull).toBe(true);
-        
+
         // Access column properties to trigger reference function execution
         expect(typeof column).toBe("object");
         const columnKeys = Object.keys(column);
@@ -862,7 +923,7 @@ describe("Database Schema", () => {
     it("should execute all table definitions with references", () => {
       // Force execution of all table definitions that contain references
       // Access foreign key properties to trigger references() function calls
-      
+
       // sessions.userId references users.id (line 44-45)
       const sessionsUserId = sessions.userId;
       expect(sessionsUserId).toBeDefined();
@@ -873,7 +934,7 @@ describe("Database Schema", () => {
       if (sessionsForeignKey) {
         expect(sessionsForeignKey).toBeDefined();
       }
-      
+
       // accounts.userId references users.id (line 54-56)
       const accountsUserId = accounts.userId;
       expect(accountsUserId).toBeDefined();
@@ -883,7 +944,7 @@ describe("Database Schema", () => {
       if (accountsForeignKey) {
         expect(accountsForeignKey).toBeDefined();
       }
-      
+
       // subscriptions.userId references users.id (line 88-90)
       const subscriptionsUserId = subscriptions.userId;
       expect(subscriptionsUserId).toBeDefined();
@@ -893,7 +954,7 @@ describe("Database Schema", () => {
       if (subscriptionsForeignKey) {
         expect(subscriptionsForeignKey).toBeDefined();
       }
-      
+
       // payments.userId references users.id (line 114-116)
       const paymentsUserId = payments.userId;
       expect(paymentsUserId).toBeDefined();
@@ -903,7 +964,7 @@ describe("Database Schema", () => {
       if (paymentsForeignKey) {
         expect(paymentsForeignKey).toBeDefined();
       }
-      
+
       // uploads.userId references users.id (line 161-163)
       const uploadsUserId = uploads.userId;
       expect(uploadsUserId).toBeDefined();
@@ -917,32 +978,32 @@ describe("Database Schema", () => {
 
     it("should trigger foreign key reference functions", () => {
       // Direct testing of foreign key relationships to ensure coverage of .references() calls
-      
+
       // Test sessions table foreign key reference (line 45)
       expect(sessions.userId.name).toBe("userId");
       expect(sessions.userId.notNull).toBe(true);
       // Access the column properties to trigger the references() function
       const sessionColumns = Object.keys(sessions);
       expect(sessionColumns).toContain("userId");
-      
+
       // Test accounts table foreign key reference (line 56)
       expect(accounts.userId.name).toBe("userId");
       expect(accounts.userId.notNull).toBe(true);
       const accountColumns = Object.keys(accounts);
       expect(accountColumns).toContain("userId");
-      
+
       // Test subscriptions table foreign key reference (line 90)
       expect(subscriptions.userId.name).toBe("userId");
       expect(subscriptions.userId.notNull).toBe(true);
       const subscriptionColumns = Object.keys(subscriptions);
       expect(subscriptionColumns).toContain("userId");
-      
+
       // Test payments table foreign key reference (line 116)
       expect(payments.userId.name).toBe("userId");
       expect(payments.userId.notNull).toBe(true);
       const paymentColumns = Object.keys(payments);
       expect(paymentColumns).toContain("userId");
-      
+
       // Test uploads table foreign key reference (line 163)
       expect(uploads.userId.name).toBe("userId");
       expect(uploads.userId.notNull).toBe(true);
@@ -952,29 +1013,29 @@ describe("Database Schema", () => {
 
     it("should execute index definitions for all tables", () => {
       // Force execution of index function calls by accessing table structure
-      
+
       // accounts table index (line 69)
       expect(accounts.userId).toBeDefined();
       const accountsKeys = Object.keys(accounts);
       expect(accountsKeys.length).toBeGreaterThan(0);
-      
+
       // subscriptions table indexes (lines 103-104)
       expect(subscriptions.userId).toBeDefined();
       expect(subscriptions.customerId).toBeDefined();
       const subscriptionsKeys = Object.keys(subscriptions);
       expect(subscriptionsKeys.length).toBeGreaterThan(0);
-      
+
       // payments table index (line 130)
       expect(payments.userId).toBeDefined();
       const paymentsKeys = Object.keys(payments);
       expect(paymentsKeys.length).toBeGreaterThan(0);
-      
+
       // webhookEvents table indexes (lines 150-151)
       expect(webhookEvents.eventId).toBeDefined();
       expect(webhookEvents.provider).toBeDefined();
       const webhookEventsKeys = Object.keys(webhookEvents);
       expect(webhookEventsKeys.length).toBeGreaterThan(0);
-      
+
       // uploads table indexes (lines 173-174)
       expect(uploads.userId).toBeDefined();
       expect(uploads.fileKey).toBeDefined();
@@ -985,33 +1046,39 @@ describe("Database Schema", () => {
     it("should execute all table definitions with indexes", () => {
       // Force execution of index definitions
       // These checks will trigger the execution of the index() function calls
-      
+
       // accounts table indexes (lines 68-70)
       expect(accounts).toBeDefined();
       expect(accounts.userId).toBeDefined();
       const accountsTable = accounts as unknown as Record<string, unknown>;
       expect(typeof accountsTable).toBe("object");
-      
+
       // subscriptions table indexes (lines 102-105)
       expect(subscriptions).toBeDefined();
       expect(subscriptions.userId).toBeDefined();
       expect(subscriptions.customerId).toBeDefined();
-      const subscriptionsTable = subscriptions as unknown as Record<string, unknown>;
+      const subscriptionsTable = subscriptions as unknown as Record<
+        string,
+        unknown
+      >;
       expect(typeof subscriptionsTable).toBe("object");
-      
+
       // payments table indexes (lines 129-131)
       expect(payments).toBeDefined();
       expect(payments.userId).toBeDefined();
       const paymentsTable = payments as unknown as Record<string, unknown>;
       expect(typeof paymentsTable).toBe("object");
-      
+
       // webhookEvents table indexes (lines 149-152)
       expect(webhookEvents).toBeDefined();
       expect(webhookEvents.eventId).toBeDefined();
       expect(webhookEvents.provider).toBeDefined();
-      const webhookEventsTable = webhookEvents as unknown as Record<string, unknown>;
+      const webhookEventsTable = webhookEvents as unknown as Record<
+        string,
+        unknown
+      >;
       expect(typeof webhookEventsTable).toBe("object");
-      
+
       // uploads table indexes (lines 172-175)
       expect(uploads).toBeDefined();
       expect(uploads.userId).toBeDefined();
@@ -1022,20 +1089,35 @@ describe("Database Schema", () => {
 
     it("should handle all table schema functions", () => {
       // This test ensures all table-related functions get executed
-      const tablesWithUserId = [sessions, accounts, subscriptions, payments, uploads];
-      const allTables = [users, sessions, accounts, verifications, subscriptions, payments, webhookEvents, uploads];
-      
+      const tablesWithUserId = [
+        sessions,
+        accounts,
+        subscriptions,
+        payments,
+        uploads,
+      ];
+      const allTables = [
+        users,
+        sessions,
+        accounts,
+        verifications,
+        subscriptions,
+        payments,
+        webhookEvents,
+        uploads,
+      ];
+
       allTables.forEach((table) => {
         expect(table).toBeDefined();
         expect(typeof table).toBe("object");
         expect(table).not.toBeNull();
-        
+
         // Test basic table structure
         expect(table.id).toBeDefined();
         expect(table.id.name).toBe("id");
         expect(table.id.primary).toBe(true);
       });
-      
+
       // Test tables that have userId foreign key
       tablesWithUserId.forEach((table) => {
         expect((table as typeof sessions).userId).toBeDefined();
@@ -1050,7 +1132,7 @@ describe("Database Schema", () => {
       // Test enum creation (line 13-17)
       expect(userRoleEnum).toBeDefined();
       expect(userRoleEnum.enumValues).toEqual(["user", "admin", "super_admin"]);
-      
+
       // Test users table creation (line 19-29)
       expect(users).toBeDefined();
       expect(users.id).toBeDefined();
@@ -1062,7 +1144,7 @@ describe("Database Schema", () => {
       expect(users.paymentProviderCustomerId).toBeDefined();
       expect(users.createdAt).toBeDefined();
       expect(users.updatedAt).toBeDefined();
-      
+
       // Test sessions table creation (line 31-46)
       expect(sessions).toBeDefined();
       expect(sessions.id).toBeDefined();
@@ -1076,7 +1158,7 @@ describe("Database Schema", () => {
       expect(sessions.browser).toBeDefined();
       expect(sessions.deviceType).toBeDefined();
       expect(sessions.userId).toBeDefined();
-      
+
       // Test verifications table creation (line 74-81)
       expect(verifications).toBeDefined();
       expect(verifications.id).toBeDefined();
@@ -1097,7 +1179,7 @@ describe("Database Schema", () => {
       expect(payments.id.primary).toBe(true);
       expect(webhookEvents.id.primary).toBe(true);
       expect(uploads.id.primary).toBe(true);
-      
+
       // Test notNull constraints on key fields
       expect(users.name.notNull).toBe(true);
       expect(users.email.notNull).toBe(true);
@@ -1105,7 +1187,7 @@ describe("Database Schema", () => {
       expect(users.role.notNull).toBe(true);
       expect(users.createdAt.notNull).toBe(true);
       expect(users.updatedAt.notNull).toBe(true);
-      
+
       // Test unique constraints
       expect(users.email.isUnique).toBe(true);
       expect(users.paymentProviderCustomerId.isUnique).toBe(true);
@@ -1113,7 +1195,7 @@ describe("Database Schema", () => {
       expect(subscriptions.subscriptionId.isUnique).toBe(true);
       expect(payments.paymentId.isUnique).toBe(true);
       expect(webhookEvents.eventId.isUnique).toBe(true);
-      
+
       // Test default values
       expect(users.role.default).toBe("user");
       expect(payments.currency.default).toBe("usd");
@@ -1127,7 +1209,7 @@ describe("Database Schema", () => {
       expect(payments.id.primary).toBe(true);
       expect(webhookEvents.id.primary).toBe(true);
       expect(uploads.id.primary).toBe(true);
-      
+
       // Test timestamp columns with defaultNow()
       expect(subscriptions.createdAt.notNull).toBe(true);
       expect(subscriptions.updatedAt.notNull).toBe(true);
@@ -1140,17 +1222,23 @@ describe("Database Schema", () => {
 
     it("should test all foreign key references", () => {
       // Test all userId foreign key references
-      const tablesWithUserIdFK = [sessions, accounts, subscriptions, payments, uploads];
-      
-      tablesWithUserIdFK.forEach(table => {
+      const tablesWithUserIdFK = [
+        sessions,
+        accounts,
+        subscriptions,
+        payments,
+        uploads,
+      ];
+
+      tablesWithUserIdFK.forEach((table) => {
         expect((table as any).userId).toBeDefined();
         expect((table as any).userId.name).toBe("userId");
         expect((table as any).userId.notNull).toBe(true);
-        
+
         // Access the column to trigger reference function execution
         const userIdColumn = (table as any).userId;
         expect(userIdColumn).toBeTruthy();
-        
+
         // Force evaluation of foreign key properties
         if (userIdColumn.references) {
           expect(userIdColumn.references).toBeDefined();
@@ -1165,21 +1253,21 @@ describe("Database Schema", () => {
         { table: subscriptions, name: "subscriptions" },
         { table: payments, name: "payments" },
         { table: webhookEvents, name: "webhook_events" },
-        { table: uploads, name: "uploads" }
+        { table: uploads, name: "uploads" },
       ];
-      
+
       tablesWithIndexes.forEach(({ table }) => {
         expect(table).toBeDefined();
         expect(typeof table).toBe("object");
-        
+
         // Force access to table structure to trigger index creation
         const tableKeys = Object.keys(table);
         expect(tableKeys.length).toBeGreaterThan(0);
-        
+
         // Verify table has the expected structure
         expect((table as any).id).toBeDefined();
         expect((table as any).id.primary).toBe(true);
-        
+
         // Access table metadata if available
         if ((table as any)._) {
           const tableMetadata = (table as any)._;
@@ -1193,19 +1281,19 @@ describe("Database Schema", () => {
       expect(users.id.dataType).toBe("string");
       expect(users.name.dataType).toBe("string");
       expect(users.email.dataType).toBe("string");
-      
+
       // Test boolean columns
       expect(users.emailVerified.dataType).toBe("boolean");
       expect(webhookEvents.processed.dataType).toBe("boolean");
-      
+
       // Test integer columns
       expect(payments.amount.dataType).toBe("number");
       expect(uploads.fileSize.dataType).toBe("number");
-      
+
       // Test timestamp columns
       expect(users.createdAt.dataType).toBe("date");
       expect(sessions.expiresAt.dataType).toBe("date");
-      
+
       // Test enum column
       expect(users.role.dataType).toBe("string");
       expect(users.role.enumValues).toEqual(["user", "admin", "super_admin"]);
@@ -1221,21 +1309,21 @@ describe("Database Schema", () => {
         { table: subscriptions, name: "subscriptions" },
         { table: payments, name: "payments" },
         { table: webhookEvents, name: "webhook_events" },
-        { table: uploads, name: "uploads" }
+        { table: uploads, name: "uploads" },
       ];
-      
+
       allTables.forEach(({ table }) => {
         // Access all properties to trigger complete table definition
         const allProperties = Object.keys(table);
         expect(allProperties.length).toBeGreaterThan(0);
-        
-        allProperties.forEach(prop => {
+
+        allProperties.forEach((prop) => {
           const column = (table as any)[prop];
           if (column && typeof column === "object" && column.name) {
             expect(column.name).toBe(prop);
             expect(typeof column.notNull).toBe("boolean");
             expect(typeof column.primary).toBe("boolean");
-            
+
             // Access all column properties to ensure complete coverage
             if (column.dataType) {
               expect(typeof column.dataType).toBe("string");

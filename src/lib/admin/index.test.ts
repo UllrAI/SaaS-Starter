@@ -25,9 +25,9 @@ jest.mock("./stats", () => ({
 describe("Admin Index Module", () => {
   it("should exist as a TypeScript file with proper exports", () => {
     const indexPath = path.join(__dirname, "index.ts");
-    
+
     expect(fs.existsSync(indexPath)).toBe(true);
-    
+
     const content = fs.readFileSync(indexPath, "utf8");
     expect(content).toBeTruthy();
     expect(content.length).toBeGreaterThan(0);
@@ -36,57 +36,57 @@ describe("Admin Index Module", () => {
   it("should export types from types module", () => {
     const indexPath = path.join(__dirname, "index.ts");
     const content = fs.readFileSync(indexPath, "utf8");
-    
+
     // Verify types exports
     expect(content).toContain("export { type TableConfig");
     expect(content).toContain("type ColumnType");
     expect(content).toContain("type ColumnInfo");
     expect(content).toContain("type SchemaInfo");
-    expect(content).toContain("from \"./types\"");
+    expect(content).toContain('from "./types"');
   });
 
   it("should export config functions from config module", () => {
     const indexPath = path.join(__dirname, "index.ts");
     const content = fs.readFileSync(indexPath, "utf8");
-    
+
     // Verify config exports
     expect(content).toContain("adminTableConfig");
     expect(content).toContain("getTableConfig");
     expect(content).toContain("isUserRelatedTable");
     expect(content).toContain("getUserRelatedColumn");
-    expect(content).toContain("from \"./config\"");
+    expect(content).toContain('from "./config"');
   });
 
   it("should export schema generator functions", () => {
     const indexPath = path.join(__dirname, "index.ts");
     const content = fs.readFileSync(indexPath, "utf8");
-    
+
     // Verify schema-generator exports
     expect(content).toContain("getTableSchema");
-    expect(content).toContain("from \"./schema-generator\"");
+    expect(content).toContain('from "./schema-generator"');
   });
 
   it("should export stats functions and types", () => {
     const indexPath = path.join(__dirname, "index.ts");
     const content = fs.readFileSync(indexPath, "utf8");
-    
+
     // Verify stats exports
     expect(content).toContain("getAdminStats");
     expect(content).toContain("type AdminStatsWithCharts");
     expect(content).toContain("type ChartData");
     expect(content).toContain("type UploadStatsDetails");
-    expect(content).toContain("from \"./stats\"");
+    expect(content).toContain('from "./stats"');
   });
 
   it("should have proper export structure", () => {
     const indexPath = path.join(__dirname, "index.ts");
     const content = fs.readFileSync(indexPath, "utf8");
-    
+
     // Verify export statements
     const exportMatches = content.match(/export\s*{[^}]+}\s*from/g);
     expect(exportMatches).toBeTruthy();
     expect(exportMatches!.length).toBeGreaterThanOrEqual(4); // At least 4 export statements
-    
+
     // Each export should have proper structure
     expect(content).toMatch(/export\s*{\s*type\s+/); // Type exports
     expect(content).toMatch(/export\s*{\s*\w+/); // Value exports
@@ -95,22 +95,24 @@ describe("Admin Index Module", () => {
   it("should organize exports by module", () => {
     const indexPath = path.join(__dirname, "index.ts");
     const content = fs.readFileSync(indexPath, "utf8");
-    
+
     // Verify modular organization
     expect(content).toContain("./types");
     expect(content).toContain("./config");
     expect(content).toContain("./schema-generator");
     expect(content).toContain("./stats");
-    
+
     // Each module should have its own export line
-    const lines = content.split("\n").filter(line => line.trim().startsWith("export"));
+    const lines = content
+      .split("\n")
+      .filter((line) => line.trim().startsWith("export"));
     expect(lines.length).toBeGreaterThanOrEqual(4);
   });
 
   it("should use proper TypeScript type export syntax", () => {
     const indexPath = path.join(__dirname, "index.ts");
     const content = fs.readFileSync(indexPath, "utf8");
-    
+
     // Verify TypeScript type export syntax
     expect(content).toContain("type TableConfig");
     expect(content).toContain("type ColumnType");
@@ -124,7 +126,7 @@ describe("Admin Index Module", () => {
   it("should not contain implementation details", () => {
     const indexPath = path.join(__dirname, "index.ts");
     const content = fs.readFileSync(indexPath, "utf8");
-    
+
     // Index should only contain exports, no implementations
     expect(content).not.toContain("function ");
     expect(content).not.toContain("const ");
@@ -137,16 +139,18 @@ describe("Admin Index Module", () => {
   it("should have proper module re-export pattern", () => {
     const indexPath = path.join(__dirname, "index.ts");
     const content = fs.readFileSync(indexPath, "utf8");
-    
+
     // Verify re-export pattern
-    const lines = content.split("\n").filter(line => line.trim().length > 0);
-    
+    const lines = content.split("\n").filter((line) => line.trim().length > 0);
+
     // Should have comment and exports
     expect(lines[0]).toContain("// 统一导出 admin 相关的类型和配置");
-    
+
     // All non-comment lines should be exports
-    const nonCommentLines = lines.filter(line => !line.trim().startsWith("//"));
-    nonCommentLines.forEach(line => {
+    const nonCommentLines = lines.filter(
+      (line) => !line.trim().startsWith("//"),
+    );
+    nonCommentLines.forEach((line) => {
       expect(line.trim()).toMatch(/^export\s*{[^}]+}\s*from\s*"[^"]+";?$/);
     });
   });
@@ -154,11 +158,11 @@ describe("Admin Index Module", () => {
   it("should provide comprehensive admin module exports", () => {
     const indexPath = path.join(__dirname, "index.ts");
     const content = fs.readFileSync(indexPath, "utf8");
-    
+
     // Verify comprehensive coverage of admin functionality
     const expectedExports = [
       "TableConfig",
-      "ColumnType", 
+      "ColumnType",
       "ColumnInfo",
       "SchemaInfo",
       "adminTableConfig",
@@ -169,10 +173,10 @@ describe("Admin Index Module", () => {
       "getAdminStats",
       "AdminStatsWithCharts",
       "ChartData",
-      "UploadStatsDetails"
+      "UploadStatsDetails",
     ];
-    
-    expectedExports.forEach(exportName => {
+
+    expectedExports.forEach((exportName) => {
       expect(content).toContain(exportName);
     });
   });
@@ -180,11 +184,11 @@ describe("Admin Index Module", () => {
   it("should have clean and maintainable structure", () => {
     const indexPath = path.join(__dirname, "index.ts");
     const content = fs.readFileSync(indexPath, "utf8");
-    
+
     // Should be concise
     const lines = content.split("\n");
     expect(lines.length).toBeLessThan(10); // Keep it simple
-    
+
     // Should have proper spacing and formatting
     expect(content).not.toContain("  "); // No double spaces
     expect(content).toContain("export {"); // Proper export syntax
@@ -195,7 +199,7 @@ describe("Admin Index Module", () => {
     // Test that the module can be imported without errors
     const indexModule = await import("./index");
     expect(typeof indexModule).toBe("object");
-    
+
     // Verify the module exports exist
     expect(indexModule).toHaveProperty("adminTableConfig");
     expect(indexModule).toHaveProperty("getTableConfig");
@@ -208,12 +212,12 @@ describe("Admin Index Module", () => {
   it("should have proper relative import paths", () => {
     const indexPath = path.join(__dirname, "index.ts");
     const content = fs.readFileSync(indexPath, "utf8");
-    
+
     // Verify all imports use relative paths
     const importMatches = content.match(/from\s+"([^"]+)"/g);
     expect(importMatches).toBeTruthy();
-    
-    importMatches!.forEach(match => {
+
+    importMatches!.forEach((match) => {
       const path = match.match(/from\s+"([^"]+)"/)?.[1];
       expect(path).toMatch(/^\.\/[\w-]+$/); // Should start with ./ and be simple (allow hyphens)
     });
@@ -222,13 +226,13 @@ describe("Admin Index Module", () => {
   it("should follow barrel export pattern", () => {
     const indexPath = path.join(__dirname, "index.ts");
     const content = fs.readFileSync(indexPath, "utf8");
-    
+
     // Verify barrel export pattern
     expect(content).toMatch(/export\s*{[^}]+}\s*from\s*"[^"]+"/);
-    
+
     // Should not have default exports in a barrel file
     expect(content).not.toContain("export default");
-    
+
     // Should group related exports
     expect(content).toContain("type TableConfig, type ColumnType");
   });
@@ -236,20 +240,20 @@ describe("Admin Index Module", () => {
   it("should have appropriate line length and readability", () => {
     const indexPath = path.join(__dirname, "index.ts");
     const content = fs.readFileSync(indexPath, "utf8");
-    
+
     const lines = content.split("\n");
-    
+
     // Check line lengths are reasonable
-    lines.forEach(line => {
+    lines.forEach((line) => {
       if (line.trim().length > 0) {
         expect(line.length).toBeLessThan(120); // Reasonable line length
       }
     });
-    
+
     // Should have proper formatting
     expect(content).toMatch(/export\s*{\s*type\s+\w+/); // Proper spacing
   });
-  
+
   it("should execute all exports successfully", async () => {
     // Import and test all exported functions
     const {
@@ -258,56 +262,56 @@ describe("Admin Index Module", () => {
       isUserRelatedTable,
       getUserRelatedColumn,
       getTableSchema,
-      getAdminStats
+      getAdminStats,
     } = await import("./index");
-    
+
     // Verify functions are callable
     expect(typeof getTableConfig).toBe("function");
     expect(typeof isUserRelatedTable).toBe("function");
     expect(typeof getUserRelatedColumn).toBe("function");
     expect(typeof getTableSchema).toBe("function");
     expect(typeof getAdminStats).toBe("function");
-    
+
     // Verify config object exists
     expect(typeof adminTableConfig).toBe("object");
     expect(adminTableConfig).toBeDefined();
   });
-  
+
   it("should provide type exports that can be used in TypeScript", () => {
     const indexPath = path.join(__dirname, "index.ts");
     const content = fs.readFileSync(indexPath, "utf8");
-    
+
     // Verify all type exports are present
     const typeExports = [
       "TableConfig",
       "ColumnType",
-      "ColumnInfo", 
+      "ColumnInfo",
       "SchemaInfo",
       "AdminStatsWithCharts",
       "ChartData",
-      "UploadStatsDetails"
+      "UploadStatsDetails",
     ];
-    
-    typeExports.forEach(typeExport => {
+
+    typeExports.forEach((typeExport) => {
       expect(content).toContain(`type ${typeExport}`);
     });
   });
-  
+
   it("should maintain proper module boundaries", async () => {
     // Test that all modules are accessible through the index
     const indexModule = await import("./index");
-    
+
     // Each module's key exports should be available
     const coreExports = [
       "adminTableConfig",
-      "getTableConfig", 
+      "getTableConfig",
       "isUserRelatedTable",
       "getUserRelatedColumn",
       "getTableSchema",
-      "getAdminStats"
+      "getAdminStats",
     ];
-    
-    coreExports.forEach(exportName => {
+
+    coreExports.forEach((exportName) => {
       expect(indexModule).toHaveProperty(exportName);
       expect(indexModule[exportName as keyof typeof indexModule]).toBeDefined();
     });

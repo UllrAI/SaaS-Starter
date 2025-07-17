@@ -43,21 +43,30 @@ describe("email", () => {
     await sendEmail(
       "test@example.com",
       "Test Subject",
-      React.createElement("div", null, "Test Body")
+      React.createElement("div", null, "Test Body"),
     );
 
     expect(mockSend).toHaveBeenCalledWith({
       from: "Test App <test@example.com>",
       to: "test@example.com",
       subject: "Test Subject",
-      react: React.createElement(React.Fragment, null, React.createElement("div", null, "Test Body")),
+      react: React.createElement(
+        React.Fragment,
+        null,
+        React.createElement("div", null, "Test Body"),
+      ),
     });
   });
 
   it("should send email with JSX body", async () => {
     mockSend.mockResolvedValue({ error: null, data: { id: "email-123" } });
 
-    const jsxBody = <div><h1>Hello</h1><p>This is a test email</p></div>;
+    const jsxBody = (
+      <div>
+        <h1>Hello</h1>
+        <p>This is a test email</p>
+      </div>
+    );
 
     await sendEmail("user@test.com", "JSX Test", jsxBody);
 
@@ -87,7 +96,7 @@ describe("email", () => {
     mockSend.mockResolvedValue({ error: testError, data: null });
 
     await expect(
-      sendEmail("error@test.com", "Error Test", "This should fail")
+      sendEmail("error@test.com", "Error Test", "This should fail"),
     ).rejects.toThrow("Failed to send email");
 
     expect(mockSend).toHaveBeenCalledWith({
@@ -106,7 +115,7 @@ describe("email", () => {
     mockSend.mockResolvedValue({ error: apiError, data: null });
 
     await expect(
-      sendEmail("invalid-email", "API Error Test", "Test body")
+      sendEmail("invalid-email", "API Error Test", "Test body"),
     ).rejects.toEqual(apiError);
   });
 
@@ -115,7 +124,7 @@ describe("email", () => {
     mockSend.mockRejectedValue(rejectionError);
 
     await expect(
-      sendEmail("test@example.com", "Rejection Test", "Test body")
+      sendEmail("test@example.com", "Rejection Test", "Test body"),
     ).rejects.toThrow("Network error");
   });
 

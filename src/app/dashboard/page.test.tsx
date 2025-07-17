@@ -9,7 +9,13 @@ jest.mock("@/lib/metadata", () => ({
 
 // Mock all complex UI dependencies to avoid context issues
 jest.mock("./_components/dashboard-page-wrapper", () => ({
-  DashboardPageWrapper: ({ title, children }: { title: string; children: React.ReactNode }) => {
+  DashboardPageWrapper: ({
+    title,
+    children,
+  }: {
+    title: string;
+    children: React.ReactNode;
+  }) => {
     // Use parameters to avoid unused variable warnings
     return title && children ? null : null;
   },
@@ -66,7 +72,9 @@ describe("Dashboard Home Page", () => {
     expect(metadata).toHaveProperty("title");
     expect(metadata).toHaveProperty("description");
     expect(metadata.title).toBe("Home");
-    expect(metadata.description).toBe("Dashboard home page with overview and quick actions");
+    expect(metadata.description).toBe(
+      "Dashboard home page with overview and quick actions",
+    );
   });
 
   it("should have descriptive metadata content", () => {

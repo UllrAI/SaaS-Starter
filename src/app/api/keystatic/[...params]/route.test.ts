@@ -1,14 +1,21 @@
-import { describe, it, expect, jest, beforeEach, afterEach } from "@jest/globals";
+import {
+  describe,
+  it,
+  expect,
+  jest,
+  beforeEach,
+  afterEach,
+} from "@jest/globals";
 import type { NextRequest } from "next/server";
 
 // Mock Response constructor
 class MockResponse {
   status: number;
-  
+
   constructor(body: unknown, init?: { status?: number }) {
     this.status = init?.status || 200;
   }
-  
+
   async text() {
     return "";
   }
@@ -22,7 +29,9 @@ type RouteHandlers = {
 };
 
 // Mock Keystatic dependencies
-const mockMakeRouteHandler = jest.fn() as jest.MockedFunction<() => RouteHandlers>;
+const mockMakeRouteHandler = jest.fn() as jest.MockedFunction<
+  () => RouteHandlers
+>;
 jest.mock("@keystatic/next/route-handler", () => ({
   makeRouteHandler: mockMakeRouteHandler,
 }));
@@ -67,31 +76,39 @@ describe("Keystatic API Route", () => {
 
       // Mock the route handlers returned by makeRouteHandler
       mockMakeRouteHandler.mockReturnValue({
-        GET: jest.fn() as jest.MockedFunction<(req: NextRequest) => Promise<Response>>,
-        POST: jest.fn() as jest.MockedFunction<(req: NextRequest) => Promise<Response>>,
+        GET: jest.fn() as jest.MockedFunction<
+          (req: NextRequest) => Promise<Response>
+        >,
+        POST: jest.fn() as jest.MockedFunction<
+          (req: NextRequest) => Promise<Response>
+        >,
       });
     });
 
     it("should call makeRouteHandler with correct config", async () => {
       // Import after setting up mocks
       await import("./route");
-      
-      expect(mockMakeRouteHandler).toHaveBeenCalledWith(
-        { config: mockKeystaticConfig }
-      );
+
+      expect(mockMakeRouteHandler).toHaveBeenCalledWith({
+        config: mockKeystaticConfig,
+      });
     });
 
     it("should export GET and POST handlers from makeRouteHandler", async () => {
-      const mockGetHandler = jest.fn() as jest.MockedFunction<(req: NextRequest) => Promise<Response>>;
-      const mockPostHandler = jest.fn() as jest.MockedFunction<(req: NextRequest) => Promise<Response>>;
-      
+      const mockGetHandler = jest.fn() as jest.MockedFunction<
+        (req: NextRequest) => Promise<Response>
+      >;
+      const mockPostHandler = jest.fn() as jest.MockedFunction<
+        (req: NextRequest) => Promise<Response>
+      >;
+
       mockMakeRouteHandler.mockReturnValue({
         GET: mockGetHandler,
         POST: mockPostHandler,
       });
 
       const { GET, POST } = await import("./route");
-      
+
       expect(GET).toBe(mockGetHandler);
       expect(POST).toBe(mockPostHandler);
     });
@@ -109,13 +126,13 @@ describe("Keystatic API Route", () => {
 
     it("should not call makeRouteHandler", async () => {
       await import("./route");
-      
+
       expect(mockMakeRouteHandler).not.toHaveBeenCalled();
     });
 
     it("should export GET and POST as functions", async () => {
       const { GET, POST } = await import("./route");
-      
+
       expect(typeof GET).toBe("function");
       expect(typeof POST).toBe("function");
     });
@@ -127,9 +144,9 @@ describe("Keystatic API Route", () => {
           status: 404,
         });
       };
-      
+
       const response = notFoundRouteHandler();
-      
+
       expect(response).toBeInstanceOf(Response);
       expect(response.status).toBe(404);
     });
@@ -139,32 +156,50 @@ describe("Keystatic API Route", () => {
     it("should show admin UI in development environment", () => {
       // Test the actual logic since we know showAdminUI = process.env.NODE_ENV === "development"
       const originalEnv = process.env.NODE_ENV;
-      Object.defineProperty(process.env, 'NODE_ENV', { value: 'development', writable: true });
-      
+      Object.defineProperty(process.env, "NODE_ENV", {
+        value: "development",
+        writable: true,
+      });
+
       const result = process.env.NODE_ENV === "development";
       expect(result).toBe(true);
-      
-      Object.defineProperty(process.env, 'NODE_ENV', { value: originalEnv, writable: true });
+
+      Object.defineProperty(process.env, "NODE_ENV", {
+        value: originalEnv,
+        writable: true,
+      });
     });
 
     it("should hide admin UI in production environment", () => {
       const originalEnv = process.env.NODE_ENV;
-      Object.defineProperty(process.env, 'NODE_ENV', { value: 'production', writable: true });
-      
+      Object.defineProperty(process.env, "NODE_ENV", {
+        value: "production",
+        writable: true,
+      });
+
       const result = process.env.NODE_ENV === "development";
       expect(result).toBe(false);
-      
-      Object.defineProperty(process.env, 'NODE_ENV', { value: originalEnv, writable: true });
+
+      Object.defineProperty(process.env, "NODE_ENV", {
+        value: originalEnv,
+        writable: true,
+      });
     });
 
     it("should hide admin UI in test environment", () => {
       const originalEnv = process.env.NODE_ENV;
-      Object.defineProperty(process.env, 'NODE_ENV', { value: 'test', writable: true });
-      
+      Object.defineProperty(process.env, "NODE_ENV", {
+        value: "test",
+        writable: true,
+      });
+
       const result = process.env.NODE_ENV === "development";
       expect(result).toBe(false);
-      
-      Object.defineProperty(process.env, 'NODE_ENV', { value: originalEnv, writable: true });
+
+      Object.defineProperty(process.env, "NODE_ENV", {
+        value: originalEnv,
+        writable: true,
+      });
     });
   });
 
@@ -178,12 +213,16 @@ describe("Keystatic API Route", () => {
       }));
 
       mockMakeRouteHandler.mockReturnValue({
-        GET: jest.fn() as jest.MockedFunction<(req: NextRequest) => Promise<Response>>,
-        POST: jest.fn() as jest.MockedFunction<(req: NextRequest) => Promise<Response>>,
+        GET: jest.fn() as jest.MockedFunction<
+          (req: NextRequest) => Promise<Response>
+        >,
+        POST: jest.fn() as jest.MockedFunction<
+          (req: NextRequest) => Promise<Response>
+        >,
       });
 
       const { GET: GET_TRUE, POST: POST_TRUE } = await import("./route");
-      
+
       expect(typeof GET_TRUE).toBe("function");
       expect(typeof POST_TRUE).toBe("function");
 
@@ -196,7 +235,7 @@ describe("Keystatic API Route", () => {
       }));
 
       const { GET: GET_FALSE, POST: POST_FALSE } = await import("./route");
-      
+
       expect(typeof GET_FALSE).toBe("function");
       expect(typeof POST_FALSE).toBe("function");
     });
@@ -211,12 +250,16 @@ describe("Keystatic API Route", () => {
       }));
 
       mockMakeRouteHandler.mockReturnValue({
-        GET: jest.fn() as jest.MockedFunction<(req: NextRequest) => Promise<Response>>,
-        POST: jest.fn() as jest.MockedFunction<(req: NextRequest) => Promise<Response>>,
+        GET: jest.fn() as jest.MockedFunction<
+          (req: NextRequest) => Promise<Response>
+        >,
+        POST: jest.fn() as jest.MockedFunction<
+          (req: NextRequest) => Promise<Response>
+        >,
       });
 
       await import("./route");
-      
+
       expect(mockMakeRouteHandler).toHaveBeenCalledWith({
         config: null,
       });
@@ -241,12 +284,16 @@ describe("Keystatic API Route", () => {
       }));
 
       mockMakeRouteHandler.mockReturnValue({
-        GET: jest.fn() as jest.MockedFunction<(req: NextRequest) => Promise<Response>>,
-        POST: jest.fn() as jest.MockedFunction<(req: NextRequest) => Promise<Response>>,
+        GET: jest.fn() as jest.MockedFunction<
+          (req: NextRequest) => Promise<Response>
+        >,
+        POST: jest.fn() as jest.MockedFunction<
+          (req: NextRequest) => Promise<Response>
+        >,
       });
 
       await import("./route");
-      
+
       expect(mockMakeRouteHandler).toHaveBeenCalledWith({
         config: customConfig,
       });

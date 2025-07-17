@@ -1,4 +1,11 @@
-import { describe, it, expect, jest, beforeEach, afterEach } from "@jest/globals";
+import {
+  describe,
+  it,
+  expect,
+  jest,
+  beforeEach,
+  afterEach,
+} from "@jest/globals";
 
 // Mock the admin-tables module
 const mockEnabledTablesMap = {
@@ -42,7 +49,10 @@ describe("Admin Config Module", () => {
       expect(adminTableConfig.uploads).toBeDefined();
       expect(adminTableConfig.uploads?.userRelated).toBe("userId");
       expect(adminTableConfig.uploads?.hiddenColumns).toEqual(["token"]);
-      expect(adminTableConfig.uploads?.readOnlyColumns).toEqual(["id", "createdAt"]);
+      expect(adminTableConfig.uploads?.readOnlyColumns).toEqual([
+        "id",
+        "createdAt",
+      ]);
     });
 
     it("should be a partial record with EnabledTableKeys", () => {
@@ -53,8 +63,8 @@ describe("Admin Config Module", () => {
     it("should contain only valid table configurations", () => {
       const validKeys = Object.keys(mockEnabledTablesMap);
       const configKeys = Object.keys(adminTableConfig);
-      
-      configKeys.forEach(key => {
+
+      configKeys.forEach((key) => {
         expect(validKeys).toContain(key);
       });
     });
@@ -63,7 +73,7 @@ describe("Admin Config Module", () => {
   describe("getTableConfig", () => {
     it("should return existing config for uploads table", () => {
       const config = getTableConfig("uploads" as EnabledTableKeys);
-      
+
       expect(config).toEqual({
         userRelated: "userId",
         hiddenColumns: ["token"],
@@ -73,7 +83,7 @@ describe("Admin Config Module", () => {
 
     it("should return default config for unconfigured tables", () => {
       const config = getTableConfig("sessions" as EnabledTableKeys);
-      
+
       expect(config).toEqual({
         userRelated: false,
         hiddenColumns: [],
@@ -83,7 +93,7 @@ describe("Admin Config Module", () => {
 
     it("should return default config for payments table", () => {
       const config = getTableConfig("payments" as EnabledTableKeys);
-      
+
       expect(config).toEqual({
         userRelated: false,
         hiddenColumns: [],
@@ -93,7 +103,7 @@ describe("Admin Config Module", () => {
 
     it("should return default config for subscriptions table", () => {
       const config = getTableConfig("subscriptions" as EnabledTableKeys);
-      
+
       expect(config).toEqual({
         userRelated: false,
         hiddenColumns: [],
@@ -103,7 +113,7 @@ describe("Admin Config Module", () => {
 
     it("should return default config for users table", () => {
       const config = getTableConfig("users" as EnabledTableKeys);
-      
+
       expect(config).toEqual({
         userRelated: false,
         hiddenColumns: [],
@@ -113,7 +123,7 @@ describe("Admin Config Module", () => {
 
     it("should return default config for verifications table", () => {
       const config = getTableConfig("verifications" as EnabledTableKeys);
-      
+
       expect(config).toEqual({
         userRelated: false,
         hiddenColumns: [],
@@ -124,7 +134,7 @@ describe("Admin Config Module", () => {
     it("should handle edge cases gracefully", () => {
       // Test with table name that's not in enabled tables (should still work with type casting)
       const config = getTableConfig("nonexistent" as EnabledTableKeys);
-      
+
       expect(config).toEqual({
         userRelated: false,
         hiddenColumns: [],
@@ -168,10 +178,10 @@ describe("Admin Config Module", () => {
       // Temporarily modify config for testing
       const originalConfig = adminTableConfig.sessions;
       (adminTableConfig as any).sessions = { userRelated: true };
-      
+
       const result = isUserRelatedTable("sessions" as EnabledTableKeys);
       expect(result).toBe(true);
-      
+
       // Restore original config
       (adminTableConfig as any).sessions = originalConfig;
     });
@@ -180,10 +190,10 @@ describe("Admin Config Module", () => {
       // Temporarily modify config for testing
       const originalConfig = adminTableConfig.payments;
       (adminTableConfig as any).payments = { userRelated: false };
-      
+
       const result = isUserRelatedTable("payments" as EnabledTableKeys);
       expect(result).toBe(false);
-      
+
       // Restore original config
       (adminTableConfig as any).payments = originalConfig;
     });
@@ -192,10 +202,10 @@ describe("Admin Config Module", () => {
       // Temporarily modify config for testing
       const originalConfig = adminTableConfig.subscriptions;
       (adminTableConfig as any).subscriptions = { userRelated: undefined };
-      
+
       const result = isUserRelatedTable("subscriptions" as EnabledTableKeys);
       expect(result).toBe(false);
-      
+
       // Restore original config
       (adminTableConfig as any).subscriptions = originalConfig;
     });
@@ -236,10 +246,10 @@ describe("Admin Config Module", () => {
       // Temporarily modify config for testing
       const originalConfig = adminTableConfig.sessions;
       (adminTableConfig as any).sessions = { userRelated: true };
-      
+
       const result = getUserRelatedColumn("sessions" as EnabledTableKeys);
       expect(result).toBe("userId");
-      
+
       // Restore original config
       (adminTableConfig as any).sessions = originalConfig;
     });
@@ -248,10 +258,10 @@ describe("Admin Config Module", () => {
       // Temporarily modify config for testing
       const originalConfig = adminTableConfig.payments;
       (adminTableConfig as any).payments = { userRelated: false };
-      
+
       const result = getUserRelatedColumn("payments" as EnabledTableKeys);
       expect(result).toBeNull();
-      
+
       // Restore original config
       (adminTableConfig as any).payments = originalConfig;
     });
@@ -260,10 +270,10 @@ describe("Admin Config Module", () => {
       // Temporarily modify config for testing
       const originalConfig = adminTableConfig.subscriptions;
       (adminTableConfig as any).subscriptions = { userRelated: "customUserId" };
-      
+
       const result = getUserRelatedColumn("subscriptions" as EnabledTableKeys);
       expect(result).toBe("customUserId");
-      
+
       // Restore original config
       (adminTableConfig as any).subscriptions = originalConfig;
     });
@@ -272,10 +282,10 @@ describe("Admin Config Module", () => {
       // Temporarily modify config for testing
       const originalConfig = adminTableConfig.users;
       (adminTableConfig as any).users = { userRelated: undefined };
-      
+
       const result = getUserRelatedColumn("users" as EnabledTableKeys);
       expect(result).toBeNull();
-      
+
       // Restore original config
       (adminTableConfig as any).users = originalConfig;
     });
@@ -284,10 +294,10 @@ describe("Admin Config Module", () => {
       // Temporarily modify config for testing
       const originalConfig = adminTableConfig.verifications;
       (adminTableConfig as any).verifications = { userRelated: null };
-      
+
       const result = getUserRelatedColumn("verifications" as EnabledTableKeys);
       expect(result).toBeNull();
-      
+
       // Restore original config
       (adminTableConfig as any).verifications = originalConfig;
     });
@@ -296,11 +306,11 @@ describe("Admin Config Module", () => {
   describe("Configuration Consistency", () => {
     it("should maintain consistent defaults across functions", () => {
       const tableName = "sessions" as EnabledTableKeys;
-      
+
       const config = getTableConfig(tableName);
       const isUserRelated = isUserRelatedTable(tableName);
       const userColumn = getUserRelatedColumn(tableName);
-      
+
       expect(config.userRelated).toBe(false);
       expect(isUserRelated).toBe(false);
       expect(userColumn).toBeNull();
@@ -308,11 +318,11 @@ describe("Admin Config Module", () => {
 
     it("should maintain consistency for configured tables", () => {
       const tableName = "uploads" as EnabledTableKeys;
-      
+
       const config = getTableConfig(tableName);
       const isUserRelated = isUserRelatedTable(tableName);
       const userColumn = getUserRelatedColumn(tableName);
-      
+
       expect(config.userRelated).toBe("userId");
       expect(isUserRelated).toBe(true);
       expect(userColumn).toBe("userId");
@@ -324,13 +334,13 @@ describe("Admin Config Module", () => {
       // Temporarily modify config for testing
       const originalConfig = adminTableConfig.payments;
       (adminTableConfig as any).payments = { userRelated: "" };
-      
+
       const isUserRelated = isUserRelatedTable("payments" as EnabledTableKeys);
       const userColumn = getUserRelatedColumn("payments" as EnabledTableKeys);
-      
+
       expect(isUserRelated).toBe(false); // empty string is falsy
       expect(userColumn).toBe(""); // but getUserRelatedColumn returns the actual string
-      
+
       // Restore original config
       (adminTableConfig as any).payments = originalConfig;
     });
@@ -339,13 +349,17 @@ describe("Admin Config Module", () => {
       // Temporarily modify config for testing
       const originalConfig = adminTableConfig.subscriptions;
       (adminTableConfig as any).subscriptions = { userRelated: 0 };
-      
-      const isUserRelated = isUserRelatedTable("subscriptions" as EnabledTableKeys);
-      const userColumn = getUserRelatedColumn("subscriptions" as EnabledTableKeys);
-      
+
+      const isUserRelated = isUserRelatedTable(
+        "subscriptions" as EnabledTableKeys,
+      );
+      const userColumn = getUserRelatedColumn(
+        "subscriptions" as EnabledTableKeys,
+      );
+
       expect(isUserRelated).toBe(false); // 0 is falsy
       expect(userColumn).toBeNull(); // not a string or true
-      
+
       // Restore original config
       (adminTableConfig as any).subscriptions = originalConfig;
     });
@@ -354,13 +368,13 @@ describe("Admin Config Module", () => {
       // Temporarily modify config for testing
       const originalConfig = adminTableConfig.users;
       (adminTableConfig as any).users = { userRelated: {} };
-      
+
       const isUserRelated = isUserRelatedTable("users" as EnabledTableKeys);
       const userColumn = getUserRelatedColumn("users" as EnabledTableKeys);
-      
+
       expect(isUserRelated).toBe(true); // object is truthy
       expect(userColumn).toBeNull(); // not a string or true
-      
+
       // Restore original config
       (adminTableConfig as any).users = originalConfig;
     });
@@ -393,12 +407,15 @@ describe("Admin Config Module", () => {
   describe("Type Safety and Structure", () => {
     it("should return objects with correct structure", () => {
       const config = getTableConfig("users" as EnabledTableKeys);
-      
+
       expect(config).toHaveProperty("userRelated");
       expect(config).toHaveProperty("hiddenColumns");
       expect(config).toHaveProperty("readOnlyColumns");
-      
-      expect(typeof config.userRelated === "boolean" || typeof config.userRelated === "string").toBe(true);
+
+      expect(
+        typeof config.userRelated === "boolean" ||
+          typeof config.userRelated === "string",
+      ).toBe(true);
       expect(Array.isArray(config.hiddenColumns)).toBe(true);
       expect(Array.isArray(config.readOnlyColumns)).toBe(true);
     });
@@ -406,10 +423,10 @@ describe("Admin Config Module", () => {
     it("should maintain immutable default configuration", () => {
       const config1 = getTableConfig("verifications" as EnabledTableKeys);
       const config2 = getTableConfig("verifications" as EnabledTableKeys);
-      
+
       // Modify one config
       config1.hiddenColumns?.push("test");
-      
+
       // Other config should remain unchanged
       expect(config2.hiddenColumns).toEqual([]);
     });
@@ -419,18 +436,18 @@ describe("Admin Config Module", () => {
     it("should handle all enabled table keys", () => {
       const enabledTableKeys: EnabledTableKeys[] = [
         "uploads",
-        "sessions", 
+        "sessions",
         "payments",
         "subscriptions",
         "users",
-        "verifications"
+        "verifications",
       ];
-      
-      enabledTableKeys.forEach(tableName => {
+
+      enabledTableKeys.forEach((tableName) => {
         expect(() => getTableConfig(tableName)).not.toThrow();
         expect(() => isUserRelatedTable(tableName)).not.toThrow();
         expect(() => getUserRelatedColumn(tableName)).not.toThrow();
-        
+
         const config = getTableConfig(tableName);
         expect(config).toBeDefined();
         expect(config).toHaveProperty("userRelated");
@@ -455,7 +472,7 @@ describe("Admin Config Module", () => {
     it("getUserRelatedColumn should return string or null", () => {
       const result1 = getUserRelatedColumn("uploads" as EnabledTableKeys);
       const result2 = getUserRelatedColumn("sessions" as EnabledTableKeys);
-      
+
       expect(typeof result1 === "string" || result1 === null).toBe(true);
       expect(typeof result2 === "string" || result2 === null).toBe(true);
       expect(result1).toBe("userId");

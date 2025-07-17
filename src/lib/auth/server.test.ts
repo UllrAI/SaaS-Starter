@@ -220,32 +220,42 @@ describe("Auth Server Configuration", () => {
     // Set NODE_ENV to development to test the dev console.log path
     const originalNodeEnv = process.env.NODE_ENV;
     process.env.NODE_ENV = "development";
-    
+
     jest.doMock("../../env", () => mockEnv);
-    
+
     // Mock console.log to track calls
-    const consoleLogSpy = jest.spyOn(console, "log").mockImplementation(() => {});
-    
+    const consoleLogSpy = jest
+      .spyOn(console, "log")
+      .mockImplementation(() => {});
+
     try {
       // Re-import to get fresh module with new NODE_ENV
       jest.resetModules();
       const { magicLink } = await import("better-auth/plugins");
       const { sendMagicLink } = await import("@/emails/magic-link");
-      
+
       // Mock magicLink to call the provided function
       const mockMagicLinkCall = jest.fn();
       (magicLink as jest.Mock).mockImplementation((config) => {
         // Call the sendMagicLink function to trigger line coverage
-        config.sendMagicLink({ email: "test@example.com", url: "http://test-url" }, {});
+        config.sendMagicLink(
+          { email: "test@example.com", url: "http://test-url" },
+          {},
+        );
         return mockMagicLinkCall;
       });
-      
+
       await import("./server");
-      
+
       // Verify console.log was called in development mode
-      expect(consoleLogSpy).toHaveBeenCalledWith("✨ Magic link: http://test-url");
-      expect(sendMagicLink).toHaveBeenCalledWith("test@example.com", "http://test-url", {});
-      
+      expect(consoleLogSpy).toHaveBeenCalledWith(
+        "✨ Magic link: http://test-url",
+      );
+      expect(sendMagicLink).toHaveBeenCalledWith(
+        "test@example.com",
+        "http://test-url",
+        {},
+      );
     } finally {
       process.env.NODE_ENV = originalNodeEnv;
       consoleLogSpy.mockRestore();
@@ -256,32 +266,40 @@ describe("Auth Server Configuration", () => {
     // Set NODE_ENV to production
     const originalNodeEnv = process.env.NODE_ENV;
     process.env.NODE_ENV = "production";
-    
+
     jest.doMock("../../env", () => mockEnv);
-    
+
     // Mock console.log to track calls
-    const consoleLogSpy = jest.spyOn(console, "log").mockImplementation(() => {});
-    
+    const consoleLogSpy = jest
+      .spyOn(console, "log")
+      .mockImplementation(() => {});
+
     try {
       // Re-import to get fresh module with new NODE_ENV
       jest.resetModules();
       const { magicLink } = await import("better-auth/plugins");
       const { sendMagicLink } = await import("@/emails/magic-link");
-      
+
       // Mock magicLink to call the provided function
       const mockMagicLinkCall = jest.fn();
       (magicLink as jest.Mock).mockImplementation((config) => {
         // Call the sendMagicLink function to trigger line coverage
-        config.sendMagicLink({ email: "test@example.com", url: "http://test-url" }, {});
+        config.sendMagicLink(
+          { email: "test@example.com", url: "http://test-url" },
+          {},
+        );
         return mockMagicLinkCall;
       });
-      
+
       await import("./server");
-      
+
       // Verify console.log was NOT called in production mode
       expect(consoleLogSpy).not.toHaveBeenCalled();
-      expect(sendMagicLink).toHaveBeenCalledWith("test@example.com", "http://test-url", {});
-      
+      expect(sendMagicLink).toHaveBeenCalledWith(
+        "test@example.com",
+        "http://test-url",
+        {},
+      );
     } finally {
       process.env.NODE_ENV = originalNodeEnv;
       consoleLogSpy.mockRestore();

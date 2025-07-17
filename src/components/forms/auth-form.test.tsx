@@ -18,7 +18,7 @@ jest.mock("@/env", () => ({
     GITHUB_CLIENT_SECRET: undefined,
     LINKEDIN_CLIENT_ID: undefined,
     LINKEDIN_CLIENT_SECRET: undefined,
-  }
+  },
 }));
 
 // Mock dependencies
@@ -33,31 +33,46 @@ jest.mock("@/lib/auth/providers", () => ({
 }));
 
 jest.mock("@/components/auth/auth-form-base", () => ({
-  AuthFormBase: ({ onSubmit, config, fields }: {
+  AuthFormBase: ({
+    onSubmit,
+    config,
+    fields,
+  }: {
     form?: unknown;
     onSubmit: (data: { email: string }) => Promise<void>;
-    config: { title: string; submitButtonText: string; alternativeActionText: string; alternativeActionLink: React.ReactNode };
+    config: {
+      title: string;
+      submitButtonText: string;
+      alternativeActionText: string;
+      alternativeActionLink: React.ReactNode;
+    };
     fields: Array<{ name: string; type: string; placeholder: string }>;
   }) => (
     <div data-testid="auth-form-base">
       <h1>{config.title}</h1>
-      <form onSubmit={async (e) => {
-        e.preventDefault();
-        const formData = new FormData(e.target as HTMLFormElement);
-        const email = formData.get('email') as string;
-        await onSubmit({ email });
-      }}>
-        {fields.map((field: { name: string; type: string; placeholder: string }) => (
-          <input
-            key={field.name}
-            name={field.name}
-            type={field.type}
-            placeholder={field.placeholder}
-          />
-        ))}
+      <form
+        onSubmit={async (e) => {
+          e.preventDefault();
+          const formData = new FormData(e.target as HTMLFormElement);
+          const email = formData.get("email") as string;
+          await onSubmit({ email });
+        }}
+      >
+        {fields.map(
+          (field: { name: string; type: string; placeholder: string }) => (
+            <input
+              key={field.name}
+              name={field.name}
+              type={field.type}
+              placeholder={field.placeholder}
+            />
+          ),
+        )}
         <button type="submit">{config.submitButtonText}</button>
       </form>
-      <div>{config.alternativeActionText} {config.alternativeActionLink}</div>
+      <div>
+        {config.alternativeActionText} {config.alternativeActionLink}
+      </div>
     </div>
   ),
 }));
@@ -65,7 +80,11 @@ jest.mock("@/components/auth/auth-form-base", () => ({
 jest.mock("next/navigation");
 jest.mock("sonner");
 jest.mock("next/link", () => {
-  return function Link({ children, href, ...props }: React.ComponentProps<"a">) {
+  return function Link({
+    children,
+    href,
+    ...props
+  }: React.ComponentProps<"a">) {
     return (
       <a href={href} {...props}>
         {children}
@@ -160,7 +179,9 @@ describe("AuthForm", () => {
           email: "test@example.com",
           callbackURL: "/dashboard",
         });
-        expect(mockPush).toHaveBeenCalledWith("/auth/sent?email=test%40example.com");
+        expect(mockPush).toHaveBeenCalledWith(
+          "/auth/sent?email=test%40example.com",
+        );
       });
     });
 

@@ -10,7 +10,11 @@ jest.mock("./schema", () => ({
   payments: { name: "payments", __type: "table" },
   webhookEvents: { name: "webhookEvents", __type: "table" },
   uploads: { name: "uploads", __type: "table" },
-  userRoleEnum: { name: "userRoleEnum", __type: "enum", enumValues: ["user", "admin", "super_admin"] },
+  userRoleEnum: {
+    name: "userRoleEnum",
+    __type: "enum",
+    enumValues: ["user", "admin", "super_admin"],
+  },
 }));
 
 describe("database/tables", () => {
@@ -21,7 +25,7 @@ describe("database/tables", () => {
   describe("module imports and exports", () => {
     it("should import all required entities from schema", () => {
       const schema = require("./schema");
-      
+
       // Verify all expected entities exist in schema
       expect(schema.accounts).toBeDefined();
       expect(schema.sessions).toBeDefined();
@@ -36,7 +40,7 @@ describe("database/tables", () => {
 
     it("should re-export all entities from schema", () => {
       const tables = require("./tables");
-      
+
       // Verify all entities are re-exported
       expect(tables.accounts).toBeDefined();
       expect(tables.sessions).toBeDefined();
@@ -52,7 +56,7 @@ describe("database/tables", () => {
     it("should export the same objects as imported from schema", () => {
       const schema = require("./schema");
       const tables = require("./tables");
-      
+
       // Verify exports match imports
       expect(tables.accounts).toBe(schema.accounts);
       expect(tables.sessions).toBe(schema.sessions);
@@ -69,7 +73,7 @@ describe("database/tables", () => {
   describe("table exports", () => {
     it("should export accounts table", () => {
       const { accounts } = require("./tables");
-      
+
       expect(accounts).toBeDefined();
       expect(accounts.name).toBe("accounts");
       expect(accounts.__type).toBe("table");
@@ -77,7 +81,7 @@ describe("database/tables", () => {
 
     it("should export sessions table", () => {
       const { sessions } = require("./tables");
-      
+
       expect(sessions).toBeDefined();
       expect(sessions.name).toBe("sessions");
       expect(sessions.__type).toBe("table");
@@ -85,7 +89,7 @@ describe("database/tables", () => {
 
     it("should export users table", () => {
       const { users } = require("./tables");
-      
+
       expect(users).toBeDefined();
       expect(users.name).toBe("users");
       expect(users.__type).toBe("table");
@@ -93,7 +97,7 @@ describe("database/tables", () => {
 
     it("should export verifications table", () => {
       const { verifications } = require("./tables");
-      
+
       expect(verifications).toBeDefined();
       expect(verifications.name).toBe("verifications");
       expect(verifications.__type).toBe("table");
@@ -101,7 +105,7 @@ describe("database/tables", () => {
 
     it("should export subscriptions table", () => {
       const { subscriptions } = require("./tables");
-      
+
       expect(subscriptions).toBeDefined();
       expect(subscriptions.name).toBe("subscriptions");
       expect(subscriptions.__type).toBe("table");
@@ -109,7 +113,7 @@ describe("database/tables", () => {
 
     it("should export payments table", () => {
       const { payments } = require("./tables");
-      
+
       expect(payments).toBeDefined();
       expect(payments.name).toBe("payments");
       expect(payments.__type).toBe("table");
@@ -117,7 +121,7 @@ describe("database/tables", () => {
 
     it("should export webhookEvents table", () => {
       const { webhookEvents } = require("./tables");
-      
+
       expect(webhookEvents).toBeDefined();
       expect(webhookEvents.name).toBe("webhookEvents");
       expect(webhookEvents.__type).toBe("table");
@@ -125,7 +129,7 @@ describe("database/tables", () => {
 
     it("should export uploads table", () => {
       const { uploads } = require("./tables");
-      
+
       expect(uploads).toBeDefined();
       expect(uploads.name).toBe("uploads");
       expect(uploads.__type).toBe("table");
@@ -135,7 +139,7 @@ describe("database/tables", () => {
   describe("enum exports", () => {
     it("should export userRoleEnum", () => {
       const { userRoleEnum } = require("./tables");
-      
+
       expect(userRoleEnum).toBeDefined();
       expect(userRoleEnum.name).toBe("userRoleEnum");
       expect(userRoleEnum.__type).toBe("enum");
@@ -146,46 +150,46 @@ describe("database/tables", () => {
   describe("module structure", () => {
     it("should export all expected properties", () => {
       const tables = require("./tables");
-      
+
       const expectedExports = [
         "accounts",
-        "sessions", 
+        "sessions",
         "users",
         "verifications",
         "subscriptions",
         "payments",
         "webhookEvents",
         "uploads",
-        "userRoleEnum"
+        "userRoleEnum",
       ];
-      
-      expectedExports.forEach(exportName => {
+
+      expectedExports.forEach((exportName) => {
         expect(tables).toHaveProperty(exportName);
       });
     });
 
     it("should not export any unexpected properties", () => {
       const tables = require("./tables");
-      
+
       const expectedExports = [
         "accounts",
-        "sessions", 
+        "sessions",
         "users",
         "verifications",
         "subscriptions",
         "payments",
         "webhookEvents",
         "uploads",
-        "userRoleEnum"
+        "userRoleEnum",
       ];
-      
+
       const actualExports = Object.keys(tables);
       expect(actualExports.sort()).toEqual(expectedExports.sort());
     });
 
     it("should have correct count of exports", () => {
       const tables = require("./tables");
-      
+
       // Should export exactly 9 entities (8 tables + 1 enum)
       expect(Object.keys(tables)).toHaveLength(9);
     });
@@ -194,7 +198,7 @@ describe("database/tables", () => {
   describe("destructuring imports", () => {
     it("should support destructuring individual tables", () => {
       const { users, accounts, sessions } = require("./tables");
-      
+
       expect(users).toBeDefined();
       expect(accounts).toBeDefined();
       expect(sessions).toBeDefined();
@@ -212,7 +216,7 @@ describe("database/tables", () => {
         uploads,
         userRoleEnum,
       } = require("./tables");
-      
+
       expect(accounts).toBeDefined();
       expect(sessions).toBeDefined();
       expect(users).toBeDefined();
@@ -226,7 +230,7 @@ describe("database/tables", () => {
 
     it("should support mixed destructuring with tables and enum", () => {
       const { users, userRoleEnum, payments } = require("./tables");
-      
+
       expect(users.__type).toBe("table");
       expect(userRoleEnum.__type).toBe("enum");
       expect(payments.__type).toBe("table");
@@ -243,7 +247,7 @@ describe("database/tables", () => {
     it("should be importable multiple times", () => {
       const tables1 = require("./tables");
       const tables2 = require("./tables");
-      
+
       // Should be the same object reference (module caching)
       expect(tables1).toBe(tables2);
     });
@@ -251,7 +255,7 @@ describe("database/tables", () => {
     it("should maintain object references across imports", () => {
       const { users: users1 } = require("./tables");
       const { users: users2 } = require("./tables");
-      
+
       expect(users1).toBe(users2);
     });
   });
@@ -259,7 +263,7 @@ describe("database/tables", () => {
   describe("table categorization", () => {
     it("should export authentication-related tables", () => {
       const { users, sessions, accounts, verifications } = require("./tables");
-      
+
       expect(users).toBeDefined();
       expect(sessions).toBeDefined();
       expect(accounts).toBeDefined();
@@ -268,7 +272,7 @@ describe("database/tables", () => {
 
     it("should export billing-related tables", () => {
       const { subscriptions, payments, webhookEvents } = require("./tables");
-      
+
       expect(subscriptions).toBeDefined();
       expect(payments).toBeDefined();
       expect(webhookEvents).toBeDefined();
@@ -276,13 +280,13 @@ describe("database/tables", () => {
 
     it("should export file-related tables", () => {
       const { uploads } = require("./tables");
-      
+
       expect(uploads).toBeDefined();
     });
 
     it("should export user role enum", () => {
       const { userRoleEnum } = require("./tables");
-      
+
       expect(userRoleEnum).toBeDefined();
       expect(userRoleEnum.__type).toBe("enum");
     });
@@ -291,7 +295,7 @@ describe("database/tables", () => {
   describe("type safety", () => {
     it("should export objects with expected structure", () => {
       const tables = require("./tables");
-      
+
       Object.values(tables).forEach((entity: any) => {
         expect(entity).toHaveProperty("name");
         expect(entity).toHaveProperty("__type");
@@ -310,21 +314,30 @@ describe("database/tables", () => {
         payments,
         webhookEvents,
         uploads,
-        userRoleEnum
+        userRoleEnum,
       } = require("./tables");
-      
+
       // Tables should have table type
-      [users, accounts, sessions, verifications, subscriptions, payments, webhookEvents, uploads].forEach(table => {
+      [
+        users,
+        accounts,
+        sessions,
+        verifications,
+        subscriptions,
+        payments,
+        webhookEvents,
+        uploads,
+      ].forEach((table) => {
         expect(table.__type).toBe("table");
       });
-      
+
       // Enum should have enum type
       expect(userRoleEnum.__type).toBe("enum");
     });
 
     it("should have valid enum values for userRoleEnum", () => {
       const { userRoleEnum } = require("./tables");
-      
+
       expect(Array.isArray(userRoleEnum.enumValues)).toBe(true);
       expect(userRoleEnum.enumValues).toContain("user");
       expect(userRoleEnum.enumValues).toContain("admin");

@@ -43,7 +43,11 @@ describe("Upload Configuration", () => {
     it("should return true for allowed document types", () => {
       expect(isFileTypeAllowed("application/pdf")).toBe(true);
       expect(isFileTypeAllowed("application/msword")).toBe(true);
-      expect(isFileTypeAllowed("application/vnd.openxmlformats-officedocument.wordprocessingml.document")).toBe(true);
+      expect(
+        isFileTypeAllowed(
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        ),
+      ).toBe(true);
     });
 
     it("should return true for allowed text types", () => {
@@ -133,7 +137,11 @@ describe("Upload Configuration", () => {
     it("should return correct extensions for document types", () => {
       expect(getFileExtension("application/pdf")).toBe("pdf");
       expect(getFileExtension("application/msword")).toBe("doc");
-      expect(getFileExtension("application/vnd.openxmlformats-officedocument.wordprocessingml.document")).toBe("docx");
+      expect(
+        getFileExtension(
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        ),
+      ).toBe("docx");
     });
 
     it("should return correct extensions for text types", () => {
@@ -200,7 +208,9 @@ describe("Upload Configuration", () => {
       const result = presignedUrlRequestSchema.safeParse(invalidInput);
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.issues[0].message).toBe("File name cannot be empty.");
+        expect(result.error.issues[0].message).toBe(
+          "File name cannot be empty.",
+        );
       }
     });
 
@@ -228,7 +238,9 @@ describe("Upload Configuration", () => {
       const result = presignedUrlRequestSchema.safeParse(invalidInput);
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.issues[0].message).toBe("Content type cannot be empty.");
+        expect(result.error.issues[0].message).toBe(
+          "Content type cannot be empty.",
+        );
       }
     });
 
@@ -247,15 +259,19 @@ describe("Upload Configuration", () => {
 
       const result1 = presignedUrlRequestSchema.safeParse(invalidInput1);
       const result2 = presignedUrlRequestSchema.safeParse(invalidInput2);
-      
+
       expect(result1.success).toBe(false);
       expect(result2.success).toBe(false);
-      
+
       if (!result1.success) {
-        expect(result1.error.issues[0].message).toBe("File size must be positive.");
+        expect(result1.error.issues[0].message).toBe(
+          "File size must be positive.",
+        );
       }
       if (!result2.success) {
-        expect(result2.error.issues[0].message).toBe("File size must be positive.");
+        expect(result2.error.issues[0].message).toBe(
+          "File size must be positive.",
+        );
       }
     });
 
@@ -307,13 +323,21 @@ describe("Upload Configuration", () => {
 
     it("should handle special characters in file names", () => {
       const specialCharInputs = [
-        { fileName: "test file with spaces.jpg", contentType: "image/jpeg", size: 1024 },
-        { fileName: "test-file_with.special.chars.jpg", contentType: "image/jpeg", size: 1024 },
+        {
+          fileName: "test file with spaces.jpg",
+          contentType: "image/jpeg",
+          size: 1024,
+        },
+        {
+          fileName: "test-file_with.special.chars.jpg",
+          contentType: "image/jpeg",
+          size: 1024,
+        },
         { fileName: "测试文件.jpg", contentType: "image/jpeg", size: 1024 },
         { fileName: "файл.jpg", contentType: "image/jpeg", size: 1024 },
       ];
 
-      specialCharInputs.forEach(input => {
+      specialCharInputs.forEach((input) => {
         const result = presignedUrlRequestSchema.safeParse(input);
         expect(result.success).toBe(true);
       });
@@ -323,14 +347,19 @@ describe("Upload Configuration", () => {
   describe("MIME Type to Extension Mapping", () => {
     it("should have comprehensive MIME type coverage", () => {
       const expectedCategories = [
-        'image/jpeg', 'image/png', 'image/gif',  // Images
-        'application/pdf', 'application/msword', // Documents
-        'audio/mpeg', 'video/mp4',               // Media
-        'text/plain', 'application/json',       // Text
-        'application/zip'                        // Archives
+        "image/jpeg",
+        "image/png",
+        "image/gif", // Images
+        "application/pdf",
+        "application/msword", // Documents
+        "audio/mpeg",
+        "video/mp4", // Media
+        "text/plain",
+        "application/json", // Text
+        "application/zip", // Archives
       ];
 
-      expectedCategories.forEach(mimeType => {
+      expectedCategories.forEach((mimeType) => {
         expect(UPLOAD_CONFIG.ALLOWED_FILE_TYPES).toContain(mimeType);
       });
     });
@@ -343,7 +372,9 @@ describe("Upload Configuration", () => {
 
   describe("Configuration Constants", () => {
     it("should have consistent size values", () => {
-      expect(UPLOAD_CONFIG.MAX_FILE_SIZE).toBe(UPLOAD_CONFIG.MAX_FILE_SIZE_MB * 1024 * 1024);
+      expect(UPLOAD_CONFIG.MAX_FILE_SIZE).toBe(
+        UPLOAD_CONFIG.MAX_FILE_SIZE_MB * 1024 * 1024,
+      );
     });
 
     it("should have reasonable timeout values", () => {
@@ -383,7 +414,7 @@ describe("Upload Configuration", () => {
       expect(formatFileSize(1023)).toBe("1023 Bytes");
       expect(formatFileSize(1024)).toBe("1 KB");
       expect(formatFileSize(1048576)).toBe("1 MB");
-      
+
       // Test very large numbers - formatFileSize only handles up to TB
       const veryLarge = 1024 * 1024 * 1024 * 1024; // 1TB
       const result = formatFileSize(veryLarge);
@@ -391,9 +422,13 @@ describe("Upload Configuration", () => {
     });
 
     it("should handle getFileExtension with complex MIME types", () => {
-      expect(getFileExtension("application/vnd.custom-format+xml")).toBe("vnd.custom-format");
+      expect(getFileExtension("application/vnd.custom-format+xml")).toBe(
+        "vnd.custom-format",
+      );
       expect(getFileExtension("text/vnd.custom+json")).toBe("vnd.custom");
-      expect(getFileExtension("application/x-custom-format")).toBe("x-custom-format");
+      expect(getFileExtension("application/x-custom-format")).toBe(
+        "x-custom-format",
+      );
     });
   });
 });

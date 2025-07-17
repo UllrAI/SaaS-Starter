@@ -98,7 +98,13 @@ export function useAdminTable<T>({
       }
     });
     // FIX: The dependency array is now stable and correct.
-  }, [currentPage, debouncedSearchTerm, filter, initialPagination.limit, initialData.length]);
+  }, [
+    currentPage,
+    debouncedSearchTerm,
+    filter,
+    initialPagination.limit,
+    initialData.length,
+  ]);
 
   // Reset page to 1 when search or filter changes
   useEffect(() => {

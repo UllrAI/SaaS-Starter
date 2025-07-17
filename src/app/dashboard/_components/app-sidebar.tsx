@@ -42,54 +42,54 @@ const navigation: {
   url: string;
   icon: LucideIcon;
 }[] = [
-    {
-      title: "Home",
-      url: "/dashboard/home",
-      icon: Home,
-    },
-    {
-      title: "Upload",
-      url: "/dashboard/upload",
-      icon: Upload,
-    },
-    {
-      title: "Settings",
-      url: "/dashboard/settings",
-      icon: Settings,
-    },
-  ];
+  {
+    title: "Home",
+    url: "/dashboard/home",
+    icon: Home,
+  },
+  {
+    title: "Upload",
+    url: "/dashboard/upload",
+    icon: Upload,
+  },
+  {
+    title: "Settings",
+    url: "/dashboard/settings",
+    icon: Settings,
+  },
+];
 
 const adminNavigation: {
   title: string;
   url: string;
   icon: LucideIcon;
 }[] = [
-    {
-      title: "Admin Dashboard",
-      url: "/dashboard/admin",
-      icon: BarChart3,
-    },
-    {
-      title: "User Management",
-      url: "/dashboard/admin/users",
-      icon: Users,
-    },
-    {
-      title: "Payments",
-      url: "/dashboard/admin/payments",
-      icon: CreditCard,
-    },
-    {
-      title: "Subscriptions",
-      url: "/dashboard/admin/subscriptions",
-      icon: Shield,
-    },
-    {
-      title: "Uploads Managements",
-      url: "/dashboard/admin/uploads",
-      icon: Upload,
-    },
-  ];
+  {
+    title: "Admin Dashboard",
+    url: "/dashboard/admin",
+    icon: BarChart3,
+  },
+  {
+    title: "User Management",
+    url: "/dashboard/admin/users",
+    icon: Users,
+  },
+  {
+    title: "Payments",
+    url: "/dashboard/admin/payments",
+    icon: CreditCard,
+  },
+  {
+    title: "Subscriptions",
+    url: "/dashboard/admin/subscriptions",
+    icon: Shield,
+  },
+  {
+    title: "Uploads Managements",
+    url: "/dashboard/admin/uploads",
+    icon: Upload,
+  },
+];
 
 const genericTableNavigation = Object.keys(enabledTablesMap).map((key) => ({
   title: key.charAt(0).toUpperCase() + key.slice(1),

@@ -11,18 +11,22 @@ type MockResponse = {
 };
 
 // Mock NextResponse and NextRequest
-const mockJson = jest.fn().mockImplementation((data: unknown, init: MockResponseInit = {}): MockResponse => ({
-  json: () => Promise.resolve(data),
-  status: init?.status || 200,
-  ok: (init.status || 200) >= 200 && (init.status || 200) < 300,
-})) as any;
+const mockJson = jest.fn().mockImplementation(
+  (data: unknown, init: MockResponseInit = {}): MockResponse => ({
+    json: () => Promise.resolve(data),
+    status: init?.status || 200,
+    ok: (init.status || 200) >= 200 && (init.status || 200) < 300,
+  }),
+) as any;
 
-const mockNextResponse = jest.fn().mockImplementation((body: unknown, init: MockResponseInit = {}): MockResponse => ({
-  json: () => Promise.resolve(body),
-  status: init?.status || 200,
-  ok: (init.status || 200) >= 200 && (init.status || 200) < 300,
-  headers: new Map(Object.entries(init.headers || {})),
-})) as any;
+const mockNextResponse = jest.fn().mockImplementation(
+  (body: unknown, init: MockResponseInit = {}): MockResponse => ({
+    json: () => Promise.resolve(body),
+    status: init?.status || 200,
+    ok: (init.status || 200) >= 200 && (init.status || 200) < 300,
+    headers: new Map(Object.entries(init.headers || {})),
+  }),
+) as any;
 
 jest.mock("next/server", () => ({
   NextRequest: jest.fn(),
@@ -99,7 +103,7 @@ describe("Upload Server Upload API", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     // Set default Date.now for consistent timestamps
-    jest.spyOn(Date, 'now').mockReturnValue(1640995200000); // 2022-01-01
+    jest.spyOn(Date, "now").mockReturnValue(1640995200000); // 2022-01-01
   });
 
   afterEach(() => {
@@ -108,16 +112,16 @@ describe("Upload Server Upload API", () => {
 
   const createMockRequest = (contentType: string, formData?: FormData) => {
     return {
-      headers: { 
-        get: jest.fn((key) => key === "content-type" ? contentType : ''),
-        has: () => false, 
-        set: () => {}, 
-        entries: () => [] 
+      headers: {
+        get: jest.fn((key) => (key === "content-type" ? contentType : "")),
+        has: () => false,
+        set: () => {},
+        entries: () => [],
       },
       formData: jest.fn().mockResolvedValue(formData || new FormData()),
       cookies: { get: () => null, has: () => false },
-      nextUrl: { pathname: '/api/upload/server-upload' },
-      url: 'http://localhost:3000/api/upload/server-upload',
+      nextUrl: { pathname: "/api/upload/server-upload" },
+      url: "http://localhost:3000/api/upload/server-upload",
     } as unknown as NextRequest;
   };
 
@@ -126,7 +130,7 @@ describe("Upload Server Upload API", () => {
       name,
       type,
       size,
-      stream: jest.fn(() => 'mock-stream'),
+      stream: jest.fn(() => "mock-stream"),
     } as unknown as File;
   };
 
@@ -141,55 +145,59 @@ describe("Upload Server Upload API", () => {
   describe("POST /api/upload/server-upload", () => {
     it("should return 401 when user is not authenticated", async () => {
       mockGetSession.mockResolvedValue(null);
-      
+
       const { POST } = await import("./route");
       const request = createMockRequest("multipart/form-data");
-      
+
       const response = await POST(request);
       const data = await response.json();
-      
+
       expect(response.status).toBe(401);
       expect(data.error).toBe("Unauthorized");
     });
 
     it("should return 400 for invalid content type", async () => {
       mockGetSession.mockResolvedValue(mockSession);
-      
+
       const { POST } = await import("./route");
       const request = createMockRequest("application/json");
-      
+
       const response = await POST(request);
       const data = await response.json();
-      
+
       expect(response.status).toBe(400);
-      expect(data.error).toBe("Invalid content type. Expected multipart/form-data");
+      expect(data.error).toBe(
+        "Invalid content type. Expected multipart/form-data",
+      );
       expect(data.received).toBe("application/json");
     });
 
     it("should return 400 when content type is missing", async () => {
       mockGetSession.mockResolvedValue(mockSession);
-      
+
       const { POST } = await import("./route");
       const request = createMockRequest("");
-      
+
       const response = await POST(request);
       const data = await response.json();
-      
+
       expect(response.status).toBe(400);
-      expect(data.error).toBe("Invalid content type. Expected multipart/form-data");
+      expect(data.error).toBe(
+        "Invalid content type. Expected multipart/form-data",
+      );
       expect(data.received).toBe("none");
     });
 
     it("should return 400 when no files are provided", async () => {
       mockGetSession.mockResolvedValue(mockSession);
-      
+
       const formData = new FormData();
       const { POST } = await import("./route");
       const request = createMockRequest("multipart/form-data", formData);
-      
+
       const response = await POST(request);
       const data = await response.json();
-      
+
       expect(response.status).toBe(400);
       expect(data.error).toBe("No files provided");
     });
@@ -200,21 +208,24 @@ describe("Upload Server Upload API", () => {
       mockIsFileSizeAllowed.mockReturnValue(true);
       mockGetFileExtension.mockReturnValue("jpg");
       mockUpload.done.mockResolvedValue({});
-      
+
       const file = createMockFile("test.jpg", "image/jpeg", 1024);
       const formData = new FormData();
       formData.append("files", file);
-      
+
       const mockFormData = {
-        getAll: jest.fn((key) => key === "files" ? [file] : []),
+        getAll: jest.fn((key) => (key === "files" ? [file] : [])),
       };
-      
+
       const { POST } = await import("./route");
-      const request = createMockRequest("multipart/form-data", mockFormData as unknown as FormData);
-      
+      const request = createMockRequest(
+        "multipart/form-data",
+        mockFormData as unknown as FormData,
+      );
+
       const response = await POST(request);
       const data = await response.json();
-      
+
       expect(response.status).toBe(200);
       expect(data.message).toBe("Uploaded 1 file(s) successfully");
       expect(data.results).toHaveLength(1);
@@ -236,18 +247,21 @@ describe("Upload Server Upload API", () => {
     it("should handle file type validation failure", async () => {
       mockGetSession.mockResolvedValue(mockSession);
       mockIsFileTypeAllowed.mockReturnValue(false);
-      
+
       const file = createMockFile("test.exe", "application/x-executable", 1024);
       const mockFormData = {
         getAll: jest.fn(() => [file]),
       };
-      
+
       const { POST } = await import("./route");
-      const request = createMockRequest("multipart/form-data", mockFormData as unknown as FormData);
-      
+      const request = createMockRequest(
+        "multipart/form-data",
+        mockFormData as unknown as FormData,
+      );
+
       const response = await POST(request);
       const data = await response.json();
-      
+
       expect(response.status).toBe(200);
       expect(data.message).toBe("Uploaded 0 file(s) successfully, 1 failed");
       expect(data.results[0]).toEqual({
@@ -261,23 +275,27 @@ describe("Upload Server Upload API", () => {
       mockGetSession.mockResolvedValue(mockSession);
       mockIsFileTypeAllowed.mockReturnValue(true);
       mockIsFileSizeAllowed.mockReturnValue(false);
-      
+
       const file = createMockFile("large.jpg", "image/jpeg", 20971520); // 20MB
       const mockFormData = {
         getAll: jest.fn(() => [file]),
       };
-      
+
       const { POST } = await import("./route");
-      const request = createMockRequest("multipart/form-data", mockFormData as unknown as FormData);
-      
+      const request = createMockRequest(
+        "multipart/form-data",
+        mockFormData as unknown as FormData,
+      );
+
       const response = await POST(request);
       const data = await response.json();
-      
+
       expect(response.status).toBe(200);
       expect(data.results[0]).toEqual({
         fileName: "large.jpg",
         success: false,
-        error: "File size 20971520 bytes exceeds maximum allowed size of 10485760 bytes",
+        error:
+          "File size 20971520 bytes exceeds maximum allowed size of 10485760 bytes",
       });
     });
 
@@ -287,18 +305,21 @@ describe("Upload Server Upload API", () => {
       mockIsFileSizeAllowed.mockReturnValue(true);
       mockGetFileExtension.mockReturnValue("jpg");
       mockUpload.done.mockRejectedValue(new Error("S3 upload failed"));
-      
+
       const file = createMockFile("test.jpg", "image/jpeg", 1024);
       const mockFormData = {
         getAll: jest.fn(() => [file]),
       };
-      
+
       const { POST } = await import("./route");
-      const request = createMockRequest("multipart/form-data", mockFormData as unknown as FormData);
-      
+      const request = createMockRequest(
+        "multipart/form-data",
+        mockFormData as unknown as FormData,
+      );
+
       const response = await POST(request);
       const data = await response.json();
-      
+
       expect(response.status).toBe(200);
       expect(data.results[0]).toEqual({
         fileName: "test.jpg",
@@ -314,18 +335,21 @@ describe("Upload Server Upload API", () => {
       mockGetFileExtension.mockReturnValue("jpg");
       mockUpload.done.mockResolvedValue({});
       mockDb.insert().values.mockRejectedValue(new Error("Database error"));
-      
+
       const file = createMockFile("test.jpg", "image/jpeg", 1024);
       const mockFormData = {
         getAll: jest.fn(() => [file]),
       };
-      
+
       const { POST } = await import("./route");
-      const request = createMockRequest("multipart/form-data", mockFormData as unknown as FormData);
-      
+      const request = createMockRequest(
+        "multipart/form-data",
+        mockFormData as unknown as FormData,
+      );
+
       const response = await POST(request);
       const data = await response.json();
-      
+
       expect(response.status).toBe(200);
       expect(data.results[0]).toEqual({
         fileName: "test.jpg",
@@ -338,28 +362,37 @@ describe("Upload Server Upload API", () => {
       mockGetSession.mockResolvedValue(mockSession);
       mockGetFileExtension.mockReturnValue("jpg");
       mockUpload.done.mockResolvedValue({});
-      
+
       // Ensure database insert succeeds for successful uploads
       mockDb.insert.mockReturnValue({
         values: jest.fn().mockResolvedValue(undefined) as any,
       });
-      
+
       const file1 = createMockFile("success.jpg", "image/jpeg", 1024);
-      const file2 = createMockFile("fail.exe", "application/x-executable", 1024);
-      
-      mockIsFileTypeAllowed.mockImplementation((type: string) => type === "image/jpeg");
+      const file2 = createMockFile(
+        "fail.exe",
+        "application/x-executable",
+        1024,
+      );
+
+      mockIsFileTypeAllowed.mockImplementation(
+        (type: string) => type === "image/jpeg",
+      );
       mockIsFileSizeAllowed.mockReturnValue(true);
-      
+
       const mockFormData = {
         getAll: jest.fn(() => [file1, file2]),
       };
-      
+
       const { POST } = await import("./route");
-      const request = createMockRequest("multipart/form-data", mockFormData as unknown as FormData);
-      
+      const request = createMockRequest(
+        "multipart/form-data",
+        mockFormData as unknown as FormData,
+      );
+
       const response = await POST(request);
       const data = await response.json();
-      
+
       expect(response.status).toBe(200);
       expect(data.message).toBe("Uploaded 1 file(s) successfully, 1 failed");
       expect(data.summary).toEqual({
@@ -371,25 +404,25 @@ describe("Upload Server Upload API", () => {
 
     it("should handle request.formData() failure", async () => {
       mockGetSession.mockResolvedValue(mockSession);
-      
+
       const request = {
-        headers: { 
+        headers: {
           get: jest.fn(() => "multipart/form-data"),
-          has: () => false, 
-          set: () => {}, 
-          entries: () => [] 
+          has: () => false,
+          set: () => {},
+          entries: () => [],
         },
         formData: jest.fn().mockRejectedValue(new Error("Invalid form data")),
         cookies: { get: () => null, has: () => false },
-        nextUrl: { pathname: '/api/upload/server-upload' },
-        url: 'http://localhost:3000/api/upload/server-upload',
+        nextUrl: { pathname: "/api/upload/server-upload" },
+        url: "http://localhost:3000/api/upload/server-upload",
       } as unknown as NextRequest;
-      
+
       const { POST } = await import("./route");
-      
+
       const response = await POST(request);
       const data = await response.json();
-      
+
       expect(response.status).toBe(500);
       expect(data.error).toBe("Internal server error");
     });
@@ -399,18 +432,21 @@ describe("Upload Server Upload API", () => {
       mockIsFileTypeAllowed.mockImplementation(() => {
         throw "String error"; // Non-Error exception
       });
-      
+
       const file = createMockFile("test.jpg", "image/jpeg", 1024);
       const mockFormData = {
         getAll: jest.fn(() => [file]),
       };
-      
+
       const { POST } = await import("./route");
-      const request = createMockRequest("multipart/form-data", mockFormData as unknown as FormData);
-      
+      const request = createMockRequest(
+        "multipart/form-data",
+        mockFormData as unknown as FormData,
+      );
+
       const response = await POST(request);
       const data = await response.json();
-      
+
       expect(response.status).toBe(200);
       expect(data.results[0]).toEqual({
         fileName: "test.jpg",
@@ -423,9 +459,9 @@ describe("Upload Server Upload API", () => {
   describe("OPTIONS /api/upload/server-upload", () => {
     it("should return CORS headers", async () => {
       const { OPTIONS } = await import("./route");
-      
+
       const response = await OPTIONS();
-      
+
       expect(response.status).toBe(200);
       // Note: We can't easily test headers with our mock setup,
       // but this ensures the function executes without error

@@ -13,9 +13,18 @@ describe("lib/billing/provider", () => {
     it("should define correct method signatures", () => {
       // Mock implementation of PaymentProvider
       const mockProvider: PaymentProvider = {
-        createCheckoutSession: createMockAsyncFunction<[CreateCheckoutOptions], { checkoutUrl: string }>({ checkoutUrl: "test" }),
-        createCustomerPortalUrl: createMockAsyncFunction<[string], { portalUrl: string }>({ portalUrl: "test" }),
-        handleWebhook: createMockAsyncFunction<[string, string], { received: boolean; message?: string }>({ received: true }),
+        createCheckoutSession: createMockAsyncFunction<
+          [CreateCheckoutOptions],
+          { checkoutUrl: string }
+        >({ checkoutUrl: "test" }),
+        createCustomerPortalUrl: createMockAsyncFunction<
+          [string],
+          { portalUrl: string }
+        >({ portalUrl: "test" }),
+        handleWebhook: createMockAsyncFunction<
+          [string, string],
+          { received: boolean; message?: string }
+        >({ received: true }),
       };
 
       // Verify interface methods exist
@@ -27,11 +36,20 @@ describe("lib/billing/provider", () => {
     describe("createCheckoutSession", () => {
       it("should have correct method signature", async () => {
         const mockProvider: PaymentProvider = {
-          createCheckoutSession: createMockAsyncFunction<[CreateCheckoutOptions], { checkoutUrl: string }>({
-            checkoutUrl: "https://checkout.example.com/session123"
+          createCheckoutSession: createMockAsyncFunction<
+            [CreateCheckoutOptions],
+            { checkoutUrl: string }
+          >({
+            checkoutUrl: "https://checkout.example.com/session123",
           }),
-          createCustomerPortalUrl: createMockAsyncFunction<[string], { portalUrl: string }>({ portalUrl: "test" }),
-          handleWebhook: createMockAsyncFunction<[string, string], { received: boolean; message?: string }>({ received: true }),
+          createCustomerPortalUrl: createMockAsyncFunction<
+            [string],
+            { portalUrl: string }
+          >({ portalUrl: "test" }),
+          handleWebhook: createMockAsyncFunction<
+            [string, string],
+            { received: boolean; message?: string }
+          >({ received: true }),
         };
 
         const mockOptions: CreateCheckoutOptions = {
@@ -47,16 +65,20 @@ describe("lib/billing/provider", () => {
 
         const result = await mockProvider.createCheckoutSession(mockOptions);
 
-        expect(mockProvider.createCheckoutSession).toHaveBeenCalledWith(mockOptions);
+        expect(mockProvider.createCheckoutSession).toHaveBeenCalledWith(
+          mockOptions,
+        );
         expect(result).toHaveProperty("checkoutUrl");
         expect(typeof result.checkoutUrl).toBe("string");
-        expect(result.checkoutUrl).toBe("https://checkout.example.com/session123");
+        expect(result.checkoutUrl).toBe(
+          "https://checkout.example.com/session123",
+        );
       });
 
       it("should return Promise with checkoutUrl", async () => {
         const mockProvider: PaymentProvider = {
           createCheckoutSession: jest.fn().mockResolvedValue({
-            checkoutUrl: "https://checkout.example.com/abc123"
+            checkoutUrl: "https://checkout.example.com/abc123",
           }) as any,
           createCustomerPortalUrl: jest.fn() as any,
           handleWebhook: jest.fn() as any,
@@ -72,14 +94,14 @@ describe("lib/billing/provider", () => {
         const result = await mockProvider.createCheckoutSession(options);
 
         expect(result).toEqual({
-          checkoutUrl: "https://checkout.example.com/abc123"
+          checkoutUrl: "https://checkout.example.com/abc123",
         });
       });
 
       it("should handle various checkout options", async () => {
         const mockProvider: PaymentProvider = {
           createCheckoutSession: jest.fn().mockResolvedValue({
-            checkoutUrl: "https://checkout.example.com/flexible"
+            checkoutUrl: "https://checkout.example.com/flexible",
           }) as any,
           createCustomerPortalUrl: jest.fn() as any,
           handleWebhook: jest.fn() as any,
@@ -105,13 +127,21 @@ describe("lib/billing/provider", () => {
         await mockProvider.createCheckoutSession(fullOptions);
 
         expect(mockProvider.createCheckoutSession).toHaveBeenCalledTimes(2);
-        expect(mockProvider.createCheckoutSession).toHaveBeenNthCalledWith(1, minimalOptions);
-        expect(mockProvider.createCheckoutSession).toHaveBeenNthCalledWith(2, fullOptions);
+        expect(mockProvider.createCheckoutSession).toHaveBeenNthCalledWith(
+          1,
+          minimalOptions,
+        );
+        expect(mockProvider.createCheckoutSession).toHaveBeenNthCalledWith(
+          2,
+          fullOptions,
+        );
       });
 
       it("should handle errors gracefully", async () => {
         const mockProvider: PaymentProvider = {
-          createCheckoutSession: jest.fn().mockRejectedValue(new Error("Checkout creation failed")) as any,
+          createCheckoutSession: jest
+            .fn()
+            .mockRejectedValue(new Error("Checkout creation failed")) as any,
           createCustomerPortalUrl: jest.fn() as any,
           handleWebhook: jest.fn() as any,
         };
@@ -121,7 +151,9 @@ describe("lib/billing/provider", () => {
           customerId: "invalid_customer",
         };
 
-        await expect(mockProvider.createCheckoutSession(options)).rejects.toThrow("Checkout creation failed");
+        await expect(
+          mockProvider.createCheckoutSession(options),
+        ).rejects.toThrow("Checkout creation failed");
       });
     });
 
@@ -130,7 +162,7 @@ describe("lib/billing/provider", () => {
         const mockProvider: PaymentProvider = {
           createCheckoutSession: jest.fn() as any,
           createCustomerPortalUrl: jest.fn().mockResolvedValue({
-            portalUrl: "https://portal.example.com/customer123"
+            portalUrl: "https://portal.example.com/customer123",
           }) as any,
           handleWebhook: jest.fn() as any,
         };
@@ -138,7 +170,9 @@ describe("lib/billing/provider", () => {
         const customerId = "cust_123456";
         const result = await mockProvider.createCustomerPortalUrl(customerId);
 
-        expect(mockProvider.createCustomerPortalUrl).toHaveBeenCalledWith(customerId);
+        expect(mockProvider.createCustomerPortalUrl).toHaveBeenCalledWith(
+          customerId,
+        );
         expect(result).toHaveProperty("portalUrl");
         expect(typeof result.portalUrl).toBe("string");
         expect(result.portalUrl).toBe("https://portal.example.com/customer123");
@@ -148,7 +182,7 @@ describe("lib/billing/provider", () => {
         const mockProvider: PaymentProvider = {
           createCheckoutSession: jest.fn() as any,
           createCustomerPortalUrl: jest.fn().mockResolvedValue({
-            portalUrl: "https://billing.example.com/portal/xyz789"
+            portalUrl: "https://billing.example.com/portal/xyz789",
           }) as any,
           handleWebhook: jest.fn() as any,
         };
@@ -157,22 +191,29 @@ describe("lib/billing/provider", () => {
         const result = await mockProvider.createCustomerPortalUrl(customerId);
 
         expect(result).toEqual({
-          portalUrl: "https://billing.example.com/portal/xyz789"
+          portalUrl: "https://billing.example.com/portal/xyz789",
         });
       });
 
       it("should handle different customer ID formats", async () => {
         const mockProvider: PaymentProvider = {
           createCheckoutSession: jest.fn() as any,
-          createCustomerPortalUrl: jest.fn()
+          createCustomerPortalUrl: jest
+            .fn()
             .mockResolvedValueOnce({ portalUrl: "https://portal.com/short123" })
-            .mockResolvedValueOnce({ portalUrl: "https://portal.com/long_customer_id_with_underscores" })
-            .mockResolvedValueOnce({ portalUrl: "https://portal.com/uuid-format-customer-id" }) as any,
+            .mockResolvedValueOnce({
+              portalUrl: "https://portal.com/long_customer_id_with_underscores",
+            })
+            .mockResolvedValueOnce({
+              portalUrl: "https://portal.com/uuid-format-customer-id",
+            }) as any,
           handleWebhook: jest.fn() as any,
         };
 
         await mockProvider.createCustomerPortalUrl("123");
-        await mockProvider.createCustomerPortalUrl("long_customer_id_with_underscores");
+        await mockProvider.createCustomerPortalUrl(
+          "long_customer_id_with_underscores",
+        );
         await mockProvider.createCustomerPortalUrl("uuid-format-customer-id");
 
         expect(mockProvider.createCustomerPortalUrl).toHaveBeenCalledTimes(3);
@@ -181,22 +222,32 @@ describe("lib/billing/provider", () => {
       it("should handle errors gracefully", async () => {
         const mockProvider: PaymentProvider = {
           createCheckoutSession: jest.fn() as any,
-          createCustomerPortalUrl: jest.fn().mockRejectedValue(new Error("Portal creation failed")) as any,
+          createCustomerPortalUrl: jest
+            .fn()
+            .mockRejectedValue(new Error("Portal creation failed")) as any,
           handleWebhook: jest.fn() as any,
         };
 
-        await expect(mockProvider.createCustomerPortalUrl("invalid_customer")).rejects.toThrow("Portal creation failed");
+        await expect(
+          mockProvider.createCustomerPortalUrl("invalid_customer"),
+        ).rejects.toThrow("Portal creation failed");
       });
 
       it("should handle empty or invalid customer IDs", async () => {
         const mockProvider: PaymentProvider = {
           createCheckoutSession: jest.fn() as any,
-          createCustomerPortalUrl: jest.fn().mockRejectedValue(new Error("Invalid customer ID")) as any,
+          createCustomerPortalUrl: jest
+            .fn()
+            .mockRejectedValue(new Error("Invalid customer ID")) as any,
           handleWebhook: jest.fn() as any,
         };
 
-        await expect(mockProvider.createCustomerPortalUrl("")).rejects.toThrow("Invalid customer ID");
-        await expect(mockProvider.createCustomerPortalUrl("null")).rejects.toThrow("Invalid customer ID");
+        await expect(mockProvider.createCustomerPortalUrl("")).rejects.toThrow(
+          "Invalid customer ID",
+        );
+        await expect(
+          mockProvider.createCustomerPortalUrl("null"),
+        ).rejects.toThrow("Invalid customer ID");
       });
     });
 
@@ -207,16 +258,22 @@ describe("lib/billing/provider", () => {
           createCustomerPortalUrl: jest.fn() as any,
           handleWebhook: jest.fn().mockResolvedValue({
             received: true,
-            message: "Webhook processed successfully"
+            message: "Webhook processed successfully",
           }) as any,
         };
 
-        const payload = JSON.stringify({ event: "payment.succeeded", data: { amount: 1000 } });
+        const payload = JSON.stringify({
+          event: "payment.succeeded",
+          data: { amount: 1000 },
+        });
         const signature = "sha256=abc123def456";
 
         const result = await mockProvider.handleWebhook(payload, signature);
 
-        expect(mockProvider.handleWebhook).toHaveBeenCalledWith(payload, signature);
+        expect(mockProvider.handleWebhook).toHaveBeenCalledWith(
+          payload,
+          signature,
+        );
         expect(result).toHaveProperty("received");
         expect(typeof result.received).toBe("boolean");
         expect(result.received).toBe(true);
@@ -245,7 +302,7 @@ describe("lib/billing/provider", () => {
           createCustomerPortalUrl: jest.fn(),
           handleWebhook: jest.fn().mockResolvedValue({
             received: true,
-            message: "Payment webhook processed"
+            message: "Payment webhook processed",
           }),
         };
 
@@ -254,8 +311,8 @@ describe("lib/billing/provider", () => {
           data: {
             paymentId: "pay_123",
             amount: 2999,
-            currency: "usd"
-          }
+            currency: "usd",
+          },
         });
         const signature = "sha256=validhash";
 
@@ -271,7 +328,7 @@ describe("lib/billing/provider", () => {
           createCustomerPortalUrl: jest.fn(),
           handleWebhook: jest.fn().mockResolvedValue({
             received: false,
-            message: "Invalid signature"
+            message: "Invalid signature",
           }),
         };
 
@@ -288,16 +345,32 @@ describe("lib/billing/provider", () => {
         const mockProvider: PaymentProvider = {
           createCheckoutSession: jest.fn(),
           createCustomerPortalUrl: jest.fn(),
-          handleWebhook: jest.fn()
-            .mockResolvedValueOnce({ received: true, message: "Payment succeeded" })
-            .mockResolvedValueOnce({ received: true, message: "Subscription created" })
-            .mockResolvedValueOnce({ received: true, message: "Customer updated" })
-            .mockResolvedValueOnce({ received: true, message: "Refund processed" }),
+          handleWebhook: jest
+            .fn()
+            .mockResolvedValueOnce({
+              received: true,
+              message: "Payment succeeded",
+            })
+            .mockResolvedValueOnce({
+              received: true,
+              message: "Subscription created",
+            })
+            .mockResolvedValueOnce({
+              received: true,
+              message: "Customer updated",
+            })
+            .mockResolvedValueOnce({
+              received: true,
+              message: "Refund processed",
+            }),
         };
 
         const events = [
           { event: "payment.succeeded", data: { amount: 1000 } },
-          { event: "subscription.created", data: { subscriptionId: "sub_123" } },
+          {
+            event: "subscription.created",
+            data: { subscriptionId: "sub_123" },
+          },
           { event: "customer.updated", data: { customerId: "cust_123" } },
           { event: "refund.created", data: { refundId: "ref_123" } },
         ];
@@ -305,7 +378,7 @@ describe("lib/billing/provider", () => {
         for (const event of events) {
           const payload = JSON.stringify(event);
           const signature = `sha256=hash_for_${event.event}`;
-          
+
           const result = await mockProvider.handleWebhook(payload, signature);
           expect(result.received).toBe(true);
         }
@@ -319,14 +392,17 @@ describe("lib/billing/provider", () => {
           createCustomerPortalUrl: jest.fn(),
           handleWebhook: jest.fn().mockResolvedValue({
             received: false,
-            message: "Malformed payload"
+            message: "Malformed payload",
           }),
         };
 
         const malformedPayload = "invalid json {";
         const signature = "sha256=validsignature";
 
-        const result = await mockProvider.handleWebhook(malformedPayload, signature);
+        const result = await mockProvider.handleWebhook(
+          malformedPayload,
+          signature,
+        );
 
         expect(result.received).toBe(false);
         expect(result.message).toBe("Malformed payload");
@@ -338,7 +414,7 @@ describe("lib/billing/provider", () => {
           createCustomerPortalUrl: jest.fn(),
           handleWebhook: jest.fn().mockResolvedValue({
             received: false,
-            message: "Empty payload or signature"
+            message: "Empty payload or signature",
           }),
         };
 
@@ -353,13 +429,17 @@ describe("lib/billing/provider", () => {
         const mockProvider: PaymentProvider = {
           createCheckoutSession: jest.fn(),
           createCustomerPortalUrl: jest.fn(),
-          handleWebhook: jest.fn().mockRejectedValue(new Error("Webhook processing failed")),
+          handleWebhook: jest
+            .fn()
+            .mockRejectedValue(new Error("Webhook processing failed")),
         };
 
         const payload = '{"event":"error.test"}';
         const signature = "sha256=testsignature";
 
-        await expect(mockProvider.handleWebhook(payload, signature)).rejects.toThrow("Webhook processing failed");
+        await expect(
+          mockProvider.handleWebhook(payload, signature),
+        ).rejects.toThrow("Webhook processing failed");
       });
     });
   });
@@ -367,8 +447,12 @@ describe("lib/billing/provider", () => {
   describe("interface compliance", () => {
     it("should ensure all methods are async and return Promises", () => {
       const mockProvider: PaymentProvider = {
-        createCheckoutSession: jest.fn().mockResolvedValue({ checkoutUrl: "test" }) as any,
-        createCustomerPortalUrl: jest.fn().mockResolvedValue({ portalUrl: "test" }) as any,
+        createCheckoutSession: jest
+          .fn()
+          .mockResolvedValue({ checkoutUrl: "test" }) as any,
+        createCustomerPortalUrl: jest
+          .fn()
+          .mockResolvedValue({ portalUrl: "test" }) as any,
         handleWebhook: jest.fn().mockResolvedValue({ received: true }) as any,
       };
 
@@ -390,14 +474,14 @@ describe("lib/billing/provider", () => {
     it("should have required properties in return types", async () => {
       const mockProvider: PaymentProvider = {
         createCheckoutSession: jest.fn().mockResolvedValue({
-          checkoutUrl: "https://checkout.example.com/test"
+          checkoutUrl: "https://checkout.example.com/test",
         }),
         createCustomerPortalUrl: jest.fn().mockResolvedValue({
-          portalUrl: "https://portal.example.com/test"
+          portalUrl: "https://portal.example.com/test",
         }),
         handleWebhook: jest.fn().mockResolvedValue({
           received: true,
-          message: "Processed successfully"
+          message: "Processed successfully",
         }),
       };
 
@@ -418,25 +502,37 @@ describe("lib/billing/provider", () => {
 
     it("should support optional message in webhook response", async () => {
       const mockProviderWithMessage: PaymentProvider = {
-        createCheckoutSession: jest.fn().mockResolvedValue({ checkoutUrl: "test" }),
-        createCustomerPortalUrl: jest.fn().mockResolvedValue({ portalUrl: "test" }),
+        createCheckoutSession: jest
+          .fn()
+          .mockResolvedValue({ checkoutUrl: "test" }),
+        createCustomerPortalUrl: jest
+          .fn()
+          .mockResolvedValue({ portalUrl: "test" }),
         handleWebhook: jest.fn().mockResolvedValue({
           received: true,
-          message: "Optional message included"
+          message: "Optional message included",
         }),
       };
 
       const mockProviderWithoutMessage: PaymentProvider = {
-        createCheckoutSession: jest.fn().mockResolvedValue({ checkoutUrl: "test" }),
-        createCustomerPortalUrl: jest.fn().mockResolvedValue({ portalUrl: "test" }),
+        createCheckoutSession: jest
+          .fn()
+          .mockResolvedValue({ checkoutUrl: "test" }),
+        createCustomerPortalUrl: jest
+          .fn()
+          .mockResolvedValue({ portalUrl: "test" }),
         handleWebhook: jest.fn().mockResolvedValue({
-          received: false
+          received: false,
           // message is optional
         }),
       };
 
-      const resultWithMessage = await mockProviderWithMessage.handleWebhook("test", "test");
-      const resultWithoutMessage = await mockProviderWithoutMessage.handleWebhook("test", "test");
+      const resultWithMessage = await mockProviderWithMessage.handleWebhook(
+        "test",
+        "test",
+      );
+      const resultWithoutMessage =
+        await mockProviderWithoutMessage.handleWebhook("test", "test");
 
       expect(resultWithMessage.message).toBe("Optional message included");
       expect(resultWithoutMessage.message).toBeUndefined();
@@ -447,14 +543,24 @@ describe("lib/billing/provider", () => {
     it("should enforce correct parameter types", () => {
       // This test verifies TypeScript compilation - if it compiles, types are correct
       const mockProvider: PaymentProvider = {
-        createCheckoutSession: jest.fn().mockResolvedValue({ checkoutUrl: "test" }) as any,
-        createCustomerPortalUrl: jest.fn().mockResolvedValue({ portalUrl: "test" }) as any,
+        createCheckoutSession: jest
+          .fn()
+          .mockResolvedValue({ checkoutUrl: "test" }) as any,
+        createCustomerPortalUrl: jest
+          .fn()
+          .mockResolvedValue({ portalUrl: "test" }) as any,
         handleWebhook: jest.fn().mockResolvedValue({ received: true }) as any,
       };
 
       // These should compile without TypeScript errors
       expect(() => {
-        mockProvider.createCheckoutSession({ tierId: "test", userId: "test", userEmail: "test@example.com", paymentMode: "subscription", billingCycle: "monthly" });
+        mockProvider.createCheckoutSession({
+          tierId: "test",
+          userId: "test",
+          userEmail: "test@example.com",
+          paymentMode: "subscription",
+          billingCycle: "monthly",
+        });
         mockProvider.createCustomerPortalUrl("customer_id");
         mockProvider.handleWebhook("payload", "signature");
       }).not.toThrow();
@@ -472,9 +578,9 @@ describe("lib/billing/provider", () => {
         }
 
         async handleWebhook(payload: string, signature: string) {
-          return { 
+          return {
             received: payload.length > 0 && signature.length > 0,
-            message: "Test implementation"
+            message: "Test implementation",
           };
         }
       }

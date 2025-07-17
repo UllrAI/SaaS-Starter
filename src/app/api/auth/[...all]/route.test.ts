@@ -15,16 +15,22 @@ jest.mock("@/lib/auth/server", () => ({
 }));
 
 // Mock better-auth module
-const mockGetHandler = jest.fn(() => Promise.resolve({})) as jest.MockedFunction<() => Promise<unknown>>;
-const mockPostHandler = jest.fn(() => Promise.resolve({})) as jest.MockedFunction<() => Promise<unknown>>;
-const mockToNextJsHandler = jest.fn().mockImplementation((handler: unknown): NextJsHandlers => {
-  // This is used to validate that the handler is passed correctly
-  expect(handler).toBe(mockAuthHandler);
-  return {
-    GET: mockGetHandler,
-    POST: mockPostHandler,
-  };
-});
+const mockGetHandler = jest.fn(() =>
+  Promise.resolve({}),
+) as jest.MockedFunction<() => Promise<unknown>>;
+const mockPostHandler = jest.fn(() =>
+  Promise.resolve({}),
+) as jest.MockedFunction<() => Promise<unknown>>;
+const mockToNextJsHandler = jest
+  .fn()
+  .mockImplementation((handler: unknown): NextJsHandlers => {
+    // This is used to validate that the handler is passed correctly
+    expect(handler).toBe(mockAuthHandler);
+    return {
+      GET: mockGetHandler,
+      POST: mockPostHandler,
+    };
+  });
 
 jest.mock("better-auth/next-js", () => ({
   toNextJsHandler: mockToNextJsHandler,
@@ -41,13 +47,13 @@ describe("Auth API Route", () => {
 
     // Verify toNextJsHandler was called
     expect(mockToNextJsHandler).toHaveBeenCalledTimes(1);
-    
+
     // Verify both handlers are exported
     expect(GET).toBeDefined();
     expect(POST).toBeDefined();
     expect(typeof GET).toBe("function");
     expect(typeof POST).toBe("function");
-    
+
     // Verify they are the mocked handlers
     expect(GET).toBe(mockGetHandler);
     expect(POST).toBe(mockPostHandler);

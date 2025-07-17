@@ -1,4 +1,11 @@
-import { describe, it, expect, jest, beforeEach, afterEach } from "@jest/globals";
+import {
+  describe,
+  it,
+  expect,
+  jest,
+  beforeEach,
+  afterEach,
+} from "@jest/globals";
 
 // Mock all external dependencies
 const mockDb = {
@@ -11,7 +18,7 @@ const mockDb = {
 const mockEnabledTablesMap = {
   users: {
     id: "users.id",
-    name: "users.name", 
+    name: "users.name",
     email: "users.email",
     $inferSelect: {},
   },
@@ -106,21 +113,21 @@ jest.mock("zod", () => ({
 describe("Admin Generic Actions", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    
+
     // Suppress console logs
-    jest.spyOn(console, 'log').mockImplementation(() => {});
-    jest.spyOn(console, 'warn').mockImplementation(() => {});
-    jest.spyOn(console, 'error').mockImplementation(() => {});
-    
+    jest.spyOn(console, "log").mockImplementation(() => {});
+    jest.spyOn(console, "warn").mockImplementation(() => {});
+    jest.spyOn(console, "error").mockImplementation(() => {});
+
     // Setup default mock implementations
     mockRequireAdmin.mockResolvedValue({
       id: "admin-user-id",
       role: "admin",
       email: "admin@example.com",
     });
-    
+
     mockRevalidatePath.mockImplementation(() => {});
-    
+
     // Mock safe action client
     mockCreateSafeActionClient.mockReturnValue({
       use: jest.fn(() => ({
@@ -129,7 +136,7 @@ describe("Admin Generic Actions", () => {
         })),
       })),
     });
-    
+
     // Mock getTableConfig
     mockGetTableConfig.mockReturnValue({
       columns: [
@@ -144,7 +151,7 @@ describe("Admin Generic Actions", () => {
         },
       ],
     });
-    
+
     // Mock drizzle-orm functions
     mockCount.mockReturnValue("count(*)");
     mockEq.mockReturnValue("id = $1");
@@ -152,7 +159,7 @@ describe("Admin Generic Actions", () => {
     mockInArray.mockReturnValue("id IN ($1, $2)");
     mockOr.mockReturnValue("(condition1 OR condition2)");
     mockAnd.mockReturnValue("(condition1 AND condition2)");
-    
+
     // Mock database query builders
     mockDb.select.mockReturnValue({
       from: jest.fn().mockReturnValue({
@@ -166,31 +173,32 @@ describe("Admin Generic Actions", () => {
         }),
       }),
     });
-    
+
     mockDb.insert.mockReturnValue({
       values: jest.fn().mockReturnValue({
-        returning: jest.fn().mockResolvedValue([
-          { id: 1, name: "New User", email: "new@example.com" },
-        ]),
+        returning: jest
+          .fn()
+          .mockResolvedValue([
+            { id: 1, name: "New User", email: "new@example.com" },
+          ]),
       }),
     });
-    
+
     mockDb.update.mockReturnValue({
       set: jest.fn().mockReturnValue({
         where: jest.fn().mockReturnValue({
-          returning: jest.fn().mockResolvedValue([
-            { id: 1, name: "Updated User", email: "updated@example.com" },
-          ]),
+          returning: jest
+            .fn()
+            .mockResolvedValue([
+              { id: 1, name: "Updated User", email: "updated@example.com" },
+            ]),
         }),
       }),
     });
-    
+
     mockDb.delete.mockReturnValue({
       where: jest.fn().mockReturnValue({
-        returning: jest.fn().mockResolvedValue([
-          { id: 1 },
-          { id: 2 },
-        ]),
+        returning: jest.fn().mockResolvedValue([{ id: 1 }, { id: 2 }]),
       }),
     });
   });
@@ -214,27 +222,27 @@ describe("Admin Generic Actions", () => {
           }),
         }),
       };
-      
+
       const mockCountQuery = {
         from: jest.fn().mockReturnValue({
           where: jest.fn().mockResolvedValue([{ total: 50 }]),
         }),
       };
-      
+
       // Mock db.select to return different objects for different calls
       mockDb.select
         .mockReturnValueOnce(mockDataQuery)
         .mockReturnValueOnce(mockCountQuery);
-      
+
       const { getGenericTableData } = await import("./admin-generic");
-      
+
       const result = await getGenericTableData("users", {
         page: 1,
         limit: 10,
         search: "test",
         sort: { by: "name", order: "asc" },
       });
-      
+
       expect(result).toEqual({
         data: [
           { id: 1, name: "User 1", email: "user1@example.com" },
@@ -247,9 +255,11 @@ describe("Admin Generic Actions", () => {
           totalPages: 5,
         },
       });
-      
+
       expect(mockDb.select).toHaveBeenCalledTimes(2);
-      expect(mockGetTableConfig).toHaveBeenCalledWith(mockEnabledTablesMap.users);
+      expect(mockGetTableConfig).toHaveBeenCalledWith(
+        mockEnabledTablesMap.users,
+      );
     });
 
     it("should handle pagination correctly", async () => {
@@ -262,24 +272,24 @@ describe("Admin Generic Actions", () => {
           }),
         }),
       };
-      
+
       const mockCountQuery = {
         from: jest.fn().mockReturnValue({
           where: jest.fn().mockResolvedValue([{ total: 25 }]),
         }),
       };
-      
+
       mockDb.select
         .mockReturnValueOnce(mockDataQuery)
         .mockReturnValueOnce(mockCountQuery);
-      
+
       const { getGenericTableData } = await import("./admin-generic");
-      
+
       const result = await getGenericTableData("users", {
         page: 3,
         limit: 5,
       });
-      
+
       expect(result.pagination).toEqual({
         page: 3,
         limit: 5,
@@ -298,25 +308,25 @@ describe("Admin Generic Actions", () => {
           }),
         }),
       };
-      
+
       const mockCountQuery = {
         from: jest.fn().mockReturnValue({
           where: jest.fn().mockResolvedValue([{ total: 0 }]),
         }),
       };
-      
+
       mockDb.select
         .mockReturnValueOnce(mockDataQuery)
         .mockReturnValueOnce(mockCountQuery);
-      
+
       const { getGenericTableData } = await import("./admin-generic");
-      
+
       await getGenericTableData("users", {
         page: 1,
         limit: 10,
         search: "john",
       });
-      
+
       expect(mockIlike).toHaveBeenCalled();
       expect(mockOr).toHaveBeenCalled();
     });
@@ -333,7 +343,7 @@ describe("Admin Generic Actions", () => {
           },
         ],
       });
-      
+
       const mockDataQuery = {
         from: jest.fn().mockReturnValue({
           where: jest.fn().mockReturnValue({
@@ -343,25 +353,25 @@ describe("Admin Generic Actions", () => {
           }),
         }),
       };
-      
+
       const mockCountQuery = {
         from: jest.fn().mockReturnValue({
           where: jest.fn().mockResolvedValue([{ total: 0 }]),
         }),
       };
-      
+
       mockDb.select
         .mockReturnValueOnce(mockDataQuery)
         .mockReturnValueOnce(mockCountQuery);
-      
+
       const { getGenericTableData } = await import("./admin-generic");
-      
+
       await getGenericTableData("users", {
         page: 1,
         limit: 10,
         search: "test",
       });
-      
+
       // Should not call ilike when no text columns
       expect(mockIlike).not.toHaveBeenCalled();
     });
@@ -370,7 +380,7 @@ describe("Admin Generic Actions", () => {
   describe("createRecord", () => {
     it("should create a new record successfully", async () => {
       const { createRecord } = await import("./admin-generic");
-      
+
       const mockParsedInput = {
         tableName: "users" as const,
         data: {
@@ -379,30 +389,32 @@ describe("Admin Generic Actions", () => {
           age: undefined, // Should be filtered out
         },
       };
-      
+
       const result = await createRecord({
         parsedInput: mockParsedInput,
       });
-      
+
       expect(result).toEqual({
         record: { id: 1, name: "New User", email: "new@example.com" },
       });
-      
+
       expect(mockDb.insert).toHaveBeenCalledWith(mockEnabledTablesMap.users);
-      expect(mockRevalidatePath).toHaveBeenCalledWith("/dashboard/admin/tables/users");
+      expect(mockRevalidatePath).toHaveBeenCalledWith(
+        "/dashboard/admin/tables/users",
+      );
     });
 
     it("should filter out undefined values", async () => {
       const { createRecord } = await import("./admin-generic");
-      
+
       const valuesMock = jest.fn().mockReturnValue({
         returning: jest.fn().mockResolvedValue([{ id: 1 }]),
       });
-      
+
       mockDb.insert.mockReturnValue({
         values: valuesMock,
       });
-      
+
       const mockParsedInput = {
         tableName: "users" as const,
         data: {
@@ -412,11 +424,11 @@ describe("Admin Generic Actions", () => {
           nullField: null,
         },
       };
-      
+
       await createRecord({
         parsedInput: mockParsedInput,
       });
-      
+
       // Check that undefined values were filtered but null values kept
       expect(valuesMock).toHaveBeenCalledWith({
         name: "Test",
@@ -431,9 +443,9 @@ describe("Admin Generic Actions", () => {
           returning: jest.fn().mockRejectedValue(new Error("Database error")),
         }),
       });
-      
+
       const { createRecord } = await import("./admin-generic");
-      
+
       const mockParsedInput = {
         tableName: "users" as const,
         data: {
@@ -441,17 +453,19 @@ describe("Admin Generic Actions", () => {
           email: "test@example.com",
         },
       };
-      
-      await expect(createRecord({
-        parsedInput: mockParsedInput,
-      })).rejects.toThrow("Database error");
+
+      await expect(
+        createRecord({
+          parsedInput: mockParsedInput,
+        }),
+      ).rejects.toThrow("Database error");
     });
   });
 
   describe("updateRecord", () => {
     it("should update a record successfully", async () => {
       const { updateRecord } = await import("./admin-generic");
-      
+
       const mockParsedInput = {
         tableName: "users" as const,
         id: 1,
@@ -461,23 +475,25 @@ describe("Admin Generic Actions", () => {
           undefinedField: undefined,
         },
       };
-      
+
       const result = await updateRecord({
         parsedInput: mockParsedInput,
       });
-      
+
       expect(result).toEqual({
         record: { id: 1, name: "Updated User", email: "updated@example.com" },
       });
-      
+
       expect(mockDb.update).toHaveBeenCalledWith(mockEnabledTablesMap.users);
       expect(mockEq).toHaveBeenCalledWith(mockEnabledTablesMap.users.id, 1);
-      expect(mockRevalidatePath).toHaveBeenCalledWith("/dashboard/admin/tables/users");
+      expect(mockRevalidatePath).toHaveBeenCalledWith(
+        "/dashboard/admin/tables/users",
+      );
     });
 
     it("should handle string IDs", async () => {
       const { updateRecord } = await import("./admin-generic");
-      
+
       const mockParsedInput = {
         tableName: "users" as const,
         id: "user-123",
@@ -485,27 +501,30 @@ describe("Admin Generic Actions", () => {
           name: "Updated User",
         },
       };
-      
+
       await updateRecord({
         parsedInput: mockParsedInput,
       });
-      
-      expect(mockEq).toHaveBeenCalledWith(mockEnabledTablesMap.users.id, "user-123");
+
+      expect(mockEq).toHaveBeenCalledWith(
+        mockEnabledTablesMap.users.id,
+        "user-123",
+      );
     });
 
     it("should filter out undefined values from update data", async () => {
       const { updateRecord } = await import("./admin-generic");
-      
+
       const setMock = jest.fn().mockReturnValue({
         where: jest.fn().mockReturnValue({
           returning: jest.fn().mockResolvedValue([{ id: 1 }]),
         }),
       });
-      
+
       mockDb.update.mockReturnValue({
         set: setMock,
       });
-      
+
       const mockParsedInput = {
         tableName: "users" as const,
         id: 1,
@@ -515,11 +534,11 @@ describe("Admin Generic Actions", () => {
           status: null,
         },
       };
-      
+
       await updateRecord({
         parsedInput: mockParsedInput,
       });
-      
+
       expect(setMock).toHaveBeenCalledWith({
         name: "Updated",
         status: null,
@@ -534,62 +553,69 @@ describe("Admin Generic Actions", () => {
           }),
         }),
       });
-      
+
       const { updateRecord } = await import("./admin-generic");
-      
+
       const mockParsedInput = {
         tableName: "users" as const,
         id: 1,
         data: { name: "Test" },
       };
-      
-      await expect(updateRecord({
-        parsedInput: mockParsedInput,
-      })).rejects.toThrow("Update failed");
+
+      await expect(
+        updateRecord({
+          parsedInput: mockParsedInput,
+        }),
+      ).rejects.toThrow("Update failed");
     });
   });
 
   describe("deleteRecords", () => {
     it("should delete multiple records successfully", async () => {
       const { deleteRecords } = await import("./admin-generic");
-      
+
       const mockParsedInput = {
         tableName: "users" as const,
         ids: [1, 2, 3],
       };
-      
+
       const result = await deleteRecords({
         parsedInput: mockParsedInput,
       });
-      
+
       expect(result).toEqual({
         success: true,
         count: 2, // Mocked return length
       });
-      
+
       expect(mockDb.delete).toHaveBeenCalledWith(mockEnabledTablesMap.users);
-      expect(mockInArray).toHaveBeenCalledWith(mockEnabledTablesMap.users.id, [1, 2, 3]);
-      expect(mockRevalidatePath).toHaveBeenCalledWith("/dashboard/admin/tables/users");
+      expect(mockInArray).toHaveBeenCalledWith(
+        mockEnabledTablesMap.users.id,
+        [1, 2, 3],
+      );
+      expect(mockRevalidatePath).toHaveBeenCalledWith(
+        "/dashboard/admin/tables/users",
+      );
     });
 
     it("should handle single record deletion", async () => {
       const { deleteRecords } = await import("./admin-generic");
-      
+
       mockDb.delete.mockReturnValue({
         where: jest.fn().mockReturnValue({
           returning: jest.fn().mockResolvedValue([{ id: 1 }]),
         }),
       });
-      
+
       const mockParsedInput = {
         tableName: "users" as const,
         ids: [1],
       };
-      
+
       const result = await deleteRecords({
         parsedInput: mockParsedInput,
       });
-      
+
       expect(result).toEqual({
         success: true,
         count: 1,
@@ -598,20 +624,21 @@ describe("Admin Generic Actions", () => {
 
     it("should handle mixed ID types", async () => {
       const { deleteRecords } = await import("./admin-generic");
-      
+
       const mockParsedInput = {
         tableName: "users" as const,
         ids: [1, "user-2", 3],
       };
-      
+
       await deleteRecords({
         parsedInput: mockParsedInput,
       });
-      
-      expect(mockInArray).toHaveBeenCalledWith(
-        mockEnabledTablesMap.users.id,
-        [1, "user-2", 3]
-      );
+
+      expect(mockInArray).toHaveBeenCalledWith(mockEnabledTablesMap.users.id, [
+        1,
+        "user-2",
+        3,
+      ]);
     });
 
     it("should handle deletion errors", async () => {
@@ -620,17 +647,19 @@ describe("Admin Generic Actions", () => {
           returning: jest.fn().mockRejectedValue(new Error("Delete failed")),
         }),
       });
-      
+
       const { deleteRecords } = await import("./admin-generic");
-      
+
       const mockParsedInput = {
         tableName: "users" as const,
         ids: [1, 2],
       };
-      
-      await expect(deleteRecords({
-        parsedInput: mockParsedInput,
-      })).rejects.toThrow("Delete failed");
+
+      await expect(
+        deleteRecords({
+          parsedInput: mockParsedInput,
+        }),
+      ).rejects.toThrow("Delete failed");
     });
 
     it("should handle empty results", async () => {
@@ -639,18 +668,18 @@ describe("Admin Generic Actions", () => {
           returning: jest.fn().mockResolvedValue([]),
         }),
       });
-      
+
       const { deleteRecords } = await import("./admin-generic");
-      
+
       const mockParsedInput = {
         tableName: "users" as const,
         ids: [999], // Non-existent ID
       };
-      
+
       const result = await deleteRecords({
         parsedInput: mockParsedInput,
       });
-      
+
       expect(result).toEqual({
         success: true,
         count: 0,
@@ -661,13 +690,15 @@ describe("Admin Generic Actions", () => {
   describe("Authorization", () => {
     it("should have admin middleware configured correctly", async () => {
       // Test that the actions are properly configured with middleware
-      const { createRecord, updateRecord, deleteRecords } = await import("./admin-generic");
-      
+      const { createRecord, updateRecord, deleteRecords } = await import(
+        "./admin-generic"
+      );
+
       // All admin actions should be functions (indicating they were properly created)
       expect(typeof createRecord).toBe("function");
       expect(typeof updateRecord).toBe("function");
       expect(typeof deleteRecords).toBe("function");
-      
+
       // Test that our mocked safe action setup works
       expect(mockCreateSafeActionClient).toBeDefined();
       expect(mockRequireAdmin).toBeDefined();
@@ -676,21 +707,21 @@ describe("Admin Generic Actions", () => {
     it("should execute admin actions with proper context", async () => {
       // Test that actions execute successfully with admin context
       const { createRecord } = await import("./admin-generic");
-      
+
       const mockParsedInput = {
         tableName: "users" as const,
         data: { name: "Test User", email: "test@example.com" },
       };
-      
+
       const result = await createRecord({
         parsedInput: mockParsedInput,
       });
-      
+
       // Verify the action completed successfully
       expect(result).toEqual({
         record: { id: 1, name: "New User", email: "new@example.com" },
       });
-      
+
       // Verify database operations were called
       expect(mockDb.insert).toHaveBeenCalled();
       expect(mockRevalidatePath).toHaveBeenCalled();
@@ -701,11 +732,11 @@ describe("Admin Generic Actions", () => {
     it("should handle invalid table names", async () => {
       // This would be caught by Zod validation in real usage
       const { getGenericTableData } = await import("./admin-generic");
-      
+
       // Mock the enabledTablesMap to not include the table
       const originalMap = { ...mockEnabledTablesMap };
       delete (mockEnabledTablesMap as any).invalidTable;
-      
+
       try {
         await getGenericTableData("invalidTable" as any, {
           page: 1,
@@ -714,7 +745,7 @@ describe("Admin Generic Actions", () => {
       } catch (error) {
         expect(error).toBeDefined();
       }
-      
+
       // Restore original map
       Object.assign(mockEnabledTablesMap, originalMap);
     });
@@ -729,24 +760,24 @@ describe("Admin Generic Actions", () => {
           }),
         }),
       };
-      
+
       const mockCountQuery = {
         from: jest.fn().mockReturnValue({
           where: jest.fn().mockResolvedValue([{ total: 10 }]),
         }),
       };
-      
+
       mockDb.select
         .mockReturnValueOnce(mockDataQuery)
         .mockReturnValueOnce(mockCountQuery);
-      
+
       const { getGenericTableData } = await import("./admin-generic");
-      
+
       const result = await getGenericTableData("users", {
         page: 1,
         limit: 0,
       });
-      
+
       expect(result.pagination.totalPages).toBe(Infinity);
     });
 
@@ -760,25 +791,25 @@ describe("Admin Generic Actions", () => {
           }),
         }),
       };
-      
+
       const mockCountQuery = {
         from: jest.fn().mockReturnValue({
           where: jest.fn().mockResolvedValue([{ total: 0 }]),
         }),
       };
-      
+
       mockDb.select
         .mockReturnValueOnce(mockDataQuery)
         .mockReturnValueOnce(mockCountQuery);
-      
+
       const { getGenericTableData } = await import("./admin-generic");
-      
+
       await getGenericTableData("users", {
         page: 1,
         limit: 10,
         search: "",
       });
-      
+
       // Should not apply search filters for empty search
       expect(mockIlike).not.toHaveBeenCalled();
     });

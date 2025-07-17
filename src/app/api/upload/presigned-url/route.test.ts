@@ -65,11 +65,16 @@ describe("Upload Presigned URL API", () => {
 
   const createMockRequest = (body: unknown): NextRequest => {
     return {
-      headers: { get: () => '', has: () => false, set: () => {}, entries: () => [] },
+      headers: {
+        get: () => "",
+        has: () => false,
+        set: () => {},
+        entries: () => [],
+      },
       json: jest.fn().mockResolvedValue(body) as any,
       cookies: { get: () => null, has: () => false },
-      nextUrl: { pathname: '/api/upload/presigned-url' },
-      url: 'http://localhost:3000/api/upload/presigned-url',
+      nextUrl: { pathname: "/api/upload/presigned-url" },
+      url: "http://localhost:3000/api/upload/presigned-url",
     } as any as NextRequest;
   };
 
@@ -90,26 +95,26 @@ describe("Upload Presigned URL API", () => {
   describe("POST /api/upload/presigned-url", () => {
     it("should return 401 when user is not authenticated", async () => {
       mockGetSession.mockResolvedValue(null);
-      
+
       const { POST } = await import("./route");
       const request = createMockRequest(validRequestBody);
-      
+
       const response = await POST(request);
       const data = await response.json();
-      
+
       expect(response.status).toBe(401);
       expect(data.error).toBe("Unauthorized");
     });
 
     it("should return 401 when session exists but user.id is missing", async () => {
       mockGetSession.mockResolvedValue({ user: { id: null } });
-      
+
       const { POST } = await import("./route");
       const request = createMockRequest(validRequestBody);
-      
+
       const response = await POST(request);
       const data = await response.json();
-      
+
       expect(response.status).toBe(401);
       expect(data.error).toBe("Unauthorized");
     });
@@ -127,13 +132,13 @@ describe("Upload Presigned URL API", () => {
           }),
         },
       });
-      
+
       const { POST } = await import("./route");
       const request = createMockRequest({ invalid: "data" });
-      
+
       const response = await POST(request);
       const data = await response.json();
-      
+
       expect(response.status).toBe(400);
       expect(data.error).toBe("Invalid request data");
       expect(data.details).toEqual({
@@ -149,13 +154,13 @@ describe("Upload Presigned URL API", () => {
         data: validRequestBody,
       });
       mockIsFileTypeAllowed.mockReturnValue(false);
-      
+
       const { POST } = await import("./route");
       const request = createMockRequest(validRequestBody);
-      
+
       const response = await POST(request);
       const data = await response.json();
-      
+
       expect(response.status).toBe(400);
       expect(data.error).toBe("File type 'image/jpeg' is not allowed.");
       expect(mockIsFileTypeAllowed).toHaveBeenCalledWith("image/jpeg");
@@ -170,15 +175,17 @@ describe("Upload Presigned URL API", () => {
       mockIsFileTypeAllowed.mockReturnValue(true);
       mockIsFileSizeAllowed.mockReturnValue(false);
       mockFormatFileSize.mockImplementation((size: number) => `${size} bytes`);
-      
+
       const { POST } = await import("./route");
       const request = createMockRequest(validRequestBody);
-      
+
       const response = await POST(request);
       const data = await response.json();
-      
+
       expect(response.status).toBe(400);
-      expect(data.error).toBe("File size of 1048576 bytes exceeds the limit of 10485760 bytes.");
+      expect(data.error).toBe(
+        "File size of 1048576 bytes exceeds the limit of 10485760 bytes.",
+      );
       expect(mockIsFileSizeAllowed).toHaveBeenCalledWith(1048576);
     });
 
@@ -194,13 +201,13 @@ describe("Upload Presigned URL API", () => {
         success: false,
         error: "S3 service unavailable",
       });
-      
+
       const { POST } = await import("./route");
       const request = createMockRequest(validRequestBody);
-      
+
       const response = await POST(request);
       const data = await response.json();
-      
+
       expect(response.status).toBe(400);
       expect(data.error).toBe("S3 service unavailable");
     });
@@ -212,7 +219,7 @@ describe("Upload Presigned URL API", () => {
         publicUrl: "https://cdn.example.com/file.jpg",
         key: "uploads/user-123/file.jpg",
       };
-      
+
       mockGetSession.mockResolvedValue(mockSession);
       mockPresignedUrlRequestSchema.safeParse.mockReturnValue({
         success: true,
@@ -221,27 +228,27 @@ describe("Upload Presigned URL API", () => {
       mockIsFileTypeAllowed.mockReturnValue(true);
       mockIsFileSizeAllowed.mockReturnValue(true);
       mockCreatePresignedUrl.mockResolvedValue(mockResult);
-      
+
       const { POST } = await import("./route");
       const request = createMockRequest(validRequestBody);
-      
+
       const response = await POST(request);
       const data = await response.json();
-      
+
       expect(response.status).toBe(200);
       expect(data).toEqual({
         presignedUrl: mockResult.presignedUrl,
         publicUrl: mockResult.publicUrl,
         key: mockResult.key,
       });
-      
+
       expect(mockCreatePresignedUrl).toHaveBeenCalledWith({
         userId: "user-123",
         fileName: "test-image.jpg",
         contentType: "image/jpeg",
         size: 1048576,
       });
-      
+
       expect(mockDb.insert).toHaveBeenCalledWith("uploads-table");
       expect(mockDb.insert().values).toHaveBeenCalledWith({
         userId: "user-123",
@@ -260,7 +267,7 @@ describe("Upload Presigned URL API", () => {
         publicUrl: null, // Missing publicUrl
         key: "uploads/user-123/file.jpg",
       };
-      
+
       mockGetSession.mockResolvedValue(mockSession);
       mockPresignedUrlRequestSchema.safeParse.mockReturnValue({
         success: true,
@@ -269,53 +276,58 @@ describe("Upload Presigned URL API", () => {
       mockIsFileTypeAllowed.mockReturnValue(true);
       mockIsFileSizeAllowed.mockReturnValue(true);
       mockCreatePresignedUrl.mockResolvedValue(mockResult);
-      
+
       const { POST } = await import("./route");
       const request = createMockRequest(validRequestBody);
-      
+
       const response = await POST(request);
       const data = await response.json();
-      
+
       expect(response.status).toBe(200);
       expect(data).toEqual({
         presignedUrl: mockResult.presignedUrl,
         publicUrl: mockResult.publicUrl,
         key: mockResult.key,
       });
-      
+
       // Database insert should not be called
       expect(mockDb.insert).not.toHaveBeenCalled();
     });
 
     it("should handle request.json() failure", async () => {
       mockGetSession.mockResolvedValue(mockSession);
-      
+
       const request = {
-        headers: { get: () => '', has: () => false, set: () => {}, entries: () => [] },
+        headers: {
+          get: () => "",
+          has: () => false,
+          set: () => {},
+          entries: () => [],
+        },
         json: jest.fn().mockRejectedValue(new Error("Invalid JSON")) as any,
         cookies: { get: () => null, has: () => false },
-        nextUrl: { pathname: '/api/upload/presigned-url' },
-        url: 'http://localhost:3000/api/upload/presigned-url',
+        nextUrl: { pathname: "/api/upload/presigned-url" },
+        url: "http://localhost:3000/api/upload/presigned-url",
       } as any as NextRequest;
-      
+
       const { POST } = await import("./route");
-      
+
       const response = await POST(request);
       const data = await response.json();
-      
+
       expect(response.status).toBe(500);
       expect(data.error).toBe("Internal Server Error. Please try again later.");
     });
 
     it("should handle auth.api.getSession failure", async () => {
       mockGetSession.mockRejectedValue(new Error("Auth service down"));
-      
+
       const { POST } = await import("./route");
       const request = createMockRequest(validRequestBody);
-      
+
       const response = await POST(request);
       const data = await response.json();
-      
+
       expect(response.status).toBe(500);
       expect(data.error).toBe("Internal Server Error. Please try again later.");
     });
@@ -327,7 +339,7 @@ describe("Upload Presigned URL API", () => {
         publicUrl: "https://cdn.example.com/file.jpg",
         key: "uploads/user-123/file.jpg",
       };
-      
+
       mockGetSession.mockResolvedValue(mockSession);
       mockPresignedUrlRequestSchema.safeParse.mockReturnValue({
         success: true,
@@ -337,13 +349,13 @@ describe("Upload Presigned URL API", () => {
       mockIsFileSizeAllowed.mockReturnValue(true);
       mockCreatePresignedUrl.mockResolvedValue(mockResult);
       mockDb.insert().values.mockRejectedValue(new Error("Database error"));
-      
+
       const { POST } = await import("./route");
       const request = createMockRequest(validRequestBody);
-      
+
       const response = await POST(request);
       const data = await response.json();
-      
+
       expect(response.status).toBe(500);
       expect(data.error).toBe("Internal Server Error. Please try again later.");
     });
@@ -354,14 +366,14 @@ describe("Upload Presigned URL API", () => {
         contentType: "application/pdf",
         size: 2097152, // 2MB
       };
-      
+
       const mockResult = {
         success: true,
         presignedUrl: "https://s3.example.com/presigned",
         publicUrl: "https://cdn.example.com/document.pdf",
         key: "uploads/user-123/document.pdf",
       };
-      
+
       // Ensure mocks are properly configured
       mockGetSession.mockResolvedValue(mockSession);
       mockPresignedUrlRequestSchema.safeParse.mockReturnValue({
@@ -372,13 +384,13 @@ describe("Upload Presigned URL API", () => {
       mockIsFileSizeAllowed.mockReturnValue(true);
       mockCreatePresignedUrl.mockResolvedValue(mockResult);
       mockDb.insert().values.mockResolvedValue(undefined);
-      
+
       const { POST } = await import("./route");
       const request = createMockRequest(pdfRequest);
-      
+
       const response = await POST(request);
       const data = await response.json();
-      
+
       expect(response.status).toBe(200);
       expect(mockIsFileTypeAllowed).toHaveBeenCalledWith("application/pdf");
       expect(mockIsFileSizeAllowed).toHaveBeenCalledWith(2097152);

@@ -46,7 +46,9 @@ describe("database configuration", () => {
     it("should use environment DATABASE_URL", () => {
       const config = require("./config").default;
 
-      expect(config.dbCredentials.url).toBe("postgresql://test:password@localhost:5432/testdb");
+      expect(config.dbCredentials.url).toBe(
+        "postgresql://test:password@localhost:5432/testdb",
+      );
     });
 
     it("should have verbose mode enabled for development", () => {
@@ -94,7 +96,10 @@ describe("database configuration", () => {
       // Verify all required properties exist and have correct types
       expect(prodConfig).toHaveProperty("dialect", "postgresql");
       expect(prodConfig).toHaveProperty("schema", "./database/schema.ts");
-      expect(prodConfig).toHaveProperty("out", "./database/migrations/production");
+      expect(prodConfig).toHaveProperty(
+        "out",
+        "./database/migrations/production",
+      );
       expect(prodConfig).toHaveProperty("dbCredentials");
       expect(prodConfig.dbCredentials).toHaveProperty("url");
       // Production should not have verbose property
@@ -104,7 +109,9 @@ describe("database configuration", () => {
     it("should use environment DATABASE_URL", () => {
       const prodConfig = require("./config.prod").default;
 
-      expect(prodConfig.dbCredentials.url).toBe("postgresql://test:password@localhost:5432/testdb");
+      expect(prodConfig.dbCredentials.url).toBe(
+        "postgresql://test:password@localhost:5432/testdb",
+      );
     });
 
     it("should not have verbose mode for production", () => {
@@ -180,7 +187,9 @@ describe("database configuration", () => {
     it("should import from correct env module", () => {
       // This test ensures the env import is working
       const env = require("@/env");
-      expect(env.DATABASE_URL).toBe("postgresql://test:password@localhost:5432/testdb");
+      expect(env.DATABASE_URL).toBe(
+        "postgresql://test:password@localhost:5432/testdb",
+      );
     });
 
     it("should handle different DATABASE_URL formats", () => {
@@ -188,8 +197,12 @@ describe("database configuration", () => {
       const devConfig = require("./config").default;
       const prodConfig = require("./config.prod").default;
 
-      expect(devConfig.dbCredentials.url).toBe("postgresql://test:password@localhost:5432/testdb");
-      expect(prodConfig.dbCredentials.url).toBe("postgresql://test:password@localhost:5432/testdb");
+      expect(devConfig.dbCredentials.url).toBe(
+        "postgresql://test:password@localhost:5432/testdb",
+      );
+      expect(prodConfig.dbCredentials.url).toBe(
+        "postgresql://test:password@localhost:5432/testdb",
+      );
     });
   });
 
@@ -251,8 +264,14 @@ describe("database configuration", () => {
       const devConfig = require("./config").default;
       const prodConfig = require("./config.prod").default;
 
-      expect(typeof devConfig.verbose === "boolean" || devConfig.verbose === undefined).toBe(true);
-      expect(typeof prodConfig.verbose === "boolean" || prodConfig.verbose === undefined).toBe(true);
+      expect(
+        typeof devConfig.verbose === "boolean" ||
+          devConfig.verbose === undefined,
+      ).toBe(true);
+      expect(
+        typeof prodConfig.verbose === "boolean" ||
+          prodConfig.verbose === undefined,
+      ).toBe(true);
     });
   });
 

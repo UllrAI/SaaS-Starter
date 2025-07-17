@@ -158,8 +158,12 @@ describe("schema-generator", () => {
 
       const result = generateZodSchema(schemaInfo);
 
-      expect(result.safeParse({ metadata: '{"key": "value"}' }).success).toBe(true);
-      expect(result.safeParse({ metadata: "invalid_json" }).success).toBe(false);
+      expect(result.safeParse({ metadata: '{"key": "value"}' }).success).toBe(
+        true,
+      );
+      expect(result.safeParse({ metadata: "invalid_json" }).success).toBe(
+        false,
+      );
       expect(result.safeParse({ metadata: "" }).success).toBe(true);
     });
 
@@ -176,7 +180,10 @@ describe("schema-generator", () => {
 
       const result = generateZodSchema(schemaInfo);
 
-      expect(result.safeParse({ id: "123e4567-e89b-12d3-a456-426614174000" }).success).toBe(true);
+      expect(
+        result.safeParse({ id: "123e4567-e89b-12d3-a456-426614174000" })
+          .success,
+      ).toBe(true);
       expect(result.safeParse({ id: "" }).success).toBe(false);
     });
 
@@ -193,7 +200,9 @@ describe("schema-generator", () => {
 
       const result = generateZodSchema(schemaInfo);
 
-      expect(result.safeParse({ content: "long text content" }).success).toBe(true);
+      expect(result.safeParse({ content: "long text content" }).success).toBe(
+        true,
+      );
       expect(result.safeParse({ content: "" }).success).toBe(false);
     });
 
@@ -309,7 +318,9 @@ describe("schema-generator", () => {
       expect(result.shape.active).toBeDefined();
       expect(result.shape.createdAt).toBeUndefined(); // read-only
 
-      expect(result.safeParse({ name: "John", age: 30, active: true }).success).toBe(true);
+      expect(
+        result.safeParse({ name: "John", age: 30, active: true }).success,
+      ).toBe(true);
       expect(result.safeParse({ name: "John" }).success).toBe(true);
       expect(result.safeParse({ name: "" }).success).toBe(false);
     });
@@ -322,10 +333,12 @@ describe("schema-generator", () => {
     beforeEach(() => {
       // Clear all mocks before each test
       jest.clearAllMocks();
-      
+
       // Get the mock from the module
-      const getTableConfig = jest.requireMock("drizzle-orm/pg-core").getTableConfig;
-      
+      const getTableConfig = jest.requireMock(
+        "drizzle-orm/pg-core",
+      ).getTableConfig;
+
       // Set up default mock implementation
       getTableConfig.mockImplementation((table) => {
         if (table === mockTable) {
@@ -416,7 +429,7 @@ describe("schema-generator", () => {
             ],
           };
         }
-        
+
         if (table === mockUsersTable || table?.name === "users") {
           return {
             name: "users",
@@ -424,7 +437,7 @@ describe("schema-generator", () => {
             foreignKeys: [],
           };
         }
-        
+
         return {
           name: "test",
           columns: [],
@@ -446,9 +459,9 @@ describe("schema-generator", () => {
 
       expect(result).toBeDefined();
       expect(Array.isArray(result)).toBe(true);
-      
+
       // Should detect userId as user_id type
-      const userIdColumn = result.find(col => col.name === "userId");
+      const userIdColumn = result.find((col) => col.name === "userId");
       expect(userIdColumn?.type).toBe("user_id");
     });
 
@@ -462,10 +475,13 @@ describe("schema-generator", () => {
     it("should map column types correctly", () => {
       const result = getTableSchema(mockTable as any, "users");
 
-      const columnsByName = result.reduce((acc, col) => {
-        acc[col.name] = col;
-        return acc;
-      }, {} as Record<string, any>);
+      const columnsByName = result.reduce(
+        (acc, col) => {
+          acc[col.name] = col;
+          return acc;
+        },
+        {} as Record<string, any>,
+      );
 
       expect(columnsByName.id?.type).toBe("string");
       expect(columnsByName.name?.type).toBe("string");
@@ -478,17 +494,20 @@ describe("schema-generator", () => {
     it("should detect text type for content columns", () => {
       const result = getTableSchema(mockTable as any, "users");
 
-      const contentColumn = result.find(col => col.name === "content");
+      const contentColumn = result.find((col) => col.name === "content");
       expect(contentColumn?.type).toBe("text");
     });
 
     it("should set isOptional based on column constraints", () => {
       const result = getTableSchema(mockTable as any, "users");
 
-      const columnsByName = result.reduce((acc, col) => {
-        acc[col.name] = col;
-        return acc;
-      }, {} as Record<string, any>);
+      const columnsByName = result.reduce(
+        (acc, col) => {
+          acc[col.name] = col;
+          return acc;
+        },
+        {} as Record<string, any>,
+      );
 
       expect(columnsByName.id?.isOptional).toBe(true); // primary key
       expect(columnsByName.name?.isOptional).toBe(false); // not null
@@ -499,37 +518,39 @@ describe("schema-generator", () => {
     it("should identify primary keys correctly", () => {
       const result = getTableSchema(mockTable as any, "users");
 
-      const idColumn = result.find(col => col.name === "id");
+      const idColumn = result.find((col) => col.name === "id");
       expect(idColumn?.isPrimaryKey).toBe(true);
 
-      const nameColumn = result.find(col => col.name === "name");
+      const nameColumn = result.find((col) => col.name === "name");
       expect(nameColumn?.isPrimaryKey).toBe(false);
     });
 
     it("should identify auto-generated columns correctly", () => {
       const result = getTableSchema(mockTable as any, "users");
 
-      const idColumn = result.find(col => col.name === "id");
+      const idColumn = result.find((col) => col.name === "id");
       expect(idColumn?.isAutoGenerated).toBe(false); // text primary key without default
 
-      const activeColumn = result.find(col => col.name === "active");
+      const activeColumn = result.find((col) => col.name === "active");
       expect(activeColumn?.isAutoGenerated).toBe(false); // has default but not primary key
     });
 
     it("should handle enum columns with enumValues", () => {
       const result = getTableSchema(mockTable as any, "users");
 
-      const statusColumn = result.find(col => col.name === "status");
+      const statusColumn = result.find((col) => col.name === "status");
       expect(statusColumn?.type).toBe("enum");
       expect(statusColumn?.enumValues).toEqual(["active", "inactive"]);
     });
 
     it("should handle unknown column types with fallback", () => {
       const unknownTypeTable = { name: "unknown_table" };
-      
+
       // Get the mock from the module
-      const getTableConfig = jest.requireMock("drizzle-orm/pg-core").getTableConfig;
-      
+      const getTableConfig = jest.requireMock(
+        "drizzle-orm/pg-core",
+      ).getTableConfig;
+
       // Mock getTableConfig to return unknown type
       getTableConfig.mockReturnValue({
         name: "unknown_table",
@@ -548,7 +569,7 @@ describe("schema-generator", () => {
 
       const result = getTableSchema(unknownTypeTable as any, "users");
 
-      const unknownColumn = result.find(col => col.name === "unknown_field");
+      const unknownColumn = result.find((col) => col.name === "unknown_field");
       expect(unknownColumn?.type).toBe("string"); // fallback to string
     });
 
@@ -556,16 +577,18 @@ describe("schema-generator", () => {
       const result = getTableSchema(mockTable as any, "sessions");
 
       // The userId column should be detected as user_id type due to foreign key
-      const userIdColumn = result.find(col => col.name === "userId");
+      const userIdColumn = result.find((col) => col.name === "userId");
       expect(userIdColumn?.type).toBe("user_id");
     });
 
     it("should handle missing admin config", () => {
       const unknownTable = { name: "unknown_table" };
-      
+
       // Get the mock from the module
-      const getTableConfig = jest.requireMock("drizzle-orm/pg-core").getTableConfig;
-      
+      const getTableConfig = jest.requireMock(
+        "drizzle-orm/pg-core",
+      ).getTableConfig;
+
       getTableConfig.mockReturnValue({
         name: "unknown_table",
         columns: [

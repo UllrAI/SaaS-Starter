@@ -29,14 +29,16 @@ jest.mock("@/lib/auth/server", () => ({
   },
 }));
 
-const mockCreateCustomerPortalUrl = jest.fn() as jest.MockedFunction<BillingFunction>;
+const mockCreateCustomerPortalUrl =
+  jest.fn() as jest.MockedFunction<BillingFunction>;
 jest.mock("@/lib/billing", () => ({
   billing: {
     createCustomerPortalUrl: mockCreateCustomerPortalUrl,
   },
 }));
 
-const mockGetUserSubscription = jest.fn() as jest.MockedFunction<SubscriptionFunction>;
+const mockGetUserSubscription =
+  jest.fn() as jest.MockedFunction<SubscriptionFunction>;
 jest.mock("@/lib/database/subscription", () => ({
   getUserSubscription: mockGetUserSubscription,
 }));
@@ -53,10 +55,15 @@ describe("Billing Portal API", () => {
 
   const createMockRequest = () => {
     return {
-      headers: { get: () => '', has: () => false, set: () => {}, entries: () => [] },
+      headers: {
+        get: () => "",
+        has: () => false,
+        set: () => {},
+        entries: () => [],
+      },
       cookies: { get: () => null, has: () => false },
-      nextUrl: { pathname: '/api/billing/portal' },
-      url: 'http://localhost:3000/api/billing/portal',
+      nextUrl: { pathname: "/api/billing/portal" },
+      url: "http://localhost:3000/api/billing/portal",
     } as unknown as NextRequest;
   };
 
@@ -71,26 +78,26 @@ describe("Billing Portal API", () => {
   describe("GET /api/billing/portal", () => {
     it("should return 401 when user is not authenticated", async () => {
       mockGetSession.mockResolvedValue(null);
-      
+
       const { GET } = await import("./route");
       const request = createMockRequest();
-      
+
       const response = await GET(request);
       const data = await response.json();
-      
+
       expect(response.status).toBe(401);
       expect(data.error).toBe("Unauthorized");
     });
 
     it("should return 401 when session exists but user is null", async () => {
       mockGetSession.mockResolvedValue({ user: null });
-      
+
       const { GET } = await import("./route");
       const request = createMockRequest();
-      
+
       const response = await GET(request);
       const data = await response.json();
-      
+
       expect(response.status).toBe(401);
       expect(data.error).toBe("Unauthorized");
     });
@@ -98,13 +105,13 @@ describe("Billing Portal API", () => {
     it("should return 404 when user has no subscription", async () => {
       mockGetSession.mockResolvedValue(mockSession);
       mockGetUserSubscription.mockResolvedValue(null);
-      
+
       const { GET } = await import("./route");
       const request = createMockRequest();
-      
+
       const response = await GET(request);
       const data = await response.json();
-      
+
       expect(response.status).toBe(404);
       expect(data.error).toBe("No active subscription found for this user.");
     });
@@ -115,13 +122,13 @@ describe("Billing Portal API", () => {
         customerId: null,
         status: "active",
       });
-      
+
       const { GET } = await import("./route");
       const request = createMockRequest();
-      
+
       const response = await GET(request);
       const data = await response.json();
-      
+
       expect(response.status).toBe(404);
       expect(data.error).toBe("No active subscription found for this user.");
     });
@@ -132,13 +139,13 @@ describe("Billing Portal API", () => {
         customerId: "",
         status: "active",
       });
-      
+
       const { GET } = await import("./route");
       const request = createMockRequest();
-      
+
       const response = await GET(request);
       const data = await response.json();
-      
+
       expect(response.status).toBe(404);
       expect(data.error).toBe("No active subscription found for this user.");
     });
@@ -152,13 +159,13 @@ describe("Billing Portal API", () => {
       mockCreateCustomerPortalUrl.mockResolvedValue({
         portalUrl: "https://portal.example.com",
       });
-      
+
       const { GET } = await import("./route");
       const request = createMockRequest();
-      
+
       const response = await GET(request);
       const data = await response.json();
-      
+
       expect(response.status).toBe(200);
       expect(data.portalUrl).toBe("https://portal.example.com");
       expect(mockCreateCustomerPortalUrl).toHaveBeenCalledWith("cus-123");
@@ -166,13 +173,13 @@ describe("Billing Portal API", () => {
 
     it("should handle auth.api.getSession failure", async () => {
       mockGetSession.mockRejectedValue(new Error("Auth service unavailable"));
-      
+
       const { GET } = await import("./route");
       const request = createMockRequest();
-      
+
       const response = await GET(request);
       const data = await response.json();
-      
+
       expect(response.status).toBe(500);
       expect(data.error).toBe("Auth service unavailable");
     });
@@ -180,13 +187,13 @@ describe("Billing Portal API", () => {
     it("should handle getUserSubscription failure", async () => {
       mockGetSession.mockResolvedValue(mockSession);
       mockGetUserSubscription.mockRejectedValue(new Error("Database error"));
-      
+
       const { GET } = await import("./route");
       const request = createMockRequest();
-      
+
       const response = await GET(request);
       const data = await response.json();
-      
+
       expect(response.status).toBe(500);
       expect(data.error).toBe("Database error");
     });
@@ -197,14 +204,16 @@ describe("Billing Portal API", () => {
         customerId: "cus-123",
         status: "active",
       });
-      mockCreateCustomerPortalUrl.mockRejectedValue(new Error("Billing service error"));
-      
+      mockCreateCustomerPortalUrl.mockRejectedValue(
+        new Error("Billing service error"),
+      );
+
       const { GET } = await import("./route");
       const request = createMockRequest();
-      
+
       const response = await GET(request);
       const data = await response.json();
-      
+
       expect(response.status).toBe(500);
       expect(data.error).toBe("Billing service error");
     });
@@ -216,13 +225,13 @@ describe("Billing Portal API", () => {
         status: "active",
       });
       mockCreateCustomerPortalUrl.mockRejectedValue("String error");
-      
+
       const { GET } = await import("./route");
       const request = createMockRequest();
-      
+
       const response = await GET(request);
       const data = await response.json();
-      
+
       expect(response.status).toBe(500);
       expect(data.error).toBe("Internal Server Error");
     });
@@ -236,12 +245,12 @@ describe("Billing Portal API", () => {
       mockCreateCustomerPortalUrl.mockResolvedValue({
         portalUrl: "https://portal.example.com",
       });
-      
+
       const { GET } = await import("./route");
       const request = createMockRequest();
-      
+
       await GET(request);
-      
+
       expect(mockGetUserSubscription).toHaveBeenCalledWith("user-123");
     });
 
@@ -254,12 +263,12 @@ describe("Billing Portal API", () => {
       mockCreateCustomerPortalUrl.mockResolvedValue({
         portalUrl: "https://portal.example.com",
       });
-      
+
       const { GET } = await import("./route");
       const request = createMockRequest();
-      
+
       await GET(request);
-      
+
       expect(mockGetSession).toHaveBeenCalledWith({ headers: request.headers });
     });
   });

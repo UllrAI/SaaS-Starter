@@ -1,4 +1,11 @@
-import { describe, it, expect, jest, beforeEach, afterEach } from "@jest/globals";
+import {
+  describe,
+  it,
+  expect,
+  jest,
+  beforeEach,
+  afterEach,
+} from "@jest/globals";
 import type { NextRequest } from "next/server";
 
 // Mock NextResponse
@@ -42,14 +49,14 @@ const originalEnv = process.env;
 describe("Billing Checkout API", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    
+
     // Setup mock implementations
     mockJson.mockImplementation((data: any, init?: { status?: number }) => ({
       json: () => Promise.resolve(data),
       status: init?.status || 200,
       ok: (init?.status || 200) >= 200 && (init?.status || 200) < 300,
     }));
-    
+
     process.env = {
       ...originalEnv,
       NEXT_PUBLIC_APP_URL: "https://example.com",
@@ -62,11 +69,16 @@ describe("Billing Checkout API", () => {
 
   const createMockRequest = (body: any) => {
     return {
-      headers: { get: () => '', has: () => false, set: () => {}, entries: () => [] },
+      headers: {
+        get: () => "",
+        has: () => false,
+        set: () => {},
+        entries: () => [],
+      },
       json: jest.fn().mockResolvedValue(body),
       cookies: { get: () => null, has: () => false },
-      nextUrl: { pathname: '/api/billing/checkout' },
-      url: 'http://localhost:3000/api/billing/checkout',
+      nextUrl: { pathname: "/api/billing/checkout" },
+      url: "http://localhost:3000/api/billing/checkout",
     };
   };
 
@@ -81,28 +93,28 @@ describe("Billing Checkout API", () => {
   describe("POST /api/billing/checkout", () => {
     it("should return 401 when user is not authenticated", async () => {
       mockGetSession.mockResolvedValue(null);
-      
+
       const { POST } = await import("./route");
       const request = createMockRequest({});
-      
+
       const response = await POST(request);
       const data = await response.json();
-      
+
       expect(response.status).toBe(401);
       expect(data.error).toBe("Unauthorized");
     });
 
     it("should return 400 for invalid request body", async () => {
       mockGetSession.mockResolvedValue(mockSession);
-      
+
       const { POST } = await import("./route");
       const request = createMockRequest({
         invalidField: "invalid",
       });
-      
+
       const response = await POST(request);
       const data = await response.json();
-      
+
       expect(response.status).toBe(400);
       expect(data.error).toBe("Invalid request body");
       expect(data.details).toBeDefined();
@@ -117,17 +129,17 @@ describe("Billing Checkout API", () => {
       mockCreateCustomerPortalUrl.mockResolvedValue({
         portalUrl: "https://portal.example.com",
       });
-      
+
       const { POST } = await import("./route");
       const request = createMockRequest({
         tierId: "tier-1",
         paymentMode: "subscription",
         billingCycle: "monthly",
       });
-      
+
       const response = await POST(request);
       const data = await response.json();
-      
+
       expect(response.status).toBe(409);
       expect(data.error).toContain("already have an active subscription");
       expect(data.managementUrl).toBe("https://portal.example.com");
@@ -142,17 +154,17 @@ describe("Billing Checkout API", () => {
       mockCreateCustomerPortalUrl.mockResolvedValue({
         portalUrl: "https://portal.example.com",
       });
-      
+
       const { POST } = await import("./route");
       const request = createMockRequest({
         tierId: "tier-1",
         paymentMode: "subscription",
         billingCycle: "monthly",
       });
-      
+
       const response = await POST(request);
       const data = await response.json();
-      
+
       expect(response.status).toBe(409);
       expect(data.managementUrl).toBe("https://portal.example.com");
     });
@@ -166,17 +178,17 @@ describe("Billing Checkout API", () => {
       mockCreateCheckoutSession.mockResolvedValue({
         checkoutUrl: "https://checkout.example.com",
       });
-      
+
       const { POST } = await import("./route");
       const request = createMockRequest({
         tierId: "tier-1",
         paymentMode: "subscription",
         billingCycle: "monthly",
       });
-      
+
       const response = await POST(request);
       const data = await response.json();
-      
+
       expect(response.status).toBe(200);
       expect(data.checkoutUrl).toBe("https://checkout.example.com");
     });
@@ -190,16 +202,16 @@ describe("Billing Checkout API", () => {
       mockCreateCheckoutSession.mockResolvedValue({
         checkoutUrl: "https://checkout.example.com",
       });
-      
+
       const { POST } = await import("./route");
       const request = createMockRequest({
         tierId: "tier-1",
         paymentMode: "one_time",
       });
-      
+
       const response = await POST(request);
       const data = await response.json();
-      
+
       expect(response.status).toBe(200);
       expect(data.checkoutUrl).toBe("https://checkout.example.com");
       expect(mockGetUserSubscription).not.toHaveBeenCalled();
@@ -211,16 +223,16 @@ describe("Billing Checkout API", () => {
       mockCreateCheckoutSession.mockResolvedValue({
         checkoutUrl: "https://checkout.example.com",
       });
-      
+
       const { POST } = await import("./route");
       const request = createMockRequest({
         tierId: "tier-premium",
         paymentMode: "subscription",
         billingCycle: "yearly",
       });
-      
+
       const response = await POST(request);
-      
+
       expect(mockCreateCheckoutSession).toHaveBeenCalledWith({
         userId: "user-123",
         userEmail: "test@example.com",
@@ -232,7 +244,7 @@ describe("Billing Checkout API", () => {
         cancelUrl: "https://example.com/payment-status?status=cancelled",
         failureUrl: "https://example.com/payment-status?status=failed",
       });
-      
+
       const data = await response.json();
       expect(response.status).toBe(200);
       expect(data.checkoutUrl).toBe("https://checkout.example.com");
@@ -244,20 +256,20 @@ describe("Billing Checkout API", () => {
       mockCreateCheckoutSession.mockResolvedValue({
         checkoutUrl: "https://checkout.example.com",
       });
-      
+
       const { POST } = await import("./route");
       const request = createMockRequest({
         tierId: "tier-1",
         paymentMode: "subscription",
         // billingCycle omitted
       });
-      
+
       const response = await POST(request);
-      
+
       expect(mockCreateCheckoutSession).toHaveBeenCalledWith(
         expect.objectContaining({
           billingCycle: undefined,
-        })
+        }),
       );
       expect(response.status).toBe(200);
     });
@@ -266,17 +278,17 @@ describe("Billing Checkout API", () => {
       process.env.NEXT_PUBLIC_APP_URL = "";
       mockGetSession.mockResolvedValue(mockSession);
       mockGetUserSubscription.mockResolvedValue(null);
-      
+
       const { POST } = await import("./route");
       const request = createMockRequest({
         tierId: "tier-1",
         paymentMode: "subscription",
         billingCycle: "monthly",
       });
-      
+
       const response = await POST(request);
       const data = await response.json();
-      
+
       expect(response.status).toBe(500);
       expect(data.error).toContain("Failed to create checkout session");
     });
@@ -285,50 +297,55 @@ describe("Billing Checkout API", () => {
       mockGetSession.mockResolvedValue(mockSession);
       mockGetUserSubscription.mockResolvedValue(null);
       mockCreateCheckoutSession.mockRejectedValue(new Error("Billing error"));
-      
+
       const { POST } = await import("./route");
       const request = createMockRequest({
         tierId: "tier-1",
         paymentMode: "subscription",
         billingCycle: "monthly",
       });
-      
+
       const response = await POST(request);
       const data = await response.json();
-      
+
       expect(response.status).toBe(500);
       expect(data.error).toContain("Failed to create checkout session");
     });
 
     it("should handle auth.api.getSession failure", async () => {
       mockGetSession.mockRejectedValue(new Error("Auth error"));
-      
+
       const { POST } = await import("./route");
       const request = createMockRequest({});
-      
+
       const response = await POST(request);
       const data = await response.json();
-      
+
       expect(response.status).toBe(500);
       expect(data.error).toContain("Failed to create checkout session");
     });
 
     it("should handle request.json() failure", async () => {
       mockGetSession.mockResolvedValue(mockSession);
-      
+
       const request = {
-        headers: { get: () => '', has: () => false, set: () => {}, entries: () => [] },
+        headers: {
+          get: () => "",
+          has: () => false,
+          set: () => {},
+          entries: () => [],
+        },
         json: jest.fn().mockRejectedValue(new Error("Invalid JSON")) as any,
         cookies: { get: () => null, has: () => false },
-        nextUrl: { pathname: '/api/billing/checkout' },
-        url: 'http://localhost:3000/api/billing/checkout',
+        nextUrl: { pathname: "/api/billing/checkout" },
+        url: "http://localhost:3000/api/billing/checkout",
       } as any as NextRequest;
-      
+
       const { POST } = await import("./route");
-      
+
       const response = await POST(request);
       const data = await response.json();
-      
+
       expect(response.status).toBe(500);
       expect(data.error).toContain("Failed to create checkout session");
     });
@@ -339,61 +356,61 @@ describe("Billing Checkout API", () => {
       mockCreateCheckoutSession.mockResolvedValue({
         checkoutUrl: "https://checkout.example.com",
       });
-      
+
       const { POST } = await import("./route");
-      
+
       // Test monthly billing cycle
       const monthlyRequest = createMockRequest({
         tierId: "tier-1",
         paymentMode: "subscription",
         billingCycle: "monthly",
       });
-      
+
       let response = await POST(monthlyRequest);
       expect(response.status).toBe(200);
-      
+
       // Test yearly billing cycle
       const yearlyRequest = createMockRequest({
         tierId: "tier-1",
         paymentMode: "subscription",
         billingCycle: "yearly",
       });
-      
+
       response = await POST(yearlyRequest);
       expect(response.status).toBe(200);
-      
+
       // Test one_time payment mode
       const oneTimeRequest = createMockRequest({
         tierId: "tier-1",
         paymentMode: "one_time",
       });
-      
+
       response = await POST(oneTimeRequest);
       expect(response.status).toBe(200);
     });
 
     it("should validate checkoutSchema with invalid enum values", async () => {
       mockGetSession.mockResolvedValue(mockSession);
-      
+
       const { POST } = await import("./route");
-      
+
       // Test invalid payment mode
       const invalidModeRequest = createMockRequest({
         tierId: "tier-1",
         paymentMode: "invalid_mode",
         billingCycle: "monthly",
       });
-      
+
       let response = await POST(invalidModeRequest);
       expect(response.status).toBe(400);
-      
+
       // Test invalid billing cycle
       const invalidCycleRequest = createMockRequest({
         tierId: "tier-1",
         paymentMode: "subscription",
         billingCycle: "invalid_cycle",
       });
-      
+
       response = await POST(invalidCycleRequest);
       expect(response.status).toBe(400);
     });

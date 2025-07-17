@@ -93,7 +93,7 @@ describe("Auth Client", () => {
     // Check that all expected exports exist
     const expectedExports = [
       "signIn",
-      "signOut", 
+      "signOut",
       "signUp",
       "revokeSession",
       "updateUser",
@@ -115,9 +115,11 @@ describe("Auth Client", () => {
       "authClient",
     ];
 
-    expectedExports.forEach(exportName => {
+    expectedExports.forEach((exportName) => {
       expect(clientModule).toHaveProperty(exportName);
-      expect(clientModule[exportName as keyof typeof clientModule]).toBeDefined();
+      expect(
+        clientModule[exportName as keyof typeof clientModule],
+      ).toBeDefined();
     });
   });
 
@@ -201,14 +203,16 @@ describe("Auth Client", () => {
       expect(mockCreateAuthClient).toHaveBeenCalledWith(
         expect.objectContaining({
           baseURL: "https://example.com",
-        })
+        }),
       );
     });
 
     it("should include required plugins", async () => {
       await import("./client");
 
-      const callArgs = mockCreateAuthClient.mock.calls[0][0] as { plugins: unknown[] };
+      const callArgs = mockCreateAuthClient.mock.calls[0][0] as {
+        plugins: unknown[];
+      };
       expect(callArgs.plugins).toHaveLength(2);
       expect(mockMagicLinkClient).toHaveBeenCalled();
       expect(mockInferAdditionalFields).toHaveBeenCalled();

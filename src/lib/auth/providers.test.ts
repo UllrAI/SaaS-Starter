@@ -1,4 +1,11 @@
-import { describe, it, expect, jest, beforeEach, beforeAll } from "@jest/globals";
+import {
+  describe,
+  it,
+  expect,
+  jest,
+  beforeEach,
+  beforeAll,
+} from "@jest/globals";
 
 // Mock environment variables
 const mockEnv = {
@@ -39,7 +46,9 @@ describe("Auth Providers", () => {
     });
 
     it("should contain Google provider configuration", () => {
-      const googleConfig = providersModule.providerConfigs.find((config) => config.name === "google");
+      const googleConfig = providersModule.providerConfigs.find(
+        (config) => config.name === "google",
+      );
       expect(googleConfig).toEqual({
         name: "google",
         clientIdKey: "GOOGLE_CLIENT_ID",
@@ -48,7 +57,9 @@ describe("Auth Providers", () => {
     });
 
     it("should contain GitHub provider configuration", () => {
-      const githubConfig = providersModule.providerConfigs.find((config) => config.name === "github");
+      const githubConfig = providersModule.providerConfigs.find(
+        (config) => config.name === "github",
+      );
       expect(githubConfig).toEqual({
         name: "github",
         clientIdKey: "GITHUB_CLIENT_ID",
@@ -57,7 +68,9 @@ describe("Auth Providers", () => {
     });
 
     it("should contain LinkedIn provider configuration", () => {
-      const linkedinConfig = providersModule.providerConfigs.find((config) => config.name === "linkedin");
+      const linkedinConfig = providersModule.providerConfigs.find(
+        (config) => config.name === "linkedin",
+      );
       expect(linkedinConfig).toEqual({
         name: "linkedin",
         clientIdKey: "LINKEDIN_CLIENT_ID",
@@ -66,19 +79,25 @@ describe("Auth Providers", () => {
     });
 
     it("should have unique provider names", () => {
-      const names = providersModule.providerConfigs.map((config) => config.name);
+      const names = providersModule.providerConfigs.map(
+        (config) => config.name,
+      );
       const uniqueNames = [...new Set(names)];
       expect(names).toHaveLength(uniqueNames.length);
     });
 
     it("should have unique client ID keys", () => {
-      const clientIdKeys = providersModule.providerConfigs.map((config) => config.clientIdKey);
+      const clientIdKeys = providersModule.providerConfigs.map(
+        (config) => config.clientIdKey,
+      );
       const uniqueClientIdKeys = [...new Set(clientIdKeys)];
       expect(clientIdKeys).toHaveLength(uniqueClientIdKeys.length);
     });
 
     it("should have unique client secret keys", () => {
-      const clientSecretKeys = providersModule.providerConfigs.map((config) => config.clientSecretKey);
+      const clientSecretKeys = providersModule.providerConfigs.map(
+        (config) => config.clientSecretKey,
+      );
       const uniqueClientSecretKeys = [...new Set(clientSecretKeys)];
       expect(clientSecretKeys).toHaveLength(uniqueClientSecretKeys.length);
     });
@@ -219,9 +238,11 @@ describe("Auth Providers", () => {
 
     it("should handle all valid provider types", () => {
       const providers: SocialProvider[] = ["google", "github", "linkedin"];
-      
-      providers.forEach(provider => {
-        expect(typeof providersModule.isSocialProviderAvailable(provider)).toBe("boolean");
+
+      providers.forEach((provider) => {
+        expect(typeof providersModule.isSocialProviderAvailable(provider)).toBe(
+          "boolean",
+        );
       });
     });
   });
@@ -288,8 +309,10 @@ describe("Auth Providers", () => {
 
       const availableProviders = providersModule.getAvailableSocialProviders();
       const count = providersModule.getAvailableSocialProvidersCount();
-      const isGoogleAvailable = providersModule.isSocialProviderAvailable("google");
-      const isGithubAvailable = providersModule.isSocialProviderAvailable("github");
+      const isGoogleAvailable =
+        providersModule.isSocialProviderAvailable("google");
+      const isGithubAvailable =
+        providersModule.isSocialProviderAvailable("github");
 
       expect(availableProviders).toEqual(["google"]);
       expect(count).toBe(1);
@@ -322,9 +345,11 @@ describe("Auth Providers", () => {
   describe("Type Safety", () => {
     it("should only accept valid SocialProvider types", () => {
       const validProviders: SocialProvider[] = ["google", "github", "linkedin"];
-      
-      validProviders.forEach(provider => {
-        expect(() => providersModule.isSocialProviderAvailable(provider)).not.toThrow();
+
+      validProviders.forEach((provider) => {
+        expect(() =>
+          providersModule.isSocialProviderAvailable(provider),
+        ).not.toThrow();
       });
     });
 

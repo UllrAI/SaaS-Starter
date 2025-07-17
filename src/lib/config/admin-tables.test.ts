@@ -1,4 +1,11 @@
-import { describe, it, expect, jest, beforeEach, afterEach } from "@jest/globals";
+import {
+  describe,
+  it,
+  expect,
+  jest,
+  beforeEach,
+  afterEach,
+} from "@jest/globals";
 
 // Mock database schema
 const mockSchema = {
@@ -76,15 +83,15 @@ describe("Admin Tables Configuration", () => {
     it("should have all expected keys", () => {
       const expectedKeys = [
         "uploads",
-        "sessions", 
+        "sessions",
         "payments",
         "subscriptions",
         "users",
-        "verifications"
+        "verifications",
       ];
       const actualKeys = Object.keys(enabledTablesMap);
-      
-      expectedKeys.forEach(key => {
+
+      expectedKeys.forEach((key) => {
         expect(actualKeys).toContain(key);
       });
     });
@@ -102,7 +109,7 @@ describe("Admin Tables Configuration", () => {
       // Test that the object has the readonly structure
       expect(enabledTablesMap).toBeDefined();
       expect(typeof enabledTablesMap).toBe("object");
-      
+
       // The const assertion should make it readonly at compile time
       const keys = Object.keys(enabledTablesMap);
       expect(keys.length).toBeGreaterThan(0);
@@ -115,13 +122,13 @@ describe("Admin Tables Configuration", () => {
       const validKeys: EnabledTableKeys[] = [
         "uploads",
         "sessions",
-        "payments", 
+        "payments",
         "subscriptions",
         "users",
-        "verifications"
+        "verifications",
       ];
 
-      validKeys.forEach(key => {
+      validKeys.forEach((key) => {
         expect(enabledTablesMap[key]).toBeDefined();
       });
     });
@@ -157,8 +164,8 @@ describe("Admin Tables Configuration", () => {
     it("should maintain consistent naming convention", () => {
       // Verify that table names follow the expected pattern
       const tableNames = Object.keys(enabledTablesMap);
-      
-      tableNames.forEach(name => {
+
+      tableNames.forEach((name) => {
         expect(typeof name).toBe("string");
         expect(name.length).toBeGreaterThan(0);
         expect(name).toMatch(/^[a-z][a-z]*s?$/); // lowercase letters, optionally plural
@@ -167,7 +174,7 @@ describe("Admin Tables Configuration", () => {
 
     it("should have proper table object structure", () => {
       // Verify that each table object has expected properties
-      Object.values(enabledTablesMap).forEach(table => {
+      Object.values(enabledTablesMap).forEach((table) => {
         expect(table).toBeDefined();
         expect(typeof table).toBe("object");
         expect(table).not.toBeNull();
@@ -180,34 +187,27 @@ describe("Admin Tables Configuration", () => {
       const coreBusinessTables = [
         "uploads",
         "payments",
-        "subscriptions", 
-        "users"
+        "subscriptions",
+        "users",
       ];
 
-      coreBusinessTables.forEach(tableName => {
+      coreBusinessTables.forEach((tableName) => {
         expect(enabledTablesMap).toHaveProperty(tableName);
       });
     });
 
     it("should include authentication-related tables", () => {
-      const authTables = [
-        "sessions",
-        "verifications",
-        "users"
-      ];
+      const authTables = ["sessions", "verifications", "users"];
 
-      authTables.forEach(tableName => {
+      authTables.forEach((tableName) => {
         expect(enabledTablesMap).toHaveProperty(tableName);
       });
     });
 
     it("should include billing-related tables", () => {
-      const billingTables = [
-        "payments",
-        "subscriptions"
-      ];
+      const billingTables = ["payments", "subscriptions"];
 
-      billingTables.forEach(tableName => {
+      billingTables.forEach((tableName) => {
         expect(enabledTablesMap).toHaveProperty(tableName);
       });
     });
@@ -217,10 +217,10 @@ describe("Admin Tables Configuration", () => {
     it("should be enumerable", () => {
       const keys = Object.keys(enabledTablesMap);
       expect(keys.length).toBeGreaterThan(0);
-      
+
       const values = Object.values(enabledTablesMap);
       expect(values.length).toBeGreaterThan(0);
-      
+
       const entries = Object.entries(enabledTablesMap);
       expect(entries.length).toBeGreaterThan(0);
     });
@@ -237,9 +237,15 @@ describe("Admin Tables Configuration", () => {
     });
 
     it("should support Object.hasOwnProperty", () => {
-      expect(Object.prototype.hasOwnProperty.call(enabledTablesMap, "uploads")).toBe(true);
-      expect(Object.prototype.hasOwnProperty.call(enabledTablesMap, "sessions")).toBe(true);
-      expect(Object.prototype.hasOwnProperty.call(enabledTablesMap, "nonexistent")).toBe(false);
+      expect(
+        Object.prototype.hasOwnProperty.call(enabledTablesMap, "uploads"),
+      ).toBe(true);
+      expect(
+        Object.prototype.hasOwnProperty.call(enabledTablesMap, "sessions"),
+      ).toBe(true);
+      expect(
+        Object.prototype.hasOwnProperty.call(enabledTablesMap, "nonexistent"),
+      ).toBe(false);
     });
 
     it("should support 'in' operator", () => {
@@ -274,9 +280,13 @@ describe("Admin Tables Configuration", () => {
     });
 
     it("should work with computed property access", () => {
-      const tableNames: EnabledTableKeys[] = ["uploads", "sessions", "payments"];
-      
-      tableNames.forEach(tableName => {
+      const tableNames: EnabledTableKeys[] = [
+        "uploads",
+        "sessions",
+        "payments",
+      ];
+
+      tableNames.forEach((tableName) => {
         const table = enabledTablesMap[tableName];
         expect(table).toBeDefined();
         expect(typeof table).toBe("object");
@@ -289,9 +299,9 @@ describe("Admin Tables Configuration", () => {
       // The configuration file should map URL path names to Drizzle table objects
       expect(enabledTablesMap).toBeDefined();
       expect(typeof enabledTablesMap).toBe("object");
-      
+
       // Each key should be a valid URL path segment
-      Object.keys(enabledTablesMap).forEach(key => {
+      Object.keys(enabledTablesMap).forEach((key) => {
         expect(key).toMatch(/^[a-z][a-z]*s?$/); // Valid URL segment format
       });
     });
@@ -317,8 +327,8 @@ describe("Admin Tables Configuration", () => {
     it("should maintain type constraints", () => {
       // Verify that the type system enforces correct usage
       const tableKeys = Object.keys(enabledTablesMap) as EnabledTableKeys[];
-      
-      tableKeys.forEach(key => {
+
+      tableKeys.forEach((key) => {
         const table: EnabledTable = enabledTablesMap[key];
         expect(table).toBeDefined();
       });
@@ -329,15 +339,15 @@ describe("Admin Tables Configuration", () => {
     it("should provide efficient table lookup", () => {
       // Test that table lookup is efficient
       const startTime = Date.now();
-      
+
       for (let i = 0; i < 100; i++) {
         const table = enabledTablesMap.uploads;
         expect(table).toBeDefined();
       }
-      
+
       const endTime = Date.now();
       const duration = endTime - startTime;
-      
+
       // Should complete 100 lookups very quickly (less than 100ms)
       expect(duration).toBeLessThan(100);
     });
@@ -347,7 +357,7 @@ describe("Admin Tables Configuration", () => {
       const table1 = enabledTablesMap.uploads;
       const table2 = enabledTablesMap.uploads;
       const table3 = enabledTablesMap.uploads;
-      
+
       expect(table1).toBe(table2);
       expect(table2).toBe(table3);
       expect(table1).toBe(table3);

@@ -11,15 +11,15 @@ const config = {
     "^@/(.*)$": "<rootDir>/src/$1",
   },
   setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
-  
+
   // Transform patterns for external modules
   transformIgnorePatterns: [
-    "node_modules/(?!(@t3-oss/env-nextjs|@t3-oss/env-core|postgres|better-auth|better-call|uncrypto|clsx|class-variance-authority|jose|standardwebhooks|next-safe-action|nanostores)/)"
+    "node_modules/(?!(@t3-oss/env-nextjs|@t3-oss/env-core|postgres|better-auth|better-call|uncrypto|clsx|class-variance-authority|jose|standardwebhooks|next-safe-action|nanostores)/)",
   ],
-  
+
   // Coverage configuration
   coverageReporters: ["text", "lcov", "html"],
-  
+
   // Exclude UI-only files and configuration files from coverage
   coveragePathIgnorePatterns: [
     // System and build files
@@ -27,7 +27,7 @@ const config = {
     "\\.next/",
     "coverage/",
     "\\.claude/",
-    
+
     // Configuration files
     "jest\\.config\\.js",
     "jest\\.setup\\.ts",
@@ -36,39 +36,39 @@ const config = {
     "postcss\\.config\\.js",
     "drizzle\\.config\\.ts",
     "keystatic\\.config\\.ts",
-    
+
     // Test files
     "\\.test\\.(ts|tsx)$",
     "\\.spec\\.(ts|tsx)$",
-    
+
     // Type definitions and utilities
     "types/",
     "scripts/",
     "database/config",
-    
+
     // Static files
     "app/robots\\.ts",
     "app/sitemap\\.ts",
-    
+
     // Email templates (UI-only)
     "emails/",
-    
+
     // Pure UI components (shadcn/ui and similar)
     "components/ui/",
-    
+
     // Theme and styling components
     "providers/theme-provider\\.tsx",
     "components/mode-toggle\\.tsx",
-    
+
     // Simple utility hooks with no business logic
     "hooks/use-mobile\\.tsx",
-    
+
     // Marketing and static page components
     "components/homepage/",
     "components/blog/",
     "components/logo\\.tsx",
     "components/cookie-consent\\.tsx",
-    
+
     // Complex UI components with minimal business logic
     "components/payment-options\\.tsx",
     "components/admin/StatCard\\.tsx",
@@ -78,21 +78,21 @@ const config = {
     "components/auth/auth-form-base\\.tsx",
     "components/auth/link-sent-card\\.tsx",
     "components/auth/social-login-buttons\\.tsx",
-    
+
     // Next.js App Router pages (UI-only)
-    "app/\\(pages\\)/",           // Marketing pages
-    "app/\\(auth\\)/",            // Auth pages  
+    "app/\\(pages\\)/", // Marketing pages
+    "app/\\(auth\\)/", // Auth pages
     "app/dashboard/.*/_components/(?!session-guard)", // Dashboard UI components (except session-guard)
-    "app/dashboard/.*/page\\.tsx",   // Dashboard pages
-    "app/keystatic/",            // CMS pages
-    
+    "app/dashboard/.*/page\\.tsx", // Dashboard pages
+    "app/keystatic/", // CMS pages
+
     // Layout files
     "app/.*/layout\\.tsx",
     "app/loading\\.tsx",
     "app/not-found\\.tsx",
     "app/layout\\.tsx",
   ],
-  
+
   // Collect coverage from all source files
   collectCoverageFrom: [
     "**/*.{ts,tsx}",

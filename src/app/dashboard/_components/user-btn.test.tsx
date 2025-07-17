@@ -5,12 +5,12 @@ import path from "path";
 import React, { useState } from "react";
 
 // Test component that mimics UserButton behavior without external dependencies
-const TestUserButton = ({ 
-  session, 
-  isPending, 
-  sidebarOpen = true, 
+const TestUserButton = ({
+  session,
+  isPending,
+  sidebarOpen = true,
   onLogout = jest.fn(),
-  mockAuthClient = { signOut: jest.fn() }
+  mockAuthClient = { signOut: jest.fn() },
 }: {
   session: any;
   isPending: boolean;
@@ -46,12 +46,23 @@ const TestUserButton = ({
   if (isPending) {
     return (
       <div data-testid="user-button-loading">
-        <div className={`flex items-center gap-2 p-2 ${!sidebarOpen ? "justify-center" : ""}`}>
-          <div data-testid="avatar-skeleton" className="h-8 w-8 rounded-full bg-gray-200" />
+        <div
+          className={`flex items-center gap-2 p-2 ${!sidebarOpen ? "justify-center" : ""}`}
+        >
+          <div
+            data-testid="avatar-skeleton"
+            className="h-8 w-8 rounded-full bg-gray-200"
+          />
           {sidebarOpen && (
             <div className="flex-1">
-              <div data-testid="name-skeleton" className="mb-1 h-4 w-24 bg-gray-200" />
-              <div data-testid="email-skeleton" className="h-3 w-32 bg-gray-200" />
+              <div
+                data-testid="name-skeleton"
+                className="mb-1 h-4 w-24 bg-gray-200"
+              />
+              <div
+                data-testid="email-skeleton"
+                className="h-3 w-32 bg-gray-200"
+              />
             </div>
           )}
         </div>
@@ -61,11 +72,11 @@ const TestUserButton = ({
 
   return (
     <div data-testid="user-button">
-      <button 
+      <button
         data-testid="user-menu-trigger"
         className={`flex items-center gap-2 ${!sidebarOpen ? "h-8 w-8 justify-center p-0" : ""}`}
       >
-        <div 
+        <div
           data-testid="user-avatar"
           className={`rounded-full ${sidebarOpen ? "h-8 w-8" : "h-6 w-6"}`}
         >
@@ -81,11 +92,13 @@ const TestUserButton = ({
                 {session?.user?.email}
               </span>
             </div>
-            <div data-testid="chevron-icon" className="ml-auto size-4">⌄</div>
+            <div data-testid="chevron-icon" className="ml-auto size-4">
+              ⌄
+            </div>
           </>
         )}
       </button>
-      
+
       <div data-testid="dropdown-menu">
         <div data-testid="dropdown-header">
           <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
@@ -93,7 +106,10 @@ const TestUserButton = ({
               {session?.user?.name?.slice(0, 1).toUpperCase() || "U"}
             </div>
             <div className="grid flex-1 text-left text-sm leading-tight">
-              <span data-testid="dropdown-name" className="truncate font-semibold">
+              <span
+                data-testid="dropdown-name"
+                className="truncate font-semibold"
+              >
                 {session?.user?.name}
               </span>
               <span data-testid="dropdown-email" className="truncate text-xs">
@@ -102,20 +118,22 @@ const TestUserButton = ({
             </div>
           </div>
         </div>
-        
+
         <button data-testid="settings-link" className="cursor-pointer">
           <span data-testid="settings-icon">⚙</span>
           Settings
         </button>
-        
-        <button 
-          data-testid="logout-button" 
+
+        <button
+          data-testid="logout-button"
           className="cursor-pointer"
           onClick={handleLogout}
         >
           {loggingOut ? (
             <div className="flex items-center gap-2">
-              <span data-testid="loading-spinner" className="animate-spin">⟳</span>
+              <span data-testid="loading-spinner" className="animate-spin">
+                ⟳
+              </span>
               <span>Log Out</span>
             </div>
           ) : (
@@ -136,18 +154,14 @@ describe("UserButton Component Behavioral Tests", () => {
       id: "123",
       email: "test@example.com",
       name: "Test User",
-      image: "https://example.com/avatar.jpg"
-    }
+      image: "https://example.com/avatar.jpg",
+    },
   };
 
   describe("Loading State", () => {
     it("should render loading skeleton when session is pending", () => {
       render(
-        <TestUserButton 
-          session={null} 
-          isPending={true} 
-          sidebarOpen={true}
-        />
+        <TestUserButton session={null} isPending={true} sidebarOpen={true} />,
       );
 
       expect(screen.getByTestId("user-button-loading")).toBeInTheDocument();
@@ -158,11 +172,7 @@ describe("UserButton Component Behavioral Tests", () => {
 
     it("should render collapsed loading state when sidebar is closed", () => {
       render(
-        <TestUserButton 
-          session={null} 
-          isPending={true} 
-          sidebarOpen={false}
-        />
+        <TestUserButton session={null} isPending={true} sidebarOpen={false} />,
       );
 
       expect(screen.getByTestId("user-button-loading")).toBeInTheDocument();
@@ -175,25 +185,27 @@ describe("UserButton Component Behavioral Tests", () => {
   describe("User Information Display", () => {
     it("should display user information when session is loaded", () => {
       render(
-        <TestUserButton 
-          session={mockSession} 
-          isPending={false} 
+        <TestUserButton
+          session={mockSession}
+          isPending={false}
           sidebarOpen={true}
-        />
+        />,
       );
 
       expect(screen.getByTestId("user-name")).toHaveTextContent("Test User");
-      expect(screen.getByTestId("user-email")).toHaveTextContent("test@example.com");
+      expect(screen.getByTestId("user-email")).toHaveTextContent(
+        "test@example.com",
+      );
       expect(screen.getByTestId("user-avatar")).toHaveTextContent("T");
     });
 
     it("should display only avatar when sidebar is collapsed", () => {
       render(
-        <TestUserButton 
-          session={mockSession} 
-          isPending={false} 
+        <TestUserButton
+          session={mockSession}
+          isPending={false}
           sidebarOpen={false}
-        />
+        />,
       );
 
       expect(screen.getByTestId("user-avatar")).toBeInTheDocument();
@@ -207,21 +219,23 @@ describe("UserButton Component Behavioral Tests", () => {
         user: {
           id: "123",
           email: "test@example.com",
-          name: null
-        }
+          name: null,
+        },
       };
 
       render(
-        <TestUserButton 
-          session={sessionWithoutName} 
-          isPending={false} 
+        <TestUserButton
+          session={sessionWithoutName}
+          isPending={false}
           sidebarOpen={true}
-        />
+        />,
       );
 
       expect(screen.getByTestId("user-avatar")).toHaveTextContent("U");
       expect(screen.getByTestId("user-name")).toHaveTextContent("");
-      expect(screen.getByTestId("user-email")).toHaveTextContent("test@example.com");
+      expect(screen.getByTestId("user-email")).toHaveTextContent(
+        "test@example.com",
+      );
     });
   });
 
@@ -229,24 +243,24 @@ describe("UserButton Component Behavioral Tests", () => {
     it("should handle successful logout", async () => {
       const mockOnLogout = jest.fn();
       const mockAuthClient = {
-        signOut: jest.fn().mockResolvedValue({ error: null })
+        signOut: jest.fn().mockResolvedValue({ error: null }),
       };
 
       render(
-        <TestUserButton 
-          session={mockSession} 
-          isPending={false} 
+        <TestUserButton
+          session={mockSession}
+          isPending={false}
           sidebarOpen={true}
           onLogout={mockOnLogout}
           mockAuthClient={mockAuthClient}
-        />
+        />,
       );
 
       const logoutButton = screen.getByTestId("logout-button");
       fireEvent.click(logoutButton);
 
       expect(screen.getByTestId("loading-spinner")).toBeInTheDocument();
-      
+
       await waitFor(() => {
         expect(mockAuthClient.signOut).toHaveBeenCalledWith({
           fetchOptions: {
@@ -259,18 +273,18 @@ describe("UserButton Component Behavioral Tests", () => {
 
     it("should handle logout error", async () => {
       const mockAuthClient = {
-        signOut: jest.fn().mockResolvedValue({ 
-          error: { message: "Logout failed" } 
-        })
+        signOut: jest.fn().mockResolvedValue({
+          error: { message: "Logout failed" },
+        }),
       };
 
       render(
-        <TestUserButton 
-          session={mockSession} 
-          isPending={false} 
+        <TestUserButton
+          session={mockSession}
+          isPending={false}
           sidebarOpen={true}
           mockAuthClient={mockAuthClient}
-        />
+        />,
       );
 
       const logoutButton = screen.getByTestId("logout-button");
@@ -286,16 +300,20 @@ describe("UserButton Component Behavioral Tests", () => {
 
     it("should show loading state during logout", async () => {
       const mockAuthClient = {
-        signOut: jest.fn().mockImplementation(() => new Promise(resolve => setTimeout(resolve, 100)))
+        signOut: jest
+          .fn()
+          .mockImplementation(
+            () => new Promise((resolve) => setTimeout(resolve, 100)),
+          ),
       };
 
       render(
-        <TestUserButton 
-          session={mockSession} 
-          isPending={false} 
+        <TestUserButton
+          session={mockSession}
+          isPending={false}
           sidebarOpen={true}
           mockAuthClient={mockAuthClient}
-        />
+        />,
       );
 
       const logoutButton = screen.getByTestId("logout-button");
@@ -309,11 +327,11 @@ describe("UserButton Component Behavioral Tests", () => {
   describe("Avatar Handling", () => {
     it("should display first letter of name as fallback", () => {
       render(
-        <TestUserButton 
-          session={mockSession} 
-          isPending={false} 
+        <TestUserButton
+          session={mockSession}
+          isPending={false}
           sidebarOpen={true}
-        />
+        />,
       );
 
       expect(screen.getByTestId("user-avatar")).toHaveTextContent("T");
@@ -325,16 +343,16 @@ describe("UserButton Component Behavioral Tests", () => {
         user: {
           id: "123",
           email: "test@example.com",
-          name: "John Doe Smith"
-        }
+          name: "John Doe Smith",
+        },
       };
 
       render(
-        <TestUserButton 
-          session={sessionWithLongName} 
-          isPending={false} 
+        <TestUserButton
+          session={sessionWithLongName}
+          isPending={false}
           sidebarOpen={true}
-        />
+        />,
       );
 
       expect(screen.getByTestId("user-avatar")).toHaveTextContent("J");
@@ -345,16 +363,16 @@ describe("UserButton Component Behavioral Tests", () => {
         user: {
           id: "123",
           email: "test@example.com",
-          name: ""
-        }
+          name: "",
+        },
       };
 
       render(
-        <TestUserButton 
-          session={sessionWithEmptyName} 
-          isPending={false} 
+        <TestUserButton
+          session={sessionWithEmptyName}
+          isPending={false}
           sidebarOpen={true}
-        />
+        />,
       );
 
       expect(screen.getByTestId("user-avatar")).toHaveTextContent("U");
@@ -366,42 +384,42 @@ describe("UserButton Component Behavioral Tests", () => {
 describe("UserButton Component Static Analysis", () => {
   it("should exist as a TypeScript file with proper export", () => {
     const componentPath = path.join(__dirname, "user-btn.tsx");
-    
+
     expect(fs.existsSync(componentPath)).toBe(true);
-    
+
     const content = fs.readFileSync(componentPath, "utf8");
-    
+
     // Verify component structure
     expect(content).toContain("export function UserButton");
-    expect(content).toContain("\"use client\"");
+    expect(content).toContain('"use client"');
   });
 
   it("should have proper import structure", () => {
     const componentPath = path.join(__dirname, "user-btn.tsx");
     const content = fs.readFileSync(componentPath, "utf8");
-    
+
     // Verify imports
-    expect(content).toContain("from \"lucide-react\"");
-    expect(content).toContain("from \"@/components/ui/avatar\"");
-    expect(content).toContain("from \"@/lib/avatar\"");
-    expect(content).toContain("from \"@/components/ui/skeleton\"");
-    expect(content).toContain("from \"@/components/ui/dropdown-menu\"");
-    expect(content).toContain("from \"@/components/ui/sidebar\"");
-    expect(content).toContain("from \"@/lib/auth/client\"");
-    expect(content).toContain("from \"sonner\"");
-    expect(content).toContain("from \"nextjs-toploader/app\"");
-    expect(content).toContain("from \"next/link\"");
+    expect(content).toContain('from "lucide-react"');
+    expect(content).toContain('from "@/components/ui/avatar"');
+    expect(content).toContain('from "@/lib/avatar"');
+    expect(content).toContain('from "@/components/ui/skeleton"');
+    expect(content).toContain('from "@/components/ui/dropdown-menu"');
+    expect(content).toContain('from "@/components/ui/sidebar"');
+    expect(content).toContain('from "@/lib/auth/client"');
+    expect(content).toContain('from "sonner"');
+    expect(content).toContain('from "nextjs-toploader/app"');
+    expect(content).toContain('from "next/link"');
   });
 
   it("should implement proper logout functionality", () => {
     const componentPath = path.join(__dirname, "user-btn.tsx");
     const content = fs.readFileSync(componentPath, "utf8");
-    
+
     // Verify logout functionality
     expect(content).toContain("const handleLogout = async () =>");
     expect(content).toContain("setLoggingOut(true)");
     expect(content).toContain("authClient.signOut");
-    expect(content).toContain("router.push(\"/login\")");
+    expect(content).toContain('router.push("/login")');
     expect(content).toContain("toast.error");
     expect(content).toContain("toast.success");
     expect(content).toContain("toast.info");
@@ -411,9 +429,11 @@ describe("UserButton Component Static Analysis", () => {
   it("should handle loading states properly", () => {
     const componentPath = path.join(__dirname, "user-btn.tsx");
     const content = fs.readFileSync(componentPath, "utf8");
-    
+
     // Verify loading state handling
-    expect(content).toContain("const [loggingOut, setLoggingOut] = useState(false)");
+    expect(content).toContain(
+      "const [loggingOut, setLoggingOut] = useState(false)",
+    );
     expect(content).toContain("if (isPending)");
     expect(content).toContain("return (");
     expect(content).toContain("<Skeleton");
@@ -424,10 +444,12 @@ describe("UserButton Component Static Analysis", () => {
   it("should use proper React hooks pattern", () => {
     const componentPath = path.join(__dirname, "user-btn.tsx");
     const content = fs.readFileSync(componentPath, "utf8");
-    
+
     // Verify hooks usage
     expect(content).toContain("const { isMobile, open } = useSidebar()");
-    expect(content).toContain("const { data: session, isPending } = useSession()");
+    expect(content).toContain(
+      "const { data: session, isPending } = useSession()",
+    );
     expect(content).toContain("const router = useRouter()");
     expect(content).toContain("useState(false)");
   });
@@ -435,7 +457,7 @@ describe("UserButton Component Static Analysis", () => {
   it("should handle user avatar properly", () => {
     const componentPath = path.join(__dirname, "user-btn.tsx");
     const content = fs.readFileSync(componentPath, "utf8");
-    
+
     // Verify avatar handling
     expect(content).toContain("getUserAvatarUrl(");
     expect(content).toContain("session?.user?.image");
@@ -450,19 +472,19 @@ describe("UserButton Component Static Analysis", () => {
   it("should implement responsive design", () => {
     const componentPath = path.join(__dirname, "user-btn.tsx");
     const content = fs.readFileSync(componentPath, "utf8");
-    
+
     // Verify responsive design
     expect(content).toContain("isMobile");
     expect(content).toContain("open");
     expect(content).toContain("!open ?");
     expect(content).toContain("{open &&");
-    expect(content).toContain("side={isMobile ? \"bottom\" : \"right\"}");
+    expect(content).toContain('side={isMobile ? "bottom" : "right"}');
   });
 
   it("should have proper dropdown menu structure", () => {
     const componentPath = path.join(__dirname, "user-btn.tsx");
     const content = fs.readFileSync(componentPath, "utf8");
-    
+
     // Verify dropdown structure
     expect(content).toContain("<DropdownMenu>");
     expect(content).toContain("<DropdownMenuTrigger");
@@ -476,17 +498,17 @@ describe("UserButton Component Static Analysis", () => {
   it("should include settings navigation", () => {
     const componentPath = path.join(__dirname, "user-btn.tsx");
     const content = fs.readFileSync(componentPath, "utf8");
-    
+
     // Verify settings link
-    expect(content).toContain("Link href=\"/dashboard/settings?page=account\"");
-    expect(content).toContain("<Settings className=\"size-4\" />");
+    expect(content).toContain('Link href="/dashboard/settings?page=account"');
+    expect(content).toContain('<Settings className="size-4" />');
     expect(content).toContain("Settings");
   });
 
   it("should implement proper error handling", () => {
     const componentPath = path.join(__dirname, "user-btn.tsx");
     const content = fs.readFileSync(componentPath, "utf8");
-    
+
     // Verify error handling
     expect(content).toContain("try {");
     expect(content).toContain("} catch {");
@@ -499,9 +521,9 @@ describe("UserButton Component Static Analysis", () => {
   it("should have proper TypeScript typing", () => {
     const componentPath = path.join(__dirname, "user-btn.tsx");
     const content = fs.readFileSync(componentPath, "utf8");
-    
+
     // Verify TypeScript patterns
-    expect(content).toContain("\"use client\"");
+    expect(content).toContain('"use client"');
     expect(content).toContain("export function UserButton()");
     expect(content).toContain("useState(false)");
     expect(content).toMatch(/const\s+\w+\s*=/); // Variable declarations
@@ -510,9 +532,9 @@ describe("UserButton Component Static Analysis", () => {
   it("should follow React best practices", () => {
     const componentPath = path.join(__dirname, "user-btn.tsx");
     const content = fs.readFileSync(componentPath, "utf8");
-    
+
     // Verify best practices
-    expect(content).toContain("\"use client\""); // Client component
+    expect(content).toContain('"use client"'); // Client component
     expect(content).toMatch(/export\s+function\s+UserButton/); // Named export
     expect(content).not.toContain("var "); // No var declarations
     expect(content).toContain("const "); // Uses const for variables
@@ -522,23 +544,23 @@ describe("UserButton Component Static Analysis", () => {
   it("should handle success callback properly", () => {
     const componentPath = path.join(__dirname, "user-btn.tsx");
     const content = fs.readFileSync(componentPath, "utf8");
-    
+
     // Verify success callback
     expect(content).toContain("fetchOptions: {");
     expect(content).toContain("onSuccess: () => {");
-    expect(content).toContain("router.push(\"/login\")");
-    expect(content).toContain("\"You have been logged out successfully.\"");
+    expect(content).toContain('router.push("/login")');
+    expect(content).toContain('"You have been logged out successfully."');
   });
 
   it("should have proper component structure", () => {
     const componentPath = path.join(__dirname, "user-btn.tsx");
     const content = fs.readFileSync(componentPath, "utf8");
-    
+
     // Verify component structure
     const lines = content.split("\n");
     expect(lines.length).toBeGreaterThan(150); // Substantial component
     expect(lines.length).toBeLessThan(200); // But not too large
-    
+
     // Should have reasonable complexity
     const ifStatements = content.match(/if\s*\(/g);
     expect(ifStatements).toBeTruthy();
@@ -548,18 +570,18 @@ describe("UserButton Component Static Analysis", () => {
   it("should use proper sidebar components", () => {
     const componentPath = path.join(__dirname, "user-btn.tsx");
     const content = fs.readFileSync(componentPath, "utf8");
-    
+
     // Verify sidebar usage
     expect(content).toContain("<SidebarMenu>");
     expect(content).toContain("<SidebarMenuItem>");
     expect(content).toContain("<SidebarMenuButton");
-    expect(content).toContain("size={open ? \"lg\" : \"default\"}");
+    expect(content).toContain('size={open ? "lg" : "default"}');
   });
 
   it("should handle conditional rendering correctly", () => {
     const componentPath = path.join(__dirname, "user-btn.tsx");
     const content = fs.readFileSync(componentPath, "utf8");
-    
+
     // Verify conditional rendering
     expect(content).toContain("if (isPending) {");
     expect(content).toContain("return (");
@@ -570,12 +592,12 @@ describe("UserButton Component Static Analysis", () => {
   it("should have proper CSS classes", () => {
     const componentPath = path.join(__dirname, "user-btn.tsx");
     const content = fs.readFileSync(componentPath, "utf8");
-    
+
     // Verify CSS classes
     expect(content).toContain("className=");
-    expect(content).toContain("\"cursor-pointer\"");
-    expect(content).toContain("\"size-4\"");
-    expect(content).toContain("\"flex items-center gap-2\"");
+    expect(content).toContain('"cursor-pointer"');
+    expect(content).toContain('"size-4"');
+    expect(content).toContain('"flex items-center gap-2"');
     expect(content).toContain("truncate font-semibold");
     expect(content).toContain("rounded-full");
   });
@@ -583,18 +605,18 @@ describe("UserButton Component Static Analysis", () => {
   it("should implement proper logout UI feedback", () => {
     const componentPath = path.join(__dirname, "user-btn.tsx");
     const content = fs.readFileSync(componentPath, "utf8");
-    
+
     // Verify logout UI feedback
     expect(content).toContain("loggingOut ? (");
-    expect(content).toContain("<Loader2 className=\"size-4 animate-spin\" />");
-    expect(content).toContain("<LogOut className=\"size-4\" />");
+    expect(content).toContain('<Loader2 className="size-4 animate-spin" />');
+    expect(content).toContain('<LogOut className="size-4" />');
     expect(content).toContain("Log Out");
   });
 
   it("should handle missing user data gracefully", () => {
     const componentPath = path.join(__dirname, "user-btn.tsx");
     const content = fs.readFileSync(componentPath, "utf8");
-    
+
     // Verify graceful handling
     expect(content).toContain("session?.user?.name");
     expect(content).toContain("session?.user?.email");
@@ -605,7 +627,7 @@ describe("UserButton Component Static Analysis", () => {
   it("should have proper accessibility considerations", () => {
     const componentPath = path.join(__dirname, "user-btn.tsx");
     const content = fs.readFileSync(componentPath, "utf8");
-    
+
     // Verify accessibility
     expect(content).toContain("alt={session?.user?.name}");
     expect(content).toContain("asChild");

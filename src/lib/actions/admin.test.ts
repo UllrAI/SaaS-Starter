@@ -1,4 +1,11 @@
-import { describe, it, expect, jest, beforeEach, afterEach } from "@jest/globals";
+import {
+  describe,
+  it,
+  expect,
+  jest,
+  beforeEach,
+  afterEach,
+} from "@jest/globals";
 
 // Mock environment variables
 const mockEnv = {
@@ -15,7 +22,7 @@ const mockDb = {
 
 const mockUsers = {
   id: "users.id",
-  name: "users.name", 
+  name: "users.name",
   email: "users.email",
   emailVerified: "users.emailVerified",
   image: "users.image",
@@ -28,7 +35,7 @@ const mockUsers = {
 const mockSubscriptions = {
   id: "subscriptions.id",
   userId: "subscriptions.userId",
-  subscriptionId: "subscriptions.subscriptionId", 
+  subscriptionId: "subscriptions.subscriptionId",
   status: "subscriptions.status",
   productId: "subscriptions.productId",
   customerId: "subscriptions.customerId",
@@ -160,7 +167,7 @@ jest.mock("../r2", () => ({
 describe("Admin Actions", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    
+
     // Setup default mock implementations
     mockDb.select.mockReturnValue({
       from: jest.fn().mockReturnValue({
@@ -187,13 +194,13 @@ describe("Admin Actions", () => {
         }),
       }),
     });
-    
+
     mockDb.update.mockReturnValue({
       set: jest.fn().mockReturnValue({
         where: jest.fn().mockResolvedValue([]),
       }),
     });
-    
+
     mockDb.delete.mockReturnValue({
       where: jest.fn().mockResolvedValue([]),
     });
@@ -219,9 +226,9 @@ describe("Admin Actions", () => {
           subscriptionId: "sub1",
         },
       ];
-      
+
       const mockTotalData = [{ total: 1 }];
-      
+
       // Mock the complex query chain
       const mockQuery = {
         from: jest.fn().mockReturnThis(),
@@ -231,19 +238,21 @@ describe("Admin Actions", () => {
         limit: jest.fn().mockReturnThis(),
         offset: jest.fn().mockResolvedValue(mockUsersData),
       };
-      
+
       const mockTotalQuery = {
         from: jest.fn().mockReturnThis(),
         where: jest.fn().mockResolvedValue(mockTotalData),
       };
-      
-      mockDb.select.mockReturnValueOnce(mockQuery).mockReturnValueOnce(mockTotalQuery);
-      
+
+      mockDb.select
+        .mockReturnValueOnce(mockQuery)
+        .mockReturnValueOnce(mockTotalQuery);
+
       // Import and test the function
       const { getUsers } = await import("./admin");
-      
+
       const result = await getUsers({});
-      
+
       expect(result).toEqual({
         data: [
           {
@@ -281,20 +290,22 @@ describe("Admin Actions", () => {
         limit: jest.fn().mockReturnThis(),
         offset: jest.fn().mockResolvedValue([]),
       };
-      
+
       const mockTotalQuery = {
         from: jest.fn().mockReturnThis(),
         where: jest.fn().mockResolvedValue([{ total: 0 }]),
       };
-      
-      mockDb.select.mockReturnValueOnce(mockQuery).mockReturnValueOnce(mockTotalQuery);
+
+      mockDb.select
+        .mockReturnValueOnce(mockQuery)
+        .mockReturnValueOnce(mockTotalQuery);
       mockOr.mockReturnValue("search-condition");
       mockIlike.mockReturnValue("like-condition");
-      
+
       const { getUsers } = await import("./admin");
-      
+
       await getUsers({ search: "john" });
-      
+
       expect(mockIlike).toHaveBeenCalledWith(mockUsers.name, "%john%");
       expect(mockIlike).toHaveBeenCalledWith(mockUsers.email, "%john%");
       expect(mockOr).toHaveBeenCalled();
@@ -309,19 +320,21 @@ describe("Admin Actions", () => {
         limit: jest.fn().mockReturnThis(),
         offset: jest.fn().mockResolvedValue([]),
       };
-      
+
       const mockTotalQuery = {
         from: jest.fn().mockReturnThis(),
         where: jest.fn().mockResolvedValue([{ total: 0 }]),
       };
-      
-      mockDb.select.mockReturnValueOnce(mockQuery).mockReturnValueOnce(mockTotalQuery);
+
+      mockDb.select
+        .mockReturnValueOnce(mockQuery)
+        .mockReturnValueOnce(mockTotalQuery);
       mockEq.mockReturnValue("role-condition");
-      
+
       const { getUsers } = await import("./admin");
-      
+
       await getUsers({ role: "admin" });
-      
+
       expect(mockEq).toHaveBeenCalledWith(mockUsers.role, "admin");
     });
 
@@ -334,18 +347,20 @@ describe("Admin Actions", () => {
         limit: jest.fn().mockReturnThis(),
         offset: jest.fn().mockResolvedValue([]),
       };
-      
+
       const mockTotalQuery = {
         from: jest.fn().mockReturnThis(),
         where: jest.fn().mockResolvedValue([{ total: 0 }]),
       };
-      
-      mockDb.select.mockReturnValueOnce(mockQuery).mockReturnValueOnce(mockTotalQuery);
-      
+
+      mockDb.select
+        .mockReturnValueOnce(mockQuery)
+        .mockReturnValueOnce(mockTotalQuery);
+
       const { getUsers } = await import("./admin");
-      
+
       await getUsers({ page: 2, limit: 10 });
-      
+
       expect(mockQuery.offset).toHaveBeenCalledWith(10); // (page - 1) * limit
       expect(mockQuery.limit).toHaveBeenCalledWith(10);
     });
@@ -359,26 +374,30 @@ describe("Admin Actions", () => {
         limit: jest.fn().mockReturnThis(),
         offset: jest.fn().mockResolvedValue([]),
       };
-      
+
       const mockTotalQuery = {
         from: jest.fn().mockReturnThis(),
         where: jest.fn().mockResolvedValue([{ total: 0 }]),
       };
-      
-      mockDb.select.mockReturnValueOnce(mockQuery).mockReturnValueOnce(mockTotalQuery);
+
+      mockDb.select
+        .mockReturnValueOnce(mockQuery)
+        .mockReturnValueOnce(mockTotalQuery);
       mockAsc.mockReturnValue("asc-sort");
       mockDesc.mockReturnValue("desc-sort");
-      
+
       const { getUsers } = await import("./admin");
-      
+
       // Test ascending sort
       await getUsers({ sortBy: "name", sortOrder: "asc" });
       expect(mockAsc).toHaveBeenCalledWith(mockUsers.name);
-      
+
       // Reset mocks for next test
       jest.clearAllMocks();
-      mockDb.select.mockReturnValueOnce(mockQuery).mockReturnValueOnce(mockTotalQuery);
-      
+      mockDb.select
+        .mockReturnValueOnce(mockQuery)
+        .mockReturnValueOnce(mockTotalQuery);
+
       // Test descending sort
       await getUsers({ sortBy: "email", sortOrder: "desc" });
       expect(mockDesc).toHaveBeenCalledWith(mockUsers.email);
@@ -399,9 +418,9 @@ describe("Admin Actions", () => {
           subscriptionId: "sub2", // Different subscription ID
         },
       ];
-      
+
       const mockTotalData = [{ total: 1 }];
-      
+
       const mockQuery = {
         from: jest.fn().mockReturnThis(),
         leftJoin: jest.fn().mockReturnThis(),
@@ -410,18 +429,20 @@ describe("Admin Actions", () => {
         limit: jest.fn().mockReturnThis(),
         offset: jest.fn().mockResolvedValue(mockUsersData),
       };
-      
+
       const mockTotalQuery = {
         from: jest.fn().mockReturnThis(),
         where: jest.fn().mockResolvedValue(mockTotalData),
       };
-      
-      mockDb.select.mockReturnValueOnce(mockQuery).mockReturnValueOnce(mockTotalQuery);
-      
+
+      mockDb.select
+        .mockReturnValueOnce(mockQuery)
+        .mockReturnValueOnce(mockTotalQuery);
+
       const { getUsers } = await import("./admin");
-      
+
       const result = await getUsers({});
-      
+
       // Should add the new subscription to existing subscriptions array
       expect(result.data[0].subscriptions).toHaveLength(1);
       expect(result.data[0].subscriptions[0]).toEqual({
@@ -454,9 +475,9 @@ describe("Admin Actions", () => {
           },
         },
       ];
-      
+
       const mockTotalData = [{ total: 1 }];
-      
+
       const mockQuery = {
         from: jest.fn().mockReturnThis(),
         leftJoin: jest.fn().mockReturnThis(),
@@ -465,20 +486,22 @@ describe("Admin Actions", () => {
         limit: jest.fn().mockReturnThis(),
         offset: jest.fn().mockResolvedValue(mockPaymentsData),
       };
-      
+
       const mockTotalQuery = {
         from: jest.fn().mockReturnThis(),
         leftJoin: jest.fn().mockReturnThis(),
         where: jest.fn().mockResolvedValue(mockTotalData),
       };
-      
-      mockDb.select.mockReturnValueOnce(mockQuery).mockReturnValueOnce(mockTotalQuery);
+
+      mockDb.select
+        .mockReturnValueOnce(mockQuery)
+        .mockReturnValueOnce(mockTotalQuery);
       mockGetProductTierByProductId.mockReturnValue({ name: "Pro Tier" });
-      
+
       const { getPayments } = await import("./admin");
-      
+
       const result = await getPayments({});
-      
+
       expect(result.data).toHaveLength(1);
       expect(result.data[0]).toMatchObject({
         id: "payment1",
@@ -501,20 +524,22 @@ describe("Admin Actions", () => {
         limit: jest.fn().mockReturnThis(),
         offset: jest.fn().mockResolvedValue([]),
       };
-      
+
       const mockTotalQuery = {
         from: jest.fn().mockReturnThis(),
         leftJoin: jest.fn().mockReturnThis(),
         where: jest.fn().mockResolvedValue([{ total: 0 }]),
       };
-      
-      mockDb.select.mockReturnValueOnce(mockQuery).mockReturnValueOnce(mockTotalQuery);
+
+      mockDb.select
+        .mockReturnValueOnce(mockQuery)
+        .mockReturnValueOnce(mockTotalQuery);
       mockEq.mockReturnValue("status-condition");
-      
+
       const { getPayments } = await import("./admin");
-      
+
       await getPayments({ status: "succeeded" });
-      
+
       expect(mockEq).toHaveBeenCalledWith(mockPayments.status, "succeeded");
     });
 
@@ -527,26 +552,34 @@ describe("Admin Actions", () => {
         limit: jest.fn().mockReturnThis(),
         offset: jest.fn().mockResolvedValue([]),
       };
-      
+
       const mockTotalQuery = {
         from: jest.fn().mockReturnThis(),
         leftJoin: jest.fn().mockReturnThis(),
         where: jest.fn().mockResolvedValue([{ total: 0 }]),
       };
-      
-      mockDb.select.mockReturnValueOnce(mockQuery).mockReturnValueOnce(mockTotalQuery);
+
+      mockDb.select
+        .mockReturnValueOnce(mockQuery)
+        .mockReturnValueOnce(mockTotalQuery);
       mockGte.mockReturnValue("gte-condition");
       mockLte.mockReturnValue("lte-condition");
-      
+
       const { getPayments } = await import("./admin");
-      
-      await getPayments({ 
-        dateFrom: "2024-01-01", 
-        dateTo: "2024-01-31" 
+
+      await getPayments({
+        dateFrom: "2024-01-01",
+        dateTo: "2024-01-31",
       });
-      
-      expect(mockGte).toHaveBeenCalledWith(mockPayments.createdAt, new Date("2024-01-01"));
-      expect(mockLte).toHaveBeenCalledWith(mockPayments.createdAt, new Date("2024-01-31"));
+
+      expect(mockGte).toHaveBeenCalledWith(
+        mockPayments.createdAt,
+        new Date("2024-01-01"),
+      );
+      expect(mockLte).toHaveBeenCalledWith(
+        mockPayments.createdAt,
+        new Date("2024-01-31"),
+      );
     });
   });
 
@@ -573,9 +606,9 @@ describe("Admin Actions", () => {
           },
         },
       ];
-      
+
       const mockTotalData = [{ total: 1 }];
-      
+
       const mockQuery = {
         from: jest.fn().mockReturnThis(),
         leftJoin: jest.fn().mockReturnThis(),
@@ -584,20 +617,22 @@ describe("Admin Actions", () => {
         limit: jest.fn().mockReturnThis(),
         offset: jest.fn().mockResolvedValue(mockSubscriptionsData),
       };
-      
+
       const mockTotalQuery = {
         from: jest.fn().mockReturnThis(),
         leftJoin: jest.fn().mockReturnThis(),
         where: jest.fn().mockResolvedValue(mockTotalData),
       };
-      
-      mockDb.select.mockReturnValueOnce(mockQuery).mockReturnValueOnce(mockTotalQuery);
+
+      mockDb.select
+        .mockReturnValueOnce(mockQuery)
+        .mockReturnValueOnce(mockTotalQuery);
       mockGetProductTierById.mockReturnValue({ name: "Pro Plan" });
-      
+
       const { getSubscriptions } = await import("./admin");
-      
+
       const result = await getSubscriptions({});
-      
+
       expect(result.data).toHaveLength(1);
       expect(result.data[0]).toMatchObject({
         id: "sub1",
@@ -616,21 +651,23 @@ describe("Admin Actions", () => {
         limit: jest.fn().mockReturnThis(),
         offset: jest.fn().mockResolvedValue([]),
       };
-      
+
       const mockTotalQuery = {
         from: jest.fn().mockReturnThis(),
         leftJoin: jest.fn().mockReturnThis(),
         where: jest.fn().mockResolvedValue([{ total: 0 }]),
       };
-      
-      mockDb.select.mockReturnValueOnce(mockQuery).mockReturnValueOnce(mockTotalQuery);
+
+      mockDb.select
+        .mockReturnValueOnce(mockQuery)
+        .mockReturnValueOnce(mockTotalQuery);
       mockOr.mockReturnValue("search-condition");
       mockEq.mockReturnValue("status-condition");
-      
+
       const { getSubscriptions } = await import("./admin");
-      
+
       await getSubscriptions({ search: "john", status: "active" });
-      
+
       expect(mockOr).toHaveBeenCalled();
       expect(mockEq).toHaveBeenCalledWith(mockSubscriptions.status, "active");
     });
@@ -656,9 +693,9 @@ describe("Admin Actions", () => {
           },
         },
       ];
-      
+
       const mockTotalData = [{ total: 1 }];
-      
+
       const mockQuery = {
         from: jest.fn().mockReturnThis(),
         innerJoin: jest.fn().mockReturnThis(),
@@ -667,19 +704,21 @@ describe("Admin Actions", () => {
         limit: jest.fn().mockReturnThis(),
         offset: jest.fn().mockResolvedValue(mockUploadsData),
       };
-      
+
       const mockTotalQuery = {
         from: jest.fn().mockReturnThis(),
         innerJoin: jest.fn().mockReturnThis(),
         where: jest.fn().mockResolvedValue(mockTotalData),
       };
-      
-      mockDb.select.mockReturnValueOnce(mockQuery).mockReturnValueOnce(mockTotalQuery);
-      
+
+      mockDb.select
+        .mockReturnValueOnce(mockQuery)
+        .mockReturnValueOnce(mockTotalQuery);
+
       const { getUploads } = await import("./admin");
-      
+
       const result = await getUploads({});
-      
+
       expect(result.data).toHaveLength(1);
       expect(result.data[0]).toMatchObject({
         id: "upload1",
@@ -698,20 +737,22 @@ describe("Admin Actions", () => {
         limit: jest.fn().mockReturnThis(),
         offset: jest.fn().mockResolvedValue([]),
       };
-      
+
       const mockTotalQuery = {
         from: jest.fn().mockReturnThis(),
         innerJoin: jest.fn().mockReturnThis(),
         where: jest.fn().mockResolvedValue([{ total: 0 }]),
       };
-      
-      mockDb.select.mockReturnValueOnce(mockQuery).mockReturnValueOnce(mockTotalQuery);
+
+      mockDb.select
+        .mockReturnValueOnce(mockQuery)
+        .mockReturnValueOnce(mockTotalQuery);
       mockLike.mockReturnValue("like-condition");
-      
+
       const { getUploads } = await import("./admin");
-      
+
       await getUploads({ fileType: "image" });
-      
+
       expect(mockLike).toHaveBeenCalledWith(mockUploads.contentType, "image/%");
     });
 
@@ -724,22 +765,27 @@ describe("Admin Actions", () => {
         limit: jest.fn().mockReturnThis(),
         offset: jest.fn().mockResolvedValue([]),
       };
-      
+
       const mockTotalQuery = {
         from: jest.fn().mockReturnThis(),
         innerJoin: jest.fn().mockReturnThis(),
         where: jest.fn().mockResolvedValue([{ total: 0 }]),
       };
-      
-      mockDb.select.mockReturnValueOnce(mockQuery).mockReturnValueOnce(mockTotalQuery);
+
+      mockDb.select
+        .mockReturnValueOnce(mockQuery)
+        .mockReturnValueOnce(mockTotalQuery);
       mockOr.mockReturnValue("search-condition");
       mockIlike.mockReturnValue("like-condition");
-      
+
       const { getUploads } = await import("./admin");
-      
+
       await getUploads({ search: "test.jpg" });
-      
-      expect(mockIlike).toHaveBeenCalledWith(mockUploads.fileName, "%test.jpg%");
+
+      expect(mockIlike).toHaveBeenCalledWith(
+        mockUploads.fileName,
+        "%test.jpg%",
+      );
       expect(mockIlike).toHaveBeenCalledWith(mockUsers.email, "%test.jpg%");
       expect(mockIlike).toHaveBeenCalledWith(mockUsers.name, "%test.jpg%");
       expect(mockOr).toHaveBeenCalled();
@@ -754,22 +800,24 @@ describe("Admin Actions", () => {
         limit: jest.fn().mockReturnThis(),
         offset: jest.fn().mockResolvedValue([]),
       };
-      
+
       const mockTotalQuery = {
         from: jest.fn().mockReturnThis(),
         innerJoin: jest.fn().mockReturnThis(),
         where: jest.fn().mockResolvedValue([{ total: 0 }]),
       };
-      
-      mockDb.select.mockReturnValueOnce(mockQuery).mockReturnValueOnce(mockTotalQuery);
+
+      mockDb.select
+        .mockReturnValueOnce(mockQuery)
+        .mockReturnValueOnce(mockTotalQuery);
       mockLike.mockReturnValue("like-condition");
       mockNot.mockReturnValue("not-condition");
       mockAnd.mockReturnValue("and-condition");
-      
+
       const { getUploads } = await import("./admin");
-      
+
       await getUploads({ fileType: "other" });
-      
+
       // Should use not() to exclude all standard file types
       expect(mockNot).toHaveBeenCalled();
       expect(mockAnd).toHaveBeenCalled();
@@ -780,7 +828,7 @@ describe("Admin Actions", () => {
     it("should update user successfully", async () => {
       const mockUser = { role: "user" };
       const mockContext = { user: { id: "admin1", role: "admin" } };
-      
+
       mockDb.select.mockReturnValue({
         from: jest.fn().mockReturnValue({
           where: jest.fn().mockReturnValue({
@@ -788,20 +836,20 @@ describe("Admin Actions", () => {
           }),
         }),
       });
-      
+
       mockDb.update.mockReturnValue({
         set: jest.fn().mockReturnValue({
           where: jest.fn().mockResolvedValue([]),
         }),
       });
-      
+
       const { updateUserAction } = await import("./admin");
-      
+
       const result = await updateUserAction({
         parsedInput: { id: "user1", name: "New Name", role: "admin" },
         ctx: mockContext,
       });
-      
+
       expect(result).toEqual({
         success: true,
         message: "User updated successfully.",
@@ -817,20 +865,20 @@ describe("Admin Actions", () => {
           }),
         }),
       });
-      
+
       const { updateUserAction } = await import("./admin");
-      
+
       await expect(
         updateUserAction({
           parsedInput: { id: "nonexistent", name: "New Name" },
           ctx: { user: { id: "admin1", role: "admin" } },
-        })
+        }),
       ).rejects.toThrow("User not found");
     });
 
     it("should prevent modifying super_admin without super_admin role", async () => {
       const mockUser = { role: "super_admin" };
-      
+
       mockDb.select.mockReturnValue({
         from: jest.fn().mockReturnValue({
           where: jest.fn().mockReturnValue({
@@ -838,20 +886,20 @@ describe("Admin Actions", () => {
           }),
         }),
       });
-      
+
       const { updateUserAction } = await import("./admin");
-      
+
       await expect(
         updateUserAction({
           parsedInput: { id: "user1", name: "New Name" },
           ctx: { user: { id: "admin1", role: "admin" } },
-        })
+        }),
       ).rejects.toThrow("Insufficient permissions to modify super_admin");
     });
 
     it("should prevent self role modification", async () => {
       const mockUser = { role: "admin" };
-      
+
       mockDb.select.mockReturnValue({
         from: jest.fn().mockReturnValue({
           where: jest.fn().mockReturnValue({
@@ -859,14 +907,14 @@ describe("Admin Actions", () => {
           }),
         }),
       });
-      
+
       const { updateUserAction } = await import("./admin");
-      
+
       await expect(
         updateUserAction({
           parsedInput: { id: "admin1", role: "user" },
           ctx: { user: { id: "admin1", role: "admin" } },
-        })
+        }),
       ).rejects.toThrow("Cannot modify your own role");
     });
   });
@@ -877,7 +925,7 @@ describe("Admin Actions", () => {
         subscriptionId: "sub_123",
         userId: "user1",
       };
-      
+
       mockDb.select.mockReturnValue({
         from: jest.fn().mockReturnValue({
           where: jest.fn().mockReturnValue({
@@ -885,15 +933,15 @@ describe("Admin Actions", () => {
           }),
         }),
       });
-      
+
       mockCreemClient.cancelSubscription.mockResolvedValue({ success: true });
-      
+
       const { cancelSubscriptionAction } = await import("./admin");
-      
+
       const result = await cancelSubscriptionAction({
         parsedInput: { subscriptionId: "sub_123" },
       });
-      
+
       expect(mockCreemClient.cancelSubscription).toHaveBeenCalledWith({
         xApiKey: mockEnv.CREEM_API_KEY,
         id: "sub_123",
@@ -902,7 +950,9 @@ describe("Admin Actions", () => {
         success: true,
         message: "Subscription cancellation initiated.",
       });
-      expect(mockRevalidatePath).toHaveBeenCalledWith("/dashboard/admin/subscriptions");
+      expect(mockRevalidatePath).toHaveBeenCalledWith(
+        "/dashboard/admin/subscriptions",
+      );
     });
 
     it("should throw error when subscription not found", async () => {
@@ -913,13 +963,13 @@ describe("Admin Actions", () => {
           }),
         }),
       });
-      
+
       const { cancelSubscriptionAction } = await import("./admin");
-      
+
       await expect(
         cancelSubscriptionAction({
           parsedInput: { subscriptionId: "nonexistent" },
-        })
+        }),
       ).rejects.toThrow("Subscription not found");
     });
   });
@@ -927,7 +977,7 @@ describe("Admin Actions", () => {
   describe("deleteUploadAction", () => {
     it("should delete upload successfully", async () => {
       const mockUpload = { fileKey: "files/test.jpg" };
-      
+
       mockDb.select.mockReturnValue({
         from: jest.fn().mockReturnValue({
           where: jest.fn().mockReturnValue({
@@ -935,21 +985,23 @@ describe("Admin Actions", () => {
           }),
         }),
       });
-      
+
       mockDeleteFileFromR2.mockResolvedValue({ success: true });
-      
+
       const { deleteUploadAction } = await import("./admin");
-      
+
       const result = await deleteUploadAction({
         parsedInput: { uploadId: "upload1" },
       });
-      
+
       expect(mockDeleteFileFromR2).toHaveBeenCalledWith("files/test.jpg");
       expect(result).toEqual({
         success: true,
         message: "Upload deleted successfully.",
       });
-      expect(mockRevalidatePath).toHaveBeenCalledWith("/dashboard/admin/uploads");
+      expect(mockRevalidatePath).toHaveBeenCalledWith(
+        "/dashboard/admin/uploads",
+      );
     });
 
     it("should throw error when upload not found", async () => {
@@ -960,13 +1012,13 @@ describe("Admin Actions", () => {
           }),
         }),
       });
-      
+
       const { deleteUploadAction } = await import("./admin");
-      
+
       await expect(
         deleteUploadAction({
           parsedInput: { uploadId: "nonexistent" },
-        })
+        }),
       ).rejects.toThrow("Upload not found");
     });
   });
@@ -977,21 +1029,21 @@ describe("Admin Actions", () => {
         { id: "upload1", fileKey: "files/test1.jpg" },
         { id: "upload2", fileKey: "files/test2.jpg" },
       ];
-      
+
       mockDb.select.mockReturnValue({
         from: jest.fn().mockReturnValue({
           where: jest.fn().mockResolvedValue(mockUploads),
         }),
       });
-      
+
       mockDeleteFilesFromR2.mockResolvedValue({ success: true });
-      
+
       const { batchDeleteUploadsAction } = await import("./admin");
-      
+
       const result = await batchDeleteUploadsAction({
         parsedInput: { uploadIds: ["upload1", "upload2"] },
       });
-      
+
       expect(mockDeleteFilesFromR2).toHaveBeenCalledWith([
         "files/test1.jpg",
         "files/test2.jpg",
@@ -1000,7 +1052,9 @@ describe("Admin Actions", () => {
         success: true,
         message: "Successfully deleted 2 file(s).",
       });
-      expect(mockRevalidatePath).toHaveBeenCalledWith("/dashboard/admin/uploads");
+      expect(mockRevalidatePath).toHaveBeenCalledWith(
+        "/dashboard/admin/uploads",
+      );
     });
 
     it("should throw error when no uploads found", async () => {
@@ -1009,38 +1063,36 @@ describe("Admin Actions", () => {
           where: jest.fn().mockResolvedValue([]),
         }),
       });
-      
+
       const { batchDeleteUploadsAction } = await import("./admin");
-      
+
       await expect(
         batchDeleteUploadsAction({
           parsedInput: { uploadIds: ["nonexistent"] },
-        })
+        }),
       ).rejects.toThrow("No uploads found to delete.");
     });
 
     it("should throw error when R2 deletion fails", async () => {
-      const mockUploads = [
-        { id: "upload1", fileKey: "files/test1.jpg" },
-      ];
-      
+      const mockUploads = [{ id: "upload1", fileKey: "files/test1.jpg" }];
+
       mockDb.select.mockReturnValue({
         from: jest.fn().mockReturnValue({
           where: jest.fn().mockResolvedValue(mockUploads),
         }),
       });
-      
-      mockDeleteFilesFromR2.mockResolvedValue({ 
-        success: false, 
-        error: "R2 service unavailable" 
+
+      mockDeleteFilesFromR2.mockResolvedValue({
+        success: false,
+        error: "R2 service unavailable",
       });
-      
+
       const { batchDeleteUploadsAction } = await import("./admin");
-      
+
       await expect(
         batchDeleteUploadsAction({
           parsedInput: { uploadIds: ["upload1"] },
-        })
+        }),
       ).rejects.toThrow("R2 service unavailable");
     });
   });
@@ -1059,23 +1111,28 @@ describe("Admin Actions", () => {
         limit: jest.fn().mockReturnThis(),
         offset: jest.fn().mockResolvedValue([]),
       };
-      
+
       const mockTotalQuery = {
         from: jest.fn().mockReturnThis(),
         where: jest.fn().mockResolvedValue([{ total: 0 }]),
       };
-      
-      mockDb.select.mockReturnValueOnce(mockQuery).mockReturnValueOnce(mockTotalQuery);
+
+      mockDb.select
+        .mockReturnValueOnce(mockQuery)
+        .mockReturnValueOnce(mockTotalQuery);
       mockOr.mockReturnValue("search-condition");
       mockIlike.mockReturnValue("ilike-condition");
 
       const { getUsers } = await import("./admin");
-      
+
       // Test search functionality - this should cover line 192
       const result = await getUsers({ search: "nonexistent@example.com" });
-      
+
       expect(mockOr).toHaveBeenCalled();
-      expect(mockIlike).toHaveBeenCalledWith(expect.anything(), "%nonexistent@example.com%");
+      expect(mockIlike).toHaveBeenCalledWith(
+        expect.anything(),
+        "%nonexistent@example.com%",
+      );
       expect(result.data).toHaveLength(0);
       expect(result.pagination.total).toBe(0);
     });
@@ -1089,18 +1146,20 @@ describe("Admin Actions", () => {
         limit: jest.fn().mockReturnThis(),
         offset: jest.fn().mockResolvedValue([]),
       };
-      
+
       const mockTotalQuery = {
         from: jest.fn().mockReturnThis(),
         where: jest.fn().mockResolvedValue([{ total: 1000 }]),
       };
-      
-      mockDb.select.mockReturnValueOnce(mockQuery).mockReturnValueOnce(mockTotalQuery);
+
+      mockDb.select
+        .mockReturnValueOnce(mockQuery)
+        .mockReturnValueOnce(mockTotalQuery);
 
       const { getUsers } = await import("./admin");
-      
+
       const result = await getUsers({ page: 100, limit: 10 });
-      
+
       expect(mockQuery.offset).toHaveBeenCalledWith(990); // (100 - 1) * 10
       expect(result.pagination.total).toBe(1000);
       expect(result.pagination.totalPages).toBe(100);
@@ -1115,28 +1174,33 @@ describe("Admin Actions", () => {
         limit: jest.fn().mockReturnThis(),
         offset: jest.fn().mockResolvedValue([]),
       };
-      
+
       const mockTotalQuery = {
         from: jest.fn().mockReturnThis(),
         where: jest.fn().mockResolvedValue([{ total: 0 }]),
       };
-      
-      mockDb.select.mockReturnValueOnce(mockQuery).mockReturnValueOnce(mockTotalQuery);
+
+      mockDb.select
+        .mockReturnValueOnce(mockQuery)
+        .mockReturnValueOnce(mockTotalQuery);
       mockOr.mockReturnValue("search-condition");
       mockIlike.mockReturnValue("ilike-condition");
 
       const { getUsers } = await import("./admin");
-      
+
       // Test search with special characters
       await getUsers({ search: "user@domain-with-special.chars_123" });
-      
+
       expect(mockOr).toHaveBeenCalled();
-      expect(mockIlike).toHaveBeenCalledWith(expect.anything(), "%user@domain-with-special.chars_123%");
+      expect(mockIlike).toHaveBeenCalledWith(
+        expect.anything(),
+        "%user@domain-with-special.chars_123%",
+      );
     });
 
     it("should handle all specific file type categories", async () => {
       const fileTypes = ["video", "audio", "pdf", "text", "archive"];
-      
+
       for (const fileType of fileTypes) {
         const mockQuery = {
           from: jest.fn().mockReturnThis(),
@@ -1146,20 +1210,22 @@ describe("Admin Actions", () => {
           limit: jest.fn().mockReturnThis(),
           offset: jest.fn().mockResolvedValue([]),
         };
-        
+
         const mockTotalQuery = {
           from: jest.fn().mockReturnThis(),
           innerJoin: jest.fn().mockReturnThis(),
           where: jest.fn().mockResolvedValue([{ total: 0 }]),
         };
-        
-        mockDb.select.mockReturnValueOnce(mockQuery).mockReturnValueOnce(mockTotalQuery);
-        
+
+        mockDb.select
+          .mockReturnValueOnce(mockQuery)
+          .mockReturnValueOnce(mockTotalQuery);
+
         const { getUploads } = await import("./admin");
-        
+
         await getUploads({ fileType });
       }
-      
+
       expect(mockDb.select).toHaveBeenCalled();
     });
 
@@ -1172,19 +1238,21 @@ describe("Admin Actions", () => {
         limit: jest.fn().mockReturnThis(),
         offset: jest.fn().mockResolvedValue([]),
       };
-      
+
       const mockTotalQuery = {
         from: jest.fn().mockReturnThis(),
         innerJoin: jest.fn().mockReturnThis(),
         where: jest.fn().mockResolvedValue([{ total: 0 }]),
       };
-      
-      mockDb.select.mockReturnValueOnce(mockQuery).mockReturnValueOnce(mockTotalQuery);
-      
+
+      mockDb.select
+        .mockReturnValueOnce(mockQuery)
+        .mockReturnValueOnce(mockTotalQuery);
+
       const { getUploads } = await import("./admin");
-      
+
       await getUploads({ fileType: "unknown-type" });
-      
+
       expect(mockDb.select).toHaveBeenCalled();
     });
 
@@ -1197,25 +1265,27 @@ describe("Admin Actions", () => {
         limit: jest.fn().mockReturnThis(),
         offset: jest.fn().mockResolvedValue([]),
       };
-      
+
       const mockTotalQuery = {
         from: jest.fn().mockReturnThis(),
         leftJoin: jest.fn().mockReturnThis(),
         where: jest.fn().mockResolvedValue([{ total: 0 }]),
       };
-      
-      mockDb.select.mockReturnValueOnce(mockQuery).mockReturnValueOnce(mockTotalQuery);
-      
+
+      mockDb.select
+        .mockReturnValueOnce(mockQuery)
+        .mockReturnValueOnce(mockTotalQuery);
+
       const { getPayments } = await import("./admin");
-      
+
       // Test with all conditions set
-      await getPayments({ 
-        search: "test", 
-        status: "succeeded", 
-        dateFrom: "2023-01-01", 
-        dateTo: "2023-12-31" 
+      await getPayments({
+        search: "test",
+        status: "succeeded",
+        dateFrom: "2023-01-01",
+        dateTo: "2023-12-31",
       });
-      
+
       expect(mockGte).toHaveBeenCalled();
       expect(mockLte).toHaveBeenCalled();
       expect(mockEq).toHaveBeenCalled();
@@ -1230,23 +1300,28 @@ describe("Admin Actions", () => {
         limit: jest.fn().mockReturnThis(),
         offset: jest.fn().mockResolvedValue([]),
       };
-      
+
       const mockTotalQuery = {
         from: jest.fn().mockReturnThis(),
         leftJoin: jest.fn().mockReturnThis(),
         where: jest.fn().mockResolvedValue([{ total: 0 }]),
       };
-      
-      mockDb.select.mockReturnValueOnce(mockQuery).mockReturnValueOnce(mockTotalQuery);
+
+      mockDb.select
+        .mockReturnValueOnce(mockQuery)
+        .mockReturnValueOnce(mockTotalQuery);
       mockOr.mockReturnValue("search-condition");
       mockIlike.mockReturnValue("ilike-condition");
-      
+
       const { getPayments } = await import("./admin");
-      
+
       // Test payment search with paymentId search
       await getPayments({ search: "pay_123abc" });
-      
-      expect(mockIlike).toHaveBeenCalledWith(mockPayments.paymentId, "%pay_123abc%");
+
+      expect(mockIlike).toHaveBeenCalledWith(
+        mockPayments.paymentId,
+        "%pay_123abc%",
+      );
       expect(mockOr).toHaveBeenCalled();
     });
 
@@ -1259,21 +1334,23 @@ describe("Admin Actions", () => {
         limit: jest.fn().mockReturnThis(),
         offset: jest.fn().mockResolvedValue([]),
       };
-      
+
       const mockTotalQuery = {
         from: jest.fn().mockReturnThis(),
         innerJoin: jest.fn().mockReturnThis(),
         where: jest.fn().mockResolvedValue([{ total: 0 }]),
       };
-      
-      mockDb.select.mockReturnValueOnce(mockQuery).mockReturnValueOnce(mockTotalQuery);
+
+      mockDb.select
+        .mockReturnValueOnce(mockQuery)
+        .mockReturnValueOnce(mockTotalQuery);
       mockAnd.mockReturnValue("and-condition");
-      
+
       const { getUploads } = await import("./admin");
-      
+
       // Test with no search and fileType "all" to test empty conditions
       await getUploads({ search: "", fileType: "all" });
-      
+
       expect(mockQuery.where).toHaveBeenCalledWith(undefined);
     });
   });

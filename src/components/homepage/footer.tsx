@@ -44,6 +44,15 @@ const footerSections: FooterSection[] = [
     ],
   },
   {
+    title: "Other Products",
+    links: [
+      { name: "PixMiller", href: "https://pixmiller.com/", external: true },
+      { name: "HeadShots.fun", href: "https://headshots.fun/", external: true },
+      { name: "To Markdown", href: "https://to-markdown.com/", external: true },
+      { name: "HiPNG.com", href: "https://hipng.com/", external: true },
+    ],
+  },
+  {
     title: "Company",
     links: [
       { name: "About", href: "/about" },
@@ -166,7 +175,7 @@ export function Footer() {
 
             {/* Links sections */}
             <div className="lg:col-span-4">
-              <div className="grid grid-cols-2 gap-8 sm:grid-cols-4">
+              <div className="grid grid-cols-2 gap-8 sm:grid-cols-5">
                 {footerSections.map((section) => (
                   <div key={section.title}>
                     <h3 className="text-foreground mb-4 text-sm font-semibold">

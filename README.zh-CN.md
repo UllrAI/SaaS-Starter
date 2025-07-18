@@ -106,8 +106,8 @@ cp .env.example .env
 
 本项目使用 Drizzle ORM 进行数据库迁移。为了确保开发和生产环境的隔离，项目配置了两个独立的数据库配置文件：
 
-- `database/config.ts` - 开发环境配置，迁移文件输出到 `database/migrations/development/`
-- `database/config.prod.ts` - 生产环境配置，迁移文件输出到 `database/migrations/production/`
+- `src/database/config.ts` - 开发环境配置，迁移文件输出到 `src/database/migrations/development/`
+- `src/database/config.prod.ts` - 生产环境配置，迁移文件输出到 `src/database/migrations/production/`
 
 #### 开发环境
 
@@ -271,6 +271,8 @@ function MyComponent() {
   );
 }
 ```
+
+> **注意**: 此项目使用 `src` 目录结构，所有组件和库文件都位于 `src/` 目录中，通过 `@/` 路径映射可以直接访问 `src/` 目录下的文件。
 
 #### 图片压缩
 

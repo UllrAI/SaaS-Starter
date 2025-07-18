@@ -1,7 +1,7 @@
 import { config, fields, collection } from "@keystatic/core";
 
 export const showAdminUI = process.env.NODE_ENV === "development";
-import { APP_NAME } from "./lib/config/constants";
+import { APP_NAME } from "@/lib/config/constants";
 
 export default config({
   storage: {

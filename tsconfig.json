@@ -20,7 +20,10 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"],
+      "@/*": ["./src/*"],
+      "@/env": ["./env.js"],
+      "@/keystatic.config": ["./keystatic.config.ts"],
+      "@/styles/*": ["./styles/*"],
       "env": ["./env.js"]
     }
   },

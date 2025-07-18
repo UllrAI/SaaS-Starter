@@ -135,41 +135,43 @@ graph TD
 
 ```
 SaaS-Starter-main/
-├── app/                  # Next.js App Router 核心目录
-│   ├── (auth)/           # 认证相关页面 (登录、注册)
-│   ├── (dashboard)/      # 受保护的仪表盘页面
-│   ├── (pages)/          # 公开页面 (首页、关于、博客等)
-│   ├── api/              # API 路由
-│   ├── keystatic/        # Keystatic CMS 管理界面
-│   ├── layout.tsx        # 根布局
-│   └── not-found.tsx     # 全局 404 页面
-├── components/           # React 组件
-│   ├── admin/            # 管理后台相关组件
-│   ├── auth/             # 认证流程组件
-│   ├── blog/             # 博客相关组件
-│   ├── forms/            # 表单组件
-│   ├── homepage/         # 首页专用组件
-│   └── ui/               # 通用 UI 组件 (基于 shadcn/ui)
+├── src/                  # 所有应用程序源代码
+│   ├── app/              # Next.js App Router 核心目录
+│   │   ├── (auth)/       # 认证相关页面 (登录、注册)
+│   │   ├── (dashboard)/  # 受保护的仪表盘页面
+│   │   ├── (pages)/      # 公开页面 (首页、关于、博客等)
+│   │   ├── api/          # API 路由
+│   │   ├── keystatic/    # Keystatic CMS 管理界面
+│   │   ├── layout.tsx    # 根布局
+│   │   └── not-found.tsx # 全局 404 页面
+│   ├── components/       # React 组件
+│   │   ├── admin/        # 管理后台相关组件
+│   │   ├── auth/         # 认证流程组件
+│   │   ├── blog/         # 博客相关组件
+│   │   ├── forms/        # 表单组件
+│   │   ├── homepage/     # 首页专用组件
+│   │   └── ui/           # 通用 UI 组件 (基于 shadcn/ui)
+│   ├── database/         # Drizzle ORM 相关
+│   │   ├── migrations/   # 数据库迁移文件
+│   │   ├── config.ts     # 开发环境迁移配置
+│   │   ├── config.prod.ts # 生产环境迁移配置
+│   │   ├── index.ts      # Drizzle 客户端初始化
+│   │   └── schema.ts     # 数据库表结构定义
+│   ├── emails/           # React Email 邮件模板
+│   ├── hooks/            # 自定义 React Hooks
+│   ├── lib/              # 核心逻辑与工具函数
+│   │   ├── actions/      # Next.js Server Actions
+│   │   ├── admin/        # 管理后台核心逻辑
+│   │   ├── auth/         # 认证配置与逻辑 (Better-Auth)
+│   │   ├── billing/      # 支付抽象层与提供商 (Creem)
+│   │   ├── config/       # 全局常量、产品、角色等配置
+│   │   ├── database/     # 数据库辅助函数
+│   │   ├── email.tsx     # 邮件发送服务
+│   │   └── r2.ts         # Cloudflare R2 文件上传服务
+│   ├── schemas/          # Zod 验证 schema
+│   └── types/            # TypeScript 类型定义
 ├── content/              # Keystatic 管理的内容 (Markdown, JSON)
-├── database/             # Drizzle ORM 相关
-│   ├── migrations/       # 数据库迁移文件
-│   ├── config.ts         # 开发环境迁移配置
-│   ├── config.prod.ts    # 生产环境迁移配置
-│   ├── index.ts          # Drizzle 客户端初始化
-│   └── schema.ts         # 数据库表结构定义
-├── emails/               # React Email 邮件模板
-├── hooks/                # 自定义 React Hooks
-├── lib/                  # 核心逻辑与工具函数
-│   ├── actions/          # Next.js Server Actions
-│   ├── admin/            # 管理后台核心逻辑
-│   ├── auth/             # 认证配置与逻辑 (Better-Auth)
-│   ├── billing/          # 支付抽象层与提供商 (Creem)
-│   ├── config/           # 全局常量、产品、角色等配置
-│   ├── database/         # 数据库辅助函数
-│   ├── email.tsx         # 邮件发送服务
-│   └── r2.ts             # Cloudflare R2 文件上传服务
 ├── public/               # 静态资源
-├── schemas/              # Zod 验证 schema
 ├── scripts/              # 辅助脚本 (如设置管理员)
 └── styles/               # 全局样式与 CSS
 ```
@@ -178,7 +180,7 @@ SaaS-Starter-main/
 
 #### 2.2.1. 入口文件和启动流程
 
-- **`app/layout.tsx`**: 项目的根布局，包裹所有页面。它负责：
+- **`src/app/layout.tsx`**: 项目的根布局，包裹所有页面。它负责：
   - 设置 HTML `lang` 属性和字体变量。
   - 集成 `ThemeProvider` 实现深色/浅色模式。
   - 集成 `NextTopLoader` 提供页面加载进度条。
@@ -188,7 +190,7 @@ SaaS-Starter-main/
   - 检查用户会话 Cookie。
   - 如果用户未登录但访问 `/dashboard/*`，重定向到 `/login`。
   - 如果用户已登录但访问 `/login` 或 `/signup`，重定向到 `/dashboard`。
-- **`app/dashboard/layout.tsx`**: 仪表盘的根布局。
+- **`src/app/dashboard/layout.tsx`**: 仪表盘的根布局。
   - 使用 `SessionGuard` 组件保护所有子路由。`SessionGuard` 是一个客户端组件，它会验证会话是否存在，如果不存在则重定向到登录页，并在验证期间显示加载动画。
   - 渲染 `AppSidebar` 和主内容区域 `SidebarInset`。
 
@@ -197,18 +199,18 @@ SaaS-Starter-main/
 项目的配置高度集中化，便于维护和扩展。
 
 - **环境变量 (`env.ts`)**: 使用 `@t3-oss/env-nextjs` 强制校验环境变量。所有环境变量（如 API 密钥、数据库 URL）必须在 `.env` 文件中定义，并通过 `env.ts` 进行类型安全访问。这避免了运行时因缺少环境变量而导致的错误。
-- **应用常量 (`lib/config/constants.ts`)**: 存放应用名称、描述、联系邮箱等不会频繁更改的硬编码值。
-- **产品套餐 (`lib/config/products.ts`)**: 统一定义所有付费套餐。每个套餐包含内部 ID、名称、特性列表以及在不同支付提供商（如 Creem）中的产品 ID。这种结构使得添加新套餐或更换支付提供商变得容易。
-- **用户角色 (`lib/config/roles.ts`)**: 定义了用户角色及其层级关系（`user`, `admin`, `super_admin`）。`hasRole` 等辅助函数提供了统一的权限检查逻辑。
-- **文件上传 (`lib/config/upload.ts`)**: 集中管理文件上传的所有规则，包括最大文件大小、允许的文件类型等。所有上传路径（客户端和服务器端）都共享此配置，确保规则一致性。
+- **应用常量 (`src/lib/config/constants.ts`)**: 存放应用名称、描述、联系邮箱等不会频繁更改的硬编码值。
+- **产品套餐 (`src/lib/config/products.ts`)**: 统一定义所有付费套餐。每个套餐包含内部 ID、名称、特性列表以及在不同支付提供商（如 Creem）中的产品 ID。这种结构使得添加新套餐或更换支付提供商变得容易。
+- **用户角色 (`src/lib/config/roles.ts`)**: 定义了用户角色及其层级关系（`user`, `admin`, `super_admin`）。`hasRole` 等辅助函数提供了统一的权限检查逻辑。
+- **文件上传 (`src/lib/config/upload.ts`)**: 集中管理文件上传的所有规则，包括最大文件大小、允许的文件类型等。所有上传路径（客户端和服务器端）都共享此配置，确保规则一致性。
 
 #### 2.2.3. 路由架构
 
 项目采用 Next.js App Router，并利用路由组 (Route Groups) 对页面进行逻辑隔离。
 
-- `(pages)`: 存放所有对公众可见的页面，如首页、关于、博客、定价等。使用 `app/(pages)/layout.tsx` 提供统一的页头和页脚。
-- `(auth)`: 存放认证流程中的页面，如登录、注册。使用 `app/(auth)/layout.tsx` 提供一个居中、简洁的布局。
-- `(dashboard)`: 存放所有需要用户登录才能访问的页面。其布局 `app/dashboard/layout.tsx` 通过 `SessionGuard` 实现了路由保护。
+- `(pages)`: 存放所有对公众可见的页面，如首页、关于、博客、定价等。使用 `src/app/(pages)/layout.tsx` 提供统一的页头和页脚。
+- `(auth)`: 存放认证流程中的页面，如登录、注册。使用 `src/app/(auth)/layout.tsx` 提供一个居中、简洁的布局。
+- `(dashboard)`: 存放所有需要用户登录才能访问的页面。其布局 `src/app/dashboard/layout.tsx` 通过 `SessionGuard` 实现了路由保护。
 
 #### 2.2.4. 构建和打包流程
 
@@ -242,7 +244,7 @@ SaaS-Starter-main/
    - 填入您的 PostgreSQL `DATABASE_URL`。
    - 注册并获取 Creem, Resend, Cloudflare R2 的 API 密钥，并填入 `.env` 文件。
 1. **数据库设置**:
-   - **开发环境**: `pnpm db:push` 会将 `database/schema.ts` 的更改直接同步到数据库，适合快速迭代。
+   - **开发环境**: `pnpm db:push` 会将 `src/database/schema.ts` 的更改直接同步到数据库，适合快速迭代。
    - **生产环境**: **必须**使用迁移文件。流程：
      1. `pnpm db:generate:prod`：生成生产环境的迁移 SQL 文件。
      1. 将代码和迁移文件部署到生产环境。
@@ -252,14 +254,14 @@ SaaS-Starter-main/
 
 1. **启动开发服务器**: `pnpm dev`
 1. **修改数据库**:
-   - 编辑 `database/schema.ts`。
+   - 编辑 `src/database/schema.ts`。
    - 运行 `pnpm db:push` 同步变更。
 1. **创建新页面**:
-   - 在 `app/(pages)` 或 `app/(dashboard)` 中创建新的文件夹和 `page.tsx` 文件。
+   - 在 `src/app/(pages)` 或 `src/app/(dashboard)` 中创建新的文件夹和 `page.tsx` 文件。
 1. **创建 API 路由**:
-   - 在 `app/api` 目录下创建新的文件夹和 `route.ts` 文件。
+   - 在 `src/app/api` 目录下创建新的文件夹和 `route.ts` 文件。
 1. **创建 Server Action**:
-   - 在 `lib/actions` 目录下创建新文件，使用 `"use server";` 指令。
+   - 在 `src/lib/actions` 目录下创建新文件，使用 `"use server";` 指令。
 1. **代码检查**:
    - 运行 `pnpm lint` 检查代码风格。
    - 运行 `pnpm prettier:format` 格式化代码。
@@ -271,9 +273,9 @@ SaaS-Starter-main/
   - 函数和变量使用驼峰命名法 (camelCase)。
   - 常量使用大写蛇形命名法 (UPPER_SNAKE_CASE)。
 - **文件组织**:
-  - 页面组件放置在各自的 `app` 路由文件夹下，通常在 `_components` 子目录中。
-  - 可复用组件放置在 `components` 目录下。
-  - 逻辑、类型、配置等分离到 `lib`, `types`, `schemas` 目录中。
+  - 页面组件放置在各自的 `src/app` 路由文件夹下，通常在 `_components` 子目录中。
+  - 可复用组件放置在 `src/components` 目录下。
+  - 逻辑、类型、配置等分离到 `src/lib`, `src/types`, `src/schemas` 目录中。
 - **注释要求**:
   - 对复杂函数或逻辑块使用 JSDoc 注释。
   - 对非直观的代码进行行内注释。
@@ -285,13 +287,13 @@ SaaS-Starter-main/
 ### 4.1. 认证系统 (Better-Auth)
 
 本脚手架使用 `better-auth` 库提供了一套完整的认证解决方案。
-- **核心配置**: `lib/auth/server.ts`
+- **核心配置**: `src/lib/auth/server.ts`
   - 配置了 Drizzle 数据库适配器。
   - 动态加载社交登录提供商 (Google, GitHub, LinkedIn)，只有在 `.env` 中提供了对应的 `CLIENT_ID` 和 `SECRET` 时才会启用。
   - 集成了 `magicLink` 插件，并配置了使用 Resend 发送邮件。
-- **API 路由**: `app/api/auth/[...all]/route.ts`
+- **API 路由**: `src/app/api/auth/[...all]/route.ts`
   - 这是一个动态路由，捕获所有 `better-auth` 的认证请求（如 `/api/auth/magic-link`, `/api/auth/google/login` 等），并交由 `auth.handler` 处理。
-- **客户端**: `lib/auth/client.ts`
+- **客户端**: `src/lib/auth/client.ts`
   - 提供了在客户端组件中与认证系统交互的方法，如 `signIn`, `signOut`, `useSession` 等。
 - **认证流程 (Magic Link 魔术链接)**:
 [![魔术链接](https://mermaid.ink/img/pako:eNp1k-1r00Acx_-V415NaNN2fVh74ETqA4KysYc30je35NaGJrl6SUQtBVeUVXHasQ1ZrYjCQBxL3ZvOWde_ppe0_4WXnh1ldiGQu-P7uXy_97tfFapUIxBBmzxxiaWSOzouMmwWLDB-Kpg5uqpXsOWAdZuwWet5Qyfig23AvW9-4yw47oC5265TukeZeWMWsUrYU8JCwm_v8Ldf-eF3QSw_mCleITaxtFA8qnuDXlcioXKiDo1FFxelDwSG_T3--kiIA--Un3eD-jnf7gWHPX5xMCGkVDDSCQLLS6trIIYregwL4zETF3U1auhWeUJI4RQR7H_xG02__cb_2PUPGkHrFVijZWL9B0j_wlbnzD-t8w-7o5dbMgmY481jSYH1lYeX6SURFWyYDIF_zMm-3-6M9vr--yPJX8kvxTKuFAx-nQhfErk2-v2708lVbBgbWC3fckJbNxVFufYERj_eDTtb0n8E8MYn3vs9-NMadj5fQaZr4_WDC0-qQJ7Ssk6AqNFoe4d7Ld7c5Y2fIKZhu7RBMdNgBBaZrkHkMJdEoEmYicMprI7LD50SMUkBIjHUyCZ2DacAC1ZNYOLmPKbUnJCMusUSRJvYsMXMrWjYmdz0y1UmzpywPHUtB6L5xHgPiKrwGUTJRFxJL8TjafFmc6nkfDoCn0OUziqpXC6XyWUzyVQmk0nUIvDF-K9xJbsgNETTHcoeyQ4bN1rtLzk3Xew?type=png)](https://mermaid.live/edit#pako:eNp1k-1r00Acx_-V415NaNN2fVh74ETqA4KysYc30je35NaGJrl6SUQtBVeUVXHasQ1ZrYjCQBxL3ZvOWde_ppe0_4WXnh1ldiGQu-P7uXy_97tfFapUIxBBmzxxiaWSOzouMmwWLDB-Kpg5uqpXsOWAdZuwWet5Qyfig23AvW9-4yw47oC5265TukeZeWMWsUrYU8JCwm_v8Ldf-eF3QSw_mCleITaxtFA8qnuDXlcioXKiDo1FFxelDwSG_T3--kiIA--Un3eD-jnf7gWHPX5xMCGkVDDSCQLLS6trIIYregwL4zETF3U1auhWeUJI4RQR7H_xG02__cb_2PUPGkHrFVijZWL9B0j_wlbnzD-t8w-7o5dbMgmY481jSYH1lYeX6SURFWyYDIF_zMm-3-6M9vr--yPJX8kvxTKuFAx-nQhfErk2-v2708lVbBgbWC3fckJbNxVFufYERj_eDTtb0n8E8MYn3vs9-NMadj5fQaZr4_WDC0-qQJ7Ssk6AqNFoe4d7Ld7c5Y2fIKZhu7RBMdNgBBaZrkHkMJdEoEmYicMprI7LD50SMUkBIjHUyCZ2DacAC1ZNYOLmPKbUnJCMusUSRJvYsMXMrWjYmdz0y1UmzpywPHUtB6L5xHgPiKrwGUTJRFxJL8TjafFmc6nkfDoCn0OUziqpXC6XyWUzyVQmk0nUIvDF-K9xJbsgNETTHcoeyQ4bN1rtLzk3Xew)
@@ -314,22 +316,22 @@ SaaS-Starter-main/
   ```
 ### 4.2. 数据库与 ORM (Drizzle)
 
-- **Schema 定义**: `database/schema.ts` 是所有数据库表的单一事实来源，使用 Drizzle ORM 的语法定义表结构、关系和约束。
-- **客户端初始化**: `database/index.ts` 负责初始化 Drizzle 客户端，并根据环境（Serverless 或传统服务器）应用不同的连接池配置 (`lib/database/connection.ts`)。
+- **Schema 定义**: `src/database/schema.ts` 是所有数据库表的单一事实来源，使用 Drizzle ORM 的语法定义表结构、关系和约束。
+- **客户端初始化**: `src/database/index.ts` 负责初始化 Drizzle 客户端，并根据环境（Serverless 或传统服务器）应用不同的连接池配置 (`src/lib/database/connection.ts`)。
 - **迁移管理**:
-  - 项目为开发和生产环境维护两套独立的迁移历史记录，分别位于 `database/migrations/development` 和 `database/migrations/production`。
+  - 项目为开发和生产环境维护两套独立的迁移历史记录，分别位于 `src/database/migrations/development` 和 `src/database/migrations/production`。
   - `pnpm db:generate` & `pnpm db:generate:prod`: 基于 `schema.ts` 的变化生成 SQL 迁移文件。
   - `pnpm db:push`: 仅限开发，直接将 schema 同步到数据库，会丢失历史记录。
   - `pnpm db:migrate:dev` & `pnpm db:migrate:prod`: 应用迁移文件到数据库。
 
 ### 4.3. 支付与订阅 (Creem)
-- **抽象层**: `lib/billing/index.ts` 导出一个统一的 `billing` 对象，未来可以轻松切换到其他支付提供商（如 Stripe），而无需修改上层业务代码。
-- **提供商实现**: `lib/billing/creem/provider.ts` 是 Creem 支付提供商的具体实现，封装了创建 Checkout 会话、客户门户和处理 Webhook 的逻辑。
+- **抽象层**: `src/lib/billing/index.ts` 导出一个统一的 `billing` 对象，未来可以轻松切换到其他支付提供商（如 Stripe），而无需修改上层业务代码。
+- **提供商实现**: `src/lib/billing/creem/provider.ts` 是 Creem 支付提供商的具体实现，封装了创建 Checkout 会话、客户门户和处理 Webhook 的逻辑。
 - **API 接口**:
   - `/api/billing/checkout`: 创建支付会话。在用户尝试购买已有的订阅时，会返回 `409 Conflict` 状态码和管理链接。
   - `/api/billing/portal`: 创建一个指向 Creem 客户门户的 URL，用户可以在此管理自己的订阅。
   - `/api/billing/webhooks/creem`: 接收来自 Creem 的 Webhook 事件，用于更新订阅状态、记录付款等。
-- **Webhook 处理**: `lib/billing/creem/webhook.ts`
+- **Webhook 处理**: `src/lib/billing/creem/webhook.ts`
   - **安全**: 使用 `crypto.timingSafeEqual` 验证 Webhook 签名，防止伪造请求。
   - **幂等性**: 在 `webhook_events` 表中记录已处理的事件 ID，防止同一事件被重复处理。
   - **事务性**: 所有数据库操作都在一个事务中完成，确保数据一致性。
@@ -356,7 +358,7 @@ SaaS-Starter-main/
   ```
 ### 4.4. 文件上传 (Cloudflare R2)
 
-系统支持两种上传模式，为不同场景提供最佳选择。所有上传规则集中在 `lib/config/upload.ts`。
+系统支持两种上传模式，为不同场景提供最佳选择。所有上传规则集中在 `src/lib/config/upload.ts`。
 
 #### 4.4.1. 客户端预签名上传 (UI 推荐)
 
@@ -413,20 +415,20 @@ sequenceDiagram
 - **管理界面**: 在开发环境中，通过访问 `/keystatic` 进入管理后台。为了安全，此界面在生产环境中默认禁用。
 - **内容读取**:
   - `@keystatic/core/reader` 用于在服务器端安全地读取 `content/` 目录下的内容。
-  - `app/(pages)/blog/page.tsx`: 博客列表页，读取所有文章。
-  - `app/(pages)/blog/[slug]/page.tsx`: 博客详情页，读取单篇文章，并使用 `@markdoc/markdoc` 解析 Markdoc 内容。
+  - `src/app/(pages)/blog/page.tsx`: 博客列表页，读取所有文章。
+  - `src/app/(pages)/blog/[slug]/page.tsx`: 博客详情页，读取单篇文章，并使用 `@markdoc/markdoc` 解析 Markdoc 内容。
 
 ### 4.6. 管理后台 (Admin Dashboard)
 
 提供了一套强大的、可扩展的数据管理系统。
 
-- **通用表格管理器**: `components/admin/generic-table/generic-table-manager.tsx` 是一个核心组件，可以为任何在 `lib/config/admin-tables.ts` 中声明的表自动生成一个完整的 CRUD 管理界面。
+- **通用表格管理器**: `src/components/admin/generic-table/generic-table-manager.tsx` 是一个核心组件，可以为任何在 `src/lib/config/admin-tables.ts` 中声明的表自动生成一个完整的 CRUD 管理界面。
 - **配置驱动**:
-  1. 在 `lib/config/admin-tables.ts` 中添加 Drizzle 表对象。
-  1. 在 `app/dashboard/_components/app-sidebar.tsx` 的 `genericTableNavigation` 中添加导航链接。
+  1. 在 `src/lib/config/admin-tables.ts` 中添加 Drizzle 表对象。
+  1. 在 `src/app/dashboard/_components/app-sidebar.tsx` 的 `genericTableNavigation` 中添加导航链接。
   1. 即可在 `/dashboard/admin/tables/[tableName]` 访问新的管理页面。
-- **Server Actions**: 所有 CRUD 操作都通过 `lib/actions/admin-generic.ts` 中的类型安全的 Server Actions 完成，无需编写额外的 API 路由。
-- **Schema 解析**: `lib/admin/schema-generator.ts` 动态解析 Drizzle schema，自动生成表单和验证规则 (Zod)，极大地简化了后台开发。
+- **Server Actions**: 所有 CRUD 操作都通过 `src/lib/actions/admin-generic.ts` 中的类型安全的 Server Actions 完成，无需编写额外的 API 路由。
+- **Schema 解析**: `src/lib/admin/schema-generator.ts` 动态解析 Drizzle schema，自动生成表单和验证规则 (Zod)，极大地简化了后台开发。
 
 ---
 
@@ -434,16 +436,16 @@ sequenceDiagram
 
 ### 5.1. 扩展点识别
 
-- **添加新页面**: 在 `app/(pages)` 或 `app/(dashboard)` 中创建新路由。
+- **添加新页面**: 在 `src/app/(pages)` 或 `src/app/(dashboard)` 中创建新路由。
 - **添加新后台管理表**:
-  1. 在 `database/schema.ts` 中定义新表。
-  1. 在 `lib/config/admin-tables.ts` 的 `enabledTablesMap` 中注册该表。
-  1. 在 `app/dashboard/_components/app-sidebar.tsx` 中添加导航链接。
+  1. 在 `src/database/schema.ts` 中定义新表。
+  1. 在 `src/lib/config/admin-tables.ts` 的 `enabledTablesMap` 中注册该表。
+  1. 在 `src/app/dashboard/_components/app-sidebar.tsx` 中添加导航链接。
 - **添加新支付提供商**:
-  1. 在 `lib/billing/` 下创建新的提供商实现文件，需遵循 `lib/billing/provider.ts` 的 `PaymentProvider` 接口。
-  1. 在 `lib/billing/index.ts` 中修改 `PAYMENT_PROVIDER` 逻辑以切换到新提供商。
-- **自定义邮件模板**: 在 `emails/` 目录下创建或修改 React Email 组件。
-- **自定义 UI 组件**: 在 `components/ui/` 中修改 `shadcn/ui` 组件或添加新组件。
+  1. 在 `src/lib/billing/` 下创建新的提供商实现文件，需遵循 `src/lib/billing/provider.ts` 的 `PaymentProvider` 接口。
+  1. 在 `src/lib/billing/index.ts` 中修改 `PAYMENT_PROVIDER` 逻辑以切换到新提供商。
+- **自定义邮件模板**: 在 `src/emails/` 目录下创建或修改 React Email 组件。
+- **自定义 UI 组件**: 在 `src/components/ui/` 中修改 `shadcn/ui` 组件或添加新组件。
 
 ### 5.2. API 参考
 
@@ -500,7 +502,7 @@ sequenceDiagram
 
 - **框架**: 使用 `Jest` 和 `React Testing Library`。
 - **配置文件**: `jest.config.ts`, `jest.setup.ts`。
-- **示例**: 项目中包含了对 UI 组件 (`logo.test.tsx`)、布局 (`layout.test.tsx`)、Schema (`auth.schema.test.ts`) 和核心逻辑 (`database/index.test.ts`) 的单元测试示例。
+- **示例**: 项目中包含了对 UI 组件 (`logo.test.tsx`)、布局 (`layout.test.tsx`)、Schema (`auth.schema.test.ts`) 和核心逻辑 (`src/database/index.test.ts`) 的单元测试示例。
 - **运行测试**: `pnpm test`
 
 ### 6.2. 代码质量保障
@@ -586,7 +588,7 @@ sequenceDiagram
 
 ### 8.3. 工具函数
 
-`lib/utils.ts` 中提供了一些实用的工具函数：
+`src/lib/utils.ts` 中提供了一些实用的工具函数：
 
 - `cn(...inputs)`: 安全地合并 Tailwind CSS 类名，并解决冲突。
 - `formatCurrency(amount, currency)`: 将以分为单位的金额格式化为货币字符串。
@@ -609,7 +611,7 @@ sequenceDiagram
 
 ### 10.1. 性能优化
 
-- **代码分割**: 对大型组件使用 `next/dynamic` 进行动态导入，如 `app/dashboard/settings/_components/settings.tsx` 中对每个设置页面的动态导入。
+- **代码分割**: 对大型组件使用 `next/dynamic` 进行动态导入，如 `src/app/dashboard/settings/_components/settings.tsx` 中对每个设置页面的动态导入。
 - **图片优化**: 优先使用 Next.js 的 `<Image>` 组件，它会自动进行图片大小优化、格式转换（如 WebP）和懒加载。
 - **服务器组件**: 尽可能使用 React Server Components (RSC) 来获取数据和执行逻辑，减少发送到客户端的 JavaScript 代码量。
 - **数据库查询**: 避免在循环中执行数据库查询。利用 Drizzle ORM 的 join 和批量操作能力来减少数据库往返次数。
@@ -620,7 +622,7 @@ sequenceDiagram
 - **路由保护**: `middleware.ts` 是第一道防线，但**必须**在 Server Actions 和 API 路由中使用 `requireAuth`、`requireAdmin` 等函数进行后端权限验证。
 - **SQL 注入**: 使用 Drizzle ORM 可以有效防止 SQL 注入攻击，因为它会自动参数化查询。
 - **XSS**: Next.js 和 React 默认会对 JSX 内容进行转义，防止跨站脚本攻击。处理用户生成的内容时，请使用成熟的库（如 `DOMPurify`）进行清理。
-- **Webhook 安全**: `lib/billing/creem/webhook.ts` 中的签名验证是确保 Webhook 请求来源可信的关键。
+- **Webhook 安全**: `src/lib/billing/creem/webhook.ts` 中的签名验证是确保 Webhook 请求来源可信的关键。
 
 ### 10.3. 部署指南
 

@@ -1,8 +1,21 @@
-import { describe, it, expect, jest, beforeEach, afterEach } from "@jest/globals";
+import {
+  describe,
+  it,
+  expect,
+  jest,
+  beforeEach,
+  afterEach,
+} from "@jest/globals";
 
 // Mock next/bundle-analyzer
 jest.mock("@next/bundle-analyzer", () => {
-  const mockWithBundleAnalyzer = jest.fn((config: { enabled: boolean }) => (nextConfig: Record<string, unknown>) => ({ ...nextConfig, analyzed: true }));
+  const mockWithBundleAnalyzer = jest.fn(
+    (config: { enabled: boolean }) =>
+      (nextConfig: Record<string, unknown>) => ({
+        ...nextConfig,
+        analyzed: true,
+      }),
+  );
   return mockWithBundleAnalyzer;
 });
 

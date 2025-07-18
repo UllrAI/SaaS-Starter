@@ -134,41 +134,43 @@ graph TD
 
 ```
 SaaS-Starter-main/
-├── app/                  # Next.js App Router core directory
-│   ├── (auth)/           # Authentication-related pages (login, signup)
-│   ├── (dashboard)/      # Protected dashboard pages
-│   ├── (pages)/          # Public pages (home, about, blog, etc.)
-│   ├── api/              # API routes
-│   ├── keystatic/        # Keystatic CMS admin interface
-│   ├── layout.tsx        # Root layout
-│   └── not-found.tsx     # Global 404 page
-├── components/           # React components
-│   ├── admin/            # Admin dashboard components
-│   ├── auth/             # Authentication flow components
-│   ├── blog/             # Blog-related components
-│   ├── forms/            # Form components
-│   ├── homepage/         # Homepage-specific components
-│   └── ui/               # Generic UI components (based on shadcn/ui)
+├── src/                  # All application source code
+│   ├── app/              # Next.js App Router core directory
+│   │   ├── (auth)/       # Authentication-related pages (login, signup)
+│   │   ├── (dashboard)/  # Protected dashboard pages
+│   │   ├── (pages)/      # Public pages (home, about, blog, etc.)
+│   │   ├── api/          # API routes
+│   │   ├── keystatic/    # Keystatic CMS admin interface
+│   │   ├── layout.tsx    # Root layout
+│   │   └── not-found.tsx # Global 404 page
+│   ├── components/       # React components
+│   │   ├── admin/        # Admin dashboard components
+│   │   ├── auth/         # Authentication flow components
+│   │   ├── blog/         # Blog-related components
+│   │   ├── forms/        # Form components
+│   │   ├── homepage/     # Homepage-specific components
+│   │   └── ui/           # Generic UI components (based on shadcn/ui)
+│   ├── database/         # Drizzle ORM related
+│   │   ├── migrations/   # Database migration files
+│   │   ├── config.ts     # Development migration config
+│   │   ├── config.prod.ts # Production migration config
+│   │   ├── index.ts      # Drizzle client initialization
+│   │   └── schema.ts     # Database table structure definitions
+│   ├── emails/           # React Email templates
+│   ├── hooks/            # Custom React Hooks
+│   ├── lib/              # Core logic and utility functions
+│   │   ├── actions/      # Next.js Server Actions
+│   │   ├── admin/        # Admin dashboard core logic
+│   │   ├── auth/         # Authentication config and logic (Better-Auth)
+│   │   ├── billing/      # Payment abstraction layer and providers (Creem)
+│   │   ├── config/       # Global constants, products, roles, etc.
+│   │   ├── database/     # Database helper functions
+│   │   ├── email.tsx     # Email sending service
+│   │   └── r2.ts         # Cloudflare R2 file upload service
+│   ├── schemas/          # Zod validation schemas
+│   └── types/            # TypeScript type definitions
 ├── content/              # Keystatic-managed content (Markdown, JSON)
-├── database/             # Drizzle ORM related
-│   ├── migrations/       # Database migration files
-│   ├── config.ts         # Development migration config
-│   ├── config.prod.ts    # Production migration config
-│   ├── index.ts          # Drizzle client initialization
-│   └── schema.ts         # Database table structure definitions
-├── emails/               # React Email templates
-├── hooks/                # Custom React Hooks
-├── lib/                  # Core logic and utility functions
-│   ├── actions/          # Next.js Server Actions
-│   ├── admin/            # Admin dashboard core logic
-│   ├── auth/             # Authentication config and logic (Better-Auth)
-│   ├── billing/          # Payment abstraction layer and providers (Creem)
-│   ├── config/           # Global constants, products, roles, etc.
-│   ├── database/         # Database helper functions
-│   ├── email.tsx         # Email sending service
-│   └── r2.ts             # Cloudflare R2 file upload service
 ├── public/               # Static assets
-├── schemas/              # Zod validation schemas
 ├── scripts/              # Helper scripts (like setting up admin)
 └── styles/               # Global styles and CSS
 ```
@@ -177,7 +179,7 @@ SaaS-Starter-main/
 
 #### 2.2.1. Entry Files and Startup Flow
 
-- **`app/layout.tsx`**: The project's root layout that wraps all pages. It handles:
+- **`src/app/layout.tsx`**: The project's root layout that wraps all pages. It handles:
   - Setting HTML `lang` attribute and font variables.
   - Integrating `ThemeProvider` for dark/light mode.
   - Integrating `NextTopLoader` for page loading progress.
@@ -187,7 +189,7 @@ SaaS-Starter-main/
   - Checks user session cookies.
   - Redirects to `/login` if user is not logged in but accessing `/dashboard/*`.
   - Redirects to `/dashboard` if user is logged in but accessing `/login` or `/signup`.
-- **`app/dashboard/layout.tsx`**: Root layout for the dashboard.
+- **`src/app/dashboard/layout.tsx`**: Root layout for the dashboard.
   - Uses `SessionGuard` component to protect all child routes. `SessionGuard` is a client component that verifies session existence, redirects to login if not found, and shows loading animation during verification.
   - Renders `AppSidebar` and main content area `SidebarInset`.
 
@@ -196,18 +198,18 @@ SaaS-Starter-main/
 The project's configuration is highly centralized for easy maintenance and extension.
 
 - **Environment Variables (`env.ts`)**: Uses `@t3-oss/env-nextjs` to enforce environment variable validation. All environment variables (like API keys, database URLs) must be defined in the `.env` file and accessed through `env.ts` for type safety. This prevents runtime errors due to missing environment variables.
-- **Application Constants (`lib/config/constants.ts`)**: Stores app name, description, contact email, and other hardcoded values that don't change frequently.
-- **Product Plans (`lib/config/products.ts`)**: Centrally defines all paid plans. Each plan includes internal ID, name, feature list, and product IDs in different payment providers (like Creem). This structure makes it easy to add new plans or switch payment providers.
-- **User Roles (`lib/config/roles.ts`)**: Defines user roles and their hierarchical relationships (`user`, `admin`, `super_admin`). Helper functions like `hasRole` provide unified permission checking logic.
-- **File Upload (`lib/config/upload.ts`)**: Centrally manages all file upload rules, including maximum file size, allowed file types, etc. All upload paths (client and server-side) share this configuration, ensuring rule consistency.
+- **Application Constants (`src/lib/config/constants.ts`)**: Stores app name, description, contact email, and other hardcoded values that don't change frequently.
+- **Product Plans (`src/lib/config/products.ts`)**: Centrally defines all paid plans. Each plan includes internal ID, name, feature list, and product IDs in different payment providers (like Creem). This structure makes it easy to add new plans or switch payment providers.
+- **User Roles (`src/lib/config/roles.ts`)**: Defines user roles and their hierarchical relationships (`user`, `admin`, `super_admin`). Helper functions like `hasRole` provide unified permission checking logic.
+- **File Upload (`src/lib/config/upload.ts`)**: Centrally manages all file upload rules, including maximum file size, allowed file types, etc. All upload paths (client and server-side) share this configuration, ensuring rule consistency.
 
 #### 2.2.3. Routing Architecture
 
 The project uses Next.js App Router and leverages Route Groups for logical page separation.
 
-- `(pages)`: Contains all public pages like home, about, blog, pricing, etc. Uses `app/(pages)/layout.tsx` to provide unified header and footer.
-- `(auth)`: Contains authentication flow pages like login, signup. Uses `app/(auth)/layout.tsx` to provide a centered, clean layout.
-- `(dashboard)`: Contains all pages requiring user login. Its layout `app/dashboard/layout.tsx` implements route protection through `SessionGuard`.
+- `(pages)`: Contains all public pages like home, about, blog, pricing, etc. Uses `src/app/(pages)/layout.tsx` to provide unified header and footer.
+- `(auth)`: Contains authentication flow pages like login, signup. Uses `src/app/(auth)/layout.tsx` to provide a centered, clean layout.
+- `(dashboard)`: Contains all pages requiring user login. Its layout `src/app/dashboard/layout.tsx` implements route protection through `SessionGuard`.
 
 #### 2.2.4. Build and Packaging Process
 
@@ -284,13 +286,13 @@ The project uses Next.js App Router and leverages Route Groups for logical page 
 ### 4.1. Authentication System (Better-Auth)
 
 This starter kit uses the `better-auth` library to provide a complete authentication solution.
-- **Core Configuration**: `lib/auth/server.ts`
+- **Core Configuration**: `src/lib/auth/server.ts`
   - Configures Drizzle database adapter.
   - Dynamically loads social login providers (Google, GitHub, LinkedIn), only enabled when corresponding `CLIENT_ID` and `SECRET` are provided in `.env`.
   - Integrates `magicLink` plugin and configures using Resend for email sending.
 - **API Route**: `app/api/auth/[...all]/route.ts`
   - This is a dynamic route that captures all `better-auth` authentication requests (like `/api/auth/magic-link`, `/api/auth/google/login`, etc.) and hands them to `auth.handler`.
-- **Client**: `lib/auth/client.ts`
+- **Client**: `src/lib/auth/client.ts`
   - Provides methods for interacting with the authentication system in client components, like `signIn`, `signOut`, `useSession`, etc.
 - **Authentication Flow (Magic Link)**:
 [![Magic Link](https://mermaid.ink/img/pako:eNp1k-1r00Acx_-V415NaNN2fVh74ETqA4KysYc30je35NaGJrl6SUQtBVeUVXHasQ1ZrYjCQBxL3ZvOWde_ppe0_4WXnh1ldiGQu-P7uXy_97tfFapUIxBBmzxxiaWSOzouMmwWLDB-Kpg5uqpXsOWAdZuwWet5Qyfig23AvW9-4yw47oC5265TukeZeWMWsUrYU8JCwm_v8Ldf-eF3QSw_mCleITaxtFA8qnuDXlcioXKiDo1FFxelDwSG_T3--kiIA--Un3eD-jnf7gWHPX5xMCGkVDDSCQLLS6trIIYregwL4zETF3U1auhWeUJI4RQR7H_xG02__cb_2PUPGkHrFVijZWL9B0j_wlbnzD-t8w-7o5dbMgmY481jSYH1lYeX6SURFWyYDIF_zMm-3-6M9vr--yPJX8kvxTKuFAx-nQhfErk2-v2708lVbBgbWC3fckJbNxVFufYERj_eDTtb0n8E8MYn3vs9-NMadj5fQaZr4_WDC0-qQJ7Ssk6AqNFoe4d7Ld7c5Y2fIKZhu7RBMdNgBBaZrkHkMJdEoEmYicMprI7LD50SMUkBIjHUyCZ2DacAC1ZNYOLmPKbUnJCMusUSRJvYsMXMrWjYmdz0y1UmzpywPHUtB6L5xHgPiKrwGUTJRFxJL8TjafFmc6nkfDoCn0OUziqpXC6XyWUzyVQmk0nUIvDF-K9xJbsgNETTHcoeyQ4bN1rtLzk3Xew)](https://mermaid.live/edit#pako:eNp1k-1r00Acx_-V415NaNN2fVh74ETqA4KysYc30je35NaGJrl6SUQtBVeUVXHasQ1ZrYjCQBxL3ZvOWde_ppe0_4WXnh1ldiGQu-P7uXy_97tfFapUIxBBmzxxiaWSOzouMmwWLDB-Kpg5uqpXsOWAdZuwWet5Qyfig23AvW9-4yw47oC5265TukeZeWMWsUrYU8JCwm_v8Ldf-eF3QSw_mCleITaxtFA8qnuDXlcioXKiDo1FFxelDwSG_T3--kiIA--Un3eD-jnf7gWHPX5xMCGkVDDSCQLLS6trIIYregwL4zETF3U1auhWeUJI4RQR7H_xG02__cb_2PUPGkHrFVijZWL9B0j_wlbnzD-t8w-7o5dbMgmY481jSYH1lYeX6SURFWyYDIF_zMm-3-6M9vr--yPJX8kvxTKuFAx-nQhfErk2-v2708lVbBgbWC3fckJbNxVFufYERj_eDTtb0n8E8MYn3vs9-NMadj5fQaZr4_WDC0-qQJ7Ssk6AqNFoe4d7Ld7c5Y2fIKZhu7RBMdNgBBaZrkHkMJdEoEmYicMprI7LD50SMUkBIjHUyCZ2DacAC1ZNYOLmPKbUnJCMusUSRJvYsMXMrWjYmdz0y1UmzpywPHUtB6L5xHgPiKrwGUTJRFxJL8TjafFmc6nkfDoCn0OUziqpXC6XyWUzyVQmk0nUIvDF-K9xJbsgNETTHcoeyQ4bN1rtLzk3Xew)
@@ -314,7 +316,7 @@ This starter kit uses the `better-auth` library to provide a complete authentica
 ### 4.2. Database & ORM (Drizzle)
 
 - **Schema Definition**: `database/schema.ts` is the single source of truth for all database tables, defining table structures, relationships, and constraints using Drizzle ORM syntax.
-- **Client Initialization**: `database/index.ts` initializes the Drizzle client and applies different connection pool configurations based on environment (Serverless or traditional server) (`lib/database/connection.ts`).
+- **Client Initialization**: `database/index.ts` initializes the Drizzle client and applies different connection pool configurations based on environment (Serverless or traditional server) (`src/lib/database/connection.ts`).
 - **Migration Management**:
   - The project maintains two separate migration histories for development and production environments, located in `database/migrations/development` and `database/migrations/production` respectively.
   - `pnpm db:generate` & `pnpm db:generate:prod`: Generate SQL migration files based on changes in `schema.ts`.
@@ -322,13 +324,13 @@ This starter kit uses the `better-auth` library to provide a complete authentica
   - `pnpm db:migrate:dev` & `pnpm db:migrate:prod`: Apply migration files to database.
 
 ### 4.3. Payment & Subscriptions (Creem)
-- **Abstraction Layer**: `lib/billing/index.ts` exports a unified `billing` object, making it easy to switch to other payment providers (like Stripe) in the future without modifying upper-level business code.
-- **Provider Implementation**: `lib/billing/creem/provider.ts` is the specific implementation for Creem payment provider, encapsulating logic for creating checkout sessions, customer portals, and handling webhooks.
+- **Abstraction Layer**: `src/lib/billing/index.ts` exports a unified `billing` object, making it easy to switch to other payment providers (like Stripe) in the future without modifying upper-level business code.
+- **Provider Implementation**: `src/lib/billing/creem/provider.ts` is the specific implementation for Creem payment provider, encapsulating logic for creating checkout sessions, customer portals, and handling webhooks.
 - **API Interfaces**:
   - `/api/billing/checkout`: Creates payment sessions. Returns `409 Conflict` status and management link when user tries to purchase existing subscription.
   - `/api/billing/portal`: Creates a URL to Creem customer portal where users can manage their subscriptions.
   - `/api/billing/webhooks/creem`: Receives webhook events from Creem for updating subscription status, recording payments, etc.
-- **Webhook Handling**: `lib/billing/creem/webhook.ts`
+- **Webhook Handling**: `src/lib/billing/creem/webhook.ts`
   - **Security**: Uses `crypto.timingSafeEqual` to verify webhook signatures, preventing forged requests.
   - **Idempotency**: Records processed event IDs in `webhook_events` table to prevent duplicate processing of the same event.
   - **Transactional**: All database operations are completed in one transaction, ensuring data consistency.
@@ -355,7 +357,7 @@ This starter kit uses the `better-auth` library to provide a complete authentica
   ```
 ### 4.4. File Upload (Cloudflare R2)
 
-The system supports two upload modes, providing optimal choices for different scenarios. All upload rules are centralized in `lib/config/upload.ts`.
+The system supports two upload modes, providing optimal choices for different scenarios. All upload rules are centralized in `src/lib/config/upload.ts`.
 
 #### 4.4.1. Client-side Presigned Upload (UI Recommended)
 
@@ -412,20 +414,20 @@ sequenceDiagram
 - **Admin Interface**: In development environment, access `/keystatic` to enter admin dashboard. For security, this interface is disabled by default in production.
 - **Content Reading**:
   - `@keystatic/core/reader` used for safely reading content under `content/` directory on server-side.
-  - `app/(pages)/blog/page.tsx`: Blog list page, reads all articles.
-  - `app/(pages)/blog/[slug]/page.tsx`: Blog detail page, reads single article and uses `@markdoc/markdoc` to parse Markdoc content.
+  - `src/app/(pages)/blog/page.tsx`: Blog list page, reads all articles.
+  - `src/app/(pages)/blog/[slug]/page.tsx`: Blog detail page, reads single article and uses `@markdoc/markdoc` to parse Markdoc content.
 
 ### 4.6. Admin Dashboard
 
 Provides a powerful, extensible data management system.
 
-- **Generic Table Manager**: `components/admin/generic-table/generic-table-manager.tsx` is a core component that can automatically generate a complete CRUD management interface for any table declared in `lib/config/admin-tables.ts`.
+- **Generic Table Manager**: `components/admin/generic-table/generic-table-manager.tsx` is a core component that can automatically generate a complete CRUD management interface for any table declared in `src/lib/config/admin-tables.ts`.
 - **Configuration-Driven**:
-  1. Add Drizzle table object in `lib/config/admin-tables.ts`.
-  1. Add navigation link in `genericTableNavigation` in `app/dashboard/_components/app-sidebar.tsx`.
+  1. Add Drizzle table object in `src/lib/config/admin-tables.ts`.
+  1. Add navigation link in `genericTableNavigation` in `src/app/dashboard/_components/app-sidebar.tsx`.
   1. Access new management page at `/dashboard/admin/tables/[tableName]`.
-- **Server Actions**: All CRUD operations completed through type-safe Server Actions in `lib/actions/admin-generic.ts`, no need to write additional API routes.
-- **Schema Parsing**: `lib/admin/schema-generator.ts` dynamically parses Drizzle schema, automatically generates forms and validation rules (Zod), greatly simplifying backend development.
+- **Server Actions**: All CRUD operations completed through type-safe Server Actions in `src/lib/actions/admin-generic.ts`, no need to write additional API routes.
+- **Schema Parsing**: `src/lib/admin/schema-generator.ts` dynamically parses Drizzle schema, automatically generates forms and validation rules (Zod), greatly simplifying backend development.
 
 ---
 
@@ -436,13 +438,13 @@ Provides a powerful, extensible data management system.
 - **Add New Pages**: Create new routes in `app/(pages)` or `app/(dashboard)`.
 - **Add New Admin Management Tables**:
   1. Define new table in `database/schema.ts`.
-  1. Register the table in `enabledTablesMap` in `lib/config/admin-tables.ts`.
-  1. Add navigation link in `app/dashboard/_components/app-sidebar.tsx`.
+  1. Register the table in `enabledTablesMap` in `src/lib/config/admin-tables.ts`.
+  1. Add navigation link in `src/app/dashboard/_components/app-sidebar.tsx`.
 - **Add New Payment Provider**:
-  1. Create new provider implementation file under `lib/billing/`, must follow `PaymentProvider` interface in `lib/billing/provider.ts`.
-  1. Modify `PAYMENT_PROVIDER` logic in `lib/billing/index.ts` to switch to new provider.
-- **Customize Email Templates**: Create or modify React Email components in `emails/` directory.
-- **Customize UI Components**: Modify `shadcn/ui` components or add new ones in `components/ui/`.
+  1. Create new provider implementation file under `src/lib/billing/`, must follow `PaymentProvider` interface in `src/lib/billing/provider.ts`.
+  1. Modify `PAYMENT_PROVIDER` logic in `src/lib/billing/index.ts` to switch to new provider.
+- **Customize Email Templates**: Create or modify React Email components in `src/emails/` directory.
+- **Customize UI Components**: Modify `shadcn/ui` components or add new ones in `src/components/ui/`.
 
 ### 5.2. API Reference
 
@@ -585,7 +587,7 @@ All required and optional environment variables are detailed in the environment 
 
 ### 8.3. Utility Functions
 
-`lib/utils.ts` provides some useful utility functions:
+`src/lib/utils.ts` provides some useful utility functions:
 
 - `cn(...inputs)`: Safely merge Tailwind CSS class names and resolve conflicts.
 - `formatCurrency(amount, currency)`: Format amounts in cents to currency strings.
@@ -608,7 +610,7 @@ All required and optional environment variables are detailed in the environment 
 
 ### 10.1. Performance Optimization
 
-- **Code Splitting**: Use `next/dynamic` for dynamic imports of large components, like dynamic imports for each settings page in `app/dashboard/settings/_components/settings.tsx`.
+- **Code Splitting**: Use `next/dynamic` for dynamic imports of large components, like dynamic imports for each settings page in `src/app/dashboard/settings/_components/settings.tsx`.
 - **Image Optimization**: Prioritize using Next.js `<Image>` component, which automatically performs image size optimization, format conversion (like WebP), and lazy loading.
 - **Server Components**: Use React Server Components (RSC) as much as possible for data fetching and logic execution, reducing JavaScript code sent to client.
 - **Database Queries**: Avoid executing database queries in loops. Leverage Drizzle ORM's join and batch operation capabilities to reduce database round trips.
@@ -619,7 +621,7 @@ All required and optional environment variables are detailed in the environment 
 - **Route Protection**: `middleware.ts` is the first line of defense, but **must** use functions like `requireAuth`, `requireAdmin` in Server Actions and API routes for backend permission verification.
 - **SQL Injection**: Using Drizzle ORM effectively prevents SQL injection attacks because it automatically parameterizes queries.
 - **XSS**: Next.js and React escape JSX content by default, preventing cross-site scripting attacks. When handling user-generated content, use mature libraries (like `DOMPurify`) for sanitization.
-- **Webhook Security**: Signature verification in `lib/billing/creem/webhook.ts` is key to ensuring webhook requests come from trusted sources.
+- **Webhook Security**: Signature verification in `src/lib/billing/creem/webhook.ts` is key to ensuring webhook requests come from trusted sources.
 
 ### 10.3. Deployment Guide
 

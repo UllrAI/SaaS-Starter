@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
-import authMiddleware from "./middleware";
+import authMiddleware from "./src/middleware";
 import { getSessionCookie } from "better-auth/cookies";
 
 // Mock better-auth/cookies
 jest.mock("better-auth/cookies", () => ({
-  getSessionCookie: jest.fn() as jest.MockedFunction<(cookies: { get: (name: string) => { value: string } | undefined }) => string | null>,
+  getSessionCookie: jest.fn() as jest.MockedFunction<
+    (cookies: {
+      get: (name: string) => { value: string } | undefined;
+    }) => string | null
+  >,
 }));
 
 // Mock Next.js server components
@@ -17,7 +21,9 @@ jest.mock("next/server", () => ({
     url: url, // Ensure url is a full string
     nextUrl: new URL(url),
     cookies: {
-      get: jest.fn() as jest.MockedFunction<(name: string) => { value: string } | undefined>,
+      get: jest.fn() as jest.MockedFunction<
+        (name: string) => { value: string } | undefined
+      >,
     },
   })),
 }));
@@ -33,8 +39,12 @@ describe("authMiddleware", () => {
     const request = new NextRequest("http://localhost/login");
     const response = await authMiddleware(request);
 
-    expect(NextResponse.redirect).toHaveBeenCalledWith(new URL("/dashboard", request.url));
-    expect(response?.headers.get("location")).toBe("http://localhost/dashboard");
+    expect(NextResponse.redirect).toHaveBeenCalledWith(
+      new URL("/dashboard", request.url),
+    );
+    expect(response?.headers.get("location")).toBe(
+      "http://localhost/dashboard",
+    );
   });
 
   it("should redirect unauthenticated users from dashboard pages to /login with callbackUrl", async () => {
@@ -47,7 +57,9 @@ describe("authMiddleware", () => {
     loginUrl.searchParams.set("callbackUrl", "/dashboard/settings");
 
     expect(NextResponse.redirect).toHaveBeenCalledWith(loginUrl);
-    expect(response?.headers.get("location")).toBe("http://localhost/login?callbackUrl=%2Fdashboard%2Fsettings");
+    expect(response?.headers.get("location")).toBe(
+      "http://localhost/login?callbackUrl=%2Fdashboard%2Fsettings",
+    );
   });
 
   it("should allow logged-in users to access non-auth, non-dashboard pages", async () => {
@@ -76,8 +88,12 @@ describe("authMiddleware", () => {
     const request = new NextRequest("http://localhost/signup");
     const response = await authMiddleware(request);
 
-    expect(NextResponse.redirect).toHaveBeenCalledWith(new URL("/dashboard", request.url));
-    expect(response?.headers.get("location")).toBe("http://localhost/dashboard");
+    expect(NextResponse.redirect).toHaveBeenCalledWith(
+      new URL("/dashboard", request.url),
+    );
+    expect(response?.headers.get("location")).toBe(
+      "http://localhost/dashboard",
+    );
   });
 
   it("should redirect logged-in users from /auth/sent to /dashboard", async () => {
@@ -86,8 +102,12 @@ describe("authMiddleware", () => {
     const request = new NextRequest("http://localhost/auth/sent");
     const response = await authMiddleware(request);
 
-    expect(NextResponse.redirect).toHaveBeenCalledWith(new URL("/dashboard", request.url));
-    expect(response?.headers.get("location")).toBe("http://localhost/dashboard");
+    expect(NextResponse.redirect).toHaveBeenCalledWith(
+      new URL("/dashboard", request.url),
+    );
+    expect(response?.headers.get("location")).toBe(
+      "http://localhost/dashboard",
+    );
   });
 
   it("should allow unauthenticated users to access /login", async () => {

@@ -83,8 +83,154 @@ export function GenericForm({
         return (
           <Checkbox checked={field.value} onCheckedChange={field.onChange} />
         );
+      case "email":
+        return (
+          <Input
+            type="email"
+            placeholder="example@email.com"
+            {...field}
+            value={String(value)}
+          />
+        );
+      case "url":
+        return (
+          <Input
+            type="url"
+            placeholder="https://example.com"
+            {...field}
+            value={String(value)}
+          />
+        );
+      case "phone":
+        return (
+          <Input
+            type="tel"
+            placeholder="+1 (555) 123-4567"
+            {...field}
+            value={String(value)}
+          />
+        );
+      case "color":
+        return (
+          <div className="flex gap-2">
+            <Input
+              type="color"
+              {...field}
+              value={String(value) || "#000000"}
+              className="w-16 h-10 p-1 border rounded"
+            />
+            <Input
+              type="text"
+              {...field}
+              value={String(value)}
+              placeholder="#000000"
+              className="flex-1"
+            />
+          </div>
+        );
+      case "password":
+        return (
+          <Input
+            type="password"
+            {...field}
+            value={String(value)}
+          />
+        );
       case "text":
-        return <Textarea {...field} value={String(value)} />;
+      case "textarea":
+      case "richtext":
+      case "markdown":
+        return (
+          <Textarea 
+            {...field} 
+            value={String(value)}
+            rows={col.type === "text" ? 2 : 4}
+            placeholder={
+              col.type === "markdown" 
+                ? "Enter markdown text..." 
+                : col.type === "richtext"
+                ? "Enter rich text content..."
+                : `Enter ${col.name}...`
+            }
+          />
+        );
+      case "tags":
+        return (
+          <Textarea
+            {...field}
+            value={
+              Array.isArray(value) 
+                ? value.join(', ') 
+                : String(value)
+            }
+            placeholder="Enter tags separated by commas"
+            rows={2}
+            onChange={(e) => field.onChange(e.target.value)}
+          />
+        );
+      case "file":
+      case "image":
+        return (
+          <div className="space-y-2">
+            <Input
+              type="file"
+              accept={col.type === "image" ? "image/*" : "*/*"}
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  // For now, just store the file name
+                  // In a real implementation, you'd upload the file and store the URL
+                  field.onChange(file.name);
+                }
+              }}
+            />
+            {value && (
+              <div className="text-sm text-gray-500">
+                Current file: {String(value)}
+              </div>
+            )}
+          </div>
+        );
+      case "currency":
+        return (
+          <div className="relative">
+            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+              $
+            </span>
+            <Input
+              type="number"
+              step="0.01"
+              min="0"
+              className="pl-8"
+              {...field}
+              onChange={(e) => field.onChange(Number(e.target.value))}
+              placeholder="0.00"
+            />
+          </div>
+        );
+      case "filesize":
+        return (
+          <div className="relative">
+            <Input
+              type="number"
+              min="0"
+              {...field}
+              onChange={(e) => field.onChange(Number(e.target.value))}
+              placeholder="File size in bytes"
+            />
+            <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
+              bytes
+            </span>
+          </div>
+        );
+      case "foreign_key":
+        return (
+          <Input
+            {...field}
+            value={String(value)}
+            placeholder={`Enter ${col.name} ID`}
+          />
+        );
       case "enum":
         return (
           <Select onValueChange={field.onChange} defaultValue={field.value}>
@@ -127,6 +273,8 @@ export function GenericForm({
                 ? JSON.stringify(value, null, 2)
                 : String(value)
             }
+            placeholder="Enter valid JSON"
+            rows={4}
           />
         );
       default:

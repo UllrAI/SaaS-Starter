@@ -9,7 +9,7 @@ const mockToggleSidebar = jest.fn();
 
 // Test component that mimics AppSidebar behavior without external dependencies
 const TestAppSidebar = ({
-  pathname = "/dashboard/home",
+  pathname = "/dashboard",
   session = null,
   sidebarOpen = true,
   onNavigate = jest.fn(),
@@ -22,7 +22,7 @@ const TestAppSidebar = ({
   enabledTables?: string[];
 }) => {
   const navigation = [
-    { title: "Home", url: "/dashboard/home", icon: "🏠" },
+    { title: "Home", url: "/dashboard", icon: "🏠" },
     { title: "Upload", url: "/dashboard/upload", icon: "📤" },
     { title: "Settings", url: "/dashboard/settings", icon: "⚙️" },
   ];
@@ -266,7 +266,7 @@ describe("AppSidebar Component Behavioral Tests", () => {
       );
 
       fireEvent.click(screen.getByTestId("nav-item-home"));
-      expect(mockOnNavigate).toHaveBeenCalledWith("/dashboard/home");
+      expect(mockOnNavigate).toHaveBeenCalledWith("/dashboard");
 
       fireEvent.click(screen.getByTestId("nav-item-upload"));
       expect(mockOnNavigate).toHaveBeenCalledWith("/dashboard/upload");
@@ -589,7 +589,7 @@ describe("AppSidebar Component", () => {
 
     // Verify navigation item structure
     expect(content).toContain('title: "Home"');
-    expect(content).toContain('url: "/dashboard/home"');
+    expect(content).toContain('url: "/dashboard"');
     expect(content).toContain("icon: Home");
 
     expect(content).toContain('title: "Upload"');
@@ -873,7 +873,7 @@ describe("AppSidebar Component", () => {
     const content = fs.readFileSync(componentPath, "utf8");
 
     // Verify all navigation scenarios are covered
-    expect(content).toContain("/dashboard/home");
+    expect(content).toContain("/dashboard");
     expect(content).toContain("/dashboard/upload");
     expect(content).toContain("/dashboard/settings");
     expect(content).toContain("/dashboard/admin");

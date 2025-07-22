@@ -38,8 +38,8 @@ export function Hero() {
             {/* Main Heading */}
             <div className="space-y-4">
               <h1 className="text-foreground text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
-                Build & Launch Your
-                <span className="text-primary block">SaaS in Days</span>
+                Build & Launch
+                <span className="text-primary block">MicroSaaS in Days</span>
               </h1>
 
               <p className="text-muted-foreground max-w-lg text-xl leading-relaxed">

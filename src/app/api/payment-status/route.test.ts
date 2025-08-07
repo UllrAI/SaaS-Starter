@@ -1,13 +1,4 @@
-import {
-  describe,
-  it,
-  expect,
-  jest,
-  beforeEach,
-  afterEach,
-  beforeAll,
-} from "@jest/globals";
-import type { SpyInstance } from "../../../jest.setup";
+import type { SpyInstance } from "@/../jest.setup";
 import {
   MockSession,
   MockSubscription,
@@ -15,7 +6,7 @@ import {
   createMockSession,
   createMockSubscription,
   createMockCreemCheckout,
-} from "../../../jest.setup";
+} from "@/../jest.setup";
 
 // Type definitions for mocked functions
 type SessionFunction = (options: {

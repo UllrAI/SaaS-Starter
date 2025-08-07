@@ -11,7 +11,7 @@ const mockEnv = {
 };
 
 // Mock modules
-jest.mock("../../env", () => mockEnv);
+jest.mock("@/env", () => mockEnv);
 jest.mock("@/database", () => ({ db: {} }));
 jest.mock("@/database/tables", () => ({}));
 jest.mock("@/emails/magic-link", () => ({ sendMagicLink: jest.fn() }));
@@ -41,7 +41,7 @@ describe("Auth Server Configuration", () => {
 
   it("should include Google provider when both CLIENT_ID and CLIENT_SECRET are provided", async () => {
     // Mock env with Google credentials
-    jest.doMock("../../env", () => ({
+    jest.doMock("@/env", () => ({
       ...mockEnv,
       GOOGLE_CLIENT_ID: "google-client-id",
       GOOGLE_CLIENT_SECRET: "google-client-secret",
@@ -59,7 +59,7 @@ describe("Auth Server Configuration", () => {
 
   it("should include GitHub provider when both CLIENT_ID and CLIENT_SECRET are provided", async () => {
     // Mock env with GitHub credentials
-    jest.doMock("../../env", () => ({
+    jest.doMock("@/env", () => ({
       ...mockEnv,
       GITHUB_CLIENT_ID: "github-client-id",
       GITHUB_CLIENT_SECRET: "github-client-secret",
@@ -77,7 +77,7 @@ describe("Auth Server Configuration", () => {
 
   it("should include LinkedIn provider when LinkedIn credentials are provided", async () => {
     // Mock env with LinkedIn credentials
-    jest.doMock("../../env", () => ({
+    jest.doMock("@/env", () => ({
       ...mockEnv,
       LINKEDIN_CLIENT_ID: "linkedin-client-id",
       LINKEDIN_CLIENT_SECRET: "linkedin-client-secret",
@@ -95,7 +95,7 @@ describe("Auth Server Configuration", () => {
 
   it("should include all providers when all credentials are provided", async () => {
     // Mock env with Google, GitHub, and LinkedIn credentials
-    jest.doMock("../../env", () => ({
+    jest.doMock("@/env", () => ({
       ...mockEnv,
       GOOGLE_CLIENT_ID: "google-client-id",
       GOOGLE_CLIENT_SECRET: "google-client-secret",
@@ -116,7 +116,7 @@ describe("Auth Server Configuration", () => {
 
   it("should not include Google provider when CLIENT_ID is missing", async () => {
     // Mock env with only Google CLIENT_SECRET
-    jest.doMock("../../env", () => ({
+    jest.doMock("@/env", () => ({
       ...mockEnv,
       GOOGLE_CLIENT_SECRET: "google-client-secret",
     }));
@@ -129,7 +129,7 @@ describe("Auth Server Configuration", () => {
 
   it("should not include Google provider when CLIENT_SECRET is missing", async () => {
     // Mock env with only Google CLIENT_ID
-    jest.doMock("../../env", () => ({
+    jest.doMock("@/env", () => ({
       ...mockEnv,
       GOOGLE_CLIENT_ID: "google-client-id",
     }));
@@ -142,7 +142,7 @@ describe("Auth Server Configuration", () => {
 
   it("should not include GitHub provider when CLIENT_ID is missing", async () => {
     // Mock env with only GitHub CLIENT_SECRET
-    jest.doMock("../../env", () => ({
+    jest.doMock("@/env", () => ({
       ...mockEnv,
       GITHUB_CLIENT_SECRET: "github-client-secret",
     }));
@@ -155,7 +155,7 @@ describe("Auth Server Configuration", () => {
 
   it("should not include GitHub provider when CLIENT_SECRET is missing", async () => {
     // Mock env with only GitHub CLIENT_ID
-    jest.doMock("../../env", () => ({
+    jest.doMock("@/env", () => ({
       ...mockEnv,
       GITHUB_CLIENT_ID: "github-client-id",
     }));
@@ -168,7 +168,7 @@ describe("Auth Server Configuration", () => {
 
   it("should not include LinkedIn provider when CLIENT_ID is missing", async () => {
     // Mock env with only LinkedIn CLIENT_SECRET
-    jest.doMock("../../env", () => ({
+    jest.doMock("@/env", () => ({
       ...mockEnv,
       LINKEDIN_CLIENT_SECRET: "linkedin-client-secret",
     }));
@@ -181,7 +181,7 @@ describe("Auth Server Configuration", () => {
 
   it("should not include LinkedIn provider when CLIENT_SECRET is missing", async () => {
     // Mock env with only LinkedIn CLIENT_ID
-    jest.doMock("../../env", () => ({
+    jest.doMock("@/env", () => ({
       ...mockEnv,
       LINKEDIN_CLIENT_ID: "linkedin-client-id",
     }));
@@ -194,7 +194,7 @@ describe("Auth Server Configuration", () => {
 
   it("should have empty socialProviders when no credentials are provided", async () => {
     // Mock env without any social provider credentials
-    jest.doMock("../../env", () => mockEnv);
+    jest.doMock("@/env", () => mockEnv);
 
     const { auth } = await import("./server");
     const config = auth.options;
@@ -204,7 +204,7 @@ describe("Auth Server Configuration", () => {
   });
 
   it("should maintain other auth configuration properties", async () => {
-    jest.doMock("../../env", () => mockEnv);
+    jest.doMock("@/env", () => mockEnv);
 
     const { auth } = await import("./server");
     const config = auth.options;
@@ -221,7 +221,7 @@ describe("Auth Server Configuration", () => {
     const originalNodeEnv = process.env.NODE_ENV;
     process.env.NODE_ENV = "development";
 
-    jest.doMock("../../env", () => mockEnv);
+    jest.doMock("@/env", () => mockEnv);
 
     // Mock console.log to track calls
     const consoleLogSpy = jest
@@ -267,7 +267,7 @@ describe("Auth Server Configuration", () => {
     const originalNodeEnv = process.env.NODE_ENV;
     process.env.NODE_ENV = "production";
 
-    jest.doMock("../../env", () => mockEnv);
+    jest.doMock("@/env", () => mockEnv);
 
     // Mock console.log to track calls
     const consoleLogSpy = jest

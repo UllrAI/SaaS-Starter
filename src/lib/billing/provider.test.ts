@@ -1,5 +1,5 @@
 import { describe, it, expect, jest } from "@jest/globals";
-import { createMockAsyncFunction } from "../../jest.setup";
+import { createMockAsyncFunction } from "@/../jest.setup";
 
 // Mock types to avoid external dependencies
 jest.mock("@/types/billing", () => ({

@@ -49,6 +49,24 @@ const mockInArray = jest.fn();
 const mockOr = jest.fn();
 const mockAnd = jest.fn();
 
+const createColumnMock = () => {
+    const chainable = {
+      primaryKey: jest.fn().mockReturnThis(),
+      notNull: jest.fn().mockReturnThis(),
+      default: jest.fn().mockReturnThis(),
+      unique: jest.fn().mockReturnThis(),
+      references: jest.fn().mockReturnThis(),
+      defaultRandom: jest.fn().mockReturnThis(),
+      defaultNow: jest.fn().mockReturnThis(),
+    };
+    return jest.fn(() => ({
+        ...chainable,
+        getSQLType: jest.fn(),
+        dataType: 'any',
+      }));
+  };
+  
+
 // Create chainable mock factory for Zod
 const createZodChainableMock = () => {
   const chainable = {
@@ -86,6 +104,18 @@ jest.mock("next-safe-action", () => ({
 
 jest.mock("drizzle-orm/pg-core", () => ({
   getTableConfig: mockGetTableConfig,
+  pgEnum: jest.fn((_name, values) => {
+     const enumFn = jest.fn(() => ({ ...createColumnMock()() }));
+     (enumFn as any).enumValues = values;
+     return enumFn;
+     }),
+  pgTable: jest.fn((_name, columns) => columns),
+  text: createColumnMock(),
+  integer: createColumnMock(),
+  timestamp: createColumnMock(),
+  boolean: createColumnMock(),
+  uuid: createColumnMock(),
+  index: jest.fn(),
 }));
 
 jest.mock("drizzle-orm", () => ({
@@ -139,18 +169,13 @@ describe("Admin Generic Actions", () => {
 
     // Mock getTableConfig
     mockGetTableConfig.mockReturnValue({
-      columns: [
-        {
-          getSQLType: jest.fn().mockReturnValue("text"),
-        },
-        {
-          getSQLType: jest.fn().mockReturnValue("varchar(255)"),
-        },
-        {
-          getSQLType: jest.fn().mockReturnValue("integer"),
-        },
-      ],
-    });
+       columns: [
+         { name: 'id', getSQLType: () => 'text', primary: true, notNull: true, hasDefault: false },
+         { name: 'name', getSQLType: () => 'varchar(255)', primary: false, notNull: true, hasDefault: false },
+         { name: 'email', getSQLType: () => 'varchar(255)', primary: false, notNull: true, hasDefault: false },
+       ],
+       foreignKeys: [], // <--- 添加这个空的 foreignKeys 数组
+     });
 
     // Mock drizzle-orm functions
     mockCount.mockReturnValue("count(*)");

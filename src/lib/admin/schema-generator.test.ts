@@ -495,7 +495,7 @@ describe("schema-generator", () => {
       const result = getTableSchema(mockTable as any, "users");
 
       const contentColumn = result.find((col) => col.name === "content");
-      expect(contentColumn?.type).toBe("text");
+      expect(contentColumn?.type).toBe("textarea");
     });
 
     it("should set isOptional based on column constraints", () => {

@@ -23,8 +23,8 @@ describe("database configuration", () => {
 
       expect(config).toBeDefined();
       expect(config.dialect).toBe("postgresql");
-      expect(config.schema).toBe("./database/schema.ts");
-      expect(config.out).toBe("./database/migrations/development");
+      expect(config.schema).toBe("./src/database/schema.ts");
+      expect(config.out).toBe("./src/database/migrations/development");
       expect(config.verbose).toBe(true);
       expect(config.dbCredentials).toEqual({
         url: "postgresql://test:password@localhost:5432/testdb",
@@ -36,8 +36,11 @@ describe("database configuration", () => {
 
       // Verify all required properties exist and have correct types
       expect(config).toHaveProperty("dialect", "postgresql");
-      expect(config).toHaveProperty("schema", "./database/schema.ts");
-      expect(config).toHaveProperty("out", "./database/migrations/development");
+      expect(config).toHaveProperty("schema", "./src/database/schema.ts");
+      expect(config).toHaveProperty(
+        "out",
+        "./src/database/migrations/development",
+      );
       expect(config).toHaveProperty("verbose", true);
       expect(config).toHaveProperty("dbCredentials");
       expect(config.dbCredentials).toHaveProperty("url");
@@ -60,7 +63,7 @@ describe("database configuration", () => {
     it("should use development migrations folder", () => {
       const config = require("./config").default;
 
-      expect(config.out).toBe("./database/migrations/development");
+      expect(config.out).toBe("./src/database/migrations/development");
     });
 
     it("should use postgresql dialect", () => {
@@ -72,7 +75,7 @@ describe("database configuration", () => {
     it("should reference correct schema file", () => {
       const config = require("./config").default;
 
-      expect(config.schema).toBe("./database/schema.ts");
+      expect(config.schema).toBe("./src/database/schema.ts");
     });
   });
 
@@ -82,8 +85,8 @@ describe("database configuration", () => {
 
       expect(prodConfig).toBeDefined();
       expect(prodConfig.dialect).toBe("postgresql");
-      expect(prodConfig.schema).toBe("./database/schema.ts");
-      expect(prodConfig.out).toBe("./database/migrations/production");
+      expect(prodConfig.schema).toBe("./src/database/schema.ts");
+      expect(prodConfig.out).toBe("./src/database/migrations/production");
       expect(prodConfig.verbose).toBeUndefined(); // Production doesn't have verbose
       expect(prodConfig.dbCredentials).toEqual({
         url: "postgresql://test:password@localhost:5432/testdb",
@@ -95,10 +98,10 @@ describe("database configuration", () => {
 
       // Verify all required properties exist and have correct types
       expect(prodConfig).toHaveProperty("dialect", "postgresql");
-      expect(prodConfig).toHaveProperty("schema", "./database/schema.ts");
+      expect(prodConfig).toHaveProperty("schema", "./src/database/schema.ts");
       expect(prodConfig).toHaveProperty(
         "out",
-        "./database/migrations/production",
+        "./src/database/migrations/production",
       );
       expect(prodConfig).toHaveProperty("dbCredentials");
       expect(prodConfig.dbCredentials).toHaveProperty("url");
@@ -123,7 +126,7 @@ describe("database configuration", () => {
     it("should use production migrations folder", () => {
       const prodConfig = require("./config.prod").default;
 
-      expect(prodConfig.out).toBe("./database/migrations/production");
+      expect(prodConfig.out).toBe("./src/database/migrations/production");
     });
 
     it("should use postgresql dialect", () => {
@@ -135,7 +138,7 @@ describe("database configuration", () => {
     it("should reference correct schema file", () => {
       const prodConfig = require("./config.prod").default;
 
-      expect(prodConfig.schema).toBe("./database/schema.ts");
+      expect(prodConfig.schema).toBe("./src/database/schema.ts");
     });
   });
 
@@ -144,8 +147,8 @@ describe("database configuration", () => {
       const devConfig = require("./config").default;
       const prodConfig = require("./config.prod").default;
 
-      expect(devConfig.out).toBe("./database/migrations/development");
-      expect(prodConfig.out).toBe("./database/migrations/production");
+      expect(devConfig.out).toBe("./src/database/migrations/development");
+      expect(prodConfig.out).toBe("./src/database/migrations/production");
       expect(devConfig.out).not.toBe(prodConfig.out);
     });
 
@@ -170,8 +173,8 @@ describe("database configuration", () => {
       const devConfig = require("./config").default;
       const prodConfig = require("./config.prod").default;
 
-      expect(devConfig.schema).toBe("./database/schema.ts");
-      expect(prodConfig.schema).toBe("./database/schema.ts");
+      expect(devConfig.schema).toBe("./src/database/schema.ts");
+      expect(prodConfig.schema).toBe("./src/database/schema.ts");
       expect(devConfig.schema).toBe(prodConfig.schema);
     });
 
@@ -291,7 +294,7 @@ describe("database configuration", () => {
       const prodConfig = require("./config.prod").default;
 
       [devConfig, prodConfig].forEach((config) => {
-        expect(config.schema).toBe("./database/schema.ts");
+        expect(config.schema).toBe("./src/database/schema.ts");
       });
     });
 

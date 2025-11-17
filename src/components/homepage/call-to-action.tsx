@@ -53,7 +53,7 @@ export function CallToAction() {
               className="h-12 px-8 text-base font-medium hover:bg-accent/70"
               asChild
             >
-              <Link href="/features">See what's inside</Link>
+              <Link href="/features">See what&apos;s inside</Link>
             </Button>
           </div>
 

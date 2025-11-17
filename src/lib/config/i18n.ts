@@ -15,7 +15,7 @@ export const LOCALE_DISPLAY_INFO: Record<SupportedLocale, LocaleDisplayInfo> = {
   },
   "zh-CN": {
     label: "简体中文",
-  },
+  }
 };
 
 export function getLocaleDisplayInfo(

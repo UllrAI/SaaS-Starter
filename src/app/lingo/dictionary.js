@@ -1288,7 +1288,7 @@ export default {
           content: {
             en: "Build & Launch<element:span>Micro SaaS in hours</element:span>",
             "zh-CN":
-              "构建和发布<element:span>几小时内的微型SaaS</element:span>",
+              "构建和发布<element:span>微型 SaaS 仅需几小时</element:span>",
           },
           hash: "9faca0006bf2b1b7e5475593a0d14d8d",
         },

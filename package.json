@@ -69,6 +69,7 @@
     "embla-carousel-react": "^8.6.0",
     "framer-motion": "^12.18.1",
     "input-otp": "^1.4.2",
+    "lingo.dev": "^0.115.0",
     "lucide-react": "^0.518.0",
     "mailchecker": "^6.0.17",
     "next": "^15.3.4",

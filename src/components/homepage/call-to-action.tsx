@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/logo";
@@ -20,7 +22,7 @@ export function CallToAction() {
               Launch your SaaS in hours 
             </p>
             <h2 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-              Everything you need to ship a MicroSaaS
+              Everything you need to ship a Micro SaaS
             </h2>
             <p className="text-muted-foreground text-base leading-relaxed sm:text-lg">
               Auth, billing, docs, and marketing pages already wired together so your next release can

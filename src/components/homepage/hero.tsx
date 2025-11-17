@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+
+import React, { use } from "react";
 import { Button } from "@/components/ui/button";
 import {
   ArrowRight,
@@ -35,11 +37,11 @@ export function Hero() {
             <div className="space-y-6">
               <h1 className="text-foreground text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
                 Build & Launch
-                <span className="text-primary/90 block">MicroSaaS in hours</span>
+                <span className="text-primary/90 block">Micro SaaS in hours</span>
               </h1>
 
               <p className="text-muted-foreground max-w-2xl text-lg leading-relaxed sm:text-xl">
-                {APP_DESCRIPTION} Everything you need to go from idea to revenue with one cohesive starter.
+                {APP_DESCRIPTION}
               </p>
             </div>
 

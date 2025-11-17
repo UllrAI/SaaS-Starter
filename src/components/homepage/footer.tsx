@@ -208,8 +208,8 @@ export function Footer() {
 
             <div className="text-muted-foreground flex items-center gap-2 text-sm">
               <span>Made with</span>
-              <Heart className="h-4 w-4 text-red-500" />
               <span>{COMPANY_TAGLINE}</span>
+              <Heart className="h-4 w-4 text-red-500" />
             </div>
           </div>
         </div>

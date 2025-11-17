@@ -110,7 +110,7 @@ export function SocialLoginButtons({
             variant="outline"
             disabled={isDisabled}
             onClick={() => handleSocialLogin(provider)}
-            className="hover:border-primary/50 hover:bg-primary/5 h-12 w-full border-2 transition-all duration-200"
+            className="h-12 w-full border-2 transition-all duration-200 cursor-pointer"
           >
             {isLoading ? (
               <span className="flex items-center gap-2">

@@ -4,6 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
 import { ModeToggle } from "@/components/mode-toggle";
+import { LocaleSwitcher } from "@/components/locale-switcher";
 import { Logo } from "@/components/logo";
 import {
   APP_NAME,
@@ -170,6 +171,12 @@ export function Footer() {
                 ))}
                 <div className="bg-border mx-1 h-6 w-px" />
                 <ModeToggle variant="outline" size="icon" />
+                <LocaleSwitcher
+                  variant="outline"
+                  size="sm"
+                  showLabel
+                  align="start"
+                />
               </div>
             </div>
 

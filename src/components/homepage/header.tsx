@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { Logo } from "@/components/logo";
 import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/mode-toggle";
+import { LocaleSwitcher } from "@/components/locale-switcher";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -369,6 +370,8 @@ export function Header() {
 
             {/* Right side actions */}
             <div className="flex items-center gap-3">
+              {/* Locale selector */}
+              <LocaleSwitcher variant="ghost" size="icon" />
               {/* Theme toggle */}
               <ModeToggle variant="ghost" size="icon" />
 

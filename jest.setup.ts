@@ -729,28 +729,24 @@ type DrizzleCondition = {
   conditions?: unknown[];
 };
 
-const mockEq = jest
-  .fn()
-  .mockImplementation(
-    (field: unknown, value: unknown): DrizzleCondition => ({
-      field,
-      value,
-      type: "eq",
-    }),
-  );
+const mockEq = jest.fn().mockImplementation(
+  (field: unknown, value: unknown): DrizzleCondition => ({
+    field,
+    value,
+    type: "eq",
+  }),
+);
 const mockDesc = jest
   .fn()
   .mockImplementation(
     (field: unknown): DrizzleCondition => ({ field, type: "desc" }),
   );
-const mockAnd = jest
-  .fn()
-  .mockImplementation(
-    (...conditions: unknown[]): DrizzleCondition => ({
-      conditions,
-      type: "and",
-    }),
-  );
+const mockAnd = jest.fn().mockImplementation(
+  (...conditions: unknown[]): DrizzleCondition => ({
+    conditions,
+    type: "and",
+  }),
+);
 
 // Mock Drizzle ORM functions
 jest.mock("drizzle-orm", () => ({

@@ -136,18 +136,19 @@ describe("Admin Index Module", () => {
     expect(content).not.toContain("interface ");
   });
 
-  
   it("should have proper module re-export pattern", () => {
     const indexPath = path.join(__dirname, "index.ts");
     const content = fs.readFileSync(indexPath, "utf8");
 
     // 每一行要么是注释，要么是导出语句的一部分
-    const lines = content.split('\n').filter(line => line.trim() !== '');
-    lines.forEach(line => {
+    const lines = content.split("\n").filter((line) => line.trim() !== "");
+    lines.forEach((line) => {
       const trimmedLine = line.trim();
-      const isComment = trimmedLine.startsWith('//');
-      const isExportPart = /^(export\s*\{|type|\w+,?|\}\s*from)/.test(trimmedLine);
-      
+      const isComment = trimmedLine.startsWith("//");
+      const isExportPart = /^(export\s*\{|type|\w+,?|\}\s*from)/.test(
+        trimmedLine,
+      );
+
       // 断言每一行都必须是注释或导出语句的一部分
       expect(isComment || isExportPart).toBe(true);
     });

@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   # PostgreSQL Database
@@ -35,37 +35,37 @@ services:
     environment:
       # Database
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/ullrai_starter
-      
+
       # Database connection pool settings
       DB_POOL_SIZE: 20
       DB_IDLE_TIMEOUT: 300
       DB_MAX_LIFETIME: 14400
       DB_CONNECT_TIMEOUT: 30
-      
+
       # Application URL
       NEXT_PUBLIC_APP_URL: http://localhost:3000
-      
+
       # Auth Secret (generate a new one for production)
       BETTER_AUTH_SECRET: your-development-secret-key-here
-      
+
       # OAuth (optional - configure as needed)
-      # GOOGLE_CLIENT_ID: 
-      # GOOGLE_CLIENT_SECRET: 
-      # GITHUB_CLIENT_ID: 
-      # GITHUB_CLIENT_SECRET: 
-      # LINKEDIN_CLIENT_ID: 
-      # LINKEDIN_CLIENT_SECRET: 
-      
+      # GOOGLE_CLIENT_ID:
+      # GOOGLE_CLIENT_SECRET:
+      # GITHUB_CLIENT_ID:
+      # GITHUB_CLIENT_SECRET:
+      # LINKEDIN_CLIENT_ID:
+      # LINKEDIN_CLIENT_SECRET:
+
       # Email service (configure with your Resend API key)
       RESEND_API_KEY: your-resend-api-key-here
-      
+
       # Cloudflare R2 Storage (configure with your credentials)
       R2_ENDPOINT: your-r2-endpoint
       R2_ACCESS_KEY_ID: your-r2-access-key
       R2_SECRET_ACCESS_KEY: your-r2-secret-key
       R2_BUCKET_NAME: your-bucket-name
       R2_PUBLIC_URL: your-r2-public-url
-      
+
       # Payment provider (configure with your Creem credentials)
       CREEM_API_KEY: your-creem-api-key
       CREEM_ENVIRONMENT: test_mode

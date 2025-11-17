@@ -1,238 +1,268 @@
 :root {
-    /* 优雅复古终端主题 - 浅色模式 */
-    --background: oklch(0.9800 0.0024 120.0000); /* 淡绿纸质背景 */
-    --foreground: oklch(0.2400 0.0480 140.0000); /* 深绿终端文字 */
-    --card: oklch(0.9600 0.0040 115.0000);
-    --card-foreground: oklch(0.2400 0.0480 140.0000);
-    --popover: oklch(0.9750 0.0030 118.0000);
-    --popover-foreground: oklch(0.2400 0.0480 140.0000);
-    --primary: oklch(0.4200 0.1800 142.0000); /* 经典终端绿 */
-    --primary-foreground: oklch(0.9850 0.0020 120.0000);
-    --secondary: oklch(0.9200 0.0080 110.0000);
-    --secondary-foreground: oklch(0.3000 0.0600 135.0000);
-    --muted: oklch(0.9000 0.0100 125.0000);
-    --muted-foreground: oklch(0.5500 0.0300 130.0000);
-    --accent: oklch(0.7800 0.1400 75.0000); /* 复古琥珀色 */
-    --accent-foreground: oklch(0.2200 0.0200 80.0000);
-    --destructive: oklch(0.5500 0.2200 15.0000); /* 复古红色 */
-    --destructive-foreground: oklch(0.9800 0.0020 20.0000);
-    --border: oklch(0.8500 0.0200 125.0000);
-    --input: oklch(0.9300 0.0150 120.0000);
-    --ring: oklch(0.4200 0.1800 142.0000);
-    
-    /* 图表颜色 - 终端风格调色板 */
-    --chart-1: oklch(0.4200 0.1800 142.0000); /* 终端绿 */
-    --chart-2: oklch(0.7800 0.1400 75.0000);  /* 琥珀 */
-    --chart-3: oklch(0.5800 0.1600 25.0000);  /* 复古橙 */
-    --chart-4: oklch(0.6500 0.1200 200.0000); /* 青蓝 */
-    --chart-5: oklch(0.7200 0.1000 300.0000); /* 紫罗兰 */
-    
-    /* 侧边栏样式 */
-    --sidebar: oklch(0.9400 0.0060 118.0000);
-    --sidebar-foreground: oklch(0.3500 0.0500 135.0000);
-    --sidebar-primary: oklch(0.4200 0.1800 142.0000);
-    --sidebar-primary-foreground: oklch(0.9850 0.0020 120.0000);
-    --sidebar-accent: oklch(0.8200 0.0800 112.0000);
-    --sidebar-accent-foreground: oklch(0.2800 0.0400 138.0000);
-    --sidebar-border: oklch(0.8500 0.0200 125.0000);
-    --sidebar-ring: oklch(0.4200 0.1800 142.0000);
-    
-    /* 字体设置 - 等宽字体营造终端感 */
-    --font-sans: "JetBrains Mono", "Fira Code", "Source Code Pro", "SF Mono", Monaco, Inconsolata, "Roboto Mono", Consolas, "Liberation Mono", Menlo, Courier, monospace;
-    --font-serif: "JetBrains Mono", "Fira Code", "Source Code Pro", monospace;
-    --font-mono: "JetBrains Mono", "Fira Code", "Source Code Pro", monospace;
-    
-    /* 圆角设置 - 轻微圆角保持复古感 */
-    --radius: 0.125rem;
-    
-    /* 阴影效果 - 淡化处理 */
-    --shadow-2xs: 0px 1px 2px 0px oklch(0.2400 0.0480 140.0000 / 0.05);
-    --shadow-xs: 0px 1px 3px 0px oklch(0.2400 0.0480 140.0000 / 0.08);
-    --shadow-sm: 0px 1px 3px 0px oklch(0.2400 0.0480 140.0000 / 0.10), 0px 1px 2px -1px oklch(0.2400 0.0480 140.0000 / 0.06);
-    --shadow: 0px 2px 4px -1px oklch(0.2400 0.0480 140.0000 / 0.08), 0px 2px 3px -1px oklch(0.2400 0.0480 140.0000 / 0.06);
-    --shadow-md: 0px 4px 6px -1px oklch(0.2400 0.0480 140.0000 / 0.08), 0px 2px 4px -2px oklch(0.2400 0.0480 140.0000 / 0.06);
-    --shadow-lg: 0px 10px 15px -3px oklch(0.2400 0.0480 140.0000 / 0.08), 0px 4px 6px -4px oklch(0.2400 0.0480 140.0000 / 0.06);
-    --shadow-xl: 0px 20px 25px -5px oklch(0.2400 0.0480 140.0000 / 0.08), 0px 8px 10px -6px oklch(0.2400 0.0480 140.0000 / 0.06);
-    --shadow-2xl: 0px 25px 50px -12px oklch(0.2400 0.0480 140.0000 / 0.15);
-    
-    --tracking-normal: -0.01em; /* 轻微字间距调整 */
-    --spacing: 0.25rem;
+  /* 优雅复古终端主题 - 浅色模式 */
+  --background: oklch(0.98 0.0024 120); /* 淡绿纸质背景 */
+  --foreground: oklch(0.24 0.048 140); /* 深绿终端文字 */
+  --card: oklch(0.96 0.004 115);
+  --card-foreground: oklch(0.24 0.048 140);
+  --popover: oklch(0.975 0.003 118);
+  --popover-foreground: oklch(0.24 0.048 140);
+  --primary: oklch(0.42 0.18 142); /* 经典终端绿 */
+  --primary-foreground: oklch(0.985 0.002 120);
+  --secondary: oklch(0.92 0.008 110);
+  --secondary-foreground: oklch(0.3 0.06 135);
+  --muted: oklch(0.9 0.01 125);
+  --muted-foreground: oklch(0.55 0.03 130);
+  --accent: oklch(0.78 0.14 75); /* 复古琥珀色 */
+  --accent-foreground: oklch(0.22 0.02 80);
+  --destructive: oklch(0.55 0.22 15); /* 复古红色 */
+  --destructive-foreground: oklch(0.98 0.002 20);
+  --border: oklch(0.85 0.02 125);
+  --input: oklch(0.93 0.015 120);
+  --ring: oklch(0.42 0.18 142);
+
+  /* 图表颜色 - 终端风格调色板 */
+  --chart-1: oklch(0.42 0.18 142); /* 终端绿 */
+  --chart-2: oklch(0.78 0.14 75); /* 琥珀 */
+  --chart-3: oklch(0.58 0.16 25); /* 复古橙 */
+  --chart-4: oklch(0.65 0.12 200); /* 青蓝 */
+  --chart-5: oklch(0.72 0.1 300); /* 紫罗兰 */
+
+  /* 侧边栏样式 */
+  --sidebar: oklch(0.94 0.006 118);
+  --sidebar-foreground: oklch(0.35 0.05 135);
+  --sidebar-primary: oklch(0.42 0.18 142);
+  --sidebar-primary-foreground: oklch(0.985 0.002 120);
+  --sidebar-accent: oklch(0.82 0.08 112);
+  --sidebar-accent-foreground: oklch(0.28 0.04 138);
+  --sidebar-border: oklch(0.85 0.02 125);
+  --sidebar-ring: oklch(0.42 0.18 142);
+
+  /* 字体设置 - 等宽字体营造终端感 */
+  --font-sans:
+    "JetBrains Mono", "Fira Code", "Source Code Pro", "SF Mono", Monaco,
+    Inconsolata, "Roboto Mono", Consolas, "Liberation Mono", Menlo, Courier,
+    monospace;
+  --font-serif: "JetBrains Mono", "Fira Code", "Source Code Pro", monospace;
+  --font-mono: "JetBrains Mono", "Fira Code", "Source Code Pro", monospace;
+
+  /* 圆角设置 - 轻微圆角保持复古感 */
+  --radius: 0.125rem;
+
+  /* 阴影效果 - 淡化处理 */
+  --shadow-2xs: 0px 1px 2px 0px oklch(0.24 0.048 140 / 0.05);
+  --shadow-xs: 0px 1px 3px 0px oklch(0.24 0.048 140 / 0.08);
+  --shadow-sm:
+    0px 1px 3px 0px oklch(0.24 0.048 140 / 0.1),
+    0px 1px 2px -1px oklch(0.24 0.048 140 / 0.06);
+  --shadow:
+    0px 2px 4px -1px oklch(0.24 0.048 140 / 0.08),
+    0px 2px 3px -1px oklch(0.24 0.048 140 / 0.06);
+  --shadow-md:
+    0px 4px 6px -1px oklch(0.24 0.048 140 / 0.08),
+    0px 2px 4px -2px oklch(0.24 0.048 140 / 0.06);
+  --shadow-lg:
+    0px 10px 15px -3px oklch(0.24 0.048 140 / 0.08),
+    0px 4px 6px -4px oklch(0.24 0.048 140 / 0.06);
+  --shadow-xl:
+    0px 20px 25px -5px oklch(0.24 0.048 140 / 0.08),
+    0px 8px 10px -6px oklch(0.24 0.048 140 / 0.06);
+  --shadow-2xl: 0px 25px 50px -12px oklch(0.24 0.048 140 / 0.15);
+
+  --tracking-normal: -0.01em; /* 轻微字间距调整 */
+  --spacing: 0.25rem;
+}
+
+.dark {
+  /* 优雅复古终端主题 - 深色模式 */
+  --background: oklch(0.09 0.008 140); /* 深绿终端背景 */
+  --foreground: oklch(0.85 0.12 140); /* 亮绿终端文字 */
+  --card: oklch(0.12 0.01 138);
+  --card-foreground: oklch(0.85 0.12 140);
+  --popover: oklch(0.11 0.009 139);
+  --popover-foreground: oklch(0.85 0.12 140);
+  --primary: oklch(0.78 0.24 142); /* 明亮终端绿 */
+  --primary-foreground: oklch(0.09 0.008 140);
+  --secondary: oklch(0.2 0.015 135);
+  --secondary-foreground: oklch(0.75 0.1 142);
+  --muted: oklch(0.18 0.012 137);
+  --muted-foreground: oklch(0.6 0.08 140);
+  --accent: oklch(0.82 0.18 75); /* 明亮琥珀 */
+  --accent-foreground: oklch(0.15 0.01 80);
+  --destructive: oklch(0.68 0.24 20); /* 明亮复古红 */
+  --destructive-foreground: oklch(0.09 0.008 25);
+  --border: oklch(0.25 0.02 135);
+  --input: oklch(0.22 0.018 138);
+  --ring: oklch(0.78 0.24 142);
+
+  /* 图表颜色 - 深色模式终端调色板 */
+  --chart-1: oklch(0.78 0.24 142); /* 亮终端绿 */
+  --chart-2: oklch(0.82 0.18 75); /* 亮琥珀 */
+  --chart-3: oklch(0.75 0.2 25); /* 亮橙 */
+  --chart-4: oklch(0.72 0.16 200); /* 亮青蓝 */
+  --chart-5: oklch(0.8 0.14 300); /* 亮紫 */
+
+  /* 侧边栏样式 - 深色 */
+  --sidebar: oklch(0.08 0.007 142);
+  --sidebar-foreground: oklch(0.7 0.09 140);
+  --sidebar-primary: oklch(0.78 0.24 142);
+  --sidebar-primary-foreground: oklch(0.09 0.008 140);
+  --sidebar-accent: oklch(0.28 0.03 138);
+  --sidebar-accent-foreground: oklch(0.78 0.18 142);
+  --sidebar-border: oklch(0.25 0.02 135);
+  --sidebar-ring: oklch(0.78 0.24 142);
+
+  /* 字体保持一致 */
+  --font-sans:
+    "JetBrains Mono", "Fira Code", "Source Code Pro", "SF Mono", Monaco,
+    Inconsolata, "Roboto Mono", Consolas, "Liberation Mono", Menlo, Courier,
+    monospace;
+  --font-serif: "JetBrains Mono", "Fira Code", "Source Code Pro", monospace;
+  --font-mono: "JetBrains Mono", "Fira Code", "Source Code Pro", monospace;
+
+  --radius: 0.125rem;
+
+  /* 深色模式阴影 */
+  --shadow-2xs: 0px 1px 2px 0px oklch(0 0 0 / 0.15);
+  --shadow-xs: 0px 1px 3px 0px oklch(0 0 0 / 0.2);
+  --shadow-sm:
+    0px 1px 3px 0px oklch(0 0 0 / 0.25), 0px 1px 2px -1px oklch(0 0 0 / 0.15);
+  --shadow:
+    0px 2px 4px -1px oklch(0 0 0 / 0.2), 0px 2px 3px -1px oklch(0 0 0 / 0.15);
+  --shadow-md:
+    0px 4px 6px -1px oklch(0 0 0 / 0.2), 0px 2px 4px -2px oklch(0 0 0 / 0.15);
+  --shadow-lg:
+    0px 10px 15px -3px oklch(0 0 0 / 0.2), 0px 4px 6px -4px oklch(0 0 0 / 0.15);
+  --shadow-xl:
+    0px 20px 25px -5px oklch(0 0 0 / 0.25),
+    0px 8px 10px -6px oklch(0 0 0 / 0.15);
+  --shadow-2xl: 0px 25px 50px -12px oklch(0 0 0 / 0.35);
+
+  --tracking-normal: -0.01em;
+}
+
+/* 终端风格特效 */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+  --font-serif: var(--font-serif);
+
+  --radius-sm: calc(var(--radius) - 2px);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) + 2px);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --shadow-2xs: var(--shadow-2xs);
+  --shadow-xs: var(--shadow-xs);
+  --shadow-sm: var(--shadow-sm);
+  --shadow: var(--shadow);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+  --shadow-xl: var(--shadow-xl);
+  --shadow-2xl: var(--shadow-2xl);
+
+  --tracking-tighter: calc(var(--tracking-normal) - 0.05em);
+  --tracking-tight: calc(var(--tracking-normal) - 0.025em);
+  --tracking-normal: var(--tracking-normal);
+  --tracking-wide: calc(var(--tracking-normal) + 0.025em);
+  --tracking-wider: calc(var(--tracking-normal) + 0.05em);
+  --tracking-widest: calc(var(--tracking-normal) + 0.1em);
+}
+
+body {
+  letter-spacing: var(--tracking-normal);
+  /* 添加终端感的文本渲染 */
+  font-feature-settings:
+    "liga" 1,
+    "calt" 1;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 终端风格的滚动条 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--muted);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: var(--radius);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+}
+
+/* 终端风格的光标闪烁动画 */
+@keyframes terminal-cursor {
+  0%,
+  50% {
+    opacity: 1;
   }
-  
-  .dark {
-    /* 优雅复古终端主题 - 深色模式 */
-    --background: oklch(0.0900 0.0080 140.0000); /* 深绿终端背景 */
-    --foreground: oklch(0.8500 0.1200 140.0000); /* 亮绿终端文字 */
-    --card: oklch(0.1200 0.0100 138.0000);
-    --card-foreground: oklch(0.8500 0.1200 140.0000);
-    --popover: oklch(0.1100 0.0090 139.0000);
-    --popover-foreground: oklch(0.8500 0.1200 140.0000);
-    --primary: oklch(0.7800 0.2400 142.0000); /* 明亮终端绿 */
-    --primary-foreground: oklch(0.0900 0.0080 140.0000);
-    --secondary: oklch(0.2000 0.0150 135.0000);
-    --secondary-foreground: oklch(0.7500 0.1000 142.0000);
-    --muted: oklch(0.1800 0.0120 137.0000);
-    --muted-foreground: oklch(0.6000 0.0800 140.0000);
-    --accent: oklch(0.8200 0.1800 75.0000); /* 明亮琥珀 */
-    --accent-foreground: oklch(0.1500 0.0100 80.0000);
-    --destructive: oklch(0.6800 0.2400 20.0000); /* 明亮复古红 */
-    --destructive-foreground: oklch(0.0900 0.0080 25.0000);
-    --border: oklch(0.2500 0.0200 135.0000);
-    --input: oklch(0.2200 0.0180 138.0000);
-    --ring: oklch(0.7800 0.2400 142.0000);
-    
-    /* 图表颜色 - 深色模式终端调色板 */
-    --chart-1: oklch(0.7800 0.2400 142.0000); /* 亮终端绿 */
-    --chart-2: oklch(0.8200 0.1800 75.0000);  /* 亮琥珀 */
-    --chart-3: oklch(0.7500 0.2000 25.0000);  /* 亮橙 */
-    --chart-4: oklch(0.7200 0.1600 200.0000); /* 亮青蓝 */
-    --chart-5: oklch(0.8000 0.1400 300.0000); /* 亮紫 */
-    
-    /* 侧边栏样式 - 深色 */
-    --sidebar: oklch(0.0800 0.0070 142.0000);
-    --sidebar-foreground: oklch(0.7000 0.0900 140.0000);
-    --sidebar-primary: oklch(0.7800 0.2400 142.0000);
-    --sidebar-primary-foreground: oklch(0.0900 0.0080 140.0000);
-    --sidebar-accent: oklch(0.2800 0.0300 138.0000);
-    --sidebar-accent-foreground: oklch(0.7800 0.1800 142.0000);
-    --sidebar-border: oklch(0.2500 0.0200 135.0000);
-    --sidebar-ring: oklch(0.7800 0.2400 142.0000);
-    
-    /* 字体保持一致 */
-    --font-sans: "JetBrains Mono", "Fira Code", "Source Code Pro", "SF Mono", Monaco, Inconsolata, "Roboto Mono", Consolas, "Liberation Mono", Menlo, Courier, monospace;
-    --font-serif: "JetBrains Mono", "Fira Code", "Source Code Pro", monospace;
-    --font-mono: "JetBrains Mono", "Fira Code", "Source Code Pro", monospace;
-    
-    --radius: 0.125rem;
-    
-    /* 深色模式阴影 */
-    --shadow-2xs: 0px 1px 2px 0px oklch(0.0000 0 0 / 0.15);
-    --shadow-xs: 0px 1px 3px 0px oklch(0.0000 0 0 / 0.20);
-    --shadow-sm: 0px 1px 3px 0px oklch(0.0000 0 0 / 0.25), 0px 1px 2px -1px oklch(0.0000 0 0 / 0.15);
-    --shadow: 0px 2px 4px -1px oklch(0.0000 0 0 / 0.20), 0px 2px 3px -1px oklch(0.0000 0 0 / 0.15);
-    --shadow-md: 0px 4px 6px -1px oklch(0.0000 0 0 / 0.20), 0px 2px 4px -2px oklch(0.0000 0 0 / 0.15);
-    --shadow-lg: 0px 10px 15px -3px oklch(0.0000 0 0 / 0.20), 0px 4px 6px -4px oklch(0.0000 0 0 / 0.15);
-    --shadow-xl: 0px 20px 25px -5px oklch(0.0000 0 0 / 0.25), 0px 8px 10px -6px oklch(0.0000 0 0 / 0.15);
-    --shadow-2xl: 0px 25px 50px -12px oklch(0.0000 0 0 / 0.35);
-    
-    --tracking-normal: -0.01em;
+  51%,
+  100% {
+    opacity: 0;
   }
-  
-  /* 终端风格特效 */
-  @theme inline {
-    --color-background: var(--background);
-    --color-foreground: var(--foreground);
-    --color-card: var(--card);
-    --color-card-foreground: var(--card-foreground);
-    --color-popover: var(--popover);
-    --color-popover-foreground: var(--popover-foreground);
-    --color-primary: var(--primary);
-    --color-primary-foreground: var(--primary-foreground);
-    --color-secondary: var(--secondary);
-    --color-secondary-foreground: var(--secondary-foreground);
-    --color-muted: var(--muted);
-    --color-muted-foreground: var(--muted-foreground);
-    --color-accent: var(--accent);
-    --color-accent-foreground: var(--accent-foreground);
-    --color-destructive: var(--destructive);
-    --color-destructive-foreground: var(--destructive-foreground);
-    --color-border: var(--border);
-    --color-input: var(--input);
-    --color-ring: var(--ring);
-    --color-chart-1: var(--chart-1);
-    --color-chart-2: var(--chart-2);
-    --color-chart-3: var(--chart-3);
-    --color-chart-4: var(--chart-4);
-    --color-chart-5: var(--chart-5);
-    --color-sidebar: var(--sidebar);
-    --color-sidebar-foreground: var(--sidebar-foreground);
-    --color-sidebar-primary: var(--sidebar-primary);
-    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-    --color-sidebar-accent: var(--sidebar-accent);
-    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-    --color-sidebar-border: var(--sidebar-border);
-    --color-sidebar-ring: var(--sidebar-ring);
-  
-    --font-sans: var(--font-sans);
-    --font-mono: var(--font-mono);
-    --font-serif: var(--font-serif);
-  
-    --radius-sm: calc(var(--radius) - 2px);
-    --radius-md: var(--radius);
-    --radius-lg: calc(var(--radius) + 2px);
-    --radius-xl: calc(var(--radius) + 4px);
-  
-    --shadow-2xs: var(--shadow-2xs);
-    --shadow-xs: var(--shadow-xs);
-    --shadow-sm: var(--shadow-sm);
-    --shadow: var(--shadow);
-    --shadow-md: var(--shadow-md);
-    --shadow-lg: var(--shadow-lg);
-    --shadow-xl: var(--shadow-xl);
-    --shadow-2xl: var(--shadow-2xl);
-  
-    --tracking-tighter: calc(var(--tracking-normal) - 0.05em);
-    --tracking-tight: calc(var(--tracking-normal) - 0.025em);
-    --tracking-normal: var(--tracking-normal);
-    --tracking-wide: calc(var(--tracking-normal) + 0.025em);
-    --tracking-wider: calc(var(--tracking-normal) + 0.05em);
-    --tracking-widest: calc(var(--tracking-normal) + 0.1em);
-  }
-  
-  body {
-    letter-spacing: var(--tracking-normal);
-    /* 添加终端感的文本渲染 */
-    font-feature-settings: "liga" 1, "calt" 1;
-    text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-  
-  /* 终端风格的滚动条 */
-  ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-  }
-  
-  ::-webkit-scrollbar-track {
-    background: var(--muted);
-  }
-  
-  ::-webkit-scrollbar-thumb {
-    background: var(--primary);
-    border-radius: var(--radius);
-  }
-  
-  ::-webkit-scrollbar-thumb:hover {
-    background: var(--accent);
-  }
-  
-  /* 终端风格的光标闪烁动画 */
-  @keyframes terminal-cursor {
-    0%, 50% { opacity: 1; }
-    51%, 100% { opacity: 0; }
-  }
-  
-  .terminal-cursor::after {
-    content: "█";
-    animation: terminal-cursor 1s infinite;
-    color: var(--primary);
-  }
-  
-  /* CRT显示器扫描线效果（可选） */
-  .terminal-effect::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    pointer-events: none;
-    background: repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 2px,
-      oklch(0 0 0 / 0.03) 2px,
-      oklch(0 0 0 / 0.03) 4px
-    );
-  }
+}
+
+.terminal-cursor::after {
+  content: "█";
+  animation: terminal-cursor 1s infinite;
+  color: var(--primary);
+}
+
+/* CRT显示器扫描线效果（可选） */
+.terminal-effect::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    oklch(0 0 0 / 0.03) 2px,
+    oklch(0 0 0 / 0.03) 4px
+  );
+}

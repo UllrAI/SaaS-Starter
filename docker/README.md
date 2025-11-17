@@ -11,14 +11,14 @@ This directory contains Docker configuration for running the UllrAI Starter appl
 ## Quick Start
 
 1. **Configure Environment Variables**
-   
+
    Before running, update the environment variables in `docker-compose.yml`:
-   
+
    ```yaml
    # Required for development
    BETTER_AUTH_SECRET: "your-development-secret-key-here"
    RESEND_API_KEY: "your-resend-api-key-here"
-   
+
    # Configure R2 storage
    R2_ENDPOINT: "your-r2-endpoint"
    R2_ACCESS_KEY_ID: "your-r2-access-key"
@@ -26,14 +26,14 @@ This directory contains Docker configuration for running the UllrAI Starter appl
    ```
 
 2. **Run the application**
-   
+
    ```bash
    cd docker
    docker-compose up --build
    ```
 
 3. **Access the application**
-   
+
    - Application: http://localhost:3000
    - Database: localhost:5432
    - Redis: localhost:6379
@@ -41,17 +41,20 @@ This directory contains Docker configuration for running the UllrAI Starter appl
 ## Services
 
 ### app
+
 - **Port**: 3000
 - **Dependencies**: PostgreSQL
 - **Health check**: Next.js application readiness
 
 ### postgres
+
 - **Port**: 5432
 - **Database**: `ullrai_starter`
 - **Credentials**: postgres/postgres (development only)
 - **Persistence**: Docker volume `postgres_data`
 
 ### redis (optional)
+
 - **Port**: 6379
 - **Persistence**: Docker volume `redis_data`
 - **Use case**: Caching and session storage
@@ -59,25 +62,28 @@ This directory contains Docker configuration for running the UllrAI Starter appl
 ## Development Workflow
 
 1. **Database Migrations**
+
    ```bash
    # Run migrations inside the container
    docker-compose exec app pnpm run db:migrate:dev
    ```
 
 2. **Logs**
+
    ```bash
    # View application logs
    docker-compose logs -f app
-   
+
    # View all services
    docker-compose logs -f
    ```
 
 3. **Shell Access**
+
    ```bash
    # Access application container
    docker-compose exec app sh
-   
+
    # Access database
    docker-compose exec postgres psql -U postgres -d ullrai_starter
    ```
@@ -96,6 +102,7 @@ For production deployment:
 ## Troubleshooting
 
 ### Database Connection Issues
+
 ```bash
 # Check if PostgreSQL is ready
 docker-compose exec postgres pg_isready -U postgres
@@ -106,6 +113,7 @@ docker-compose up --build
 ```
 
 ### Build Issues
+
 ```bash
 # Clean build
 docker-compose down

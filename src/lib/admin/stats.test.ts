@@ -424,42 +424,32 @@ describe("Admin Stats", () => {
       const mockQueries = [
         { from: jest.fn().mockResolvedValue([{ value: 100 }]) }, // user total
         {
-          from: jest
-            .fn()
-            .mockReturnValue({
-              where: jest.fn().mockResolvedValue([{ value: 80 }]),
-            }),
+          from: jest.fn().mockReturnValue({
+            where: jest.fn().mockResolvedValue([{ value: 80 }]),
+          }),
         }, // user verified
         {
-          from: jest
-            .fn()
-            .mockReturnValue({
-              where: jest.fn().mockResolvedValue([{ value: 5 }]),
-            }),
+          from: jest.fn().mockReturnValue({
+            where: jest.fn().mockResolvedValue([{ value: 5 }]),
+          }),
         }, // user admins
         { from: jest.fn().mockResolvedValue([{ value: 50 }]) }, // sub total
         {
-          from: jest
-            .fn()
-            .mockReturnValue({
-              where: jest.fn().mockResolvedValue([{ value: 40 }]),
-            }),
+          from: jest.fn().mockReturnValue({
+            where: jest.fn().mockResolvedValue([{ value: 40 }]),
+          }),
         }, // sub active
         {
-          from: jest
-            .fn()
-            .mockReturnValue({
-              where: jest.fn().mockResolvedValue([{ value: 10 }]),
-            }),
+          from: jest.fn().mockReturnValue({
+            where: jest.fn().mockResolvedValue([{ value: 10 }]),
+          }),
         }, // sub canceled
         { from: jest.fn().mockResolvedValue([{ value: 200 }]) }, // pay total
         { from: jest.fn().mockResolvedValue([{ value: "50000" }]) }, // pay revenue
         {
-          from: jest
-            .fn()
-            .mockReturnValue({
-              where: jest.fn().mockResolvedValue([{ value: 180 }]),
-            }),
+          from: jest.fn().mockReturnValue({
+            where: jest.fn().mockResolvedValue([{ value: 180 }]),
+          }),
         }, // pay successful
         { from: jest.fn().mockResolvedValue([{ value: 300 }]) }, // upload total
         { from: jest.fn().mockResolvedValue([{ value: "2000000000" }]) }, // upload size
@@ -530,42 +520,32 @@ describe("Admin Stats", () => {
       const mockBasicStatsQueries = [
         { from: jest.fn().mockResolvedValue([{ value: 100 }]) }, // user total
         {
-          from: jest
-            .fn()
-            .mockReturnValue({
-              where: jest.fn().mockResolvedValue([{ value: 80 }]),
-            }),
+          from: jest.fn().mockReturnValue({
+            where: jest.fn().mockResolvedValue([{ value: 80 }]),
+          }),
         }, // user verified
         {
-          from: jest
-            .fn()
-            .mockReturnValue({
-              where: jest.fn().mockResolvedValue([{ value: 5 }]),
-            }),
+          from: jest.fn().mockReturnValue({
+            where: jest.fn().mockResolvedValue([{ value: 5 }]),
+          }),
         }, // user admins
         { from: jest.fn().mockResolvedValue([{ value: 50 }]) }, // sub total
         {
-          from: jest
-            .fn()
-            .mockReturnValue({
-              where: jest.fn().mockResolvedValue([{ value: 40 }]),
-            }),
+          from: jest.fn().mockReturnValue({
+            where: jest.fn().mockResolvedValue([{ value: 40 }]),
+          }),
         }, // sub active
         {
-          from: jest
-            .fn()
-            .mockReturnValue({
-              where: jest.fn().mockResolvedValue([{ value: 10 }]),
-            }),
+          from: jest.fn().mockReturnValue({
+            where: jest.fn().mockResolvedValue([{ value: 10 }]),
+          }),
         }, // sub canceled
         { from: jest.fn().mockResolvedValue([{ value: 200 }]) }, // pay total
         { from: jest.fn().mockResolvedValue([{ value: "50000" }]) }, // pay revenue
         {
-          from: jest
-            .fn()
-            .mockReturnValue({
-              where: jest.fn().mockResolvedValue([{ value: 180 }]),
-            }),
+          from: jest.fn().mockReturnValue({
+            where: jest.fn().mockResolvedValue([{ value: 180 }]),
+          }),
         }, // pay successful
         { from: jest.fn().mockResolvedValue([{ value: 300 }]) }, // upload total
         { from: jest.fn().mockResolvedValue([{ value: "2000000000" }]) }, // upload size

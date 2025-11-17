@@ -22,83 +22,169 @@ const drizzleTypeToTsType: Record<string, ColumnType> = {
 };
 
 // Helper function to detect field type based on column name patterns
-function detectColumnTypeByName(columnName: string, baseType: ColumnType): ColumnType {
+function detectColumnTypeByName(
+  columnName: string,
+  baseType: ColumnType,
+): ColumnType {
   const name = columnName.toLowerCase();
-  
+
   // Date/Time detection (PRIORITY: Handle first to override other detections)
-  if (name === "createdat" || name === "created_at" || 
-      name === "updatedat" || name === "updated_at" ||
-      name === "deletedat" || name === "deleted_at" ||
-      name.includes("time") || name.includes("date") ||
-      name.endsWith("at") && (name.includes("created") || name.includes("updated") || name.includes("deleted"))) {
+  if (
+    name === "createdat" ||
+    name === "created_at" ||
+    name === "updatedat" ||
+    name === "updated_at" ||
+    name === "deletedat" ||
+    name === "deleted_at" ||
+    name.includes("time") ||
+    name.includes("date") ||
+    (name.endsWith("at") &&
+      (name.includes("created") ||
+        name.includes("updated") ||
+        name.includes("deleted")))
+  ) {
     return "date";
   }
-  
+
   // Email detection (exact matches or clear email fields)
-  if (name === "email" || name === "useremail" || name === "emailaddress" || name.endsWith("email")) {
+  if (
+    name === "email" ||
+    name === "useremail" ||
+    name === "emailaddress" ||
+    name.endsWith("email")
+  ) {
     return "email";
   }
-  
+
   // URL detection (exact matches or clear URL fields)
-  if (name === "url" || name === "link" || name === "website" || name === "homepage" || name.endsWith("url") || name.endsWith("link")) {
+  if (
+    name === "url" ||
+    name === "link" ||
+    name === "website" ||
+    name === "homepage" ||
+    name.endsWith("url") ||
+    name.endsWith("link")
+  ) {
     return "url";
   }
-  
+
   // Phone detection (exact matches or clear phone fields)
-  if (name === "phone" || name === "mobile" || name === "tel" || name === "telephone" || name.endsWith("phone") || name.endsWith("mobile")) {
+  if (
+    name === "phone" ||
+    name === "mobile" ||
+    name === "tel" ||
+    name === "telephone" ||
+    name.endsWith("phone") ||
+    name.endsWith("mobile")
+  ) {
     return "phone";
   }
-  
+
   // Color detection (exact matches)
-  if (name === "color" || name === "colour" || name.endsWith("color") || name.endsWith("colour")) {
+  if (
+    name === "color" ||
+    name === "colour" ||
+    name.endsWith("color") ||
+    name.endsWith("colour")
+  ) {
     return "color";
   }
-  
-  // File size detection (for number fields)  
-  if (baseType === "number" && (name === "filesize" || name === "file_size" || name === "size" || name.endsWith("size") || name.toLowerCase().includes("filesize"))) {
+
+  // File size detection (for number fields)
+  if (
+    baseType === "number" &&
+    (name === "filesize" ||
+      name === "file_size" ||
+      name === "size" ||
+      name.endsWith("size") ||
+      name.toLowerCase().includes("filesize"))
+  ) {
     return "filesize";
   }
-  
+
   // Currency detection (for number fields) - be more specific
-  if (baseType === "number" && (name.includes("price") || name.includes("amount") || name.includes("cost") || name.includes("fee") || name.includes("salary") || name === "currency")) {
+  if (
+    baseType === "number" &&
+    (name.includes("price") ||
+      name.includes("amount") ||
+      name.includes("cost") ||
+      name.includes("fee") ||
+      name.includes("salary") ||
+      name === "currency")
+  ) {
     return "currency";
   }
-  
+
   // File name detection (not file upload, just display)
-  if (name === "filename" || name === "file_name" || name === "originalname" || name === "original_name") {
+  if (
+    name === "filename" ||
+    name === "file_name" ||
+    name === "originalname" ||
+    name === "original_name"
+  ) {
     return "file"; // Special handling for file names
   }
-  
+
   // Image detection (only for actual image fields, not URLs)
-  if ((name === "image" || name === "avatar" || name === "photo" || name === "picture") && baseType === "string" && !name.includes("url")) {
+  if (
+    (name === "image" ||
+      name === "avatar" ||
+      name === "photo" ||
+      name === "picture") &&
+    baseType === "string" &&
+    !name.includes("url")
+  ) {
     return "image";
   }
-  
+
   // Rich text detection (exact matches)
-  if (name.includes("richtext") || name.includes("rich_text") || name.includes("html")) {
+  if (
+    name.includes("richtext") ||
+    name.includes("rich_text") ||
+    name.includes("html")
+  ) {
     return "richtext";
   }
-  
+
   // Markdown detection (exact matches)
   if (name.includes("markdown") || name.includes("md")) {
     return "markdown";
   }
-  
+
   // Tags detection (exact matches for tag fields)
-  if (name === "tags" || name === "keywords" || name === "labels" || name.endsWith("tags")) {
+  if (
+    name === "tags" ||
+    name === "keywords" ||
+    name === "labels" ||
+    name.endsWith("tags")
+  ) {
     return "tags";
   }
-  
+
   // Password detection (exact matches)
-  if (name === "password" || name === "passwd" || name === "secret" || name.endsWith("password")) {
+  if (
+    name === "password" ||
+    name === "passwd" ||
+    name === "secret" ||
+    name.endsWith("password")
+  ) {
     return "password";
   }
-  
+
   // Textarea detection for long text fields (more specific)
-  if (baseType === "string" && (name.includes("description") || name.includes("content") || name.includes("note") || name.includes("comment") || name.includes("message") || name.includes("bio") || name.includes("summary"))) {
+  if (
+    baseType === "string" &&
+    (name.includes("description") ||
+      name.includes("content") ||
+      name.includes("note") ||
+      name.includes("comment") ||
+      name.includes("message") ||
+      name.includes("bio") ||
+      name.includes("summary"))
+  ) {
     return "textarea";
   }
-  
+
   return baseType;
 }
 
@@ -106,27 +192,27 @@ function detectColumnTypeByName(columnName: string, baseType: ColumnType): Colum
 export function getDisplayFieldForTable(tableName: string): string {
   // Table-specific display field preferences
   const tableDisplayFields: Record<string, string> = {
-    'users': 'name',
-    'user': 'name',
-    'categories': 'name',
-    'category': 'name',
-    'products': 'name',
-    'product': 'name',
-    'orders': 'id', // For orders, ID might be more meaningful
-    'order': 'id',
-    'payments': 'id',
-    'payment': 'id',
-    'subscriptions': 'id',
-    'subscription': 'id',
+    users: "name",
+    user: "name",
+    categories: "name",
+    category: "name",
+    products: "name",
+    product: "name",
+    orders: "id", // For orders, ID might be more meaningful
+    order: "id",
+    payments: "id",
+    payment: "id",
+    subscriptions: "id",
+    subscription: "id",
   };
-  
+
   // Check if we have a specific preference for this table
   if (tableDisplayFields[tableName]) {
     return tableDisplayFields[tableName];
   }
-  
+
   // Default fallback: use 'name' if available, otherwise 'id'
-  return 'name';
+  return "name";
 }
 
 export function getTableSchema(
@@ -156,7 +242,7 @@ export function getTableSchema(
       : undefined;
     const isUserIdFk = foreignTableName === userTableName;
 
-    let foreignKeyInfo: ColumnInfo['foreignKey'] = undefined;
+    let foreignKeyInfo: ColumnInfo["foreignKey"] = undefined;
 
     // Handle user relationship
     if (column.name === userRelatedColumn && isUserIdFk) {
@@ -166,7 +252,7 @@ export function getTableSchema(
         column: foreignKey!.reference().columns[0].name,
         displayField: "name", // Default to 'name' field for users
       };
-    } 
+    }
     // Handle foreign key relationships (non-user)
     else if (foreignKey && !isUserIdFk) {
       columnType = "foreign_key";
@@ -237,7 +323,9 @@ export function generateZodSchema(
         }
         break;
       case "phone":
-        fieldSchema = z.string().regex(/^[+]?[\d\s\-()]+$/, "Please enter a valid phone number");
+        fieldSchema = z
+          .string()
+          .regex(/^[+]?[\d\s\-()]+$/, "Please enter a valid phone number");
         if (!col.isOptional) {
           fieldSchema = (fieldSchema as z.ZodString).min(1, {
             message: "This field is required",
@@ -245,7 +333,12 @@ export function generateZodSchema(
         }
         break;
       case "color":
-        fieldSchema = z.string().regex(/^#[0-9A-Fa-f]{6}$/, "Please enter a valid color (e.g., #FF0000)");
+        fieldSchema = z
+          .string()
+          .regex(
+            /^#[0-9A-Fa-f]{6}$/,
+            "Please enter a valid color (e.g., #FF0000)",
+          );
         if (!col.isOptional) {
           fieldSchema = (fieldSchema as z.ZodString).min(1, {
             message: "This field is required",
@@ -269,7 +362,10 @@ export function generateZodSchema(
       case "tags":
         fieldSchema = z.string().transform((str) => {
           if (!str) return [];
-          return str.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
+          return str
+            .split(",")
+            .map((tag) => tag.trim())
+            .filter((tag) => tag.length > 0);
         });
         break;
       case "number":

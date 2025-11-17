@@ -1,6 +1,6 @@
 "use client";
 
-import React, { use } from "react";
+import React from "react";
 import { Button } from "@/components/ui/button";
 import {
   ArrowRight,

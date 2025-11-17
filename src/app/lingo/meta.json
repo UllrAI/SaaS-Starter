@@ -1,5 +1,4 @@
 {
-  "version": 0.1,
   "files": {
     "(auth)/auth/sent/page.tsx": {
       "scopes": {
@@ -1263,37 +1262,13 @@
     },
     "../components/homepage/footer.tsx": {
       "scopes": {
-        "14/declaration/body/1/argument/1/9/1/1/1": {
-          "type": "element",
-          "hash": "b9b8e7f4e470fccd87caff0319de7a56",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "© {currentYear} {COMPANY_NAME}. All rights reserved."
-        },
-        "14/declaration/body/1/argument/1/9/1/3/1": {
-          "type": "element",
-          "hash": "f0705bebd6ac510e8ce7df86a09cb354",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Made with"
-        },
-        "14/declaration/body/1/argument/1/9/1/3/3": {
-          "type": "element",
-          "hash": "f0705bebd6ac510e8ce7df86a09cb354",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Made with"
-        },
         "15/declaration/body/1/argument/1/9/1/1/1": {
           "type": "element",
           "hash": "b9b8e7f4e470fccd87caff0319de7a56",
           "context": "",
           "skip": false,
           "overrides": {},
-          "content": "© {currentYear} <element:CompanyNameText></element:CompanyNameText>. All rights reserved."
+          "content": "© {currentYear} {COMPANY_NAME}. All rights reserved."
         },
         "15/declaration/body/1/argument/1/9/1/3/1": {
           "type": "element",
@@ -1307,30 +1282,6 @@
     },
     "../components/homepage/header.tsx": {
       "scopes": {
-        "18/body/3/consequent/0/argument/1/1": {
-          "type": "element",
-          "hash": "bc82f0d7f47c95548c0de127137b2e8e",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "<element:UserCircle></element:UserCircle> Dashboard"
-        },
-        "18/body/4/argument/1/1": {
-          "type": "element",
-          "hash": "ec7b8f314fe9bc6591006707484ede61",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Sign In"
-        },
-        "18/body/4/argument/3/1": {
-          "type": "element",
-          "hash": "1d5f030c4ec9c869e647ae060518b948",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Get Started"
-        },
         "19/body/3/consequent/0/argument/1/1": {
           "type": "element",
           "hash": "bc82f0d7f47c95548c0de127137b2e8e",
@@ -1354,14 +1305,6 @@
           "skip": false,
           "overrides": {},
           "content": "Get Started"
-        },
-        "20/body/1/argument/1/1": {
-          "type": "element",
-          "hash": "307c87de1cb4d48596238fc68243816a",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Navigation Menu"
         },
         "20/body/3/consequent/0/argument/1/1": {
           "type": "element",
@@ -1395,15 +1338,7 @@
           "overrides": {},
           "content": "Navigation Menu"
         },
-        "21/declaration/body/5/argument/1/1/1/11/11/3": {
-          "type": "element",
-          "hash": "29dea3e0b6238874f8c7a27619df8e36",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Toggle menu"
-        },
-        "22/declaration/body/5/argument/1/1/1/11/11/3": {
+        "22/declaration/body/5/argument/1/1/1/11/15/3": {
           "type": "element",
           "hash": "29dea3e0b6238874f8c7a27619df8e36",
           "context": "",
@@ -1478,14 +1413,6 @@
           "skip": false,
           "overrides": {},
           "content": "Build & Launch<element:span>Micro SaaS in hours</element:span>"
-        },
-        "5/declaration/body/0/argument/1/1/3/7/3": {
-          "type": "element",
-          "hash": "a5183e27ce5a7a2a2dbd953fc9f52057",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "{APP_DESCRIPTION} Everything you need to go from idea to revenue with one cohesive starter."
         },
         "5/declaration/body/0/argument/1/1/7/3/11/1/1": {
           "type": "element",
@@ -1622,206 +1549,6 @@
           "skip": false,
           "overrides": {},
           "content": "<element:Zap></element:Zap> Fast Deploy"
-        },
-        "6/declaration/body/0/argument/1/1/3/15/1/1": {
-          "type": "element",
-          "hash": "66b61c0ae5e7fd9c8d2d8027fc7cc76a",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Start Building<element:ArrowRight></element:ArrowRight>"
-        },
-        "6/declaration/body/0/argument/1/1/3/15/3/1": {
-          "type": "element",
-          "hash": "0198492a984a019811a10e73c0b13827",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "<element:Github></element:Github> View on GitHub"
-        },
-        "6/declaration/body/0/argument/1/1/3/19/1/3": {
-          "type": "element",
-          "hash": "b5dfd9a30b3c8fd0607aa2414e340546",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "4.9/5"
-        },
-        "6/declaration/body/0/argument/1/1/3/19/1/5": {
-          "type": "element",
-          "hash": "cc8747dcc80f665609e9f26e63c463e4",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "average rating"
-        },
-        "6/declaration/body/0/argument/1/1/3/19/5/3": {
-          "type": "element",
-          "hash": "d9bd021cdd6c0cf66376061c4cceb094",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "10,000+ developers shipped with us"
-        },
-        "6/declaration/body/0/argument/1/1/3/3/1": {
-          "type": "element",
-          "hash": "b80ab5d722ff90c4606d7fb2f36cba45",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "<element:Sparkles></element:Sparkles> Fresh release"
-        },
-        "6/declaration/body/0/argument/1/1/3/3/3": {
-          "type": "element",
-          "hash": "de60cae903486d308e58d8112c954422",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Trusted by 10,000+ devs"
-        },
-        "6/declaration/body/0/argument/1/1/3/7/1": {
-          "type": "element",
-          "hash": "9faca0006bf2b1b7e5475593a0d14d8d",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Build & Launch<element:span>Micro SaaS in hours</element:span>"
-        },
-        "6/declaration/body/0/argument/1/1/7/3/11/1/1": {
-          "type": "element",
-          "hash": "d6609525c0ec758580ed5fd6c38d1ff2",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Deployments"
-        },
-        "6/declaration/body/0/argument/1/1/7/3/11/1/3": {
-          "type": "element",
-          "hash": "2ec651d9372762ade4c8bc7aafab3030",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Past 7 days"
-        },
-        "6/declaration/body/0/argument/1/1/7/3/11/5/1/1": {
-          "type": "element",
-          "hash": "914b4f146384a0699ed4853e22951015",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Success rate"
-        },
-        "6/declaration/body/0/argument/1/1/7/3/11/5/1/3": {
-          "type": "element",
-          "hash": "ebf8401702bd148b6b1b8a3cbcbe256f",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "99.9%"
-        },
-        "6/declaration/body/0/argument/1/1/7/3/11/5/3/1": {
-          "type": "element",
-          "hash": "0595918b3b5586fd944a3df3c950e589",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Build time"
-        },
-        "6/declaration/body/0/argument/1/1/7/3/11/5/3/3": {
-          "type": "element",
-          "hash": "82f2057ba1fec2baee1d732d36c82e58",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "1m 42s"
-        },
-        "6/declaration/body/0/argument/1/1/7/3/3/1/3/1": {
-          "type": "element",
-          "hash": "d57e9a8c3fd2985b2433e8f616db036a",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "UllrAI Dashboard"
-        },
-        "6/declaration/body/0/argument/1/1/7/3/3/1/3/3": {
-          "type": "element",
-          "hash": "341586dca2d122fe1421ed6f0e8a1071",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Demo metrics"
-        },
-        "6/declaration/body/0/argument/1/1/7/3/3/3": {
-          "type": "element",
-          "hash": "afe3d19c708ceaa2ceb3acef9c8d5c7c",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "<element:Activity></element:Activity> Demo"
-        },
-        "6/declaration/body/0/argument/1/1/7/3/7/1/1": {
-          "type": "element",
-          "hash": "22359624809a9d18e781bfd1c50703a7",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Monthly revenue"
-        },
-        "6/declaration/body/0/argument/1/1/7/3/7/1/3": {
-          "type": "element",
-          "hash": "c9d7afacf15b4057c1974a99dd78ecde",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "$84.2k"
-        },
-        "6/declaration/body/0/argument/1/1/7/3/7/1/5": {
-          "type": "element",
-          "hash": "39a5557ffdb5eb3ce5d3c752e0ef6d5e",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "+18% vs last month"
-        },
-        "6/declaration/body/0/argument/1/1/7/3/7/3/1": {
-          "type": "element",
-          "hash": "ca0d9f2095793a051cd8a598073d7211",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Active users"
-        },
-        "6/declaration/body/0/argument/1/1/7/3/7/3/3": {
-          "type": "element",
-          "hash": "4b5b2ea91770a0f61379b48e2af0cf10",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "12.4k"
-        },
-        "6/declaration/body/0/argument/1/1/7/3/7/3/5": {
-          "type": "element",
-          "hash": "2fa9d74e95f96897cce7a231d466bf8b",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "+1.2k this week"
-        },
-        "6/declaration/body/0/argument/1/1/7/7/1": {
-          "type": "element",
-          "hash": "f8fd0932b1df20a9ed614dfd53de88fb",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "<element:div></element:div> Easy Setup"
-        },
-        "6/declaration/body/0/argument/1/1/7/9/1": {
-          "type": "element",
-          "hash": "0e7cca9032f511058280f061e4f7aecd",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "<element:Zap></element:Zap> Fast Deploy"
         }
       }
     },
@@ -1945,39 +1672,39 @@
         }
       }
     },
-    "../components/i18n/brand-text.tsx": {
+    "../components/locale-switcher.tsx": {
       "scopes": {
-        "1/declaration/body/0/argument": {
+        "10/declaration/body/7/argument/1/1/5": {
           "type": "element",
-          "hash": "a8ea0d03b5bd55724c03e1b3dbcabb4e",
+          "hash": "7fa8806eeb911aa9ba9f013b274a2e47",
           "context": "",
           "skip": false,
           "overrides": {},
-          "content": "SaaS Starter"
+          "content": "Select language"
         },
-        "2/declaration/body/0/argument": {
+        "10/declaration/body/7/argument/3/1": {
           "type": "element",
-          "hash": "849d81f2d013703b06e5144df269fa77",
+          "hash": "277fd1a41cc237a437cd1d5e4a80463b",
           "context": "",
           "skip": false,
           "overrides": {},
-          "content": "Complete UllrAI SaaS starter with authentication, payments, database, and deployment."
+          "content": "Language"
         },
-        "3/declaration/body/0/argument": {
+        "13/declaration/body/7/argument/1/1/5": {
           "type": "element",
-          "hash": "8137d8a6a4a1e122ce7a794cbddbf045",
+          "hash": "7fa8806eeb911aa9ba9f013b274a2e47",
           "context": "",
           "skip": false,
           "overrides": {},
-          "content": "UllrAI Lab"
+          "content": "Select language"
         },
-        "4/declaration/body/0/argument": {
+        "13/declaration/body/7/argument/3/1": {
           "type": "element",
-          "hash": "8f3a9d075ace8e470a2daec25f8b000d",
+          "hash": "277fd1a41cc237a437cd1d5e4a80463b",
           "context": "",
           "skip": false,
           "overrides": {},
-          "content": "by UllrAI, for developers"
+          "content": "Language"
         }
       }
     },
@@ -2354,154 +2081,6 @@
           "skip": false,
           "overrides": {},
           "content": "Sign In to {APP_NAME}"
-        },
-        "7/0/init/body/1/argument/1/1-content": {
-          "type": "attribute",
-          "hash": "980ae540c1c0d2c306f3b782197b966c",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "width=device-width, initial-scale=1.0"
-        },
-        "7/0/init/body/1/argument/1/3-content": {
-          "type": "attribute",
-          "hash": "6dd396742b433c636f7817db8dfbc43c",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "text/html; charset=UTF-8"
-        },
-        "8/0/init/body/1/argument/0/3": {
-          "type": "element",
-          "hash": "1f2d370de69c916dcbcf9e0912e8bf98",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Click the secure button below to complete your sign-in process. Your secure sign-in link for <element:BrandName></element:BrandName>"
-        },
-        "8/0/init/body/1/argument/0/5/1/1/11/1": {
-          "type": "element",
-          "hash": "1edea1c5f6da00db441765e83603d587",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "This email was sent to <element:Link>{email}</element:Link>"
-        },
-        "8/0/init/body/1/argument/0/5/1/1/11/3": {
-          "type": "element",
-          "hash": "34ddf208a2e99435eb17c8e301199cd6",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "© <function:Date.getFullYear/> <element:BrandName></element:BrandName>, <element:CompanyNameText></element:CompanyNameText>. All rights reserved. | {currentDate}"
-        },
-        "8/0/init/body/1/argument/0/5/1/1/3/1": {
-          "type": "element",
-          "hash": "2349a10adce0ded1402cc6d2da2397f3",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Welcome to <element:BrandName></element:BrandName>"
-        },
-        "8/0/init/body/1/argument/0/5/1/1/3/3": {
-          "type": "element",
-          "hash": "8cabdedfc1f31d8cfc1f20b04daeda4e",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Your secure sign-in link is ready"
-        },
-        "8/0/init/body/1/argument/0/5/1/1/7/1": {
-          "type": "element",
-          "hash": "19ee03f4be4b1cc097986f0d74cf7d71",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Hello,"
-        },
-        "8/0/init/body/1/argument/0/5/1/1/7/11/expression/right/1": {
-          "type": "element",
-          "hash": "90774a27e629a717966ab4e8cbd1dc43",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Sign-in Request Details:"
-        },
-        "8/0/init/body/1/argument/0/5/1/1/7/11/expression/right/3/expression/right": {
-          "type": "element",
-          "hash": "bce99423e1e54849acac9feef05082be",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "<element:strong>Device:</element:strong> {deviceInfo.browser} on {deviceInfo.os}"
-        },
-        "8/0/init/body/1/argument/0/5/1/1/7/11/expression/right/5/expression/right": {
-          "type": "element",
-          "hash": "271a1daea12fe0acf42f0907758ab963",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "<element:strong>Location:</element:strong> {deviceInfo.location} (approximate)"
-        },
-        "8/0/init/body/1/argument/0/5/1/1/7/13": {
-          "type": "element",
-          "hash": "5e1b36d11864c5a73848c0c9e8d4217c",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "<element:strong>Security Notice:</element:strong> This link will expire in 15 minutes for your security. If you didn't request this sign-in, please ignore this email."
-        },
-        "8/0/init/body/1/argument/0/5/1/1/7/15": {
-          "type": "element",
-          "hash": "6eb53f14ad7c9d2040c0e6f5ca00b39e",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "If the button doesn't work, you can copy and paste this link into your browser:"
-        },
-        "8/0/init/body/1/argument/0/5/1/1/7/3": {
-          "type": "element",
-          "hash": "2cb6b1a7627db741a259430784d4f628",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "We received a request to sign in to your <element:BrandName></element:BrandName> account. Click the secure button below to complete your sign-in process."
-        },
-        "8/0/init/body/1/argument/0/5/1/1/7/7/1": {
-          "type": "element",
-          "hash": "9ef9a890c190c7e0176e2092f0624db8",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Sign In to <element:BrandName></element:BrandName>"
-        }
-      }
-    },
-    "../lib/i18n/brand-copy.tsx": {
-      "scopes": {
-        "3/0/init/1/value/0/value/body": {
-          "type": "element",
-          "hash": "6034f191f07c39905661f913a8b50ffc",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Complete UllrAI SaaS starter with authentication, payments, database, and deployment."
-        },
-        "3/0/init/2/value/0/value/body": {
-          "type": "element",
-          "hash": "8137d8a6a4a1e122ce7a794cbddbf045",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "UllrAI Lab"
-        },
-        "3/0/init/3/value/0/value/body": {
-          "type": "element",
-          "hash": "8f3a9d075ace8e470a2daec25f8b000d",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "by UllrAI, for developers"
         }
       }
     },

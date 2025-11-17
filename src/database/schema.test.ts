@@ -12,6 +12,22 @@ import {
   webhookEvents,
   uploads,
 } from "./schema";
+import { Table } from "drizzle-orm/table";
+
+const getIndexConfigs = (table: Record<string, unknown>) => {
+  const builder = (table as any)[Table.Symbol.ExtraConfigBuilder];
+  expect(builder).toBeDefined();
+
+  const extraColumns = (table as any)[Table.Symbol.ExtraConfigColumns];
+  const configResult = builder ? builder(extraColumns) : [];
+  const builders = Array.isArray(configResult)
+    ? configResult
+    : Object.values(configResult ?? {});
+
+  return builders.map((entry: { build: (table: unknown) => { config: unknown } }) =>
+    entry.build(table).config,
+  );
+};
 
 describe("Database Schema", () => {
   describe("userRoleEnum", () => {
@@ -1341,6 +1357,50 @@ describe("Database Schema", () => {
           }
         });
       });
+    });
+  });
+
+  describe("table indexes and constraints", () => {
+    it("accounts table defines a userId index to speed lookups", () => {
+      const configs = getIndexConfigs(accounts);
+      const indexNames = configs.map((cfg) => cfg.name);
+      expect(indexNames).toContain("accounts_userId_idx");
+
+      const userIndex = configs.find((cfg) => cfg.name === "accounts_userId_idx");
+      expect(userIndex?.columns.map((column: any) => column.name)).toEqual(["userId"]);
+    });
+
+    it("subscriptions table indexes both userId and customerId", () => {
+      const configs = getIndexConfigs(subscriptions);
+      const indexNames = configs.map((cfg) => cfg.name);
+      expect(indexNames).toEqual(
+        expect.arrayContaining(["subscriptions_userId_idx", "subscriptions_customerId_idx"]),
+      );
+    });
+
+    it("payments table exposes a userId index", () => {
+      const configs = getIndexConfigs(payments);
+      const indexNames = configs.map((cfg) => cfg.name);
+      expect(indexNames).toContain("payments_userId_idx");
+    });
+
+    it("webhook events table keeps eventId/provider indexes for idempotency", () => {
+      const configs = getIndexConfigs(webhookEvents);
+      const indexNames = configs.map((cfg) => cfg.name);
+      expect(indexNames).toEqual(
+        expect.arrayContaining([
+          "webhook_events_eventId_idx",
+          "webhook_events_provider_idx",
+        ]),
+      );
+    });
+
+    it("uploads table indexes file ownership and key", () => {
+      const configs = getIndexConfigs(uploads);
+      const indexNames = configs.map((cfg) => cfg.name);
+      expect(indexNames).toEqual(
+        expect.arrayContaining(["uploads_userId_idx", "uploads_fileKey_idx"]),
+      );
     });
   });
 });

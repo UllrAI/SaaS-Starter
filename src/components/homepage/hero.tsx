@@ -16,7 +16,7 @@ import Link from "next/link";
 
 export function Hero() {
   return (
-    <section className="bg-background relative flex items-center justify-center overflow-hidden">
+    <section className="bg-background relative items-center justify-center overflow-hidden">
       {/* Subtle Background Pattern */}
       <div className="absolute inset-0 -z-10">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(120,119,198,0.03),transparent_50%)]" />

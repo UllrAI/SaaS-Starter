@@ -9,6 +9,8 @@ const createJestConfig = nextJest({
 const customJestConfig = {
   setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
   testEnvironment: "jest-environment-jsdom",
+  coverageProvider: "v8",
+  globalSetup: "<rootDir>/jest.global-setup.js",
   moduleNameMapper: {
     // 处理 tsconfig.json 中那些不符合通用模式的特定别名
     "^@/env$": "<rootDir>/env.js",

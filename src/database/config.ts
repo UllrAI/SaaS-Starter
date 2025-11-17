@@ -4,7 +4,7 @@ import env from "@/env";
 // Drizzle configuration
 export default defineConfig({
   dialect: "postgresql",
-  schema: "./src/database/schema.ts",
+  schema: "./database/schema.ts",
   out: "./database/migrations/development",
   verbose: true,
   dbCredentials: {

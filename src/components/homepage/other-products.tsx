@@ -69,15 +69,18 @@ const products: Product[] = [
 
 export function OtherProducts() {
   return (
-    <section className="bg-muted/30 py-24">
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
-        <div className="mx-auto max-w-2xl text-center">
+    <section className="relative py-24">
+      <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
+        <div className="mx-auto max-w-3xl text-center">
+          <Badge variant="secondary" className="mb-4">
+            More from UllrAI Lab
+          </Badge>
           <h2 className="text-foreground text-3xl font-bold tracking-tight sm:text-4xl">
-            More Tools From UllrAI Lab
+            Explore our other tools
           </h2>
           <p className="text-muted-foreground mt-4 text-lg leading-8">
-            Explore our collection of AI-powered tools that help creators,
-            developers, and businesses work smarter
+            AI-powered utilities that help creators, developers, and teams ship
+            faster every day.
           </p>
         </div>
 
@@ -87,16 +90,16 @@ export function OtherProducts() {
             return (
               <Card
                 key={product.name}
-                className="group relative overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+                className="relative h-full rounded-xl border border-border/70 bg-background/80 p-6 shadow-sm"
               >
-                <CardContent className="p-6">
+                <CardContent className="p-0">
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="bg-primary/10 text-primary flex h-10 w-10 items-center justify-center rounded-lg">
+                      <div className="bg-primary/10 text-primary flex h-10 w-10 items-center justify-center rounded-2xl">
                         <IconComponent className="h-5 w-5" />
                       </div>
                       <div className="flex-1">
-                        <h3 className="text-foreground group-hover:text-primary font-semibold transition-colors">
+                        <h3 className="text-foreground font-semibold">
                           {product.name}
                         </h3>
                         {product.badge && (
@@ -106,7 +109,7 @@ export function OtherProducts() {
                         )}
                       </div>
                     </div>
-                    <ExternalLink className="text-muted-foreground h-4 w-4 opacity-0 transition-opacity group-hover:opacity-100" />
+                    <ExternalLink className="text-muted-foreground h-4 w-4" />
                   </div>
 
                   <p className="text-muted-foreground mt-4 text-sm leading-relaxed">
@@ -125,6 +128,16 @@ export function OtherProducts() {
             );
           })}
         </div>
+
+        <p className="text-muted-foreground mt-10 text-center text-sm">
+          Have an idea for another tool?
+          <a
+            href="mailto:support@ullrai.com"
+            className="text-primary ml-2 font-medium hover:underline"
+          >
+            Let us know
+          </a>
+        </p>
       </div>
     </section>
   );

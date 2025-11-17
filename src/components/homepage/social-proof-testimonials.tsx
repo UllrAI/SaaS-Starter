@@ -153,16 +153,16 @@ function TestimonialCard({
 }) {
   return (
     <Card
-      className={`h-full transition-all duration-300 hover:shadow-lg ${
+      className={`h-full border border-border/60 transition-all duration-300 hover:border-primary/40 hover:shadow-lg ${
         testimonial.featured
-          ? "border-primary/20 bg-primary/5"
-          : "border-border hover:border-border/80"
+          ? "bg-gradient-to-b from-primary/5 via-background to-background"
+          : "bg-background/80"
       }`}
     >
       <CardContent className="p-6">
         {/* Quote Icon */}
-        <div className="mb-4">
-          <Quote className="text-primary/60 h-8 w-8" />
+        <div className="mb-4 inline-flex rounded-full bg-primary/10 p-2">
+          <Quote className="text-primary/70 h-5 w-5" />
         </div>
 
         {/* Rating */}
@@ -207,9 +207,9 @@ function StatCard({ stat }: { stat: (typeof stats)[0] }) {
   const IconComponent = stat.icon;
 
   return (
-    <div className="space-y-2 text-center">
-      <div className="bg-primary/10 mx-auto flex h-12 w-12 items-center justify-center rounded-lg">
-        <IconComponent className="text-primary h-6 w-6" />
+    <div className="border-border/50 bg-background/80 flex flex-col items-center rounded-2xl border px-6 py-5 text-center shadow-sm">
+      <div className="bg-primary/10 text-primary mb-3 flex h-12 w-12 items-center justify-center rounded-xl">
+        <IconComponent className="h-6 w-6" />
       </div>
       <div className="text-foreground text-2xl font-bold">{stat.value}</div>
       <div className="text-foreground text-sm font-medium">{stat.label}</div>
@@ -220,11 +220,11 @@ function StatCard({ stat }: { stat: (typeof stats)[0] }) {
 
 export function SocialProofUnified() {
   return (
-    <section className="bg-muted/30 py-24">
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
+    <section className="relative py-24">
+      <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
         {/* Stats Section */}
         <div className="mb-20">
-          <div className="mb-12 text-center">
+          <div className="mx-auto mb-12 max-w-3xl text-center">
             <Badge variant="secondary" className="mb-4">
               <TrendingUp className="mr-2 h-3 w-3" />
               Trusted Worldwide
@@ -237,7 +237,7 @@ export function SocialProofUnified() {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 gap-8 sm:grid-cols-4">
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {stats.map((stat, index) => (
               <StatCard key={index} stat={stat} />
             ))}
@@ -269,21 +269,20 @@ export function SocialProofUnified() {
         </div>
 
         {/* Company Logos Section */}
-        <div className="text-center">
-          <p className="text-muted-foreground mb-8 text-sm">
-            Trusted by innovative companies worldwide
+        <div className="rounded-2xl border border-border/60 bg-background/80 px-6 py-10 text-center shadow-sm">
+          <p className="text-muted-foreground mb-6 text-sm uppercase tracking-wide">
+            Trusted by innovative companies
           </p>
-          <div className="flex flex-wrap items-center justify-center gap-8 opacity-60">
+          <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-5">
             {companies.map((company, index) => {
               const IconComponent = company.icon;
               return (
-                <div key={index} className="flex items-center justify-center">
-                  <div className="bg-muted-foreground/10 border-muted-foreground/20 hover:bg-muted-foreground/20 flex h-16 w-32 items-center justify-center gap-3 rounded-lg border transition-colors">
-                    <IconComponent className={`h-6 w-6 ${company.color}`} />
-                    <span className="text-muted-foreground text-sm font-medium">
-                      {company.name}
-                    </span>
-                  </div>
+                <div
+                  key={index}
+                  className="text-muted-foreground/80 flex items-center gap-2 text-sm font-medium"
+                >
+                  <IconComponent className={`h-5 w-5 ${company.color}`} />
+                  {company.name}
                 </div>
               );
             })}
@@ -291,16 +290,14 @@ export function SocialProofUnified() {
         </div>
 
         {/* Bottom CTA */}
-        <div className="mt-16 text-center">
-          <p className="text-muted-foreground text-sm">
-            Want to share your success story?
-            <a
-              href="mailto:hello@example.com"
-              className="text-primary ml-1 hover:underline"
-            >
-              Get in touch
-            </a>
-          </p>
+        <div className="mt-12 text-center text-sm text-muted-foreground">
+          Want to share your success story?
+          <a
+            href="mailto:hello@example.com"
+            className="text-primary ml-2 font-medium hover:underline"
+          >
+            Get in touch
+          </a>
         </div>
       </div>
     </section>

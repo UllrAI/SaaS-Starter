@@ -7,7 +7,6 @@ import {
   Rocket,
   Shield,
   BarChart3,
-  ArrowRight,
   Sparkles,
   CreditCard,
 } from "lucide-react";
@@ -64,15 +63,21 @@ const features: Feature[] = [
   },
 ];
 
-function FeatureCard({ feature }: { feature: Feature; index: number }) {
+const featureStats = [
+  { label: "Components", value: "50+" },
+  { label: "Integrations", value: "10+" },
+  { label: "Type Safe", value: "100%" },
+];
+
+function FeatureCard({ feature }: { feature: Feature }) {
   const IconComponent = feature.icon;
 
   return (
-    <Card className="group relative overflow-hidden p-6 transition-all duration-300 hover:shadow-md">
+    <Card className="h-full rounded-xl border border-border/70 bg-background/80 p-6 shadow-sm">
       <div className="space-y-4">
         {/* Icon and Category */}
         <div className="flex items-center justify-between">
-          <div className="bg-primary/10 text-primary group-hover:bg-primary/20 flex h-12 w-12 items-center justify-center rounded-lg transition-all duration-300">
+          <div className="bg-primary/10 text-primary flex h-12 w-12 items-center justify-center rounded-xl">
             <IconComponent className="h-6 w-6" />
           </div>
           <Badge variant="secondary" className="text-xs">
@@ -90,19 +95,14 @@ function FeatureCard({ feature }: { feature: Feature; index: number }) {
           </p>
         </div>
       </div>
-
-      {/* Hover Arrow */}
-      <div className="absolute right-4 bottom-4 opacity-0 transition-all duration-300 group-hover:translate-x-1 group-hover:opacity-100">
-        <ArrowRight className="text-muted-foreground h-4 w-4" />
-      </div>
     </Card>
   );
 }
 
 export function Features() {
   return (
-    <section className="bg-background py-24">
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
+    <section className="relative py-24">
+      <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
         {/* Section Header */}
         <div className="mx-auto mb-16 max-w-2xl text-center">
           <Badge variant="secondary" className="mb-4">
@@ -122,26 +122,22 @@ export function Features() {
         </div>
 
         {/* Features Grid */}
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {features.map((feature) => (
-            <FeatureCard key={feature.title} feature={feature} index={0} /> // Removed unused index from map and passed 0 as index to FeatureCard
+            <FeatureCard key={feature.title} feature={feature} />
           ))}
         </div>
 
         {/* Bottom Stats */}
-        <div className="mt-16 grid grid-cols-3 gap-8 text-center">
-          <div>
-            <div className="text-foreground text-2xl font-bold">50+</div>
-            <div className="text-muted-foreground text-sm">Components</div>
-          </div>
-          <div>
-            <div className="text-foreground text-2xl font-bold">10+</div>
-            <div className="text-muted-foreground text-sm">Integrations</div>
-          </div>
-          <div>
-            <div className="text-foreground text-2xl font-bold">100%</div>
-            <div className="text-muted-foreground text-sm">Type Safe</div>
-          </div>
+        <div className="border-border/60 bg-background/80 mt-16 grid gap-6 rounded-2xl border p-6 text-center sm:grid-cols-3">
+          {featureStats.map((stat) => (
+            <div key={stat.label}>
+              <div className="text-foreground text-2xl font-bold">
+                {stat.value}
+              </div>
+              <div className="text-muted-foreground text-sm">{stat.label}</div>
+            </div>
+          ))}
         </div>
       </div>
     </section>

@@ -60,17 +60,15 @@ export function SocialLoginButtons({
   loading: externalLoading = false,
   onLoadingChange,
 }: SocialLoginButtonsProps) {
-  const [internalLoading, setInternalLoading] = useState(false);
-  const loading = externalLoading || internalLoading;
-
-  const handleLoadingChange = (newLoading: boolean) => {
-    setInternalLoading(newLoading);
-    onLoadingChange?.(newLoading);
-  };
+  const [activeProvider, setActiveProvider] = useState<SocialProvider | null>(
+    null,
+  );
 
   const handleSocialLogin = async (provider: SocialProvider) => {
+    setActiveProvider(provider);
+    onLoadingChange?.(true);
+
     try {
-      handleLoadingChange(true);
       await signIn.social({
         provider,
         callbackURL,
@@ -80,7 +78,8 @@ export function SocialLoginButtons({
         "Something went wrong. Contact support if the issue persists",
       );
     } finally {
-      handleLoadingChange(false);
+      setActiveProvider(null);
+      onLoadingChange?.(false);
     }
   };
 
@@ -99,16 +98,21 @@ export function SocialLoginButtons({
         const config = socialProviders[provider];
         const IconComponent = config.icon;
 
+        const isLoading = activeProvider === provider;
+        const isDisabled =
+          (activeProvider !== null && activeProvider !== provider) ||
+          externalLoading;
+
         return (
           <Button
             key={provider}
             type="button"
             variant="outline"
-            disabled={loading}
+            disabled={isDisabled}
             onClick={() => handleSocialLogin(provider)}
             className="hover:border-primary/50 hover:bg-primary/5 h-12 w-full border-2 transition-all duration-200"
           >
-            {loading ? (
+            {isLoading ? (
               <span className="flex items-center gap-2">
                 <Loader2 className="h-4 w-4 animate-spin" />
                 <span>Connecting...</span>

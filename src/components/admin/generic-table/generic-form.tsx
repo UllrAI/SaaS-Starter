@@ -117,7 +117,7 @@ export function GenericForm({
               type="color"
               {...field}
               value={String(value) || "#000000"}
-              className="w-16 h-10 p-1 border rounded"
+              className="h-10 w-16 rounded border p-1"
             />
             <Input
               type="text"
@@ -129,28 +129,22 @@ export function GenericForm({
           </div>
         );
       case "password":
-        return (
-          <Input
-            type="password"
-            {...field}
-            value={String(value)}
-          />
-        );
+        return <Input type="password" {...field} value={String(value)} />;
       case "text":
       case "textarea":
       case "richtext":
       case "markdown":
         return (
-          <Textarea 
-            {...field} 
+          <Textarea
+            {...field}
             value={String(value)}
             rows={col.type === "text" ? 2 : 4}
             placeholder={
-              col.type === "markdown" 
-                ? "Enter markdown text..." 
+              col.type === "markdown"
+                ? "Enter markdown text..."
                 : col.type === "richtext"
-                ? "Enter rich text content..."
-                : `Enter ${col.name}...`
+                  ? "Enter rich text content..."
+                  : `Enter ${col.name}...`
             }
           />
         );
@@ -158,11 +152,7 @@ export function GenericForm({
         return (
           <Textarea
             {...field}
-            value={
-              Array.isArray(value) 
-                ? value.join(', ') 
-                : String(value)
-            }
+            value={Array.isArray(value) ? value.join(", ") : String(value)}
             placeholder="Enter tags separated by commas"
             rows={2}
             onChange={(e) => field.onChange(e.target.value)}
@@ -194,7 +184,7 @@ export function GenericForm({
       case "currency":
         return (
           <div className="relative">
-            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+            <span className="absolute top-1/2 left-3 -translate-y-1/2 transform text-gray-500">
               $
             </span>
             <Input
@@ -218,7 +208,7 @@ export function GenericForm({
               onChange={(e) => field.onChange(Number(e.target.value))}
               placeholder="File size in bytes"
             />
-            <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
+            <span className="absolute top-1/2 right-3 -translate-y-1/2 transform text-sm text-gray-500">
               bytes
             </span>
           </div>

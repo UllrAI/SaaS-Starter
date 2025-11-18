@@ -6,8 +6,13 @@ import { Logo } from "@/components/logo";
 import { ArrowRight, CheckCircle } from "lucide-react";
 import Link from "next/link";
 
+const proofPoints = [
+  { id: "production-ready", label: <>Production ready</> },
+  { id: "soc2-friendly", label: <>SOC2-friendly</> },
+  { id: "zero-setup-fees", label: <>Zero setup fees</> },
+];
+
 export function CallToAction() {
-  const proofPoints = ["Production ready", "SOC2-friendly", "Zero setup fees"];
 
   return (
     <section className="border-t border-border/60 bg-accent/20">
@@ -31,10 +36,10 @@ export function CallToAction() {
           </div>
 
           <div className="mt-6 flex flex-wrap items-center justify-center gap-4 text-sm text-muted-foreground">
-            {proofPoints.map((point) => (
-              <span key={point} className="inline-flex items-center gap-2">
+            {proofPoints.map(({ id, label }) => (
+              <span key={id} className="inline-flex items-center gap-2">
                 <CheckCircle className="h-4 w-4 text-primary" />
-                {point}
+                {label}
               </span>
             ))}
           </div>

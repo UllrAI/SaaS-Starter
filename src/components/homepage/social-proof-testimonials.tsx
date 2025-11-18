@@ -20,11 +20,15 @@ import {
 const testimonials = [
   {
     id: 1,
-    content:
-      "This starter kit saved me months of development time. The authentication system and payment integration work flawlessly out of the box.",
+    content: (
+      <>
+        This starter kit saved me months of development time. The authentication system and payment
+        integration work flawlessly out of the box.
+      </>
+    ),
     author: {
       name: "Sarah Chen",
-      role: "Founder",
+      role: <>Founder</>,
       company: "TechFlow",
       avatar:
         "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=150&h=150&fit=crop&crop=face",
@@ -35,11 +39,15 @@ const testimonials = [
   },
   {
     id: 2,
-    content:
-      "Clean code, excellent documentation, and responsive support. Everything I needed to launch my SaaS product quickly.",
+    content: (
+      <>
+        Clean code, excellent documentation, and responsive support. Everything I needed to launch my
+        SaaS product quickly.
+      </>
+    ),
     author: {
       name: "Marcus Rodriguez",
-      role: "CTO",
+      role: <>CTO</>,
       company: "DataViz Pro",
       avatar:
         "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
@@ -50,11 +58,15 @@ const testimonials = [
   },
   {
     id: 3,
-    content:
-      "The UI components are beautiful and the dark mode implementation is perfect. My users love the interface.",
+    content: (
+      <>
+        The UI components are beautiful and the dark mode implementation is perfect. My users love
+        the interface.
+      </>
+    ),
     author: {
       name: "Emily Watson",
-      role: "Product Manager",
+      role: <>Product Manager</>,
       company: "CloudSync",
       avatar:
         "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
@@ -65,11 +77,15 @@ const testimonials = [
   },
   {
     id: 4,
-    content:
-      "Best investment I&apos;ve made for my startup. The code quality is enterprise-grade and the architecture is scalable.",
+    content: (
+      <>
+        Best investment I&apos;ve made for my startup. The code quality is enterprise-grade and the
+        architecture is scalable.
+      </>
+    ),
     author: {
       name: "David Kim",
-      role: "Lead Developer",
+      role: <>Lead Developer</>,
       company: "InnovateLab",
       avatar:
         "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
@@ -80,11 +96,15 @@ const testimonials = [
   },
   {
     id: 5,
-    content:
-      "Incredible attention to detail. The analytics dashboard and user management features are exactly what I needed.",
+    content: (
+      <>
+        Incredible attention to detail. The analytics dashboard and user management features are
+        exactly what I needed.
+      </>
+    ),
     author: {
       name: "Lisa Thompson",
-      role: "Entrepreneur",
+      role: <>Entrepreneur</>,
       company: "StartupHub",
       avatar:
         "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=150&h=150&fit=crop&crop=face",
@@ -95,11 +115,15 @@ const testimonials = [
   },
   {
     id: 6,
-    content:
-      "From idea to production in just 2 weeks. This starter kit is a game-changer for indie developers.",
+    content: (
+      <>
+        From idea to production in just 2 weeks. This starter kit is a game-changer for indie
+        developers.
+      </>
+    ),
     author: {
       name: "Alex Johnson",
-      role: "Indie Developer",
+      role: <>Indie Developer</>,
       company: "Solo Ventures",
       avatar:
         "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face",
@@ -112,38 +136,42 @@ const testimonials = [
 
 const stats = [
   {
+    id: "developers",
     icon: Users,
     value: "10,000+",
-    label: "Developers",
-    description: "Trust our starter",
+    label: <>Developers</>,
+    description: <>Trust our starter</>,
   },
   {
+    id: "projects",
     icon: TrendingUp,
     value: "500+",
-    label: "Projects",
-    description: "Built and launched",
+    label: <>Projects</>,
+    description: <>Built and launched</>,
   },
   {
+    id: "uptime",
     icon: Award,
     value: "99.9%",
-    label: "Uptime",
-    description: "Guaranteed reliability",
+    label: <>Uptime</>,
+    description: <>Guaranteed reliability</>,
   },
   {
+    id: "rating",
     icon: CheckCircle,
     value: "4.9/5",
-    label: "Rating",
-    description: "Average user rating",
+    label: <>Rating</>,
+    description: <>Average user rating</>,
   },
 ];
 
 const companies = [
-  { name: "Supabase", icon: Zap, color: "text-blue-500" },
-  { name: "Neno", icon: Database, color: "text-green-500" },
-  { name: "GitHub", icon: Github, color: "text-gray-700" },
-  { name: "Slack", icon: Slack, color: "text-purple-500" },
-  { name: "Figma", icon: Figma, color: "text-pink-500" },
-  { name: "Linkedin", icon: Linkedin, color: "text-blue-500" },
+  { id: "supabase", name: "Supabase", icon: Zap, color: "text-blue-500" },
+  { id: "neno", name: "Neno", icon: Database, color: "text-green-500" },
+  { id: "github", name: "GitHub", icon: Github, color: "text-gray-700" },
+  { id: "slack", name: "Slack", icon: Slack, color: "text-purple-500" },
+  { id: "figma", name: "Figma", icon: Figma, color: "text-pink-500" },
+  { id: "linkedin", name: "Linkedin", icon: Linkedin, color: "text-blue-500" },
 ];
 
 function TestimonialCard({
@@ -194,7 +222,7 @@ function TestimonialCard({
               {testimonial.author.name}
             </div>
             <div className="text-muted-foreground text-xs">
-              {testimonial.author.role} at {testimonial.author.company}
+              {testimonial.author.role} - {testimonial.author.company}
             </div>
           </div>
         </div>
@@ -238,8 +266,8 @@ export function SocialProofUnified() {
           </div>
 
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {stats.map((stat, index) => (
-              <StatCard key={index} stat={stat} />
+            {stats.map((stat) => (
+              <StatCard key={stat.id} stat={stat} />
             ))}
           </div>
         </div>
@@ -274,11 +302,11 @@ export function SocialProofUnified() {
             Trusted by innovative companies
           </p>
           <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-5">
-            {companies.map((company, index) => {
+            {companies.map((company) => {
               const IconComponent = company.icon;
               return (
                 <div
-                  key={index}
+                  key={company.id}
                   className="text-muted-foreground/80 flex items-center gap-2 text-sm font-medium"
                 >
                   <IconComponent className={`h-5 w-5 ${company.color}`} />

@@ -14,8 +14,9 @@ import {
 } from "lucide-react";
 
 interface Product {
+  id: string;
   name: string;
-  description: string;
+  description: React.ReactNode;
   url: string;
   icon: React.ComponentType<{ className?: string }>;
   badge?: string;
@@ -23,45 +24,49 @@ interface Product {
 
 const products: Product[] = [
   {
+    id: "pixmiller",
     name: "PixMiller",
-    description:
-      "Remove backgrounds in seconds with AI precision - no design skills needed",
+    description: (
+      <>Remove backgrounds in seconds with AI precision - no design skills needed</>
+    ),
     url: "https://pixmiller.com/",
     icon: Image,
   },
   {
+    id: "headshots-fun",
     name: "HeadShots.fun",
-    description:
-      "Generate professional headshots instantly - perfect for LinkedIn, resumes & more",
+    description: (
+      <>Generate professional headshots instantly - perfect for LinkedIn, resumes & more</>
+    ),
     url: "https://headshots.fun/",
     icon: Sparkles,
     badge: "Open Source",
   },
   {
+    id: "to-markdown",
     name: "To Markdown",
-    description:
-      "Convert any document to clean Markdown instantly - PDFs, Word docs, web pages",
+    description: <>Convert any document to clean Markdown instantly - PDFs, Word docs, web pages</>,
     url: "https://to-markdown.com/",
     icon: FileText,
   },
   {
+    id: "trend-x-day",
     name: "Trend X Day",
-    description:
-      "Stay ahead with daily insights - data-driven analysis of global trends",
+    description: <>Stay ahead with daily insights - data-driven analysis of global trends</>,
     url: "https://trendxday.com/",
     icon: TrendingUp,
   },
   {
+    id: "ogimage-site",
     name: "OGimage.site",
-    description:
-      "Create stunning social media cards that boost engagement and clicks",
+    description: <>Create stunning social media cards that boost engagement and clicks</>,
     url: "https://ogimage.site/",
     icon: Square,
   },
   {
+    id: "hipng",
     name: "HiPNG.com",
-    description:
-      "Access thousands of AI-generated transparent PNGs - perfect for any project",
+    description: <>Access thousands of AI-generated transparent PNGs - perfect for any project</>,
     url: "https://hipng.com/",
     icon: Zap,
   },
@@ -89,7 +94,7 @@ export function OtherProducts() {
             const IconComponent = product.icon;
             return (
               <Card
-                key={product.name}
+                key={product.id}
                 className="relative h-full rounded-xl border border-border/70 bg-background/80 p-6 shadow-sm"
               >
                 <CardContent className="p-0">

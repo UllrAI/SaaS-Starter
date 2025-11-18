@@ -12,61 +12,89 @@ import {
 } from "lucide-react";
 
 interface Feature {
-  title: string;
-  description: string;
+  id: string;
+  title: React.ReactNode;
+  description: React.ReactNode;
   icon: React.ComponentType<{ className?: string }>;
   category: string;
 }
 
 const features: Feature[] = [
   {
-    title: "Authentication & Users",
-    description:
-      "Complete auth system with OAuth, magic links, and user management. Role-based access control included.",
+    id: "auth-users",
+    title: <>Authentication & Users</>,
+    description: (
+      <>
+        Complete auth system with OAuth, magic links, and user management. Role-based access
+        control included.
+      </>
+    ),
     icon: Shield,
     category: "Security",
   },
   {
-    title: "Payments & Billing",
-    description:
-      "Stripe integration with subscriptions, invoicing, and tax handling. Revenue tracking built-in.",
+    id: "payments-billing",
+    title: <>Payments & Billing</>,
+    description: (
+      <>
+        Stripe integration with subscriptions, invoicing, and tax handling. Revenue tracking
+        built-in.
+      </>
+    ),
     icon: CreditCard,
     category: "Payments",
   },
   {
-    title: "Database & API",
-    description:
-      "Type-safe database with Drizzle ORM. RESTful APIs and real-time subscriptions ready.",
+    id: "database-api",
+    title: <>Database & API</>,
+    description: (
+      <>
+        Type-safe database with Drizzle ORM. RESTful APIs and real-time subscriptions ready.
+      </>
+    ),
     icon: Database,
     category: "Backend",
   },
   {
-    title: "Analytics & Insights",
-    description:
-      "User behavior tracking, conversion metrics, and beautiful dashboards for data-driven decisions.",
+    id: "analytics-insights",
+    title: <>Analytics & Insights</>,
+    description: (
+      <>
+        User behavior tracking, conversion metrics, and beautiful dashboards for data-driven
+        decisions.
+      </>
+    ),
     icon: BarChart3,
     category: "Analytics",
   },
   {
-    title: "Modern UI/UX",
-    description:
-      "Beautiful, responsive design with dark mode. Accessible components and smooth animations.",
+    id: "modern-ui-ux",
+    title: <>Modern UI/UX</>,
+    description: (
+      <>
+        Beautiful, responsive design with dark mode. Accessible components and smooth animations.
+      </>
+    ),
     icon: Palette,
     category: "Design",
   },
   {
-    title: "Production Deploy",
-    description:
-      "One-click deployment to Vercel, AWS, or Docker. CI/CD pipelines and monitoring included.",
+    id: "production-deploy",
+    title: <>Production Deploy</>,
+    description: (
+      <>
+        One-click deployment to Vercel, AWS, or Docker. CI/CD pipelines and monitoring included.
+      </>
+    ),
     icon: Rocket,
     category: "DevOps",
   },
 ];
 
-const featureStats = [
-  { label: "Components", value: "50+" },
-  { label: "Integrations", value: "10+" },
-  { label: "Type Safe", value: "100%" },
+const featureStats: { id: string; label: React.ReactNode; value: React.ReactNode }[] = [
+  { id: "components", label: <>Components</>, value: <>50+</> },
+  { id: "integrations", label: <>Integrations</>, value: <>10+</> },
+  { id: "type-safe", label: <>Type Safe</>, value: <>100%</> },
 ];
 
 function FeatureCard({ feature }: { feature: Feature }) {
@@ -124,14 +152,14 @@ export function Features() {
         {/* Features Grid */}
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {features.map((feature) => (
-            <FeatureCard key={feature.title} feature={feature} />
+            <FeatureCard key={feature.id} feature={feature} />
           ))}
         </div>
 
         {/* Bottom Stats */}
         <div className="border-border/60 bg-background/80 mt-16 grid gap-6 rounded-2xl border p-6 text-center sm:grid-cols-3">
           {featureStats.map((stat) => (
-            <div key={stat.label}>
+            <div key={stat.id}>
               <div className="text-foreground text-2xl font-bold">
                 {stat.value}
               </div>

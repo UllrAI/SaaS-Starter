@@ -16,13 +16,15 @@ import {
 import { Github, Twitter, Mail, Heart } from "lucide-react";
 
 interface FooterLink {
-  name: string;
+  id: string;
+  name: React.ReactNode;
   href: string;
   external?: boolean;
 }
 
 interface FooterSection {
-  title: string;
+  id: string;
+  title: React.ReactNode;
   links: FooterLink[];
 }
 
@@ -34,47 +36,67 @@ interface FooterSocialLink {
 
 const footerSections: FooterSection[] = [
   {
-    title: "Product",
+    id: "foot-product",
+    title: <>Product</>,
     links: [
-      { name: "Features", href: "/#features" },
-      { name: "Pricing", href: "/pricing" },
-      { name: "Documentation", href: "/docs" },
-      { name: "Changelog", href: "/changelog" },
+      { id: "foot-features", name: <>Features</>, href: "/#features" },
+      { id: "foot-pricing", name: <>Pricing</>, href: "/pricing" },
+      { id: "foot-docs", name: <>Documentation</>, href: "/docs" },
+      { id: "foot-changelog", name: <>Changelog</>, href: "/changelog" },
     ],
   },
   {
-    title: "Other Products",
+    id: "foot-other-products",
+    title: <>Other Products</>,
     links: [
-      { name: "PixMiller", href: "https://pixmiller.com/", external: true },
-      { name: "HeadShots.fun", href: "https://headshots.fun/", external: true },
-      { name: "To Markdown", href: "https://to-markdown.com/", external: true },
-      { name: "HiPNG.com", href: "https://hipng.com/", external: true },
+      { id: "foot-pixmiller", name: "PixMiller", href: "https://pixmiller.com/", external: true },
+      {
+        id: "foot-headshots",
+        name: "HeadShots.fun",
+        href: "https://headshots.fun/",
+        external: true,
+      },
+      {
+        id: "foot-tomarkdown",
+        name: "To Markdown",
+        href: "https://to-markdown.com/",
+        external: true,
+      },
+      { 
+        id: "foot-hipng",
+        name: "HiPNG.com",
+        href: "https://hipng.com/",
+        external: true
+      },
     ],
   },
   {
-    title: "Company",
+    id: "foot-company",
+    title: <>Company</>,
     links: [
-      { name: "About", href: "/about" },
-      { name: "Blog", href: "/blog" },
-      { name: "Contact", href: "/contact" },
-      { name: "Careers", href: "/careers" },
+      { id: "foot-about", name: <>About</>, href: "/about" },
+      { id: "foot-blog", name: <>Blog</>, href: "/blog" },
+      { id: "foot-contact", name: <>Contact</>, href: "/contact" },
+      { id: "foot-careers", name: <>Careers</>, href: "/careers" },
     ],
   },
   {
-    title: "Resources",
+    id: "foot-resources",
+    title: <>Resources</>,
     links: [
-      { name: "Help Center", href: "/help" },
-      { name: "Community", href: "/community" },
-      { name: "Tutorials", href: "/tutorials" },
-      { name: "Templates", href: "/templates" },
+      { id: "foot-help", name: <>Help Center</>, href: "/help" },
+      { id: "foot-community", name: <>Community</>, href: "/community" },
+      { id: "foot-tutorials", name: <>Tutorials</>, href: "/tutorials" },
+      { id: "foot-templates", name: <>Templates</>, href: "/templates" },
     ],
   },
   {
-    title: "Legal",
+    id: "foot-legal",
+    title: <>Legal</>,
     links: [
-      { name: "Privacy", href: "/privacy" },
-      { name: "Terms", href: "/terms" },
-      { name: "Security", href: "/security" },
+      { id: "foot-privacy", name: <>Privacy</>, href: "/privacy" },
+      { id: "foot-terms", name: <>Terms</>, href: "/terms" },
+      { id: "foot-security", name: <>Security</>, href: "/security" },
     ],
   },
 ];
@@ -156,7 +178,7 @@ export function Footer() {
               </div>
 
               <p className="text-muted-foreground mb-6 max-w-md text-sm">
-                Complete UllrAI SaaS starter with authentication, payments,
+                Complete UllrAI Micro SaaS starter with authentication, payments,
                 database, and deployment.
               </p>
 
@@ -183,13 +205,13 @@ export function Footer() {
             <div className="lg:col-span-4">
               <div className="grid grid-cols-2 gap-8 sm:grid-cols-5">
                 {footerSections.map((section) => (
-                  <div key={section.title}>
+                  <div key={section.id}>
                     <h3 className="text-foreground mb-4 text-sm font-semibold">
                       {section.title}
                     </h3>
                     <ul className="space-y-3">
                       {section.links.map((link) => (
-                        <li key={link.name}>
+                        <li key={link.id}>
                           <FooterLinkComponent link={link} />
                         </li>
                       ))}

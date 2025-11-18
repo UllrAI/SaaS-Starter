@@ -15,7 +15,7 @@ export const metadata = createMetadata({
     template: `%s | ${APP_NAME}`,
     default: `${APP_NAME}`,
   },
-  description: "Complete UllrAI SaaS starter with authentication, payments, database, and deployment.",
+  description: "Complete Micro UllrAI SaaS starter with authentication, payments, database, and deployment.",
   applicationName: APP_NAME,
   authors: [{ name: COMPANY_NAME, url: env.NEXT_PUBLIC_APP_URL }],
   creator: COMPANY_NAME,

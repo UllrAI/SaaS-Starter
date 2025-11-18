@@ -34,6 +34,54 @@
     },
     "(pages)/about/page.tsx": {
       "scopes": {
+        "14/0/init/0/2/value": {
+          "type": "element",
+          "hash": "fd6855a2c35b6dd25a45700d13c109c2",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "CEO & Founder"
+        },
+        "14/0/init/0/3/value": {
+          "type": "element",
+          "hash": "4a544233030d4e5c29fee5919ce0e9d2",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Former tech lead at major SaaS companies. Passionate about developer tools."
+        },
+        "14/0/init/1/2/value": {
+          "type": "element",
+          "hash": "8969cd6bb5a49670ce1e4388839c0862",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "CTO"
+        },
+        "14/0/init/1/3/value": {
+          "type": "element",
+          "hash": "8b101f9d3dbcaf792657ba3d13d8ff11",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Full-stack engineer with 10+ years building scalable applications."
+        },
+        "14/0/init/2/2/value": {
+          "type": "element",
+          "hash": "05fba7c68234b0d185b845021a80d7ef",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Head of Product"
+        },
+        "14/0/init/2/3/value": {
+          "type": "element",
+          "hash": "ff5aed56616ed9d23a1f6c3174134be0",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Product strategist focused on developer experience and user success."
+        },
         "14/declaration/body/0/argument/11/1/1/1": {
           "type": "element",
           "hash": "0ec73fab2bea1090e621eb93b6ac2ff4",
@@ -147,6 +195,286 @@
           "content": "Our Values"
         },
         "14/declaration/body/0/argument/7/1/1/3": {
+          "type": "element",
+          "hash": "83daad699a9d95a2d8ec6d4a6f736f04",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "The principles that guide everything we do"
+        },
+        "15/0/init/0/2/value": {
+          "type": "element",
+          "hash": "ca8dec265219f704e9d7e3bc73a653d1",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Mission-Driven"
+        },
+        "15/0/init/0/3/value": {
+          "type": "element",
+          "hash": "d299688e2cd1acd2212ee5b18012844a",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "We're committed to democratizing SaaS development and making it accessible to everyone."
+        },
+        "15/0/init/1/2/value": {
+          "type": "element",
+          "hash": "2c230dbf6d3915cb2af1d215b087502d",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Innovation First"
+        },
+        "15/0/init/1/3/value": {
+          "type": "element",
+          "hash": "ffeb21422061de120f1eab8d482101b2",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "We constantly push the boundaries of what's possible in developer tooling."
+        },
+        "15/0/init/2/2/value": {
+          "type": "element",
+          "hash": "bf56adc65a8c8a1920ebdd503f135a39",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Community Focused"
+        },
+        "15/0/init/2/3/value": {
+          "type": "element",
+          "hash": "bb818b8e43aeff2fe74666ce447878a8",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Our success is measured by the success of the developers who use our platform."
+        },
+        "15/0/init/3/2/value": {
+          "type": "element",
+          "hash": "cd469a9e46a146cb0477f91278d60847",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Global Impact"
+        },
+        "15/0/init/3/3/value": {
+          "type": "element",
+          "hash": "e47bd92d9b01c2bad7ac7bd9c1030652",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Building tools that empower developers worldwide to create amazing products."
+        },
+        "16/0/init/0/1/value": {
+          "type": "element",
+          "hash": "a6cb0906514090502c363a1c6d8759e0",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "2023"
+        },
+        "16/0/init/0/2/value": {
+          "type": "element",
+          "hash": "b5ea088c8899f9adce735b38b5211067",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Company Founded"
+        },
+        "16/0/init/0/3/value": {
+          "type": "element",
+          "hash": "9d0b6fa216ff90e3fd1787ff4f1e958b",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Started with a vision to simplify SaaS development"
+        },
+        "16/0/init/1/1/value": {
+          "type": "element",
+          "hash": "9a7ec02c4dcc49b7f0b8a1b913477ff6",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "2024"
+        },
+        "16/0/init/1/2/value": {
+          "type": "element",
+          "hash": "19f83034c94be27aa98441a77bdf26f2",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "10K+ Developers"
+        },
+        "16/0/init/1/3/value": {
+          "type": "element",
+          "hash": "b4eebab63f5ab65a2fadb48e1d1496ae",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Reached our first major milestone of active users"
+        },
+        "16/0/init/2/1/value": {
+          "type": "element",
+          "hash": "9a7ec02c4dcc49b7f0b8a1b913477ff6",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "2024"
+        },
+        "16/0/init/2/2/value": {
+          "type": "element",
+          "hash": "5c06ffcfc361921d4f1a4dbfd1b62d23",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Series A Funding"
+        },
+        "16/0/init/2/3/value": {
+          "type": "element",
+          "hash": "fbbf89b3631f1c7eb1df957e8200596b",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Secured funding to accelerate product development"
+        },
+        "16/0/init/3/1/value": {
+          "type": "element",
+          "hash": "9a7ec02c4dcc49b7f0b8a1b913477ff6",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "2024"
+        },
+        "16/0/init/3/2/value": {
+          "type": "element",
+          "hash": "53241ecdb77245c0f4de1a2fc4132ef8",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Enterprise Launch"
+        },
+        "16/0/init/3/3/value": {
+          "type": "element",
+          "hash": "54cabfd1a849907fcee58700d4cd79a6",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Launched enterprise features for larger teams"
+        },
+        "17/declaration/body/0/argument/11/1/1/1": {
+          "type": "element",
+          "hash": "0ec73fab2bea1090e621eb93b6ac2ff4",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Meet Our Team"
+        },
+        "17/declaration/body/0/argument/11/1/1/3": {
+          "type": "element",
+          "hash": "2aba9a0ee852b59a4f72138c39e20c35",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "The passionate individuals behind {COMPANY_NAME}"
+        },
+        "17/declaration/body/0/argument/15/1/1/1": {
+          "type": "element",
+          "hash": "a5f674bf00e37819ab5988e20a054032",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Our Journey"
+        },
+        "17/declaration/body/0/argument/15/1/1/3": {
+          "type": "element",
+          "hash": "9afee0ab15a34bef8545c72a725c2cf1",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Key milestones in our mission to transform SaaS development"
+        },
+        "17/declaration/body/0/argument/19/1/1/1": {
+          "type": "element",
+          "hash": "cb195fc9f70e7505a01bbe873b6cc71f",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Ready to Build Something Amazing?"
+        },
+        "17/declaration/body/0/argument/19/1/1/3": {
+          "type": "element",
+          "hash": "4ae8ee459ceb257ff65d486f93948d92",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Join thousands of developers who are already building the next generation of SaaS products."
+        },
+        "17/declaration/body/0/argument/19/1/1/5/1/1": {
+          "type": "element",
+          "hash": "5476c30aeb582ba0951c3ac8fa44d125",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Get Started Today"
+        },
+        "17/declaration/body/0/argument/19/1/1/5/3/1": {
+          "type": "element",
+          "hash": "94537da970ffef6210bba8fcecb74a8c",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Contact Sales"
+        },
+        "17/declaration/body/0/argument/3/3/1/1/3": {
+          "type": "element",
+          "hash": "579dce76baba62c19cbbee8a566ae190",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Building the future of SaaS development"
+        },
+        "17/declaration/body/0/argument/3/3/1/3": {
+          "type": "element",
+          "hash": "e2773a75e84310030deb03af9732de81",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "About <element:span>{COMPANY_NAME}</element:span>"
+        },
+        "17/declaration/body/0/argument/3/3/1/5": {
+          "type": "element",
+          "hash": "202a57d6be543a21408fde1486a91aa9",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "We're on a mission to democratize SaaS development by providing developers with the tools, templates, and infrastructure they need to build and launch successful products faster than ever before."
+        },
+        "17/declaration/body/0/argument/3/3/1/7/1/1": {
+          "type": "element",
+          "hash": "a643f17fdb219993a4cf4f1b143c36bd",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Get in Touch"
+        },
+        "17/declaration/body/0/argument/3/3/1/7/3/1": {
+          "type": "element",
+          "hash": "4d602aa5a0da4e2811f28cd12994bc8e",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Join Our Team"
+        },
+        "17/declaration/body/0/argument/7/1/1/1": {
+          "type": "element",
+          "hash": "6585fd29d04b7a3463c1691cff9b0324",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Our Values"
+        },
+        "17/declaration/body/0/argument/7/1/1/3": {
           "type": "element",
           "hash": "83daad699a9d95a2d8ec6d4a6f736f04",
           "context": "",
@@ -322,6 +650,126 @@
     },
     "(pages)/contact/contact-methods.tsx": {
       "scopes": {
+        "6/0/init/0/2/value": {
+          "type": "element",
+          "hash": "947fb7c5c665079804df41c61161e722",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Email Support"
+        },
+        "6/0/init/0/3/value": {
+          "type": "element",
+          "hash": "e5a89893971b5ef9de093f312283ce13",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Get help from our support team"
+        },
+        "6/0/init/0/5/value": {
+          "type": "element",
+          "hash": "a9b65e3da043ad494bda5f5d67a9eea0",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "24/7 response within 4 hours"
+        },
+        "6/0/init/1/2/value": {
+          "type": "element",
+          "hash": "df302c3fb3bd7194dfac794b9dc5bab0",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Phone Support"
+        },
+        "6/0/init/1/3/value": {
+          "type": "element",
+          "hash": "7df348c77b79d8ff6cf16a356518093a",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Speak directly with our team"
+        },
+        "6/0/init/1/4/value": {
+          "type": "element",
+          "hash": "d39074f6a278f108c68084ddcef63dbf",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "+1 (555) 123-4567"
+        },
+        "6/0/init/1/5/value": {
+          "type": "element",
+          "hash": "a0b30993062da0c836d16d7ab629d888",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Mon-Fri, 9AM-6PM EST"
+        },
+        "6/0/init/2/2/value": {
+          "type": "element",
+          "hash": "4bc82a4bd3f4626c5d7ff2f9e95f7fcd",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Live Chat"
+        },
+        "6/0/init/2/3/value": {
+          "type": "element",
+          "hash": "f9eae6f7ef6898ba4cd7554f7300270f",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Instant help when you need it"
+        },
+        "6/0/init/2/4/value": {
+          "type": "element",
+          "hash": "c8274cd1576a93ef5aea4f1889103dc1",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Available in dashboard"
+        },
+        "6/0/init/2/5/value": {
+          "type": "element",
+          "hash": "a0b30993062da0c836d16d7ab629d888",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Mon-Fri, 9AM-6PM EST"
+        },
+        "6/0/init/3/2/value": {
+          "type": "element",
+          "hash": "3f70b8332239b3b3ba77e8d12d9655c4",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Office Address"
+        },
+        "6/0/init/3/3/value": {
+          "type": "element",
+          "hash": "5538f22046cee3b415de5f958226cf3a",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Visit us in person"
+        },
+        "6/0/init/3/4/value": {
+          "type": "element",
+          "hash": "6c24696cc5dc42bff997471585f97cfd",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "123 Tech Street, San Francisco, CA 94105"
+        },
+        "6/0/init/3/5/value": {
+          "type": "element",
+          "hash": "8907778a37043cb98d963efa168880ba",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "By appointment only"
+        },
         "6/declaration/body/0/argument/3/1/1/1/1": {
           "type": "element",
           "hash": "a643f17fdb219993a4cf4f1b143c36bd",
@@ -331,6 +779,22 @@
           "content": "Get in Touch"
         },
         "6/declaration/body/0/argument/3/1/1/1/3": {
+          "type": "element",
+          "hash": "892e5c9a5816f4bb9593532a375b96b0",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Choose the best way to reach us"
+        },
+        "7/declaration/body/0/argument/3/1/1/1/1": {
+          "type": "element",
+          "hash": "a643f17fdb219993a4cf4f1b143c36bd",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Get in Touch"
+        },
+        "7/declaration/body/0/argument/3/1/1/1/3": {
           "type": "element",
           "hash": "892e5c9a5816f4bb9593532a375b96b0",
           "context": "",
@@ -1194,6 +1658,54 @@
     },
     "../components/homepage/call-to-action.tsx": {
       "scopes": {
+        "5/0/init/0/1/value": {
+          "type": "element",
+          "hash": "bd2246ceeb038a071ec936bfed5765d5",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Production ready"
+        },
+        "5/0/init/1/1/value": {
+          "type": "element",
+          "hash": "55056bb10aa66b402ab512c9a8038687",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "SOC2-friendly"
+        },
+        "5/0/init/2/1/value": {
+          "type": "element",
+          "hash": "f48cb75d017b70ed436d5f936d083f01",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Zero setup fees"
+        },
+        "5/declaration/body/0/0/init/0": {
+          "type": "element",
+          "hash": "bd2246ceeb038a071ec936bfed5765d5",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Production ready"
+        },
+        "5/declaration/body/0/0/init/1": {
+          "type": "element",
+          "hash": "55056bb10aa66b402ab512c9a8038687",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "SOC2-friendly"
+        },
+        "5/declaration/body/0/0/init/2": {
+          "type": "element",
+          "hash": "f48cb75d017b70ed436d5f936d083f01",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Zero setup fees"
+        },
         "5/declaration/body/1/argument/1/1/3/1": {
           "type": "element",
           "hash": "9f9694d09cac2588146f8b94de32270c",
@@ -1241,11 +1753,203 @@
           "skip": false,
           "overrides": {},
           "content": "Cancel anytime • Keep your code • Works with your current stack"
+        },
+        "6/declaration/body/0/argument/1/1/3/1": {
+          "type": "element",
+          "hash": "9f9694d09cac2588146f8b94de32270c",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Launch your SaaS in hours"
+        },
+        "6/declaration/body/0/argument/1/1/3/3": {
+          "type": "element",
+          "hash": "6e874aeb8ccb786dd85503f882423f55",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Everything you need to ship a Micro SaaS"
+        },
+        "6/declaration/body/0/argument/1/1/3/5": {
+          "type": "element",
+          "hash": "c4e57c4be391d80373137e97771623e1",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Auth, billing, docs, and marketing pages already wired together so your next release can focus on the product, not the scaffolding."
+        },
+        "6/declaration/body/0/argument/1/1/7/1/1": {
+          "type": "element",
+          "hash": "1665ce66c400e352bd4dd140e837955b",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Start free trial<element:ArrowRight></element:ArrowRight>"
+        },
+        "6/declaration/body/0/argument/1/1/7/3/1": {
+          "type": "element",
+          "hash": "b8964d6c475dae0116ec8448b8378104",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "See what's inside"
+        },
+        "6/declaration/body/0/argument/1/1/9": {
+          "type": "element",
+          "hash": "78fcf4bbc90e585a327d6e50abcc7c16",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Cancel anytime • Keep your code • Works with your current stack"
         }
       }
     },
     "../components/homepage/features.tsx": {
       "scopes": {
+        "5/0/init/0/1/value": {
+          "type": "element",
+          "hash": "bfae4b52066dd00ce747b686dec08968",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Authentication & Users"
+        },
+        "5/0/init/0/2/value": {
+          "type": "element",
+          "hash": "c239f5732d564caf043b543b2b190887",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Complete auth system with OAuth, magic links, and user management. Role-based access control included."
+        },
+        "5/0/init/1/1/value": {
+          "type": "element",
+          "hash": "10784287176dcfa29f104aae2b11dc6c",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Payments & Billing"
+        },
+        "5/0/init/1/2/value": {
+          "type": "element",
+          "hash": "8c21b55b823836a852551d5abf3c6e14",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Stripe integration with subscriptions, invoicing, and tax handling. Revenue tracking built-in."
+        },
+        "5/0/init/2/1/value": {
+          "type": "element",
+          "hash": "dfa7ce24746f08c778db872ca43ec45a",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Database & API"
+        },
+        "5/0/init/2/2/value": {
+          "type": "element",
+          "hash": "f9500f2cda25b68b69c7a812a25dff08",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Type-safe database with Drizzle ORM. RESTful APIs and real-time subscriptions ready."
+        },
+        "5/0/init/3/1/value": {
+          "type": "element",
+          "hash": "e878fe44da5916d3d2d140be4656e2e0",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Analytics & Insights"
+        },
+        "5/0/init/3/2/value": {
+          "type": "element",
+          "hash": "a6c6ef57663cc47713e0d1e6abddae31",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "User behavior tracking, conversion metrics, and beautiful dashboards for data-driven decisions."
+        },
+        "5/0/init/4/1/value": {
+          "type": "element",
+          "hash": "3adf415ce549bfb038f182c137748e5f",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Modern UI/UX"
+        },
+        "5/0/init/4/2/value": {
+          "type": "element",
+          "hash": "ef0a843dac5cda3161820a62f5b15750",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Beautiful, responsive design with dark mode. Accessible components and smooth animations."
+        },
+        "5/0/init/5/1/value": {
+          "type": "element",
+          "hash": "5a55f21571479a1c298a1cf183cfd5c5",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Production Deploy"
+        },
+        "5/0/init/5/2/value": {
+          "type": "element",
+          "hash": "f90508c5e3ef6baf3cbfaa49b5ddd100",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "One-click deployment to Vercel, AWS, or Docker. CI/CD pipelines and monitoring included."
+        },
+        "6/0/init/0/1/value": {
+          "type": "element",
+          "hash": "29808044228e3ed2c4a894dd64ebd11c",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Components"
+        },
+        "6/0/init/0/2/value": {
+          "type": "element",
+          "hash": "95db5d0ffb4ca86daa9437400343589c",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "50+"
+        },
+        "6/0/init/1/1/value": {
+          "type": "element",
+          "hash": "0ccce343287704cd90150c32e2fcad36",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Integrations"
+        },
+        "6/0/init/1/2/value": {
+          "type": "element",
+          "hash": "be22599fc4cdf0ac9ab922ea0b23626e",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "10+"
+        },
+        "6/0/init/2/1/value": {
+          "type": "element",
+          "hash": "5b3846d58a01fe0190c27f1da7be7283",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Type Safe"
+        },
+        "6/0/init/2/2/value": {
+          "type": "element",
+          "hash": "6f003883aeec8ac02f9a42f834130f5a",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "100%"
+        },
         "8/declaration/body/0/argument/1/3/1": {
           "type": "element",
           "hash": "6f0b61f7bc85a5a3a4ae39bcc54ba2b0",
@@ -1274,13 +1978,205 @@
     },
     "../components/homepage/footer.tsx": {
       "scopes": {
-        "15/declaration/body/1/argument/1/3/1/3/3": {
+        "11/0/init/0/1/value": {
           "type": "element",
-          "hash": "1d5cb4314898c05ab723678b64ae8c8f",
+          "hash": "4e5f845a09d417dde0a1310bc9ca4bfe",
           "context": "",
           "skip": false,
           "overrides": {},
-          "content": "Complete UllrAI SaaS starter with authentication, payments, database, and deployment."
+          "content": "Product"
+        },
+        "11/0/init/0/2/value/0/1/value": {
+          "type": "element",
+          "hash": "341ff316a339b106a178f0b8d362951b",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Features"
+        },
+        "11/0/init/0/2/value/1/1/value": {
+          "type": "element",
+          "hash": "ce27f1aeacccc542a174c4b2bce022b0",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Pricing"
+        },
+        "11/0/init/0/2/value/2/1/value": {
+          "type": "element",
+          "hash": "1563fcb5ddb5037b0709ccd3dd384a92",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Documentation"
+        },
+        "11/0/init/0/2/value/3/1/value": {
+          "type": "element",
+          "hash": "2a0cc1faf653e9ca97786acee96ffbde",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Changelog"
+        },
+        "11/0/init/1/1/value": {
+          "type": "element",
+          "hash": "0312fecb3eaff2c0a1d4d7a4107bb1b4",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Other Products"
+        },
+        "11/0/init/1/2/value/0/1/value": {
+          "type": "element",
+          "hash": "b7b7792f7c587f3cf15a7513b52a9bf5",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "PixMiller"
+        },
+        "11/0/init/1/2/value/1/1/value": {
+          "type": "element",
+          "hash": "82620f183bfe1fe6c08a557924cb5697",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "HeadShots.fun"
+        },
+        "11/0/init/1/2/value/2/1/value": {
+          "type": "element",
+          "hash": "5da8330025f77460403159f7b7de7664",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "To Markdown"
+        },
+        "11/0/init/1/2/value/3/1/value": {
+          "type": "element",
+          "hash": "c6885341f18aae4c9396d16d5e49266b",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "HiPNG.com"
+        },
+        "11/0/init/2/1/value": {
+          "type": "element",
+          "hash": "9e36d11fa82d1bd4563eef2abc4fcfba",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Company"
+        },
+        "11/0/init/2/2/value/0/1/value": {
+          "type": "element",
+          "hash": "944521eeeed2511833d2299931273c71",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "About"
+        },
+        "11/0/init/2/2/value/1/1/value": {
+          "type": "element",
+          "hash": "7feb9b36be2028520ffe37de06505148",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Blog"
+        },
+        "11/0/init/2/2/value/2/1/value": {
+          "type": "element",
+          "hash": "9afa39bc47019ee6dec6c74b6273967c",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Contact"
+        },
+        "11/0/init/2/2/value/3/1/value": {
+          "type": "element",
+          "hash": "0c3de148ec7e5f5076feaf91f545eb3a",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Careers"
+        },
+        "11/0/init/3/1/value": {
+          "type": "element",
+          "hash": "ec7fb05ed963bb6781a35782b3475502",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Resources"
+        },
+        "11/0/init/3/2/value/0/1/value": {
+          "type": "element",
+          "hash": "73b806a0915ba3692c0ebc9361533f02",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Help Center"
+        },
+        "11/0/init/3/2/value/1/1/value": {
+          "type": "element",
+          "hash": "aa83f4456d11185e5e72dba3260bf00b",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Community"
+        },
+        "11/0/init/3/2/value/2/1/value": {
+          "type": "element",
+          "hash": "ecfd6330c22476c4ff707df9a4400f42",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Tutorials"
+        },
+        "11/0/init/3/2/value/3/1/value": {
+          "type": "element",
+          "hash": "8ed62f56c81fa96c0f3182acb331bf63",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Templates"
+        },
+        "11/0/init/4/1/value": {
+          "type": "element",
+          "hash": "00d3f08da61a21887009819cf93fb414",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Legal"
+        },
+        "11/0/init/4/2/value/0/1/value": {
+          "type": "element",
+          "hash": "6007d5d5f6591c027b15bd49ab7a8c47",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Privacy"
+        },
+        "11/0/init/4/2/value/1/1/value": {
+          "type": "element",
+          "hash": "c531b88ecfe7dd2337a34f4a9ed18a5f",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Terms"
+        },
+        "11/0/init/4/2/value/2/1/value": {
+          "type": "element",
+          "hash": "4b34923fef858a2b9a4a914c3e822889",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Security"
+        },
+        "15/declaration/body/1/argument/1/3/1/3/3": {
+          "type": "element",
+          "hash": "7c3667b512dcab3eb0d0489e03261967",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Complete UllrAI Micro SaaS starter with authentication, payments, database, and deployment."
         },
         "15/declaration/body/1/argument/1/9/1/1/1": {
           "type": "element",
@@ -1310,6 +2206,134 @@
     },
     "../components/homepage/header.tsx": {
       "scopes": {
+        "16/0/init/0/1/value": {
+          "type": "element",
+          "hash": "341ff316a339b106a178f0b8d362951b",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Features"
+        },
+        "16/0/init/0/2/value/0/1/value": {
+          "type": "element",
+          "hash": "491fbb938cfe44df0438ad3e198d23e6",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Authentication"
+        },
+        "16/0/init/0/2/value/0/3/value": {
+          "type": "element",
+          "hash": "bef84e0e2b98aa29c36a39806663a352",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Secure user authentication with magic links"
+        },
+        "16/0/init/0/2/value/1/1/value": {
+          "type": "element",
+          "hash": "b01dbdd049ebbd4a349fa64d6ce65a3b",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Billing"
+        },
+        "16/0/init/0/2/value/1/3/value": {
+          "type": "element",
+          "hash": "8bd67162c716180b9c0386c26f3385c7",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Subscription management and payments"
+        },
+        "16/0/init/0/2/value/2/1/value": {
+          "type": "element",
+          "hash": "c9380ea68c8c76ea451bd9613329a07c",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Dashboard"
+        },
+        "16/0/init/0/2/value/2/3/value": {
+          "type": "element",
+          "hash": "acf5d1d6cd027b69240aa45533f2fa07",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "User dashboard and settings"
+        },
+        "16/0/init/1/1/value": {
+          "type": "element",
+          "hash": "ce27f1aeacccc542a174c4b2bce022b0",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Pricing"
+        },
+        "16/0/init/2/1/value": {
+          "type": "element",
+          "hash": "944521eeeed2511833d2299931273c71",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "About"
+        },
+        "16/0/init/3/1/value": {
+          "type": "element",
+          "hash": "7feb9b36be2028520ffe37de06505148",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Blog"
+        },
+        "16/0/init/4/1/value": {
+          "type": "element",
+          "hash": "9afa39bc47019ee6dec6c74b6273967c",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Contact"
+        },
+        "17/0/init/0/1/value": {
+          "type": "element",
+          "hash": "341ff316a339b106a178f0b8d362951b",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Features"
+        },
+        "17/0/init/1/1/value": {
+          "type": "element",
+          "hash": "ce27f1aeacccc542a174c4b2bce022b0",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Pricing"
+        },
+        "17/0/init/2/1/value": {
+          "type": "element",
+          "hash": "944521eeeed2511833d2299931273c71",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "About"
+        },
+        "17/0/init/3/1/value": {
+          "type": "element",
+          "hash": "7feb9b36be2028520ffe37de06505148",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Blog"
+        },
+        "17/0/init/4/1/value": {
+          "type": "element",
+          "hash": "9afa39bc47019ee6dec6c74b6273967c",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Contact"
+        },
         "19/body/3/consequent/0/argument/1/1": {
           "type": "element",
           "hash": "bc82f0d7f47c95548c0de127137b2e8e",
@@ -1444,11 +2468,11 @@
         },
         "5/declaration/body/0/argument/1/1/3/7/3": {
           "type": "element",
-          "hash": "1d5cb4314898c05ab723678b64ae8c8f",
+          "hash": "7c3667b512dcab3eb0d0489e03261967",
           "context": "",
           "skip": false,
           "overrides": {},
-          "content": "Complete UllrAI SaaS starter with authentication, payments, database, and deployment."
+          "content": "Complete UllrAI Micro SaaS starter with authentication, payments, database, and deployment."
         },
         "5/declaration/body/0/argument/1/1/7/3/11/1/1": {
           "type": "element",
@@ -1585,11 +2609,291 @@
           "skip": false,
           "overrides": {},
           "content": "<element:Zap></element:Zap> Fast Deploy"
+        },
+        "6/0/init/0/1/value": {
+          "type": "element",
+          "hash": "fda5eebe09595746036088959163b92a",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Production Ready"
+        },
+        "6/0/init/1/1/value": {
+          "type": "element",
+          "hash": "327aa6ab1261880e719e58e5b2b6833a",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Enterprise Security"
+        },
+        "6/0/init/2/1/value": {
+          "type": "element",
+          "hash": "52954c277c6a846bfb1f48ef558a27f4",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Lightning Fast"
+        },
+        "7/declaration/body/0/argument/1/1/3/15/1/1": {
+          "type": "element",
+          "hash": "66b61c0ae5e7fd9c8d2d8027fc7cc76a",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Start Building<element:ArrowRight></element:ArrowRight>"
+        },
+        "7/declaration/body/0/argument/1/1/3/15/3/1": {
+          "type": "element",
+          "hash": "0198492a984a019811a10e73c0b13827",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:Github></element:Github> View on GitHub"
+        },
+        "7/declaration/body/0/argument/1/1/3/19/1/3": {
+          "type": "element",
+          "hash": "b5dfd9a30b3c8fd0607aa2414e340546",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "4.9/5"
+        },
+        "7/declaration/body/0/argument/1/1/3/19/1/5": {
+          "type": "element",
+          "hash": "cc8747dcc80f665609e9f26e63c463e4",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "average rating"
+        },
+        "7/declaration/body/0/argument/1/1/3/19/5/3": {
+          "type": "element",
+          "hash": "d9bd021cdd6c0cf66376061c4cceb094",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "10,000+ developers shipped with us"
+        },
+        "7/declaration/body/0/argument/1/1/3/3/1": {
+          "type": "element",
+          "hash": "b80ab5d722ff90c4606d7fb2f36cba45",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:Sparkles></element:Sparkles> Fresh release"
+        },
+        "7/declaration/body/0/argument/1/1/3/3/3": {
+          "type": "element",
+          "hash": "de60cae903486d308e58d8112c954422",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Trusted by 10,000+ devs"
+        },
+        "7/declaration/body/0/argument/1/1/3/7/1": {
+          "type": "element",
+          "hash": "9faca0006bf2b1b7e5475593a0d14d8d",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Build & Launch<element:span>Micro SaaS in hours</element:span>"
+        },
+        "7/declaration/body/0/argument/1/1/3/7/3": {
+          "type": "element",
+          "hash": "7c3667b512dcab3eb0d0489e03261967",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Complete UllrAI Micro SaaS starter with authentication, payments, database, and deployment."
+        },
+        "7/declaration/body/0/argument/1/1/7/3/11/1/1": {
+          "type": "element",
+          "hash": "d6609525c0ec758580ed5fd6c38d1ff2",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Deployments"
+        },
+        "7/declaration/body/0/argument/1/1/7/3/11/1/3": {
+          "type": "element",
+          "hash": "2ec651d9372762ade4c8bc7aafab3030",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Past 7 days"
+        },
+        "7/declaration/body/0/argument/1/1/7/3/11/5/1/1": {
+          "type": "element",
+          "hash": "914b4f146384a0699ed4853e22951015",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Success rate"
+        },
+        "7/declaration/body/0/argument/1/1/7/3/11/5/1/3": {
+          "type": "element",
+          "hash": "ebf8401702bd148b6b1b8a3cbcbe256f",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "99.9%"
+        },
+        "7/declaration/body/0/argument/1/1/7/3/11/5/3/1": {
+          "type": "element",
+          "hash": "0595918b3b5586fd944a3df3c950e589",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Build time"
+        },
+        "7/declaration/body/0/argument/1/1/7/3/11/5/3/3": {
+          "type": "element",
+          "hash": "82f2057ba1fec2baee1d732d36c82e58",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "1m 42s"
+        },
+        "7/declaration/body/0/argument/1/1/7/3/3/1/3/1": {
+          "type": "element",
+          "hash": "d57e9a8c3fd2985b2433e8f616db036a",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "UllrAI Dashboard"
+        },
+        "7/declaration/body/0/argument/1/1/7/3/3/1/3/3": {
+          "type": "element",
+          "hash": "341586dca2d122fe1421ed6f0e8a1071",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Demo metrics"
+        },
+        "7/declaration/body/0/argument/1/1/7/3/3/3": {
+          "type": "element",
+          "hash": "afe3d19c708ceaa2ceb3acef9c8d5c7c",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:Activity></element:Activity> Demo"
+        },
+        "7/declaration/body/0/argument/1/1/7/3/7/1/1": {
+          "type": "element",
+          "hash": "22359624809a9d18e781bfd1c50703a7",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Monthly revenue"
+        },
+        "7/declaration/body/0/argument/1/1/7/3/7/1/3": {
+          "type": "element",
+          "hash": "c9d7afacf15b4057c1974a99dd78ecde",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "$84.2k"
+        },
+        "7/declaration/body/0/argument/1/1/7/3/7/1/5": {
+          "type": "element",
+          "hash": "39a5557ffdb5eb3ce5d3c752e0ef6d5e",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "+18% vs last month"
+        },
+        "7/declaration/body/0/argument/1/1/7/3/7/3/1": {
+          "type": "element",
+          "hash": "ca0d9f2095793a051cd8a598073d7211",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Active users"
+        },
+        "7/declaration/body/0/argument/1/1/7/3/7/3/3": {
+          "type": "element",
+          "hash": "4b5b2ea91770a0f61379b48e2af0cf10",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "12.4k"
+        },
+        "7/declaration/body/0/argument/1/1/7/3/7/3/5": {
+          "type": "element",
+          "hash": "2fa9d74e95f96897cce7a231d466bf8b",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "+1.2k this week"
+        },
+        "7/declaration/body/0/argument/1/1/7/7/1": {
+          "type": "element",
+          "hash": "f8fd0932b1df20a9ed614dfd53de88fb",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:div></element:div> Easy Setup"
+        },
+        "7/declaration/body/0/argument/1/1/7/9/1": {
+          "type": "element",
+          "hash": "0e7cca9032f511058280f061e4f7aecd",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:Zap></element:Zap> Fast Deploy"
         }
       }
     },
     "../components/homepage/other-products.tsx": {
       "scopes": {
+        "5/0/init/0/2/value": {
+          "type": "element",
+          "hash": "050573be6a96e5960a1c9a5341a2346e",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Remove backgrounds in seconds with AI precision - no design skills needed"
+        },
+        "5/0/init/1/2/value": {
+          "type": "element",
+          "hash": "b0feb2bf7ec5f66d206ad6b059bafd53",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Generate professional headshots instantly - perfect for LinkedIn, resumes & more"
+        },
+        "5/0/init/2/2/value": {
+          "type": "element",
+          "hash": "1f423d9776fcbb98ef74fad3d098cc57",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Convert any document to clean Markdown instantly - PDFs, Word docs, web pages"
+        },
+        "5/0/init/3/2/value": {
+          "type": "element",
+          "hash": "a3135f28adee663ff4fd902d03a25029",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Stay ahead with daily insights - data-driven analysis of global trends"
+        },
+        "5/0/init/4/2/value": {
+          "type": "element",
+          "hash": "9ff2e12f40d5c58bb4e8b4cc05ce5f73",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Create stunning social media cards that boost engagement and clicks"
+        },
+        "5/0/init/5/2/value": {
+          "type": "element",
+          "hash": "9e68bfc79962b566824f8c147766478b",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Access thousands of AI-generated transparent PNGs - perfect for any project"
+        },
         "6/declaration/body/0/argument/1/1/1": {
           "type": "element",
           "hash": "6b0424ad87e3e19bf93d443847db40c9",
@@ -1690,6 +2994,166 @@
           "overrides": {},
           "content": "See what our community has to say about their experience"
         },
+        "5/0/init/0/1/value": {
+          "type": "element",
+          "hash": "1c8245fd2632a455f7646d136f62445f",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "This starter kit saved me months of development time. The authentication system and payment integration work flawlessly out of the box."
+        },
+        "5/0/init/0/2/value/1/value": {
+          "type": "element",
+          "hash": "da5bfc0a0de1d49c23fa6757dcd0f7b1",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Founder"
+        },
+        "5/0/init/1/1/value": {
+          "type": "element",
+          "hash": "f49f286761ad7cd9a326d2995b647076",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Clean code, excellent documentation, and responsive support. Everything I needed to launch my SaaS product quickly."
+        },
+        "5/0/init/1/2/value/1/value": {
+          "type": "element",
+          "hash": "8969cd6bb5a49670ce1e4388839c0862",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "CTO"
+        },
+        "5/0/init/2/1/value": {
+          "type": "element",
+          "hash": "a7aafbe1932e557ee7add892fdf40247",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "The UI components are beautiful and the dark mode implementation is perfect. My users love the interface."
+        },
+        "5/0/init/2/2/value/1/value": {
+          "type": "element",
+          "hash": "dfeadc96e6d3de22a884ee97974b505e",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Product Manager"
+        },
+        "5/0/init/3/1/value": {
+          "type": "element",
+          "hash": "687664b21e2c8ca0523336f7d8b918b4",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Best investment I've made for my startup. The code quality is enterprise-grade and the architecture is scalable."
+        },
+        "5/0/init/3/2/value/1/value": {
+          "type": "element",
+          "hash": "c350e0a7884d53e5aecf7f0756e44e47",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Lead Developer"
+        },
+        "5/0/init/4/1/value": {
+          "type": "element",
+          "hash": "a77c8874cf1100d787af03dc12f89e9e",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Incredible attention to detail. The analytics dashboard and user management features are exactly what I needed."
+        },
+        "5/0/init/4/2/value/1/value": {
+          "type": "element",
+          "hash": "d9bd4b803f388048cdb08b35352518a3",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Entrepreneur"
+        },
+        "5/0/init/5/1/value": {
+          "type": "element",
+          "hash": "0ac046eb58333f9782d98c586da0d264",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "From idea to production in just 2 weeks. This starter kit is a game-changer for indie developers."
+        },
+        "5/0/init/5/2/value/1/value": {
+          "type": "element",
+          "hash": "38992ee1805d8e11013c30c51f912786",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Indie Developer"
+        },
+        "6/0/init/0/3/value": {
+          "type": "element",
+          "hash": "ff5d5b628f04a42cf4548929937918cd",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Developers"
+        },
+        "6/0/init/0/4/value": {
+          "type": "element",
+          "hash": "078419ddfe2b12ee1b61bce0f83bbddf",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Trust our starter"
+        },
+        "6/0/init/1/3/value": {
+          "type": "element",
+          "hash": "fe8af5cfb3c95cb35534872a325b225e",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Projects"
+        },
+        "6/0/init/1/4/value": {
+          "type": "element",
+          "hash": "c729ab82b3b0137a19ad06a60e50f1fb",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Built and launched"
+        },
+        "6/0/init/2/3/value": {
+          "type": "element",
+          "hash": "635192ad4d63006b0fb3e9eda720ce4e",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Uptime"
+        },
+        "6/0/init/2/4/value": {
+          "type": "element",
+          "hash": "66c24aab54ea87d8de8181d13ac230a1",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Guaranteed reliability"
+        },
+        "6/0/init/3/3/value": {
+          "type": "element",
+          "hash": "c9fa231054678af1362b7f9c6ab35e23",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Rating"
+        },
+        "6/0/init/3/4/value": {
+          "type": "element",
+          "hash": "de6fd3b3185e77b740e8b49945d394d1",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Average user rating"
+        },
         "8/body/0/argument/1/11": {
           "type": "element",
           "hash": "768679994de9356f0371d055a2e15c18",
@@ -1700,11 +3164,11 @@
         },
         "8/body/0/argument/1/15/3/3": {
           "type": "element",
-          "hash": "43b7b1ac35c3a58e95fb741c4fbacfc5",
+          "hash": "a1120a21ea83dc6ac0d54a9cc21f3e08",
           "context": "",
           "skip": false,
           "overrides": {},
-          "content": "{testimonial.author.role} at {testimonial.author.company}"
+          "content": "{testimonial.author.role} - {testimonial.author.company}"
         }
       }
     },

@@ -17,6 +17,34 @@ import {
 import { GITHUB_URL } from "@/lib/config/constants";
 import Link from "next/link";
 
+interface TrustIndicator {
+  id: string;
+  label: React.ReactNode;
+  icon: React.ComponentType<{ className?: string }>;
+  accent: string;
+}
+
+const trustIndicators: TrustIndicator[] = [
+  {
+    id: "production-ready",
+    label: <>Production Ready</>,
+    icon: CheckCircle,
+    accent: "text-emerald-500",
+  },
+  {
+    id: "enterprise-security",
+    label: <>Enterprise Security</>,
+    icon: Shield,
+    accent: "text-blue-500",
+  },
+  {
+    id: "lightning-fast",
+    label: <>Lightning Fast</>,
+    icon: Zap,
+    accent: "text-yellow-500",
+  },
+];
+
 export function Hero() {
   return (
     <section className="relative overflow-hidden border-b border-border/60 bg-background">
@@ -41,19 +69,15 @@ export function Hero() {
               </h1>
 
               <p className="text-muted-foreground max-w-2xl text-lg leading-relaxed sm:text-xl">
-                Complete UllrAI SaaS starter with authentication, payments,
+                Complete UllrAI Micro SaaS starter with authentication, payments,
                 database, and deployment.
               </p>
             </div>
 
             {/* Trust Indicators */}
             <div className="text-muted-foreground flex flex-wrap gap-x-6 gap-y-3 text-sm">
-              {[
-                { label: "Production Ready", icon: CheckCircle, accent: "text-emerald-500" },
-                { label: "Enterprise Security", icon: Shield, accent: "text-blue-500" },
-                { label: "Lightning Fast", icon: Zap, accent: "text-yellow-500" },
-              ].map(({ label, icon: Icon, accent }) => (
-                <span key={label} className="flex items-center gap-2">
+              {trustIndicators.map(({ id, label, icon: Icon, accent }) => (
+                <span key={id} className="flex items-center gap-2">
                   <Icon className={`${accent} h-4 w-4`} />
                   {label}
                 </span>

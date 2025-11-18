@@ -13,7 +13,7 @@ import {
   Database,
 } from "lucide-react";
 import { APP_NAME } from "@/lib/config/constants";
-import { isAdminRole, UserRole } from "@/lib/config/roles";
+import { isAdminRole } from "@/lib/config/roles";
 import { enabledTablesMap } from "@/lib/config/admin-tables";
 
 import {
@@ -34,7 +34,6 @@ import { useRouter } from "nextjs-toploader/app";
 import { UserButton } from "./user-btn";
 import { Logo } from "@/components/logo";
 import { cn } from "@/lib/utils";
-import Link from "next/link";
 import { useSession } from "@/lib/auth/client";
 
 const navigation: {
@@ -42,24 +41,28 @@ const navigation: {
   title: React.ReactNode;
   url: string;
   icon: LucideIcon;
+  matchMode?: "exact" | "prefix";
 }[] = [
   {
     key: "Home",
     title: <>Home</>,
     url: "/dashboard",
     icon: Home,
+    matchMode: "exact",
   },
   {
     key: "Upload",
     title: <>Upload</>,
     url: "/dashboard/upload",
     icon: Upload,
+    matchMode: "exact",
   },
   {
     key: "Settings",
     title: <>Settings</>,
     url: "/dashboard/settings",
     icon: Settings,
+    matchMode: "prefix",
   },
 ];
 
@@ -68,36 +71,42 @@ const adminNavigation: {
   title: React.ReactNode;
   url: string;
   icon: LucideIcon;
+  matchMode?: "exact" | "prefix";
 }[] = [
   {
     key: "Admin Dashboard",
     title: <>Admin Dashboard</>,
     url: "/dashboard/admin",
     icon: BarChart3,
+    matchMode: "exact",
   },
   {
     key: "User Management",
     title: <>User Management</>,
     url: "/dashboard/admin/users",
     icon: Users,
+    matchMode: "exact",
   },
   {
     key: "Payments",
     title: <>Payments</>,
     url: "/dashboard/admin/payments",
     icon: CreditCard,
+    matchMode: "exact",
   },
   {
     key: "Subscriptions",
     title: <>Subscriptions</>,
     url: "/dashboard/admin/subscriptions",
     icon: Shield,
+    matchMode: "exact",
   },
   {
     key: "Uploads Managements",
     title: <>Uploads Managements</>,
     url: "/dashboard/admin/uploads",
     icon: Upload,
+    matchMode: "exact",
   },
 ];
 
@@ -106,20 +115,103 @@ const genericTableNavigation = Object.keys(enabledTablesMap).map((key) => ({
   title: <>{key.charAt(0).toUpperCase() + key.slice(1)}</>,
   url: `/dashboard/admin/tables/${key}`,
   icon: Database,
+  matchMode: "exact" as const,
 }));
+
+interface MenuItemProps {
+  item: {
+    key: string;
+    title: React.ReactNode;
+    url: string;
+    icon: LucideIcon;
+    matchMode?: "exact" | "prefix";
+  };
+  pathname: string;
+  allItems: MenuItemProps["item"][];
+}
+
+function SidebarMenuLink({ item, pathname, allItems }: MenuItemProps) {
+  const router = useRouter();
+  const itemMatchMode = item.matchMode || "exact";
+
+  const isMatch = itemMatchMode === "exact"
+    ? pathname === item.url
+    : pathname.startsWith(item.url);
+
+  const matchingItems = allItems.filter((otherItem) => {
+    const otherMode = otherItem.matchMode || "exact";
+    return otherMode === "exact"
+      ? pathname === otherItem.url
+      : pathname.startsWith(otherItem.url);
+  });
+
+  const maxMatchLength = Math.max(
+    ...matchingItems.map((i) => i.url.length)
+  );
+
+  const isActive = isMatch && item.url.length === maxMatchLength;
+
+  const handleClick = () => {
+    router.push(item.url);
+  };
+
+  return (
+    <SidebarMenuButton isActive={isActive} tooltip={item.key} className="w-full" onClick={handleClick}>
+      <item.icon className="size-4" />
+      <span>{item.title}</span>
+    </SidebarMenuButton>
+  );
+}
+
+interface MenuSectionProps {
+  title?: React.ReactNode;
+  items: MenuItemProps["item"][];
+  pathname: string;
+}
+
+function SidebarSection({ title, items, pathname }: MenuSectionProps) {
+  return (
+    <SidebarGroup>
+      <SidebarGroupContent className="flex flex-col gap-2">
+        {title && (
+          <div className="text-muted-foreground px-2 py-1 text-xs font-semibold">
+            {title}
+          </div>
+        )}
+        <SidebarMenu>
+          {items.map((item) => (
+            <SidebarMenuItem key={item.key}>
+              <SidebarMenuLink item={item} pathname={pathname} allItems={items} />
+            </SidebarMenuItem>
+          ))}
+        </SidebarMenu>
+      </SidebarGroupContent>
+    </SidebarGroup>
+  );
+}
 
 export function AppSidebar() {
   const pathname = usePathname();
   const router = useRouter();
-  const { open, toggleSidebar } = useSidebar();
+  const { open } = useSidebar();
   const { data: session } = useSession();
 
-  const isAdmin =
-    session?.user &&
-    isAdminRole((session.user as { role?: UserRole }).role || "user");
+  const getUserRole = () =>
+    (session?.user?.role as "user" | "admin" | "super_admin") || "user";
 
-  const handleNavigation = (url: string) => () => {
-    router.replace(url);
+  const showAdminSections = isAdminRole(getUserRole());
+
+  const getNormalizedUser = () => {
+    if (!session?.user) return null;
+    return {
+      ...session.user,
+      role: getUserRole(),
+      image: session.user.image || undefined,
+    };
+  };
+
+  const handleLogoClick = () => {
+    router.push("/");
   };
 
   return (
@@ -130,117 +222,26 @@ export function AppSidebar() {
           open ? "px-4" : "justify-center",
         )}
       >
-        <Link href="/">
+        <button onClick={handleLogoClick} className="cursor-pointer">
           <Logo className="m-0 size-5 p-1" />
-        </Link>
-        {open && (
-          <>
-            <span className="text-base font-semibold">{APP_NAME}</span>
-          </>
-        )}
+        </button>
+        {open && <span className="text-base font-semibold">{APP_NAME}</span>}
       </SidebarHeader>
       <SidebarContent className="">
-        <SidebarGroup>
-          <SidebarGroupContent className="flex flex-col gap-2">
-            <SidebarMenu>
-              {navigation.map((item) => (
-                <SidebarMenuItem key={item.key}>
-                  <div
-                    onClick={handleNavigation(item.url)}
-                    onDoubleClick={() => {
-                      handleNavigation(item.url)();
-                      toggleSidebar();
-                    }}
-                  >
-                    <SidebarMenuButton
-                      isActive={item.url === pathname}
-                      tooltip={item.key}
-                      className="cursor-pointer"
-                    >
-                      <item.icon className="size-4" />
-                      <span>{item.title}</span>
-                    </SidebarMenuButton>
-                  </div>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        <SidebarSection title={undefined} items={navigation} pathname={pathname} />
 
-        {/* Admin Navigation */}
-        {isAdmin && (
+        {showAdminSections && (
           <>
-            <SidebarGroup>
-              <SidebarGroupContent className="flex flex-col gap-2">
-                {open && (
-                  <div className="text-muted-foreground px-2 py-1 text-xs font-semibold">
-                    Admin
-                  </div>
-                )}
-                <SidebarMenu>
-                  {adminNavigation.map((item) => (
-                    <SidebarMenuItem key={item.key}>
-                      <div
-                        onClick={handleNavigation(item.url)}
-                        onDoubleClick={() => {
-                          handleNavigation(item.url)();
-                          toggleSidebar();
-                        }}
-                      >
-                        <SidebarMenuButton
-                          isActive={item.url === pathname}
-                          tooltip={item.key}
-                          className="cursor-pointer"
-                        >
-                          <item.icon className="size-4" />
-                          <span>{item.title}</span>
-                        </SidebarMenuButton>
-                      </div>
-                    </SidebarMenuItem>
-                  ))}
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </SidebarGroup>
+            <SidebarSection title={open ? "Admin" : undefined} items={adminNavigation} pathname={pathname} />
 
-            {/* 新增：通用表格管理菜单 */}
             {genericTableNavigation.length > 0 && (
-              <SidebarGroup>
-                <SidebarGroupContent className="flex flex-col gap-2">
-                  {open && (
-                    <div className="text-muted-foreground px-2 py-1 text-xs font-semibold">
-                      Manage Tables
-                    </div>
-                  )}
-                  <SidebarMenu>
-                    {genericTableNavigation.map((item) => (
-                      <SidebarMenuItem key={item.key}>
-                        <div
-                          onClick={handleNavigation(item.url)}
-                          onDoubleClick={() => {
-                            handleNavigation(item.url)();
-                            toggleSidebar();
-                          }}
-                        >
-                          <SidebarMenuButton
-                            isActive={pathname.startsWith(item.url)}
-                            tooltip={item.key}
-                            className="cursor-pointer"
-                          >
-                            <item.icon className="size-4" />
-                            <span>{item.title}</span>
-                          </SidebarMenuButton>
-                        </div>
-                      </SidebarMenuItem>
-                    ))}
-                  </SidebarMenu>
-                </SidebarGroupContent>
-              </SidebarGroup>
+              <SidebarSection title={open ? "Manage Tables" : undefined} items={genericTableNavigation} pathname={pathname} />
             )}
           </>
         )}
       </SidebarContent>
       <SidebarFooter className="border-sidebar-divider border-t p-2">
-        <UserButton />
+        <UserButton user={getNormalizedUser()} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

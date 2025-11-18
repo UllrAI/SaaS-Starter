@@ -1,46 +1,54 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useSession } from "@/lib/auth/client";
 import { usePathname, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Loader2, Sparkles } from "lucide-react";
 
-export function SessionGuard({ children }: { children: React.ReactNode }) {
+interface SessionGuardProps {
+  children: React.ReactNode;
+}
+
+export function SessionGuard({ children }: SessionGuardProps) {
   const { data: session, isPending } = useSession();
   const router = useRouter();
   const pathname = usePathname();
+  const hasRedirectedRef = useRef(false);
 
   useEffect(() => {
-    // 1. 等待会话状态加载完成
     if (isPending) {
       return;
     }
 
-    // 2. 加载完成但会话不存在，并且当前在受保护的 dashboard 路径下
-    if (!session && pathname.startsWith("/dashboard")) {
+    if (session?.user) {
+      hasRedirectedRef.current = false;
+      return;
+    }
+
+    if (hasRedirectedRef.current) {
+      return;
+    }
+
+    hasRedirectedRef.current = true;
+
+    if (pathname.startsWith("/dashboard")) {
       toast.error("Your session has expired. Please log in again.");
-      router.push("/login"); // 重定向到登录页
+      router.replace("/login");
     }
   }, [session, isPending, router, pathname]);
 
-  // 3. 在等待验证时，显示全局的加载动画，防止内容闪烁
-  if (isPending) {
+  if (isPending || !session?.user) {
     return <SessionGuardLoading />;
   }
 
-  // 4. 会话有效，渲染子组件
-  if (session) {
-    return <>{children}</>;
-  }
-
-  // 5. 如果会话不存在，不渲染任何内容，等待 useEffect 重定向
-  return null;
+  return <>{children}</>;
 }
 
 function SessionGuardLoading() {
   return (
-    <section className="absolute inset-0 flex items-center justify-center bg-background/80">
+    // Match the rounded corners from SidebarInset so the overlay doesn't bleed past them.
+    <section className="absolute inset-0 flex items-center justify-center bg-background/80 rounded-2xl">
       <div className="flex flex-col items-center gap-4">
         <div className="relative">
           <div className="bg-primary/10 absolute inset-0 animate-pulse rounded-full" />

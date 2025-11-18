@@ -3989,6 +3989,46 @@
           "skip": false,
           "overrides": {},
           "content": "Toggle Sidebar"
+        },
+        "24/body/2/consequent/0/argument/1/1/1": {
+          "type": "element",
+          "hash": "85fcd93a6f051c26d057e4b30d392317",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Sidebar"
+        },
+        "24/body/2/consequent/0/argument/1/1/3": {
+          "type": "element",
+          "hash": "51aa5f202c817560f38d3527a9a1366d",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Displays the mobile sidebar."
+        },
+        "25/body/1/argument/3": {
+          "type": "element",
+          "hash": "0ef91fcb33b04612eb8a202f673d7881",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Toggle Sidebar"
+        },
+        "26/body/1/argument-aria-label": {
+          "type": "attribute",
+          "hash": "0ef91fcb33b04612eb8a202f673d7881",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Toggle Sidebar"
+        },
+        "26/body/1/argument-title": {
+          "type": "attribute",
+          "hash": "0ef91fcb33b04612eb8a202f673d7881",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Toggle Sidebar"
         }
       }
     },
@@ -4182,6 +4222,46 @@
           "overrides": {},
           "content": "Uploads Managements"
         },
+        "15/0/init/0/1/value": {
+          "type": "element",
+          "hash": "bbb5815b611504951063a4dab820f36f",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Admin Dashboard"
+        },
+        "15/0/init/1/1/value": {
+          "type": "element",
+          "hash": "82b1e7d9d4c8a8592d956c2ef21bd58c",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "User Management"
+        },
+        "15/0/init/2/1/value": {
+          "type": "element",
+          "hash": "1ce1a8d31ed709fb29fce2057045d104",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Payments"
+        },
+        "15/0/init/3/1/value": {
+          "type": "element",
+          "hash": "0d17f4d8d660df40b41d82e0171af6ad",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Subscriptions"
+        },
+        "15/0/init/4/1/value": {
+          "type": "element",
+          "hash": "86b4dcd6e7bb2e6cf47151539e570be0",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Uploads Managements"
+        },
         "16/declaration/body/6/argument/3/5/expression/right/1/1/1/expression/right": {
           "type": "element",
           "hash": "1b1db62f967e180838caeff14b805a8c",
@@ -4191,6 +4271,70 @@
           "content": "Admin"
         },
         "16/declaration/body/6/argument/3/5/expression/right/5/expression/right/1/1/expression/right": {
+          "type": "element",
+          "hash": "ea7b215a42902966b2f131b58fedc6bd",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Manage Tables"
+        },
+        "16/declaration/body/9/argument/3/5/expression/right/1/1/1/expression/right": {
+          "type": "element",
+          "hash": "1b1db62f967e180838caeff14b805a8c",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Admin"
+        },
+        "16/declaration/body/9/argument/3/5/expression/right/5/expression/right/1/1/expression/right": {
+          "type": "element",
+          "hash": "ea7b215a42902966b2f131b58fedc6bd",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Manage Tables"
+        },
+        "17/declaration/body/5/argument/3/5/expression/right/1/1/1/expression/right": {
+          "type": "element",
+          "hash": "1b1db62f967e180838caeff14b805a8c",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Admin"
+        },
+        "17/declaration/body/5/argument/3/5/expression/right/5/expression/right/1/1/expression/right": {
+          "type": "element",
+          "hash": "ea7b215a42902966b2f131b58fedc6bd",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Manage Tables"
+        },
+        "17/declaration/body/8/argument/3/5/expression/right/1/1/1/expression/right": {
+          "type": "element",
+          "hash": "1b1db62f967e180838caeff14b805a8c",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Admin"
+        },
+        "17/declaration/body/8/argument/3/5/expression/right/5/expression/right/1/1/expression/right": {
+          "type": "element",
+          "hash": "ea7b215a42902966b2f131b58fedc6bd",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Manage Tables"
+        },
+        "18/declaration/body/9/argument/3/5/expression/right/1/1/1/expression/right": {
+          "type": "element",
+          "hash": "1b1db62f967e180838caeff14b805a8c",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Admin"
+        },
+        "18/declaration/body/9/argument/3/5/expression/right/5/expression/right/1/1/expression/right": {
           "type": "element",
           "hash": "ea7b215a42902966b2f131b58fedc6bd",
           "context": "",
@@ -4209,11 +4353,51 @@
           "skip": false,
           "overrides": {},
           "content": "Loading..."
+        },
+        "7/body/0/argument/1/3/3": {
+          "type": "element",
+          "hash": "82b4ea7ed1439094d7c4be13aaba9a66",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Loading..."
+        },
+        "8/body/0/argument/1/3/3": {
+          "type": "element",
+          "hash": "82b4ea7ed1439094d7c4be13aaba9a66",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Loading..."
         }
       }
     },
     "dashboard/_components/user-btn.tsx": {
       "scopes": {
+        "12/declaration/body/4/argument/1/1/3/5/1/1": {
+          "type": "element",
+          "hash": "292ad169645e3d3c7195da7937aa0bd9",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:Settings></element:Settings> Settings"
+        },
+        "12/declaration/body/4/argument/1/1/3/9/1/expression/alternate": {
+          "type": "element",
+          "hash": "94566d276c3c9ed048fe046f7e8f5fa1",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:LogOut></element:LogOut> Log Out"
+        },
+        "12/declaration/body/4/argument/1/1/3/9/1/expression/consequent/3": {
+          "type": "element",
+          "hash": "0a29c741e0a1f63184ee7b85ce2da68c",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Log Out"
+        },
         "12/declaration/body/6/argument/1/1/3/5/1/1": {
           "type": "element",
           "hash": "292ad169645e3d3c7195da7937aa0bd9",
@@ -4231,6 +4415,54 @@
           "content": "<element:LogOut></element:LogOut> Log Out"
         },
         "12/declaration/body/6/argument/1/1/3/9/1/expression/consequent/3": {
+          "type": "element",
+          "hash": "0a29c741e0a1f63184ee7b85ce2da68c",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Log Out"
+        },
+        "12/declaration/body/8/argument/1/1/3/5/1/1": {
+          "type": "element",
+          "hash": "292ad169645e3d3c7195da7937aa0bd9",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:Settings></element:Settings> Settings"
+        },
+        "12/declaration/body/8/argument/1/1/3/9/1/expression/alternate": {
+          "type": "element",
+          "hash": "94566d276c3c9ed048fe046f7e8f5fa1",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:LogOut></element:LogOut> Log Out"
+        },
+        "12/declaration/body/8/argument/1/1/3/9/1/expression/consequent/3": {
+          "type": "element",
+          "hash": "0a29c741e0a1f63184ee7b85ce2da68c",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Log Out"
+        },
+        "13/declaration/body/7/argument/1/1/3/5/1/1": {
+          "type": "element",
+          "hash": "292ad169645e3d3c7195da7937aa0bd9",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:Settings></element:Settings> Settings"
+        },
+        "13/declaration/body/7/argument/1/1/3/9/1/expression/alternate": {
+          "type": "element",
+          "hash": "94566d276c3c9ed048fe046f7e8f5fa1",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:LogOut></element:LogOut> Log Out"
+        },
+        "13/declaration/body/7/argument/1/1/3/9/1/expression/consequent/3": {
           "type": "element",
           "hash": "0a29c741e0a1f63184ee7b85ce2da68c",
           "context": "",

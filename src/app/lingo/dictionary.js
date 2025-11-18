@@ -1021,7 +1021,7 @@ export default {
           content: {
             en: "We are committed to protecting your privacy and ensuring the security of your personal information. This policy explains how we collect, use, and safeguard your data.",
             "zh-CN":
-              "我们致力于保护您的隐私并确保您的个人信息安全。本政策解释了我们如何收集、使用和保护您的数据。",
+              "我们致力于保护您的隐私及个人信息安全。本政策解释了我们如何收集、使用和保护您的数据。",
           },
           hash: "17c8101a6ca532ace13a782fcc6b122d",
         },
@@ -2900,6 +2900,104 @@ export default {
     },
     "../components/payment-options.tsx": {
       entries: {
+        "15/0/init/0/value/0/value": {
+          content: {
+            en: "Plus",
+            "zh-CN": "专业版",
+          },
+          hash: "54ddb7f88090c3d3f7e9e4a389a97cec",
+        },
+        "15/0/init/0/value/1/value": {
+          content: {
+            en: "Best for growing teams and businesses",
+            "zh-CN": "最适合成长中的团队和企业",
+          },
+          hash: "888771d5956296aee866520e783a0012",
+        },
+        "15/0/init/1/value/0/value": {
+          content: {
+            en: "Professional",
+            "zh-CN": "企业版",
+          },
+          hash: "0059ac0aac3f10a46b28c095e697cbbb",
+        },
+        "15/0/init/1/value/1/value": {
+          content: {
+            en: "Best for growing teams and businesses",
+            "zh-CN": "最适合成长中的团队和企业",
+          },
+          hash: "888771d5956296aee866520e783a0012",
+        },
+        "15/0/init/2/value/0/value": {
+          content: {
+            en: "Team",
+            "zh-CN": "团队版",
+          },
+          hash: "c621ea9404a37af289def443b309bf1b",
+        },
+        "15/0/init/2/value/1/value": {
+          content: {
+            en: "Best for growing teams and businesses",
+            "zh-CN": "最适合成长中的团队和企业",
+          },
+          hash: "888771d5956296aee866520e783a0012",
+        },
+        "16/0/init/0/value": {
+          content: {
+            en: "Unlimited projects",
+            "zh-CN": "无限项目",
+          },
+          hash: "efa27941636566fc67176563d6506743",
+        },
+        "16/0/init/1/value": {
+          content: {
+            en: "Advanced analytics",
+            "zh-CN": "高级分析",
+          },
+          hash: "bb9f62c1cd0601e0b3fae13f7685c81d",
+        },
+        "16/0/init/2/value": {
+          content: {
+            en: "Priority support",
+            "zh-CN": "优先支持",
+          },
+          hash: "ba86ddd272252bf41fe76785628abff1",
+        },
+        "16/0/init/3/value": {
+          content: {
+            en: "10GB storage",
+            "zh-CN": "10GB存储空间",
+          },
+          hash: "292ca13bac534b1ca307c1ad6f61a792",
+        },
+        "16/0/init/4/value": {
+          content: {
+            en: "Team collaboration",
+            "zh-CN": "团队协作",
+          },
+          hash: "a54ab738c5d2db752d92a89ff16e2ed3",
+        },
+        "16/0/init/5/value": {
+          content: {
+            en: "API access",
+            "zh-CN": "API访问",
+          },
+          hash: "7bfaa79c6a8881a688f9c009e6541c88",
+        },
+        "16/0/init/6/value": {
+          content: {
+            en: "Dedicated support",
+            "zh-CN": "专属支持",
+          },
+          hash: "28a57ff95b08e633d4078feba035b368",
+        },
+        "16/0/init/7/value": {
+          content: {
+            en: "Advanced security",
+            "zh-CN": "高级安全",
+          },
+          hash: "6336048b7159ef703c678f46223dddec",
+        },
         "16/declaration/body/8/argument/11/1/expression/0/body/3/argument/1/expression/right/1":
           {
             content: {
@@ -2916,6 +3014,30 @@ export default {
             },
             hash: "f841f6620ce95fd3c7f624660cbafe92",
           },
+        "16/declaration/body/8/argument/11/1/expression/0/body/3/argument/3/5/3/1/1/expression/alternate/alternate":
+          {
+            content: {
+              en: "Billed monthly",
+              "zh-CN": "按月计费",
+            },
+            hash: "1b5bf08424cbffae551bce0e3a35f924",
+          },
+        "16/declaration/body/8/argument/11/1/expression/0/body/3/argument/3/5/3/1/1/expression/alternate/consequent":
+          {
+            content: {
+              en: "Billed annually",
+              "zh-CN": "按年计费",
+            },
+            hash: "2dde195e8efbd4b6b3bef055008954da",
+          },
+        "16/declaration/body/8/argument/11/1/expression/0/body/3/argument/3/5/3/1/1/expression/consequent":
+          {
+            content: {
+              en: "One-time payment",
+              "zh-CN": "一次性付款",
+            },
+            hash: "4dd19f2570c6fe396673fa3a6c984a6d",
+          },
         "16/declaration/body/8/argument/11/1/expression/0/body/3/argument/3/5/5/expression/right":
           {
             content: {
@@ -2923,6 +3045,31 @@ export default {
               "zh-CN": "<function:formatPrice/> 每年总计",
             },
             hash: "5df9ccc9638b514bc2ee5f7b7b668130",
+          },
+        "16/declaration/body/8/argument/11/1/expression/0/body/3/argument/5/3/expression/alternate/1/expression/alternate/consequent":
+          {
+            content: {
+              en: "<element:LogIn></element:LogIn> Login to Get <element:React.Fragment>{tier.name}</element:React.Fragment>",
+              "zh-CN":
+                "<element:LogIn></element:LogIn> 登录获取 <element:React.Fragment>{tier.name}</element:React.Fragment>",
+            },
+            hash: "8fcd2efa4c053e4d974c9e78ba34c5be",
+          },
+        "16/declaration/body/8/argument/11/1/expression/0/body/3/argument/5/3/expression/alternate/1/expression/consequent":
+          {
+            content: {
+              en: "<element:Loader2></element:Loader2> Processing...",
+              "zh-CN": "<element:Loader2></element:Loader2> 处理中...",
+            },
+            hash: "63a4b31ce7f5507b3bcfac196a87417f",
+          },
+        "16/declaration/body/8/argument/11/1/expression/0/body/3/argument/5/5/expression/alternate/1/expression/alternate/alternate":
+          {
+            content: {
+              en: "Get {tier.label}",
+              "zh-CN": "获取 {tier.label}",
+            },
+            hash: "7954c772ab8c27b23fae6d341c53d577",
           },
         "16/declaration/body/8/argument/11/1/expression/0/body/3/argument/5/5/expression/alternate/1/expression/alternate/consequent":
           {
@@ -2932,7 +3079,87 @@ export default {
             },
             hash: "14d5f16d813ef8547595bc2cf5165715",
           },
+        "16/declaration/body/8/argument/11/1/expression/0/body/3/argument/5/5/expression/alternate/1/expression/alternate/consequent/3":
+          {
+            content: {
+              en: "Login to Get {tier.label}",
+              "zh-CN": "登录以获取 {tier.label}",
+            },
+            hash: "80f55128fe71a8f044ad1fe71dd3698a",
+          },
         "16/declaration/body/8/argument/11/1/expression/0/body/3/argument/5/5/expression/alternate/1/expression/consequent":
+          {
+            content: {
+              en: "<element:Loader2></element:Loader2> Processing...",
+              "zh-CN": "<element:Loader2></element:Loader2> 处理中...",
+            },
+            hash: "63a4b31ce7f5507b3bcfac196a87417f",
+          },
+        "16/declaration/body/8/argument/11/1/expression/0/body/6/argument/1/expression/right/1":
+          {
+            content: {
+              en: "<element:Star></element:Star> Most Popular",
+              "zh-CN": "<element:Star></element:Star> 最受欢迎",
+            },
+            hash: "69b93512dcde68b518e5270c8f255437",
+          },
+        "16/declaration/body/8/argument/11/1/expression/0/body/6/argument/3/5/1/3/expression/right":
+          {
+            content: {
+              en: "/month",
+              "zh-CN": "/月",
+            },
+            hash: "f841f6620ce95fd3c7f624660cbafe92",
+          },
+        "16/declaration/body/8/argument/11/1/expression/0/body/6/argument/3/5/3/1/1/expression/alternate/alternate":
+          {
+            content: {
+              en: "Billed monthly",
+              "zh-CN": "按月计费",
+            },
+            hash: "1b5bf08424cbffae551bce0e3a35f924",
+          },
+        "16/declaration/body/8/argument/11/1/expression/0/body/6/argument/3/5/3/1/1/expression/alternate/consequent":
+          {
+            content: {
+              en: "Billed annually",
+              "zh-CN": "按年计费",
+            },
+            hash: "2dde195e8efbd4b6b3bef055008954da",
+          },
+        "16/declaration/body/8/argument/11/1/expression/0/body/6/argument/3/5/3/1/1/expression/consequent":
+          {
+            content: {
+              en: "One-time payment",
+              "zh-CN": "一次性付款",
+            },
+            hash: "4dd19f2570c6fe396673fa3a6c984a6d",
+          },
+        "16/declaration/body/8/argument/11/1/expression/0/body/6/argument/3/5/5/expression/right":
+          {
+            content: {
+              en: "<function:formatPrice/> total per year",
+              "zh-CN": "<function:formatPrice/> 每年总计",
+            },
+            hash: "5df9ccc9638b514bc2ee5f7b7b668130",
+          },
+        "16/declaration/body/8/argument/11/1/expression/0/body/6/argument/5/5/expression/alternate/1/expression/alternate/alternate":
+          {
+            content: {
+              en: "Get {labelNode}",
+              "zh-CN": "获取 {tier.label}",
+            },
+            hash: "7954c772ab8c27b23fae6d341c53d577",
+          },
+        "16/declaration/body/8/argument/11/1/expression/0/body/6/argument/5/5/expression/alternate/1/expression/alternate/consequent/3":
+          {
+            content: {
+              en: "Login to Get {labelNode}",
+              "zh-CN": "登录以获取 {tier.label}",
+            },
+            hash: "80f55128fe71a8f044ad1fe71dd3698a",
+          },
+        "16/declaration/body/8/argument/11/1/expression/0/body/6/argument/5/5/expression/alternate/1/expression/consequent":
           {
             content: {
               en: "<element:Loader2></element:Loader2> Processing...",
@@ -2969,6 +3196,270 @@ export default {
           hash: "3d40ba01d1677008b3df63364b4d23a6",
         },
         "16/declaration/body/8/argument/7/expression/right/3/1/expression/right":
+          {
+            content: {
+              en: "<element:Zap></element:Zap> Save 17% with yearly billing",
+              "zh-CN": "<element:Zap></element:Zap> 年付可节省17%",
+            },
+            hash: "5265300527ba1f5f86c9bee3438b3daf",
+          },
+        "18/declaration/body/11/argument/11/1/expression/0/body/6/argument/1/expression/right/1":
+          {
+            content: {
+              en: "<element:Star></element:Star> Most Popular",
+              "zh-CN": "<element:Star></element:Star> 最受欢迎",
+            },
+            hash: "69b93512dcde68b518e5270c8f255437",
+          },
+        "18/declaration/body/11/argument/11/1/expression/0/body/6/argument/3/5/1/3/expression/right":
+          {
+            content: {
+              en: "/month",
+              "zh-CN": "/月",
+            },
+            hash: "f841f6620ce95fd3c7f624660cbafe92",
+          },
+        "18/declaration/body/11/argument/11/1/expression/0/body/6/argument/3/5/3/1/1/expression/alternate/alternate":
+          {
+            content: {
+              en: "Billed monthly",
+              "zh-CN": "按月计费",
+            },
+            hash: "1b5bf08424cbffae551bce0e3a35f924",
+          },
+        "18/declaration/body/11/argument/11/1/expression/0/body/6/argument/3/5/3/1/1/expression/alternate/consequent":
+          {
+            content: {
+              en: "Billed annually",
+              "zh-CN": "按年计费",
+            },
+            hash: "2dde195e8efbd4b6b3bef055008954da",
+          },
+        "18/declaration/body/11/argument/11/1/expression/0/body/6/argument/3/5/3/1/1/expression/consequent":
+          {
+            content: {
+              en: "One-time payment",
+              "zh-CN": "一次性付款",
+            },
+            hash: "4dd19f2570c6fe396673fa3a6c984a6d",
+          },
+        "18/declaration/body/11/argument/11/1/expression/0/body/6/argument/3/5/5/expression/right":
+          {
+            content: {
+              en: "<function:formatPrice/> total per year",
+              "zh-CN": "<function:formatPrice/> 每年总计",
+            },
+            hash: "5df9ccc9638b514bc2ee5f7b7b668130",
+          },
+        "18/declaration/body/11/argument/11/1/expression/0/body/6/argument/5/5/expression/alternate/1/expression/alternate/alternate":
+          {
+            content: {
+              en: "Get {localizedLabel}",
+              "zh-CN": "获取 {tier.label}",
+            },
+            hash: "7954c772ab8c27b23fae6d341c53d577",
+          },
+        "18/declaration/body/11/argument/11/1/expression/0/body/6/argument/5/5/expression/alternate/1/expression/alternate/consequent/3":
+          {
+            content: {
+              en: "Login to Get {localizedLabel}",
+              "zh-CN": "登录以获取 {tier.label}",
+            },
+            hash: "80f55128fe71a8f044ad1fe71dd3698a",
+          },
+        "18/declaration/body/11/argument/11/1/expression/0/body/6/argument/5/5/expression/alternate/1/expression/consequent":
+          {
+            content: {
+              en: "<element:Loader2></element:Loader2> Processing...",
+              "zh-CN": "<element:Loader2></element:Loader2> 处理中...",
+            },
+            hash: "63a4b31ce7f5507b3bcfac196a87417f",
+          },
+        "18/declaration/body/11/argument/3/1/1/1": {
+          content: {
+            en: "<element:Calendar></element:Calendar> Subscription",
+            "zh-CN": "<element:Calendar></element:Calendar> 订阅",
+          },
+          hash: "42fd08fe29e9432519c7fc0dcf6ee5cb",
+        },
+        "18/declaration/body/11/argument/3/1/1/3": {
+          content: {
+            en: "<element:CreditCard></element:CreditCard> One-time",
+            "zh-CN": "<element:CreditCard></element:CreditCard> 一次性",
+          },
+          hash: "cb77aeda84fdf50124cba9b2bbe6047d",
+        },
+        "18/declaration/body/11/argument/7/expression/right/1/1": {
+          content: {
+            en: "Monthly",
+            "zh-CN": "月付",
+          },
+          hash: "96c7960bb2bd69083d275daf90dae1ee",
+        },
+        "18/declaration/body/11/argument/7/expression/right/1/5": {
+          content: {
+            en: "Yearly",
+            "zh-CN": "年付",
+          },
+          hash: "3d40ba01d1677008b3df63364b4d23a6",
+        },
+        "18/declaration/body/11/argument/7/expression/right/3/1/expression/right":
+          {
+            content: {
+              en: "<element:Zap></element:Zap> Save 17% with yearly billing",
+              "zh-CN": "<element:Zap></element:Zap> 年付可节省17%",
+            },
+            hash: "5265300527ba1f5f86c9bee3438b3daf",
+          },
+        "18/declaration/body/8/argument/11/1/expression/0/body/3/argument/1/expression/right/1":
+          {
+            content: {
+              en: "<element:Star></element:Star> Most Popular",
+              "zh-CN": "<element:Star></element:Star> 最受欢迎",
+            },
+            hash: "69b93512dcde68b518e5270c8f255437",
+          },
+        "18/declaration/body/8/argument/11/1/expression/0/body/3/argument/3/5/1/3/expression/right":
+          {
+            content: {
+              en: "/month",
+              "zh-CN": "/月",
+            },
+            hash: "f841f6620ce95fd3c7f624660cbafe92",
+          },
+        "18/declaration/body/8/argument/11/1/expression/0/body/3/argument/3/5/5/expression/right":
+          {
+            content: {
+              en: "<function:formatPrice/> total per year",
+              "zh-CN": "<function:formatPrice/> 每年总计",
+            },
+            hash: "5df9ccc9638b514bc2ee5f7b7b668130",
+          },
+        "18/declaration/body/8/argument/11/1/expression/0/body/3/argument/5/5/expression/alternate/1/expression/alternate/alternate":
+          {
+            content: {
+              en: "Get {tier.label}",
+              "zh-CN": "获取 {tier.label}",
+            },
+            hash: "7954c772ab8c27b23fae6d341c53d577",
+          },
+        "18/declaration/body/8/argument/11/1/expression/0/body/3/argument/5/5/expression/alternate/1/expression/alternate/consequent/3":
+          {
+            content: {
+              en: "Login to Get {tier.label}",
+              "zh-CN": "登录以获取 {tier.label}",
+            },
+            hash: "80f55128fe71a8f044ad1fe71dd3698a",
+          },
+        "18/declaration/body/8/argument/11/1/expression/0/body/3/argument/5/5/expression/alternate/1/expression/consequent":
+          {
+            content: {
+              en: "<element:Loader2></element:Loader2> Processing...",
+              "zh-CN": "<element:Loader2></element:Loader2> 处理中...",
+            },
+            hash: "63a4b31ce7f5507b3bcfac196a87417f",
+          },
+        "18/declaration/body/8/argument/11/1/expression/0/body/6/argument/1/expression/right/1":
+          {
+            content: {
+              en: "<element:Star></element:Star> Most Popular",
+              "zh-CN": "<element:Star></element:Star> 最受欢迎",
+            },
+            hash: "69b93512dcde68b518e5270c8f255437",
+          },
+        "18/declaration/body/8/argument/11/1/expression/0/body/6/argument/3/5/1/3/expression/right":
+          {
+            content: {
+              en: "/month",
+              "zh-CN": "/月",
+            },
+            hash: "f841f6620ce95fd3c7f624660cbafe92",
+          },
+        "18/declaration/body/8/argument/11/1/expression/0/body/6/argument/3/5/3/1/1/expression/alternate/alternate":
+          {
+            content: {
+              en: "Billed monthly",
+              "zh-CN": "按月计费",
+            },
+            hash: "1b5bf08424cbffae551bce0e3a35f924",
+          },
+        "18/declaration/body/8/argument/11/1/expression/0/body/6/argument/3/5/3/1/1/expression/alternate/consequent":
+          {
+            content: {
+              en: "Billed annually",
+              "zh-CN": "按年计费",
+            },
+            hash: "2dde195e8efbd4b6b3bef055008954da",
+          },
+        "18/declaration/body/8/argument/11/1/expression/0/body/6/argument/3/5/3/1/1/expression/consequent":
+          {
+            content: {
+              en: "One-time payment",
+              "zh-CN": "一次性付款",
+            },
+            hash: "4dd19f2570c6fe396673fa3a6c984a6d",
+          },
+        "18/declaration/body/8/argument/11/1/expression/0/body/6/argument/3/5/5/expression/right":
+          {
+            content: {
+              en: "<function:formatPrice/> total per year",
+              "zh-CN": "<function:formatPrice/> 每年总计",
+            },
+            hash: "5df9ccc9638b514bc2ee5f7b7b668130",
+          },
+        "18/declaration/body/8/argument/11/1/expression/0/body/6/argument/5/5/expression/alternate/1/expression/alternate/alternate":
+          {
+            content: {
+              en: "Get {labelNode}",
+              "zh-CN": "获取 {tier.label}",
+            },
+            hash: "7954c772ab8c27b23fae6d341c53d577",
+          },
+        "18/declaration/body/8/argument/11/1/expression/0/body/6/argument/5/5/expression/alternate/1/expression/alternate/consequent/3":
+          {
+            content: {
+              en: "Login to Get {labelNode}",
+              "zh-CN": "登录以获取 {tier.label}",
+            },
+            hash: "80f55128fe71a8f044ad1fe71dd3698a",
+          },
+        "18/declaration/body/8/argument/11/1/expression/0/body/6/argument/5/5/expression/alternate/1/expression/consequent":
+          {
+            content: {
+              en: "<element:Loader2></element:Loader2> Processing...",
+              "zh-CN": "<element:Loader2></element:Loader2> 处理中...",
+            },
+            hash: "63a4b31ce7f5507b3bcfac196a87417f",
+          },
+        "18/declaration/body/8/argument/3/1/1/1": {
+          content: {
+            en: "<element:Calendar></element:Calendar> Subscription",
+            "zh-CN": "<element:Calendar></element:Calendar> 订阅",
+          },
+          hash: "42fd08fe29e9432519c7fc0dcf6ee5cb",
+        },
+        "18/declaration/body/8/argument/3/1/1/3": {
+          content: {
+            en: "<element:CreditCard></element:CreditCard> One-time",
+            "zh-CN": "<element:CreditCard></element:CreditCard> 一次性",
+          },
+          hash: "cb77aeda84fdf50124cba9b2bbe6047d",
+        },
+        "18/declaration/body/8/argument/7/expression/right/1/1": {
+          content: {
+            en: "Monthly",
+            "zh-CN": "月付",
+          },
+          hash: "96c7960bb2bd69083d275daf90dae1ee",
+        },
+        "18/declaration/body/8/argument/7/expression/right/1/5": {
+          content: {
+            en: "Yearly",
+            "zh-CN": "年付",
+          },
+          hash: "3d40ba01d1677008b3df63364b4d23a6",
+        },
+        "18/declaration/body/8/argument/7/expression/right/3/1/expression/right":
           {
             content: {
               en: "<element:Zap></element:Zap> Save 17% with yearly billing",

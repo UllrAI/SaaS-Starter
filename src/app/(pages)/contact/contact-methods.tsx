@@ -62,7 +62,7 @@ export function ContactMethods() {
               </p>
             </div>
 
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2">
               {contactMethods.map((method) => {
                 const Icon = method.icon;
                 return (

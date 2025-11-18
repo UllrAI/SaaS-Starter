@@ -336,6 +336,17 @@ export default {
         },
       },
     },
+    "(pages)/page.tsx": {
+      entries: {
+        "0/declaration/body/0/argument": {
+          content: {
+            en: "Home Placeholder",
+            "zh-CN": "首页占位符",
+          },
+          hash: "4c7198821571e959242c29b496a79373",
+        },
+      },
+    },
     "(pages)/payment-status/_components/payment-status-content.tsx": {
       entries: {
         "11/declaration/body/6/consequent/0/argument/5/1/1/3/1": {
@@ -1157,6 +1168,14 @@ export default {
     },
     "../components/homepage/footer.tsx": {
       entries: {
+        "15/declaration/body/1/argument/1/3/1/3/3": {
+          content: {
+            en: "Complete UllrAI SaaS starter with authentication, payments, database, and deployment.",
+            "zh-CN":
+              "完整的 UllrAI SaaS 启动模板，包含身份验证、支付、数据库和部署功能。",
+          },
+          hash: "1d5cb4314898c05ab723678b64ae8c8f",
+        },
         "15/declaration/body/1/argument/1/9/1/1/1": {
           content: {
             en: "© {currentYear} {COMPANY_NAME}. All rights reserved.",
@@ -1170,6 +1189,13 @@ export default {
             "zh-CN": "使用...制作",
           },
           hash: "f0705bebd6ac510e8ce7df86a09cb354",
+        },
+        "15/declaration/body/1/argument/1/9/1/3/3": {
+          content: {
+            en: "by UllrAI, for developers",
+            "zh-CN": "由 UllrAI 为开发者打造",
+          },
+          hash: "8f3a9d075ace8e470a2daec25f8b000d",
         },
       },
     },
@@ -1291,6 +1317,14 @@ export default {
               "构建和发布<element:span>微型 SaaS 仅需几小时</element:span>",
           },
           hash: "9faca0006bf2b1b7e5475593a0d14d8d",
+        },
+        "5/declaration/body/0/argument/1/1/3/7/3": {
+          content: {
+            en: "Complete UllrAI SaaS starter with authentication, payments, database, and deployment.",
+            "zh-CN":
+              "完整的 UllrAI SaaS 启动模板，包含身份验证、支付、数据库和部署功能。",
+          },
+          hash: "1d5cb4314898c05ab723678b64ae8c8f",
         },
         "5/declaration/body/0/argument/1/1/7/3/11/1/1": {
           content: {
@@ -1523,6 +1557,20 @@ export default {
     },
     "../components/locale-switcher.tsx": {
       entries: {
+        "10/declaration/body/7/argument/1/1/5": {
+          content: {
+            en: "Select language",
+            "zh-CN": "选择语言",
+          },
+          hash: "7fa8806eeb911aa9ba9f013b274a2e47",
+        },
+        "10/declaration/body/7/argument/3/1": {
+          content: {
+            en: "Language",
+            "zh-CN": "语言",
+          },
+          hash: "277fd1a41cc237a437cd1d5e4a80463b",
+        },
         "13/declaration/body/7/argument/1/1/5": {
           content: {
             en: "Select language",

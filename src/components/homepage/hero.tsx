@@ -14,7 +14,7 @@ import {
   BowArrow,
   Activity,
 } from "lucide-react";
-import { APP_DESCRIPTION, GITHUB_URL } from "@/lib/config/constants";
+import { GITHUB_URL } from "@/lib/config/constants";
 import Link from "next/link";
 
 export function Hero() {
@@ -41,7 +41,8 @@ export function Hero() {
               </h1>
 
               <p className="text-muted-foreground max-w-2xl text-lg leading-relaxed sm:text-xl">
-                {APP_DESCRIPTION}
+                Complete UllrAI SaaS starter with authentication, payments,
+                database, and deployment.
               </p>
             </div>
 

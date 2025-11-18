@@ -8,9 +8,7 @@ import { LocaleSwitcher } from "@/components/locale-switcher";
 import { Logo } from "@/components/logo";
 import {
   APP_NAME,
-  APP_DESCRIPTION,
   COMPANY_NAME,
-  COMPANY_TAGLINE,
   GITHUB_URL,
   TWITTERACCOUNT,
   CONTACT_EMAIL,
@@ -158,7 +156,8 @@ export function Footer() {
               </div>
 
               <p className="text-muted-foreground mb-6 max-w-md text-sm">
-                {APP_DESCRIPTION}
+                Complete UllrAI SaaS starter with authentication, payments,
+                database, and deployment.
               </p>
 
               {/* Social links */}
@@ -214,9 +213,8 @@ export function Footer() {
             </div>
 
             <div className="text-muted-foreground flex items-center gap-2 text-sm">
-              <span>Made with</span>
-              <span>{COMPANY_TAGLINE}</span>
               <Heart className="h-4 w-4 text-red-500" />
+              <span>by UllrAI, for developers</span>
             </div>
           </div>
         </div>

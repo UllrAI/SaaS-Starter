@@ -2,7 +2,6 @@
 import { ChevronsUpDown, Loader2, LogOut, Settings } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getUserAvatarUrl } from "@/lib/avatar";
-import { Skeleton } from "@/components/ui/skeleton";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,13 +22,23 @@ import { toast } from "sonner";
 import { useRouter } from "nextjs-toploader/app";
 import React, { useState } from "react";
 import Link from "next/link";
-import { useSession } from "@/lib/auth/client";
+import type { AuthUser } from "@/lib/auth/permissions";
 
-export function UserButton() {
+interface UserButtonProps {
+  user?: AuthUser | null;
+}
+
+export function UserButton({ user }: UserButtonProps) {
   const { isMobile, open } = useSidebar();
-  const { data: session, isPending } = useSession();
   const router = useRouter();
   const [loggingOut, setLoggingOut] = useState(false);
+
+  if (!user) {
+    return null;
+  }
+
+  const userInitial = user.name?.slice(0, 1).toUpperCase() || "U";
+  const avatarUrl = getUserAvatarUrl(user.image, user.email, user.name);
 
   const handleLogout = async () => {
     setLoggingOut(true);
@@ -53,26 +62,6 @@ export function UserButton() {
     }
   };
 
-  if (isPending) {
-    return (
-      <SidebarMenu>
-        <SidebarMenuItem>
-          <div
-            className={`flex items-center gap-2 p-2 ${!open ? "justify-center" : ""}`}
-          >
-            <Skeleton className="h-8 w-8 rounded-full" />
-            {open && (
-              <div className="flex-1">
-                <Skeleton className="mb-1 h-4 w-24" />
-                <Skeleton className="h-3 w-32" />
-              </div>
-            )}
-          </div>
-        </SidebarMenuItem>
-      </SidebarMenu>
-    );
-  }
-
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -87,27 +76,16 @@ export function UserButton() {
               <Avatar
                 className={`rounded-full ${open ? "h-8 w-8" : "h-6 w-6"}`}
               >
-                <AvatarImage
-                  src={getUserAvatarUrl(
-                    session?.user?.image,
-                    session?.user?.email,
-                    session?.user?.name,
-                  )}
-                  alt={session?.user?.name}
-                />
+                <AvatarImage src={avatarUrl} alt={user.name} />
                 <AvatarFallback className="rounded-lg">
-                  {session?.user?.name?.slice(0, 1).toUpperCase()}
+                  {userInitial}
                 </AvatarFallback>
               </Avatar>
               {open && (
                 <>
                   <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-semibold">
-                      {session?.user?.name}
-                    </span>
-                    <span className="truncate text-xs">
-                      {session?.user?.email}
-                    </span>
+                    <span className="truncate font-semibold">{user.name}</span>
+                    <span className="truncate text-xs">{user.email}</span>
                   </div>
                   <ChevronsUpDown className="ml-auto size-4" />
                 </>
@@ -123,25 +101,14 @@ export function UserButton() {
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-full">
-                  <AvatarImage
-                    src={getUserAvatarUrl(
-                      session?.user?.image,
-                      session?.user?.email,
-                      session?.user?.name,
-                    )}
-                    alt={session?.user?.name}
-                  />
+                  <AvatarImage src={avatarUrl} alt={user.name} />
                   <AvatarFallback className="rounded-lg">
-                    {session?.user?.name?.slice(0, 1).toUpperCase()}
+                    {userInitial}
                   </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">
-                    {session?.user?.name}
-                  </span>
-                  <span className="truncate text-xs">
-                    {session?.user?.email}
-                  </span>
+                  <span className="truncate font-semibold">{user.name}</span>
+                  <span className="truncate text-xs">{user.email}</span>
                 </div>
               </div>
             </DropdownMenuLabel>

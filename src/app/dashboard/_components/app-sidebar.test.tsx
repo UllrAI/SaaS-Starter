@@ -4,9 +4,6 @@ import fs from "fs";
 import path from "path";
 import React from "react";
 
-// Mock the useSidebar hook
-const mockToggleSidebar = jest.fn();
-
 // Test component that mimics AppSidebar behavior without external dependencies
 const TestAppSidebar = ({
   pathname = "/dashboard",
@@ -547,16 +544,16 @@ describe("AppSidebar Component", () => {
     expect(content).toContain('from "@/lib/config/roles"');
     expect(content).toContain('from "@/lib/config/admin-tables"');
     expect(content).toContain('from "@/lib/utils"');
-    expect(content).toContain('from "@/lib/auth/permissions"');
+    expect(content).toContain('from "@/lib/auth/client"');
 
     // Verify component imports
     expect(content).toContain('from "@/components/ui/sidebar"');
     expect(content).toContain('from "@/components/logo"');
+    expect(content).toContain('from "./user-btn"');
 
     // Verify Next.js imports
     expect(content).toContain('from "next/navigation"');
     expect(content).toContain('from "nextjs-toploader/app"');
-    expect(content).toContain('from "next/link"');
   });
 
   it("should define navigation arrays with proper structure", () => {
@@ -626,12 +623,10 @@ describe("AppSidebar Component", () => {
     // Verify hooks usage
     expect(content).toContain("const pathname = usePathname()");
     expect(content).toContain("const router = useRouter()");
-    expect(content).toContain("const { open, toggleSidebar } = useSidebar()");
-    expect(content).toContain("interface AppSidebarProps");
-    expect(content).toContain("user: AuthUser");
-    expect(content).toContain(
-      "export function AppSidebar({ user }: AppSidebarProps)",
-    );
+    expect(content).toContain("const { open } = useSidebar()");
+    expect(content).toContain("const { data: session } = useSession()");
+    expect(content).toContain("const getUserRole = () =>");
+    expect(content).toContain("const getNormalizedUser = () =>");
   });
 
   it("should implement admin role checking", () => {
@@ -639,7 +634,7 @@ describe("AppSidebar Component", () => {
     const content = fs.readFileSync(componentPath, "utf8");
 
     // Verify admin role checking logic
-    expect(content).toContain("const showAdminSections = isAdminRole(user.role);");
+    expect(content).toContain("const showAdminSections = isAdminRole(getUserRole());");
   });
 
   it("should implement navigation handler", () => {
@@ -647,10 +642,10 @@ describe("AppSidebar Component", () => {
     const content = fs.readFileSync(componentPath, "utf8");
 
     // Verify navigation handler
-    expect(content).toContain(
-      "const handleNavigation = (url: string) => () =>",
-    );
-    expect(content).toContain("router.push(url)");
+    expect(content).toContain("const handleLogoClick = () => {");
+    expect(content).toContain('router.push("/")');
+    expect(content).toContain("const handleClick = () => {");
+    expect(content).toContain("router.push(item.url);");
   });
 
   it("should render sidebar with proper structure", () => {
@@ -680,13 +675,13 @@ describe("AppSidebar Component", () => {
     const content = fs.readFileSync(componentPath, "utf8");
 
     // Verify navigation rendering
-    expect(content).toContain("{navigation.map((item) =>");
+    expect(content).toContain("function SidebarSection");
     expect(content).toContain("<SidebarMenuItem key={item.key}>");
+    expect(content).toContain("<SidebarMenuLink item={item} pathname={pathname} allItems={items} />");
+    expect(content).toContain("<SidebarSection title={undefined} items={navigation} pathname={pathname} />");
     expect(content).toContain("<SidebarMenuButton");
-    expect(content).toContain("isActive={item.url === pathname}");
     expect(content).toContain("tooltip={item.key}");
     expect(content).toContain('<item.icon className="size-4" />');
-    expect(content).toContain("<span>{item.title}</span>");
   });
 
   it("should conditionally render admin navigation", () => {
@@ -695,8 +690,7 @@ describe("AppSidebar Component", () => {
 
     // Verify admin conditional rendering
     expect(content).toContain("{showAdminSections && (");
-    expect(content).toContain("{adminNavigation.map((item) =>");
-    expect(content).toContain("Admin");
+    expect(content).toContain('<SidebarSection title={open ? "Admin" : undefined} items={adminNavigation} pathname={pathname} />');
   });
 
   it("should conditionally render generic table navigation", () => {
@@ -705,9 +699,8 @@ describe("AppSidebar Component", () => {
 
     // Verify generic table conditional rendering
     expect(content).toContain("{genericTableNavigation.length > 0 && (");
-    expect(content).toContain("{genericTableNavigation.map((item) =>");
+    expect(content).toContain('<SidebarSection title={open ? "Manage Tables" : undefined} items={genericTableNavigation} pathname={pathname} />');
     expect(content).toContain("Manage Tables");
-    expect(content).toContain("pathname.startsWith(item.url)");
   });
 
   it("should render footer with user button", () => {
@@ -716,7 +709,7 @@ describe("AppSidebar Component", () => {
 
     // Verify footer content
     expect(content).toContain("<SidebarFooter");
-    expect(content).toContain("<UserButton user={user} />");
+    expect(content).toContain("<UserButton user={getNormalizedUser()} />");
   });
 
   it("should use proper CSS classes and styling", () => {
@@ -793,14 +786,15 @@ describe("AppSidebar Component", () => {
     expect(content).toContain("useSidebar()");
     expect(content).toContain("usePathname()");
     expect(content).toContain("useRouter()");
-    expect(content).toContain("AuthUser");
+    expect(content).toContain("useSession()");
+    expect(content).toContain("const getUserRole = () =>");
+    expect(content).toContain("const getNormalizedUser = () =>");
 
     // Verify state usage
     expect(content).toContain("open");
-    expect(content).toContain("toggleSidebar");
     expect(content).toContain("pathname");
     expect(content).toContain("router");
-    expect(content).toContain("user");
+    expect(content).toContain("session");
   });
 
   it("should implement accessibility features", () => {

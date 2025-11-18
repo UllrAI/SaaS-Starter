@@ -50,7 +50,6 @@ export function PricingSection({ className }: { className?: string }) {
   const { data: session, isPending: isSessionLoading } = useSession();
   const router = useRouter();
 
-  // **修正点 1: 引入 mounted 状态来处理水合问题**
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
     setMounted(true);
@@ -213,7 +212,6 @@ export function PricingSection({ className }: { className?: string }) {
             loadingState.mode === paymentMode &&
             (paymentMode === "one_time" || loadingState.cycle === billingCycle);
 
-          // **修正点 2: 决定按钮是否禁用的逻辑**
           const isDisabled = !mounted || isLoading || isSessionLoading;
 
           return (
@@ -260,10 +258,10 @@ export function PricingSection({ className }: { className?: string }) {
                   <div className="flex h-5 items-center justify-center">
                     <p className="text-muted-foreground text-sm font-medium">
                       {paymentMode === "one_time"
-                        ? "One-time payment"
+                        ? <>One-time payment</>
                         : billingCycle === "yearly"
-                          ? "Billed annually"
-                          : "Billed monthly"}
+                          ? <>Billed annually</>
+                          : <>Billed monthly</>}
                     </p>
                   </div>
                   {billingCycle === "yearly" && paymentMode !== "one_time" && (
@@ -310,7 +308,6 @@ export function PricingSection({ className }: { className?: string }) {
                     </div>
                   ))}
                 </div>
-                {/* **修正点 3: 使用骨架屏处理未挂载或会话加载中的状态** */}
                 {!mounted || isSessionLoading ? (
                   <Skeleton className="h-12 w-full" />
                 ) : (

@@ -3230,6 +3230,118 @@
     },
     "../components/payment-options.tsx": {
       "scopes": {
+        "15/0/init/0/value/0/value": {
+          "type": "element",
+          "hash": "54ddb7f88090c3d3f7e9e4a389a97cec",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Plus"
+        },
+        "15/0/init/0/value/1/value": {
+          "type": "element",
+          "hash": "888771d5956296aee866520e783a0012",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Best for growing teams and businesses"
+        },
+        "15/0/init/1/value/0/value": {
+          "type": "element",
+          "hash": "0059ac0aac3f10a46b28c095e697cbbb",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Professional"
+        },
+        "15/0/init/1/value/1/value": {
+          "type": "element",
+          "hash": "888771d5956296aee866520e783a0012",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Best for growing teams and businesses"
+        },
+        "15/0/init/2/value/0/value": {
+          "type": "element",
+          "hash": "c621ea9404a37af289def443b309bf1b",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Team"
+        },
+        "15/0/init/2/value/1/value": {
+          "type": "element",
+          "hash": "888771d5956296aee866520e783a0012",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Best for growing teams and businesses"
+        },
+        "16/0/init/0/value": {
+          "type": "element",
+          "hash": "efa27941636566fc67176563d6506743",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Unlimited projects"
+        },
+        "16/0/init/1/value": {
+          "type": "element",
+          "hash": "bb9f62c1cd0601e0b3fae13f7685c81d",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Advanced analytics"
+        },
+        "16/0/init/2/value": {
+          "type": "element",
+          "hash": "ba86ddd272252bf41fe76785628abff1",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Priority support"
+        },
+        "16/0/init/3/value": {
+          "type": "element",
+          "hash": "292ca13bac534b1ca307c1ad6f61a792",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "10GB storage"
+        },
+        "16/0/init/4/value": {
+          "type": "element",
+          "hash": "a54ab738c5d2db752d92a89ff16e2ed3",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Team collaboration"
+        },
+        "16/0/init/5/value": {
+          "type": "element",
+          "hash": "7bfaa79c6a8881a688f9c009e6541c88",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "API access"
+        },
+        "16/0/init/6/value": {
+          "type": "element",
+          "hash": "28a57ff95b08e633d4078feba035b368",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Dedicated support"
+        },
+        "16/0/init/7/value": {
+          "type": "element",
+          "hash": "6336048b7159ef703c678f46223dddec",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Advanced security"
+        },
         "16/declaration/body/8/argument/11/1/expression/0/body/3/argument/1/expression/right/1": {
           "type": "element",
           "hash": "69b93512dcde68b518e5270c8f255437",
@@ -3246,6 +3358,30 @@
           "overrides": {},
           "content": "/month"
         },
+        "16/declaration/body/8/argument/11/1/expression/0/body/3/argument/3/5/3/1/1/expression/alternate/alternate": {
+          "type": "element",
+          "hash": "1b5bf08424cbffae551bce0e3a35f924",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Billed monthly"
+        },
+        "16/declaration/body/8/argument/11/1/expression/0/body/3/argument/3/5/3/1/1/expression/alternate/consequent": {
+          "type": "element",
+          "hash": "2dde195e8efbd4b6b3bef055008954da",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Billed annually"
+        },
+        "16/declaration/body/8/argument/11/1/expression/0/body/3/argument/3/5/3/1/1/expression/consequent": {
+          "type": "element",
+          "hash": "4dd19f2570c6fe396673fa3a6c984a6d",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "One-time payment"
+        },
         "16/declaration/body/8/argument/11/1/expression/0/body/3/argument/3/5/5/expression/right": {
           "type": "element",
           "hash": "5df9ccc9638b514bc2ee5f7b7b668130",
@@ -3253,6 +3389,30 @@
           "skip": false,
           "overrides": {},
           "content": "<function:formatPrice/> total per year"
+        },
+        "16/declaration/body/8/argument/11/1/expression/0/body/3/argument/5/3/expression/alternate/1/expression/alternate/consequent": {
+          "type": "element",
+          "hash": "14d5f16d813ef8547595bc2cf5165715",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:LogIn></element:LogIn> Login to Get {tier.name}"
+        },
+        "16/declaration/body/8/argument/11/1/expression/0/body/3/argument/5/3/expression/alternate/1/expression/consequent": {
+          "type": "element",
+          "hash": "63a4b31ce7f5507b3bcfac196a87417f",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:Loader2></element:Loader2> Processing..."
+        },
+        "16/declaration/body/8/argument/11/1/expression/0/body/3/argument/5/5/expression/alternate/1/expression/alternate/alternate": {
+          "type": "element",
+          "hash": "7954c772ab8c27b23fae6d341c53d577",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Get {tier.label}"
         },
         "16/declaration/body/8/argument/11/1/expression/0/body/3/argument/5/5/expression/alternate/1/expression/alternate/consequent": {
           "type": "element",
@@ -3262,7 +3422,87 @@
           "overrides": {},
           "content": "<element:LogIn></element:LogIn> Login to Get {tier.name}"
         },
+        "16/declaration/body/8/argument/11/1/expression/0/body/3/argument/5/5/expression/alternate/1/expression/alternate/consequent/3": {
+          "type": "element",
+          "hash": "80f55128fe71a8f044ad1fe71dd3698a",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Login to Get {tier.label}"
+        },
         "16/declaration/body/8/argument/11/1/expression/0/body/3/argument/5/5/expression/alternate/1/expression/consequent": {
+          "type": "element",
+          "hash": "63a4b31ce7f5507b3bcfac196a87417f",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:Loader2></element:Loader2> Processing..."
+        },
+        "16/declaration/body/8/argument/11/1/expression/0/body/6/argument/1/expression/right/1": {
+          "type": "element",
+          "hash": "69b93512dcde68b518e5270c8f255437",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:Star></element:Star> Most Popular"
+        },
+        "16/declaration/body/8/argument/11/1/expression/0/body/6/argument/3/5/1/3/expression/right": {
+          "type": "element",
+          "hash": "f841f6620ce95fd3c7f624660cbafe92",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "/month"
+        },
+        "16/declaration/body/8/argument/11/1/expression/0/body/6/argument/3/5/3/1/1/expression/alternate/alternate": {
+          "type": "element",
+          "hash": "1b5bf08424cbffae551bce0e3a35f924",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Billed monthly"
+        },
+        "16/declaration/body/8/argument/11/1/expression/0/body/6/argument/3/5/3/1/1/expression/alternate/consequent": {
+          "type": "element",
+          "hash": "2dde195e8efbd4b6b3bef055008954da",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Billed annually"
+        },
+        "16/declaration/body/8/argument/11/1/expression/0/body/6/argument/3/5/3/1/1/expression/consequent": {
+          "type": "element",
+          "hash": "4dd19f2570c6fe396673fa3a6c984a6d",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "One-time payment"
+        },
+        "16/declaration/body/8/argument/11/1/expression/0/body/6/argument/3/5/5/expression/right": {
+          "type": "element",
+          "hash": "5df9ccc9638b514bc2ee5f7b7b668130",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<function:formatPrice/> total per year"
+        },
+        "16/declaration/body/8/argument/11/1/expression/0/body/6/argument/5/5/expression/alternate/1/expression/alternate/alternate": {
+          "type": "element",
+          "hash": "7954c772ab8c27b23fae6d341c53d577",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Get {labelNode}"
+        },
+        "16/declaration/body/8/argument/11/1/expression/0/body/6/argument/5/5/expression/alternate/1/expression/alternate/consequent/3": {
+          "type": "element",
+          "hash": "80f55128fe71a8f044ad1fe71dd3698a",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Login to Get {labelNode}"
+        },
+        "16/declaration/body/8/argument/11/1/expression/0/body/6/argument/5/5/expression/alternate/1/expression/consequent": {
           "type": "element",
           "hash": "63a4b31ce7f5507b3bcfac196a87417f",
           "context": "",
@@ -3303,6 +3543,278 @@
           "content": "Yearly"
         },
         "16/declaration/body/8/argument/7/expression/right/3/1/expression/right": {
+          "type": "element",
+          "hash": "5265300527ba1f5f86c9bee3438b3daf",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:Zap></element:Zap> Save 17% with yearly billing"
+        },
+        "18/declaration/body/11/argument/11/1/expression/0/body/6/argument/1/expression/right/1": {
+          "type": "element",
+          "hash": "69b93512dcde68b518e5270c8f255437",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:Star></element:Star> Most Popular"
+        },
+        "18/declaration/body/11/argument/11/1/expression/0/body/6/argument/3/5/1/3/expression/right": {
+          "type": "element",
+          "hash": "f841f6620ce95fd3c7f624660cbafe92",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "/month"
+        },
+        "18/declaration/body/11/argument/11/1/expression/0/body/6/argument/3/5/3/1/1/expression/alternate/alternate": {
+          "type": "element",
+          "hash": "1b5bf08424cbffae551bce0e3a35f924",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Billed monthly"
+        },
+        "18/declaration/body/11/argument/11/1/expression/0/body/6/argument/3/5/3/1/1/expression/alternate/consequent": {
+          "type": "element",
+          "hash": "2dde195e8efbd4b6b3bef055008954da",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Billed annually"
+        },
+        "18/declaration/body/11/argument/11/1/expression/0/body/6/argument/3/5/3/1/1/expression/consequent": {
+          "type": "element",
+          "hash": "4dd19f2570c6fe396673fa3a6c984a6d",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "One-time payment"
+        },
+        "18/declaration/body/11/argument/11/1/expression/0/body/6/argument/3/5/5/expression/right": {
+          "type": "element",
+          "hash": "5df9ccc9638b514bc2ee5f7b7b668130",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<function:formatPrice/> total per year"
+        },
+        "18/declaration/body/11/argument/11/1/expression/0/body/6/argument/5/5/expression/alternate/1/expression/alternate/alternate": {
+          "type": "element",
+          "hash": "7954c772ab8c27b23fae6d341c53d577",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Get {localizedLabel}"
+        },
+        "18/declaration/body/11/argument/11/1/expression/0/body/6/argument/5/5/expression/alternate/1/expression/alternate/consequent/3": {
+          "type": "element",
+          "hash": "80f55128fe71a8f044ad1fe71dd3698a",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Login to Get {localizedLabel}"
+        },
+        "18/declaration/body/11/argument/11/1/expression/0/body/6/argument/5/5/expression/alternate/1/expression/consequent": {
+          "type": "element",
+          "hash": "63a4b31ce7f5507b3bcfac196a87417f",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:Loader2></element:Loader2> Processing..."
+        },
+        "18/declaration/body/11/argument/3/1/1/1": {
+          "type": "element",
+          "hash": "42fd08fe29e9432519c7fc0dcf6ee5cb",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:Calendar></element:Calendar> Subscription"
+        },
+        "18/declaration/body/11/argument/3/1/1/3": {
+          "type": "element",
+          "hash": "cb77aeda84fdf50124cba9b2bbe6047d",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:CreditCard></element:CreditCard> One-time"
+        },
+        "18/declaration/body/11/argument/7/expression/right/1/1": {
+          "type": "element",
+          "hash": "96c7960bb2bd69083d275daf90dae1ee",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Monthly"
+        },
+        "18/declaration/body/11/argument/7/expression/right/1/5": {
+          "type": "element",
+          "hash": "3d40ba01d1677008b3df63364b4d23a6",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Yearly"
+        },
+        "18/declaration/body/11/argument/7/expression/right/3/1/expression/right": {
+          "type": "element",
+          "hash": "5265300527ba1f5f86c9bee3438b3daf",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:Zap></element:Zap> Save 17% with yearly billing"
+        },
+        "18/declaration/body/8/argument/11/1/expression/0/body/3/argument/1/expression/right/1": {
+          "type": "element",
+          "hash": "69b93512dcde68b518e5270c8f255437",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:Star></element:Star> Most Popular"
+        },
+        "18/declaration/body/8/argument/11/1/expression/0/body/3/argument/3/5/1/3/expression/right": {
+          "type": "element",
+          "hash": "f841f6620ce95fd3c7f624660cbafe92",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "/month"
+        },
+        "18/declaration/body/8/argument/11/1/expression/0/body/3/argument/3/5/5/expression/right": {
+          "type": "element",
+          "hash": "5df9ccc9638b514bc2ee5f7b7b668130",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<function:formatPrice/> total per year"
+        },
+        "18/declaration/body/8/argument/11/1/expression/0/body/3/argument/5/5/expression/alternate/1/expression/alternate/alternate": {
+          "type": "element",
+          "hash": "7954c772ab8c27b23fae6d341c53d577",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Get {tier.label}"
+        },
+        "18/declaration/body/8/argument/11/1/expression/0/body/3/argument/5/5/expression/alternate/1/expression/alternate/consequent/3": {
+          "type": "element",
+          "hash": "80f55128fe71a8f044ad1fe71dd3698a",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Login to Get {tier.label}"
+        },
+        "18/declaration/body/8/argument/11/1/expression/0/body/3/argument/5/5/expression/alternate/1/expression/consequent": {
+          "type": "element",
+          "hash": "63a4b31ce7f5507b3bcfac196a87417f",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:Loader2></element:Loader2> Processing..."
+        },
+        "18/declaration/body/8/argument/11/1/expression/0/body/6/argument/1/expression/right/1": {
+          "type": "element",
+          "hash": "69b93512dcde68b518e5270c8f255437",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:Star></element:Star> Most Popular"
+        },
+        "18/declaration/body/8/argument/11/1/expression/0/body/6/argument/3/5/1/3/expression/right": {
+          "type": "element",
+          "hash": "f841f6620ce95fd3c7f624660cbafe92",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "/month"
+        },
+        "18/declaration/body/8/argument/11/1/expression/0/body/6/argument/3/5/3/1/1/expression/alternate/alternate": {
+          "type": "element",
+          "hash": "1b5bf08424cbffae551bce0e3a35f924",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Billed monthly"
+        },
+        "18/declaration/body/8/argument/11/1/expression/0/body/6/argument/3/5/3/1/1/expression/alternate/consequent": {
+          "type": "element",
+          "hash": "2dde195e8efbd4b6b3bef055008954da",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Billed annually"
+        },
+        "18/declaration/body/8/argument/11/1/expression/0/body/6/argument/3/5/3/1/1/expression/consequent": {
+          "type": "element",
+          "hash": "4dd19f2570c6fe396673fa3a6c984a6d",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "One-time payment"
+        },
+        "18/declaration/body/8/argument/11/1/expression/0/body/6/argument/3/5/5/expression/right": {
+          "type": "element",
+          "hash": "5df9ccc9638b514bc2ee5f7b7b668130",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<function:formatPrice/> total per year"
+        },
+        "18/declaration/body/8/argument/11/1/expression/0/body/6/argument/5/5/expression/alternate/1/expression/alternate/alternate": {
+          "type": "element",
+          "hash": "7954c772ab8c27b23fae6d341c53d577",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Get {labelNode}"
+        },
+        "18/declaration/body/8/argument/11/1/expression/0/body/6/argument/5/5/expression/alternate/1/expression/alternate/consequent/3": {
+          "type": "element",
+          "hash": "80f55128fe71a8f044ad1fe71dd3698a",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Login to Get {labelNode}"
+        },
+        "18/declaration/body/8/argument/11/1/expression/0/body/6/argument/5/5/expression/alternate/1/expression/consequent": {
+          "type": "element",
+          "hash": "63a4b31ce7f5507b3bcfac196a87417f",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:Loader2></element:Loader2> Processing..."
+        },
+        "18/declaration/body/8/argument/3/1/1/1": {
+          "type": "element",
+          "hash": "42fd08fe29e9432519c7fc0dcf6ee5cb",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:Calendar></element:Calendar> Subscription"
+        },
+        "18/declaration/body/8/argument/3/1/1/3": {
+          "type": "element",
+          "hash": "cb77aeda84fdf50124cba9b2bbe6047d",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:CreditCard></element:CreditCard> One-time"
+        },
+        "18/declaration/body/8/argument/7/expression/right/1/1": {
+          "type": "element",
+          "hash": "96c7960bb2bd69083d275daf90dae1ee",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Monthly"
+        },
+        "18/declaration/body/8/argument/7/expression/right/1/5": {
+          "type": "element",
+          "hash": "3d40ba01d1677008b3df63364b4d23a6",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Yearly"
+        },
+        "18/declaration/body/8/argument/7/expression/right/3/1/expression/right": {
           "type": "element",
           "hash": "5265300527ba1f5f86c9bee3438b3daf",
           "context": "",

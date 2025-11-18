@@ -3,7 +3,6 @@ import Script from "next/script";
 import { createMetadata } from "@/lib/metadata";
 import {
   APP_NAME,
-  APP_DESCRIPTION,
   COMPANY_NAME,
 } from "@/lib/config/constants";
 import env from "@/env";
@@ -14,9 +13,9 @@ import { AppProviders } from "@/components/app-providers";
 export const metadata = createMetadata({
   title: {
     template: `%s | ${APP_NAME}`,
-    default: `${APP_NAME} - ${APP_DESCRIPTION}`,
+    default: `${APP_NAME}`,
   },
-  description: APP_DESCRIPTION,
+  description: "Complete UllrAI SaaS starter with authentication, payments, database, and deployment.",
   applicationName: APP_NAME,
   authors: [{ name: COMPANY_NAME, url: env.NEXT_PUBLIC_APP_URL }],
   creator: COMPANY_NAME,

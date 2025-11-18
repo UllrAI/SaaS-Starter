@@ -368,6 +368,18 @@
         }
       }
     },
+    "(pages)/page.tsx": {
+      "scopes": {
+        "0/declaration/body/0/argument": {
+          "type": "element",
+          "hash": "4c7198821571e959242c29b496a79373",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Home Placeholder"
+        }
+      }
+    },
     "(pages)/payment-status/_components/payment-status-content.tsx": {
       "scopes": {
         "11/declaration/body/6/consequent/0/argument/5/1/1/3/1": {
@@ -1262,6 +1274,14 @@
     },
     "../components/homepage/footer.tsx": {
       "scopes": {
+        "15/declaration/body/1/argument/1/3/1/3/3": {
+          "type": "element",
+          "hash": "1d5cb4314898c05ab723678b64ae8c8f",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Complete UllrAI SaaS starter with authentication, payments, database, and deployment."
+        },
         "15/declaration/body/1/argument/1/9/1/1/1": {
           "type": "element",
           "hash": "b9b8e7f4e470fccd87caff0319de7a56",
@@ -1277,6 +1297,14 @@
           "skip": false,
           "overrides": {},
           "content": "Made with"
+        },
+        "15/declaration/body/1/argument/1/9/1/3/3": {
+          "type": "element",
+          "hash": "8f3a9d075ace8e470a2daec25f8b000d",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "by UllrAI, for developers"
         }
       }
     },
@@ -1413,6 +1441,14 @@
           "skip": false,
           "overrides": {},
           "content": "Build & Launch<element:span>Micro SaaS in hours</element:span>"
+        },
+        "5/declaration/body/0/argument/1/1/3/7/3": {
+          "type": "element",
+          "hash": "1d5cb4314898c05ab723678b64ae8c8f",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Complete UllrAI SaaS starter with authentication, payments, database, and deployment."
         },
         "5/declaration/body/0/argument/1/1/7/3/11/1/1": {
           "type": "element",

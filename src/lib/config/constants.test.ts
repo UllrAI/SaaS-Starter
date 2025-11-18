@@ -64,11 +64,7 @@ describe("Constants Configuration", () => {
     it("should export correct brand configuration", async () => {
       const constants = await import("./constants");
 
-      expect(constants.APP_DESCRIPTION).toBe(
-        "Complete UllrAI SaaS starter with authentication, payments, database, and deployment.",
-      );
       expect(constants.COMPANY_NAME).toBe("UllrAI Lab");
-      expect(constants.COMPANY_TAGLINE).toBe("by UllrAI, for developers");
     });
 
     it("should export correct trial configuration", async () => {
@@ -141,9 +137,7 @@ describe("Constants Configuration", () => {
       const constants = await import("./constants");
 
       expect(typeof constants.APP_NAME).toBe("string");
-      expect(typeof constants.APP_DESCRIPTION).toBe("string");
       expect(typeof constants.COMPANY_NAME).toBe("string");
-      expect(typeof constants.COMPANY_TAGLINE).toBe("string");
       expect(typeof constants.TRIAL_DAYS).toBe("number");
       expect(typeof constants.AVATAR_STYLE).toBe("string");
       expect(typeof constants.CONTACT_EMAIL).toBe("string");
@@ -162,9 +156,7 @@ describe("Constants Configuration", () => {
 
       const allConstants = [
         constants.APP_NAME,
-        constants.APP_DESCRIPTION,
         constants.COMPANY_NAME,
-        constants.COMPANY_TAGLINE,
         constants.AVATAR_STYLE,
         constants.CONTACT_EMAIL,
         constants.LEGAL_EMAIL,
@@ -242,16 +234,5 @@ describe("Constants Configuration", () => {
       }
     });
 
-    it("should have description that matches the product", async () => {
-      const constants = await import("./constants");
-
-      expect(constants.APP_DESCRIPTION.toLowerCase()).toContain("saas");
-      expect(constants.APP_DESCRIPTION.toLowerCase()).toContain("starter");
-      expect(constants.APP_DESCRIPTION.toLowerCase()).toContain(
-        "authentication",
-      );
-      expect(constants.APP_DESCRIPTION.toLowerCase()).toContain("payments");
-      expect(constants.APP_DESCRIPTION.toLowerCase()).toContain("database");
-    });
   });
 });

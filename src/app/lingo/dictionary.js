@@ -3049,11 +3049,10 @@ export default {
         "16/declaration/body/8/argument/11/1/expression/0/body/3/argument/5/3/expression/alternate/1/expression/alternate/consequent":
           {
             content: {
-              en: "<element:LogIn></element:LogIn> Login to Get <element:React.Fragment>{tier.name}</element:React.Fragment>",
-              "zh-CN":
-                "<element:LogIn></element:LogIn> 登录获取 <element:React.Fragment>{tier.name}</element:React.Fragment>",
+              en: "<element:LogIn></element:LogIn> Login to Get {tier.name}",
+              "zh-CN": "<element:LogIn></element:LogIn> 登录以获取{tier.name}",
             },
-            hash: "8fcd2efa4c053e4d974c9e78ba34c5be",
+            hash: "14d5f16d813ef8547595bc2cf5165715",
           },
         "16/declaration/body/8/argument/11/1/expression/0/body/3/argument/5/3/expression/alternate/1/expression/consequent":
           {
@@ -3469,6 +3468,24 @@ export default {
           },
       },
     },
+    "../components/ui/breadcrumb-client.tsx": {
+      entries: {
+        "10/body/0/argument/3": {
+          content: {
+            en: "More",
+            "zh-CN": "更多",
+          },
+          hash: "ee5e035ee328a8947be2ea44e338a57d",
+        },
+        "4/body/0/argument-aria-label": {
+          content: {
+            en: "breadcrumb",
+            "zh-CN": "面包屑导航",
+          },
+          hash: "6ff91b79dc0ab911eabd5433c4702fea",
+        },
+      },
+    },
     "../components/ui/breadcrumb.tsx": {
       entries: {
         "10/body/0/argument/3": {
@@ -3726,6 +3743,62 @@ export default {
     },
     "dashboard/_components/app-sidebar.tsx": {
       entries: {
+        "13/0/init/0/1/value": {
+          content: {
+            en: "Home",
+            "zh-CN": "主页",
+          },
+          hash: "104a3db3b671c04e167eafbe21e57881",
+        },
+        "13/0/init/1/1/value": {
+          content: {
+            en: "Upload",
+            "zh-CN": "上传",
+          },
+          hash: "4a6c84aa16db0f4e5697f49b45257bc7",
+        },
+        "13/0/init/2/1/value": {
+          content: {
+            en: "Settings",
+            "zh-CN": "设置",
+          },
+          hash: "8df6777277469c1fd88cc18dde2f1cc3",
+        },
+        "14/0/init/0/1/value": {
+          content: {
+            en: "Admin Dashboard",
+            "zh-CN": "管理员仪表板",
+          },
+          hash: "bbb5815b611504951063a4dab820f36f",
+        },
+        "14/0/init/1/1/value": {
+          content: {
+            en: "User Management",
+            "zh-CN": "用户管理",
+          },
+          hash: "82b1e7d9d4c8a8592d956c2ef21bd58c",
+        },
+        "14/0/init/2/1/value": {
+          content: {
+            en: "Payments",
+            "zh-CN": "支付",
+          },
+          hash: "1ce1a8d31ed709fb29fce2057045d104",
+        },
+        "14/0/init/3/1/value": {
+          content: {
+            en: "Subscriptions",
+            "zh-CN": "订阅",
+          },
+          hash: "0d17f4d8d660df40b41d82e0171af6ad",
+        },
+        "14/0/init/4/1/value": {
+          content: {
+            en: "Uploads Managements",
+            "zh-CN": "上传管理",
+          },
+          hash: "86b4dcd6e7bb2e6cf47151539e570be0",
+        },
         "16/declaration/body/6/argument/3/5/expression/right/1/1/1/expression/right":
           {
             content: {
@@ -3742,6 +3815,17 @@ export default {
             },
             hash: "ea7b215a42902966b2f131b58fedc6bd",
           },
+      },
+    },
+    "dashboard/_components/session-guard.tsx": {
+      entries: {
+        "6/body/0/argument/1/3/3": {
+          content: {
+            en: "Loading...",
+            "zh-CN": "加载中...",
+          },
+          hash: "82b4ea7ed1439094d7c4be13aaba9a66",
+        },
       },
     },
     "dashboard/_components/user-btn.tsx": {
@@ -4806,6 +4890,22 @@ export default {
           },
           hash: "d2f87ba8d25ccc05a925a1ed4bff1caa",
         },
+        "11/declaration/body/3/argument/5/expression/consequent/3/1/1/1/expression/alternate":
+          {
+            content: {
+              en: "Your subscription renews on <expression/>",
+              "zh-CN": "您的订阅将在 <expression/> 续订",
+            },
+            hash: "db03b9cf2e10445faf18c25fb87480be",
+          },
+        "11/declaration/body/3/argument/5/expression/consequent/3/1/1/1/expression/consequent":
+          {
+            content: {
+              en: "Your subscription will end on <expression/>",
+              "zh-CN": "您的订阅将在 <expression/> 到期",
+            },
+            hash: "7b66185c962de094940e9d62cfb5f16a",
+          },
         "11/declaration/body/3/argument/5/expression/consequent/3/3": {
           content: {
             en: "<expression/> Manage Subscription",
@@ -4869,6 +4969,22 @@ export default {
           },
           hash: "4e1fcce15854d824919b4a582c697c90",
         },
+        "11/declaration/body/3/argument/9/3/1/expression/consequent/3/1/expression/0/body/5/1/1/expression/alternate":
+          {
+            content: {
+              en: "Subscription",
+              "zh-CN": "订阅",
+            },
+            hash: "ba9f3675e18987d067d48533c8897343",
+          },
+        "11/declaration/body/3/argument/9/3/1/expression/consequent/3/1/expression/0/body/5/1/1/expression/consequent":
+          {
+            content: {
+              en: "One Time Purchase",
+              "zh-CN": "一次性购买",
+            },
+            hash: "8a2bca0c5db90c56a1e295983c4e932c",
+          },
       },
     },
     "dashboard/settings/_components/notifications-page.tsx": {
@@ -4947,6 +5063,34 @@ export default {
     },
     "dashboard/settings/_components/settings.tsx": {
       entries: {
+        "16/0/init/0/0/value": {
+          content: {
+            en: "Account & Security",
+            "zh-CN": "账户与安全",
+          },
+          hash: "6c1fa5c24692092b31925ba9d58425b4",
+        },
+        "16/0/init/1/0/value": {
+          content: {
+            en: "Billing & Plans",
+            "zh-CN": "账单与计划",
+          },
+          hash: "4185045a3f5adac2583bcabefb1d1fce",
+        },
+        "16/0/init/2/0/value": {
+          content: {
+            en: "Emails & Notifications",
+            "zh-CN": "邮件与通知",
+          },
+          hash: "82e0c09fadeabd392d0d39a01a43a219",
+        },
+        "16/0/init/3/0/value": {
+          content: {
+            en: "Appearance",
+            "zh-CN": "外观",
+          },
+          hash: "cdd8c41c5fb859234e8a603544fce631",
+        },
         "17/declaration/body/4/argument/1/1/1": {
           content: {
             en: "Settings",

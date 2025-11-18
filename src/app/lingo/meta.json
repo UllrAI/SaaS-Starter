@@ -3824,6 +3824,26 @@
         }
       }
     },
+    "../components/ui/breadcrumb-client.tsx": {
+      "scopes": {
+        "10/body/0/argument/3": {
+          "type": "element",
+          "hash": "ee5e035ee328a8947be2ea44e338a57d",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "More"
+        },
+        "4/body/0/argument-aria-label": {
+          "type": "attribute",
+          "hash": "6ff91b79dc0ab911eabd5433c4702fea",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "breadcrumb"
+        }
+      }
+    },
     "../components/ui/breadcrumb.tsx": {
       "scopes": {
         "10/body/0/argument/3": {
@@ -4098,6 +4118,70 @@
     },
     "dashboard/_components/app-sidebar.tsx": {
       "scopes": {
+        "13/0/init/0/1/value": {
+          "type": "element",
+          "hash": "104a3db3b671c04e167eafbe21e57881",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Home"
+        },
+        "13/0/init/1/1/value": {
+          "type": "element",
+          "hash": "4a6c84aa16db0f4e5697f49b45257bc7",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Upload"
+        },
+        "13/0/init/2/1/value": {
+          "type": "element",
+          "hash": "8df6777277469c1fd88cc18dde2f1cc3",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Settings"
+        },
+        "14/0/init/0/1/value": {
+          "type": "element",
+          "hash": "bbb5815b611504951063a4dab820f36f",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Admin Dashboard"
+        },
+        "14/0/init/1/1/value": {
+          "type": "element",
+          "hash": "82b1e7d9d4c8a8592d956c2ef21bd58c",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "User Management"
+        },
+        "14/0/init/2/1/value": {
+          "type": "element",
+          "hash": "1ce1a8d31ed709fb29fce2057045d104",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Payments"
+        },
+        "14/0/init/3/1/value": {
+          "type": "element",
+          "hash": "0d17f4d8d660df40b41d82e0171af6ad",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Subscriptions"
+        },
+        "14/0/init/4/1/value": {
+          "type": "element",
+          "hash": "86b4dcd6e7bb2e6cf47151539e570be0",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Uploads Managements"
+        },
         "16/declaration/body/6/argument/3/5/expression/right/1/1/1/expression/right": {
           "type": "element",
           "hash": "1b1db62f967e180838caeff14b805a8c",
@@ -4113,6 +4197,18 @@
           "skip": false,
           "overrides": {},
           "content": "Manage Tables"
+        }
+      }
+    },
+    "dashboard/_components/session-guard.tsx": {
+      "scopes": {
+        "6/body/0/argument/1/3/3": {
+          "type": "element",
+          "hash": "82b4ea7ed1439094d7c4be13aaba9a66",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Loading..."
         }
       }
     },
@@ -5302,6 +5398,22 @@
           "overrides": {},
           "content": "Your active plan details."
         },
+        "11/declaration/body/3/argument/5/expression/consequent/3/1/1/1/expression/alternate": {
+          "type": "element",
+          "hash": "db03b9cf2e10445faf18c25fb87480be",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Your subscription renews on <expression/>"
+        },
+        "11/declaration/body/3/argument/5/expression/consequent/3/1/1/1/expression/consequent": {
+          "type": "element",
+          "hash": "7b66185c962de094940e9d62cfb5f16a",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Your subscription will end on <expression/>"
+        },
         "11/declaration/body/3/argument/5/expression/consequent/3/3": {
           "type": "element",
           "hash": "e6408f6db27eee9666ff2866a65647b5",
@@ -5373,6 +5485,22 @@
           "skip": false,
           "overrides": {},
           "content": "Status"
+        },
+        "11/declaration/body/3/argument/9/3/1/expression/consequent/3/1/expression/0/body/5/1/1/expression/alternate": {
+          "type": "element",
+          "hash": "ba9f3675e18987d067d48533c8897343",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Subscription"
+        },
+        "11/declaration/body/3/argument/9/3/1/expression/consequent/3/1/expression/0/body/5/1/1/expression/consequent": {
+          "type": "element",
+          "hash": "8a2bca0c5db90c56a1e295983c4e932c",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "One Time Purchase"
         }
       }
     },
@@ -5462,6 +5590,38 @@
     },
     "dashboard/settings/_components/settings.tsx": {
       "scopes": {
+        "16/0/init/0/0/value": {
+          "type": "element",
+          "hash": "6c1fa5c24692092b31925ba9d58425b4",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Account & Security"
+        },
+        "16/0/init/1/0/value": {
+          "type": "element",
+          "hash": "4185045a3f5adac2583bcabefb1d1fce",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Billing & Plans"
+        },
+        "16/0/init/2/0/value": {
+          "type": "element",
+          "hash": "82e0c09fadeabd392d0d39a01a43a219",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Emails & Notifications"
+        },
+        "16/0/init/3/0/value": {
+          "type": "element",
+          "hash": "cdd8c41c5fb859234e8a603544fce631",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Appearance"
+        },
         "17/declaration/body/4/argument/1/1/1": {
           "type": "element",
           "hash": "62851315fd36d9a87dc149e0228fd4e3",

@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useSession } from "@/lib/auth/client";
 import { usePathname, useRouter } from "next/navigation";
 import { toast } from "sonner";
-import Loading from "@/app/loading"; // 复用现有的加载组件
+import { Loader2, Sparkles } from "lucide-react";
 
 export function SessionGuard({ children }: { children: React.ReactNode }) {
   const { data: session, isPending } = useSession();
@@ -26,7 +26,7 @@ export function SessionGuard({ children }: { children: React.ReactNode }) {
 
   // 3. 在等待验证时，显示全局的加载动画，防止内容闪烁
   if (isPending) {
-    return <Loading />;
+    return <SessionGuardLoading />;
   }
 
   // 4. 会话有效，渲染子组件
@@ -36,4 +36,23 @@ export function SessionGuard({ children }: { children: React.ReactNode }) {
 
   // 5. 如果会话不存在，不渲染任何内容，等待 useEffect 重定向
   return null;
+}
+
+function SessionGuardLoading() {
+  return (
+    <section className="absolute inset-0 flex items-center justify-center bg-background/80">
+      <div className="flex flex-col items-center gap-4">
+        <div className="relative">
+          <div className="bg-primary/10 absolute inset-0 animate-pulse rounded-full" />
+          <div className="border-border bg-background/50 relative flex h-12 w-12 items-center justify-center rounded-full border backdrop-blur-sm">
+            <Loader2 className="text-primary h-5 w-5 animate-spin" />
+          </div>
+        </div>
+        <div className="text-muted-foreground flex items-center gap-2 text-sm">
+          <Sparkles className="text-primary h-3 w-3 animate-pulse" />
+          <span>Loading...</span>
+        </div>
+      </div>
+    </section>
+  );
 }

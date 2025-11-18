@@ -15,77 +15,134 @@ export const metadata = createMetadata({
     "Learn about our mission to help developers build and launch SaaS products faster than ever before.",
 });
 
-const teamMembers = [
+interface TeamMember {
+  id: string;
+  name: string;
+  role: React.ReactNode;
+  bio: React.ReactNode;
+  image: string;
+}
+
+interface CompanyValue {
+  id: string;
+  icon: React.ComponentType<{ className?: string }>;
+  title: React.ReactNode;
+  description: React.ReactNode;
+}
+
+interface Milestone {
+  id: string;
+  year: React.ReactNode;
+  title: React.ReactNode;
+  description: React.ReactNode;
+}
+
+const teamMembers: TeamMember[] = [
   {
+    id: "alex-chen",
     name: "Alex Chen",
-    role: "CEO & Founder",
-    bio: "Former tech lead at major SaaS companies. Passionate about developer tools.",
+    role: <>CEO & Founder</>,
+    bio: (
+      <>
+        Former tech lead at major SaaS companies. Passionate about developer tools.
+      </>
+    ),
     image:
       "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?fit=crop&crop=face",
   },
   {
+    id: "sarah-johnson",
     name: "Sarah Johnson",
-    role: "CTO",
-    bio: "Full-stack engineer with 10+ years building scalable applications.",
+    role: <>CTO</>,
+    bio: (
+      <>
+        Full-stack engineer with 10+ years building scalable applications.
+      </>
+    ),
     image:
       "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?fit=crop&crop=face",
   },
   {
+    id: "mike-rodriguez",
     name: "Mike Rodriguez",
-    role: "Head of Product",
-    bio: "Product strategist focused on developer experience and user success.",
+    role: <>Head of Product</>,
+    bio: (
+      <>
+        Product strategist focused on developer experience and user success.
+      </>
+    ),
     image:
       "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?fit=crop&crop=face",
   },
 ];
 
-const values = [
+const values: CompanyValue[] = [
   {
+    id: "mission-driven",
     icon: Target,
-    title: "Mission-Driven",
-    description:
-      "We&apos;re committed to democratizing SaaS development and making it accessible to everyone.",
+    title: <>Mission-Driven</>,
+    description: (
+      <>
+        We&apos;re committed to democratizing SaaS development and making it accessible to everyone.
+      </>
+    ),
   },
   {
+    id: "innovation-first",
     icon: Lightbulb,
-    title: "Innovation First",
-    description:
-      "We constantly push the boundaries of what&apos;s possible in developer tooling.",
+    title: <>Innovation First</>,
+    description: (
+      <>
+        We constantly push the boundaries of what&apos;s possible in developer tooling.
+      </>
+    ),
   },
   {
+    id: "community-focused",
     icon: Heart,
-    title: "Community Focused",
-    description:
-      "Our success is measured by the success of the developers who use our platform.",
+    title: <>Community Focused</>,
+    description: (
+      <>
+        Our success is measured by the success of the developers who use our platform.
+      </>
+    ),
   },
   {
+    id: "global-impact",
     icon: Globe,
-    title: "Global Impact",
-    description:
-      "Building tools that empower developers worldwide to create amazing products.",
+    title: <>Global Impact</>,
+    description: (
+      <>
+        Building tools that empower developers worldwide to create amazing products.
+      </>
+    ),
   },
 ];
 
-const milestones = [
+const milestones: Milestone[] = [
   {
-    year: "2023",
-    title: "Company Founded",
-    description: "Started with a vision to simplify SaaS development",
+    id: "milestone-2023-founded",
+    year: <>2023</>,
+    title: <>Company Founded</>,
+    description: <>Started with a vision to simplify SaaS development</>,
   },
   {
-    year: "2024",
-    title: "10K+ Developers",
-    description: "Reached our first major milestone of active users",
+    id: "milestone-2024-developers",
+    year: <>2024</>,
+    title: <>10K+ Developers</>,
+    description: <>Reached our first major milestone of active users</>,
   },
   {
-    year: "2024",
-    title: "Series A Funding",
-    description: "Secured funding to accelerate product development",
+    id: "milestone-2024-funding",
+    year: <>2024</>,
+    title: <>Series A Funding</>,
+    description: <>Secured funding to accelerate product development</>,
   },
   {
-    year: "2024",
-    title: "Enterprise Launch",
-    description: "Launched enterprise features for larger teams",
+    id: "milestone-2024-enterprise",
+    year: <>2024</>,
+    title: <>Enterprise Launch</>,
+    description: <>Launched enterprise features for larger teams</>,
   },
 ];
 
@@ -141,10 +198,10 @@ export default function AboutPage() {
           </div>
 
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
-            {values.map((value, index) => {
+            {values.map((value) => {
               const Icon = value.icon;
               return (
-                <Card key={index} className="text-center shadow-sm">
+                <Card key={value.id} className="text-center shadow-sm">
                   <CardContent className="pt-6">
                     <div className="bg-primary/10 mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg">
                       <Icon className="text-primary h-6 w-6" />
@@ -174,8 +231,8 @@ export default function AboutPage() {
           </div>
 
           <div className="mx-auto grid max-w-4xl gap-8 md:grid-cols-3">
-            {teamMembers.map((member, index) => (
-              <Card key={index} className="text-center">
+            {teamMembers.map((member) => (
+              <Card key={member.id} className="text-center">
                 <CardContent className="pt-6">
                   <div className="bg-muted mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-full">
                     <Image
@@ -211,7 +268,7 @@ export default function AboutPage() {
           <div className="mx-auto max-w-3xl">
             <div className="space-y-8">
               {milestones.map((milestone, index) => (
-                <div key={index} className="flex gap-4">
+                <div key={milestone.id} className="flex gap-4">
                   <div className="flex flex-col items-center">
                     <div className="bg-primary flex h-10 w-10 items-center justify-center rounded-full">
                       <Award className="text-primary-foreground h-5 w-5" />

@@ -38,61 +38,72 @@ import Link from "next/link";
 import { useSession } from "@/lib/auth/client";
 
 const navigation: {
-  title: string;
+  key: string;
+  title: React.ReactNode;
   url: string;
   icon: LucideIcon;
 }[] = [
   {
-    title: "Home",
+    key: "Home",
+    title: <>Home</>,
     url: "/dashboard",
     icon: Home,
   },
   {
-    title: "Upload",
+    key: "Upload",
+    title: <>Upload</>,
     url: "/dashboard/upload",
     icon: Upload,
   },
   {
-    title: "Settings",
+    key: "Settings",
+    title: <>Settings</>,
     url: "/dashboard/settings",
     icon: Settings,
   },
 ];
 
 const adminNavigation: {
-  title: string;
+  key: string;
+  title: React.ReactNode;
   url: string;
   icon: LucideIcon;
 }[] = [
   {
-    title: "Admin Dashboard",
+    key: "Admin Dashboard",
+    title: <>Admin Dashboard</>,
     url: "/dashboard/admin",
     icon: BarChart3,
   },
   {
-    title: "User Management",
+    key: "User Management",
+    title: <>User Management</>,
     url: "/dashboard/admin/users",
     icon: Users,
   },
   {
-    title: "Payments",
+    key: "Payments",
+    title: <>Payments</>,
     url: "/dashboard/admin/payments",
     icon: CreditCard,
   },
   {
-    title: "Subscriptions",
+    key: "Subscriptions",
+    title: <>Subscriptions</>,
     url: "/dashboard/admin/subscriptions",
     icon: Shield,
   },
   {
-    title: "Uploads Managements",
+    key: "Uploads Managements",
+    title: <>Uploads Managements</>,
     url: "/dashboard/admin/uploads",
     icon: Upload,
   },
 ];
 
 const genericTableNavigation = Object.keys(enabledTablesMap).map((key) => ({
-  title: key.charAt(0).toUpperCase() + key.slice(1),
+  key: key.charAt(0).toUpperCase() + key.slice(1),
+  title: <>{key.charAt(0).toUpperCase() + key.slice(1)}</>,
   url: `/dashboard/admin/tables/${key}`,
   icon: Database,
 }));
@@ -133,7 +144,7 @@ export function AppSidebar() {
           <SidebarGroupContent className="flex flex-col gap-2">
             <SidebarMenu>
               {navigation.map((item) => (
-                <SidebarMenuItem key={item.title}>
+                <SidebarMenuItem key={item.key}>
                   <div
                     onClick={handleNavigation(item.url)}
                     onDoubleClick={() => {
@@ -143,7 +154,7 @@ export function AppSidebar() {
                   >
                     <SidebarMenuButton
                       isActive={item.url === pathname}
-                      tooltip={item.title}
+                      tooltip={item.key}
                       className="cursor-pointer"
                     >
                       <item.icon className="size-4" />
@@ -168,7 +179,7 @@ export function AppSidebar() {
                 )}
                 <SidebarMenu>
                   {adminNavigation.map((item) => (
-                    <SidebarMenuItem key={item.title}>
+                    <SidebarMenuItem key={item.key}>
                       <div
                         onClick={handleNavigation(item.url)}
                         onDoubleClick={() => {
@@ -178,7 +189,7 @@ export function AppSidebar() {
                       >
                         <SidebarMenuButton
                           isActive={item.url === pathname}
-                          tooltip={item.title}
+                          tooltip={item.key}
                           className="cursor-pointer"
                         >
                           <item.icon className="size-4" />
@@ -202,7 +213,7 @@ export function AppSidebar() {
                   )}
                   <SidebarMenu>
                     {genericTableNavigation.map((item) => (
-                      <SidebarMenuItem key={item.title}>
+                      <SidebarMenuItem key={item.key}>
                         <div
                           onClick={handleNavigation(item.url)}
                           onDoubleClick={() => {
@@ -212,7 +223,7 @@ export function AppSidebar() {
                         >
                           <SidebarMenuButton
                             isActive={pathname.startsWith(item.url)}
-                            tooltip={item.title}
+                            tooltip={item.key}
                             className="cursor-pointer"
                           >
                             <item.icon className="size-4" />

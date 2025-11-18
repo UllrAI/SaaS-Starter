@@ -3,7 +3,7 @@ import { describe, it, expect } from "@jest/globals";
 import { DashboardPageHeader } from "./dashboard-page-header";
 
 // Mock the UI components
-jest.mock("@/components/ui/breadcrumb", () => ({
+jest.mock("@/components/ui/breadcrumb-client", () => ({
   Breadcrumb: ({ children }: { children: React.ReactNode }) => (
     <nav data-testid="breadcrumb">{children}</nav>
   ),

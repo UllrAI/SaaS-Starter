@@ -121,7 +121,7 @@ export async function getUserSubscription(
     if (activeSubscriptions.length > 1) {
       console.warn(
         `User ${userId} has ${activeSubscriptions.length} active/trialing subscriptions. ` +
-          `This may indicate a data consistency issue. Returning the most recent one.`,
+        `This may indicate a data consistency issue. Returning the most recent one.`,
         {
           userId,
           subscriptionIds: activeSubscriptions.map((s) => s.subscriptionId),
@@ -185,7 +185,7 @@ export async function getUserPayments(userId: string, limit: number = 10) {
  */
 export async function isWebhookEventProcessed(
   eventId: string,
-  provider: string = "creem", // provider is unused
+  provider: string = "creem",
   tx?: Tx,
 ): Promise<boolean> {
   const dbase = getDb(tx);

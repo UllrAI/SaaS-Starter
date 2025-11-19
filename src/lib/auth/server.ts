@@ -6,7 +6,6 @@ import env from "@/env";
 import { db } from "@/database";
 import { sendMagicLink } from "@/emails/magic-link";
 import { APP_NAME } from "@/lib/config/constants";
-// 移除: import { UAParser } from "ua-parser-js";
 import { providerConfigs } from "./providers";
 
 // Dynamically build social providers based on environment variables
@@ -40,10 +39,8 @@ export const auth = betterAuth({
   session: {
     expiresIn: 60 * 60 * 24 * 30, // 30 days
     cookieCache: {
-      enabled: false,
+      enabled: true,
     },
-    // 我们不再预先解析和存储这些字段，所以可以从附加字段中移除
-    // better-auth 会自动存储原始的 userAgent
     additionalFields: {},
   },
   user: {
@@ -69,8 +66,6 @@ export const auth = betterAuth({
       trustedProviders: ["google", "github", "linkedin"],
     },
   },
-  // 完全移除 databaseHooks，因为我们不再在创建会话时进行解析
-  // databaseHooks: { ... },
   plugins: [
     magicLink({
       sendMagicLink: async ({ email, url }, request) => {

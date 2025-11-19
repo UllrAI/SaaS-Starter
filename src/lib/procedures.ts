@@ -22,18 +22,8 @@ const actionClient = createSafeActionClient({
       actionName: z.string(),
     });
   },
-}).use(async ({ next, clientInput, metadata }) => {
-  const startTime = performance.now();
-
+}).use(async ({ next }) => {
   const result = await next();
-
-  const endTime = performance.now();
-
-  console.log(`Server action ${metadata.actionName} 
-    with input: 
-    ${clientInput} took ${endTime - startTime}ms 
-    and resulted with:
-     ${result}`);
 
   return result;
 });

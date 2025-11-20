@@ -28,20 +28,20 @@ import { UseFormReturn, FieldValues, Path } from "react-hook-form";
 
 interface AuthFormField<T extends FieldValues> {
   name: Path<T>;
-  label: string;
+  label: ReactNode;
   placeholder: string;
   icon: React.ComponentType<{ className?: string }>;
   type?: string;
 }
 
 interface AuthFormConfig {
-  title: string;
-  description: string;
-  badgeText: string;
-  submitButtonText: string;
-  loadingText: string;
+  title: ReactNode;
+  description: ReactNode;
+  badgeText: ReactNode;
+  submitButtonText: ReactNode;
+  loadingText: ReactNode;
   submitIcon: React.ComponentType<{ className?: string }>;
-  alternativeActionText: string;
+  alternativeActionText: ReactNode;
   alternativeActionLink: ReactNode;
   showTerms?: boolean;
   callbackURL: string;
@@ -79,7 +79,7 @@ export function AuthFormBase<T extends FieldValues>({
   };
 
   return (
-    <Card className="bg-background/80 max-w-md shadow-xl backdrop-blur-sm">
+    <Card className="bg-background/80 max-w-md border-2 shadow-lg backdrop-blur-sm">
       <CardHeader className="space-y-4 pb-2">
         {/* Welcome Badge */}
         <div className="flex justify-center">
@@ -153,7 +153,7 @@ export function AuthFormBase<T extends FieldValues>({
                             type={field.type || "text"}
                             {...formField}
                             disabled={loading}
-                            className="focus:border-primary/50 h-12 border-2 pl-10 transition-colors"
+                            className="focus:border-primary/50 h-12 border-2 pl-10 shadow-sm transition-all focus:translate-x-[1px] focus:translate-y-[1px] focus:shadow-none"
                           />
                         </div>
                       </FormControl>
@@ -168,7 +168,7 @@ export function AuthFormBase<T extends FieldValues>({
             <Button
               type="submit"
               disabled={loading}
-              className="from-primary to-primary/90 hover:from-primary/90 hover:to-primary text-primary-foreground h-12 w-full cursor-pointer bg-gradient-to-r font-medium shadow-lg transition-all duration-200 hover:shadow-xl"
+              className="from-primary to-primary/90 hover:from-primary/90 hover:to-primary text-primary-foreground h-12 w-full cursor-pointer bg-gradient-to-r font-medium shadow transition-all duration-200 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-sm active:translate-x-[4px] active:translate-y-[4px] active:shadow-none"
             >
               {loading ? (
                 <span className="flex items-center gap-2">

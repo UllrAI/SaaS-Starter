@@ -43,28 +43,28 @@ const navigation: {
   icon: LucideIcon;
   matchMode?: "exact" | "prefix";
 }[] = [
-    {
-      key: "Home",
-      title: <>Home</>,
-      url: "/dashboard",
-      icon: Home,
-      matchMode: "exact",
-    },
-    {
-      key: "Upload",
-      title: <>Upload</>,
-      url: "/dashboard/upload",
-      icon: Upload,
-      matchMode: "exact",
-    },
-    {
-      key: "Settings",
-      title: <>Settings</>,
-      url: "/dashboard/settings",
-      icon: Settings,
-      matchMode: "prefix",
-    },
-  ];
+  {
+    key: "Home",
+    title: <>Home</>,
+    url: "/dashboard",
+    icon: Home,
+    matchMode: "exact",
+  },
+  {
+    key: "Upload",
+    title: <>Upload</>,
+    url: "/dashboard/upload",
+    icon: Upload,
+    matchMode: "exact",
+  },
+  {
+    key: "Settings",
+    title: <>Settings</>,
+    url: "/dashboard/settings",
+    icon: Settings,
+    matchMode: "prefix",
+  },
+];
 
 const adminNavigation: {
   key: string;
@@ -73,42 +73,42 @@ const adminNavigation: {
   icon: LucideIcon;
   matchMode?: "exact" | "prefix";
 }[] = [
-    {
-      key: "admin-dashboard",
-      title: <>Admin Dashboard</>,
-      url: "/dashboard/admin",
-      icon: BarChart3,
-      matchMode: "exact",
-    },
-    {
-      key: "user-management",
-      title: <>User Management</>,
-      url: "/dashboard/admin/users",
-      icon: Users,
-      matchMode: "exact",
-    },
-    {
-      key: "payments",
-      title: <>Payments</>,
-      url: "/dashboard/admin/payments",
-      icon: CreditCard,
-      matchMode: "exact",
-    },
-    {
-      key: "subscriptions",
-      title: <>Subscriptions</>,
-      url: "/dashboard/admin/subscriptions",
-      icon: Shield,
-      matchMode: "exact",
-    },
-    {
-      key: "uploads-managements",
-      title: <>Uploads Managements</>,
-      url: "/dashboard/admin/uploads",
-      icon: Upload,
-      matchMode: "exact",
-    },
-  ];
+  {
+    key: "admin-dashboard",
+    title: <>Admin Dashboard</>,
+    url: "/dashboard/admin",
+    icon: BarChart3,
+    matchMode: "exact",
+  },
+  {
+    key: "user-management",
+    title: <>User Management</>,
+    url: "/dashboard/admin/users",
+    icon: Users,
+    matchMode: "exact",
+  },
+  {
+    key: "payments",
+    title: <>Payments</>,
+    url: "/dashboard/admin/payments",
+    icon: CreditCard,
+    matchMode: "exact",
+  },
+  {
+    key: "subscriptions",
+    title: <>Subscriptions</>,
+    url: "/dashboard/admin/subscriptions",
+    icon: Shield,
+    matchMode: "exact",
+  },
+  {
+    key: "uploads-managements",
+    title: <>Uploads Managements</>,
+    url: "/dashboard/admin/uploads",
+    icon: Upload,
+    matchMode: "exact",
+  },
+];
 
 const genericTableNavigation = Object.keys(enabledTablesMap).map((key) => ({
   key: key.charAt(0).toUpperCase() + key.slice(1),
@@ -134,9 +134,10 @@ function SidebarMenuLink({ item, pathname, allItems }: MenuItemProps) {
   const router = useRouter();
   const itemMatchMode = item.matchMode || "exact";
 
-  const isMatch = itemMatchMode === "exact"
-    ? pathname === item.url
-    : pathname.startsWith(item.url);
+  const isMatch =
+    itemMatchMode === "exact"
+      ? pathname === item.url
+      : pathname.startsWith(item.url);
 
   const matchingItems = allItems.filter((otherItem) => {
     const otherMode = otherItem.matchMode || "exact";
@@ -145,9 +146,7 @@ function SidebarMenuLink({ item, pathname, allItems }: MenuItemProps) {
       : pathname.startsWith(otherItem.url);
   });
 
-  const maxMatchLength = Math.max(
-    ...matchingItems.map((i) => i.url.length)
-  );
+  const maxMatchLength = Math.max(...matchingItems.map((i) => i.url.length));
 
   const isActive = isMatch && item.url.length === maxMatchLength;
 
@@ -156,7 +155,12 @@ function SidebarMenuLink({ item, pathname, allItems }: MenuItemProps) {
   };
 
   return (
-    <SidebarMenuButton isActive={isActive} tooltip={item.key} className="w-full cursor-pointer" onClick={handleClick}>
+    <SidebarMenuButton
+      isActive={isActive}
+      tooltip={item.key}
+      className="w-full cursor-pointer"
+      onClick={handleClick}
+    >
       <item.icon className="size-4" />
       <span>{item.title}</span>
     </SidebarMenuButton>
@@ -181,7 +185,11 @@ function SidebarSection({ title, items, pathname }: MenuSectionProps) {
         <SidebarMenu>
           {items.map((item) => (
             <SidebarMenuItem key={item.key}>
-              <SidebarMenuLink item={item} pathname={pathname} allItems={items} />
+              <SidebarMenuLink
+                item={item}
+                pathname={pathname}
+                allItems={items}
+              />
             </SidebarMenuItem>
           ))}
         </SidebarMenu>
@@ -228,14 +236,26 @@ export function AppSidebar() {
         {open && <span className="text-base font-semibold">{APP_NAME}</span>}
       </SidebarHeader>
       <SidebarContent className="">
-        <SidebarSection title={undefined} items={navigation} pathname={pathname} />
+        <SidebarSection
+          title={undefined}
+          items={navigation}
+          pathname={pathname}
+        />
 
         {showAdminSections && (
           <>
-            <SidebarSection title={open ? <>Admin</> : undefined} items={adminNavigation} pathname={pathname} />
+            <SidebarSection
+              title={open ? <>Admin</> : undefined}
+              items={adminNavigation}
+              pathname={pathname}
+            />
 
             {genericTableNavigation.length > 0 && (
-              <SidebarSection title={open ? <>Manage Tables</> : undefined} items={genericTableNavigation} pathname={pathname} />
+              <SidebarSection
+                title={open ? <>Manage Tables</> : undefined}
+                items={genericTableNavigation}
+                pathname={pathname}
+              />
             )}
           </>
         )}

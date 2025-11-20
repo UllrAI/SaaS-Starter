@@ -13,13 +13,15 @@ export type SupportedLocale = keyof typeof LOCALE_CONFIG;
 
 export const SOURCE_LOCALE = "en" as const;
 
-export const SUPPORTED_LOCALES = Object.keys(LOCALE_CONFIG) as SupportedLocale[];
+export const SUPPORTED_LOCALES = Object.keys(
+  LOCALE_CONFIG,
+) as SupportedLocale[];
 
 export const TARGET_LOCALES = SUPPORTED_LOCALES.filter(
-  (locale) => locale !== SOURCE_LOCALE
+  (locale) => locale !== SOURCE_LOCALE,
 );
 
-export type LocaleDisplayInfo = typeof LOCALE_CONFIG[SupportedLocale];
+export type LocaleDisplayInfo = (typeof LOCALE_CONFIG)[SupportedLocale];
 
 export function getLocaleDisplayInfo(locale: string): LocaleDisplayInfo {
   return (

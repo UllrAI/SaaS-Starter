@@ -44,7 +44,7 @@
         },
         "14/0/init/0/3/value": {
           "type": "element",
-          "hash": "4a544233030d4e5c29fee5919ce0e9d2",
+          "hash": "4f4b3b2aaf601cfb820e8b5c1edfb45b",
           "context": "",
           "skip": false,
           "overrides": {},
@@ -60,7 +60,7 @@
         },
         "14/0/init/1/3/value": {
           "type": "element",
-          "hash": "8b101f9d3dbcaf792657ba3d13d8ff11",
+          "hash": "24040a79a15e7e7dbf030f1a5f8522bf",
           "context": "",
           "skip": false,
           "overrides": {},
@@ -76,7 +76,7 @@
         },
         "14/0/init/2/3/value": {
           "type": "element",
-          "hash": "ff5aed56616ed9d23a1f6c3174134be0",
+          "hash": "06705a4cadd41b9fb9545343bc0a2669",
           "context": "",
           "skip": false,
           "overrides": {},
@@ -212,7 +212,7 @@
         },
         "15/0/init/0/3/value": {
           "type": "element",
-          "hash": "d299688e2cd1acd2212ee5b18012844a",
+          "hash": "440887997000f988d714f2639085020e",
           "context": "",
           "skip": false,
           "overrides": {},
@@ -228,7 +228,7 @@
         },
         "15/0/init/1/3/value": {
           "type": "element",
-          "hash": "ffeb21422061de120f1eab8d482101b2",
+          "hash": "0754ac9544f3faa9de3f9ded087a8c34",
           "context": "",
           "skip": false,
           "overrides": {},
@@ -244,7 +244,7 @@
         },
         "15/0/init/2/3/value": {
           "type": "element",
-          "hash": "bb818b8e43aeff2fe74666ce447878a8",
+          "hash": "604fb6816d93a4ada1dc1755f74993a5",
           "context": "",
           "skip": false,
           "overrides": {},
@@ -260,7 +260,7 @@
         },
         "15/0/init/3/3/value": {
           "type": "element",
-          "hash": "e47bd92d9b01c2bad7ac7bd9c1030652",
+          "hash": "133ed2f9000a5c83f0adc785872f8596",
           "context": "",
           "skip": false,
           "overrides": {},
@@ -1762,9 +1762,25 @@
           "overrides": {},
           "content": "Launch your SaaS in hours"
         },
+        "6/declaration/body/0/argument/1/1/3/1/1": {
+          "type": "element",
+          "hash": "c7f711f3686737b8dd05c1c329a88780",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Launch your SaaS in hours"
+        },
         "6/declaration/body/0/argument/1/1/3/3": {
           "type": "element",
           "hash": "6e874aeb8ccb786dd85503f882423f55",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Everything you need to ship a Micro SaaS"
+        },
+        "6/declaration/body/0/argument/1/1/3/3/1": {
+          "type": "element",
+          "hash": "3cd13b80ada64cc2a9d3b6365620c40d",
           "context": "",
           "skip": false,
           "overrides": {},
@@ -1778,6 +1794,14 @@
           "overrides": {},
           "content": "Auth, billing, docs, and marketing pages already wired together so your next release can focus on the product, not the scaffolding."
         },
+        "6/declaration/body/0/argument/1/1/3/5/1": {
+          "type": "element",
+          "hash": "5452ae8ad8820820ae385c14ffd575e8",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Auth, billing, and marketing pages already wired together so your next release can focus on the product, not the scaffolding."
+        },
         "6/declaration/body/0/argument/1/1/7/1/1": {
           "type": "element",
           "hash": "1665ce66c400e352bd4dd140e837955b",
@@ -1786,7 +1810,31 @@
           "overrides": {},
           "content": "Start free trial<element:ArrowRight></element:ArrowRight>"
         },
+        "6/declaration/body/0/argument/1/1/7/1/1/1": {
+          "type": "element",
+          "hash": "e346e4ed7d138dcc873db187922369da",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Start free trial"
+        },
         "6/declaration/body/0/argument/1/1/7/3/1": {
+          "type": "element",
+          "hash": "b8964d6c475dae0116ec8448b8378104",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "See what's inside"
+        },
+        "6/declaration/body/0/argument/1/1/7/3/1/0": {
+          "type": "element",
+          "hash": "b8964d6c475dae0116ec8448b8378104",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "See what's inside"
+        },
+        "6/declaration/body/0/argument/1/1/7/3/1/1": {
           "type": "element",
           "hash": "b8964d6c475dae0116ec8448b8378104",
           "context": "",
@@ -1797,6 +1845,14 @@
         "6/declaration/body/0/argument/1/1/9": {
           "type": "element",
           "hash": "78fcf4bbc90e585a327d6e50abcc7c16",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Cancel anytime • Keep your code • Works with your current stack"
+        },
+        "6/declaration/body/0/argument/1/1/9/1": {
+          "type": "element",
+          "hash": "0dd5bc1e37b0c254793ddf5298403414",
           "context": "",
           "skip": false,
           "overrides": {},
@@ -1816,7 +1872,7 @@
         },
         "5/0/init/0/2/value": {
           "type": "element",
-          "hash": "c239f5732d564caf043b543b2b190887",
+          "hash": "b061a52fbb8447dd2d3efb41ba349e84",
           "context": "",
           "skip": false,
           "overrides": {},
@@ -1832,11 +1888,11 @@
         },
         "5/0/init/1/2/value": {
           "type": "element",
-          "hash": "8c21b55b823836a852551d5abf3c6e14",
+          "hash": "346b7f26939d26a1993407799a97345a",
           "context": "",
           "skip": false,
           "overrides": {},
-          "content": "Stripe integration with subscriptions, invoicing, and tax handling. Revenue tracking built-in."
+          "content": "Flexible payment integration with subscriptions, and billing management. Revenue tracking built-in."
         },
         "5/0/init/2/1/value": {
           "type": "element",
@@ -1848,7 +1904,7 @@
         },
         "5/0/init/2/2/value": {
           "type": "element",
-          "hash": "f9500f2cda25b68b69c7a812a25dff08",
+          "hash": "409bb2f3626d3d3050fd6d14eb621f0e",
           "context": "",
           "skip": false,
           "overrides": {},
@@ -1864,7 +1920,7 @@
         },
         "5/0/init/3/2/value": {
           "type": "element",
-          "hash": "a6c6ef57663cc47713e0d1e6abddae31",
+          "hash": "904f885b6da25969fcb3c297b4faa8dc",
           "context": "",
           "skip": false,
           "overrides": {},
@@ -1880,7 +1936,7 @@
         },
         "5/0/init/4/2/value": {
           "type": "element",
-          "hash": "ef0a843dac5cda3161820a62f5b15750",
+          "hash": "167147f46a8c259edd24a8152e93b4e1",
           "context": "",
           "skip": false,
           "overrides": {},
@@ -1896,7 +1952,7 @@
         },
         "5/0/init/5/2/value": {
           "type": "element",
-          "hash": "f90508c5e3ef6baf3cbfaa49b5ddd100",
+          "hash": "99169d7b1d3ef6892ec6801a48319110",
           "context": "",
           "skip": false,
           "overrides": {},
@@ -1958,6 +2014,14 @@
           "overrides": {},
           "content": "<element:Sparkles></element:Sparkles> Everything Included"
         },
+        "8/declaration/body/0/argument/1/3/1/3": {
+          "type": "element",
+          "hash": "341ff316a339b106a178f0b8d362951b",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Features"
+        },
         "8/declaration/body/0/argument/1/3/3": {
           "type": "element",
           "hash": "f9d3f25070280a358ed5ac97f7629058",
@@ -1966,6 +2030,30 @@
           "overrides": {},
           "content": "Everything you need to<element:span>build and scale</element:span>"
         },
+        "8/declaration/body/0/argument/1/3/3/1": {
+          "type": "element",
+          "hash": "1ade2268c19bb119e9e9e55edd50f7b4",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Everything you need to"
+        },
+        "8/declaration/body/0/argument/1/3/3/3/0": {
+          "type": "element",
+          "hash": "697ed3dc4f16442effed462d586e92dc",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "build and scale"
+        },
+        "8/declaration/body/0/argument/1/3/3/3/1": {
+          "type": "element",
+          "hash": "697ed3dc4f16442effed462d586e92dc",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "build and scale"
+        },
         "8/declaration/body/0/argument/1/3/5": {
           "type": "element",
           "hash": "13eb4fd0b29b8ddc7cb952132e578275",
@@ -1973,6 +2061,14 @@
           "skip": false,
           "overrides": {},
           "content": "Skip months of development. Our starter includes all the essential features you need to launch your SaaS product successfully."
+        },
+        "8/declaration/body/0/argument/1/3/5/1": {
+          "type": "element",
+          "hash": "4bce7bfef0a73bfa517673c1c1587dcd",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Skip months of development. Our SaaS Starter includes all the essential features you need to launch your product."
         }
       }
     },
@@ -2170,9 +2266,17 @@
           "overrides": {},
           "content": "Security"
         },
+        "15/declaration/body/1/argument/1/3/1/3/1/3": {
+          "type": "element",
+          "hash": "3ea94cdc355a6bd1deaee13872197e26",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Complete UllrAI Micro SaaS starter with authentication, payments, database, and deployment."
+        },
         "15/declaration/body/1/argument/1/3/1/3/3": {
           "type": "element",
-          "hash": "7c3667b512dcab3eb0d0489e03261967",
+          "hash": "c889c061a2cef4644907bcee740b03cd",
           "context": "",
           "skip": false,
           "overrides": {},
@@ -2610,6 +2714,1550 @@
           "overrides": {},
           "content": "<element:Zap></element:Zap> Fast Deploy"
         },
+        "5/declaration/body/0/argument/5/1/11/1": {
+          "type": "element",
+          "hash": "ecef247b33fde474a24ca47aa8b12dd0",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "The ultimate Next.js starter kit for developers who value speed and quality. Authentication, payments, and database - fully integrated and type-safe."
+        },
+        "5/declaration/body/0/argument/5/1/15/1/1/1": {
+          "type": "element",
+          "hash": "b8b22cf7d5ed4dcd2e9731cc94230314",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Start Building"
+        },
+        "5/declaration/body/0/argument/5/1/15/3/1/3": {
+          "type": "element",
+          "hash": "a624e6956091a93659cd8d37ba864aec",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Star on GitHub"
+        },
+        "5/declaration/body/0/argument/5/1/19/1/0": {
+          "type": "element",
+          "hash": "74f0efd12ae446db7c287fbcfbeaae63",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "POWERED BY MODERN STACK"
+        },
+        "5/declaration/body/0/argument/5/1/19/3/1/3/0": {
+          "type": "element",
+          "hash": "6eb0a7c408f3eaa826dbb9e17a82fd09",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Next.js 15"
+        },
+        "5/declaration/body/0/argument/5/1/19/3/3/3/0": {
+          "type": "element",
+          "hash": "adcb9c0ee423c7c2ea33048dd761f882",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Auth.js"
+        },
+        "5/declaration/body/0/argument/5/1/19/3/5/3/0": {
+          "type": "element",
+          "hash": "c35bb85d9507094c0fea7e0dc04b3d72",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Stripe"
+        },
+        "5/declaration/body/0/argument/5/1/19/3/7/3/0": {
+          "type": "element",
+          "hash": "d63d2a97f55baa75f353987658ddb0a0",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "TypeScript"
+        },
+        "5/declaration/body/0/argument/5/1/19/3/9/3/0": {
+          "type": "element",
+          "hash": "e8006e5a885b01275725393b6d0ffc17",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Tailwind"
+        },
+        "5/declaration/body/0/argument/5/1/3/1/3/0": {
+          "type": "element",
+          "hash": "bb3739cba12a3470e108fa6cfa23a6ac",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "v1.0.0 Release"
+        },
+        "5/declaration/body/0/argument/5/1/3/1/7/0": {
+          "type": "element",
+          "hash": "fda5eebe09595746036088959163b92a",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Production Ready"
+        },
+        "5/declaration/body/0/argument/5/1/7/1": {
+          "type": "element",
+          "hash": "f46be09e257eb9d6bbe736b345baa8dd",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Ship your SaaS"
+        },
+        "5/declaration/body/0/argument/5/1/7/3/0": {
+          "type": "element",
+          "hash": "0a123fd6406c2b4841d4dd4b462793af",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "in record time."
+        },
+        "5/declaration/body/3/argument/5/1/3/1": {
+          "type": "element",
+          "hash": "dc284d6c860844a863a31ba548186ea4",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:span><element:span></element:span><element:span></element:span></element:span> v2.0 ONLINE"
+        },
+        "5/declaration/body/3/argument/5/1/3/3": {
+          "type": "element",
+          "hash": "9abd85a7601c9788e9fc9c45b642507e",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "MICRO<element:br></element:br><element:span>SAAS</element:span> STARTER"
+        },
+        "5/declaration/body/3/argument/5/1/3/5": {
+          "type": "element",
+          "hash": "e35671ac388d25090c197269df0e16fc",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:span>Stop configuring. Start shipping.</element:span><element:br></element:br> The production-ready toolkit for the modern developer."
+        },
+        "5/declaration/body/3/argument/5/1/3/7/1/1": {
+          "type": "element",
+          "hash": "7e898f3d430c0402a360a4b3a7517cd4",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "INITIALIZE PROJECT<element:Terminal></element:Terminal>"
+        },
+        "5/declaration/body/3/argument/5/1/3/7/3/1": {
+          "type": "element",
+          "hash": "e359a8dc1f2652bec413d0067c32afab",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:Github></element:Github> GITHUB"
+        },
+        "5/declaration/body/3/argument/5/1/7/9/3/1/5": {
+          "type": "element",
+          "hash": "2ec98242987572c88280312673f8ee8c",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "TERMINAL"
+        },
+        "5/declaration/body/3/argument/5/1/7/9/3/3": {
+          "type": "element",
+          "hash": "0099038d45a19cf35b512908f5358b50",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "zsh"
+        },
+        "5/declaration/body/3/argument/5/1/7/9/7/1/1/1": {
+          "type": "element",
+          "hash": "f1f9af1d54b55d5a0f599b9c7b5ba91d",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "➜"
+        },
+        "5/declaration/body/3/argument/5/1/7/9/7/3/1/1": {
+          "type": "element",
+          "hash": "35b2e9cf1fd6b81ad95b30817e5b6be0",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "✔"
+        },
+        "5/declaration/body/3/argument/5/1/7/9/7/3/1/3": {
+          "type": "element",
+          "hash": "ef551c8c36e85e0d1f5cec367f5f97d1",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Loaded configuration"
+        },
+        "5/declaration/body/3/argument/5/1/7/9/7/3/3/1": {
+          "type": "element",
+          "hash": "35b2e9cf1fd6b81ad95b30817e5b6be0",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "✔"
+        },
+        "5/declaration/body/3/argument/5/1/7/9/7/3/3/3": {
+          "type": "element",
+          "hash": "b44a07db10a4d73bdba46d23a70c0f2d",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Detected environment: <element:span>Next.js 15</element:span>"
+        },
+        "5/declaration/body/3/argument/5/1/7/9/7/3/5/1": {
+          "type": "element",
+          "hash": "35b2e9cf1fd6b81ad95b30817e5b6be0",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "✔"
+        },
+        "5/declaration/body/3/argument/5/1/7/9/7/3/5/3": {
+          "type": "element",
+          "hash": "bdd231f110c856c9d0aa896f6b70e3d4",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Initialized database: <element:span>PostgreSQL</element:span>"
+        },
+        "5/declaration/body/3/argument/5/1/7/9/7/3/7/1": {
+          "type": "element",
+          "hash": "35b2e9cf1fd6b81ad95b30817e5b6be0",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "✔"
+        },
+        "5/declaration/body/3/argument/5/1/7/9/7/3/7/3": {
+          "type": "element",
+          "hash": "65ce645785aaa45d3634878188e7992f",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Configured payments: <element:span>Stripe</element:span>"
+        },
+        "5/declaration/body/3/argument/5/1/7/9/7/3/9/1": {
+          "type": "element",
+          "hash": "f1f9af1d54b55d5a0f599b9c7b5ba91d",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "➜"
+        },
+        "5/declaration/body/3/argument/5/1/7/9/7/3/9/3": {
+          "type": "element",
+          "hash": "2dee62dc62ee76ca15ca803c25b74897",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Ready to build something amazing_"
+        },
+        "5/declaration/body/5/argument/1/1/3/11": {
+          "type": "element",
+          "hash": "fb4867ca3e503bee38b90af74457135e",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Complete UllrAI SaaS starter with authentication, payments, database, and deployment. Everything you need to go from idea to revenue."
+        },
+        "5/declaration/body/5/argument/1/1/3/15/1/1": {
+          "type": "element",
+          "hash": "0ddb912d4ac58cf941509c704b97f580",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "START NOW<element:Terminal></element:Terminal>"
+        },
+        "5/declaration/body/5/argument/1/1/3/15/3/1": {
+          "type": "element",
+          "hash": "1c661730bd1c62d744b05d05914ae49c",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:Github></element:Github> VIEW SOURCE"
+        },
+        "5/declaration/body/5/argument/1/1/3/3/1/1/3": {
+          "type": "element",
+          "hash": "4bfd3e63035e3546f7350dfc85650c88",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "OpenSource READY"
+        },
+        "5/declaration/body/5/argument/1/1/3/3/1/3": {
+          "type": "element",
+          "hash": "4bfd3e63035e3546f7350dfc85650c88",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "OpenSource READY"
+        },
+        "5/declaration/body/5/argument/1/1/3/3/3/3": {
+          "type": "element",
+          "hash": "4bfd3e63035e3546f7350dfc85650c88",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "OpenSource READY"
+        },
+        "5/declaration/body/5/argument/1/1/3/7": {
+          "type": "element",
+          "hash": "731af333d77f0ed5fcc4068e244cc557",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "SHIP YOUR<element:br></element:br><element:span>MICRO SaaS</element:span>"
+        },
+        "5/declaration/body/5/argument/1/1/3/7/1": {
+          "type": "element",
+          "hash": "099c4b75ac4089b1f5a7fca3d2000a7a",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "SHIP YOUR"
+        },
+        "5/declaration/body/5/argument/1/1/3/7/5": {
+          "type": "element",
+          "hash": "9a2a2a4467a115d32e1fa46ad07b4084",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "MICRO SaaS"
+        },
+        "5/declaration/body/5/argument/1/1/7/3/3/1/5": {
+          "type": "element",
+          "hash": "b729ad4a807413e8486d9b4cc7224b98",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:Terminal></element:Terminal> developer-console"
+        },
+        "5/declaration/body/5/argument/1/1/7/3/3/3": {
+          "type": "element",
+          "hash": "8efed3d76d62e48db6707ab3e8191421",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "user@saas-starter:~/projects/my-app"
+        },
+        "5/declaration/body/5/argument/1/1/7/3/7/3/1/1/1": {
+          "type": "element",
+          "hash": "f1f9af1d54b55d5a0f599b9c7b5ba91d",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "➜"
+        },
+        "5/declaration/body/5/argument/1/1/7/3/7/3/3/11": {
+          "type": "element",
+          "hash": "11cc462723b0081e788170e4c576793f",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:span>➜</element:span> pnpm install"
+        },
+        "5/declaration/body/5/argument/1/1/7/3/7/3/3/15": {
+          "type": "element",
+          "hash": "f7035e78dd2e6150e938fe6ec58f7b1e",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:span>➜</element:span> pnpm dev"
+        },
+        "5/declaration/body/5/argument/1/1/7/3/7/3/3/21/1": {
+          "type": "element",
+          "hash": "df1b3893a8d70531c38c2795d675698e",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "✓ Ready in 1.2s"
+        },
+        "5/declaration/body/5/argument/1/1/7/3/7/3/3/21/3": {
+          "type": "element",
+          "hash": "1b678a409b2d0964857a4ac62bdc38c0",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "○ Local: <element:span>http://localhost:3000</element:span>"
+        },
+        "5/declaration/body/5/argument/1/1/7/3/7/3/3/23/3": {
+          "type": "element",
+          "hash": "c78d7f75ad3c7edd1f0122fb0f7587e7",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Running..."
+        },
+        "5/declaration/body/5/argument/1/1/7/3/7/3/3/3": {
+          "type": "element",
+          "hash": "7dd88cc1f037741079d5f59aad663532",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:span>➜</element:span> git clone https://github.com/ullrai/saas-starter"
+        },
+        "5/declaration/body/5/argument/1/1/7/3/7/3/3/5": {
+          "type": "element",
+          "hash": "5fe457891d64c27f433a57603b6680c1",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:span>➜</element:span> cd saas-starter"
+        },
+        "5/declaration/body/5/argument/1/1/7/3/7/3/3/9": {
+          "type": "element",
+          "hash": "4cb8bd2adf9586bcaa55a8e333258e38",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:span>➜</element:span> cp .env.example .env"
+        },
+        "5/declaration/body/5/argument/1/1/7/3/7/7/1/1": {
+          "type": "element",
+          "hash": "e31d4ef360bcc840101a43d5710ace84",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "What's Included"
+        },
+        "5/declaration/body/5/argument/1/1/7/3/7/7/1/3/3": {
+          "type": "element",
+          "hash": "fda5eebe09595746036088959163b92a",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Production Ready"
+        },
+        "5/declaration/body/5/argument/1/1/7/3/7/7/5/1/1/1": {
+          "type": "element",
+          "hash": "c98e649bd9091a5238d8543d65e6c130",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "✓"
+        },
+        "5/declaration/body/5/argument/1/1/7/3/7/7/5/1/1/3": {
+          "type": "element",
+          "hash": "491fbb938cfe44df0438ad3e198d23e6",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Authentication"
+        },
+        "5/declaration/body/5/argument/1/1/7/3/7/7/5/1/11/1": {
+          "type": "element",
+          "hash": "c98e649bd9091a5238d8543d65e6c130",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "✓"
+        },
+        "5/declaration/body/5/argument/1/1/7/3/7/7/5/1/11/3": {
+          "type": "element",
+          "hash": "e9cb3728ab19a1a79878a3f5fde3f891",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "i18n Ready"
+        },
+        "5/declaration/body/5/argument/1/1/7/3/7/7/5/1/3/1": {
+          "type": "element",
+          "hash": "c98e649bd9091a5238d8543d65e6c130",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "✓"
+        },
+        "5/declaration/body/5/argument/1/1/7/3/7/7/5/1/3/3": {
+          "type": "element",
+          "hash": "995e559af78b6f78c0ea736cde8b737b",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Database"
+        },
+        "5/declaration/body/5/argument/1/1/7/3/7/7/5/1/5/1": {
+          "type": "element",
+          "hash": "c98e649bd9091a5238d8543d65e6c130",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "✓"
+        },
+        "5/declaration/body/5/argument/1/1/7/3/7/7/5/1/5/3": {
+          "type": "element",
+          "hash": "1ce1a8d31ed709fb29fce2057045d104",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Payments"
+        },
+        "5/declaration/body/5/argument/1/1/7/3/7/7/5/1/7/1": {
+          "type": "element",
+          "hash": "c98e649bd9091a5238d8543d65e6c130",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "✓"
+        },
+        "5/declaration/body/5/argument/1/1/7/3/7/7/5/1/7/3": {
+          "type": "element",
+          "hash": "d83c28574c7b4f3c4b151633ee74b436",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "File Upload"
+        },
+        "5/declaration/body/5/argument/1/1/7/3/7/7/5/1/9/1": {
+          "type": "element",
+          "hash": "c98e649bd9091a5238d8543d65e6c130",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "✓"
+        },
+        "5/declaration/body/5/argument/1/1/7/3/7/7/5/1/9/3": {
+          "type": "element",
+          "hash": "3b3bec539fb82de7563a8e4704608570",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Admin Panel"
+        },
+        "5/declaration/body/5/argument/1/1/7/3/7/7/7/1": {
+          "type": "element",
+          "hash": "79ac61fabf0da0c3aa70d32b8eb959ff",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Built with <element:span>Next.js 15</element:span> + <element:span>shadcn/ui</element:span>"
+        },
+        "5/declaration/body/5/argument/5/1/3/11": {
+          "type": "element",
+          "hash": "fb4867ca3e503bee38b90af74457135e",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Complete UllrAI SaaS starter with authentication, payments, database, and deployment. Everything you need to go from idea to revenue."
+        },
+        "5/declaration/body/5/argument/5/1/3/15/1/1": {
+          "type": "element",
+          "hash": "0ddb912d4ac58cf941509c704b97f580",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "START NOW<element:Terminal></element:Terminal>"
+        },
+        "5/declaration/body/5/argument/5/1/3/15/3/1": {
+          "type": "element",
+          "hash": "1c661730bd1c62d744b05d05914ae49c",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:Github></element:Github> VIEW SOURCE"
+        },
+        "5/declaration/body/5/argument/5/1/3/3/1/3": {
+          "type": "element",
+          "hash": "4bfd3e63035e3546f7350dfc85650c88",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "OpenSource READY"
+        },
+        "5/declaration/body/5/argument/5/1/3/7": {
+          "type": "element",
+          "hash": "731af333d77f0ed5fcc4068e244cc557",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "SHIP YOUR<element:br></element:br><element:span>MICRO SaaS</element:span>"
+        },
+        "5/declaration/body/5/argument/5/1/7/3/1/3/1": {
+          "type": "element",
+          "hash": "b915164d4dfb3f57968740614b132c2a",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "PERFORMANCE"
+        },
+        "5/declaration/body/5/argument/5/1/7/3/1/3/3": {
+          "type": "element",
+          "hash": "c39b86309cec215381f36b3bcf3e9ca2",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "100/100"
+        },
+        "5/declaration/body/5/argument/5/1/7/3/3/1/5": {
+          "type": "element",
+          "hash": "b729ad4a807413e8486d9b4cc7224b98",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:Terminal></element:Terminal> developer-console"
+        },
+        "5/declaration/body/5/argument/5/1/7/3/3/3": {
+          "type": "element",
+          "hash": "8efed3d76d62e48db6707ab3e8191421",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "user@saas-starter:~/projects/my-app"
+        },
+        "5/declaration/body/5/argument/5/1/7/3/7/3/1/1/1": {
+          "type": "element",
+          "hash": "f1f9af1d54b55d5a0f599b9c7b5ba91d",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "➜"
+        },
+        "5/declaration/body/5/argument/5/1/7/3/7/3/3/11": {
+          "type": "element",
+          "hash": "11cc462723b0081e788170e4c576793f",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:span>➜</element:span> pnpm install"
+        },
+        "5/declaration/body/5/argument/5/1/7/3/7/3/3/15": {
+          "type": "element",
+          "hash": "f7035e78dd2e6150e938fe6ec58f7b1e",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:span>➜</element:span> pnpm dev"
+        },
+        "5/declaration/body/5/argument/5/1/7/3/7/3/3/21/1": {
+          "type": "element",
+          "hash": "df1b3893a8d70531c38c2795d675698e",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "✓ Ready in 1.2s"
+        },
+        "5/declaration/body/5/argument/5/1/7/3/7/3/3/21/3": {
+          "type": "element",
+          "hash": "1b678a409b2d0964857a4ac62bdc38c0",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "○ Local: <element:span>http://localhost:3000</element:span>"
+        },
+        "5/declaration/body/5/argument/5/1/7/3/7/3/3/23/3": {
+          "type": "element",
+          "hash": "c78d7f75ad3c7edd1f0122fb0f7587e7",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Running..."
+        },
+        "5/declaration/body/5/argument/5/1/7/3/7/3/3/3": {
+          "type": "element",
+          "hash": "7dd88cc1f037741079d5f59aad663532",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:span>➜</element:span> git clone https://github.com/ullrai/saas-starter"
+        },
+        "5/declaration/body/5/argument/5/1/7/3/7/3/3/5": {
+          "type": "element",
+          "hash": "5fe457891d64c27f433a57603b6680c1",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:span>➜</element:span> cd saas-starter"
+        },
+        "5/declaration/body/5/argument/5/1/7/3/7/3/3/9": {
+          "type": "element",
+          "hash": "4cb8bd2adf9586bcaa55a8e333258e38",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:span>➜</element:span> cp .env.example .env"
+        },
+        "5/declaration/body/5/argument/5/1/7/3/7/7/1/1": {
+          "type": "element",
+          "hash": "e31d4ef360bcc840101a43d5710ace84",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "What's Included"
+        },
+        "5/declaration/body/5/argument/5/1/7/3/7/7/1/3/3": {
+          "type": "element",
+          "hash": "fda5eebe09595746036088959163b92a",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Production Ready"
+        },
+        "5/declaration/body/5/argument/5/1/7/3/7/7/5/1/1/1": {
+          "type": "element",
+          "hash": "c98e649bd9091a5238d8543d65e6c130",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "✓"
+        },
+        "5/declaration/body/5/argument/5/1/7/3/7/7/5/1/1/3": {
+          "type": "element",
+          "hash": "491fbb938cfe44df0438ad3e198d23e6",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Authentication"
+        },
+        "5/declaration/body/5/argument/5/1/7/3/7/7/5/1/11/1": {
+          "type": "element",
+          "hash": "c98e649bd9091a5238d8543d65e6c130",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "✓"
+        },
+        "5/declaration/body/5/argument/5/1/7/3/7/7/5/1/11/3": {
+          "type": "element",
+          "hash": "e9cb3728ab19a1a79878a3f5fde3f891",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "i18n Ready"
+        },
+        "5/declaration/body/5/argument/5/1/7/3/7/7/5/1/13/1": {
+          "type": "element",
+          "hash": "c98e649bd9091a5238d8543d65e6c130",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "✓"
+        },
+        "5/declaration/body/5/argument/5/1/7/3/7/7/5/1/13/3": {
+          "type": "element",
+          "hash": "99542ec7aff2a162e9c4beee1f8d7b78",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "50+ Components"
+        },
+        "5/declaration/body/5/argument/5/1/7/3/7/7/5/1/15/1": {
+          "type": "element",
+          "hash": "c98e649bd9091a5238d8543d65e6c130",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "✓"
+        },
+        "5/declaration/body/5/argument/5/1/7/3/7/7/5/1/15/3": {
+          "type": "element",
+          "hash": "d63d2a97f55baa75f353987658ddb0a0",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "TypeScript"
+        },
+        "5/declaration/body/5/argument/5/1/7/3/7/7/5/1/3/1": {
+          "type": "element",
+          "hash": "c98e649bd9091a5238d8543d65e6c130",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "✓"
+        },
+        "5/declaration/body/5/argument/5/1/7/3/7/7/5/1/3/3": {
+          "type": "element",
+          "hash": "995e559af78b6f78c0ea736cde8b737b",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Database"
+        },
+        "5/declaration/body/5/argument/5/1/7/3/7/7/5/1/5/1": {
+          "type": "element",
+          "hash": "c98e649bd9091a5238d8543d65e6c130",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "✓"
+        },
+        "5/declaration/body/5/argument/5/1/7/3/7/7/5/1/5/3": {
+          "type": "element",
+          "hash": "1ce1a8d31ed709fb29fce2057045d104",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Payments"
+        },
+        "5/declaration/body/5/argument/5/1/7/3/7/7/5/1/7/1": {
+          "type": "element",
+          "hash": "c98e649bd9091a5238d8543d65e6c130",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "✓"
+        },
+        "5/declaration/body/5/argument/5/1/7/3/7/7/5/1/7/3": {
+          "type": "element",
+          "hash": "d83c28574c7b4f3c4b151633ee74b436",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "File Upload"
+        },
+        "5/declaration/body/5/argument/5/1/7/3/7/7/5/1/9/1": {
+          "type": "element",
+          "hash": "c98e649bd9091a5238d8543d65e6c130",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "✓"
+        },
+        "5/declaration/body/5/argument/5/1/7/3/7/7/5/1/9/3": {
+          "type": "element",
+          "hash": "3b3bec539fb82de7563a8e4704608570",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Admin Panel"
+        },
+        "5/declaration/body/5/argument/5/1/7/3/7/7/7/1": {
+          "type": "element",
+          "hash": "79ac61fabf0da0c3aa70d32b8eb959ff",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Built with <element:span>Next.js 15</element:span> + <element:span>shadcn/ui</element:span>"
+        },
+        "5/declaration/body/5/argument/5/1/7/5/1/3/1": {
+          "type": "element",
+          "hash": "6f5bb6e5e8deb0dd3b05ca240ac663de",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "COMPONENTS"
+        },
+        "5/declaration/body/5/argument/5/1/7/5/1/3/3": {
+          "type": "element",
+          "hash": "bec2cc35f02cd5614a12872cd030e656",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "50+ Ready"
+        },
+        "5/declaration/body/5/argument/5/1/7/9/3/1/5": {
+          "type": "element",
+          "hash": "b729ad4a807413e8486d9b4cc7224b98",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:Terminal></element:Terminal> developer-console"
+        },
+        "5/declaration/body/5/argument/5/1/7/9/3/3": {
+          "type": "element",
+          "hash": "8efed3d76d62e48db6707ab3e8191421",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "user@saas-starter:~/projects/my-app"
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/3/1/1/1": {
+          "type": "element",
+          "hash": "f1f9af1d54b55d5a0f599b9c7b5ba91d",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "➜"
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/3/3/11": {
+          "type": "element",
+          "hash": "1c8142d54a42d5953bdd8b8cb94950b6",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "# Setup environment variables"
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/3/3/13": {
+          "type": "element",
+          "hash": "4cb8bd2adf9586bcaa55a8e333258e38",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:span>➜</element:span> cp .env.example .env"
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/3/3/15": {
+          "type": "element",
+          "hash": "c11a7c511ba196c3eaab1ee5b5c889b5",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:span>➜</element:span> nano .env"
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/3/3/21": {
+          "type": "element",
+          "hash": "11cc462723b0081e788170e4c576793f",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:span>➜</element:span> pnpm install"
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/3/3/23": {
+          "type": "element",
+          "hash": "ae360176709001309e0f6bff32b153d6",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:span>➜</element:span> pnpm db:push"
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/3/3/29": {
+          "type": "element",
+          "hash": "f7035e78dd2e6150e938fe6ec58f7b1e",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:span>➜</element:span> pnpm dev"
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/3/3/3": {
+          "type": "element",
+          "hash": "7dd88cc1f037741079d5f59aad663532",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:span>➜</element:span> git clone https://github.com/ullrai/saas-starter"
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/3/3/35/1": {
+          "type": "element",
+          "hash": "df1b3893a8d70531c38c2795d675698e",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "✓ Ready in 1.2s"
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/3/3/35/3": {
+          "type": "element",
+          "hash": "1b678a409b2d0964857a4ac62bdc38c0",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "○ Local: <element:span>http://localhost:3000</element:span>"
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/3/3/35/5": {
+          "type": "element",
+          "hash": "02ee755a100be596aedb05e2bbd1f6ca",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "○ Database: Connected"
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/3/3/37/3": {
+          "type": "element",
+          "hash": "c78d7f75ad3c7edd1f0122fb0f7587e7",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Running..."
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/3/3/5": {
+          "type": "element",
+          "hash": "5fe457891d64c27f433a57603b6680c1",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:span>➜</element:span> cd saas-starter"
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/7/1/1": {
+          "type": "element",
+          "hash": "932c1be6391f6548c3500afe7522feed",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Components Library"
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/7/1/3/3": {
+          "type": "element",
+          "hash": "035af5df1671b68b31b2897196602733",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "50+ Ready to Use"
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/7/3/3/1/1": {
+          "type": "element",
+          "hash": "e703f557fbc66ecd955f2b477e77852a",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "UI Components"
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/7/3/3/1/3": {
+          "type": "element",
+          "hash": "7d822f489eee28c06512ad7f06e78bb7",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "shadcn/ui"
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/7/3/3/3/1": {
+          "type": "element",
+          "hash": "b2b34f0c1dc721d52708a7b4feef311f",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "• Button"
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/7/3/3/3/11": {
+          "type": "element",
+          "hash": "9b393254cc33a56aa5a87b6f9fe26405",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "• Chart"
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/7/3/3/3/3": {
+          "type": "element",
+          "hash": "8676ac569004e1b709cb7182033821a5",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "• Card"
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/7/3/3/3/5": {
+          "type": "element",
+          "hash": "e757a083715edfc4d335a638f15fbfe3",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "• Dialog"
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/7/3/3/3/7": {
+          "type": "element",
+          "hash": "d43bce035bf591ee6c7a735e2578aeac",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "• Table"
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/7/3/3/3/9": {
+          "type": "element",
+          "hash": "3e5d39a20bb0f42950c75a168ee36a4b",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "• Form"
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/7/3/3/5": {
+          "type": "element",
+          "hash": "821c803eef7ff4a1a15fa2b7d2cfbf98",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "+44 more components"
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/7/3/5/1/1": {
+          "type": "element",
+          "hash": "74ea71ea56d4b5f57f35adfb43d06e07",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Pre-built Features"
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/7/3/5/1/3": {
+          "type": "element",
+          "hash": "cf437d18fed5f6d0acd666532241812e",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "READY"
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/7/3/5/3/1": {
+          "type": "element",
+          "hash": "d013b29373a6ad6bb76941e54e604a92",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "• Auth System"
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/7/3/5/3/11": {
+          "type": "element",
+          "hash": "21a71ac4f1288603814c5bb0c8699f44",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "• User Settings"
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/7/3/5/3/3": {
+          "type": "element",
+          "hash": "883571ad19f93f7b23376ed3fefa2aae",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "• Dashboard"
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/7/3/5/3/5": {
+          "type": "element",
+          "hash": "c01f569e07a2b4e4309053b0d7bbd0bd",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "• File Upload"
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/7/3/5/3/7": {
+          "type": "element",
+          "hash": "c73e6af0347508657d3c1349398858f9",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "• Admin Panel"
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/7/3/5/3/9": {
+          "type": "element",
+          "hash": "336f391fa4ff3d7484777d496004ba39",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "• Billing"
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/7/5/1/1": {
+          "type": "element",
+          "hash": "d63d2a97f55baa75f353987658ddb0a0",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "TypeScript"
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/7/5/1/3": {
+          "type": "element",
+          "hash": "14fc617d2bbaf4311961839b09960600",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "100% Type-Safe"
+        },
+        "5/declaration/body/5/argument/5/11": {
+          "type": "element",
+          "hash": "b7c4517b416e111f179e6f84c9761d70",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Complete UllrAI SaaS starter with authentication, payments, database, and deployment. Everything you need to go from idea to revenue."
+        },
+        "5/declaration/body/5/argument/5/15/1/1": {
+          "type": "element",
+          "hash": "61e7ecb8794a1814327964fdf845f5da",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "START NOW<element:Terminal></element:Terminal>"
+        },
+        "5/declaration/body/5/argument/5/15/3/1": {
+          "type": "element",
+          "hash": "ab7dc13d7ecb59180def630b1db02072",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:Github></element:Github> VIEW SOURCE"
+        },
+        "5/declaration/body/5/argument/5/19/3/1/3/1": {
+          "type": "element",
+          "hash": "b915164d4dfb3f57968740614b132c2a",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "PERFORMANCE"
+        },
+        "5/declaration/body/5/argument/5/19/3/1/3/3": {
+          "type": "element",
+          "hash": "c39b86309cec215381f36b3bcf3e9ca2",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "100/100"
+        },
+        "5/declaration/body/5/argument/5/19/5/1/3/1": {
+          "type": "element",
+          "hash": "6f5bb6e5e8deb0dd3b05ca240ac663de",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "COMPONENTS"
+        },
+        "5/declaration/body/5/argument/5/19/5/1/3/3": {
+          "type": "element",
+          "hash": "bec2cc35f02cd5614a12872cd030e656",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "50+ Ready"
+        },
+        "5/declaration/body/5/argument/5/19/9/3/1/5": {
+          "type": "element",
+          "hash": "31039781db74132baae4e003436aa4fd",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:Terminal></element:Terminal> developer-console"
+        },
+        "5/declaration/body/5/argument/5/19/9/3/3": {
+          "type": "element",
+          "hash": "74f4a8b4eb46a93ce96737be256d69c3",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "user@saas-starter:~/projects/my-app"
+        },
+        "5/declaration/body/5/argument/5/19/9/7/3/1/1/1": {
+          "type": "element",
+          "hash": "f1f9af1d54b55d5a0f599b9c7b5ba91d",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "➜"
+        },
+        "5/declaration/body/5/argument/5/19/9/7/3/3/1": {
+          "type": "element",
+          "hash": "99c43f696c9d798e304022f540360b7a",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:span>import</element:span><element:span><expression/></element:span><element:span>from</element:span><element:span>\"@/lib/auth\"</element:span>;"
+        },
+        "5/declaration/body/5/argument/5/19/9/7/3/3/11": {
+          "type": "element",
+          "hash": "d24bfa4565e91882c47a8b7a742d2bbc",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "# Setup environment variables"
+        },
+        "5/declaration/body/5/argument/5/19/9/7/3/3/13": {
+          "type": "element",
+          "hash": "4df3307d12b7a110d0c50b131d3f899e",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:span>➜</element:span> cp .env.example .env"
+        },
+        "5/declaration/body/5/argument/5/19/9/7/3/3/15": {
+          "type": "element",
+          "hash": "c30c9ce10521ea35fcb7ad7c0731f52b",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:span>➜</element:span> nano .env <element:span># Configure DATABASE_URL, BETTER_AUTH_SECRET...</element:span>"
+        },
+        "5/declaration/body/5/argument/5/19/9/7/3/3/17/3": {
+          "type": "element",
+          "hash": "22617def3195c58b9eef83deef456c4b",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Compiling..."
+        },
+        "5/declaration/body/5/argument/5/19/9/7/3/3/21": {
+          "type": "element",
+          "hash": "abacb6fe35f6ab17457c6c4a4c6cc716",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:span>➜</element:span> pnpm install"
+        },
+        "5/declaration/body/5/argument/5/19/9/7/3/3/23": {
+          "type": "element",
+          "hash": "9fec4db2d46f808a4a081d1d30d91f56",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:span>➜</element:span> pnpm db:push <element:span># Migrate database schema</element:span>"
+        },
+        "5/declaration/body/5/argument/5/19/9/7/3/3/29": {
+          "type": "element",
+          "hash": "2a6c788dda0d1a3691aa27aa7ff054e9",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:span>➜</element:span> pnpm dev"
+        },
+        "5/declaration/body/5/argument/5/19/9/7/3/3/3": {
+          "type": "element",
+          "hash": "918a58212d6dff2df528252882fa67fa",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:span>➜</element:span> git clone https://github.com/ullrai/saas-starter"
+        },
+        "5/declaration/body/5/argument/5/19/9/7/3/3/35/1": {
+          "type": "element",
+          "hash": "df1b3893a8d70531c38c2795d675698e",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "✓ Ready in 1.2s"
+        },
+        "5/declaration/body/5/argument/5/19/9/7/3/3/35/3": {
+          "type": "element",
+          "hash": "1b678a409b2d0964857a4ac62bdc38c0",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "○ Local: <element:span>http://localhost:3000</element:span>"
+        },
+        "5/declaration/body/5/argument/5/19/9/7/3/3/35/5": {
+          "type": "element",
+          "hash": "02ee755a100be596aedb05e2bbd1f6ca",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "○ Database: Connected"
+        },
+        "5/declaration/body/5/argument/5/19/9/7/3/3/37/3": {
+          "type": "element",
+          "hash": "c78d7f75ad3c7edd1f0122fb0f7587e7",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Running..."
+        },
+        "5/declaration/body/5/argument/5/19/9/7/3/3/5": {
+          "type": "element",
+          "hash": "934d1d8f2ecd5684185fc4fd8722b207",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:span>➜</element:span> cd saas-starter"
+        },
+        "5/declaration/body/5/argument/5/19/9/7/3/3/7": {
+          "type": "element",
+          "hash": "98def1dd15b21413c81723a6f2409c69",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:span>export default</element:span><element:span>async function</element:span><element:span>App</element:span>() <expression/>"
+        },
+        "5/declaration/body/5/argument/5/19/9/7/3/3/9/1": {
+          "type": "element",
+          "hash": "cd925ae60c3c9078ad4f189507272135",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "// Your entire SaaS stack is ready"
+        },
+        "5/declaration/body/5/argument/5/19/9/7/7/1/1": {
+          "type": "element",
+          "hash": "932c1be6391f6548c3500afe7522feed",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Components Library"
+        },
+        "5/declaration/body/5/argument/5/19/9/7/7/1/3/3": {
+          "type": "element",
+          "hash": "035af5df1671b68b31b2897196602733",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "50+ Ready to Use"
+        },
+        "5/declaration/body/5/argument/5/19/9/7/7/3/1/1/1": {
+          "type": "element",
+          "hash": "995e559af78b6f78c0ea736cde8b737b",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Database"
+        },
+        "5/declaration/body/5/argument/5/19/9/7/7/3/1/1/3": {
+          "type": "element",
+          "hash": "b9fc9b653867355312a43bd36280b289",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "CONNECTED"
+        },
+        "5/declaration/body/5/argument/5/19/9/7/7/3/3/1/1": {
+          "type": "element",
+          "hash": "e703f557fbc66ecd955f2b477e77852a",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "UI Components"
+        },
+        "5/declaration/body/5/argument/5/19/9/7/7/3/3/1/3": {
+          "type": "element",
+          "hash": "7d822f489eee28c06512ad7f06e78bb7",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "shadcn/ui"
+        },
+        "5/declaration/body/5/argument/5/19/9/7/7/3/3/3/1": {
+          "type": "element",
+          "hash": "b2b34f0c1dc721d52708a7b4feef311f",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "• Button"
+        },
+        "5/declaration/body/5/argument/5/19/9/7/7/3/3/3/11": {
+          "type": "element",
+          "hash": "9b393254cc33a56aa5a87b6f9fe26405",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "• Chart"
+        },
+        "5/declaration/body/5/argument/5/19/9/7/7/3/3/3/3": {
+          "type": "element",
+          "hash": "8676ac569004e1b709cb7182033821a5",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "• Card"
+        },
+        "5/declaration/body/5/argument/5/19/9/7/7/3/3/3/5": {
+          "type": "element",
+          "hash": "e757a083715edfc4d335a638f15fbfe3",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "• Dialog"
+        },
+        "5/declaration/body/5/argument/5/19/9/7/7/3/3/3/7": {
+          "type": "element",
+          "hash": "d43bce035bf591ee6c7a735e2578aeac",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "• Table"
+        },
+        "5/declaration/body/5/argument/5/19/9/7/7/3/3/3/9": {
+          "type": "element",
+          "hash": "3e5d39a20bb0f42950c75a168ee36a4b",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "• Form"
+        },
+        "5/declaration/body/5/argument/5/19/9/7/7/3/3/5": {
+          "type": "element",
+          "hash": "232eae6109b57d2acc496c17b0c18e8c",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "+44 more components"
+        },
+        "5/declaration/body/5/argument/5/19/9/7/7/3/5/1/1": {
+          "type": "element",
+          "hash": "74ea71ea56d4b5f57f35adfb43d06e07",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Pre-built Features"
+        },
+        "5/declaration/body/5/argument/5/19/9/7/7/3/5/1/3": {
+          "type": "element",
+          "hash": "cf437d18fed5f6d0acd666532241812e",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "READY"
+        },
+        "5/declaration/body/5/argument/5/19/9/7/7/3/5/3/1": {
+          "type": "element",
+          "hash": "d013b29373a6ad6bb76941e54e604a92",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "• Auth System"
+        },
+        "5/declaration/body/5/argument/5/19/9/7/7/3/5/3/11": {
+          "type": "element",
+          "hash": "21a71ac4f1288603814c5bb0c8699f44",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "• User Settings"
+        },
+        "5/declaration/body/5/argument/5/19/9/7/7/3/5/3/3": {
+          "type": "element",
+          "hash": "883571ad19f93f7b23376ed3fefa2aae",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "• Dashboard"
+        },
+        "5/declaration/body/5/argument/5/19/9/7/7/3/5/3/5": {
+          "type": "element",
+          "hash": "c01f569e07a2b4e4309053b0d7bbd0bd",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "• File Upload"
+        },
+        "5/declaration/body/5/argument/5/19/9/7/7/3/5/3/7": {
+          "type": "element",
+          "hash": "c73e6af0347508657d3c1349398858f9",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "• Admin Panel"
+        },
+        "5/declaration/body/5/argument/5/19/9/7/7/3/5/3/9": {
+          "type": "element",
+          "hash": "336f391fa4ff3d7484777d496004ba39",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "• Billing"
+        },
+        "5/declaration/body/5/argument/5/19/9/7/7/5/1/1": {
+          "type": "element",
+          "hash": "d63d2a97f55baa75f353987658ddb0a0",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "TypeScript"
+        },
+        "5/declaration/body/5/argument/5/19/9/7/7/5/1/3": {
+          "type": "element",
+          "hash": "14fc617d2bbaf4311961839b09960600",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "100% Type-Safe"
+        },
+        "5/declaration/body/5/argument/5/3/1": {
+          "type": "element",
+          "hash": "1113fb3f9f2879d568e26bfb8c2cd2be",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:span><element:span></element:span><element:span></element:span></element:span> v2.0 PRODUCTION READY"
+        },
+        "5/declaration/body/5/argument/5/3/1/3": {
+          "type": "element",
+          "hash": "4bfd3e63035e3546f7350dfc85650c88",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "OpenSource READY"
+        },
+        "5/declaration/body/5/argument/5/7": {
+          "type": "element",
+          "hash": "07f63b42410dbd731ffbd58939e3e797",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "SHIP YOUR<element:br></element:br><element:span>MICRO SaaS</element:span>"
+        },
         "6/0/init/0/1/value": {
           "type": "element",
           "hash": "fda5eebe09595746036088959163b92a",
@@ -2633,6 +4281,550 @@
           "skip": false,
           "overrides": {},
           "content": "Lightning Fast"
+        },
+        "6/declaration/body/0/argument/5/3/3/5/1/3": {
+          "type": "element",
+          "hash": "6e3c70a761833de4bbc0adbf829d3c19",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "System Online"
+        },
+        "6/declaration/body/0/argument/5/3/3/5/3/1": {
+          "type": "element",
+          "hash": "0ef1c3496935af00d169793d63f3b75d",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "MICRO"
+        },
+        "6/declaration/body/0/argument/5/3/3/5/3/5/1": {
+          "type": "element",
+          "hash": "cc8e71f010000e5fec070d6351e63795",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "SaaS STARTER"
+        },
+        "6/declaration/body/0/argument/5/3/3/5/3/9": {
+          "type": "element",
+          "hash": "7f9428170aa24998169a929ed8a223d4",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "STARTER"
+        },
+        "6/declaration/body/0/argument/5/3/3/5/5/1": {
+          "type": "element",
+          "hash": "10400dc92eede697a6f7a1da89c341b0",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Deploy production-ready applications in minutes. The complete toolkit for the modern developer."
+        },
+        "6/declaration/body/0/argument/5/3/3/5/7/1/1/1": {
+          "type": "element",
+          "hash": "1a3fec8106f0de565c50f6290e7dfec6",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "INITIALIZE PROJECT"
+        },
+        "6/declaration/body/0/argument/5/3/7/11/1/0": {
+          "type": "element",
+          "hash": "26ff290a38cd58d5953c17493b249bad",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "QUICK ACCESS"
+        },
+        "6/declaration/body/0/argument/5/3/7/11/3/1/1/1": {
+          "type": "element",
+          "hash": "93c6989524d146328295305a1cbb3378",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "SOURCE CODE"
+        },
+        "6/declaration/body/0/argument/5/3/7/11/5/1/1/1": {
+          "type": "element",
+          "hash": "256fb2afb542846b02596e55af54d6ca",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "DOCUMENTATION"
+        },
+        "6/declaration/body/0/argument/5/3/7/3/1/0": {
+          "type": "element",
+          "hash": "2d0cae7d377a60ce3e45160f0dfa19d6",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "STATUS MONITOR"
+        },
+        "6/declaration/body/0/argument/5/3/7/7/1/3/0": {
+          "type": "element",
+          "hash": "ebf8401702bd148b6b1b8a3cbcbe256f",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "99.9%"
+        },
+        "6/declaration/body/0/argument/5/3/7/7/1/5/0": {
+          "type": "element",
+          "hash": "454ef0404c04fc8e6378d7288034567d",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "UPTIME"
+        },
+        "6/declaration/body/0/argument/5/3/7/7/3/3/0": {
+          "type": "element",
+          "hash": "c4a8eec0f6b2eb20c555098fc1649a85",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "50ms"
+        },
+        "6/declaration/body/0/argument/5/3/7/7/3/5/0": {
+          "type": "element",
+          "hash": "a326c3388eaff0969adddde95142b95e",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "LATENCY"
+        },
+        "6/declaration/body/0/argument/5/3/7/7/5/3/0": {
+          "type": "element",
+          "hash": "b63b5e3e17bc323a77a7f008043e396a",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "SOC2"
+        },
+        "6/declaration/body/0/argument/5/3/7/7/5/5/0": {
+          "type": "element",
+          "hash": "cf437d18fed5f6d0acd666532241812e",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "READY"
+        },
+        "6/declaration/body/0/argument/5/3/7/7/7/3/0": {
+          "type": "element",
+          "hash": "64cceb3b0b81304b63f47ff31cee472c",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "v2.0"
+        },
+        "6/declaration/body/0/argument/5/3/7/7/7/5/0": {
+          "type": "element",
+          "hash": "60d805bd9abd470a9e3b79fe003d3036",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "VERSION"
+        },
+        "6/declaration/body/0/argument/5/7/1/1/1": {
+          "type": "element",
+          "hash": "03ed7a02ce16c3681ca48ef7d6afd854",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "GLOBAL CDN"
+        },
+        "6/declaration/body/0/argument/5/7/1/3/1": {
+          "type": "element",
+          "hash": "702495d1d2a28a1956fba85d7de5d291",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "E2E ENCRYPTION"
+        },
+        "6/declaration/body/0/argument/5/7/3/1": {
+          "type": "element",
+          "hash": "4907c577303c42982e5d6ac1cfdb364f",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "ID: 8X-992-ALPHA"
+        },
+        "6/declaration/body/3/argument/1/1/3/1": {
+          "type": "element",
+          "hash": "ca2f5fdb4b154df7632f0b606b670073",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "v2.0 NOW AVAILABLE"
+        },
+        "6/declaration/body/3/argument/1/1/3/3": {
+          "type": "element",
+          "hash": "631e8d84b8af666b970bd3b05ce2c93a",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "MICRO<element:br></element:br> SAAS STARTER"
+        },
+        "6/declaration/body/3/argument/1/1/3/5": {
+          "type": "element",
+          "hash": "de25ba386a46b8be0caf1879b7d04107",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "The complete toolkit for the modern developer. Deploy production-ready applications in minutes, not months."
+        },
+        "6/declaration/body/3/argument/1/1/3/7/1/1": {
+          "type": "element",
+          "hash": "7e898f3d430c0402a360a4b3a7517cd4",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "INITIALIZE PROJECT<element:Terminal></element:Terminal>"
+        },
+        "6/declaration/body/3/argument/1/1/3/7/3/1": {
+          "type": "element",
+          "hash": "e359a8dc1f2652bec413d0067c32afab",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:Github></element:Github> GITHUB"
+        },
+        "6/declaration/body/3/argument/1/1/7/7/3/1/5": {
+          "type": "element",
+          "hash": "096657489892cb3594592f3ced30d679",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "bash — 80x24"
+        },
+        "6/declaration/body/3/argument/1/1/7/7/7/1/1/1": {
+          "type": "element",
+          "hash": "26d58d6d3544aa73ce368f1b76077eb1",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "❯"
+        },
+        "6/declaration/body/3/argument/1/1/7/7/7/3/1/1": {
+          "type": "element",
+          "hash": "35b2e9cf1fd6b81ad95b30817e5b6be0",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "✔"
+        },
+        "6/declaration/body/3/argument/1/1/7/7/7/3/1/3": {
+          "type": "element",
+          "hash": "04987284a7952837e0aa1b5b05fdf59c",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Downloading template..."
+        },
+        "6/declaration/body/3/argument/1/1/7/7/7/3/3/1": {
+          "type": "element",
+          "hash": "35b2e9cf1fd6b81ad95b30817e5b6be0",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "✔"
+        },
+        "6/declaration/body/3/argument/1/1/7/7/7/3/3/3": {
+          "type": "element",
+          "hash": "fe1d8d4dcef63e8262dc081d2cfe5c15",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Installing dependencies..."
+        },
+        "6/declaration/body/3/argument/1/1/7/7/7/3/5/1": {
+          "type": "element",
+          "hash": "35b2e9cf1fd6b81ad95b30817e5b6be0",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "✔"
+        },
+        "6/declaration/body/3/argument/1/1/7/7/7/3/5/3": {
+          "type": "element",
+          "hash": "402c8ea69c72f9f350b1470af25d25b5",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Setting up database..."
+        },
+        "6/declaration/body/3/argument/1/1/7/7/7/3/7/1": {
+          "type": "element",
+          "hash": "26d58d6d3544aa73ce368f1b76077eb1",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "❯"
+        },
+        "6/declaration/body/3/argument/1/1/7/7/7/3/7/3": {
+          "type": "element",
+          "hash": "68a72238acd5b16c97f420205721f13e",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Ready to code!"
+        },
+        "6/declaration/body/5/argument/1/1/3/11": {
+          "type": "element",
+          "hash": "6902f058cf5b48291f258e7eeea59a8b",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Complete UllrAI SaaS starter with authentication, payments, database, and deployment. Everything you need to go from idea to revenue."
+        },
+        "6/declaration/body/5/argument/1/1/3/15/1/1": {
+          "type": "element",
+          "hash": "0ddb912d4ac58cf941509c704b97f580",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "START NOW<element:Terminal></element:Terminal>"
+        },
+        "6/declaration/body/5/argument/1/1/3/15/3/1": {
+          "type": "element",
+          "hash": "1c661730bd1c62d744b05d05914ae49c",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:Github></element:Github> VIEW SOURCE"
+        },
+        "6/declaration/body/5/argument/1/1/3/3/1/3": {
+          "type": "element",
+          "hash": "4bfd3e63035e3546f7350dfc85650c88",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "OpenSource READY"
+        },
+        "6/declaration/body/5/argument/1/1/3/7/1": {
+          "type": "element",
+          "hash": "099c4b75ac4089b1f5a7fca3d2000a7a",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "SHIP YOUR"
+        },
+        "6/declaration/body/5/argument/1/1/3/7/5": {
+          "type": "element",
+          "hash": "9a2a2a4467a115d32e1fa46ad07b4084",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "MICRO SaaS"
+        },
+        "6/declaration/body/5/argument/1/1/7/3/3/1/5": {
+          "type": "element",
+          "hash": "b729ad4a807413e8486d9b4cc7224b98",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:Terminal></element:Terminal> developer-console"
+        },
+        "6/declaration/body/5/argument/1/1/7/3/3/3": {
+          "type": "element",
+          "hash": "8efed3d76d62e48db6707ab3e8191421",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "user@saas-starter:~/projects/my-app"
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/3/1/1/1": {
+          "type": "element",
+          "hash": "f1f9af1d54b55d5a0f599b9c7b5ba91d",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "➜"
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/3/3/11": {
+          "type": "element",
+          "hash": "11cc462723b0081e788170e4c576793f",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:span>➜</element:span> pnpm install"
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/3/3/15": {
+          "type": "element",
+          "hash": "f7035e78dd2e6150e938fe6ec58f7b1e",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:span>➜</element:span> pnpm dev"
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/3/3/21/1": {
+          "type": "element",
+          "hash": "df1b3893a8d70531c38c2795d675698e",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "✓ Ready in 1.2s"
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/3/3/21/3": {
+          "type": "element",
+          "hash": "de85a3b9161c411cb69b53420a65c4e4",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "○ Local: <element:span>http://localhost:3000</element:span>"
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/3/3/23/3": {
+          "type": "element",
+          "hash": "c78d7f75ad3c7edd1f0122fb0f7587e7",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Running..."
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/3/3/3": {
+          "type": "element",
+          "hash": "2eafec112c559d2c4b30443b67ccf25c",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:span>➜</element:span> git clone https://github.com/ullrai/saas-starter"
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/3/3/5": {
+          "type": "element",
+          "hash": "5fe457891d64c27f433a57603b6680c1",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:span>➜</element:span> cd saas-starter"
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/3/3/9": {
+          "type": "element",
+          "hash": "9f6dede3951f99228352db09df537461",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:span>➜</element:span> cp .env.example .env"
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/7/1/1": {
+          "type": "element",
+          "hash": "556c48883be6a649e3072272c37f10cf",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "What's Included"
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/7/1/3/3": {
+          "type": "element",
+          "hash": "20aa4c07e47134dcac3e5d69474d9d74",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Production Ready"
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/7/5/1/1/1": {
+          "type": "element",
+          "hash": "c98e649bd9091a5238d8543d65e6c130",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "✓"
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/7/5/1/1/3": {
+          "type": "element",
+          "hash": "491fbb938cfe44df0438ad3e198d23e6",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Authentication"
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/7/5/1/11/1": {
+          "type": "element",
+          "hash": "c98e649bd9091a5238d8543d65e6c130",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "✓"
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/7/5/1/11/3": {
+          "type": "element",
+          "hash": "e9cb3728ab19a1a79878a3f5fde3f891",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "i18n Ready"
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/7/5/1/3/1": {
+          "type": "element",
+          "hash": "c98e649bd9091a5238d8543d65e6c130",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "✓"
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/7/5/1/3/3": {
+          "type": "element",
+          "hash": "995e559af78b6f78c0ea736cde8b737b",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Database"
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/7/5/1/5/1": {
+          "type": "element",
+          "hash": "c98e649bd9091a5238d8543d65e6c130",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "✓"
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/7/5/1/5/3": {
+          "type": "element",
+          "hash": "1ce1a8d31ed709fb29fce2057045d104",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Payments"
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/7/5/1/7/1": {
+          "type": "element",
+          "hash": "c98e649bd9091a5238d8543d65e6c130",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "✓"
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/7/5/1/7/3": {
+          "type": "element",
+          "hash": "d83c28574c7b4f3c4b151633ee74b436",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "File Upload"
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/7/5/1/9/1": {
+          "type": "element",
+          "hash": "c98e649bd9091a5238d8543d65e6c130",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "✓"
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/7/5/1/9/3": {
+          "type": "element",
+          "hash": "3b3bec539fb82de7563a8e4704608570",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Admin Panel"
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/7/7/1": {
+          "type": "element",
+          "hash": "f76ef3db186b495e3935895a85d56f71",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Built with <element:span>Next.js 15</element:span> + <element:span>shadcn/ui</element:span>"
         },
         "7/declaration/body/0/argument/1/1/3/15/1/1": {
           "type": "element",
@@ -2976,7 +5168,7 @@
       "scopes": {
         "5/0/init/0/2/value": {
           "type": "element",
-          "hash": "050573be6a96e5960a1c9a5341a2346e",
+          "hash": "a3cde80912b89974cdf5c3101ee8cbb1",
           "context": "",
           "skip": false,
           "overrides": {},
@@ -2984,7 +5176,7 @@
         },
         "5/0/init/1/2/value": {
           "type": "element",
-          "hash": "b0feb2bf7ec5f66d206ad6b059bafd53",
+          "hash": "8085ab680e31f36ad5c250847c41dede",
           "context": "",
           "skip": false,
           "overrides": {},
@@ -2992,7 +5184,7 @@
         },
         "5/0/init/2/2/value": {
           "type": "element",
-          "hash": "1f423d9776fcbb98ef74fad3d098cc57",
+          "hash": "0210784d41baca72732d23889e9df25e",
           "context": "",
           "skip": false,
           "overrides": {},
@@ -3000,7 +5192,7 @@
         },
         "5/0/init/3/2/value": {
           "type": "element",
-          "hash": "a3135f28adee663ff4fd902d03a25029",
+          "hash": "5340c94329c3692f0f0c36cdae5b4609",
           "context": "",
           "skip": false,
           "overrides": {},
@@ -3016,7 +5208,7 @@
         },
         "5/0/init/5/2/value": {
           "type": "element",
-          "hash": "9e68bfc79962b566824f8c147766478b",
+          "hash": "5669faf7d01bec20a354f12771fc273a",
           "context": "",
           "skip": false,
           "overrides": {},
@@ -3030,9 +5222,25 @@
           "overrides": {},
           "content": "More from UllrAI Lab"
         },
+        "6/declaration/body/0/argument/1/1/1/3": {
+          "type": "element",
+          "hash": "8137d8a6a4a1e122ce7a794cbddbf045",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "UllrAI Lab"
+        },
         "6/declaration/body/0/argument/1/1/3": {
           "type": "element",
           "hash": "ea509fdf5073086bef253319bf50de91",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Explore our other tools"
+        },
+        "6/declaration/body/0/argument/1/1/3/1": {
+          "type": "element",
+          "hash": "3849709803b4b892a65029899f6ffd6f",
           "context": "",
           "skip": false,
           "overrides": {},
@@ -3046,6 +5254,14 @@
           "overrides": {},
           "content": "AI-powered utilities that help creators, developers, and teams ship faster every day."
         },
+        "6/declaration/body/0/argument/1/1/5/1": {
+          "type": "element",
+          "hash": "4f736cd0e15dac03516bfa7652070c0b",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "AI-powered utilities that help creators, developers, and teams ship faster every day."
+        },
         "6/declaration/body/0/argument/1/5": {
           "type": "element",
           "hash": "4a84a3aabebf02729085474f76dadeb4",
@@ -3053,6 +5269,22 @@
           "skip": false,
           "overrides": {},
           "content": "Have an idea for another tool?<element:a>Let us know</element:a>"
+        },
+        "6/declaration/body/0/argument/1/5/1": {
+          "type": "element",
+          "hash": "bc746a00f152f4e766a5e79845f4aa8f",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Have an idea for another tool?"
+        },
+        "6/declaration/body/0/argument/1/5/3/1": {
+          "type": "element",
+          "hash": "7e2f57b4da58029e6b8d48a5081c8472",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Let us know"
         }
       }
     },
@@ -3066,6 +5298,14 @@
           "overrides": {},
           "content": "Trusted by innovative companies"
         },
+        "10/declaration/body/0/argument/1/11/1/1": {
+          "type": "element",
+          "hash": "83e57c9ba54bc1d63a9e54653edf6b41",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Trusted by innovative companies"
+        },
         "10/declaration/body/0/argument/1/15": {
           "type": "element",
           "hash": "e269ab816e6fc4b43499013e8b063ed5",
@@ -3073,6 +5313,22 @@
           "skip": false,
           "overrides": {},
           "content": "Want to share your success story?<element:a>Get in touch</element:a>"
+        },
+        "10/declaration/body/0/argument/1/15/1": {
+          "type": "element",
+          "hash": "a6ac70610c7460de8c3e01618be5ea1f",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Want to share your success story?"
+        },
+        "10/declaration/body/0/argument/1/15/3/1": {
+          "type": "element",
+          "hash": "35323605e31c113fd664486afc33f3eb",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Get in touch"
         },
         "10/declaration/body/0/argument/1/3/1/1": {
           "type": "element",
@@ -3082,9 +5338,25 @@
           "overrides": {},
           "content": "<element:TrendingUp></element:TrendingUp> Trusted Worldwide"
         },
+        "10/declaration/body/0/argument/1/3/1/1/3": {
+          "type": "element",
+          "hash": "76712cf76855f695712cf05b994caebd",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Metrics"
+        },
         "10/declaration/body/0/argument/1/3/1/3": {
           "type": "element",
           "hash": "79e4c7c1c53313bacfbd381806e4a980",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Join thousands of developers"
+        },
+        "10/declaration/body/0/argument/1/3/1/3/1": {
+          "type": "element",
+          "hash": "b004aaee548c739c1a2027651f24e828",
           "context": "",
           "skip": false,
           "overrides": {},
@@ -3098,6 +5370,14 @@
           "overrides": {},
           "content": "Building successful SaaS products with our starter kit"
         },
+        "10/declaration/body/0/argument/1/3/1/5/1": {
+          "type": "element",
+          "hash": "e4c2375da039e19ffe20fd4eb7b44b9f",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Building successful SaaS products with our starter kit"
+        },
         "10/declaration/body/0/argument/1/7/1/1": {
           "type": "element",
           "hash": "e429f2cc62ea9270a40f33f01caaacbf",
@@ -3106,9 +5386,25 @@
           "overrides": {},
           "content": "<element:Users></element:Users> Customer Stories"
         },
+        "10/declaration/body/0/argument/1/7/1/1/3": {
+          "type": "element",
+          "hash": "aa83f4456d11185e5e72dba3260bf00b",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Community"
+        },
         "10/declaration/body/0/argument/1/7/1/3": {
           "type": "element",
           "hash": "f57a79d3827b2afa6575af88991fafa9",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Loved by developers worldwide"
+        },
+        "10/declaration/body/0/argument/1/7/1/3/1": {
+          "type": "element",
+          "hash": "64528aad0185140ce21bdc14fce14e6b",
           "context": "",
           "skip": false,
           "overrides": {},
@@ -3122,13 +5418,21 @@
           "overrides": {},
           "content": "See what our community has to say about their experience"
         },
-        "5/0/init/0/1/value": {
+        "10/declaration/body/0/argument/1/7/1/5/1": {
           "type": "element",
-          "hash": "1c8245fd2632a455f7646d136f62445f",
+          "hash": "fb9ba548222e1d69672c5b7dab00e3af",
           "context": "",
           "skip": false,
           "overrides": {},
-          "content": "This starter kit saved me months of development time. The authentication system and payment integration work flawlessly out of the box."
+          "content": "See what our community has to say about their experience"
+        },
+        "5/0/init/0/1/value": {
+          "type": "element",
+          "hash": "8501c482749ea6ee8605b8066dc57675",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "This starter kit saved me months of development time. The payment integration work flawlessly out of the box."
         },
         "5/0/init/0/2/value/1/value": {
           "type": "element",
@@ -3140,7 +5444,7 @@
         },
         "5/0/init/1/1/value": {
           "type": "element",
-          "hash": "f49f286761ad7cd9a326d2995b647076",
+          "hash": "535d6df7f0f6a6a94ff93ec35355bfe9",
           "context": "",
           "skip": false,
           "overrides": {},
@@ -3156,7 +5460,7 @@
         },
         "5/0/init/2/1/value": {
           "type": "element",
-          "hash": "a7aafbe1932e557ee7add892fdf40247",
+          "hash": "48b000875dae162c112a39194efb042c",
           "context": "",
           "skip": false,
           "overrides": {},
@@ -3172,7 +5476,7 @@
         },
         "5/0/init/3/1/value": {
           "type": "element",
-          "hash": "687664b21e2c8ca0523336f7d8b918b4",
+          "hash": "077dee3839faefb7d67276a6cd49fb8a",
           "context": "",
           "skip": false,
           "overrides": {},
@@ -3188,7 +5492,7 @@
         },
         "5/0/init/4/1/value": {
           "type": "element",
-          "hash": "a77c8874cf1100d787af03dc12f89e9e",
+          "hash": "e441b46f68587df2d0d94e15b7beddc7",
           "context": "",
           "skip": false,
           "overrides": {},
@@ -3204,7 +5508,7 @@
         },
         "5/0/init/5/1/value": {
           "type": "element",
-          "hash": "0ac046eb58333f9782d98c586da0d264",
+          "hash": "eada624711672c80854a73a488b15cb0",
           "context": "",
           "skip": false,
           "overrides": {},
@@ -3292,11 +5596,11 @@
         },
         "8/body/0/argument/1/15/3/3": {
           "type": "element",
-          "hash": "a1120a21ea83dc6ac0d54a9cc21f3e08",
+          "hash": "05314b4949d0417be555f0119bd4e44b",
           "context": "",
           "skip": false,
           "overrides": {},
-          "content": "{testimonial.author.role} - {testimonial.author.company}"
+          "content": "{testimonial.author.role} @ {testimonial.author.company}"
         }
       }
     },
@@ -5848,7 +8152,7 @@
         },
         "11/declaration/body/3/argument/5/expression/consequent/3/1/1/1/expression/alternate": {
           "type": "element",
-          "hash": "db03b9cf2e10445faf18c25fb87480be",
+          "hash": "ef21b5479a4be97df1f65ba4890a1db4",
           "context": "",
           "skip": false,
           "overrides": {},
@@ -5856,7 +8160,7 @@
         },
         "11/declaration/body/3/argument/5/expression/consequent/3/1/1/1/expression/consequent": {
           "type": "element",
-          "hash": "7b66185c962de094940e9d62cfb5f16a",
+          "hash": "460a91119e5da13ca7a7542dcfc95781",
           "context": "",
           "skip": false,
           "overrides": {},

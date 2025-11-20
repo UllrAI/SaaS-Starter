@@ -7,8 +7,8 @@ import {
   Rocket,
   Shield,
   BarChart3,
-  Sparkles,
   CreditCard,
+  Code,
 } from "lucide-react";
 
 interface Feature {
@@ -25,8 +25,8 @@ const features: Feature[] = [
     title: <>Authentication & Users</>,
     description: (
       <>
-        Complete auth system with OAuth, magic links, and user management. Role-based access
-        control included.
+        Complete auth system with OAuth, magic links, and user management.
+        Role-based access control included.
       </>
     ),
     icon: Shield,
@@ -37,8 +37,8 @@ const features: Feature[] = [
     title: <>Payments & Billing</>,
     description: (
       <>
-        Stripe integration with subscriptions, invoicing, and tax handling. Revenue tracking
-        built-in.
+        Flexible payment integration with subscriptions, and billing management.
+        Revenue tracking built-in.
       </>
     ),
     icon: CreditCard,
@@ -49,7 +49,8 @@ const features: Feature[] = [
     title: <>Database & API</>,
     description: (
       <>
-        Type-safe database with Drizzle ORM. RESTful APIs and real-time subscriptions ready.
+        Type-safe database with Drizzle ORM. RESTful APIs and real-time
+        subscriptions ready.
       </>
     ),
     icon: Database,
@@ -60,8 +61,8 @@ const features: Feature[] = [
     title: <>Analytics & Insights</>,
     description: (
       <>
-        User behavior tracking, conversion metrics, and beautiful dashboards for data-driven
-        decisions.
+        User behavior tracking, conversion metrics, and beautiful dashboards for
+        data-driven decisions.
       </>
     ),
     icon: BarChart3,
@@ -72,7 +73,8 @@ const features: Feature[] = [
     title: <>Modern UI/UX</>,
     description: (
       <>
-        Beautiful, responsive design with dark mode. Accessible components and smooth animations.
+        Beautiful, responsive design with dark mode. Accessible components and
+        smooth animations.
       </>
     ),
     icon: Palette,
@@ -83,7 +85,8 @@ const features: Feature[] = [
     title: <>Production Deploy</>,
     description: (
       <>
-        One-click deployment to Vercel, AWS, or Docker. CI/CD pipelines and monitoring included.
+        One-click deployment to Vercel, AWS, or Docker. CI/CD pipelines and
+        monitoring included.
       </>
     ),
     icon: Rocket,
@@ -91,7 +94,11 @@ const features: Feature[] = [
   },
 ];
 
-const featureStats: { id: string; label: React.ReactNode; value: React.ReactNode }[] = [
+const featureStats: {
+  id: string;
+  label: React.ReactNode;
+  value: React.ReactNode;
+}[] = [
   { id: "components", label: <>Components</>, value: <>50+</> },
   { id: "integrations", label: <>Integrations</>, value: <>10+</> },
   { id: "type-safe", label: <>Type Safe</>, value: <>100%</> },
@@ -101,23 +108,21 @@ function FeatureCard({ feature }: { feature: Feature }) {
   const IconComponent = feature.icon;
 
   return (
-    <Card className="h-full rounded-xl border border-border/70 bg-background/80 p-6 shadow-sm">
+    <Card className="group border-border bg-card hover:border-primary hover:bg-secondary/50 h-full border p-6 transition-all">
       <div className="space-y-4">
         {/* Icon and Category */}
         <div className="flex items-center justify-between">
-          <div className="bg-primary/10 text-primary flex h-12 w-12 items-center justify-center rounded-xl">
+          <div className="bg-secondary text-primary border-border group-hover:border-primary group-hover:bg-primary group-hover:text-primary-foreground flex h-12 w-12 items-center justify-center border transition-colors">
             <IconComponent className="h-6 w-6" />
           </div>
-          <Badge variant="secondary" className="text-xs">
+          <Badge variant="outline" className="border-border font-mono text-xs">
             {feature.category}
           </Badge>
         </div>
 
         {/* Content */}
         <div className="space-y-2">
-          <h3 className="text-foreground text-lg font-semibold">
-            {feature.title}
-          </h3>
+          <h3 className="text-foreground text-lg font-bold">{feature.title}</h3>
           <p className="text-muted-foreground text-sm leading-relaxed">
             {feature.description}
           </p>
@@ -129,23 +134,27 @@ function FeatureCard({ feature }: { feature: Feature }) {
 
 export function Features() {
   return (
-    <section className="relative py-24">
+    <section className="bg-background border-border relative border-b py-24">
       <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
         {/* Section Header */}
         <div className="mx-auto mb-16 max-w-2xl text-center">
-          <Badge variant="secondary" className="mb-4">
-            <Sparkles className="mr-2 h-3 w-3" />
-            Everything Included
+          <Badge variant="outline" className="border-primary text-primary mb-4">
+            <Code className="mr-2 h-3 w-3" />
+            <>Features</>
           </Badge>
 
           <h2 className="text-foreground text-3xl font-bold tracking-tight sm:text-4xl">
-            Everything you need to
-            <span className="text-primary block">build and scale</span>
+            <>Everything you need to</>
+            <span className="text-primary mt-1 block">
+              <>build and scale</>
+            </span>
           </h2>
 
           <p className="text-muted-foreground mt-6 text-lg">
-            Skip months of development. Our starter includes all the essential
-            features you need to launch your SaaS product successfully.
+            <>
+              Skip months of development. Our SaaS Starter includes all the
+              essential features you need to launch your product.
+            </>
           </p>
         </div>
 
@@ -157,13 +166,18 @@ export function Features() {
         </div>
 
         {/* Bottom Stats */}
-        <div className="border-border/60 bg-background/80 mt-16 grid gap-6 rounded-2xl border p-6 text-center sm:grid-cols-3">
+        <div className="bg-border border-border mt-16 grid gap-px border sm:grid-cols-3">
           {featureStats.map((stat) => (
-            <div key={stat.id}>
-              <div className="text-foreground text-2xl font-bold">
+            <div
+              key={stat.id}
+              className="bg-card hover:bg-secondary/50 p-8 text-center transition-colors"
+            >
+              <div className="text-foreground text-4xl font-bold tracking-tighter">
                 {stat.value}
               </div>
-              <div className="text-muted-foreground text-sm">{stat.label}</div>
+              <div className="text-muted-foreground mt-2 text-sm tracking-widest uppercase">
+                {stat.label}
+              </div>
             </div>
           ))}
         </div>

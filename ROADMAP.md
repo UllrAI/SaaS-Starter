@@ -1,7 +1,6 @@
 # Roadmap | 路线图
 
-> **Language Select / 语言选择**: [English](#english) | [中文](#中文)
-> **Documentation / 文档**: [README (EN)](./README.md) | [README (中文)](./README.zh-CN.md)
+> **Language Select / 语言选择**: [English](#english) | [中文](#中文) > **Documentation / 文档**: [README (EN)](./README.md) | [README (中文)](./README.zh-CN.md)
 
 ---
 

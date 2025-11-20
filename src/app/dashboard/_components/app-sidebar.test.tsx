@@ -634,7 +634,9 @@ describe("AppSidebar Component", () => {
     const content = fs.readFileSync(componentPath, "utf8");
 
     // Verify admin role checking logic
-    expect(content).toContain("const showAdminSections = isAdminRole(getUserRole());");
+    expect(content).toContain(
+      "const showAdminSections = isAdminRole(getUserRole());",
+    );
   });
 
   it("should implement navigation handler", () => {
@@ -677,8 +679,12 @@ describe("AppSidebar Component", () => {
     // Verify navigation rendering
     expect(content).toContain("function SidebarSection");
     expect(content).toContain("<SidebarMenuItem key={item.key}>");
-    expect(content).toContain("<SidebarMenuLink item={item} pathname={pathname} allItems={items} />");
-    expect(content).toContain("<SidebarSection title={undefined} items={navigation} pathname={pathname} />");
+    expect(content).toContain(
+      "<SidebarMenuLink\n                item={item}\n                pathname={pathname}\n                allItems={items}\n              />",
+    );
+    expect(content).toContain(
+      "<SidebarSection\n          title={undefined}\n          items={navigation}\n          pathname={pathname}\n        />",
+    );
     expect(content).toContain("<SidebarMenuButton");
     expect(content).toContain("tooltip={item.key}");
     expect(content).toContain('<item.icon className="size-4" />');
@@ -690,7 +696,9 @@ describe("AppSidebar Component", () => {
 
     // Verify admin conditional rendering
     expect(content).toContain("{showAdminSections && (");
-    expect(content).toContain('<SidebarSection title={open ? "Admin" : undefined} items={adminNavigation} pathname={pathname} />');
+    expect(content).toContain(
+      "<SidebarSection\n              title={open ? <>Admin</> : undefined}\n              items={adminNavigation}\n              pathname={pathname}\n            />",
+    );
   });
 
   it("should conditionally render generic table navigation", () => {
@@ -699,7 +707,9 @@ describe("AppSidebar Component", () => {
 
     // Verify generic table conditional rendering
     expect(content).toContain("{genericTableNavigation.length > 0 && (");
-    expect(content).toContain('<SidebarSection title={open ? "Manage Tables" : undefined} items={genericTableNavigation} pathname={pathname} />');
+    expect(content).toContain(
+      "<SidebarSection\n                title={open ? <>Manage Tables</> : undefined}\n                items={genericTableNavigation}\n                pathname={pathname}\n              />",
+    );
     expect(content).toContain("Manage Tables");
   });
 

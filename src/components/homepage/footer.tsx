@@ -49,7 +49,12 @@ const footerSections: FooterSection[] = [
     id: "foot-other-products",
     title: <>Other Products</>,
     links: [
-      { id: "foot-pixmiller", name: "PixMiller", href: "https://pixmiller.com/", external: true },
+      {
+        id: "foot-pixmiller",
+        name: "PixMiller",
+        href: "https://pixmiller.com/",
+        external: true,
+      },
       {
         id: "foot-headshots",
         name: "HeadShots.fun",
@@ -62,11 +67,11 @@ const footerSections: FooterSection[] = [
         href: "https://to-markdown.com/",
         external: true,
       },
-      { 
+      {
         id: "foot-hipng",
         name: "HiPNG.com",
         href: "https://hipng.com/",
-        external: true
+        external: true,
       },
     ],
   },
@@ -178,8 +183,8 @@ export function Footer() {
               </div>
 
               <p className="text-muted-foreground mb-6 max-w-md text-sm">
-                Complete UllrAI Micro SaaS starter with authentication, payments,
-                database, and deployment.
+                Complete UllrAI Micro SaaS starter with authentication,
+                payments, database, and deployment.
               </p>
 
               {/* Social links */}

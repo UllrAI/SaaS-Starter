@@ -1500,6 +1500,108 @@ export default {
         },
       },
     },
+    "../components/forms/auth-form.tsx": {
+      entries: {
+        "14/declaration/body/5/0/init/0/value/alternate": {
+          content: {
+            en: "Get started today",
+            "zh-CN": "立即开始",
+          },
+          hash: "e7965bdd92d09d2ccf3ac251624227e3",
+        },
+        "14/declaration/body/5/0/init/0/value/consequent": {
+          content: {
+            en: "Welcome back",
+            "zh-CN": "欢迎回来",
+          },
+          hash: "4928884739ba559e6e4b960e80fe1452",
+        },
+        "14/declaration/body/5/0/init/1/value/alternate": {
+          content: {
+            en: "Create your account in seconds with just your email address",
+            "zh-CN": "只需您的电子邮件地址，几秒钟即可创建账户",
+          },
+          hash: "c33edb296b319819b688c0958e62460d",
+        },
+        "14/declaration/body/5/0/init/1/value/consequent": {
+          content: {
+            en: "Enter your email to receive a secure magic link and access your dashboard",
+            "zh-CN": "输入您的电子邮件以接收安全的魔法链接并访问您的仪表板",
+          },
+          hash: "56bec51728059251cebdb4f780d232ba",
+        },
+        "14/declaration/body/5/0/init/2/value/alternate": {
+          content: {
+            en: "Get started",
+            "zh-CN": "开始使用",
+          },
+          hash: "5c783951b0100a168bdd2161ff294833",
+        },
+        "14/declaration/body/5/0/init/2/value/consequent": {
+          content: {
+            en: "Welcome back",
+            "zh-CN": "欢迎回来",
+          },
+          hash: "4928884739ba559e6e4b960e80fe1452",
+        },
+        "14/declaration/body/5/0/init/3/value/alternate": {
+          content: {
+            en: "Create Account",
+            "zh-CN": "创建账户",
+          },
+          hash: "3c3c9666b2acc1404eaa89e34e17f946",
+        },
+        "14/declaration/body/5/0/init/3/value/consequent": {
+          content: {
+            en: "Send Magic Link",
+            "zh-CN": "发送魔法链接",
+          },
+          hash: "2355c2172034c18bec99cfbf0071465f",
+        },
+        "14/declaration/body/5/0/init/4/value": {
+          content: {
+            en: "Sending magic link...",
+            "zh-CN": "正在发送魔法链接...",
+          },
+          hash: "3c6640f1a4662c0567b7214b86247bcd",
+        },
+        "14/declaration/body/5/0/init/6/value/alternate": {
+          content: {
+            en: "Already have an account?",
+            "zh-CN": "已有账户？",
+          },
+          hash: "699043a787e26ec2ecad53f52df28d5b",
+        },
+        "14/declaration/body/5/0/init/6/value/consequent": {
+          content: {
+            en: "New to our platform?",
+            "zh-CN": "是我们的新用户？",
+          },
+          hash: "6ca216fee0ec60fcf086b8c16c31d128",
+        },
+        "14/declaration/body/5/0/init/7/value/1/expression/alternate": {
+          content: {
+            en: "Sign in instead",
+            "zh-CN": "改为登录",
+          },
+          hash: "4cc5756cc2b58989f907ea2ac4219667",
+        },
+        "14/declaration/body/5/0/init/7/value/1/expression/consequent": {
+          content: {
+            en: "Create an account",
+            "zh-CN": "创建账户",
+          },
+          hash: "bc53a57281d2701563f94f3169518028",
+        },
+        "14/declaration/body/6/0/init/0/1/value": {
+          content: {
+            en: "Email address",
+            "zh-CN": "邮箱地址",
+          },
+          hash: "3ba3f099b1b9be6c35ad797da660cb9f",
+        },
+      },
+    },
     "../components/homepage/call-to-action.tsx": {
       entries: {
         "5/0/init/0/1/value": {

@@ -33,6 +33,220 @@ export default {
     },
     "(pages)/about/page.tsx": {
       entries: {
+        "11/declaration/body/0/argument/3/3/1/11/1/3": {
+          content: {
+            en: "Core Maintainers",
+            "zh-CN": "核心维护者",
+          },
+          hash: "e49f6bc604d4664ffc63852331f7c5b3",
+        },
+        "11/declaration/body/0/argument/3/3/1/11/3/1/expression/0/body/3/1": {
+          content: {
+            en: "Dev Member {i}",
+            "zh-CN": "开发成员 {i}",
+          },
+          hash: "b3d248181377e5cfb4f29969d0682ea3",
+        },
+        "11/declaration/body/0/argument/3/3/1/11/3/1/expression/0/body/3/3": {
+          content: {
+            en: "Senior Engineer",
+            "zh-CN": "高级工程师",
+          },
+          hash: "207c363fa49b218de4312a3bff31c7ec",
+        },
+        "11/declaration/body/0/argument/3/3/1/15/1/3": {
+          content: {
+            en: "Changelog",
+            "zh-CN": "更新日志",
+          },
+          hash: "2a0cc1faf653e9ca97786acee96ffbde",
+        },
+        "11/declaration/body/0/argument/3/3/1/15/3/1/3/1": {
+          content: {
+            en: "v2.0.0",
+            "zh-CN": "v2.0.0",
+          },
+          hash: "93be1453b1acd0f3294b24092fc79e75",
+        },
+        "11/declaration/body/0/argument/3/3/1/15/3/1/3/3": {
+          content: {
+            en: "October 2023",
+            "zh-CN": "2023年10月",
+          },
+          hash: "2b819e1c64a91fa1a5ced6f4d41a48db",
+        },
+        "11/declaration/body/0/argument/3/3/1/15/3/1/5": {
+          content: {
+            en: "Global Scale",
+            "zh-CN": "全球扩展",
+          },
+          hash: "c92fd68120aa24e66363d9033403664a",
+        },
+        "11/declaration/body/0/argument/3/3/1/15/3/1/7": {
+          content: {
+            en: "Launched multi-region support and edge caching.",
+            "zh-CN": "推出多区域支持和边缘缓存。",
+          },
+          hash: "89fb93b6739bfd385398c680608bbfed",
+        },
+        "11/declaration/body/0/argument/3/3/1/15/3/3/3/1": {
+          content: {
+            en: "v1.0.0",
+            "zh-CN": "v1.0.0",
+          },
+          hash: "c3d091e69739b04d23fc9e8ecb78dab5",
+        },
+        "11/declaration/body/0/argument/3/3/1/15/3/3/3/3": {
+          content: {
+            en: "January 2023",
+            "zh-CN": "2023年1月",
+          },
+          hash: "534259cbe279c6a3cd609c43f0fc76c7",
+        },
+        "11/declaration/body/0/argument/3/3/1/15/3/3/5": {
+          content: {
+            en: "Initial Release",
+            "zh-CN": "初始发布",
+          },
+          hash: "b3d637038309c8cb001766280b7ab098",
+        },
+        "11/declaration/body/0/argument/3/3/1/15/3/3/7": {
+          content: {
+            en: "Public beta launch with core features.",
+            "zh-CN": "核心功能的公开测试版发布。",
+          },
+          hash: "98af8fb21bf077247fce03bdea4e5a70",
+        },
+        "11/declaration/body/0/argument/3/3/1/15/3/5/3/1": {
+          content: {
+            en: "v0.1.0",
+            "zh-CN": "v0.1.0",
+          },
+          hash: "eed74d28b44aac61661ced418c97e54f",
+        },
+        "11/declaration/body/0/argument/3/3/1/15/3/5/3/3": {
+          content: {
+            en: "June 2022",
+            "zh-CN": "2022年6月",
+          },
+          hash: "7d3149756bc7709fa920d15636cc251a",
+        },
+        "11/declaration/body/0/argument/3/3/1/15/3/5/5": {
+          content: {
+            en: "First Commit",
+            "zh-CN": "首次提交",
+          },
+          hash: "804f02d822ac99d7a1446e91f647e653",
+        },
+        "11/declaration/body/0/argument/3/3/1/15/3/5/7": {
+          content: {
+            en: "Development started on the core engine.",
+            "zh-CN": "核心引擎开发开始。",
+          },
+          hash: "75cf390de8ceef4dbd306ee42d4b94c2",
+        },
+        "11/declaration/body/0/argument/3/3/1/3/1/1": {
+          content: {
+            en: "README.md",
+            "zh-CN": "README.md",
+          },
+          hash: "d0d18d889c940baaa797f206124873cc",
+        },
+        "11/declaration/body/0/argument/3/3/1/3/3": {
+          content: {
+            en: "Building the future of SaaS",
+            "zh-CN": "构建SaaS的未来",
+          },
+          hash: "1870d943166d44a0f6c72a010d52db0e",
+        },
+        "11/declaration/body/0/argument/3/3/1/3/5": {
+          content: {
+            en: "We are a team of developers, designers, and creators building the tools we wish we had. Open source at heart, enterprise in scale.",
+            "zh-CN":
+              "我们是一支由开发人员、设计师和创作者组成的团队，正在构建我们希望拥有的工具。开源之心，企业规模。",
+          },
+          hash: "81c6994ceda5a7a5f789aba05c29c079",
+        },
+        "11/declaration/body/0/argument/3/3/1/7/1/3": {
+          content: {
+            en: "Core Principles",
+            "zh-CN": "核心原则",
+          },
+          hash: "c07cee4b186152b94676d1ea0dcd622a",
+        },
+        "11/declaration/body/0/argument/3/3/1/7/3/1/1/3": {
+          content: {
+            en: "Speed as a Feature",
+            "zh-CN": "速度即特性",
+          },
+          hash: "cba194b5f5689874542f88b4bb537f2d",
+        },
+        "11/declaration/body/0/argument/3/3/1/7/3/1/1/5": {
+          content: {
+            en: "We optimize for milliseconds. Performance isn't just a metric, it's a user experience requirement.",
+            "zh-CN":
+              "我们以毫秒为单位进行优化。性能不仅仅是一个指标，它是用户体验的要求。",
+          },
+          hash: "c83766522a195aa36c6889b5487177a2",
+        },
+        "11/declaration/body/0/argument/3/3/1/7/3/3/1/3": {
+          content: {
+            en: "Security First",
+            "zh-CN": "安全第一",
+          },
+          hash: "35057c25b9e31c6394e3a72da39ab8d8",
+        },
+        "11/declaration/body/0/argument/3/3/1/7/3/3/1/5": {
+          content: {
+            en: "We don't treat security as an afterthought. It's baked into our architecture from line one.",
+            "zh-CN":
+              "我们不把安全当作事后考虑。它从第一行代码就融入了我们的架构。",
+          },
+          hash: "0c9b0ed71af8291b7dcd8ec17fd82731",
+        },
+        "11/declaration/body/0/argument/3/3/1/7/3/5/1/3": {
+          content: {
+            en: "Community Driven",
+            "zh-CN": "社区驱动",
+          },
+          hash: "02711c519c298608cd0be3b1995f3e7d",
+        },
+        "11/declaration/body/0/argument/3/3/1/7/3/5/1/5": {
+          content: {
+            en: "We build in public and listen to our users. Your feedback shapes our roadmap directly.",
+            "zh-CN":
+              "我们公开构建并倾听用户的声音。您的反馈直接塑造了我们的路线图。",
+          },
+          hash: "250c11858f177097216e6cf6732f1e67",
+        },
+        "11/declaration/body/0/argument/7/1/1/1": {
+          content: {
+            en: "Ready to Build Something Amazing?",
+            "zh-CN": "准备好构建令人惊叹的东西了吗？",
+          },
+          hash: "cb195fc9f70e7505a01bbe873b6cc71f",
+        },
+        "11/declaration/body/0/argument/7/1/1/3": {
+          content: {
+            en: "Join thousands of developers who are already building the next generation of SaaS products.",
+            "zh-CN": "加入成千上万的开发者，他们已经在构建下一代SaaS产品。",
+          },
+          hash: "4ae8ee459ceb257ff65d486f93948d92",
+        },
+        "11/declaration/body/0/argument/7/1/1/5/1/1": {
+          content: {
+            en: "Get Started Today",
+            "zh-CN": "立即开始",
+          },
+          hash: "5476c30aeb582ba0951c3ac8fa44d125",
+        },
+        "11/declaration/body/0/argument/7/1/1/5/3/1": {
+          content: {
+            en: "Contact Sales",
+            "zh-CN": "联系销售",
+          },
+          hash: "94537da970ffef6210bba8fcecb74a8c",
+        },
         "14/0/init/0/2/value": {
           content: {
             en: "CEO & Founder",
@@ -106,14 +320,14 @@ export default {
         "14/declaration/body/0/argument/19/1/1/1": {
           content: {
             en: "Ready to Build Something Amazing?",
-            "zh-CN": "准备好创造令人惊叹的东西了吗？",
+            "zh-CN": "准备好构建令人惊叹的东西了吗？",
           },
           hash: "cb195fc9f70e7505a01bbe873b6cc71f",
         },
         "14/declaration/body/0/argument/19/1/1/3": {
           content: {
             en: "Join thousands of developers who are already building the next generation of SaaS products.",
-            "zh-CN": "加入数千名正在构建下一代SaaS产品的开发者。",
+            "zh-CN": "加入成千上万的开发者，他们已经在构建下一代SaaS产品。",
           },
           hash: "4ae8ee459ceb257ff65d486f93948d92",
         },
@@ -352,14 +566,14 @@ export default {
         "17/declaration/body/0/argument/19/1/1/1": {
           content: {
             en: "Ready to Build Something Amazing?",
-            "zh-CN": "准备好创造令人惊叹的东西了吗？",
+            "zh-CN": "准备好构建令人惊叹的东西了吗？",
           },
           hash: "cb195fc9f70e7505a01bbe873b6cc71f",
         },
         "17/declaration/body/0/argument/19/1/1/3": {
           content: {
             en: "Join thousands of developers who are already building the next generation of SaaS products.",
-            "zh-CN": "加入数千名正在构建下一代SaaS产品的开发者。",
+            "zh-CN": "加入成千上万的开发者，他们已经在构建下一代SaaS产品。",
           },
           hash: "4ae8ee459ceb257ff65d486f93948d92",
         },
@@ -426,6 +640,234 @@ export default {
             "zh-CN": "指导我们一切行为的准则",
           },
           hash: "83daad699a9d95a2d8ec6d4a6f736f04",
+        },
+        "9/declaration/body/0/argument/3/3/1/11/1/3": {
+          content: {
+            en: "Core Maintainers",
+            "zh-CN": "核心维护者",
+          },
+          hash: "e49f6bc604d4664ffc63852331f7c5b3",
+        },
+        "9/declaration/body/0/argument/3/3/1/11/3/1/expression/0/body/3/1": {
+          content: {
+            en: "Dev Member {i}",
+            "zh-CN": "开发成员 {i}",
+          },
+          hash: "b3d248181377e5cfb4f29969d0682ea3",
+        },
+        "9/declaration/body/0/argument/3/3/1/11/3/1/expression/0/body/3/3": {
+          content: {
+            en: "Senior Engineer",
+            "zh-CN": "高级工程师",
+          },
+          hash: "207c363fa49b218de4312a3bff31c7ec",
+        },
+        "9/declaration/body/0/argument/3/3/1/11/3/1/expression/0/body/7/1": {
+          content: {
+            en: "Dev Member {i}",
+            "zh-CN": "开发成员 {i}",
+          },
+          hash: "76c60eacefd98d804d2ea1d66964bd5f",
+        },
+        "9/declaration/body/0/argument/3/3/1/11/3/1/expression/0/body/7/3": {
+          content: {
+            en: "Senior Engineer",
+            "zh-CN": "高级工程师",
+          },
+          hash: "207c363fa49b218de4312a3bff31c7ec",
+        },
+        "9/declaration/body/0/argument/3/3/1/15/1/3": {
+          content: {
+            en: "Changelog",
+            "zh-CN": "更新日志",
+          },
+          hash: "2a0cc1faf653e9ca97786acee96ffbde",
+        },
+        "9/declaration/body/0/argument/3/3/1/15/3/1/3/1": {
+          content: {
+            en: "v2.0.0",
+            "zh-CN": "v2.0.0",
+          },
+          hash: "93be1453b1acd0f3294b24092fc79e75",
+        },
+        "9/declaration/body/0/argument/3/3/1/15/3/1/3/3": {
+          content: {
+            en: "October 2023",
+            "zh-CN": "2023年10月",
+          },
+          hash: "2b819e1c64a91fa1a5ced6f4d41a48db",
+        },
+        "9/declaration/body/0/argument/3/3/1/15/3/1/5": {
+          content: {
+            en: "Global Scale",
+            "zh-CN": "全球扩展",
+          },
+          hash: "c92fd68120aa24e66363d9033403664a",
+        },
+        "9/declaration/body/0/argument/3/3/1/15/3/1/7": {
+          content: {
+            en: "Launched multi-region support and edge caching.",
+            "zh-CN": "推出多区域支持和边缘缓存。",
+          },
+          hash: "89fb93b6739bfd385398c680608bbfed",
+        },
+        "9/declaration/body/0/argument/3/3/1/15/3/3/3/1": {
+          content: {
+            en: "v1.0.0",
+            "zh-CN": "v1.0.0",
+          },
+          hash: "c3d091e69739b04d23fc9e8ecb78dab5",
+        },
+        "9/declaration/body/0/argument/3/3/1/15/3/3/3/3": {
+          content: {
+            en: "January 2023",
+            "zh-CN": "2023年1月",
+          },
+          hash: "534259cbe279c6a3cd609c43f0fc76c7",
+        },
+        "9/declaration/body/0/argument/3/3/1/15/3/3/5": {
+          content: {
+            en: "Initial Release",
+            "zh-CN": "初始发布",
+          },
+          hash: "b3d637038309c8cb001766280b7ab098",
+        },
+        "9/declaration/body/0/argument/3/3/1/15/3/3/7": {
+          content: {
+            en: "Public beta launch with core features.",
+            "zh-CN": "核心功能的公开测试版发布。",
+          },
+          hash: "98af8fb21bf077247fce03bdea4e5a70",
+        },
+        "9/declaration/body/0/argument/3/3/1/15/3/5/3/1": {
+          content: {
+            en: "v0.1.0",
+            "zh-CN": "v0.1.0",
+          },
+          hash: "eed74d28b44aac61661ced418c97e54f",
+        },
+        "9/declaration/body/0/argument/3/3/1/15/3/5/3/3": {
+          content: {
+            en: "June 2022",
+            "zh-CN": "2022年6月",
+          },
+          hash: "7d3149756bc7709fa920d15636cc251a",
+        },
+        "9/declaration/body/0/argument/3/3/1/15/3/5/5": {
+          content: {
+            en: "First Commit",
+            "zh-CN": "首次提交",
+          },
+          hash: "804f02d822ac99d7a1446e91f647e653",
+        },
+        "9/declaration/body/0/argument/3/3/1/15/3/5/7": {
+          content: {
+            en: "Development started on the core engine.",
+            "zh-CN": "核心引擎开发开始。",
+          },
+          hash: "75cf390de8ceef4dbd306ee42d4b94c2",
+        },
+        "9/declaration/body/0/argument/3/3/1/3/1/1": {
+          content: {
+            en: "README.md",
+            "zh-CN": "README.md",
+          },
+          hash: "d0d18d889c940baaa797f206124873cc",
+        },
+        "9/declaration/body/0/argument/3/3/1/3/3": {
+          content: {
+            en: "Building the future of SaaS",
+            "zh-CN": "构建SaaS的未来",
+          },
+          hash: "1870d943166d44a0f6c72a010d52db0e",
+        },
+        "9/declaration/body/0/argument/3/3/1/3/5": {
+          content: {
+            en: "We are a team of developers, designers, and creators building the tools we wish we had. Open source at heart, enterprise in scale.",
+            "zh-CN":
+              "我们是一支由开发人员、设计师和创作者组成的团队，正在构建我们希望拥有的工具。开源之心，企业规模。",
+          },
+          hash: "81c6994ceda5a7a5f789aba05c29c079",
+        },
+        "9/declaration/body/0/argument/3/3/1/7/1/3": {
+          content: {
+            en: "Core Principles",
+            "zh-CN": "核心原则",
+          },
+          hash: "c07cee4b186152b94676d1ea0dcd622a",
+        },
+        "9/declaration/body/0/argument/3/3/1/7/3/1/1/3": {
+          content: {
+            en: "Speed as a Feature",
+            "zh-CN": "速度即特性",
+          },
+          hash: "cba194b5f5689874542f88b4bb537f2d",
+        },
+        "9/declaration/body/0/argument/3/3/1/7/3/1/1/5": {
+          content: {
+            en: "We optimize for milliseconds. Performance isn't just a metric, it's a user experience requirement.",
+            "zh-CN":
+              "我们以毫秒为单位进行优化。性能不仅仅是一个指标，它是用户体验的要求。",
+          },
+          hash: "c83766522a195aa36c6889b5487177a2",
+        },
+        "9/declaration/body/0/argument/3/3/1/7/3/3/1/3": {
+          content: {
+            en: "Security First",
+            "zh-CN": "安全第一",
+          },
+          hash: "35057c25b9e31c6394e3a72da39ab8d8",
+        },
+        "9/declaration/body/0/argument/3/3/1/7/3/3/1/5": {
+          content: {
+            en: "We don't treat security as an afterthought. It's baked into our architecture from line one.",
+            "zh-CN":
+              "我们不把安全当作事后考虑。它从第一行代码就融入了我们的架构。",
+          },
+          hash: "0c9b0ed71af8291b7dcd8ec17fd82731",
+        },
+        "9/declaration/body/0/argument/3/3/1/7/3/5/1/3": {
+          content: {
+            en: "Community Driven",
+            "zh-CN": "社区驱动",
+          },
+          hash: "02711c519c298608cd0be3b1995f3e7d",
+        },
+        "9/declaration/body/0/argument/3/3/1/7/3/5/1/5": {
+          content: {
+            en: "We build in public and listen to our users. Your feedback shapes our roadmap directly.",
+            "zh-CN":
+              "我们公开构建并倾听用户的声音。您的反馈直接塑造了我们的路线图。",
+          },
+          hash: "250c11858f177097216e6cf6732f1e67",
+        },
+        "9/declaration/body/0/argument/7/1/1/1": {
+          content: {
+            en: "Ready to Build Something Amazing?",
+            "zh-CN": "准备好构建令人惊叹的东西了吗？",
+          },
+          hash: "cb195fc9f70e7505a01bbe873b6cc71f",
+        },
+        "9/declaration/body/0/argument/7/1/1/3": {
+          content: {
+            en: "Join thousands of developers who are already building the next generation of SaaS products.",
+            "zh-CN": "加入成千上万的开发者，他们已经在构建下一代SaaS产品。",
+          },
+          hash: "4ae8ee459ceb257ff65d486f93948d92",
+        },
+        "9/declaration/body/0/argument/7/1/1/5/1/1": {
+          content: {
+            en: "Get Started Today",
+            "zh-CN": "立即开始",
+          },
+          hash: "5476c30aeb582ba0951c3ac8fa44d125",
+        },
+        "9/declaration/body/0/argument/7/1/1/5/3/1": {
+          content: {
+            en: "Contact Sales",
+            "zh-CN": "联系销售",
+          },
+          hash: "94537da970ffef6210bba8fcecb74a8c",
         },
       },
     },
@@ -719,6 +1161,416 @@ export default {
     },
     "(pages)/contact/page.tsx": {
       entries: {
+        "10/declaration/body/0/argument/3/3/1/11/1/3": {
+          content: {
+            en: "Support Hours",
+            "zh-CN": "支持时间",
+          },
+          hash: "dab53472301f5fb67ada60937b6ec6fd",
+        },
+        "10/declaration/body/0/argument/3/3/1/11/3/1/1/1": {
+          content: {
+            en: "Standard Support",
+            "zh-CN": "标准支持",
+          },
+          hash: "96a3213d4c2c3a56aea3706321ac7811",
+        },
+        "10/declaration/body/0/argument/3/3/1/11/3/1/1/3": {
+          content: {
+            en: "Available for all users and customers",
+            "zh-CN": "对所有用户和客户可用",
+          },
+          hash: "34362af1ea023968a9ee46e4d337b69d",
+        },
+        "10/declaration/body/0/argument/3/3/1/11/3/1/3/1/1": {
+          content: {
+            en: "Monday - Friday",
+            "zh-CN": "周一至周五",
+          },
+          hash: "3b66d8b6736398fb4461a2d939d599a7",
+        },
+        "10/declaration/body/0/argument/3/3/1/11/3/1/3/1/3": {
+          content: {
+            en: "9:00 - 18:00",
+            "zh-CN": "9:00 - 18:00",
+          },
+          hash: "481ccc5e4e978472a309aa46517b2cc2",
+        },
+        "10/declaration/body/0/argument/3/3/1/11/3/1/3/3/1": {
+          content: {
+            en: "Saturday",
+            "zh-CN": "周六",
+          },
+          hash: "dc9def4f2620b182dd4e11e088c1f220",
+        },
+        "10/declaration/body/0/argument/3/3/1/11/3/1/3/3/3": {
+          content: {
+            en: "10:00 - 16:00",
+            "zh-CN": "10:00 - 16:00",
+          },
+          hash: "976cc9bbf549288ba297dba2b778dacb",
+        },
+        "10/declaration/body/0/argument/3/3/1/11/3/1/3/5/1": {
+          content: {
+            en: "Sunday",
+            "zh-CN": "周日",
+          },
+          hash: "20c6c38061dd5ed62ef1c92a51b26e2f",
+        },
+        "10/declaration/body/0/argument/3/3/1/11/3/1/3/5/3": {
+          content: {
+            en: "Closed",
+            "zh-CN": "关闭",
+          },
+          hash: "180560eb657a20f3d4edc44d5f7e7c2a",
+        },
+        "10/declaration/body/0/argument/3/3/1/11/3/3/1/1": {
+          content: {
+            en: "Premium Support",
+            "zh-CN": "高级支持",
+          },
+          hash: "cd1c7901eacf02b0ba00ccee975bc09c",
+        },
+        "10/declaration/body/0/argument/3/3/1/11/3/3/1/3": {
+          content: {
+            en: "Enterprise customers with SLA guarantees",
+            "zh-CN": "有SLA保证的企业客户",
+          },
+          hash: "1a87548fcbbafbeaf6947253c4e5790c",
+        },
+        "10/declaration/body/0/argument/3/3/1/11/3/3/3/1/1": {
+          content: {
+            en: "Availability",
+            "zh-CN": "可用性",
+          },
+          hash: "6cf93b0199c85b7ccedd33c7c3cd0d57",
+        },
+        "10/declaration/body/0/argument/3/3/1/11/3/3/3/1/3": {
+          content: {
+            en: "24/7/365",
+            "zh-CN": "24/7/365",
+          },
+          hash: "f28578bba9ee4918e73cac658041eabd",
+        },
+        "10/declaration/body/0/argument/3/3/1/11/3/3/3/3/1": {
+          content: {
+            en: "Response Time",
+            "zh-CN": "响应时间",
+          },
+          hash: "79c2a6b56c5110cc49af95f921f147c4",
+        },
+        "10/declaration/body/0/argument/3/3/1/11/3/3/3/3/3": {
+          content: {
+            en: "< 1 hour",
+            "zh-CN": "< 1 小时",
+          },
+          hash: "20f2e1a8ca578836235ada90a500e23d",
+        },
+        "10/declaration/body/0/argument/3/3/1/11/3/3/3/5/1": {
+          content: {
+            en: "Priority",
+            "zh-CN": "优先级",
+          },
+          hash: "18b192b994a3619e8ac97184a232a2ab",
+        },
+        "10/declaration/body/0/argument/3/3/1/11/3/3/3/5/3": {
+          content: {
+            en: "Critical Priority",
+            "zh-CN": "关键优先级",
+          },
+          hash: "63dcd6c751f17b6d01f571fa824569b9",
+        },
+        "10/declaration/body/0/argument/3/3/1/15/1/3": {
+          content: {
+            en: "Quick Answers",
+            "zh-CN": "快速解答",
+          },
+          hash: "547335bcadff4854fe4ec8a7e9b10ca8",
+        },
+        "10/declaration/body/0/argument/3/3/1/15/3/1/1/1": {
+          content: {
+            en: "What is the average response time?",
+            "zh-CN": "平均响应时间是多少？",
+          },
+          hash: "c91ee91dd05afd39978b9f1b145217a7",
+        },
+        "10/declaration/body/0/argument/3/3/1/15/3/1/3/1": {
+          content: {
+            en: "We typically respond to all inquiries within 24 hours during business days. Premium customers receive responses in under 1 hour.",
+            "zh-CN":
+              "我们通常在工作日24小时内回复所有咨询。高级客户在1小时内收到回复。",
+          },
+          hash: "d8f1c0101ea596e4beccef667c0e306b",
+        },
+        "10/declaration/body/0/argument/3/3/1/15/3/3/1/1": {
+          content: {
+            en: "Do you offer phone support?",
+            "zh-CN": "你们提供电话支持吗？",
+          },
+          hash: "38bea8445adab2f746bc55a84129d2e0",
+        },
+        "10/declaration/body/0/argument/3/3/1/15/3/3/3/1": {
+          content: {
+            en: "Yes, phone support is available for enterprise customers. Standard tier customers can upgrade to access phone support.",
+            "zh-CN":
+              "是的，企业客户可以使用电话支持。标准客户可以升级以访问电话支持。",
+          },
+          hash: "4072e4f795164f990bcebf3e94f475d9",
+        },
+        "10/declaration/body/0/argument/3/3/1/15/3/5/1/1": {
+          content: {
+            en: "Can I schedule a demo?",
+            "zh-CN": "我可以安排演示吗？",
+          },
+          hash: "50b659e5fc0b8f4c3fc243f46ebd2b02",
+        },
+        "10/declaration/body/0/argument/3/3/1/15/3/5/3/1": {
+          content: {
+            en: "Absolutely! Contact our sales team via email or chat to schedule a personalized demo of our platform.",
+            "zh-CN":
+              "当然！通过电子邮件或聊天联系我们的销售团队，安排我们平台的个性化演示。",
+          },
+          hash: "bb9dbf722c4b51340778d8185980be07",
+        },
+        "10/declaration/body/0/argument/3/3/1/15/3/7/1/1": {
+          content: {
+            en: "Where can I find documentation?",
+            "zh-CN": "我在哪里可以找到文档？",
+          },
+          hash: "ca9577b416df20dc8f064b8d9dd43b80",
+        },
+        "10/declaration/body/0/argument/3/3/1/15/3/7/3/1": {
+          content: {
+            en: "Our comprehensive documentation covers all features, APIs, and integrations.",
+            "zh-CN": "我们全面的文档涵盖了所有功能、API和集成。",
+          },
+          hash: "4acf3c195fb77884b086f0f31f67fde3",
+        },
+        "10/declaration/body/0/argument/3/3/1/15/3/7/3/3/1/1": {
+          content: {
+            en: "View Docs",
+            "zh-CN": "查看文档",
+          },
+          hash: "7488d9bb340ad4a702bee203872b2555",
+        },
+        "10/declaration/body/0/argument/3/3/1/19/1/3": {
+          content: {
+            en: "Helpful Resources",
+            "zh-CN": "有用资源",
+          },
+          hash: "171835648cf4eb4b6187b05c47333bed",
+        },
+        "10/declaration/body/0/argument/3/3/1/19/3/1/1/1": {
+          content: {
+            en: "Documentation",
+            "zh-CN": "文档",
+          },
+          hash: "98506f4e2c9df2c74045b0716e9995cd",
+        },
+        "10/declaration/body/0/argument/3/3/1/19/3/1/1/3": {
+          content: {
+            en: "Complete guides and API references",
+            "zh-CN": "完整指南和API参考",
+          },
+          hash: "2727c73871a9e24ee65da9b96ec16096",
+        },
+        "10/declaration/body/0/argument/3/3/1/19/3/3/1/1": {
+          content: {
+            en: "Community Forum",
+            "zh-CN": "社区论坛",
+          },
+          hash: "57337b3bcf2fd61f0070b985d52ccf61",
+        },
+        "10/declaration/body/0/argument/3/3/1/19/3/3/1/3": {
+          content: {
+            en: "Connect with other developers",
+            "zh-CN": "与其他开发者联系",
+          },
+          hash: "81046f16434ce11b278f92839ab730ed",
+        },
+        "10/declaration/body/0/argument/3/3/1/19/3/5/1/1": {
+          content: {
+            en: "Status Page",
+            "zh-CN": "状态页面",
+          },
+          hash: "08f07ce9820e99112a218f36bedf9f86",
+        },
+        "10/declaration/body/0/argument/3/3/1/19/3/5/1/3": {
+          content: {
+            en: "Real-time system status updates",
+            "zh-CN": "实时系统状态更新",
+          },
+          hash: "807865a9c1c595e22e358bd177524187",
+        },
+        "10/declaration/body/0/argument/3/3/1/3/1/1": {
+          content: {
+            en: "CONTACT.md",
+            "zh-CN": "CONTACT.md",
+          },
+          hash: "7e99f1342dd036125d47b370caf201a8",
+        },
+        "10/declaration/body/0/argument/3/3/1/3/3": {
+          content: {
+            en: "Get in Touch",
+            "zh-CN": "联系我们",
+          },
+          hash: "259d5c4f7f17b771a15a8aa7240dce5c",
+        },
+        "10/declaration/body/0/argument/3/3/1/3/5": {
+          content: {
+            en: "Have questions? Need support? Want to collaborate? We're here to help. Choose your preferred channel below.",
+            "zh-CN":
+              "有问题？需要支持？想要合作？我们在这里提供帮助。请在下面选择您喜欢的渠道。",
+          },
+          hash: "ead6a019958ad31ed2adc173e25197e3",
+        },
+        "10/declaration/body/0/argument/3/3/1/7/1/3": {
+          content: {
+            en: "Contact Channels",
+            "zh-CN": "联系渠道",
+          },
+          hash: "023df2ce84ca5bd55e9fa6014d04e275",
+        },
+        "10/declaration/body/0/argument/3/3/1/7/3/1/1/3": {
+          content: {
+            en: "Email Support",
+            "zh-CN": "邮件支持",
+          },
+          hash: "947fb7c5c665079804df41c61161e722",
+        },
+        "10/declaration/body/0/argument/3/3/1/7/3/1/1/5": {
+          content: {
+            en: "EMAIL_GATEWAY",
+            "zh-CN": "EMAIL_GATEWAY",
+          },
+          hash: "c800b52828d3155194ee37fda03a38a0",
+        },
+        "10/declaration/body/0/argument/3/3/1/7/3/1/3/1": {
+          content: {
+            en: "Technical support via email",
+            "zh-CN": "通过电子邮件提供技术支持",
+          },
+          hash: "33d848d82bc97042c475fadb6260fc82",
+        },
+        "10/declaration/body/0/argument/3/3/1/7/3/1/3/3/1": {
+          content: {
+            en: "support@company.com",
+            "zh-CN": "support@company.com",
+          },
+          hash: "29d9a1414a2c52d0040a5cd5094b8f50",
+        },
+        "10/declaration/body/0/argument/3/3/1/7/3/3/1/3": {
+          content: {
+            en: "Live Chat",
+            "zh-CN": "在线聊天",
+          },
+          hash: "4bc82a4bd3f4626c5d7ff2f9e95f7fcd",
+        },
+        "10/declaration/body/0/argument/3/3/1/7/3/3/1/5": {
+          content: {
+            en: "CHAT_INTERFACE",
+            "zh-CN": "CHAT_INTERFACE",
+          },
+          hash: "5b377b20c00ad554a680f5c8ef12ca94",
+        },
+        "10/declaration/body/0/argument/3/3/1/7/3/3/3/1": {
+          content: {
+            en: "Real-time developer support",
+            "zh-CN": "实时开发者支持",
+          },
+          hash: "b502ada5850491a433810378ead609e9",
+        },
+        "10/declaration/body/0/argument/3/3/1/7/3/3/3/3/1": {
+          content: {
+            en: "Start Chat",
+            "zh-CN": "开始聊天",
+          },
+          hash: "91a0d757438a7a66bd8a2c1917ecc55d",
+        },
+        "10/declaration/body/0/argument/3/3/1/7/3/5/1/3": {
+          content: {
+            en: "Phone Support",
+            "zh-CN": "电话支持",
+          },
+          hash: "df302c3fb3bd7194dfac794b9dc5bab0",
+        },
+        "10/declaration/body/0/argument/3/3/1/7/3/5/1/5": {
+          content: {
+            en: "VOICE_CHANNEL",
+            "zh-CN": "VOICE_CHANNEL",
+          },
+          hash: "a2be6e3e69964dff8374a724219292b3",
+        },
+        "10/declaration/body/0/argument/3/3/1/7/3/5/3/1": {
+          content: {
+            en: "Direct engineering line",
+            "zh-CN": "直接工程线路",
+          },
+          hash: "87924e17be166bb9c35ccea5c8cc6dc7",
+        },
+        "10/declaration/body/0/argument/3/3/1/7/3/5/3/3/1": {
+          content: {
+            en: "+1 (555) 123-4567",
+            "zh-CN": "+1 (555) 123-4567",
+          },
+          hash: "91c0342e4f6e5ffdec745270e1709c45",
+        },
+        "10/declaration/body/0/argument/3/3/1/7/3/7/1/3": {
+          content: {
+            en: "Visit Us",
+            "zh-CN": "访问我们",
+          },
+          hash: "27266d1bd9474b97f479f50cc4573df3",
+        },
+        "10/declaration/body/0/argument/3/3/1/7/3/7/1/5": {
+          content: {
+            en: "PHYSICAL_LOCATION",
+            "zh-CN": "PHYSICAL_LOCATION",
+          },
+          hash: "836a2ecd1ffb6f4ad7fe27bd32ea63a0",
+        },
+        "10/declaration/body/0/argument/3/3/1/7/3/7/3/1": {
+          content: {
+            en: "Engineering headquarters",
+            "zh-CN": "工程总部",
+          },
+          hash: "f24b122c64f5f9cf60f6517bae5a0ea5",
+        },
+        "10/declaration/body/0/argument/3/3/1/7/3/7/3/3": {
+          content: {
+            en: "123 Business St, City, State 12345",
+            "zh-CN": "123 Business St, City, State 12345",
+          },
+          hash: "0bfe69828ecbcc415ebdf41a35c71acb",
+        },
+        "10/declaration/body/0/argument/7/1/1/1": {
+          content: {
+            en: "Ready to Get Started?",
+            "zh-CN": "准备开始了吗？",
+          },
+          hash: "c01f897d68725a79b36129650f344783",
+        },
+        "10/declaration/body/0/argument/7/1/1/3": {
+          content: {
+            en: "Join thousands of developers building amazing products with {COMPANY_NAME}.",
+            "zh-CN": "加入数千名使用{COMPANY_NAME}构建出色产品的开发者。",
+          },
+          hash: "d4d51905470a6b20510e5302bbbbabe1",
+        },
+        "10/declaration/body/0/argument/7/1/1/5/1/1": {
+          content: {
+            en: "View Pricing",
+            "zh-CN": "查看定价",
+          },
+          hash: "a61d50b68ea0a6de50e09b4e27fcba70",
+        },
+        "10/declaration/body/0/argument/7/1/1/5/3/1": {
+          content: {
+            en: "Learn More",
+            "zh-CN": "了解更多",
+          },
+          hash: "1d49a231c2f3fe8f1fd3997a9e74fdef",
+        },
         "7/declaration/body/0/argument/3/3/1/1/3": {
           content: {
             en: "We're here to help",
@@ -799,12 +1651,246 @@ export default {
     },
     "(pages)/pricing/page.tsx": {
       entries: {
+        "11/declaration/body/0/argument/3/3/1/11/1/3": {
+          content: {
+            en: "Platform Specifications",
+            "zh-CN": "平台规格",
+          },
+          hash: "11fd6a620f81152fa23c908a2bec5e19",
+        },
+        "11/declaration/body/0/argument/3/3/1/11/3": {
+          content: {
+            en: "Core infrastructure capabilities included in all plans",
+            "zh-CN": "所有计划中包含的核心基础设施功能",
+          },
+          hash: "f58ff78274c7cf94731690f71b5725e3",
+        },
+        "11/declaration/body/0/argument/3/3/1/11/5/1/1/3": {
+          content: {
+            en: "7-Day Trial",
+            "zh-CN": "7天试用",
+          },
+          hash: "d5714988c9bada5a72d76944017327fa",
+        },
+        "11/declaration/body/0/argument/3/3/1/11/5/1/1/5": {
+          content: {
+            en: "NO_CC_REQUIRED",
+            "zh-CN": "NO_CC_REQUIRED",
+          },
+          hash: "166ce62323cfec43b2881b898bd532cc",
+        },
+        "11/declaration/body/0/argument/3/3/1/11/5/1/3/1": {
+          content: {
+            en: "Full access to all features. No credit card required for dev environment.",
+            "zh-CN": "完全访问所有功能。开发环境不需要信用卡。",
+          },
+          hash: "5def49ea61cbaaa57efb7842af128abb",
+        },
+        "11/declaration/body/0/argument/3/3/1/11/5/3/1/3": {
+          content: {
+            en: "Instant Provisioning",
+            "zh-CN": "即时配置",
+          },
+          hash: "565388423ac1022f4331d7e510edb4b4",
+        },
+        "11/declaration/body/0/argument/3/3/1/11/5/3/1/5": {
+          content: {
+            en: "AUTOMATED_SETUP",
+            "zh-CN": "AUTOMATED_SETUP",
+          },
+          hash: "d9d9f9f4a59ba79511f557b81a10ce59",
+        },
+        "11/declaration/body/0/argument/3/3/1/11/5/3/3/1": {
+          content: {
+            en: "Your environment is ready in less than 60 seconds. Zero configuration needed.",
+            "zh-CN": "您的环境在60秒内准备就绪。无需配置。",
+          },
+          hash: "a43bde944ec89dc3ee5ed9bba4be3f28",
+        },
+        "11/declaration/body/0/argument/3/3/1/11/5/5/1/3": {
+          content: {
+            en: "Enterprise Grade",
+            "zh-CN": "企业级",
+          },
+          hash: "c188b36bbc683ec6313805541b79675e",
+        },
+        "11/declaration/body/0/argument/3/3/1/11/5/5/1/5": {
+          content: {
+            en: "SOC2_TYPE_II",
+            "zh-CN": "SOC2_TYPE_II",
+          },
+          hash: "9c3b722bff634cad41abf3eeefbfe63b",
+        },
+        "11/declaration/body/0/argument/3/3/1/11/5/5/3/1": {
+          content: {
+            en: "Compliant infrastructure with 99.99% uptime SLA guarantee.",
+            "zh-CN": "合规的基础设施，保证99.99%的正常运行时间SLA。",
+          },
+          hash: "1f6b0b4ee94b27e653c50b2f8c803808",
+        },
+        "11/declaration/body/0/argument/3/3/1/11/5/7/1/3": {
+          content: {
+            en: "24/7 Support",
+            "zh-CN": "24/7支持",
+          },
+          hash: "41b957275735db9c4656358398295e95",
+        },
+        "11/declaration/body/0/argument/3/3/1/11/5/7/1/5": {
+          content: {
+            en: "ENGINEERING_DIRECT",
+            "zh-CN": "ENGINEERING_DIRECT",
+          },
+          hash: "38a71ea0f3ce4426a0c3b24b59fc79a5",
+        },
+        "11/declaration/body/0/argument/3/3/1/11/5/7/3/1": {
+          content: {
+            en: "Direct access to engineering team via Slack or Discord.",
+            "zh-CN": "通过Slack或Discord直接访问工程团队。",
+          },
+          hash: "17fa40495e507429e7dc1ff92eedf88c",
+        },
+        "11/declaration/body/0/argument/3/3/1/15/1/3": {
+          content: {
+            en: "Security & Compliance",
+            "zh-CN": "安全与合规",
+          },
+          hash: "dab33ff2909fb602784cebc142da6dfe",
+        },
+        "11/declaration/body/0/argument/3/3/1/15/3": {
+          content: {
+            en: "/security/certifications",
+            "zh-CN": "/security/certifications",
+          },
+          hash: "8a07c67312eec03c904f39182baf9cfd",
+        },
+        "11/declaration/body/0/argument/3/3/1/15/5/1/1/3": {
+          content: {
+            en: "SSL_ENCRYPTED",
+            "zh-CN": "SSL_ENCRYPTED",
+          },
+          hash: "c38410af8db4fe7d7a7292e6f5e4b654",
+        },
+        "11/declaration/body/0/argument/3/3/1/15/5/1/1/5": {
+          content: {
+            en: "TLS 1.3",
+            "zh-CN": "TLS 1.3",
+          },
+          hash: "f2fc5e4de7e72da19c1f0749b713f7bd",
+        },
+        "11/declaration/body/0/argument/3/3/1/15/5/3/1/3": {
+          content: {
+            en: "SOC2_COMPLIANT",
+            "zh-CN": "SOC2_COMPLIANT",
+          },
+          hash: "7cd82a5a7eeffa17dc17834d4f6ca98f",
+        },
+        "11/declaration/body/0/argument/3/3/1/15/5/3/1/5": {
+          content: {
+            en: "Type II",
+            "zh-CN": "Type II",
+          },
+          hash: "993e4ed03f30bcabd9419176fec5cc57",
+        },
+        "11/declaration/body/0/argument/3/3/1/15/5/5/1/3": {
+          content: {
+            en: "GDPR_READY",
+            "zh-CN": "GDPR_READY",
+          },
+          hash: "55c7ef3fdbeaa620b23311983e639177",
+        },
+        "11/declaration/body/0/argument/3/3/1/15/5/5/1/5": {
+          content: {
+            en: "EU Data Protection",
+            "zh-CN": "欧盟数据保护",
+          },
+          hash: "27587d5899f52e9ec194c5dd2a31bc18",
+        },
+        "11/declaration/body/0/argument/3/3/1/15/5/7/1/3": {
+          content: {
+            en: "PCI_DSS",
+            "zh-CN": "PCI_DSS",
+          },
+          hash: "d3dd013bc3a5c9413117290f614f5e11",
+        },
+        "11/declaration/body/0/argument/3/3/1/15/5/7/1/5": {
+          content: {
+            en: "Level 1",
+            "zh-CN": "Level 1",
+          },
+          hash: "0e4165d0bab13912883e1c0b54e08ad7",
+        },
+        "11/declaration/body/0/argument/3/3/1/19/1/3": {
+          content: {
+            en: "Supported Payment Methods",
+            "zh-CN": "支持的支付方式",
+          },
+          hash: "facfd3e8dffb6455c677820d37e012fa",
+        },
+        "11/declaration/body/0/argument/3/3/1/19/5/1": {
+          content: {
+            en: "infrastructure_provider: <element:span>{PAYMENT_PROVIDER}</element:span>",
+            "zh-CN":
+              "infrastructure_provider: <element:span>{PAYMENT_PROVIDER}</element:span>",
+          },
+          hash: "1afd520cb1dfce99956636d97767d63d",
+        },
+        "11/declaration/body/0/argument/3/3/1/3/1/1": {
+          content: {
+            en: "PRICING.md",
+            "zh-CN": "PRICING.md",
+          },
+          hash: "090c47844a8c58ef5120bbe18504232f",
+        },
+        "11/declaration/body/0/argument/3/3/1/3/3": {
+          content: {
+            en: "Simple, transparent pricing",
+            "zh-CN": "简单透明的定价",
+          },
+          hash: "248b7c42a28bf355db0bd7d4b56c0ea0",
+        },
+        "11/declaration/body/0/argument/3/3/1/3/5": {
+          content: {
+            en: "Choose the plan that works best for your needs. No hidden fees, no surprises. Start building today.",
+            "zh-CN":
+              "选择最适合您需求的计划。无隐藏费用，无意外惊喜。立即开始构建。",
+          },
+          hash: "a07ce3e0cee112c671f4b731a52a16c9",
+        },
+        "11/declaration/body/0/argument/7/1/1/1": {
+          content: {
+            en: "Need a Custom Plan?",
+            "zh-CN": "需要定制计划吗？",
+          },
+          hash: "decae040575930f43e293b1c776d4a23",
+        },
+        "11/declaration/body/0/argument/7/1/1/3": {
+          content: {
+            en: "Enterprise customers with specific requirements can contact our sales team for tailored solutions.",
+            "zh-CN":
+              "有特定要求的企业客户可以联系我们的销售团队获取定制解决方案。",
+          },
+          hash: "4d24d8aa93b390c7874b1e97abac8611",
+        },
+        "11/declaration/body/0/argument/7/1/1/5/1/1": {
+          content: {
+            en: "Contact Sales",
+            "zh-CN": "联系销售",
+          },
+          hash: "94537da970ffef6210bba8fcecb74a8c",
+        },
+        "11/declaration/body/0/argument/7/1/1/5/3/1": {
+          content: {
+            en: "Learn More",
+            "zh-CN": "了解更多",
+          },
+          hash: "1d49a231c2f3fe8f1fd3997a9e74fdef",
+        },
         "7/declaration/body/0/argument/3/3/1/1/1/1": {
           content: {
-            en: "💰 Transparent Pricing",
-            "zh-CN": "💰 透明定价",
+            en: "pricing_plans.json",
+            "zh-CN": "pricing_plans.json",
           },
-          hash: "d8dd2e7df57736b62c6859c12829896c",
+          hash: "d15f9e7c28ac3520f82230381529bf90",
         },
         "7/declaration/body/0/argument/3/3/1/1/3": {
           content: {
@@ -823,17 +1909,17 @@ export default {
         },
         "7/declaration/body/0/argument/3/3/1/7/1/1": {
           content: {
-            en: "Why choose our platform?",
-            "zh-CN": "为什么选择我们的平台？",
+            en: "Platform Specifications",
+            "zh-CN": "平台技术规格",
           },
-          hash: "675c9e6f6808172bc0789571b3f05fac",
+          hash: "d04f7508f053d787b9ae5c584d119e79",
         },
         "7/declaration/body/0/argument/3/3/1/7/1/3": {
           content: {
-            en: "Join thousands of satisfied customers who trust our secure, reliable platform",
-            "zh-CN": "加入数千名信任我们安全可靠平台的满意客户",
+            en: "Core infrastructure capabilities included in all plans",
+            "zh-CN": "所有套餐包含的核心基础设施功能",
           },
-          hash: "e6222e4a360b97ec21953e533ee245aa",
+          hash: "1691bd891fba6e7277b9d8991df7e604",
         },
         "7/declaration/body/0/argument/3/3/1/7/1/5/1/3/1": {
           content: {
@@ -906,54 +1992,146 @@ export default {
           },
           hash: "c513f3350ebd80ca297beaa30725f653",
         },
+        "7/declaration/body/0/argument/3/3/1/7/3/1/3": {
+          content: {
+            en: "7-Day Trial",
+            "zh-CN": "7天免费试用",
+          },
+          hash: "de4c81ddd53f1db6003333a8c0fc1dd2",
+        },
+        "7/declaration/body/0/argument/3/3/1/7/3/1/5": {
+          content: {
+            en: "Full access to all features. No credit card required for dev environment.",
+            "zh-CN": "完全访问所有功能。开发环境无需信用卡。",
+          },
+          hash: "cebb0340636a8a6c26593ded65b27cd6",
+        },
+        "7/declaration/body/0/argument/3/3/1/7/3/3/3": {
+          content: {
+            en: "Instant Provisioning",
+            "zh-CN": "即时配置",
+          },
+          hash: "6b6e1395f8cedf888259b848b0207ac5",
+        },
+        "7/declaration/body/0/argument/3/3/1/7/3/3/5": {
+          content: {
+            en: "Automated setup. Your environment is ready in less than 60 seconds.",
+            "zh-CN": "自动化设置。您的环境在60秒内准备就绪。",
+          },
+          hash: "516d5b7ae893d693b669bf11bd8df72f",
+        },
+        "7/declaration/body/0/argument/3/3/1/7/3/5/3": {
+          content: {
+            en: "Enterprise Grade",
+            "zh-CN": "企业级",
+          },
+          hash: "a7e744d2f5182ed121faab19402f7d66",
+        },
+        "7/declaration/body/0/argument/3/3/1/7/3/5/5": {
+          content: {
+            en: "SOC2 Type II compliant infrastructure with 99.99% uptime SLA.",
+            "zh-CN":
+              "符合SOC2 Type II标准的基础设施，提供99.99%正常运行时间服务等级协议。",
+          },
+          hash: "ec05b25812a93b8bf81bc14f83a32696",
+        },
+        "7/declaration/body/0/argument/3/3/1/7/3/7/3": {
+          content: {
+            en: "24/7 Support",
+            "zh-CN": "24/7支持",
+          },
+          hash: "963e280a138d1729c1726df17673b6af",
+        },
+        "7/declaration/body/0/argument/3/3/1/7/3/7/5": {
+          content: {
+            en: "Direct access to engineering team via Slack or Discord.",
+            "zh-CN": "通过Slack或Discord直接访问工程团队。",
+          },
+          hash: "053262e07777e39e7b95eb26e3b60b30",
+        },
+        "7/declaration/body/0/argument/3/3/1/7/5/1": {
+          content: {
+            en: "Have questions about custom requirements? <element:a>Contact Engineering Sales</element:a>",
+            "zh-CN": "对定制需求有疑问？<element:a>联系工程销售</element:a>",
+          },
+          hash: "be92fa85efad432b860220cdcf19083d",
+        },
         "7/declaration/body/0/argument/7/1/1/1": {
           content: {
-            en: "Security & Compliance",
-            "zh-CN": "安全与合规",
+            en: "Compliance Matrix",
+            "zh-CN": "合规性矩阵",
           },
-          hash: "f955a7931cd6cf387d344ca3cd8fec1a",
+          hash: "04c3503a84ae4ac93fa877b78faa44f8",
         },
         "7/declaration/body/0/argument/7/1/1/3": {
           content: {
-            en: "Industry-leading security standards and certifications",
-            "zh-CN": "行业领先的安全标准和认证",
+            en: "/security/certifications",
+            "zh-CN": "/security/certifications",
           },
-          hash: "e0deb5147392cec8ffad20344ff4bb04",
+          hash: "4fc5674df4ccf86970de8ab313a970ba",
         },
         "7/declaration/body/0/argument/7/1/5/1/3": {
           content: {
-            en: "SSL Encrypted",
-            "zh-CN": "SSL加密",
+            en: "SSL_ENCRYPTED",
+            "zh-CN": "SSL_ENCRYPTED",
           },
-          hash: "667a88236040eb3b48f7d5c83d513d7f",
+          hash: "e6341922307595fcbd8b2fc3ff002866",
+        },
+        "7/declaration/body/0/argument/7/1/5/1/5": {
+          content: {
+            en: "TLS 1.3",
+            "zh-CN": "TLS 1.3",
+          },
+          hash: "6e09322bdacdb232de35776263600efc",
         },
         "7/declaration/body/0/argument/7/1/5/3/3": {
           content: {
-            en: "SOC 2 Compliant",
-            "zh-CN": "SOC 2合规",
+            en: "SOC2_COMPLIANT",
+            "zh-CN": "SOC2_COMPLIANT",
           },
-          hash: "03b49c91bd5c918fe5df36e501bdcfb3",
+          hash: "bab3fd40f7b06e7b6a6e6dc36c4039c8",
+        },
+        "7/declaration/body/0/argument/7/1/5/3/5": {
+          content: {
+            en: "Type II",
+            "zh-CN": "Type II",
+          },
+          hash: "ffdfad44fb00f629a6af48fbf9421073",
         },
         "7/declaration/body/0/argument/7/1/5/5/3": {
           content: {
-            en: "GDPR Ready",
-            "zh-CN": "GDPR就绪",
+            en: "GDPR_READY",
+            "zh-CN": "GDPR_READY",
           },
-          hash: "9ad8cfb04f5e07584c3e6fc4926c9101",
+          hash: "a803c2237f2ddb291d2146953d768b6d",
+        },
+        "7/declaration/body/0/argument/7/1/5/5/5": {
+          content: {
+            en: "EU Data",
+            "zh-CN": "欧盟数据",
+          },
+          hash: "1368ed2745988ef97d6dfd3f1d9d4ce0",
         },
         "7/declaration/body/0/argument/7/1/5/7/3": {
           content: {
-            en: "PCI DSS Level 1",
-            "zh-CN": "PCI DSS 1级",
+            en: "PCI_DSS",
+            "zh-CN": "PCI_DSS",
           },
-          hash: "03327b8bb683509ae14af6a6c86a12fa",
+          hash: "d3dd013bc3a5c9413117290f614f5e11",
+        },
+        "7/declaration/body/0/argument/7/1/5/7/5": {
+          content: {
+            en: "Level 1",
+            "zh-CN": "Level 1",
+          },
+          hash: "4cbb6d9f0620c1d55b84283c0159e77e",
         },
         "7/declaration/body/0/argument/7/1/9/1": {
           content: {
-            en: "Accepted payment methods",
-            "zh-CN": "接受的支付方式",
+            en: "Supported Gateways",
+            "zh-CN": "支持的网关",
           },
-          hash: "35eb4b29df3c4e26fbe6f4cfebde3eb5",
+          hash: "fec065a0a8f1ec0d75b31bd0adfff732",
         },
         "7/declaration/body/0/argument/7/1/9/3/1/1": {
           content: {
@@ -992,11 +2170,11 @@ export default {
         },
         "7/declaration/body/0/argument/7/1/9/7/1": {
           content: {
-            en: "Powered by <element:span>{PAYMENT_PROVIDER}</element:span> - Modern Payment Infrastructure",
+            en: "infrastructure_provider: <element:span>{PAYMENT_PROVIDER}</element:span>",
             "zh-CN":
-              "由 <element:span>{PAYMENT_PROVIDER}</element:span> 提供支持 - 现代支付基础设施",
+              "基础设施提供商：<element:span>{PAYMENT_PROVIDER}</element:span>",
           },
-          hash: "e2d7eaf3b1d89e7015b3db298b439379",
+          hash: "56080e38b3270734642463d080f5d76e",
         },
       },
     },
@@ -4273,14 +5451,12 @@ export default {
         },
         "6/declaration/body/5/argument/1/1/7/3/7/3/3/21/1": {
           content: {
-            en: "✓ Ready in 1.2s",
             "zh-CN": "✓ 1.2秒后准备就绪",
           },
           hash: "df1b3893a8d70531c38c2795d675698e",
         },
         "6/declaration/body/5/argument/1/1/7/3/7/3/3/21/3": {
           content: {
-            en: "○ Local: <element:span>http://localhost:3000</element:span>",
             "zh-CN": "○ 本地：",
           },
           hash: "de85a3b9161c411cb69b53420a65c4e4",
@@ -4294,10 +5470,11 @@ export default {
         },
         "6/declaration/body/5/argument/1/1/7/3/7/3/3/3": {
           content: {
-            en: "<element:span>➜</element:span> git clone https://github.com/ullrai/saas-starter",
-            "zh-CN": "git clone https://github.com/ullrai/saas-starter",
+            en: "<element:span>➜</element:span> git clone https://github.com/UllrAI/SaaS-Starter.git",
+            "zh-CN":
+              "<element:span>➜</element:span> git clone https://github.com/UllrAI/SaaS-Starter.git",
           },
-          hash: "2eafec112c559d2c4b30443b67ccf25c",
+          hash: "baa46e1d1dafaff325234f1b8b46f559",
         },
         "6/declaration/body/5/argument/1/1/7/3/7/3/3/5": {
           content: {
@@ -4309,9 +5486,9 @@ export default {
         "6/declaration/body/5/argument/1/1/7/3/7/3/3/9": {
           content: {
             en: "<element:span>➜</element:span> cp .env.example .env",
-            "zh-CN": "cp .env.example .env",
+            "zh-CN": "<element:span>➜</element:span> cp .env.example .env",
           },
-          hash: "9f6dede3951f99228352db09df537461",
+          hash: "4cb8bd2adf9586bcaa55a8e333258e38",
         },
         "6/declaration/body/5/argument/1/1/7/3/7/7/1/1": {
           content: {
@@ -4413,10 +5590,56 @@ export default {
         },
         "6/declaration/body/5/argument/1/1/7/3/7/7/7/1": {
           content: {
-            en: "Built with <element:span>Next.js 15</element:span> + <element:span>shadcn/ui</element:span>",
-            "zh-CN": "使用+构建",
+            en: "<element:React.Fragment>Built with </element:React.Fragment><element:span>Next.js 15</element:span>+ <element:span>shadcn/ui</element:span>",
+            "zh-CN":
+              "<element:React.Fragment>使用</element:React.Fragment><element:span>Next.js 15</element:span>+ <element:span>shadcn/ui</element:span>",
           },
-          hash: "f76ef3db186b495e3935895a85d56f71",
+          hash: "49862237f46c4d662a6af0ead0c1c321",
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/7/7/1/1": {
+          content: {
+            en: "Built with",
+            "zh-CN": "使用",
+          },
+          hash: "daa64d7fb8b9ff0e8084dcef7bf9fb3f",
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/7/7/1/3": {
+          content: {
+            "zh-CN": "Next.js 15",
+          },
+          hash: "6eb0a7c408f3eaa826dbb9e17a82fd09",
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/7/7/1/4": {
+          content: {
+            "zh-CN": "Next.js 15",
+          },
+          hash: "6eb0a7c408f3eaa826dbb9e17a82fd09",
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/7/7/1/5": {
+          content: {
+            en: " + ",
+            "zh-CN": "+",
+          },
+          hash: "2286b28fa37112af76d6f5952c4b928e",
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/7/7/1/6": {
+          content: {
+            en: " + ",
+            "zh-CN": "+",
+          },
+          hash: "7123bc5f2dcf59a6d63730fd779aff41",
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/7/7/1/7": {
+          content: {
+            "zh-CN": "shadcn/ui",
+          },
+          hash: "7d822f489eee28c06512ad7f06e78bb7",
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/7/7/1/8": {
+          content: {
+            "zh-CN": "shadcn/ui",
+          },
+          hash: "7d822f489eee28c06512ad7f06e78bb7",
         },
         "7/declaration/body/0/argument/1/1/3/15/1/1": {
           content: {
@@ -5261,18 +6484,18 @@ export default {
         "16/declaration/body/8/argument/11/1/expression/0/body/3/argument/1/expression/right/1":
           {
             content: {
-              en: "<element:Star></element:Star> Most Popular",
-              "zh-CN": "<element:Star></element:Star> 最受欢迎",
+              en: "RECOMMENDED",
+              "zh-CN": "推荐",
             },
-            hash: "69b93512dcde68b518e5270c8f255437",
+            hash: "62cbd692b99041a965210318b3df0fc5",
           },
         "16/declaration/body/8/argument/11/1/expression/0/body/3/argument/3/5/1/3/expression/right":
           {
             content: {
-              en: "/month",
+              en: "/mo",
               "zh-CN": "/月",
             },
-            hash: "f841f6620ce95fd3c7f624660cbafe92",
+            hash: "5a72add5eeaf56befe83236eb0ab7b01",
           },
         "16/declaration/body/8/argument/11/1/expression/0/body/3/argument/3/5/3/1/1/expression/alternate/alternate":
           {
@@ -5325,18 +6548,18 @@ export default {
         "16/declaration/body/8/argument/11/1/expression/0/body/3/argument/5/5/expression/alternate/1/expression/alternate/alternate":
           {
             content: {
-              en: "Get {tier.label}",
-              "zh-CN": "获取 {tier.label}",
+              en: "GET <function:tier.name.toUpperCase/><element:Terminal></element:Terminal>",
+              "zh-CN": "获取",
             },
-            hash: "7954c772ab8c27b23fae6d341c53d577",
+            hash: "7ecd4ea1a11514a56c79a597a62973b8",
           },
         "16/declaration/body/8/argument/11/1/expression/0/body/3/argument/5/5/expression/alternate/1/expression/alternate/consequent":
           {
             content: {
-              en: "<element:LogIn></element:LogIn> Login to Get {tier.name}",
-              "zh-CN": "<element:LogIn></element:LogIn> 登录以获取{tier.name}",
+              en: "<element:LogIn></element:LogIn> LOGIN TO BUY",
+              "zh-CN": "登录购买",
             },
-            hash: "14d5f16d813ef8547595bc2cf5165715",
+            hash: "6e1d8edc3970fd04d5f82fd5306c76fe",
           },
         "16/declaration/body/8/argument/11/1/expression/0/body/3/argument/5/5/expression/alternate/1/expression/alternate/consequent/3":
           {
@@ -5349,10 +6572,10 @@ export default {
         "16/declaration/body/8/argument/11/1/expression/0/body/3/argument/5/5/expression/alternate/1/expression/consequent":
           {
             content: {
-              en: "<element:Loader2></element:Loader2> Processing...",
-              "zh-CN": "<element:Loader2></element:Loader2> 处理中...",
+              en: "<element:Loader2></element:Loader2> PROCESSING",
+              "zh-CN": "处理中",
             },
-            hash: "63a4b31ce7f5507b3bcfac196a87417f",
+            hash: "f0ace61297d2644d5103042209d2f2c0",
           },
         "16/declaration/body/8/argument/11/1/expression/0/body/6/argument/1/expression/right/1":
           {
@@ -5435,10 +6658,10 @@ export default {
         },
         "16/declaration/body/8/argument/3/1/1/3": {
           content: {
-            en: "<element:CreditCard></element:CreditCard> One-time",
-            "zh-CN": "<element:CreditCard></element:CreditCard> 一次性",
+            en: "<element:CreditCard></element:CreditCard> Lifetime",
+            "zh-CN": "<element:CreditCard></element:CreditCard> 终身",
           },
-          hash: "cb77aeda84fdf50124cba9b2bbe6047d",
+          hash: "2c769b1f59a704731d9364d2348ea1e5",
         },
         "16/declaration/body/8/argument/7/expression/right/1/1": {
           content: {
@@ -5457,10 +6680,10 @@ export default {
         "16/declaration/body/8/argument/7/expression/right/3/1/expression/right":
           {
             content: {
-              en: "<element:Zap></element:Zap> Save 17% with yearly billing",
-              "zh-CN": "<element:Zap></element:Zap> 年付可节省17%",
+              en: "<element:Zap></element:Zap> Save 17%",
+              "zh-CN": "<element:Zap></element:Zap> 节省17%",
             },
-            hash: "5265300527ba1f5f86c9bee3438b3daf",
+            hash: "3fea85118ebd53118289344dafc0705f",
           },
         "18/declaration/body/11/argument/11/1/expression/0/body/6/argument/1/expression/right/1":
           {
@@ -7095,40 +8318,341 @@ export default {
     },
     "dashboard/page.tsx": {
       entries: {
-        "8/declaration/body/0/argument-title": {
+        "7/declaration/body/0/argument-title": {
           content: {
-            en: "Home",
-            "zh-CN": "主页",
+            en: "Dashboard",
+            "zh-CN": "仪表板",
           },
-          hash: "104a3db3b671c04e167eafbe21e57881",
+          hash: "c9380ea68c8c76ea451bd9613329a07c",
         },
-        "8/declaration/body/0/argument/11/1/1/1": {
+        "7/declaration/body/0/argument/11/1/1/1": {
           content: {
-            en: "<element:Zap></element:Zap> Quick Actions",
-            "zh-CN": "<element:Zap></element:Zap> 快速操作",
-          },
-          hash: "54e8f80bede970eadb800eba1cff2b61",
-        },
-        "8/declaration/body/0/argument/11/1/1/3": {
-          content: {
-            en: "Common tasks to help you get started",
-            "zh-CN": "帮助您入门的常见任务",
-          },
-          hash: "f50b7fc60ff0236fac6fef9d67e79ea3",
-        },
-        "8/declaration/body/0/argument/11/3/1/1": {
-          content: {
-            en: "<element:Activity></element:Activity> Recent Activity",
-            "zh-CN": "<element:Activity></element:Activity> 最近活动",
+            en: "<element:Terminal></element:Terminal> Recent Activity",
+            "zh-CN": "<element:Terminal></element:Terminal> 最近活动",
           },
           hash: "ac71a73fc53d25753f37379fe32008bb",
         },
+        "7/declaration/body/0/argument/11/1/1/3": {
+          content: {
+            en: "Latest system events and logs",
+            "zh-CN": "最新的系统事件和日志",
+          },
+          hash: "dd5d5bb5dbaae37705e849877e2586e4",
+        },
+        "7/declaration/body/0/argument/11/1/3/1/1/3/1": {
+          content: {
+            en: "New user registered",
+            "zh-CN": "新用户注册",
+          },
+          hash: "5fbcb82d3b44d0bdfda8bf4c56e16aa2",
+        },
+        "7/declaration/body/0/argument/11/1/3/1/1/3/3": {
+          content: {
+            en: "user_id: 8923 • 2m ago",
+            "zh-CN": "user_id: 8923 • 2分钟前",
+          },
+          hash: "ca6a11e06c9c442bc9df1374560d60bc",
+        },
+        "7/declaration/body/0/argument/11/1/3/1/3/3/1": {
+          content: {
+            en: "Payment received",
+            "zh-CN": "收到付款",
+          },
+          hash: "874860fd1eecc451b7187f0766cea6ba",
+        },
+        "7/declaration/body/0/argument/11/1/3/1/3/3/3": {
+          content: {
+            en: "inv_2930 • $49.00 • 5m ago",
+            "zh-CN": "inv_2930 • $49.00 • 5分钟前",
+          },
+          hash: "fa188b7039a006c376101eb7c58a9bd4",
+        },
+        "7/declaration/body/0/argument/11/1/3/1/5/3/1": {
+          content: {
+            en: "Feature deployed",
+            "zh-CN": "功能已部署",
+          },
+          hash: "b6705533cd498801c84a718ef6cd2ab7",
+        },
+        "7/declaration/body/0/argument/11/1/3/1/5/3/3": {
+          content: {
+            en: "v2.4.0 • main_branch • 1h ago",
+            "zh-CN": "v2.4.0 • main_branch • 1小时前",
+          },
+          hash: "8603dce70af73112f98baabe4a667814",
+        },
+        "7/declaration/body/0/argument/11/3/1/1": {
+          content: {
+            en: "<element:Clock></element:Clock> Quick Actions",
+            "zh-CN": "<element:Clock></element:Clock> 快速操作",
+          },
+          hash: "54e8f80bede970eadb800eba1cff2b61",
+        },
+        "7/declaration/body/0/argument/11/3/1/3": {
+          content: {
+            en: "Common administrative tasks",
+            "zh-CN": "常见的管理任务",
+          },
+          hash: "e437ce614a8836bffb1d18ec558059d6",
+        },
+        "7/declaration/body/0/argument/11/3/3/1/1": {
+          content: {
+            en: "<element:ArrowUpRight></element:ArrowUpRight> Upgrade Plan",
+            "zh-CN": "<element:ArrowUpRight></element:ArrowUpRight> 升级计划",
+          },
+          hash: "30697a26bf1f752f9f8298de06601f63",
+        },
+        "7/declaration/body/0/argument/11/3/3/1/3": {
+          content: {
+            en: "<element:Users></element:Users> Manage Team",
+            "zh-CN": "<element:Users></element:Users> 管理团队",
+          },
+          hash: "2bf0a9d4cf82169205aaf6264b94a890",
+        },
+        "7/declaration/body/0/argument/11/3/3/1/5": {
+          content: {
+            en: "<element:CheckCircle2></element:CheckCircle2> Verify Domain",
+            "zh-CN": "<element:CheckCircle2></element:CheckCircle2> 验证域名",
+          },
+          hash: "ca18256678429180a3eaca129eba519d",
+        },
+        "7/declaration/body/0/argument/3/1/1/3": {
+          content: {
+            en: "system_status",
+            "zh-CN": "system_status",
+          },
+          hash: "3bef8a05bb46de82ff9f62caf7ac5a35",
+        },
+        "7/declaration/body/0/argument/3/1/3/3": {
+          content: {
+            en: "ONLINE",
+            "zh-CN": "ONLINE",
+          },
+          hash: "c16c45fac98d1058cfe2959e5c4734a2",
+        },
+        "7/declaration/body/0/argument/3/3/1/1": {
+          content: {
+            en: "Welcome back, User",
+            "zh-CN": "欢迎回来，用户",
+          },
+          hash: "aa426039cb55538a7774641a4bdfe56b",
+        },
+        "7/declaration/body/0/argument/3/3/1/3": {
+          content: {
+            en: "System is running smoothly. All services operational.",
+            "zh-CN": "系统运行正常，所有服务均正常运行。",
+          },
+          hash: "6e91c04ae89e31d570837904a81a0853",
+        },
+        "7/declaration/body/0/argument/3/3/3/1": {
+          content: {
+            en: "<element:Zap></element:Zap> Deploy New Project",
+            "zh-CN": "<element:Zap></element:Zap> 部署新项目",
+          },
+          hash: "957cb844b5c6024c335628922fcde5be",
+        },
+        "7/declaration/body/0/argument/3/3/3/3": {
+          content: {
+            en: "<element:Activity></element:Activity> View Logs",
+            "zh-CN": "<element:Activity></element:Activity> 查看日志",
+          },
+          hash: "08249111d402ca2b2d44c86e177a19d1",
+        },
+        "7/declaration/body/0/argument/7/1/1/1": {
+          content: {
+            en: "Total Revenue",
+            "zh-CN": "总收入",
+          },
+          hash: "de2f7a9155ab8c2938ddaf03b2fb7854",
+        },
+        "7/declaration/body/0/argument/7/1/3/1": {
+          content: {
+            en: "$45,231.89",
+            "zh-CN": "$45,231.89",
+          },
+          hash: "bf002ce6a57d2e15ba04947b8ac3e81d",
+        },
+        "7/declaration/body/0/argument/7/1/3/3/1": {
+          content: {
+            en: "<element:TrendingUp></element:TrendingUp> +20.1%",
+            "zh-CN": "<element:TrendingUp></element:TrendingUp> +20.1%",
+          },
+          hash: "7b9a6430d51e20ff9850b34d23215f95",
+        },
+        "7/declaration/body/0/argument/7/1/3/3/3": {
+          content: {
+            en: "from last month",
+            "zh-CN": "相比上月",
+          },
+          hash: "fa633b17714eb94793f336520083e4b4",
+        },
+        "7/declaration/body/0/argument/7/3/1/1": {
+          content: {
+            en: "Active Users",
+            "zh-CN": "活跃用户",
+          },
+          hash: "561a1f7ef3881ed535efdf1609868f93",
+        },
+        "7/declaration/body/0/argument/7/3/3/1": {
+          content: {
+            en: "+2,350",
+            "zh-CN": "+2,350",
+          },
+          hash: "73b89b70d05ed744122281082f3cbf75",
+        },
+        "7/declaration/body/0/argument/7/3/3/3/1": {
+          content: {
+            en: "<element:TrendingUp></element:TrendingUp> +180.1%",
+            "zh-CN": "<element:TrendingUp></element:TrendingUp> +180.1%",
+          },
+          hash: "8cb25c59cc530b0eb3ee8024972cf1d6",
+        },
+        "7/declaration/body/0/argument/7/3/3/3/3": {
+          content: {
+            en: "from last month",
+            "zh-CN": "相比上月",
+          },
+          hash: "fa633b17714eb94793f336520083e4b4",
+        },
+        "7/declaration/body/0/argument/7/5/1/1": {
+          content: {
+            en: "Conversions",
+            "zh-CN": "转化率",
+          },
+          hash: "5fcef29a380b5d6739a6888e064d4571",
+        },
+        "7/declaration/body/0/argument/7/5/3/1": {
+          content: {
+            en: "+12,234",
+            "zh-CN": "+12,234",
+          },
+          hash: "257980376e2b78e15b900a1a3f7918fa",
+        },
+        "7/declaration/body/0/argument/7/5/3/3/1": {
+          content: {
+            en: "<element:TrendingUp></element:TrendingUp> +19%",
+            "zh-CN": "<element:TrendingUp></element:TrendingUp> +19%",
+          },
+          hash: "efb73aef93a4a73516dd2770bf599aab",
+        },
+        "7/declaration/body/0/argument/7/5/3/3/3": {
+          content: {
+            en: "from last month",
+            "zh-CN": "相比上月",
+          },
+          hash: "fa633b17714eb94793f336520083e4b4",
+        },
+        "7/declaration/body/0/argument/7/7/1/1": {
+          content: {
+            en: "Growth Rate",
+            "zh-CN": "增长率",
+          },
+          hash: "f386f1720eb2bf89ca2ed4156fceba0e",
+        },
+        "7/declaration/body/0/argument/7/7/3/1": {
+          content: {
+            en: "+573",
+            "zh-CN": 573,
+          },
+          hash: "599a64b95e973fdb7b439842d139cb3e",
+        },
+        "7/declaration/body/0/argument/7/7/3/3/1": {
+          content: {
+            en: "<element:TrendingUp></element:TrendingUp> +201",
+            "zh-CN": "<element:TrendingUp></element:TrendingUp> +201",
+          },
+          hash: "32c8a0a6a4a1a024b9278905d69e45b8",
+        },
+        "7/declaration/body/0/argument/7/7/3/3/3": {
+          content: {
+            en: "since last hour",
+            "zh-CN": "相比上一小时",
+          },
+          hash: "82be53d09bab84e3d880d3fd44aae53b",
+        },
+        "8/declaration/body/0/argument-title": {
+          content: {
+            en: "Dashboard",
+            "zh-CN": "仪表板",
+          },
+          hash: "c9380ea68c8c76ea451bd9613329a07c",
+        },
+        "8/declaration/body/0/argument/11/1/1/1": {
+          content: {
+            en: "<element:Terminal></element:Terminal> Recent Activity",
+            "zh-CN": "<element:Terminal></element:Terminal> 最近活动",
+          },
+          hash: "ac71a73fc53d25753f37379fe32008bb",
+        },
+        "8/declaration/body/0/argument/11/1/1/3": {
+          content: {
+            en: "Latest system events and logs",
+            "zh-CN": "最新的系统事件和日志",
+          },
+          hash: "dd5d5bb5dbaae37705e849877e2586e4",
+        },
+        "8/declaration/body/0/argument/11/1/3/1/1/3/1": {
+          content: {
+            en: "New user registered",
+            "zh-CN": "新用户注册",
+          },
+          hash: "5fbcb82d3b44d0bdfda8bf4c56e16aa2",
+        },
+        "8/declaration/body/0/argument/11/1/3/1/1/3/3": {
+          content: {
+            en: "user_id: 8923 • 2m ago",
+            "zh-CN": "user_id: 8923 • 2分钟前",
+          },
+          hash: "ca6a11e06c9c442bc9df1374560d60bc",
+        },
+        "8/declaration/body/0/argument/11/1/3/1/3/3/1": {
+          content: {
+            en: "Payment received",
+            "zh-CN": "收到付款",
+          },
+          hash: "874860fd1eecc451b7187f0766cea6ba",
+        },
+        "8/declaration/body/0/argument/11/1/3/1/3/3/3": {
+          content: {
+            en: "inv_2930 • $49.00 • 5m ago",
+            "zh-CN": "inv_2930 • $49.00 • 5分钟前",
+          },
+          hash: "fa188b7039a006c376101eb7c58a9bd4",
+        },
+        "8/declaration/body/0/argument/11/1/3/1/5/3/1": {
+          content: {
+            en: "Feature deployed",
+            "zh-CN": "功能已部署",
+          },
+          hash: "b6705533cd498801c84a718ef6cd2ab7",
+        },
+        "8/declaration/body/0/argument/11/1/3/1/5/3/3": {
+          content: {
+            en: "v2.4.0 • main_branch • 1h ago",
+            "zh-CN": "v2.4.0 • main_branch • 1小时前",
+          },
+          hash: "8603dce70af73112f98baabe4a667814",
+        },
+        "8/declaration/body/0/argument/11/3/1/1": {
+          content: {
+            en: "<element:Clock></element:Clock> Quick Actions",
+            "zh-CN": "<element:Clock></element:Clock> 快速操作",
+          },
+          hash: "54e8f80bede970eadb800eba1cff2b61",
+        },
         "8/declaration/body/0/argument/11/3/1/3": {
           content: {
-            en: "Latest updates from your SaaS",
-            "zh-CN": "您的 SaaS 最新更新",
+            en: "Common administrative tasks",
+            "zh-CN": "常见的管理任务",
           },
-          hash: "25ad3762b042d7c7fc64a92994eaf5cf",
+          hash: "e437ce614a8836bffb1d18ec558059d6",
+        },
+        "8/declaration/body/0/argument/11/3/3/1/1": {
+          content: {
+            en: "<element:ArrowUpRight></element:ArrowUpRight> Upgrade Plan",
+            "zh-CN": "<element:ArrowUpRight></element:ArrowUpRight> 升级计划",
+          },
+          hash: "30697a26bf1f752f9f8298de06601f63",
         },
         "8/declaration/body/0/argument/11/3/3/1/1/3": {
           content: {
@@ -7144,6 +8668,13 @@ export default {
           },
           hash: "2ab55dc65c8369e61d3c2a533cac5e2f",
         },
+        "8/declaration/body/0/argument/11/3/3/1/3": {
+          content: {
+            en: "<element:Users></element:Users> Manage Team",
+            "zh-CN": "<element:Users></element:Users> 管理团队",
+          },
+          hash: "2bf0a9d4cf82169205aaf6264b94a890",
+        },
         "8/declaration/body/0/argument/11/3/3/1/3/3": {
           content: {
             en: "Payment received",
@@ -7157,6 +8688,13 @@ export default {
             "zh-CN": "5分钟前",
           },
           hash: "b60485ed5d1e3b5ce3667a50d535604f",
+        },
+        "8/declaration/body/0/argument/11/3/3/1/5": {
+          content: {
+            en: "<element:CheckCircle2></element:CheckCircle2> Verify Domain",
+            "zh-CN": "<element:CheckCircle2></element:CheckCircle2> 验证域名",
+          },
+          hash: "ca18256678429180a3eaca129eba519d",
         },
         "8/declaration/body/0/argument/11/3/3/1/5/3": {
           content: {
@@ -7172,12 +8710,33 @@ export default {
           },
           hash: "03e0df4619eb7f44684cbade3749095b",
         },
+        "8/declaration/body/0/argument/3/1/1/3": {
+          content: {
+            en: "system_status",
+            "zh-CN": "system_status",
+          },
+          hash: "3bef8a05bb46de82ff9f62caf7ac5a35",
+        },
+        "8/declaration/body/0/argument/3/1/3/3": {
+          content: {
+            en: "ONLINE",
+            "zh-CN": "ONLINE",
+          },
+          hash: "c16c45fac98d1058cfe2959e5c4734a2",
+        },
+        "8/declaration/body/0/argument/3/3/1/1": {
+          content: {
+            en: "Welcome back, User",
+            "zh-CN": "欢迎回来，用户",
+          },
+          hash: "aa426039cb55538a7774641a4bdfe56b",
+        },
         "8/declaration/body/0/argument/3/3/1/3": {
           content: {
-            en: "Welcome Back",
-            "zh-CN": "欢迎回来",
+            en: "System is running smoothly. All services operational.",
+            "zh-CN": "系统运行正常，所有服务均正常运行。",
           },
-          hash: "f6aad626f304541a1c13d3841d96aea2",
+          hash: "6e91c04ae89e31d570837904a81a0853",
         },
         "8/declaration/body/0/argument/3/3/3": {
           content: {
@@ -7185,6 +8744,20 @@ export default {
             "zh-CN": "再次见到您真好！👋",
           },
           hash: "0375587dc1637b8c4c9d7adaca83ee74",
+        },
+        "8/declaration/body/0/argument/3/3/3/1": {
+          content: {
+            en: "<element:Zap></element:Zap> Deploy New Project",
+            "zh-CN": "<element:Zap></element:Zap> 部署新项目",
+          },
+          hash: "957cb844b5c6024c335628922fcde5be",
+        },
+        "8/declaration/body/0/argument/3/3/3/3": {
+          content: {
+            en: "<element:Activity></element:Activity> View Logs",
+            "zh-CN": "<element:Activity></element:Activity> 查看日志",
+          },
+          hash: "08249111d402ca2b2d44c86e177a19d1",
         },
         "8/declaration/body/0/argument/3/3/5": {
           content: {
@@ -7230,6 +8803,20 @@ export default {
           },
           hash: "23b8a4fba96b260b4b89b0d71f2272a1",
         },
+        "8/declaration/body/0/argument/7/1/3/3/1": {
+          content: {
+            en: "<element:TrendingUp></element:TrendingUp> +20.1%",
+            "zh-CN": "<element:TrendingUp></element:TrendingUp> +20.1%",
+          },
+          hash: "7b9a6430d51e20ff9850b34d23215f95",
+        },
+        "8/declaration/body/0/argument/7/1/3/3/3": {
+          content: {
+            en: "from last month",
+            "zh-CN": "相比上月",
+          },
+          hash: "fa633b17714eb94793f336520083e4b4",
+        },
         "8/declaration/body/0/argument/7/3/1/1": {
           content: {
             en: "Active Users",
@@ -7252,10 +8839,24 @@ export default {
           },
           hash: "23b8a4fba96b260b4b89b0d71f2272a1",
         },
+        "8/declaration/body/0/argument/7/3/3/3/1": {
+          content: {
+            en: "<element:TrendingUp></element:TrendingUp> +180.1%",
+            "zh-CN": "<element:TrendingUp></element:TrendingUp> +180.1%",
+          },
+          hash: "8cb25c59cc530b0eb3ee8024972cf1d6",
+        },
+        "8/declaration/body/0/argument/7/3/3/3/3": {
+          content: {
+            en: "from last month",
+            "zh-CN": "相比上月",
+          },
+          hash: "fa633b17714eb94793f336520083e4b4",
+        },
         "8/declaration/body/0/argument/7/5/1/1": {
           content: {
             en: "Conversions",
-            "zh-CN": "转化",
+            "zh-CN": "转化率",
           },
           hash: "5fcef29a380b5d6739a6888e064d4571",
         },
@@ -7273,6 +8874,20 @@ export default {
               "<element:span><element:TrendingUp></element:TrendingUp> 比上月增长20.1%</element:span>",
           },
           hash: "23b8a4fba96b260b4b89b0d71f2272a1",
+        },
+        "8/declaration/body/0/argument/7/5/3/3/1": {
+          content: {
+            en: "<element:TrendingUp></element:TrendingUp> +19%",
+            "zh-CN": "<element:TrendingUp></element:TrendingUp> +19%",
+          },
+          hash: "efb73aef93a4a73516dd2770bf599aab",
+        },
+        "8/declaration/body/0/argument/7/5/3/3/3": {
+          content: {
+            en: "from last month",
+            "zh-CN": "相比上月",
+          },
+          hash: "fa633b17714eb94793f336520083e4b4",
         },
         "8/declaration/body/0/argument/7/7/1/1": {
           content: {
@@ -7295,6 +8910,20 @@ export default {
               "<element:span><element:TrendingUp></element:TrendingUp> 比上小时增长201</element:span>",
           },
           hash: "c9e6a92ad386b6b48f6621ff379d2931",
+        },
+        "8/declaration/body/0/argument/7/7/3/3/1": {
+          content: {
+            en: "<element:TrendingUp></element:TrendingUp> +201",
+            "zh-CN": "<element:TrendingUp></element:TrendingUp> +201",
+          },
+          hash: "32c8a0a6a4a1a024b9278905d69e45b8",
+        },
+        "8/declaration/body/0/argument/7/7/3/3/3": {
+          content: {
+            en: "since last hour",
+            "zh-CN": "相比上一小时",
+          },
+          hash: "82be53d09bab84e3d880d3fd44aae53b",
         },
       },
     },

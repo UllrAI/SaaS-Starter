@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react"; // 引入 useEffect
+import React, { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -21,16 +21,16 @@ import {
   CreditCard,
   Loader2,
   LogIn,
-  Star,
+  Terminal,
 } from "lucide-react";
 import { PRODUCT_TIERS, type PricingTier } from "@/lib/config/products";
 import { useSession } from "@/lib/auth/client";
 import { useRouter } from "nextjs-toploader/app";
 import type { PaymentMode, BillingCycle } from "@/types/billing";
 import { cn } from "@/lib/utils";
-import { Skeleton } from "./ui/skeleton"; // 引入骨架屏
+import { Skeleton } from "./ui/skeleton";
 
-// 辅助函数：格式化价格
+// Helper: Format Price
 const formatPrice = (price: number, currency: string = "USD") => {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -72,7 +72,7 @@ export function PricingSection({ className }: { className?: string }) {
     }
 
     setLoadingState({ tierId: tier.id, mode, cycle });
-    toast.info("Preparing your secure checkout...");
+    toast.info("Initializing secure checkout sequence...");
 
     let isRedirecting = false;
 
@@ -90,7 +90,7 @@ export function PricingSection({ className }: { className?: string }) {
       const data = await response.json();
 
       if (response.status === 409) {
-        toast.error(data.error || "You already have an active subscription.", {
+        toast.error(data.error || "Subscription already active.", {
           action: {
             label: "Manage Plan",
             onClick: () => {
@@ -125,7 +125,7 @@ export function PricingSection({ className }: { className?: string }) {
 
   return (
     <div className={cn("mx-auto w-full max-w-7xl px-4", className)}>
-      {/* 支付模式选择 */}
+      {/* Payment Mode Selection */}
       <div className="mb-8 text-center">
         <Tabs
           value={paymentMode}
@@ -143,20 +143,20 @@ export function PricingSection({ className }: { className?: string }) {
               value="one_time"
               className="data-[state=active]:bg-background flex items-center gap-2 text-sm font-medium transition-all data-[state=active]:shadow-sm"
             >
-              <CreditCard className="h-4 w-4" /> One-time
+              <CreditCard className="h-4 w-4" /> Lifetime
             </TabsTrigger>
           </TabsList>
         </Tabs>
       </div>
 
-      {/* 订阅模式下的年/月切换 */}
+      {/* Billing Cycle Toggle */}
       {paymentMode === "subscription" && (
         <div className="mb-10 flex flex-col items-center gap-3">
-          <div className="bg-muted/30 flex items-center justify-center gap-3 rounded-full p-1">
+          <div className="bg-muted/30 flex items-center justify-center gap-3 rounded-full border p-1">
             <Label
               htmlFor="billing-toggle"
               className={cn(
-                "cursor-pointer rounded-full px-3 py-2 text-sm font-medium transition-all select-none",
+                "cursor-pointer rounded-full px-4 py-1.5 text-sm font-medium transition-all select-none",
                 billingCycle === "monthly"
                   ? "bg-background text-foreground shadow-sm"
                   : "text-muted-foreground hover:text-foreground",
@@ -175,7 +175,7 @@ export function PricingSection({ className }: { className?: string }) {
             <Label
               htmlFor="billing-toggle"
               className={cn(
-                "cursor-pointer rounded-full px-3 py-2 text-sm font-medium transition-all select-none",
+                "cursor-pointer rounded-full px-4 py-1.5 text-sm font-medium transition-all select-none",
                 billingCycle === "yearly"
                   ? "bg-background text-foreground shadow-sm"
                   : "text-muted-foreground hover:text-foreground",
@@ -187,17 +187,17 @@ export function PricingSection({ className }: { className?: string }) {
           <div className="flex h-7 items-center justify-center">
             {billingCycle === "yearly" && (
               <Badge
-                variant="secondary"
-                className="animate-in fade-in-0 border-emerald-200/50 bg-gradient-to-r from-emerald-50 to-green-50 text-emerald-700 shadow-sm duration-300 dark:border-emerald-800/50 dark:from-emerald-950/50 dark:to-green-950/50 dark:text-emerald-300"
+                variant="outline"
+                className="animate-in fade-in-0 border-emerald-500/30 bg-emerald-500/10 text-emerald-600 duration-300 dark:text-emerald-400"
               >
-                <Zap className="mr-1.5 h-3 w-3" /> Save 17% with yearly billing
+                <Zap className="mr-1.5 h-3 w-3" /> Save 17%
               </Badge>
             )}
           </div>
         </div>
       )}
 
-      {/* 定价卡片 */}
+      {/* Pricing Cards */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3 lg:gap-8">
         {PRODUCT_TIERS.map((tier) => {
           const price =
@@ -218,31 +218,30 @@ export function PricingSection({ className }: { className?: string }) {
             <Card
               key={tier.id}
               className={cn(
-                "group relative transition-all duration-300 ease-out",
-                "hover:border-primary/30 hover:-translate-y-1 hover:shadow-xl",
-                "transform-gpu will-change-transform",
-                tier.isPopular &&
-                  "border-primary/50 ring-primary/20 from-primary/5 via-background to-background bg-gradient-to-br shadow-lg ring-1",
+                "relative flex flex-col transition-all duration-300",
+                tier.isPopular
+                  ? "border-primary shadow-lg ring-1 ring-primary/20"
+                  : "hover:border-primary/50 shadow-sm hover:shadow-md",
               )}
             >
               {tier.isPopular && (
-                <div className="absolute -top-4 left-1/2 z-10 -translate-x-1/2">
-                  <div className="from-primary to-primary/80 text-primary-foreground flex items-center gap-1.5 rounded-full bg-gradient-to-r px-4 py-1.5 text-xs font-semibold shadow-lg">
-                    <Star className="h-3 w-3 fill-current" />
-                    Most Popular
-                  </div>
+                <div className="absolute -top-3 left-1/2 z-10 -translate-x-1/2">
+                  <Badge className="bg-primary text-primary-foreground hover:bg-primary px-3 py-1 text-xs font-bold shadow-sm">
+                    RECOMMENDED
+                  </Badge>
                 </div>
               )}
-              <CardHeader className="pt-6 pb-6 text-center">
-                <CardTitle className="group-hover:text-primary mb-2 text-2xl font-bold transition-colors">
+
+              <CardHeader className="pt-8 pb-6 text-center">
+                <CardTitle className="text-foreground mb-2 text-xl font-bold">
                   {tier.name}
                 </CardTitle>
-                <CardDescription className="text-muted-foreground text-sm leading-relaxed">
+                <CardDescription className="text-muted-foreground mx-auto max-w-[200px] text-sm leading-relaxed">
                   {tier.description}
                 </CardDescription>
                 <div className="mt-6 space-y-2">
                   <div className="flex items-baseline justify-center gap-1">
-                    <span className="text-foreground text-5xl font-bold tracking-tight">
+                    <span className="text-foreground font-mono text-4xl font-bold tracking-tight">
                       {paymentMode === "one_time"
                         ? formatPrice(price, tier.currency)
                         : billingCycle === "monthly"
@@ -250,13 +249,13 @@ export function PricingSection({ className }: { className?: string }) {
                           : formatPrice(Math.round(price / 12), tier.currency)}
                     </span>
                     {paymentMode === "subscription" && (
-                      <span className="text-muted-foreground text-base font-medium">
-                        /month
+                      <span className="text-muted-foreground font-mono text-sm">
+                        /mo
                       </span>
                     )}
                   </div>
                   <div className="flex h-5 items-center justify-center">
-                    <p className="text-muted-foreground text-sm font-medium">
+                    <p className="text-muted-foreground text-xs font-medium uppercase tracking-wide">
                       {paymentMode === "one_time" ? (
                         <>One-time payment</>
                       ) : billingCycle === "yearly" ? (
@@ -266,15 +265,12 @@ export function PricingSection({ className }: { className?: string }) {
                       )}
                     </p>
                   </div>
-                  {billingCycle === "yearly" && paymentMode !== "one_time" && (
-                    <div className="text-muted-foreground/80 text-xs font-medium">
-                      {formatPrice(price, tier.currency)} total per year
-                    </div>
-                  )}
                 </div>
               </CardHeader>
-              <CardContent className="flex flex-1 flex-col px-6 pt-0 pb-6">
-                <div className="mb-6 flex-1 space-y-4">
+
+              <CardContent className="flex flex-1 flex-col px-6 pt-0 pb-8">
+                <div className="bg-muted/30 mb-6 h-px w-full" />
+                <div className="mb-8 flex-1 space-y-4">
                   {tier.features.map((feature, index) => (
                     <div
                       key={index}
@@ -282,27 +278,20 @@ export function PricingSection({ className }: { className?: string }) {
                     >
                       <div
                         className={cn(
-                          "mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full transition-all duration-200",
+                          "mt-0.5 flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-sm border transition-colors",
                           feature.included
-                            ? "bg-emerald-100 group-hover/feature:bg-emerald-200 dark:bg-emerald-900/30 dark:group-hover/feature:bg-emerald-900/50"
-                            : "bg-gray-100 dark:bg-gray-800",
+                            ? "border-primary/50 bg-primary/10 text-primary"
+                            : "border-muted bg-muted/50 text-muted-foreground",
                         )}
                       >
-                        <Check
-                          className={cn(
-                            "h-3 w-3 transition-all duration-200",
-                            feature.included
-                              ? "text-emerald-600 dark:text-emerald-400"
-                              : "text-muted-foreground/80",
-                          )}
-                        />
+                        <Check className="h-3 w-3" />
                       </div>
                       <span
                         className={cn(
-                          "text-sm leading-relaxed transition-colors duration-200",
+                          "text-sm leading-tight transition-colors",
                           feature.included
-                            ? "text-foreground group-hover/feature:text-foreground/90"
-                            : "text-muted-foreground line-through",
+                            ? "text-foreground"
+                            : "text-muted-foreground line-through opacity-70",
                         )}
                       >
                         {feature.name}
@@ -310,16 +299,16 @@ export function PricingSection({ className }: { className?: string }) {
                     </div>
                   ))}
                 </div>
+
                 {!mounted || isSessionLoading ? (
-                  <Skeleton className="h-12 w-full" />
+                  <Skeleton className="h-11 w-full" />
                 ) : (
                   <Button
                     className={cn(
-                      "h-12 w-full cursor-pointer text-base font-semibold transition-all duration-200",
-                      "hover:scale-[1.02] hover:shadow-lg active:scale-[0.98]",
-                      "disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none",
-                      tier.isPopular &&
-                        "bg-primary hover:bg-primary/90 shadow-lg",
+                      "h-11 w-full font-bold shadow-sm transition-all",
+                      tier.isPopular
+                        ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-md"
+                        : "bg-background hover:bg-accent hover:text-accent-foreground border",
                     )}
                     onClick={() =>
                       handleCheckout(tier, paymentMode, billingCycle)
@@ -330,15 +319,18 @@ export function PricingSection({ className }: { className?: string }) {
                     {isLoading ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Processing...
+                        PROCESSING
                       </>
                     ) : !session?.user ? (
                       <>
                         <LogIn className="mr-2 h-4 w-4" />
-                        Login to Get {tier.name}
+                        LOGIN TO BUY
                       </>
                     ) : (
-                      `Get ${tier.name}`
+                      <>
+                        GET {tier.name.toUpperCase()}
+                        <Terminal className="ml-2 h-4 w-4 opacity-50" />
+                      </>
                     )}
                   </Button>
                 )}

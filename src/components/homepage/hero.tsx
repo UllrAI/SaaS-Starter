@@ -10,7 +10,7 @@ import Link from "next/link";
 export function Hero() {
   const [copied, setCopied] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const command = "git clone https://github.com/ullrai/saas-starter";
+  const command = "git clone https://github.com/UllrAI/SaaS-Starter.git";
 
   useEffect(() => {
     setMounted(true);
@@ -121,7 +121,7 @@ export function Hero() {
               {/* Window Body (Split View) */}
               <div className="bg-background grid min-h-[400px] grid-cols-1 lg:grid-cols-12">
                 {/* Left: Terminal Setup */}
-                <div className="border-border overflow-hidden border-b p-6 text-left font-mono text-sm sm:p-8 lg:col-span-7 lg:border-r lg:border-b-0">
+                <div className="border-border overflow-hidden border-b p-6 text-left font-mono text-xs sm:p-8 lg:col-span-7 lg:border-r lg:border-b-0">
                   <div className="bg-secondary/30 border-border mb-6 flex items-center justify-between gap-4 border border-dashed p-4">
                     <div className="flex items-center gap-3 overflow-hidden">
                       <span className="text-primary font-bold">➜</span>
@@ -141,47 +141,45 @@ export function Hero() {
                     </button>
                   </div>
 
-                  <div className="space-y-2 text-xs sm:text-sm">
+                  <div data-lingo-skip className="space-y-2 text-xs sm:text-xs">
                     {/* Quick Start */}
                     <div className="text-muted-foreground/65">
-                      <span className="text-green-500">➜</span> git clone
-                      https://github.com/ullrai/saas-starter
+                      <span data-lingo-skip className="text-green-500">➜</span> git clone https://github.com/UllrAI/SaaS-Starter.git
                     </div>
                     <div className="text-muted-foreground/65">
-                      <span className="text-green-500">➜</span> cd saas-starter
+                      <span data-lingo-skip className="text-green-500">➜</span> cd saas-starter
                     </div>
 
                     <div className="h-4" />
 
                     <div className="text-muted-foreground/65">
-                      <span className="text-green-500">➜</span> cp .env.example
-                      .env
+                      <span data-lingo-skip className="text-green-500">➜</span> cp .env.example .env
                     </div>
                     <div className="text-muted-foreground/65">
-                      <span className="text-green-500">➜</span> pnpm install
+                      <span data-lingo-skip className="text-green-500">➜</span> pnpm install
                     </div>
 
                     <div className="h-4" />
 
                     <div className="text-foreground font-bold">
-                      <span className="text-primary">➜</span> pnpm dev
+                      <span data-lingo-skip className="text-primary">➜</span> pnpm dev
                     </div>
 
                     <div className="h-4" />
 
                     {/* Output */}
                     <div className="text-muted-foreground/65 space-y-1 pl-2">
-                      <div className="text-green-500">✓ Ready in 1.2s</div>
-                      <div>
+                      <div data-lingo-skip className="text-green-500">✓ Ready in 1.2s</div>
+                      <div data-lingo-skip>
                         ○ Local:{" "}
-                        <span className="text-primary underline">
+                        <span data-lingo-skip className="text-primary underline">
                           http://localhost:3000
                         </span>
                       </div>
                     </div>
 
                     <div className="text-primary mt-6 flex animate-pulse items-center gap-2">
-                      <span className="bg-primary block h-4 w-2" />
+                      <span data-lingo-skip className="bg-primary block h-4 w-2" />
                       <span>Running...</span>
                     </div>
                   </div>
@@ -233,10 +231,10 @@ export function Hero() {
 
                   <div className="border-border mt-auto border-t pt-6">
                     <div className="text-muted-foreground text-xs">
-                      Built with{" "}
-                      <span className="text-primary font-mono">Next.js 15</span>{" "}
-                      +{" "}
-                      <span className="text-primary font-mono">shadcn/ui</span>
+                      <>Built with</><br />
+                      <span data-lingo-skip className="text-primary font-mono">Next.js 15</span>
+                      <>&nbsp;</><>+</><>&nbsp;</>
+                      <span data-lingo-skip className="text-primary font-mono">shadcn/ui</span>
                     </div>
                   </div>
                 </div>

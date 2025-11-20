@@ -51,13 +51,16 @@
   --chart-5: oklch(0.55 0.15 25);
   /* Red */
 
-  --sidebar: oklch(0.98 0.002 240);
+  --sidebar: oklch(0.96 0.005 240);
+  /* Slightly darker than background for clear separation */
   --sidebar-foreground: oklch(0.25 0.04 260);
   --sidebar-primary: oklch(0.25 0.04 260);
   --sidebar-primary-foreground: oklch(0.98 0 0);
-  --sidebar-accent: oklch(0.95 0.01 240);
+  --sidebar-accent: oklch(0.93 0.01 240);
+  /* More noticeable hover state */
   --sidebar-accent-foreground: oklch(0.25 0.04 260);
-  --sidebar-border: oklch(0.92 0.005 240);
+  --sidebar-border: oklch(0.88 0.01 240);
+  /* Stronger border for clear division */
   --sidebar-ring: oklch(0.25 0.04 260);
 
   /* Fonts: Monospace is king for developers, but we keep sans for UI */

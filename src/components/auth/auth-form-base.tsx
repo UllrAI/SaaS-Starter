@@ -79,7 +79,7 @@ export function AuthFormBase<T extends FieldValues>({
   };
 
   return (
-    <Card className="bg-background/80 max-w-md border-2 shadow-lg backdrop-blur-sm">
+    <Card className="bg-background/80 max-w-md shadow-lg backdrop-blur-sm">
       <CardHeader className="space-y-4 pb-2">
         {/* Welcome Badge */}
         <div className="flex justify-center">

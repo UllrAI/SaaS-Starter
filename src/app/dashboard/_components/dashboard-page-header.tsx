@@ -11,6 +11,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { ModeToggle } from "@/components/mode-toggle";
+import { LocaleSwitcher } from "@/components/locale-switcher";
 
 interface DashboardPageHeaderProps {
   title: string;
@@ -71,6 +72,7 @@ export function DashboardPageHeader({
         </div>
         <div className="flex items-center gap-2">
           {actions}
+          <LocaleSwitcher variant="ghost" size="icon" />
           <ModeToggle variant="ghost" size="icon" />
         </div>
       </div>

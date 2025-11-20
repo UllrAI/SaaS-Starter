@@ -34,6 +34,246 @@
     },
     "(pages)/about/page.tsx": {
       "scopes": {
+        "11/declaration/body/0/argument/3/3/1/11/1/3": {
+          "type": "element",
+          "hash": "e49f6bc604d4664ffc63852331f7c5b3",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Core Maintainers"
+        },
+        "11/declaration/body/0/argument/3/3/1/11/3/1/expression/0/body/3/1": {
+          "type": "element",
+          "hash": "b3d248181377e5cfb4f29969d0682ea3",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Dev Member {i}"
+        },
+        "11/declaration/body/0/argument/3/3/1/11/3/1/expression/0/body/3/3": {
+          "type": "element",
+          "hash": "207c363fa49b218de4312a3bff31c7ec",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Senior Engineer"
+        },
+        "11/declaration/body/0/argument/3/3/1/15/1/3": {
+          "type": "element",
+          "hash": "2a0cc1faf653e9ca97786acee96ffbde",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Changelog"
+        },
+        "11/declaration/body/0/argument/3/3/1/15/3/1/3/1": {
+          "type": "element",
+          "hash": "93be1453b1acd0f3294b24092fc79e75",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "v2.0.0"
+        },
+        "11/declaration/body/0/argument/3/3/1/15/3/1/3/3": {
+          "type": "element",
+          "hash": "2b819e1c64a91fa1a5ced6f4d41a48db",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "October 2023"
+        },
+        "11/declaration/body/0/argument/3/3/1/15/3/1/5": {
+          "type": "element",
+          "hash": "c92fd68120aa24e66363d9033403664a",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Global Scale"
+        },
+        "11/declaration/body/0/argument/3/3/1/15/3/1/7": {
+          "type": "element",
+          "hash": "89fb93b6739bfd385398c680608bbfed",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Launched multi-region support and edge caching."
+        },
+        "11/declaration/body/0/argument/3/3/1/15/3/3/3/1": {
+          "type": "element",
+          "hash": "c3d091e69739b04d23fc9e8ecb78dab5",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "v1.0.0"
+        },
+        "11/declaration/body/0/argument/3/3/1/15/3/3/3/3": {
+          "type": "element",
+          "hash": "534259cbe279c6a3cd609c43f0fc76c7",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "January 2023"
+        },
+        "11/declaration/body/0/argument/3/3/1/15/3/3/5": {
+          "type": "element",
+          "hash": "b3d637038309c8cb001766280b7ab098",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Initial Release"
+        },
+        "11/declaration/body/0/argument/3/3/1/15/3/3/7": {
+          "type": "element",
+          "hash": "98af8fb21bf077247fce03bdea4e5a70",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Public beta launch with core features."
+        },
+        "11/declaration/body/0/argument/3/3/1/15/3/5/3/1": {
+          "type": "element",
+          "hash": "eed74d28b44aac61661ced418c97e54f",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "v0.1.0"
+        },
+        "11/declaration/body/0/argument/3/3/1/15/3/5/3/3": {
+          "type": "element",
+          "hash": "7d3149756bc7709fa920d15636cc251a",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "June 2022"
+        },
+        "11/declaration/body/0/argument/3/3/1/15/3/5/5": {
+          "type": "element",
+          "hash": "804f02d822ac99d7a1446e91f647e653",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "First Commit"
+        },
+        "11/declaration/body/0/argument/3/3/1/15/3/5/7": {
+          "type": "element",
+          "hash": "75cf390de8ceef4dbd306ee42d4b94c2",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Development started on the core engine."
+        },
+        "11/declaration/body/0/argument/3/3/1/3/1/1": {
+          "type": "element",
+          "hash": "d0d18d889c940baaa797f206124873cc",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "README.md"
+        },
+        "11/declaration/body/0/argument/3/3/1/3/3": {
+          "type": "element",
+          "hash": "1870d943166d44a0f6c72a010d52db0e",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Building the future of SaaS"
+        },
+        "11/declaration/body/0/argument/3/3/1/3/5": {
+          "type": "element",
+          "hash": "81c6994ceda5a7a5f789aba05c29c079",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "We are a team of developers, designers, and creators building the tools we wish we had. Open source at heart, enterprise in scale."
+        },
+        "11/declaration/body/0/argument/3/3/1/7/1/3": {
+          "type": "element",
+          "hash": "c07cee4b186152b94676d1ea0dcd622a",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Core Principles"
+        },
+        "11/declaration/body/0/argument/3/3/1/7/3/1/1/3": {
+          "type": "element",
+          "hash": "cba194b5f5689874542f88b4bb537f2d",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Speed as a Feature"
+        },
+        "11/declaration/body/0/argument/3/3/1/7/3/1/1/5": {
+          "type": "element",
+          "hash": "c83766522a195aa36c6889b5487177a2",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "We optimize for milliseconds. Performance isn't just a metric, it's a user experience requirement."
+        },
+        "11/declaration/body/0/argument/3/3/1/7/3/3/1/3": {
+          "type": "element",
+          "hash": "35057c25b9e31c6394e3a72da39ab8d8",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Security First"
+        },
+        "11/declaration/body/0/argument/3/3/1/7/3/3/1/5": {
+          "type": "element",
+          "hash": "0c9b0ed71af8291b7dcd8ec17fd82731",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "We don't treat security as an afterthought. It's baked into our architecture from line one."
+        },
+        "11/declaration/body/0/argument/3/3/1/7/3/5/1/3": {
+          "type": "element",
+          "hash": "02711c519c298608cd0be3b1995f3e7d",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Community Driven"
+        },
+        "11/declaration/body/0/argument/3/3/1/7/3/5/1/5": {
+          "type": "element",
+          "hash": "250c11858f177097216e6cf6732f1e67",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "We build in public and listen to our users. Your feedback shapes our roadmap directly."
+        },
+        "11/declaration/body/0/argument/7/1/1/1": {
+          "type": "element",
+          "hash": "cb195fc9f70e7505a01bbe873b6cc71f",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Ready to Build Something Amazing?"
+        },
+        "11/declaration/body/0/argument/7/1/1/3": {
+          "type": "element",
+          "hash": "4ae8ee459ceb257ff65d486f93948d92",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Join thousands of developers who are already building the next generation of SaaS products."
+        },
+        "11/declaration/body/0/argument/7/1/1/5/1/1": {
+          "type": "element",
+          "hash": "5476c30aeb582ba0951c3ac8fa44d125",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Get Started Today"
+        },
+        "11/declaration/body/0/argument/7/1/1/5/3/1": {
+          "type": "element",
+          "hash": "94537da970ffef6210bba8fcecb74a8c",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Contact Sales"
+        },
         "14/0/init/0/2/value": {
           "type": "element",
           "hash": "fd6855a2c35b6dd25a45700d13c109c2",
@@ -481,6 +721,262 @@
           "skip": false,
           "overrides": {},
           "content": "The principles that guide everything we do"
+        },
+        "9/declaration/body/0/argument/3/3/1/11/1/3": {
+          "type": "element",
+          "hash": "e49f6bc604d4664ffc63852331f7c5b3",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Core Maintainers"
+        },
+        "9/declaration/body/0/argument/3/3/1/11/3/1/expression/0/body/3/1": {
+          "type": "element",
+          "hash": "b3d248181377e5cfb4f29969d0682ea3",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Dev Member {i}"
+        },
+        "9/declaration/body/0/argument/3/3/1/11/3/1/expression/0/body/3/3": {
+          "type": "element",
+          "hash": "207c363fa49b218de4312a3bff31c7ec",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Senior Engineer"
+        },
+        "9/declaration/body/0/argument/3/3/1/11/3/1/expression/0/body/7/1": {
+          "type": "element",
+          "hash": "76c60eacefd98d804d2ea1d66964bd5f",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Dev Member {i}"
+        },
+        "9/declaration/body/0/argument/3/3/1/11/3/1/expression/0/body/7/3": {
+          "type": "element",
+          "hash": "207c363fa49b218de4312a3bff31c7ec",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Senior Engineer"
+        },
+        "9/declaration/body/0/argument/3/3/1/15/1/3": {
+          "type": "element",
+          "hash": "2a0cc1faf653e9ca97786acee96ffbde",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Changelog"
+        },
+        "9/declaration/body/0/argument/3/3/1/15/3/1/3/1": {
+          "type": "element",
+          "hash": "93be1453b1acd0f3294b24092fc79e75",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "v2.0.0"
+        },
+        "9/declaration/body/0/argument/3/3/1/15/3/1/3/3": {
+          "type": "element",
+          "hash": "2b819e1c64a91fa1a5ced6f4d41a48db",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "October 2023"
+        },
+        "9/declaration/body/0/argument/3/3/1/15/3/1/5": {
+          "type": "element",
+          "hash": "c92fd68120aa24e66363d9033403664a",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Global Scale"
+        },
+        "9/declaration/body/0/argument/3/3/1/15/3/1/7": {
+          "type": "element",
+          "hash": "89fb93b6739bfd385398c680608bbfed",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Launched multi-region support and edge caching."
+        },
+        "9/declaration/body/0/argument/3/3/1/15/3/3/3/1": {
+          "type": "element",
+          "hash": "c3d091e69739b04d23fc9e8ecb78dab5",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "v1.0.0"
+        },
+        "9/declaration/body/0/argument/3/3/1/15/3/3/3/3": {
+          "type": "element",
+          "hash": "534259cbe279c6a3cd609c43f0fc76c7",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "January 2023"
+        },
+        "9/declaration/body/0/argument/3/3/1/15/3/3/5": {
+          "type": "element",
+          "hash": "b3d637038309c8cb001766280b7ab098",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Initial Release"
+        },
+        "9/declaration/body/0/argument/3/3/1/15/3/3/7": {
+          "type": "element",
+          "hash": "98af8fb21bf077247fce03bdea4e5a70",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Public beta launch with core features."
+        },
+        "9/declaration/body/0/argument/3/3/1/15/3/5/3/1": {
+          "type": "element",
+          "hash": "eed74d28b44aac61661ced418c97e54f",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "v0.1.0"
+        },
+        "9/declaration/body/0/argument/3/3/1/15/3/5/3/3": {
+          "type": "element",
+          "hash": "7d3149756bc7709fa920d15636cc251a",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "June 2022"
+        },
+        "9/declaration/body/0/argument/3/3/1/15/3/5/5": {
+          "type": "element",
+          "hash": "804f02d822ac99d7a1446e91f647e653",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "First Commit"
+        },
+        "9/declaration/body/0/argument/3/3/1/15/3/5/7": {
+          "type": "element",
+          "hash": "75cf390de8ceef4dbd306ee42d4b94c2",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Development started on the core engine."
+        },
+        "9/declaration/body/0/argument/3/3/1/3/1/1": {
+          "type": "element",
+          "hash": "d0d18d889c940baaa797f206124873cc",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "README.md"
+        },
+        "9/declaration/body/0/argument/3/3/1/3/3": {
+          "type": "element",
+          "hash": "1870d943166d44a0f6c72a010d52db0e",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Building the future of SaaS"
+        },
+        "9/declaration/body/0/argument/3/3/1/3/5": {
+          "type": "element",
+          "hash": "81c6994ceda5a7a5f789aba05c29c079",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "We are a team of developers, designers, and creators building the tools we wish we had. Open source at heart, enterprise in scale."
+        },
+        "9/declaration/body/0/argument/3/3/1/7/1/3": {
+          "type": "element",
+          "hash": "c07cee4b186152b94676d1ea0dcd622a",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Core Principles"
+        },
+        "9/declaration/body/0/argument/3/3/1/7/3/1/1/3": {
+          "type": "element",
+          "hash": "cba194b5f5689874542f88b4bb537f2d",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Speed as a Feature"
+        },
+        "9/declaration/body/0/argument/3/3/1/7/3/1/1/5": {
+          "type": "element",
+          "hash": "c83766522a195aa36c6889b5487177a2",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "We optimize for milliseconds. Performance isn't just a metric, it's a user experience requirement."
+        },
+        "9/declaration/body/0/argument/3/3/1/7/3/3/1/3": {
+          "type": "element",
+          "hash": "35057c25b9e31c6394e3a72da39ab8d8",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Security First"
+        },
+        "9/declaration/body/0/argument/3/3/1/7/3/3/1/5": {
+          "type": "element",
+          "hash": "0c9b0ed71af8291b7dcd8ec17fd82731",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "We don't treat security as an afterthought. It's baked into our architecture from line one."
+        },
+        "9/declaration/body/0/argument/3/3/1/7/3/5/1/3": {
+          "type": "element",
+          "hash": "02711c519c298608cd0be3b1995f3e7d",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Community Driven"
+        },
+        "9/declaration/body/0/argument/3/3/1/7/3/5/1/5": {
+          "type": "element",
+          "hash": "250c11858f177097216e6cf6732f1e67",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "We build in public and listen to our users. Your feedback shapes our roadmap directly."
+        },
+        "9/declaration/body/0/argument/7/1/1/1": {
+          "type": "element",
+          "hash": "cb195fc9f70e7505a01bbe873b6cc71f",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Ready to Build Something Amazing?"
+        },
+        "9/declaration/body/0/argument/7/1/1/3": {
+          "type": "element",
+          "hash": "4ae8ee459ceb257ff65d486f93948d92",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Join thousands of developers who are already building the next generation of SaaS products."
+        },
+        "9/declaration/body/0/argument/7/1/1/5/1/1": {
+          "type": "element",
+          "hash": "5476c30aeb582ba0951c3ac8fa44d125",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Get Started Today"
+        },
+        "9/declaration/body/0/argument/7/1/1/5/3/1": {
+          "type": "element",
+          "hash": "94537da970ffef6210bba8fcecb74a8c",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Contact Sales"
         }
       }
     },
@@ -806,6 +1302,470 @@
     },
     "(pages)/contact/page.tsx": {
       "scopes": {
+        "10/declaration/body/0/argument/3/3/1/11/1/3": {
+          "type": "element",
+          "hash": "dab53472301f5fb67ada60937b6ec6fd",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Support Hours"
+        },
+        "10/declaration/body/0/argument/3/3/1/11/3/1/1/1": {
+          "type": "element",
+          "hash": "96a3213d4c2c3a56aea3706321ac7811",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Standard Support"
+        },
+        "10/declaration/body/0/argument/3/3/1/11/3/1/1/3": {
+          "type": "element",
+          "hash": "34362af1ea023968a9ee46e4d337b69d",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Available for all users and customers"
+        },
+        "10/declaration/body/0/argument/3/3/1/11/3/1/3/1/1": {
+          "type": "element",
+          "hash": "3b66d8b6736398fb4461a2d939d599a7",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Monday - Friday"
+        },
+        "10/declaration/body/0/argument/3/3/1/11/3/1/3/1/3": {
+          "type": "element",
+          "hash": "481ccc5e4e978472a309aa46517b2cc2",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "9:00 - 18:00"
+        },
+        "10/declaration/body/0/argument/3/3/1/11/3/1/3/3/1": {
+          "type": "element",
+          "hash": "dc9def4f2620b182dd4e11e088c1f220",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Saturday"
+        },
+        "10/declaration/body/0/argument/3/3/1/11/3/1/3/3/3": {
+          "type": "element",
+          "hash": "976cc9bbf549288ba297dba2b778dacb",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "10:00 - 16:00"
+        },
+        "10/declaration/body/0/argument/3/3/1/11/3/1/3/5/1": {
+          "type": "element",
+          "hash": "20c6c38061dd5ed62ef1c92a51b26e2f",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Sunday"
+        },
+        "10/declaration/body/0/argument/3/3/1/11/3/1/3/5/3": {
+          "type": "element",
+          "hash": "180560eb657a20f3d4edc44d5f7e7c2a",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Closed"
+        },
+        "10/declaration/body/0/argument/3/3/1/11/3/3/1/1": {
+          "type": "element",
+          "hash": "cd1c7901eacf02b0ba00ccee975bc09c",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Premium Support"
+        },
+        "10/declaration/body/0/argument/3/3/1/11/3/3/1/3": {
+          "type": "element",
+          "hash": "1a87548fcbbafbeaf6947253c4e5790c",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Enterprise customers with SLA guarantees"
+        },
+        "10/declaration/body/0/argument/3/3/1/11/3/3/3/1/1": {
+          "type": "element",
+          "hash": "6cf93b0199c85b7ccedd33c7c3cd0d57",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Availability"
+        },
+        "10/declaration/body/0/argument/3/3/1/11/3/3/3/1/3": {
+          "type": "element",
+          "hash": "f28578bba9ee4918e73cac658041eabd",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "24/7/365"
+        },
+        "10/declaration/body/0/argument/3/3/1/11/3/3/3/3/1": {
+          "type": "element",
+          "hash": "79c2a6b56c5110cc49af95f921f147c4",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Response Time"
+        },
+        "10/declaration/body/0/argument/3/3/1/11/3/3/3/3/3": {
+          "type": "element",
+          "hash": "20f2e1a8ca578836235ada90a500e23d",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "< 1 hour"
+        },
+        "10/declaration/body/0/argument/3/3/1/11/3/3/3/5/1": {
+          "type": "element",
+          "hash": "18b192b994a3619e8ac97184a232a2ab",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Priority"
+        },
+        "10/declaration/body/0/argument/3/3/1/11/3/3/3/5/3": {
+          "type": "element",
+          "hash": "63dcd6c751f17b6d01f571fa824569b9",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Critical Priority"
+        },
+        "10/declaration/body/0/argument/3/3/1/15/1/3": {
+          "type": "element",
+          "hash": "547335bcadff4854fe4ec8a7e9b10ca8",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Quick Answers"
+        },
+        "10/declaration/body/0/argument/3/3/1/15/3/1/1/1": {
+          "type": "element",
+          "hash": "c91ee91dd05afd39978b9f1b145217a7",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "What is the average response time?"
+        },
+        "10/declaration/body/0/argument/3/3/1/15/3/1/3/1": {
+          "type": "element",
+          "hash": "d8f1c0101ea596e4beccef667c0e306b",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "We typically respond to all inquiries within 24 hours during business days. Premium customers receive responses in under 1 hour."
+        },
+        "10/declaration/body/0/argument/3/3/1/15/3/3/1/1": {
+          "type": "element",
+          "hash": "38bea8445adab2f746bc55a84129d2e0",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Do you offer phone support?"
+        },
+        "10/declaration/body/0/argument/3/3/1/15/3/3/3/1": {
+          "type": "element",
+          "hash": "4072e4f795164f990bcebf3e94f475d9",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Yes, phone support is available for enterprise customers. Standard tier customers can upgrade to access phone support."
+        },
+        "10/declaration/body/0/argument/3/3/1/15/3/5/1/1": {
+          "type": "element",
+          "hash": "50b659e5fc0b8f4c3fc243f46ebd2b02",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Can I schedule a demo?"
+        },
+        "10/declaration/body/0/argument/3/3/1/15/3/5/3/1": {
+          "type": "element",
+          "hash": "bb9dbf722c4b51340778d8185980be07",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Absolutely! Contact our sales team via email or chat to schedule a personalized demo of our platform."
+        },
+        "10/declaration/body/0/argument/3/3/1/15/3/7/1/1": {
+          "type": "element",
+          "hash": "ca9577b416df20dc8f064b8d9dd43b80",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Where can I find documentation?"
+        },
+        "10/declaration/body/0/argument/3/3/1/15/3/7/3/1": {
+          "type": "element",
+          "hash": "4acf3c195fb77884b086f0f31f67fde3",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Our comprehensive documentation covers all features, APIs, and integrations."
+        },
+        "10/declaration/body/0/argument/3/3/1/15/3/7/3/3/1/1": {
+          "type": "element",
+          "hash": "7488d9bb340ad4a702bee203872b2555",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "View Docs"
+        },
+        "10/declaration/body/0/argument/3/3/1/19/1/3": {
+          "type": "element",
+          "hash": "171835648cf4eb4b6187b05c47333bed",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Helpful Resources"
+        },
+        "10/declaration/body/0/argument/3/3/1/19/3/1/1/1": {
+          "type": "element",
+          "hash": "98506f4e2c9df2c74045b0716e9995cd",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Documentation"
+        },
+        "10/declaration/body/0/argument/3/3/1/19/3/1/1/3": {
+          "type": "element",
+          "hash": "2727c73871a9e24ee65da9b96ec16096",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Complete guides and API references"
+        },
+        "10/declaration/body/0/argument/3/3/1/19/3/3/1/1": {
+          "type": "element",
+          "hash": "57337b3bcf2fd61f0070b985d52ccf61",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Community Forum"
+        },
+        "10/declaration/body/0/argument/3/3/1/19/3/3/1/3": {
+          "type": "element",
+          "hash": "81046f16434ce11b278f92839ab730ed",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Connect with other developers"
+        },
+        "10/declaration/body/0/argument/3/3/1/19/3/5/1/1": {
+          "type": "element",
+          "hash": "08f07ce9820e99112a218f36bedf9f86",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Status Page"
+        },
+        "10/declaration/body/0/argument/3/3/1/19/3/5/1/3": {
+          "type": "element",
+          "hash": "807865a9c1c595e22e358bd177524187",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Real-time system status updates"
+        },
+        "10/declaration/body/0/argument/3/3/1/3/1/1": {
+          "type": "element",
+          "hash": "7e99f1342dd036125d47b370caf201a8",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "CONTACT.md"
+        },
+        "10/declaration/body/0/argument/3/3/1/3/3": {
+          "type": "element",
+          "hash": "259d5c4f7f17b771a15a8aa7240dce5c",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Get in Touch"
+        },
+        "10/declaration/body/0/argument/3/3/1/3/5": {
+          "type": "element",
+          "hash": "ead6a019958ad31ed2adc173e25197e3",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Have questions? Need support? Want to collaborate? We're here to help. Choose your preferred channel below."
+        },
+        "10/declaration/body/0/argument/3/3/1/7/1/3": {
+          "type": "element",
+          "hash": "023df2ce84ca5bd55e9fa6014d04e275",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Contact Channels"
+        },
+        "10/declaration/body/0/argument/3/3/1/7/3/1/1/3": {
+          "type": "element",
+          "hash": "947fb7c5c665079804df41c61161e722",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Email Support"
+        },
+        "10/declaration/body/0/argument/3/3/1/7/3/1/1/5": {
+          "type": "element",
+          "hash": "c800b52828d3155194ee37fda03a38a0",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "EMAIL_GATEWAY"
+        },
+        "10/declaration/body/0/argument/3/3/1/7/3/1/3/1": {
+          "type": "element",
+          "hash": "33d848d82bc97042c475fadb6260fc82",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Technical support via email"
+        },
+        "10/declaration/body/0/argument/3/3/1/7/3/1/3/3/1": {
+          "type": "element",
+          "hash": "29d9a1414a2c52d0040a5cd5094b8f50",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "support@company.com"
+        },
+        "10/declaration/body/0/argument/3/3/1/7/3/3/1/3": {
+          "type": "element",
+          "hash": "4bc82a4bd3f4626c5d7ff2f9e95f7fcd",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Live Chat"
+        },
+        "10/declaration/body/0/argument/3/3/1/7/3/3/1/5": {
+          "type": "element",
+          "hash": "5b377b20c00ad554a680f5c8ef12ca94",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "CHAT_INTERFACE"
+        },
+        "10/declaration/body/0/argument/3/3/1/7/3/3/3/1": {
+          "type": "element",
+          "hash": "b502ada5850491a433810378ead609e9",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Real-time developer support"
+        },
+        "10/declaration/body/0/argument/3/3/1/7/3/3/3/3/1": {
+          "type": "element",
+          "hash": "91a0d757438a7a66bd8a2c1917ecc55d",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Start Chat"
+        },
+        "10/declaration/body/0/argument/3/3/1/7/3/5/1/3": {
+          "type": "element",
+          "hash": "df302c3fb3bd7194dfac794b9dc5bab0",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Phone Support"
+        },
+        "10/declaration/body/0/argument/3/3/1/7/3/5/1/5": {
+          "type": "element",
+          "hash": "a2be6e3e69964dff8374a724219292b3",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "VOICE_CHANNEL"
+        },
+        "10/declaration/body/0/argument/3/3/1/7/3/5/3/1": {
+          "type": "element",
+          "hash": "87924e17be166bb9c35ccea5c8cc6dc7",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Direct engineering line"
+        },
+        "10/declaration/body/0/argument/3/3/1/7/3/5/3/3/1": {
+          "type": "element",
+          "hash": "91c0342e4f6e5ffdec745270e1709c45",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "+1 (555) 123-4567"
+        },
+        "10/declaration/body/0/argument/3/3/1/7/3/7/1/3": {
+          "type": "element",
+          "hash": "27266d1bd9474b97f479f50cc4573df3",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Visit Us"
+        },
+        "10/declaration/body/0/argument/3/3/1/7/3/7/1/5": {
+          "type": "element",
+          "hash": "836a2ecd1ffb6f4ad7fe27bd32ea63a0",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "PHYSICAL_LOCATION"
+        },
+        "10/declaration/body/0/argument/3/3/1/7/3/7/3/1": {
+          "type": "element",
+          "hash": "f24b122c64f5f9cf60f6517bae5a0ea5",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Engineering headquarters"
+        },
+        "10/declaration/body/0/argument/3/3/1/7/3/7/3/3": {
+          "type": "element",
+          "hash": "0bfe69828ecbcc415ebdf41a35c71acb",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "123 Business St, City, State 12345"
+        },
+        "10/declaration/body/0/argument/7/1/1/1": {
+          "type": "element",
+          "hash": "c01f897d68725a79b36129650f344783",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Ready to Get Started?"
+        },
+        "10/declaration/body/0/argument/7/1/1/3": {
+          "type": "element",
+          "hash": "d4d51905470a6b20510e5302bbbbabe1",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Join thousands of developers building amazing products with {COMPANY_NAME}."
+        },
+        "10/declaration/body/0/argument/7/1/1/5/1/1": {
+          "type": "element",
+          "hash": "a61d50b68ea0a6de50e09b4e27fcba70",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "View Pricing"
+        },
+        "10/declaration/body/0/argument/7/1/1/5/3/1": {
+          "type": "element",
+          "hash": "1d49a231c2f3fe8f1fd3997a9e74fdef",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Learn More"
+        },
         "7/declaration/body/0/argument/3/3/1/1/3": {
           "type": "element",
           "hash": "55a225c56c73072090449d4d95dac7c5",
@@ -894,13 +1854,277 @@
     },
     "(pages)/pricing/page.tsx": {
       "scopes": {
-        "7/declaration/body/0/argument/3/3/1/1/1/1": {
+        "11/declaration/body/0/argument/3/3/1/11/1/3": {
           "type": "element",
-          "hash": "d8dd2e7df57736b62c6859c12829896c",
+          "hash": "11fd6a620f81152fa23c908a2bec5e19",
           "context": "",
           "skip": false,
           "overrides": {},
-          "content": "💰 Transparent Pricing"
+          "content": "Platform Specifications"
+        },
+        "11/declaration/body/0/argument/3/3/1/11/3": {
+          "type": "element",
+          "hash": "f58ff78274c7cf94731690f71b5725e3",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Core infrastructure capabilities included in all plans"
+        },
+        "11/declaration/body/0/argument/3/3/1/11/5/1/1/3": {
+          "type": "element",
+          "hash": "d5714988c9bada5a72d76944017327fa",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "7-Day Trial"
+        },
+        "11/declaration/body/0/argument/3/3/1/11/5/1/1/5": {
+          "type": "element",
+          "hash": "166ce62323cfec43b2881b898bd532cc",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "NO_CC_REQUIRED"
+        },
+        "11/declaration/body/0/argument/3/3/1/11/5/1/3/1": {
+          "type": "element",
+          "hash": "5def49ea61cbaaa57efb7842af128abb",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Full access to all features. No credit card required for dev environment."
+        },
+        "11/declaration/body/0/argument/3/3/1/11/5/3/1/3": {
+          "type": "element",
+          "hash": "565388423ac1022f4331d7e510edb4b4",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Instant Provisioning"
+        },
+        "11/declaration/body/0/argument/3/3/1/11/5/3/1/5": {
+          "type": "element",
+          "hash": "d9d9f9f4a59ba79511f557b81a10ce59",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "AUTOMATED_SETUP"
+        },
+        "11/declaration/body/0/argument/3/3/1/11/5/3/3/1": {
+          "type": "element",
+          "hash": "a43bde944ec89dc3ee5ed9bba4be3f28",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Your environment is ready in less than 60 seconds. Zero configuration needed."
+        },
+        "11/declaration/body/0/argument/3/3/1/11/5/5/1/3": {
+          "type": "element",
+          "hash": "c188b36bbc683ec6313805541b79675e",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Enterprise Grade"
+        },
+        "11/declaration/body/0/argument/3/3/1/11/5/5/1/5": {
+          "type": "element",
+          "hash": "9c3b722bff634cad41abf3eeefbfe63b",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "SOC2_TYPE_II"
+        },
+        "11/declaration/body/0/argument/3/3/1/11/5/5/3/1": {
+          "type": "element",
+          "hash": "1f6b0b4ee94b27e653c50b2f8c803808",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Compliant infrastructure with 99.99% uptime SLA guarantee."
+        },
+        "11/declaration/body/0/argument/3/3/1/11/5/7/1/3": {
+          "type": "element",
+          "hash": "41b957275735db9c4656358398295e95",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "24/7 Support"
+        },
+        "11/declaration/body/0/argument/3/3/1/11/5/7/1/5": {
+          "type": "element",
+          "hash": "38a71ea0f3ce4426a0c3b24b59fc79a5",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "ENGINEERING_DIRECT"
+        },
+        "11/declaration/body/0/argument/3/3/1/11/5/7/3/1": {
+          "type": "element",
+          "hash": "17fa40495e507429e7dc1ff92eedf88c",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Direct access to engineering team via Slack or Discord."
+        },
+        "11/declaration/body/0/argument/3/3/1/15/1/3": {
+          "type": "element",
+          "hash": "dab33ff2909fb602784cebc142da6dfe",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Security & Compliance"
+        },
+        "11/declaration/body/0/argument/3/3/1/15/3": {
+          "type": "element",
+          "hash": "8a07c67312eec03c904f39182baf9cfd",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "/security/certifications"
+        },
+        "11/declaration/body/0/argument/3/3/1/15/5/1/1/3": {
+          "type": "element",
+          "hash": "c38410af8db4fe7d7a7292e6f5e4b654",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "SSL_ENCRYPTED"
+        },
+        "11/declaration/body/0/argument/3/3/1/15/5/1/1/5": {
+          "type": "element",
+          "hash": "f2fc5e4de7e72da19c1f0749b713f7bd",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "TLS 1.3"
+        },
+        "11/declaration/body/0/argument/3/3/1/15/5/3/1/3": {
+          "type": "element",
+          "hash": "7cd82a5a7eeffa17dc17834d4f6ca98f",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "SOC2_COMPLIANT"
+        },
+        "11/declaration/body/0/argument/3/3/1/15/5/3/1/5": {
+          "type": "element",
+          "hash": "993e4ed03f30bcabd9419176fec5cc57",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Type II"
+        },
+        "11/declaration/body/0/argument/3/3/1/15/5/5/1/3": {
+          "type": "element",
+          "hash": "55c7ef3fdbeaa620b23311983e639177",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "GDPR_READY"
+        },
+        "11/declaration/body/0/argument/3/3/1/15/5/5/1/5": {
+          "type": "element",
+          "hash": "27587d5899f52e9ec194c5dd2a31bc18",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "EU Data Protection"
+        },
+        "11/declaration/body/0/argument/3/3/1/15/5/7/1/3": {
+          "type": "element",
+          "hash": "d3dd013bc3a5c9413117290f614f5e11",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "PCI_DSS"
+        },
+        "11/declaration/body/0/argument/3/3/1/15/5/7/1/5": {
+          "type": "element",
+          "hash": "0e4165d0bab13912883e1c0b54e08ad7",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Level 1"
+        },
+        "11/declaration/body/0/argument/3/3/1/19/1/3": {
+          "type": "element",
+          "hash": "facfd3e8dffb6455c677820d37e012fa",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Supported Payment Methods"
+        },
+        "11/declaration/body/0/argument/3/3/1/19/5/1": {
+          "type": "element",
+          "hash": "1afd520cb1dfce99956636d97767d63d",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "infrastructure_provider: <element:span>{PAYMENT_PROVIDER}</element:span>"
+        },
+        "11/declaration/body/0/argument/3/3/1/3/1/1": {
+          "type": "element",
+          "hash": "090c47844a8c58ef5120bbe18504232f",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "PRICING.md"
+        },
+        "11/declaration/body/0/argument/3/3/1/3/3": {
+          "type": "element",
+          "hash": "248b7c42a28bf355db0bd7d4b56c0ea0",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Simple, transparent pricing"
+        },
+        "11/declaration/body/0/argument/3/3/1/3/5": {
+          "type": "element",
+          "hash": "a07ce3e0cee112c671f4b731a52a16c9",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Choose the plan that works best for your needs. No hidden fees, no surprises. Start building today."
+        },
+        "11/declaration/body/0/argument/7/1/1/1": {
+          "type": "element",
+          "hash": "decae040575930f43e293b1c776d4a23",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Need a Custom Plan?"
+        },
+        "11/declaration/body/0/argument/7/1/1/3": {
+          "type": "element",
+          "hash": "4d24d8aa93b390c7874b1e97abac8611",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Enterprise customers with specific requirements can contact our sales team for tailored solutions."
+        },
+        "11/declaration/body/0/argument/7/1/1/5/1/1": {
+          "type": "element",
+          "hash": "94537da970ffef6210bba8fcecb74a8c",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Contact Sales"
+        },
+        "11/declaration/body/0/argument/7/1/1/5/3/1": {
+          "type": "element",
+          "hash": "1d49a231c2f3fe8f1fd3997a9e74fdef",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Learn More"
+        },
+        "7/declaration/body/0/argument/3/3/1/1/1/1": {
+          "type": "element",
+          "hash": "d15f9e7c28ac3520f82230381529bf90",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "pricing_plans.json"
         },
         "7/declaration/body/0/argument/3/3/1/1/3": {
           "type": "element",
@@ -920,19 +2144,19 @@
         },
         "7/declaration/body/0/argument/3/3/1/7/1/1": {
           "type": "element",
-          "hash": "675c9e6f6808172bc0789571b3f05fac",
+          "hash": "d04f7508f053d787b9ae5c584d119e79",
           "context": "",
           "skip": false,
           "overrides": {},
-          "content": "Why choose our platform?"
+          "content": "Platform Specifications"
         },
         "7/declaration/body/0/argument/3/3/1/7/1/3": {
           "type": "element",
-          "hash": "e6222e4a360b97ec21953e533ee245aa",
+          "hash": "1691bd891fba6e7277b9d8991df7e604",
           "context": "",
           "skip": false,
           "overrides": {},
-          "content": "Join thousands of satisfied customers who trust our secure, reliable platform"
+          "content": "Core infrastructure capabilities included in all plans"
         },
         "7/declaration/body/0/argument/3/3/1/7/1/5/1/3/1": {
           "type": "element",
@@ -1014,61 +2238,165 @@
           "overrides": {},
           "content": "Have questions about our pricing? <element:a>Contact our team</element:a>"
         },
-        "7/declaration/body/0/argument/7/1/1/1": {
+        "7/declaration/body/0/argument/3/3/1/7/3/1/3": {
           "type": "element",
-          "hash": "f955a7931cd6cf387d344ca3cd8fec1a",
+          "hash": "de4c81ddd53f1db6003333a8c0fc1dd2",
           "context": "",
           "skip": false,
           "overrides": {},
-          "content": "Security & Compliance"
+          "content": "7-Day Trial"
+        },
+        "7/declaration/body/0/argument/3/3/1/7/3/1/5": {
+          "type": "element",
+          "hash": "cebb0340636a8a6c26593ded65b27cd6",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Full access to all features. No credit card required for dev environment."
+        },
+        "7/declaration/body/0/argument/3/3/1/7/3/3/3": {
+          "type": "element",
+          "hash": "6b6e1395f8cedf888259b848b0207ac5",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Instant Provisioning"
+        },
+        "7/declaration/body/0/argument/3/3/1/7/3/3/5": {
+          "type": "element",
+          "hash": "516d5b7ae893d693b669bf11bd8df72f",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Automated setup. Your environment is ready in less than 60 seconds."
+        },
+        "7/declaration/body/0/argument/3/3/1/7/3/5/3": {
+          "type": "element",
+          "hash": "a7e744d2f5182ed121faab19402f7d66",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Enterprise Grade"
+        },
+        "7/declaration/body/0/argument/3/3/1/7/3/5/5": {
+          "type": "element",
+          "hash": "ec05b25812a93b8bf81bc14f83a32696",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "SOC2 Type II compliant infrastructure with 99.99% uptime SLA."
+        },
+        "7/declaration/body/0/argument/3/3/1/7/3/7/3": {
+          "type": "element",
+          "hash": "963e280a138d1729c1726df17673b6af",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "24/7 Support"
+        },
+        "7/declaration/body/0/argument/3/3/1/7/3/7/5": {
+          "type": "element",
+          "hash": "053262e07777e39e7b95eb26e3b60b30",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Direct access to engineering team via Slack or Discord."
+        },
+        "7/declaration/body/0/argument/3/3/1/7/5/1": {
+          "type": "element",
+          "hash": "be92fa85efad432b860220cdcf19083d",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Have questions about custom requirements? <element:a>Contact Engineering Sales</element:a>"
+        },
+        "7/declaration/body/0/argument/7/1/1/1": {
+          "type": "element",
+          "hash": "04c3503a84ae4ac93fa877b78faa44f8",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Compliance Matrix"
         },
         "7/declaration/body/0/argument/7/1/1/3": {
           "type": "element",
-          "hash": "e0deb5147392cec8ffad20344ff4bb04",
+          "hash": "4fc5674df4ccf86970de8ab313a970ba",
           "context": "",
           "skip": false,
           "overrides": {},
-          "content": "Industry-leading security standards and certifications"
+          "content": "/security/certifications"
         },
         "7/declaration/body/0/argument/7/1/5/1/3": {
           "type": "element",
-          "hash": "667a88236040eb3b48f7d5c83d513d7f",
+          "hash": "e6341922307595fcbd8b2fc3ff002866",
           "context": "",
           "skip": false,
           "overrides": {},
-          "content": "SSL Encrypted"
+          "content": "SSL_ENCRYPTED"
+        },
+        "7/declaration/body/0/argument/7/1/5/1/5": {
+          "type": "element",
+          "hash": "6e09322bdacdb232de35776263600efc",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "TLS 1.3"
         },
         "7/declaration/body/0/argument/7/1/5/3/3": {
           "type": "element",
-          "hash": "03b49c91bd5c918fe5df36e501bdcfb3",
+          "hash": "bab3fd40f7b06e7b6a6e6dc36c4039c8",
           "context": "",
           "skip": false,
           "overrides": {},
-          "content": "SOC 2 Compliant"
+          "content": "SOC2_COMPLIANT"
+        },
+        "7/declaration/body/0/argument/7/1/5/3/5": {
+          "type": "element",
+          "hash": "ffdfad44fb00f629a6af48fbf9421073",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Type II"
         },
         "7/declaration/body/0/argument/7/1/5/5/3": {
           "type": "element",
-          "hash": "9ad8cfb04f5e07584c3e6fc4926c9101",
+          "hash": "a803c2237f2ddb291d2146953d768b6d",
           "context": "",
           "skip": false,
           "overrides": {},
-          "content": "GDPR Ready"
+          "content": "GDPR_READY"
+        },
+        "7/declaration/body/0/argument/7/1/5/5/5": {
+          "type": "element",
+          "hash": "1368ed2745988ef97d6dfd3f1d9d4ce0",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "EU Data"
         },
         "7/declaration/body/0/argument/7/1/5/7/3": {
           "type": "element",
-          "hash": "03327b8bb683509ae14af6a6c86a12fa",
+          "hash": "d3dd013bc3a5c9413117290f614f5e11",
           "context": "",
           "skip": false,
           "overrides": {},
-          "content": "PCI DSS Level 1"
+          "content": "PCI_DSS"
+        },
+        "7/declaration/body/0/argument/7/1/5/7/5": {
+          "type": "element",
+          "hash": "4cbb6d9f0620c1d55b84283c0159e77e",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Level 1"
         },
         "7/declaration/body/0/argument/7/1/9/1": {
           "type": "element",
-          "hash": "35eb4b29df3c4e26fbe6f4cfebde3eb5",
+          "hash": "fec065a0a8f1ec0d75b31bd0adfff732",
           "context": "",
           "skip": false,
           "overrides": {},
-          "content": "Accepted payment methods"
+          "content": "Supported Gateways"
         },
         "7/declaration/body/0/argument/7/1/9/3/1/1": {
           "type": "element",
@@ -1112,11 +2440,11 @@
         },
         "7/declaration/body/0/argument/7/1/9/7/1": {
           "type": "element",
-          "hash": "e2d7eaf3b1d89e7015b3db298b439379",
+          "hash": "56080e38b3270734642463d080f5d76e",
           "context": "",
           "skip": false,
           "overrides": {},
-          "content": "Powered by <element:span>{PAYMENT_PROVIDER}</element:span> - Modern Payment Infrastructure"
+          "content": "infrastructure_provider: <element:span>{PAYMENT_PROVIDER}</element:span>"
         }
       }
     },
@@ -4778,7 +6106,7 @@
           "type": "element",
           "hash": "df1b3893a8d70531c38c2795d675698e",
           "context": "",
-          "skip": false,
+          "skip": true,
           "overrides": {},
           "content": "✓ Ready in 1.2s"
         },
@@ -4786,7 +6114,7 @@
           "type": "element",
           "hash": "de85a3b9161c411cb69b53420a65c4e4",
           "context": "",
-          "skip": false,
+          "skip": true,
           "overrides": {},
           "content": "○ Local: <element:span>http://localhost:3000</element:span>"
         },
@@ -4800,11 +6128,11 @@
         },
         "6/declaration/body/5/argument/1/1/7/3/7/3/3/3": {
           "type": "element",
-          "hash": "2eafec112c559d2c4b30443b67ccf25c",
+          "hash": "baa46e1d1dafaff325234f1b8b46f559",
           "context": "",
           "skip": false,
           "overrides": {},
-          "content": "<element:span>➜</element:span> git clone https://github.com/ullrai/saas-starter"
+          "content": "<element:span>➜</element:span> git clone https://github.com/UllrAI/SaaS-Starter.git"
         },
         "6/declaration/body/5/argument/1/1/7/3/7/3/3/5": {
           "type": "element",
@@ -4816,7 +6144,7 @@
         },
         "6/declaration/body/5/argument/1/1/7/3/7/3/3/9": {
           "type": "element",
-          "hash": "9f6dede3951f99228352db09df537461",
+          "hash": "4cb8bd2adf9586bcaa55a8e333258e38",
           "context": "",
           "skip": false,
           "overrides": {},
@@ -4936,11 +6264,75 @@
         },
         "6/declaration/body/5/argument/1/1/7/3/7/7/7/1": {
           "type": "element",
-          "hash": "f76ef3db186b495e3935895a85d56f71",
+          "hash": "49862237f46c4d662a6af0ead0c1c321",
           "context": "",
           "skip": false,
           "overrides": {},
-          "content": "Built with <element:span>Next.js 15</element:span> + <element:span>shadcn/ui</element:span>"
+          "content": "<element:React.Fragment>Built with </element:React.Fragment><element:span>Next.js 15</element:span>+ <element:span>shadcn/ui</element:span>"
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/7/7/1/1": {
+          "type": "element",
+          "hash": "daa64d7fb8b9ff0e8084dcef7bf9fb3f",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Built with"
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/7/7/1/10": {
+          "type": "element",
+          "hash": "7d822f489eee28c06512ad7f06e78bb7",
+          "context": "",
+          "skip": true,
+          "overrides": {},
+          "content": "shadcn/ui"
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/7/7/1/3": {
+          "type": "element",
+          "hash": "6eb0a7c408f3eaa826dbb9e17a82fd09",
+          "context": "",
+          "skip": true,
+          "overrides": {},
+          "content": "Next.js 15"
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/7/7/1/4": {
+          "type": "element",
+          "hash": "6eb0a7c408f3eaa826dbb9e17a82fd09",
+          "context": "",
+          "skip": true,
+          "overrides": {},
+          "content": "Next.js 15"
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/7/7/1/5": {
+          "type": "element",
+          "hash": "2286b28fa37112af76d6f5952c4b928e",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": " + "
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/7/7/1/6": {
+          "type": "element",
+          "hash": "7123bc5f2dcf59a6d63730fd779aff41",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": " + "
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/7/7/1/7": {
+          "type": "element",
+          "hash": "2286b28fa37112af76d6f5952c4b928e",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "+"
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/7/7/1/8": {
+          "type": "element",
+          "hash": "7d822f489eee28c06512ad7f06e78bb7",
+          "context": "",
+          "skip": true,
+          "overrides": {},
+          "content": "shadcn/ui"
         },
         "7/declaration/body/0/argument/1/1/3/15/1/1": {
           "type": "element",
@@ -5892,19 +7284,19 @@
         },
         "16/declaration/body/8/argument/11/1/expression/0/body/3/argument/1/expression/right/1": {
           "type": "element",
-          "hash": "69b93512dcde68b518e5270c8f255437",
+          "hash": "62cbd692b99041a965210318b3df0fc5",
           "context": "",
           "skip": false,
           "overrides": {},
-          "content": "<element:Star></element:Star> Most Popular"
+          "content": "RECOMMENDED"
         },
         "16/declaration/body/8/argument/11/1/expression/0/body/3/argument/3/5/1/3/expression/right": {
           "type": "element",
-          "hash": "f841f6620ce95fd3c7f624660cbafe92",
+          "hash": "5a72add5eeaf56befe83236eb0ab7b01",
           "context": "",
           "skip": false,
           "overrides": {},
-          "content": "/month"
+          "content": "/mo"
         },
         "16/declaration/body/8/argument/11/1/expression/0/body/3/argument/3/5/3/1/1/expression/alternate/alternate": {
           "type": "element",
@@ -5956,19 +7348,19 @@
         },
         "16/declaration/body/8/argument/11/1/expression/0/body/3/argument/5/5/expression/alternate/1/expression/alternate/alternate": {
           "type": "element",
-          "hash": "7954c772ab8c27b23fae6d341c53d577",
+          "hash": "7ecd4ea1a11514a56c79a597a62973b8",
           "context": "",
           "skip": false,
           "overrides": {},
-          "content": "Get {tier.label}"
+          "content": "GET <function:tier.name.toUpperCase/><element:Terminal></element:Terminal>"
         },
         "16/declaration/body/8/argument/11/1/expression/0/body/3/argument/5/5/expression/alternate/1/expression/alternate/consequent": {
           "type": "element",
-          "hash": "14d5f16d813ef8547595bc2cf5165715",
+          "hash": "6e1d8edc3970fd04d5f82fd5306c76fe",
           "context": "",
           "skip": false,
           "overrides": {},
-          "content": "<element:LogIn></element:LogIn> Login to Get {tier.name}"
+          "content": "<element:LogIn></element:LogIn> LOGIN TO BUY"
         },
         "16/declaration/body/8/argument/11/1/expression/0/body/3/argument/5/5/expression/alternate/1/expression/alternate/consequent/3": {
           "type": "element",
@@ -5980,11 +7372,11 @@
         },
         "16/declaration/body/8/argument/11/1/expression/0/body/3/argument/5/5/expression/alternate/1/expression/consequent": {
           "type": "element",
-          "hash": "63a4b31ce7f5507b3bcfac196a87417f",
+          "hash": "f0ace61297d2644d5103042209d2f2c0",
           "context": "",
           "skip": false,
           "overrides": {},
-          "content": "<element:Loader2></element:Loader2> Processing..."
+          "content": "<element:Loader2></element:Loader2> PROCESSING"
         },
         "16/declaration/body/8/argument/11/1/expression/0/body/6/argument/1/expression/right/1": {
           "type": "element",
@@ -6068,11 +7460,11 @@
         },
         "16/declaration/body/8/argument/3/1/1/3": {
           "type": "element",
-          "hash": "cb77aeda84fdf50124cba9b2bbe6047d",
+          "hash": "2c769b1f59a704731d9364d2348ea1e5",
           "context": "",
           "skip": false,
           "overrides": {},
-          "content": "<element:CreditCard></element:CreditCard> One-time"
+          "content": "<element:CreditCard></element:CreditCard> Lifetime"
         },
         "16/declaration/body/8/argument/7/expression/right/1/1": {
           "type": "element",
@@ -6092,11 +7484,11 @@
         },
         "16/declaration/body/8/argument/7/expression/right/3/1/expression/right": {
           "type": "element",
-          "hash": "5265300527ba1f5f86c9bee3438b3daf",
+          "hash": "3fea85118ebd53118289344dafc0705f",
           "context": "",
           "skip": false,
           "overrides": {},
-          "content": "<element:Zap></element:Zap> Save 17% with yearly billing"
+          "content": "<element:Zap></element:Zap> Save 17%"
         },
         "18/declaration/body/11/argument/11/1/expression/0/body/6/argument/1/expression/right/1": {
           "type": "element",
@@ -7878,45 +9270,389 @@
     },
     "dashboard/page.tsx": {
       "scopes": {
-        "8/declaration/body/0/argument-title": {
+        "7/declaration/body/0/argument-title": {
           "type": "attribute",
-          "hash": "104a3db3b671c04e167eafbe21e57881",
+          "hash": "c9380ea68c8c76ea451bd9613329a07c",
           "context": "",
           "skip": false,
           "overrides": {},
-          "content": "Home"
+          "content": "Dashboard"
         },
-        "8/declaration/body/0/argument/11/1/1/1": {
-          "type": "element",
-          "hash": "54e8f80bede970eadb800eba1cff2b61",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "<element:Zap></element:Zap> Quick Actions"
-        },
-        "8/declaration/body/0/argument/11/1/1/3": {
-          "type": "element",
-          "hash": "f50b7fc60ff0236fac6fef9d67e79ea3",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Common tasks to help you get started"
-        },
-        "8/declaration/body/0/argument/11/3/1/1": {
+        "7/declaration/body/0/argument/11/1/1/1": {
           "type": "element",
           "hash": "ac71a73fc53d25753f37379fe32008bb",
           "context": "",
           "skip": false,
           "overrides": {},
-          "content": "<element:Activity></element:Activity> Recent Activity"
+          "content": "<element:Terminal></element:Terminal> Recent Activity"
         },
-        "8/declaration/body/0/argument/11/3/1/3": {
+        "7/declaration/body/0/argument/11/1/1/3": {
           "type": "element",
-          "hash": "25ad3762b042d7c7fc64a92994eaf5cf",
+          "hash": "dd5d5bb5dbaae37705e849877e2586e4",
           "context": "",
           "skip": false,
           "overrides": {},
-          "content": "Latest updates from your SaaS"
+          "content": "Latest system events and logs"
+        },
+        "7/declaration/body/0/argument/11/1/3/1/1/3/1": {
+          "type": "element",
+          "hash": "5fbcb82d3b44d0bdfda8bf4c56e16aa2",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "New user registered"
+        },
+        "7/declaration/body/0/argument/11/1/3/1/1/3/3": {
+          "type": "element",
+          "hash": "ca6a11e06c9c442bc9df1374560d60bc",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "user_id: 8923 • 2m ago"
+        },
+        "7/declaration/body/0/argument/11/1/3/1/3/3/1": {
+          "type": "element",
+          "hash": "874860fd1eecc451b7187f0766cea6ba",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Payment received"
+        },
+        "7/declaration/body/0/argument/11/1/3/1/3/3/3": {
+          "type": "element",
+          "hash": "fa188b7039a006c376101eb7c58a9bd4",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "inv_2930 • $49.00 • 5m ago"
+        },
+        "7/declaration/body/0/argument/11/1/3/1/5/3/1": {
+          "type": "element",
+          "hash": "b6705533cd498801c84a718ef6cd2ab7",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Feature deployed"
+        },
+        "7/declaration/body/0/argument/11/1/3/1/5/3/3": {
+          "type": "element",
+          "hash": "8603dce70af73112f98baabe4a667814",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "v2.4.0 • main_branch • 1h ago"
+        },
+        "7/declaration/body/0/argument/11/3/1/1": {
+          "type": "element",
+          "hash": "54e8f80bede970eadb800eba1cff2b61",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:Clock></element:Clock> Quick Actions"
+        },
+        "7/declaration/body/0/argument/11/3/1/3": {
+          "type": "element",
+          "hash": "e437ce614a8836bffb1d18ec558059d6",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Common administrative tasks"
+        },
+        "7/declaration/body/0/argument/11/3/3/1/1": {
+          "type": "element",
+          "hash": "30697a26bf1f752f9f8298de06601f63",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:ArrowUpRight></element:ArrowUpRight> Upgrade Plan"
+        },
+        "7/declaration/body/0/argument/11/3/3/1/3": {
+          "type": "element",
+          "hash": "2bf0a9d4cf82169205aaf6264b94a890",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:Users></element:Users> Manage Team"
+        },
+        "7/declaration/body/0/argument/11/3/3/1/5": {
+          "type": "element",
+          "hash": "ca18256678429180a3eaca129eba519d",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:CheckCircle2></element:CheckCircle2> Verify Domain"
+        },
+        "7/declaration/body/0/argument/3/1/1/3": {
+          "type": "element",
+          "hash": "3bef8a05bb46de82ff9f62caf7ac5a35",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "system_status"
+        },
+        "7/declaration/body/0/argument/3/1/3/3": {
+          "type": "element",
+          "hash": "c16c45fac98d1058cfe2959e5c4734a2",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "ONLINE"
+        },
+        "7/declaration/body/0/argument/3/3/1/1": {
+          "type": "element",
+          "hash": "aa426039cb55538a7774641a4bdfe56b",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Welcome back, User"
+        },
+        "7/declaration/body/0/argument/3/3/1/3": {
+          "type": "element",
+          "hash": "6e91c04ae89e31d570837904a81a0853",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "System is running smoothly. All services operational."
+        },
+        "7/declaration/body/0/argument/3/3/3/1": {
+          "type": "element",
+          "hash": "957cb844b5c6024c335628922fcde5be",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:Zap></element:Zap> Deploy New Project"
+        },
+        "7/declaration/body/0/argument/3/3/3/3": {
+          "type": "element",
+          "hash": "08249111d402ca2b2d44c86e177a19d1",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:Activity></element:Activity> View Logs"
+        },
+        "7/declaration/body/0/argument/7/1/1/1": {
+          "type": "element",
+          "hash": "de2f7a9155ab8c2938ddaf03b2fb7854",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Total Revenue"
+        },
+        "7/declaration/body/0/argument/7/1/3/1": {
+          "type": "element",
+          "hash": "bf002ce6a57d2e15ba04947b8ac3e81d",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "$45,231.89"
+        },
+        "7/declaration/body/0/argument/7/1/3/3/1": {
+          "type": "element",
+          "hash": "7b9a6430d51e20ff9850b34d23215f95",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:TrendingUp></element:TrendingUp> +20.1%"
+        },
+        "7/declaration/body/0/argument/7/1/3/3/3": {
+          "type": "element",
+          "hash": "fa633b17714eb94793f336520083e4b4",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "from last month"
+        },
+        "7/declaration/body/0/argument/7/3/1/1": {
+          "type": "element",
+          "hash": "561a1f7ef3881ed535efdf1609868f93",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Active Users"
+        },
+        "7/declaration/body/0/argument/7/3/3/1": {
+          "type": "element",
+          "hash": "73b89b70d05ed744122281082f3cbf75",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "+2,350"
+        },
+        "7/declaration/body/0/argument/7/3/3/3/1": {
+          "type": "element",
+          "hash": "8cb25c59cc530b0eb3ee8024972cf1d6",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:TrendingUp></element:TrendingUp> +180.1%"
+        },
+        "7/declaration/body/0/argument/7/3/3/3/3": {
+          "type": "element",
+          "hash": "fa633b17714eb94793f336520083e4b4",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "from last month"
+        },
+        "7/declaration/body/0/argument/7/5/1/1": {
+          "type": "element",
+          "hash": "5fcef29a380b5d6739a6888e064d4571",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Conversions"
+        },
+        "7/declaration/body/0/argument/7/5/3/1": {
+          "type": "element",
+          "hash": "257980376e2b78e15b900a1a3f7918fa",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "+12,234"
+        },
+        "7/declaration/body/0/argument/7/5/3/3/1": {
+          "type": "element",
+          "hash": "efb73aef93a4a73516dd2770bf599aab",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:TrendingUp></element:TrendingUp> +19%"
+        },
+        "7/declaration/body/0/argument/7/5/3/3/3": {
+          "type": "element",
+          "hash": "fa633b17714eb94793f336520083e4b4",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "from last month"
+        },
+        "7/declaration/body/0/argument/7/7/1/1": {
+          "type": "element",
+          "hash": "f386f1720eb2bf89ca2ed4156fceba0e",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Growth Rate"
+        },
+        "7/declaration/body/0/argument/7/7/3/1": {
+          "type": "element",
+          "hash": "599a64b95e973fdb7b439842d139cb3e",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "+573"
+        },
+        "7/declaration/body/0/argument/7/7/3/3/1": {
+          "type": "element",
+          "hash": "32c8a0a6a4a1a024b9278905d69e45b8",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:TrendingUp></element:TrendingUp> +201"
+        },
+        "7/declaration/body/0/argument/7/7/3/3/3": {
+          "type": "element",
+          "hash": "82be53d09bab84e3d880d3fd44aae53b",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "since last hour"
+        },
+        "8/declaration/body/0/argument-title": {
+          "type": "attribute",
+          "hash": "c9380ea68c8c76ea451bd9613329a07c",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Dashboard"
+        },
+        "8/declaration/body/0/argument/11/1/1/1": {
+          "type": "element",
+          "hash": "ac71a73fc53d25753f37379fe32008bb",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:Terminal></element:Terminal> Recent Activity"
+        },
+        "8/declaration/body/0/argument/11/1/1/3": {
+          "type": "element",
+          "hash": "dd5d5bb5dbaae37705e849877e2586e4",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Latest system events and logs"
+        },
+        "8/declaration/body/0/argument/11/1/3/1/1/3/1": {
+          "type": "element",
+          "hash": "5fbcb82d3b44d0bdfda8bf4c56e16aa2",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "New user registered"
+        },
+        "8/declaration/body/0/argument/11/1/3/1/1/3/3": {
+          "type": "element",
+          "hash": "ca6a11e06c9c442bc9df1374560d60bc",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "user_id: 8923 • 2m ago"
+        },
+        "8/declaration/body/0/argument/11/1/3/1/3/3/1": {
+          "type": "element",
+          "hash": "874860fd1eecc451b7187f0766cea6ba",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Payment received"
+        },
+        "8/declaration/body/0/argument/11/1/3/1/3/3/3": {
+          "type": "element",
+          "hash": "fa188b7039a006c376101eb7c58a9bd4",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "inv_2930 • $49.00 • 5m ago"
+        },
+        "8/declaration/body/0/argument/11/1/3/1/5/3/1": {
+          "type": "element",
+          "hash": "b6705533cd498801c84a718ef6cd2ab7",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Feature deployed"
+        },
+        "8/declaration/body/0/argument/11/1/3/1/5/3/3": {
+          "type": "element",
+          "hash": "8603dce70af73112f98baabe4a667814",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "v2.4.0 • main_branch • 1h ago"
+        },
+        "8/declaration/body/0/argument/11/3/1/1": {
+          "type": "element",
+          "hash": "54e8f80bede970eadb800eba1cff2b61",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:Clock></element:Clock> Quick Actions"
+        },
+        "8/declaration/body/0/argument/11/3/1/3": {
+          "type": "element",
+          "hash": "e437ce614a8836bffb1d18ec558059d6",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Common administrative tasks"
+        },
+        "8/declaration/body/0/argument/11/3/3/1/1": {
+          "type": "element",
+          "hash": "30697a26bf1f752f9f8298de06601f63",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:ArrowUpRight></element:ArrowUpRight> Upgrade Plan"
         },
         "8/declaration/body/0/argument/11/3/3/1/1/3": {
           "type": "element",
@@ -7934,6 +9670,14 @@
           "overrides": {},
           "content": "2m ago"
         },
+        "8/declaration/body/0/argument/11/3/3/1/3": {
+          "type": "element",
+          "hash": "2bf0a9d4cf82169205aaf6264b94a890",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:Users></element:Users> Manage Team"
+        },
         "8/declaration/body/0/argument/11/3/3/1/3/3": {
           "type": "element",
           "hash": "ffa93ba2d858f831678dadceb1bd193a",
@@ -7949,6 +9693,14 @@
           "skip": false,
           "overrides": {},
           "content": "5m ago"
+        },
+        "8/declaration/body/0/argument/11/3/3/1/5": {
+          "type": "element",
+          "hash": "ca18256678429180a3eaca129eba519d",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:CheckCircle2></element:CheckCircle2> Verify Domain"
         },
         "8/declaration/body/0/argument/11/3/3/1/5/3": {
           "type": "element",
@@ -7966,13 +9718,37 @@
           "overrides": {},
           "content": "1h ago"
         },
-        "8/declaration/body/0/argument/3/3/1/3": {
+        "8/declaration/body/0/argument/3/1/1/3": {
           "type": "element",
-          "hash": "f6aad626f304541a1c13d3841d96aea2",
+          "hash": "3bef8a05bb46de82ff9f62caf7ac5a35",
           "context": "",
           "skip": false,
           "overrides": {},
-          "content": "Welcome Back"
+          "content": "system_status"
+        },
+        "8/declaration/body/0/argument/3/1/3/3": {
+          "type": "element",
+          "hash": "c16c45fac98d1058cfe2959e5c4734a2",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "ONLINE"
+        },
+        "8/declaration/body/0/argument/3/3/1/1": {
+          "type": "element",
+          "hash": "aa426039cb55538a7774641a4bdfe56b",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Welcome back, User"
+        },
+        "8/declaration/body/0/argument/3/3/1/3": {
+          "type": "element",
+          "hash": "6e91c04ae89e31d570837904a81a0853",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "System is running smoothly. All services operational."
         },
         "8/declaration/body/0/argument/3/3/3": {
           "type": "element",
@@ -7981,6 +9757,22 @@
           "skip": false,
           "overrides": {},
           "content": "Good to see you again! 👋"
+        },
+        "8/declaration/body/0/argument/3/3/3/1": {
+          "type": "element",
+          "hash": "957cb844b5c6024c335628922fcde5be",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:Zap></element:Zap> Deploy New Project"
+        },
+        "8/declaration/body/0/argument/3/3/3/3": {
+          "type": "element",
+          "hash": "08249111d402ca2b2d44c86e177a19d1",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:Activity></element:Activity> View Logs"
         },
         "8/declaration/body/0/argument/3/3/5": {
           "type": "element",
@@ -8030,6 +9822,22 @@
           "overrides": {},
           "content": "<element:span><element:TrendingUp></element:TrendingUp> +20.1%</element:span> from last month"
         },
+        "8/declaration/body/0/argument/7/1/3/3/1": {
+          "type": "element",
+          "hash": "7b9a6430d51e20ff9850b34d23215f95",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:TrendingUp></element:TrendingUp> +20.1%"
+        },
+        "8/declaration/body/0/argument/7/1/3/3/3": {
+          "type": "element",
+          "hash": "fa633b17714eb94793f336520083e4b4",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "from last month"
+        },
         "8/declaration/body/0/argument/7/3/1/1": {
           "type": "element",
           "hash": "561a1f7ef3881ed535efdf1609868f93",
@@ -8053,6 +9861,22 @@
           "skip": false,
           "overrides": {},
           "content": "<element:span><element:TrendingUp></element:TrendingUp> +180.1%</element:span> from last month"
+        },
+        "8/declaration/body/0/argument/7/3/3/3/1": {
+          "type": "element",
+          "hash": "8cb25c59cc530b0eb3ee8024972cf1d6",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:TrendingUp></element:TrendingUp> +180.1%"
+        },
+        "8/declaration/body/0/argument/7/3/3/3/3": {
+          "type": "element",
+          "hash": "fa633b17714eb94793f336520083e4b4",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "from last month"
         },
         "8/declaration/body/0/argument/7/5/1/1": {
           "type": "element",
@@ -8078,6 +9902,22 @@
           "overrides": {},
           "content": "<element:span><element:TrendingUp></element:TrendingUp> +19%</element:span> from last month"
         },
+        "8/declaration/body/0/argument/7/5/3/3/1": {
+          "type": "element",
+          "hash": "efb73aef93a4a73516dd2770bf599aab",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:TrendingUp></element:TrendingUp> +19%"
+        },
+        "8/declaration/body/0/argument/7/5/3/3/3": {
+          "type": "element",
+          "hash": "fa633b17714eb94793f336520083e4b4",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "from last month"
+        },
         "8/declaration/body/0/argument/7/7/1/1": {
           "type": "element",
           "hash": "f386f1720eb2bf89ca2ed4156fceba0e",
@@ -8101,6 +9941,22 @@
           "skip": false,
           "overrides": {},
           "content": "<element:span><element:TrendingUp></element:TrendingUp> +201</element:span> since last hour"
+        },
+        "8/declaration/body/0/argument/7/7/3/3/1": {
+          "type": "element",
+          "hash": "32c8a0a6a4a1a024b9278905d69e45b8",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:TrendingUp></element:TrendingUp> +201"
+        },
+        "8/declaration/body/0/argument/7/7/3/3/3": {
+          "type": "element",
+          "hash": "82be53d09bab84e3d880d3fd44aae53b",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "since last hour"
         }
       }
     },

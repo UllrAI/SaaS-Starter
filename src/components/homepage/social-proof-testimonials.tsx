@@ -181,11 +181,10 @@ function TestimonialCard({
 }) {
   return (
     <Card
-      className={`h-full border border-border/60 transition-all duration-300 hover:border-primary/40 hover:shadow-lg ${
-        testimonial.featured
-          ? "bg-gradient-to-b from-primary/5 via-background to-background"
-          : "bg-background/80"
-      }`}
+      className={`h-full border border-border/60 transition-all duration-300 hover:border-primary/40 hover:shadow-lg ${testimonial.featured
+        ? "bg-gradient-to-b from-primary/5 via-background to-background"
+        : "bg-background/80"
+        }`}
     >
       <CardContent className="p-6">
         {/* Quote Icon */}
@@ -297,7 +296,7 @@ export function SocialProofUnified() {
         </div>
 
         {/* Company Logos Section */}
-        <div className="rounded-2xl border border-border/60 bg-background/80 px-6 py-10 text-center shadow-sm">
+        <div className="px-6 py-10 text-center">
           <p className="text-muted-foreground mb-6 text-sm uppercase tracking-wide">
             Trusted by innovative companies
           </p>

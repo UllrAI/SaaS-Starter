@@ -11,6 +11,7 @@ import {
   TrendingUp,
   Square,
   Sparkles,
+  FlaskConical,
 } from "lucide-react";
 
 interface Product {
@@ -27,7 +28,10 @@ const products: Product[] = [
     id: "pixmiller",
     name: "PixMiller",
     description: (
-      <>Remove backgrounds in seconds with AI precision - no design skills needed</>
+      <>
+        Remove backgrounds in seconds with AI precision - no design skills
+        needed
+      </>
     ),
     url: "https://pixmiller.com/",
     icon: Image,
@@ -36,7 +40,10 @@ const products: Product[] = [
     id: "headshots-fun",
     name: "HeadShots.fun",
     description: (
-      <>Generate professional headshots instantly - perfect for LinkedIn, resumes & more</>
+      <>
+        Generate professional headshots instantly - perfect for LinkedIn,
+        resumes & more
+      </>
     ),
     url: "https://headshots.fun/",
     icon: Sparkles,
@@ -45,28 +52,44 @@ const products: Product[] = [
   {
     id: "to-markdown",
     name: "To Markdown",
-    description: <>Convert any document to clean Markdown instantly - PDFs, Word docs, web pages</>,
+    description: (
+      <>
+        Convert any document to clean Markdown instantly - PDFs, Word docs, web
+        pages
+      </>
+    ),
     url: "https://to-markdown.com/",
     icon: FileText,
   },
   {
     id: "trend-x-day",
     name: "Trend X Day",
-    description: <>Stay ahead with daily insights - data-driven analysis of global trends</>,
+    description: (
+      <>
+        Stay ahead with daily insights - data-driven analysis of global trends
+      </>
+    ),
     url: "https://trendxday.com/",
     icon: TrendingUp,
   },
   {
     id: "ogimage-site",
     name: "OGimage.site",
-    description: <>Create stunning social media cards that boost engagement and clicks</>,
+    description: (
+      <>Create stunning social media cards that boost engagement and clicks</>
+    ),
     url: "https://ogimage.site/",
     icon: Square,
   },
   {
     id: "hipng",
     name: "HiPNG.com",
-    description: <>Access thousands of AI-generated transparent PNGs - perfect for any project</>,
+    description: (
+      <>
+        Access thousands of AI-generated transparent PNGs - perfect for any
+        project
+      </>
+    ),
     url: "https://hipng.com/",
     icon: Zap,
   },
@@ -74,18 +97,21 @@ const products: Product[] = [
 
 export function OtherProducts() {
   return (
-    <section className="relative py-24">
+    <section className="bg-background border-border relative border-b py-24">
       <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-3xl text-center">
-          <Badge variant="secondary" className="mb-4">
-            More from UllrAI Lab
+          <Badge variant="outline" className="border-primary text-primary mb-4">
+            <FlaskConical className="mr-2 h-3 w-3" />
+            <>UllrAI Lab</>
           </Badge>
           <h2 className="text-foreground text-3xl font-bold tracking-tight sm:text-4xl">
-            Explore our other tools
+            <>Explore our other tools</>
           </h2>
           <p className="text-muted-foreground mt-4 text-lg leading-8">
-            AI-powered utilities that help creators, developers, and teams ship
-            faster every day.
+            <>
+              AI-powered utilities that help creators, developers, and teams
+              ship faster every day.
+            </>
           </p>
         </div>
 
@@ -95,16 +121,16 @@ export function OtherProducts() {
             return (
               <Card
                 key={product.id}
-                className="relative h-full rounded-xl border border-border/70 bg-background/80 p-6 shadow-sm"
+                className="group border-border bg-card hover:border-primary relative h-full border p-6 transition-all hover:shadow-[4px_4px_0px_0px_var(--border)]"
               >
                 <CardContent className="p-0">
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="bg-primary/10 text-primary flex h-10 w-10 items-center justify-center rounded-2xl">
+                      <div className="bg-secondary text-primary border-border group-hover:bg-primary group-hover:text-primary-foreground flex h-10 w-10 items-center justify-center border transition-colors">
                         <IconComponent className="h-5 w-5" />
                       </div>
                       <div className="flex-1">
-                        <h3 className="text-foreground font-semibold">
+                        <h3 className="text-foreground font-bold">
                           {product.name}
                         </h3>
                         {product.badge && (
@@ -114,7 +140,7 @@ export function OtherProducts() {
                         )}
                       </div>
                     </div>
-                    <ExternalLink className="text-muted-foreground h-4 w-4" />
+                    <ExternalLink className="text-muted-foreground group-hover:text-primary h-4 w-4 transition-colors" />
                   </div>
 
                   <p className="text-muted-foreground mt-4 text-sm leading-relaxed">
@@ -135,12 +161,12 @@ export function OtherProducts() {
         </div>
 
         <p className="text-muted-foreground mt-10 text-center text-sm">
-          Have an idea for another tool?
+          <>Have an idea for another tool?</>
           <a
             href="mailto:support@ullrai.com"
-            className="text-primary ml-2 font-medium hover:underline"
+            className="text-primary ml-2 font-bold hover:underline"
           >
-            Let us know
+            <>Let us know</>
           </a>
         </p>
       </div>

@@ -1,10 +1,7 @@
 import "@/styles/globals.css";
 import Script from "next/script";
 import { createMetadata } from "@/lib/metadata";
-import {
-  APP_NAME,
-  COMPANY_NAME,
-} from "@/lib/config/constants";
+import { APP_NAME, COMPANY_NAME } from "@/lib/config/constants";
 import env from "@/env";
 
 import { LingoProvider, loadDictionary } from "lingo.dev/react/rsc";
@@ -15,7 +12,8 @@ export const metadata = createMetadata({
     template: `%s | ${APP_NAME}`,
     default: `${APP_NAME}`,
   },
-  description: "Complete Micro UllrAI SaaS starter with authentication, payments, database, and deployment.",
+  description:
+    "Complete Micro UllrAI SaaS starter with authentication, payments, database, and deployment.",
   applicationName: APP_NAME,
   authors: [{ name: COMPANY_NAME, url: env.NEXT_PUBLIC_APP_URL }],
   creator: COMPANY_NAME,

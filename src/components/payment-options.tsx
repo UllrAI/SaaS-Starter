@@ -257,11 +257,13 @@ export function PricingSection({ className }: { className?: string }) {
                   </div>
                   <div className="flex h-5 items-center justify-center">
                     <p className="text-muted-foreground text-sm font-medium">
-                      {paymentMode === "one_time"
-                        ? <>One-time payment</>
-                        : billingCycle === "yearly"
-                          ? <>Billed annually</>
-                          : <>Billed monthly</>}
+                      {paymentMode === "one_time" ? (
+                        <>One-time payment</>
+                      ) : billingCycle === "yearly" ? (
+                        <>Billed annually</>
+                      ) : (
+                        <>Billed monthly</>
+                      )}
                     </p>
                   </div>
                   {billingCycle === "yearly" && paymentMode !== "one_time" && (

@@ -45,7 +45,7 @@ export default {
             en: "Former tech lead at major SaaS companies. Passionate about developer tools.",
             "zh-CN": "曾在大型SaaS公司担任技术负责人。热衷于开发者工具。",
           },
-          hash: "4a544233030d4e5c29fee5919ce0e9d2",
+          hash: "4f4b3b2aaf601cfb820e8b5c1edfb45b",
         },
         "14/0/init/1/2/value": {
           content: {
@@ -57,9 +57,9 @@ export default {
         "14/0/init/1/3/value": {
           content: {
             en: "Full-stack engineer with 10+ years building scalable applications.",
-            "zh-CN": "拥有10多年构建可扩展应用程序经验的全栈工程师。",
+            "zh-CN": "拥有10多年构建可扩展应用程序的全栈工程师。",
           },
-          hash: "8b101f9d3dbcaf792657ba3d13d8ff11",
+          hash: "24040a79a15e7e7dbf030f1a5f8522bf",
         },
         "14/0/init/2/2/value": {
           content: {
@@ -73,7 +73,7 @@ export default {
             en: "Product strategist focused on developer experience and user success.",
             "zh-CN": "专注于开发者体验和用户成功的产品策略师。",
           },
-          hash: "ff5aed56616ed9d23a1f6c3174134be0",
+          hash: "06705a4cadd41b9fb9545343bc0a2669",
         },
         "14/declaration/body/0/argument/11/1/1/1": {
           content: {
@@ -191,9 +191,9 @@ export default {
         "15/0/init/0/3/value": {
           content: {
             en: "We're committed to democratizing SaaS development and making it accessible to everyone.",
-            "zh-CN": "我们致力于让SaaS开发民主化，使其对每个人都能访问。",
+            "zh-CN": "我们致力于让SaaS开发民主化，使其对每个人都能触手可及。",
           },
-          hash: "d299688e2cd1acd2212ee5b18012844a",
+          hash: "440887997000f988d714f2639085020e",
         },
         "15/0/init/1/2/value": {
           content: {
@@ -205,9 +205,9 @@ export default {
         "15/0/init/1/3/value": {
           content: {
             en: "We constantly push the boundaries of what's possible in developer tooling.",
-            "zh-CN": "我们不断推动开发者工具领域的可能性边界。",
+            "zh-CN": "我们不断突破开发者工具的边界，探索更多可能性。",
           },
-          hash: "ffeb21422061de120f1eab8d482101b2",
+          hash: "0754ac9544f3faa9de3f9ded087a8c34",
         },
         "15/0/init/2/2/value": {
           content: {
@@ -219,9 +219,9 @@ export default {
         "15/0/init/2/3/value": {
           content: {
             en: "Our success is measured by the success of the developers who use our platform.",
-            "zh-CN": "我们的成功由使用我们平台的开发者的成功来衡量。",
+            "zh-CN": "我们的成功取决于使用我们平台的开发者的成功。",
           },
-          hash: "bb818b8e43aeff2fe74666ce447878a8",
+          hash: "604fb6816d93a4ada1dc1755f74993a5",
         },
         "15/0/init/3/2/value": {
           content: {
@@ -235,7 +235,7 @@ export default {
             en: "Building tools that empower developers worldwide to create amazing products.",
             "zh-CN": "构建能够赋能全球开发者创造出色产品的工具。",
           },
-          hash: "e47bd92d9b01c2bad7ac7bd9c1030652",
+          hash: "133ed2f9000a5c83f0adc785872f8596",
         },
         "16/0/init/0/1/value": {
           content: {
@@ -1594,12 +1594,26 @@ export default {
           },
           hash: "9f9694d09cac2588146f8b94de32270c",
         },
+        "6/declaration/body/0/argument/1/1/3/1/1": {
+          content: {
+            en: "Launch your SaaS in hours",
+            "zh-CN": "几小时内启动您的SaaS",
+          },
+          hash: "c7f711f3686737b8dd05c1c329a88780",
+        },
         "6/declaration/body/0/argument/1/1/3/3": {
           content: {
             en: "Everything you need to ship a Micro SaaS",
             "zh-CN": "发布微型SaaS所需的一切",
           },
           hash: "6e874aeb8ccb786dd85503f882423f55",
+        },
+        "6/declaration/body/0/argument/1/1/3/3/1": {
+          content: {
+            en: "Everything you need to ship a Micro SaaS",
+            "zh-CN": "发布微型SaaS所需的一切",
+          },
+          hash: "3cd13b80ada64cc2a9d3b6365620c40d",
         },
         "6/declaration/body/0/argument/1/1/3/5": {
           content: {
@@ -1609,6 +1623,14 @@ export default {
           },
           hash: "c4e57c4be391d80373137e97771623e1",
         },
+        "6/declaration/body/0/argument/1/1/3/5/1": {
+          content: {
+            en: "Auth, billing, and marketing pages already wired together so your next release can focus on the product, not the scaffolding.",
+            "zh-CN":
+              "身份验证、计费和营销页面已连接完成，因此您的下一个版本可以专注于产品本身，而非搭建基础架构。",
+          },
+          hash: "5452ae8ad8820820ae385c14ffd575e8",
+        },
         "6/declaration/body/0/argument/1/1/7/1/1": {
           content: {
             en: "Start free trial<element:ArrowRight></element:ArrowRight>",
@@ -1616,7 +1638,28 @@ export default {
           },
           hash: "1665ce66c400e352bd4dd140e837955b",
         },
+        "6/declaration/body/0/argument/1/1/7/1/1/1": {
+          content: {
+            en: "Start free trial",
+            "zh-CN": "开始免费试用",
+          },
+          hash: "e346e4ed7d138dcc873db187922369da",
+        },
         "6/declaration/body/0/argument/1/1/7/3/1": {
+          content: {
+            en: "See what's inside",
+            "zh-CN": "查看内部内容",
+          },
+          hash: "b8964d6c475dae0116ec8448b8378104",
+        },
+        "6/declaration/body/0/argument/1/1/7/3/1/0": {
+          content: {
+            en: "See what's inside",
+            "zh-CN": "查看内部内容",
+          },
+          hash: "b8964d6c475dae0116ec8448b8378104",
+        },
+        "6/declaration/body/0/argument/1/1/7/3/1/1": {
           content: {
             en: "See what's inside",
             "zh-CN": "查看内部内容",
@@ -1629,6 +1672,13 @@ export default {
             "zh-CN": "随时取消 • 保留您的代码 • 与您当前的堆栈兼容",
           },
           hash: "78fcf4bbc90e585a327d6e50abcc7c16",
+        },
+        "6/declaration/body/0/argument/1/1/9/1": {
+          content: {
+            en: "Cancel anytime • Keep your code • Works with your current stack",
+            "zh-CN": "随时取消 • 保留您的代码 • 与您当前的堆栈兼容",
+          },
+          hash: "0dd5bc1e37b0c254793ddf5298403414",
         },
       },
     },
@@ -1645,9 +1695,9 @@ export default {
           content: {
             en: "Complete auth system with OAuth, magic links, and user management. Role-based access control included.",
             "zh-CN":
-              "包含OAuth、魔法链接和用户管理的完整认证系统。包含基于角色的访问控制。",
+              "完整的身份验证系统，包含OAuth、魔法链接和用户管理。包含基于角色的访问控制。",
           },
-          hash: "c239f5732d564caf043b543b2b190887",
+          hash: "b061a52fbb8447dd2d3efb41ba349e84",
         },
         "5/0/init/1/1/value": {
           content: {
@@ -1658,10 +1708,10 @@ export default {
         },
         "5/0/init/1/2/value": {
           content: {
-            en: "Stripe integration with subscriptions, invoicing, and tax handling. Revenue tracking built-in.",
-            "zh-CN": "集成Stripe，支持订阅、开票和税务处理。内置收入跟踪功能。",
+            en: "Flexible payment integration with subscriptions, and billing management. Revenue tracking built-in.",
+            "zh-CN": "灵活的支付集成，支持订阅和计费管理。内置收入跟踪功能。",
           },
-          hash: "8c21b55b823836a852551d5abf3c6e14",
+          hash: "346b7f26939d26a1993407799a97345a",
         },
         "5/0/init/2/1/value": {
           content: {
@@ -1674,9 +1724,9 @@ export default {
           content: {
             en: "Type-safe database with Drizzle ORM. RESTful APIs and real-time subscriptions ready.",
             "zh-CN":
-              "使用Drizzle ORM的类型安全数据库。RESTful API和实时订阅已就绪。",
+              "使用Drizzle ORM的类型安全数据库。RESTful API和实时订阅已准备就绪。",
           },
-          hash: "f9500f2cda25b68b69c7a812a25dff08",
+          hash: "409bb2f3626d3d3050fd6d14eb621f0e",
         },
         "5/0/init/3/1/value": {
           content: {
@@ -1688,9 +1738,9 @@ export default {
         "5/0/init/3/2/value": {
           content: {
             en: "User behavior tracking, conversion metrics, and beautiful dashboards for data-driven decisions.",
-            "zh-CN": "用户行为跟踪、转化指标和美观的仪表板，支持数据驱动决策。",
+            "zh-CN": "用户行为跟踪、转化指标和用于数据驱动决策的精美仪表板。",
           },
-          hash: "a6c6ef57663cc47713e0d1e6abddae31",
+          hash: "904f885b6da25969fcb3c297b4faa8dc",
         },
         "5/0/init/4/1/value": {
           content: {
@@ -1703,9 +1753,9 @@ export default {
           content: {
             en: "Beautiful, responsive design with dark mode. Accessible components and smooth animations.",
             "zh-CN":
-              "美观的响应式设计，支持深色模式。无障碍组件和流畅的动画效果。",
+              "美观的响应式设计，支持深色模式。可访问的组件和流畅的动画效果。",
           },
-          hash: "ef0a843dac5cda3161820a62f5b15750",
+          hash: "167147f46a8c259edd24a8152e93b4e1",
         },
         "5/0/init/5/1/value": {
           content: {
@@ -1720,7 +1770,7 @@ export default {
             "zh-CN":
               "一键部署到Vercel、AWS或Docker。包含CI/CD流水线和监控功能。",
           },
-          hash: "f90508c5e3ef6baf3cbfaa49b5ddd100",
+          hash: "99169d7b1d3ef6892ec6801a48319110",
         },
         "6/0/init/0/1/value": {
           content: {
@@ -1771,12 +1821,40 @@ export default {
           },
           hash: "6f0b61f7bc85a5a3a4ae39bcc54ba2b0",
         },
+        "8/declaration/body/0/argument/1/3/1/3": {
+          content: {
+            en: "Features",
+            "zh-CN": "功能",
+          },
+          hash: "341ff316a339b106a178f0b8d362951b",
+        },
         "8/declaration/body/0/argument/1/3/3": {
           content: {
             en: "Everything you need to<element:span>build and scale</element:span>",
             "zh-CN": "您所需的一切<element:span>构建和扩展</element:span>",
           },
           hash: "f9d3f25070280a358ed5ac97f7629058",
+        },
+        "8/declaration/body/0/argument/1/3/3/1": {
+          content: {
+            en: "Everything you need to",
+            "zh-CN": "您所需的一切",
+          },
+          hash: "1ade2268c19bb119e9e9e55edd50f7b4",
+        },
+        "8/declaration/body/0/argument/1/3/3/3/0": {
+          content: {
+            en: "build and scale",
+            "zh-CN": "构建和扩展",
+          },
+          hash: "697ed3dc4f16442effed462d586e92dc",
+        },
+        "8/declaration/body/0/argument/1/3/3/3/1": {
+          content: {
+            en: "build and scale",
+            "zh-CN": "构建和扩展",
+          },
+          hash: "697ed3dc4f16442effed462d586e92dc",
         },
         "8/declaration/body/0/argument/1/3/5": {
           content: {
@@ -1785,6 +1863,14 @@ export default {
               "跳过数月的开发。我们的入门套件包含成功启动SaaS产品所需的所有基本功能。",
           },
           hash: "13eb4fd0b29b8ddc7cb952132e578275",
+        },
+        "8/declaration/body/0/argument/1/3/5/1": {
+          content: {
+            en: "Skip months of development. Our SaaS Starter includes all the essential features you need to launch your product.",
+            "zh-CN":
+              "跳过数月的开发时间。我们的SaaS入门套件包含了您启动产品所需的所有基本功能。",
+          },
+          hash: "4bce7bfef0a73bfa517673c1c1587dcd",
         },
       },
     },
@@ -1958,13 +2044,21 @@ export default {
           },
           hash: "4b34923fef858a2b9a4a914c3e822889",
         },
+        "15/declaration/body/1/argument/1/3/1/3/1/3": {
+          content: {
+            en: "Complete UllrAI Micro SaaS starter with authentication, payments, database, and deployment.",
+            "zh-CN":
+              "完整的 UllrAI 微型 SaaS 启动模板，包含身份验证、支付、数据库和部署功能。",
+          },
+          hash: "3ea94cdc355a6bd1deaee13872197e26",
+        },
         "15/declaration/body/1/argument/1/3/1/3/3": {
           content: {
             en: "Complete UllrAI Micro SaaS starter with authentication, payments, database, and deployment.",
             "zh-CN":
-              "完整的 UllrAI 微型 SaaS 启动套件，包含身份验证、支付、数据库和部署功能。",
+              "完整的UllrAI微型SaaS入门套件，包含身份验证、支付、数据库和部署功能。",
           },
-          hash: "7c3667b512dcab3eb0d0489e03261967",
+          hash: "c889c061a2cef4644907bcee740b03cd",
         },
         "15/declaration/body/1/argument/1/9/1/1/1": {
           content: {
@@ -2347,6 +2441,1382 @@ export default {
           },
           hash: "0e7cca9032f511058280f061e4f7aecd",
         },
+        "5/declaration/body/0/argument/5/1/11/1": {
+          content: {
+            en: "The ultimate Next.js starter kit for developers who value speed and quality. Authentication, payments, and database - fully integrated and type-safe.",
+            "zh-CN":
+              "为重视速度和质量的开发者打造的终极 Next.js 起步套件。身份验证、支付和数据库功能 - 完全集成且类型安全。",
+          },
+          hash: "ecef247b33fde474a24ca47aa8b12dd0",
+        },
+        "5/declaration/body/0/argument/5/1/15/1/1/1": {
+          content: {
+            en: "Start Building",
+            "zh-CN": "开始构建",
+          },
+          hash: "b8b22cf7d5ed4dcd2e9731cc94230314",
+        },
+        "5/declaration/body/0/argument/5/1/15/3/1/3": {
+          content: {
+            en: "Star on GitHub",
+            "zh-CN": "在 GitHub 上加星标",
+          },
+          hash: "a624e6956091a93659cd8d37ba864aec",
+        },
+        "5/declaration/body/0/argument/5/1/19/1/0": {
+          content: {
+            en: "POWERED BY MODERN STACK",
+            "zh-CN": "由现代技术栈驱动",
+          },
+          hash: "74f0efd12ae446db7c287fbcfbeaae63",
+        },
+        "5/declaration/body/0/argument/5/1/19/3/1/3/0": {
+          content: {
+            en: "Next.js 15",
+            "zh-CN": "Next.js 15",
+          },
+          hash: "6eb0a7c408f3eaa826dbb9e17a82fd09",
+        },
+        "5/declaration/body/0/argument/5/1/19/3/3/3/0": {
+          content: {
+            en: "Auth.js",
+            "zh-CN": "Auth.js",
+          },
+          hash: "adcb9c0ee423c7c2ea33048dd761f882",
+        },
+        "5/declaration/body/0/argument/5/1/19/3/5/3/0": {
+          content: {
+            en: "Stripe",
+            "zh-CN": "Stripe",
+          },
+          hash: "c35bb85d9507094c0fea7e0dc04b3d72",
+        },
+        "5/declaration/body/0/argument/5/1/19/3/7/3/0": {
+          content: {
+            en: "TypeScript",
+            "zh-CN": "TypeScript",
+          },
+          hash: "d63d2a97f55baa75f353987658ddb0a0",
+        },
+        "5/declaration/body/0/argument/5/1/19/3/9/3/0": {
+          content: {
+            en: "Tailwind",
+            "zh-CN": "Tailwind",
+          },
+          hash: "e8006e5a885b01275725393b6d0ffc17",
+        },
+        "5/declaration/body/0/argument/5/1/3/1/3/0": {
+          content: {
+            en: "v1.0.0 Release",
+            "zh-CN": "v1.0.0 发布",
+          },
+          hash: "bb3739cba12a3470e108fa6cfa23a6ac",
+        },
+        "5/declaration/body/0/argument/5/1/3/1/7/0": {
+          content: {
+            en: "Production Ready",
+            "zh-CN": "生产就绪",
+          },
+          hash: "fda5eebe09595746036088959163b92a",
+        },
+        "5/declaration/body/0/argument/5/1/7/1": {
+          content: {
+            en: "Ship your SaaS",
+            "zh-CN": "发布您的 SaaS",
+          },
+          hash: "f46be09e257eb9d6bbe736b345baa8dd",
+        },
+        "5/declaration/body/0/argument/5/1/7/3/0": {
+          content: {
+            en: "in record time.",
+            "zh-CN": "在创纪录的时间内",
+          },
+          hash: "0a123fd6406c2b4841d4dd4b462793af",
+        },
+        "5/declaration/body/3/argument/5/1/3/1": {
+          content: {
+            en: "<element:span><element:span></element:span><element:span></element:span></element:span> v2.0 ONLINE",
+            "zh-CN":
+              "<element:span><element:span></element:span><element:span></element:span></element:span> v2.0 在线",
+          },
+          hash: "dc284d6c860844a863a31ba548186ea4",
+        },
+        "5/declaration/body/3/argument/5/1/3/3": {
+          content: {
+            en: "MICRO<element:br></element:br><element:span>SAAS</element:span> STARTER",
+            "zh-CN":
+              "微型<element:br></element:br><element:span>SaaS</element:span> 启动器",
+          },
+          hash: "9abd85a7601c9788e9fc9c45b642507e",
+        },
+        "5/declaration/body/3/argument/5/1/3/5": {
+          content: {
+            en: "<element:span>Stop configuring. Start shipping.</element:span><element:br></element:br> The production-ready toolkit for the modern developer.",
+            "zh-CN":
+              "<element:span>停止配置，开始交付。</element:span><element:br></element:br> 为现代开发者准备的生产级工具包。",
+          },
+          hash: "e35671ac388d25090c197269df0e16fc",
+        },
+        "5/declaration/body/3/argument/5/1/3/7/1/1": {
+          content: {
+            en: "INITIALIZE PROJECT<element:Terminal></element:Terminal>",
+            "zh-CN": "初始化项目",
+          },
+          hash: "7e898f3d430c0402a360a4b3a7517cd4",
+        },
+        "5/declaration/body/3/argument/5/1/3/7/3/1": {
+          content: {
+            en: "<element:Github></element:Github> GITHUB",
+            "zh-CN": "<element:Github></element:Github> GITHUB",
+          },
+          hash: "e359a8dc1f2652bec413d0067c32afab",
+        },
+        "5/declaration/body/3/argument/5/1/7/9/3/1/5": {
+          content: {
+            en: "TERMINAL",
+            "zh-CN": "终端",
+          },
+          hash: "2ec98242987572c88280312673f8ee8c",
+        },
+        "5/declaration/body/3/argument/5/1/7/9/3/3": {
+          content: {
+            en: "zsh",
+            "zh-CN": "zsh",
+          },
+          hash: "0099038d45a19cf35b512908f5358b50",
+        },
+        "5/declaration/body/3/argument/5/1/7/9/7/1/1/1": {
+          content: {
+            en: "➜",
+            "zh-CN": "➜",
+          },
+          hash: "f1f9af1d54b55d5a0f599b9c7b5ba91d",
+        },
+        "5/declaration/body/3/argument/5/1/7/9/7/3/1/1": {
+          content: {
+            en: "✔",
+            "zh-CN": "✔",
+          },
+          hash: "35b2e9cf1fd6b81ad95b30817e5b6be0",
+        },
+        "5/declaration/body/3/argument/5/1/7/9/7/3/1/3": {
+          content: {
+            en: "Loaded configuration",
+            "zh-CN": "已加载配置",
+          },
+          hash: "ef551c8c36e85e0d1f5cec367f5f97d1",
+        },
+        "5/declaration/body/3/argument/5/1/7/9/7/3/3/1": {
+          content: {
+            en: "✔",
+            "zh-CN": "✔",
+          },
+          hash: "35b2e9cf1fd6b81ad95b30817e5b6be0",
+        },
+        "5/declaration/body/3/argument/5/1/7/9/7/3/3/3": {
+          content: {
+            en: "Detected environment: <element:span>Next.js 15</element:span>",
+            "zh-CN": "检测到环境：<element:span>Next.js 15</element:span>",
+          },
+          hash: "b44a07db10a4d73bdba46d23a70c0f2d",
+        },
+        "5/declaration/body/3/argument/5/1/7/9/7/3/5/1": {
+          content: {
+            en: "✔",
+            "zh-CN": "✔",
+          },
+          hash: "35b2e9cf1fd6b81ad95b30817e5b6be0",
+        },
+        "5/declaration/body/3/argument/5/1/7/9/7/3/5/3": {
+          content: {
+            en: "Initialized database: <element:span>PostgreSQL</element:span>",
+            "zh-CN": "已初始化数据库：<element:span>PostgreSQL</element:span>",
+          },
+          hash: "bdd231f110c856c9d0aa896f6b70e3d4",
+        },
+        "5/declaration/body/3/argument/5/1/7/9/7/3/7/1": {
+          content: {
+            en: "✔",
+            "zh-CN": "✔",
+          },
+          hash: "35b2e9cf1fd6b81ad95b30817e5b6be0",
+        },
+        "5/declaration/body/3/argument/5/1/7/9/7/3/7/3": {
+          content: {
+            en: "Configured payments: <element:span>Stripe</element:span>",
+            "zh-CN": "已配置支付：<element:span>Stripe</element:span>",
+          },
+          hash: "65ce645785aaa45d3634878188e7992f",
+        },
+        "5/declaration/body/3/argument/5/1/7/9/7/3/9/1": {
+          content: {
+            en: "➜",
+            "zh-CN": "➜",
+          },
+          hash: "f1f9af1d54b55d5a0f599b9c7b5ba91d",
+        },
+        "5/declaration/body/3/argument/5/1/7/9/7/3/9/3": {
+          content: {
+            en: "Ready to build something amazing_",
+            "zh-CN": "准备好构建令人惊叹的东西了_",
+          },
+          hash: "2dee62dc62ee76ca15ca803c25b74897",
+        },
+        "5/declaration/body/5/argument/1/1/3/11": {
+          content: {
+            en: "Complete UllrAI SaaS starter with authentication, payments, database, and deployment. Everything you need to go from idea to revenue.",
+            "zh-CN":
+              "完整的 UllrAI SaaS 启动套件，包含身份验证、支付、数据库和部署功能。从创意到创收，您所需的一切。",
+          },
+          hash: "fb4867ca3e503bee38b90af74457135e",
+        },
+        "5/declaration/body/5/argument/1/1/3/15/1/1": {
+          content: {
+            en: "START NOW<element:Terminal></element:Terminal>",
+            "zh-CN": "立即开始<element:Terminal></element:Terminal>",
+          },
+          hash: "0ddb912d4ac58cf941509c704b97f580",
+        },
+        "5/declaration/body/5/argument/1/1/3/15/3/1": {
+          content: {
+            en: "<element:Github></element:Github> VIEW SOURCE",
+            "zh-CN": "<element:Github></element:Github> 查看源码",
+          },
+          hash: "1c661730bd1c62d744b05d05914ae49c",
+        },
+        "5/declaration/body/5/argument/1/1/3/3/1/1/3": {
+          content: {
+            en: "OpenSource READY",
+            "zh-CN": "开源就绪",
+          },
+          hash: "4bfd3e63035e3546f7350dfc85650c88",
+        },
+        "5/declaration/body/5/argument/1/1/3/3/1/3": {
+          content: {
+            en: "OpenSource READY",
+            "zh-CN": "开源就绪",
+          },
+          hash: "4bfd3e63035e3546f7350dfc85650c88",
+        },
+        "5/declaration/body/5/argument/1/1/3/3/3/3": {
+          content: {
+            en: "OpenSource READY",
+            "zh-CN": "开源就绪",
+          },
+          hash: "4bfd3e63035e3546f7350dfc85650c88",
+        },
+        "5/declaration/body/5/argument/1/1/3/7": {
+          content: {
+            en: "SHIP YOUR<element:br></element:br><element:span>MICRO SaaS</element:span>",
+            "zh-CN":
+              "发布您的<element:br></element:br><element:span>微型 SaaS</element:span>",
+          },
+          hash: "731af333d77f0ed5fcc4068e244cc557",
+        },
+        "5/declaration/body/5/argument/1/1/3/7/1": {
+          content: {
+            en: "SHIP YOUR",
+            "zh-CN": "发布您的",
+          },
+          hash: "099c4b75ac4089b1f5a7fca3d2000a7a",
+        },
+        "5/declaration/body/5/argument/1/1/3/7/5": {
+          content: {
+            en: "MICRO SaaS",
+            "zh-CN": "微型SaaS",
+          },
+          hash: "9a2a2a4467a115d32e1fa46ad07b4084",
+        },
+        "5/declaration/body/5/argument/1/1/7/3/3/1/5": {
+          content: {
+            en: "<element:Terminal></element:Terminal> developer-console",
+            "zh-CN": "<element:Terminal></element:Terminal> 开发者控制台",
+          },
+          hash: "b729ad4a807413e8486d9b4cc7224b98",
+        },
+        "5/declaration/body/5/argument/1/1/7/3/3/3": {
+          content: {
+            en: "user@saas-starter:~/projects/my-app",
+            "zh-CN": "user@saas-starter:~/projects/my-app",
+          },
+          hash: "8efed3d76d62e48db6707ab3e8191421",
+        },
+        "5/declaration/body/5/argument/1/1/7/3/7/3/1/1/1": {
+          content: {
+            en: "➜",
+            "zh-CN": "➜",
+          },
+          hash: "f1f9af1d54b55d5a0f599b9c7b5ba91d",
+        },
+        "5/declaration/body/5/argument/1/1/7/3/7/3/3/11": {
+          content: {
+            en: "<element:span>➜</element:span> pnpm install",
+            "zh-CN": "<element:span>➜</element:span> pnpm install",
+          },
+          hash: "11cc462723b0081e788170e4c576793f",
+        },
+        "5/declaration/body/5/argument/1/1/7/3/7/3/3/15": {
+          content: {
+            en: "<element:span>➜</element:span> pnpm dev",
+            "zh-CN": "<element:span>➜</element:span> pnpm dev",
+          },
+          hash: "f7035e78dd2e6150e938fe6ec58f7b1e",
+        },
+        "5/declaration/body/5/argument/1/1/7/3/7/3/3/21/1": {
+          content: {
+            en: "✓ Ready in 1.2s",
+            "zh-CN": "✓ 1.2秒后准备就绪",
+          },
+          hash: "df1b3893a8d70531c38c2795d675698e",
+        },
+        "5/declaration/body/5/argument/1/1/7/3/7/3/3/21/3": {
+          content: {
+            en: "○ Local: <element:span>http://localhost:3000</element:span>",
+            "zh-CN":
+              "○ 本地: <element:span>http://localhost:3000</element:span>",
+          },
+          hash: "1b678a409b2d0964857a4ac62bdc38c0",
+        },
+        "5/declaration/body/5/argument/1/1/7/3/7/3/3/23/3": {
+          content: {
+            en: "Running...",
+            "zh-CN": "运行中...",
+          },
+          hash: "c78d7f75ad3c7edd1f0122fb0f7587e7",
+        },
+        "5/declaration/body/5/argument/1/1/7/3/7/3/3/3": {
+          content: {
+            en: "<element:span>➜</element:span> git clone https://github.com/ullrai/saas-starter",
+            "zh-CN":
+              "<element:span>➜</element:span> git clone https://github.com/ullrai/saas-starter",
+          },
+          hash: "7dd88cc1f037741079d5f59aad663532",
+        },
+        "5/declaration/body/5/argument/1/1/7/3/7/3/3/5": {
+          content: {
+            en: "<element:span>➜</element:span> cd saas-starter",
+            "zh-CN": "<element:span>➜</element:span> cd saas-starter",
+          },
+          hash: "5fe457891d64c27f433a57603b6680c1",
+        },
+        "5/declaration/body/5/argument/1/1/7/3/7/3/3/9": {
+          content: {
+            en: "<element:span>➜</element:span> cp .env.example .env",
+            "zh-CN": "<element:span>➜</element:span> cp .env.example .env",
+          },
+          hash: "4cb8bd2adf9586bcaa55a8e333258e38",
+        },
+        "5/declaration/body/5/argument/1/1/7/3/7/7/1/1": {
+          content: {
+            en: "What's Included",
+            "zh-CN": "包含内容",
+          },
+          hash: "e31d4ef360bcc840101a43d5710ace84",
+        },
+        "5/declaration/body/5/argument/1/1/7/3/7/7/1/3/3": {
+          content: {
+            en: "Production Ready",
+            "zh-CN": "生产就绪",
+          },
+          hash: "fda5eebe09595746036088959163b92a",
+        },
+        "5/declaration/body/5/argument/1/1/7/3/7/7/5/1/1/1": {
+          content: {
+            en: "✓",
+            "zh-CN": "✓",
+          },
+          hash: "c98e649bd9091a5238d8543d65e6c130",
+        },
+        "5/declaration/body/5/argument/1/1/7/3/7/7/5/1/1/3": {
+          content: {
+            en: "Authentication",
+            "zh-CN": "身份验证",
+          },
+          hash: "491fbb938cfe44df0438ad3e198d23e6",
+        },
+        "5/declaration/body/5/argument/1/1/7/3/7/7/5/1/11/1": {
+          content: {
+            en: "✓",
+            "zh-CN": "✓",
+          },
+          hash: "c98e649bd9091a5238d8543d65e6c130",
+        },
+        "5/declaration/body/5/argument/1/1/7/3/7/7/5/1/11/3": {
+          content: {
+            en: "i18n Ready",
+            "zh-CN": "国际化就绪",
+          },
+          hash: "e9cb3728ab19a1a79878a3f5fde3f891",
+        },
+        "5/declaration/body/5/argument/1/1/7/3/7/7/5/1/3/1": {
+          content: {
+            en: "✓",
+            "zh-CN": "✓",
+          },
+          hash: "c98e649bd9091a5238d8543d65e6c130",
+        },
+        "5/declaration/body/5/argument/1/1/7/3/7/7/5/1/3/3": {
+          content: {
+            en: "Database",
+            "zh-CN": "数据库",
+          },
+          hash: "995e559af78b6f78c0ea736cde8b737b",
+        },
+        "5/declaration/body/5/argument/1/1/7/3/7/7/5/1/5/1": {
+          content: {
+            en: "✓",
+            "zh-CN": "✓",
+          },
+          hash: "c98e649bd9091a5238d8543d65e6c130",
+        },
+        "5/declaration/body/5/argument/1/1/7/3/7/7/5/1/5/3": {
+          content: {
+            en: "Payments",
+            "zh-CN": "支付",
+          },
+          hash: "1ce1a8d31ed709fb29fce2057045d104",
+        },
+        "5/declaration/body/5/argument/1/1/7/3/7/7/5/1/7/1": {
+          content: {
+            en: "✓",
+            "zh-CN": "✓",
+          },
+          hash: "c98e649bd9091a5238d8543d65e6c130",
+        },
+        "5/declaration/body/5/argument/1/1/7/3/7/7/5/1/7/3": {
+          content: {
+            en: "File Upload",
+            "zh-CN": "文件上传",
+          },
+          hash: "d83c28574c7b4f3c4b151633ee74b436",
+        },
+        "5/declaration/body/5/argument/1/1/7/3/7/7/5/1/9/1": {
+          content: {
+            en: "✓",
+            "zh-CN": "✓",
+          },
+          hash: "c98e649bd9091a5238d8543d65e6c130",
+        },
+        "5/declaration/body/5/argument/1/1/7/3/7/7/5/1/9/3": {
+          content: {
+            en: "Admin Panel",
+            "zh-CN": "管理面板",
+          },
+          hash: "3b3bec539fb82de7563a8e4704608570",
+        },
+        "5/declaration/body/5/argument/1/1/7/3/7/7/7/1": {
+          content: {
+            en: "Built with <element:span>Next.js 15</element:span> + <element:span>shadcn/ui</element:span>",
+            "zh-CN":
+              "使用 <element:span>Next.js 15</element:span> + <element:span>shadcn/ui</element:span> 构建",
+          },
+          hash: "79ac61fabf0da0c3aa70d32b8eb959ff",
+        },
+        "5/declaration/body/5/argument/5/1/3/11": {
+          content: {
+            en: "Complete UllrAI SaaS starter with authentication, payments, database, and deployment. Everything you need to go from idea to revenue.",
+            "zh-CN":
+              "完整的 UllrAI SaaS 启动套件，包含身份验证、支付、数据库和部署功能。从创意到创收，您所需的一切。",
+          },
+          hash: "fb4867ca3e503bee38b90af74457135e",
+        },
+        "5/declaration/body/5/argument/5/1/3/15/1/1": {
+          content: {
+            en: "START NOW<element:Terminal></element:Terminal>",
+            "zh-CN": "立即开始<element:Terminal></element:Terminal>",
+          },
+          hash: "0ddb912d4ac58cf941509c704b97f580",
+        },
+        "5/declaration/body/5/argument/5/1/3/15/3/1": {
+          content: {
+            en: "<element:Github></element:Github> VIEW SOURCE",
+            "zh-CN": "<element:Github></element:Github> 查看源码",
+          },
+          hash: "1c661730bd1c62d744b05d05914ae49c",
+        },
+        "5/declaration/body/5/argument/5/1/3/3/1/3": {
+          content: {
+            en: "OpenSource READY",
+            "zh-CN": "开源就绪",
+          },
+          hash: "4bfd3e63035e3546f7350dfc85650c88",
+        },
+        "5/declaration/body/5/argument/5/1/3/7": {
+          content: {
+            en: "SHIP YOUR<element:br></element:br><element:span>MICRO SaaS</element:span>",
+            "zh-CN":
+              "发布您的<element:br></element:br><element:span>微型 SaaS</element:span>",
+          },
+          hash: "731af333d77f0ed5fcc4068e244cc557",
+        },
+        "5/declaration/body/5/argument/5/1/7/3/1/3/1": {
+          content: {
+            en: "PERFORMANCE",
+            "zh-CN": "性能",
+          },
+          hash: "b915164d4dfb3f57968740614b132c2a",
+        },
+        "5/declaration/body/5/argument/5/1/7/3/1/3/3": {
+          content: {
+            en: "100/100",
+            "zh-CN": "100/100",
+          },
+          hash: "c39b86309cec215381f36b3bcf3e9ca2",
+        },
+        "5/declaration/body/5/argument/5/1/7/3/3/1/5": {
+          content: {
+            en: "<element:Terminal></element:Terminal> developer-console",
+            "zh-CN": "<element:Terminal></element:Terminal> 开发者控制台",
+          },
+          hash: "b729ad4a807413e8486d9b4cc7224b98",
+        },
+        "5/declaration/body/5/argument/5/1/7/3/3/3": {
+          content: {
+            en: "user@saas-starter:~/projects/my-app",
+            "zh-CN": "user@saas-starter:~/projects/my-app",
+          },
+          hash: "8efed3d76d62e48db6707ab3e8191421",
+        },
+        "5/declaration/body/5/argument/5/1/7/3/7/3/1/1/1": {
+          content: {
+            en: "➜",
+            "zh-CN": "➜",
+          },
+          hash: "f1f9af1d54b55d5a0f599b9c7b5ba91d",
+        },
+        "5/declaration/body/5/argument/5/1/7/3/7/3/3/11": {
+          content: {
+            en: "<element:span>➜</element:span> pnpm install",
+            "zh-CN": "<element:span>➜</element:span> pnpm install",
+          },
+          hash: "11cc462723b0081e788170e4c576793f",
+        },
+        "5/declaration/body/5/argument/5/1/7/3/7/3/3/15": {
+          content: {
+            en: "<element:span>➜</element:span> pnpm dev",
+            "zh-CN": "<element:span>➜</element:span> pnpm dev",
+          },
+          hash: "f7035e78dd2e6150e938fe6ec58f7b1e",
+        },
+        "5/declaration/body/5/argument/5/1/7/3/7/3/3/21/1": {
+          content: {
+            en: "✓ Ready in 1.2s",
+            "zh-CN": "✓ 1.2秒后准备就绪",
+          },
+          hash: "df1b3893a8d70531c38c2795d675698e",
+        },
+        "5/declaration/body/5/argument/5/1/7/3/7/3/3/21/3": {
+          content: {
+            en: "○ Local: <element:span>http://localhost:3000</element:span>",
+            "zh-CN":
+              "○ 本地: <element:span>http://localhost:3000</element:span>",
+          },
+          hash: "1b678a409b2d0964857a4ac62bdc38c0",
+        },
+        "5/declaration/body/5/argument/5/1/7/3/7/3/3/23/3": {
+          content: {
+            en: "Running...",
+            "zh-CN": "运行中...",
+          },
+          hash: "c78d7f75ad3c7edd1f0122fb0f7587e7",
+        },
+        "5/declaration/body/5/argument/5/1/7/3/7/3/3/3": {
+          content: {
+            en: "<element:span>➜</element:span> git clone https://github.com/ullrai/saas-starter",
+            "zh-CN":
+              "<element:span>➜</element:span> git clone https://github.com/ullrai/saas-starter",
+          },
+          hash: "7dd88cc1f037741079d5f59aad663532",
+        },
+        "5/declaration/body/5/argument/5/1/7/3/7/3/3/5": {
+          content: {
+            en: "<element:span>➜</element:span> cd saas-starter",
+            "zh-CN": "<element:span>➜</element:span> cd saas-starter",
+          },
+          hash: "5fe457891d64c27f433a57603b6680c1",
+        },
+        "5/declaration/body/5/argument/5/1/7/3/7/3/3/9": {
+          content: {
+            en: "<element:span>➜</element:span> cp .env.example .env",
+            "zh-CN": "<element:span>➜</element:span> cp .env.example .env",
+          },
+          hash: "4cb8bd2adf9586bcaa55a8e333258e38",
+        },
+        "5/declaration/body/5/argument/5/1/7/3/7/7/1/1": {
+          content: {
+            en: "What's Included",
+            "zh-CN": "包含内容",
+          },
+          hash: "e31d4ef360bcc840101a43d5710ace84",
+        },
+        "5/declaration/body/5/argument/5/1/7/3/7/7/1/3/3": {
+          content: {
+            en: "Production Ready",
+            "zh-CN": "生产就绪",
+          },
+          hash: "fda5eebe09595746036088959163b92a",
+        },
+        "5/declaration/body/5/argument/5/1/7/3/7/7/5/1/1/1": {
+          content: {
+            en: "✓",
+            "zh-CN": "✓",
+          },
+          hash: "c98e649bd9091a5238d8543d65e6c130",
+        },
+        "5/declaration/body/5/argument/5/1/7/3/7/7/5/1/1/3": {
+          content: {
+            en: "Authentication",
+            "zh-CN": "身份验证",
+          },
+          hash: "491fbb938cfe44df0438ad3e198d23e6",
+        },
+        "5/declaration/body/5/argument/5/1/7/3/7/7/5/1/11/1": {
+          content: {
+            en: "✓",
+            "zh-CN": "✓",
+          },
+          hash: "c98e649bd9091a5238d8543d65e6c130",
+        },
+        "5/declaration/body/5/argument/5/1/7/3/7/7/5/1/11/3": {
+          content: {
+            en: "i18n Ready",
+            "zh-CN": "国际化就绪",
+          },
+          hash: "e9cb3728ab19a1a79878a3f5fde3f891",
+        },
+        "5/declaration/body/5/argument/5/1/7/3/7/7/5/1/13/1": {
+          content: {
+            en: "✓",
+            "zh-CN": "✓",
+          },
+          hash: "c98e649bd9091a5238d8543d65e6c130",
+        },
+        "5/declaration/body/5/argument/5/1/7/3/7/7/5/1/13/3": {
+          content: {
+            en: "50+ Components",
+            "zh-CN": "50+ 个组件",
+          },
+          hash: "99542ec7aff2a162e9c4beee1f8d7b78",
+        },
+        "5/declaration/body/5/argument/5/1/7/3/7/7/5/1/15/1": {
+          content: {
+            en: "✓",
+            "zh-CN": "✓",
+          },
+          hash: "c98e649bd9091a5238d8543d65e6c130",
+        },
+        "5/declaration/body/5/argument/5/1/7/3/7/7/5/1/15/3": {
+          content: {
+            en: "TypeScript",
+            "zh-CN": "TypeScript",
+          },
+          hash: "d63d2a97f55baa75f353987658ddb0a0",
+        },
+        "5/declaration/body/5/argument/5/1/7/3/7/7/5/1/3/1": {
+          content: {
+            en: "✓",
+            "zh-CN": "✓",
+          },
+          hash: "c98e649bd9091a5238d8543d65e6c130",
+        },
+        "5/declaration/body/5/argument/5/1/7/3/7/7/5/1/3/3": {
+          content: {
+            en: "Database",
+            "zh-CN": "数据库",
+          },
+          hash: "995e559af78b6f78c0ea736cde8b737b",
+        },
+        "5/declaration/body/5/argument/5/1/7/3/7/7/5/1/5/1": {
+          content: {
+            en: "✓",
+            "zh-CN": "✓",
+          },
+          hash: "c98e649bd9091a5238d8543d65e6c130",
+        },
+        "5/declaration/body/5/argument/5/1/7/3/7/7/5/1/5/3": {
+          content: {
+            en: "Payments",
+            "zh-CN": "支付",
+          },
+          hash: "1ce1a8d31ed709fb29fce2057045d104",
+        },
+        "5/declaration/body/5/argument/5/1/7/3/7/7/5/1/7/1": {
+          content: {
+            en: "✓",
+            "zh-CN": "✓",
+          },
+          hash: "c98e649bd9091a5238d8543d65e6c130",
+        },
+        "5/declaration/body/5/argument/5/1/7/3/7/7/5/1/7/3": {
+          content: {
+            en: "File Upload",
+            "zh-CN": "文件上传",
+          },
+          hash: "d83c28574c7b4f3c4b151633ee74b436",
+        },
+        "5/declaration/body/5/argument/5/1/7/3/7/7/5/1/9/1": {
+          content: {
+            en: "✓",
+            "zh-CN": "✓",
+          },
+          hash: "c98e649bd9091a5238d8543d65e6c130",
+        },
+        "5/declaration/body/5/argument/5/1/7/3/7/7/5/1/9/3": {
+          content: {
+            en: "Admin Panel",
+            "zh-CN": "管理面板",
+          },
+          hash: "3b3bec539fb82de7563a8e4704608570",
+        },
+        "5/declaration/body/5/argument/5/1/7/3/7/7/7/1": {
+          content: {
+            en: "Built with <element:span>Next.js 15</element:span> + <element:span>shadcn/ui</element:span>",
+            "zh-CN":
+              "使用 <element:span>Next.js 15</element:span> + <element:span>shadcn/ui</element:span> 构建",
+          },
+          hash: "79ac61fabf0da0c3aa70d32b8eb959ff",
+        },
+        "5/declaration/body/5/argument/5/1/7/5/1/3/1": {
+          content: {
+            en: "COMPONENTS",
+            "zh-CN": "组件",
+          },
+          hash: "6f5bb6e5e8deb0dd3b05ca240ac663de",
+        },
+        "5/declaration/body/5/argument/5/1/7/5/1/3/3": {
+          content: {
+            en: "50+ Ready",
+            "zh-CN": "50+ 已就绪",
+          },
+          hash: "bec2cc35f02cd5614a12872cd030e656",
+        },
+        "5/declaration/body/5/argument/5/1/7/9/3/1/5": {
+          content: {
+            en: "<element:Terminal></element:Terminal> developer-console",
+            "zh-CN": "<element:Terminal></element:Terminal> 开发者控制台",
+          },
+          hash: "b729ad4a807413e8486d9b4cc7224b98",
+        },
+        "5/declaration/body/5/argument/5/1/7/9/3/3": {
+          content: {
+            en: "user@saas-starter:~/projects/my-app",
+            "zh-CN": "user@saas-starter:~/projects/my-app",
+          },
+          hash: "8efed3d76d62e48db6707ab3e8191421",
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/3/1/1/1": {
+          content: {
+            en: "➜",
+            "zh-CN": "➜",
+          },
+          hash: "f1f9af1d54b55d5a0f599b9c7b5ba91d",
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/3/3/11": {
+          content: {
+            en: "# Setup environment variables",
+            "zh-CN": "# 设置环境变量",
+          },
+          hash: "1c8142d54a42d5953bdd8b8cb94950b6",
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/3/3/13": {
+          content: {
+            en: "<element:span>➜</element:span> cp .env.example .env",
+            "zh-CN": "<element:span>➜</element:span> cp .env.example .env",
+          },
+          hash: "4cb8bd2adf9586bcaa55a8e333258e38",
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/3/3/15": {
+          content: {
+            en: "<element:span>➜</element:span> nano .env",
+            "zh-CN": "<element:span>➜</element:span> nano .env",
+          },
+          hash: "c11a7c511ba196c3eaab1ee5b5c889b5",
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/3/3/21": {
+          content: {
+            en: "<element:span>➜</element:span> pnpm install",
+            "zh-CN": "<element:span>➜</element:span> pnpm install",
+          },
+          hash: "11cc462723b0081e788170e4c576793f",
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/3/3/23": {
+          content: {
+            en: "<element:span>➜</element:span> pnpm db:push",
+            "zh-CN": "<element:span>➜</element:span> pnpm db:push",
+          },
+          hash: "ae360176709001309e0f6bff32b153d6",
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/3/3/29": {
+          content: {
+            en: "<element:span>➜</element:span> pnpm dev",
+            "zh-CN": "<element:span>➜</element:span> pnpm dev",
+          },
+          hash: "f7035e78dd2e6150e938fe6ec58f7b1e",
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/3/3/3": {
+          content: {
+            en: "<element:span>➜</element:span> git clone https://github.com/ullrai/saas-starter",
+            "zh-CN":
+              "<element:span>➜</element:span> git clone https://github.com/ullrai/saas-starter",
+          },
+          hash: "7dd88cc1f037741079d5f59aad663532",
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/3/3/35/1": {
+          content: {
+            en: "✓ Ready in 1.2s",
+            "zh-CN": "✓ 1.2秒后准备就绪",
+          },
+          hash: "df1b3893a8d70531c38c2795d675698e",
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/3/3/35/3": {
+          content: {
+            en: "○ Local: <element:span>http://localhost:3000</element:span>",
+            "zh-CN":
+              "○ 本地: <element:span>http://localhost:3000</element:span>",
+          },
+          hash: "1b678a409b2d0964857a4ac62bdc38c0",
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/3/3/35/5": {
+          content: {
+            en: "○ Database: Connected",
+            "zh-CN": "○ 数据库: 已连接",
+          },
+          hash: "02ee755a100be596aedb05e2bbd1f6ca",
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/3/3/37/3": {
+          content: {
+            en: "Running...",
+            "zh-CN": "运行中...",
+          },
+          hash: "c78d7f75ad3c7edd1f0122fb0f7587e7",
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/3/3/5": {
+          content: {
+            en: "<element:span>➜</element:span> cd saas-starter",
+            "zh-CN": "<element:span>➜</element:span> cd saas-starter",
+          },
+          hash: "5fe457891d64c27f433a57603b6680c1",
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/7/1/1": {
+          content: {
+            en: "Components Library",
+            "zh-CN": "组件库",
+          },
+          hash: "932c1be6391f6548c3500afe7522feed",
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/7/1/3/3": {
+          content: {
+            en: "50+ Ready to Use",
+            "zh-CN": "50+ 即用组件",
+          },
+          hash: "035af5df1671b68b31b2897196602733",
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/7/3/3/1/1": {
+          content: {
+            en: "UI Components",
+            "zh-CN": "UI 组件",
+          },
+          hash: "e703f557fbc66ecd955f2b477e77852a",
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/7/3/3/1/3": {
+          content: {
+            en: "shadcn/ui",
+            "zh-CN": "shadcn/ui",
+          },
+          hash: "7d822f489eee28c06512ad7f06e78bb7",
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/7/3/3/3/1": {
+          content: {
+            en: "• Button",
+            "zh-CN": "• 按钮",
+          },
+          hash: "b2b34f0c1dc721d52708a7b4feef311f",
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/7/3/3/3/11": {
+          content: {
+            en: "• Chart",
+            "zh-CN": "• 图表",
+          },
+          hash: "9b393254cc33a56aa5a87b6f9fe26405",
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/7/3/3/3/3": {
+          content: {
+            en: "• Card",
+            "zh-CN": "• 卡片",
+          },
+          hash: "8676ac569004e1b709cb7182033821a5",
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/7/3/3/3/5": {
+          content: {
+            en: "• Dialog",
+            "zh-CN": "• 对话框",
+          },
+          hash: "e757a083715edfc4d335a638f15fbfe3",
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/7/3/3/3/7": {
+          content: {
+            en: "• Table",
+            "zh-CN": "• 表格",
+          },
+          hash: "d43bce035bf591ee6c7a735e2578aeac",
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/7/3/3/3/9": {
+          content: {
+            en: "• Form",
+            "zh-CN": "• 表单",
+          },
+          hash: "3e5d39a20bb0f42950c75a168ee36a4b",
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/7/3/3/5": {
+          content: {
+            en: "+44 more components",
+            "zh-CN": "+44 更多组件",
+          },
+          hash: "821c803eef7ff4a1a15fa2b7d2cfbf98",
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/7/3/5/1/1": {
+          content: {
+            en: "Pre-built Features",
+            "zh-CN": "预构建功能",
+          },
+          hash: "74ea71ea56d4b5f57f35adfb43d06e07",
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/7/3/5/1/3": {
+          content: {
+            en: "READY",
+            "zh-CN": "就绪",
+          },
+          hash: "cf437d18fed5f6d0acd666532241812e",
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/7/3/5/3/1": {
+          content: {
+            en: "• Auth System",
+            "zh-CN": "• 认证系统",
+          },
+          hash: "d013b29373a6ad6bb76941e54e604a92",
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/7/3/5/3/11": {
+          content: {
+            en: "• User Settings",
+            "zh-CN": "• 用户设置",
+          },
+          hash: "21a71ac4f1288603814c5bb0c8699f44",
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/7/3/5/3/3": {
+          content: {
+            en: "• Dashboard",
+            "zh-CN": "• 仪表板",
+          },
+          hash: "883571ad19f93f7b23376ed3fefa2aae",
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/7/3/5/3/5": {
+          content: {
+            en: "• File Upload",
+            "zh-CN": "• 文件上传",
+          },
+          hash: "c01f569e07a2b4e4309053b0d7bbd0bd",
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/7/3/5/3/7": {
+          content: {
+            en: "• Admin Panel",
+            "zh-CN": "• 管理面板",
+          },
+          hash: "c73e6af0347508657d3c1349398858f9",
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/7/3/5/3/9": {
+          content: {
+            en: "• Billing",
+            "zh-CN": "• 计费",
+          },
+          hash: "336f391fa4ff3d7484777d496004ba39",
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/7/5/1/1": {
+          content: {
+            en: "TypeScript",
+            "zh-CN": "TypeScript",
+          },
+          hash: "d63d2a97f55baa75f353987658ddb0a0",
+        },
+        "5/declaration/body/5/argument/5/1/7/9/7/7/5/1/3": {
+          content: {
+            en: "100% Type-Safe",
+            "zh-CN": "100% 类型安全",
+          },
+          hash: "14fc617d2bbaf4311961839b09960600",
+        },
+        "5/declaration/body/5/argument/5/11": {
+          content: {
+            en: "Complete UllrAI SaaS starter with authentication, payments, database, and deployment. Everything you need to go from idea to revenue.",
+            "zh-CN":
+              "完整的 UllrAI SaaS 启动套件，包含身份验证、支付、数据库和部署功能。您所需的一切，助您从创意到创收。",
+          },
+          hash: "b7c4517b416e111f179e6f84c9761d70",
+        },
+        "5/declaration/body/5/argument/5/15/1/1": {
+          content: {
+            en: "START NOW<element:Terminal></element:Terminal>",
+            "zh-CN": "立即开始<element:Terminal></element:Terminal>",
+          },
+          hash: "61e7ecb8794a1814327964fdf845f5da",
+        },
+        "5/declaration/body/5/argument/5/15/3/1": {
+          content: {
+            en: "<element:Github></element:Github> VIEW SOURCE",
+            "zh-CN": "<element:Github></element:Github> 查看源码",
+          },
+          hash: "ab7dc13d7ecb59180def630b1db02072",
+        },
+        "5/declaration/body/5/argument/5/19/3/1/3/1": {
+          content: {
+            en: "PERFORMANCE",
+            "zh-CN": "性能",
+          },
+          hash: "b915164d4dfb3f57968740614b132c2a",
+        },
+        "5/declaration/body/5/argument/5/19/3/1/3/3": {
+          content: {
+            en: "100/100",
+            "zh-CN": "100/100",
+          },
+          hash: "c39b86309cec215381f36b3bcf3e9ca2",
+        },
+        "5/declaration/body/5/argument/5/19/5/1/3/1": {
+          content: {
+            en: "COMPONENTS",
+            "zh-CN": "组件",
+          },
+          hash: "6f5bb6e5e8deb0dd3b05ca240ac663de",
+        },
+        "5/declaration/body/5/argument/5/19/5/1/3/3": {
+          content: {
+            en: "50+ Ready",
+            "zh-CN": "50+ 已就绪",
+          },
+          hash: "bec2cc35f02cd5614a12872cd030e656",
+        },
+        "5/declaration/body/5/argument/5/19/9/3/1/5": {
+          content: {
+            en: "<element:Terminal></element:Terminal> developer-console",
+            "zh-CN": "<element:Terminal></element:Terminal> 开发者控制台",
+          },
+          hash: "31039781db74132baae4e003436aa4fd",
+        },
+        "5/declaration/body/5/argument/5/19/9/3/3": {
+          content: {
+            en: "user@saas-starter:~/projects/my-app",
+            "zh-CN": "user@saas-starter:~/projects/my-app",
+          },
+          hash: "74f4a8b4eb46a93ce96737be256d69c3",
+        },
+        "5/declaration/body/5/argument/5/19/9/7/3/1/1/1": {
+          content: {
+            en: "➜",
+            "zh-CN": "➜",
+          },
+          hash: "f1f9af1d54b55d5a0f599b9c7b5ba91d",
+        },
+        "5/declaration/body/5/argument/5/19/9/7/3/3/1": {
+          content: {
+            en: '<element:span>import</element:span><element:span><expression/></element:span><element:span>from</element:span><element:span>"@/lib/auth"</element:span>;',
+            "zh-CN":
+              '<element:span>import</element:span><element:span><expression/></element:span><element:span>from</element:span><element:span>"@/lib/auth"</element:span>;',
+          },
+          hash: "99c43f696c9d798e304022f540360b7a",
+        },
+        "5/declaration/body/5/argument/5/19/9/7/3/3/11": {
+          content: {
+            en: "# Setup environment variables",
+            "zh-CN": "# 设置环境变量",
+          },
+          hash: "d24bfa4565e91882c47a8b7a742d2bbc",
+        },
+        "5/declaration/body/5/argument/5/19/9/7/3/3/13": {
+          content: {
+            en: "<element:span>➜</element:span> cp .env.example .env",
+            "zh-CN": "<element:span>➜</element:span> cp .env.example .env",
+          },
+          hash: "4df3307d12b7a110d0c50b131d3f899e",
+        },
+        "5/declaration/body/5/argument/5/19/9/7/3/3/15": {
+          content: {
+            en: "<element:span>➜</element:span> nano .env <element:span># Configure DATABASE_URL, BETTER_AUTH_SECRET...</element:span>",
+            "zh-CN":
+              "<element:span>➜</element:span> nano .env <element:span># 配置 DATABASE_URL, BETTER_AUTH_SECRET...</element:span>",
+          },
+          hash: "c30c9ce10521ea35fcb7ad7c0731f52b",
+        },
+        "5/declaration/body/5/argument/5/19/9/7/3/3/17/3": {
+          content: {
+            en: "Compiling...",
+            "zh-CN": "编译中...",
+          },
+          hash: "22617def3195c58b9eef83deef456c4b",
+        },
+        "5/declaration/body/5/argument/5/19/9/7/3/3/21": {
+          content: {
+            en: "<element:span>➜</element:span> pnpm install",
+            "zh-CN": "<element:span>➜</element:span> pnpm install",
+          },
+          hash: "abacb6fe35f6ab17457c6c4a4c6cc716",
+        },
+        "5/declaration/body/5/argument/5/19/9/7/3/3/23": {
+          content: {
+            en: "<element:span>➜</element:span> pnpm db:push <element:span># Migrate database schema</element:span>",
+            "zh-CN":
+              "<element:span>➜</element:span> pnpm db:push <element:span># 迁移数据库架构</element:span>",
+          },
+          hash: "9fec4db2d46f808a4a081d1d30d91f56",
+        },
+        "5/declaration/body/5/argument/5/19/9/7/3/3/29": {
+          content: {
+            en: "<element:span>➜</element:span> pnpm dev",
+            "zh-CN": "<element:span>➜</element:span> pnpm dev",
+          },
+          hash: "2a6c788dda0d1a3691aa27aa7ff054e9",
+        },
+        "5/declaration/body/5/argument/5/19/9/7/3/3/3": {
+          content: {
+            en: "<element:span>➜</element:span> git clone https://github.com/ullrai/saas-starter",
+            "zh-CN":
+              "<element:span>➜</element:span> git clone https://github.com/ullrai/saas-starter",
+          },
+          hash: "918a58212d6dff2df528252882fa67fa",
+        },
+        "5/declaration/body/5/argument/5/19/9/7/3/3/35/1": {
+          content: {
+            en: "✓ Ready in 1.2s",
+            "zh-CN": "✓ 1.2秒后准备就绪",
+          },
+          hash: "df1b3893a8d70531c38c2795d675698e",
+        },
+        "5/declaration/body/5/argument/5/19/9/7/3/3/35/3": {
+          content: {
+            en: "○ Local: <element:span>http://localhost:3000</element:span>",
+            "zh-CN":
+              "○ 本地: <element:span>http://localhost:3000</element:span>",
+          },
+          hash: "1b678a409b2d0964857a4ac62bdc38c0",
+        },
+        "5/declaration/body/5/argument/5/19/9/7/3/3/35/5": {
+          content: {
+            en: "○ Database: Connected",
+            "zh-CN": "○ 数据库: 已连接",
+          },
+          hash: "02ee755a100be596aedb05e2bbd1f6ca",
+        },
+        "5/declaration/body/5/argument/5/19/9/7/3/3/37/3": {
+          content: {
+            en: "Running...",
+            "zh-CN": "运行中...",
+          },
+          hash: "c78d7f75ad3c7edd1f0122fb0f7587e7",
+        },
+        "5/declaration/body/5/argument/5/19/9/7/3/3/5": {
+          content: {
+            en: "<element:span>➜</element:span> cd saas-starter",
+            "zh-CN": "<element:span>➜</element:span> cd saas-starter",
+          },
+          hash: "934d1d8f2ecd5684185fc4fd8722b207",
+        },
+        "5/declaration/body/5/argument/5/19/9/7/3/3/7": {
+          content: {
+            en: "<element:span>export default</element:span><element:span>async function</element:span><element:span>App</element:span>() <expression/>",
+            "zh-CN":
+              "<element:span>export default</element:span><element:span>async function</element:span><element:span>App</element:span>() <expression/>",
+          },
+          hash: "98def1dd15b21413c81723a6f2409c69",
+        },
+        "5/declaration/body/5/argument/5/19/9/7/3/3/9/1": {
+          content: {
+            en: "// Your entire SaaS stack is ready",
+            "zh-CN": "// 您的整个 SaaS 堆栈已就绪",
+          },
+          hash: "cd925ae60c3c9078ad4f189507272135",
+        },
+        "5/declaration/body/5/argument/5/19/9/7/7/1/1": {
+          content: {
+            en: "Components Library",
+            "zh-CN": "组件库",
+          },
+          hash: "932c1be6391f6548c3500afe7522feed",
+        },
+        "5/declaration/body/5/argument/5/19/9/7/7/1/3/3": {
+          content: {
+            en: "50+ Ready to Use",
+            "zh-CN": "50+ 即用组件",
+          },
+          hash: "035af5df1671b68b31b2897196602733",
+        },
+        "5/declaration/body/5/argument/5/19/9/7/7/3/1/1/1": {
+          content: {
+            en: "Database",
+            "zh-CN": "数据库",
+          },
+          hash: "995e559af78b6f78c0ea736cde8b737b",
+        },
+        "5/declaration/body/5/argument/5/19/9/7/7/3/1/1/3": {
+          content: {
+            en: "CONNECTED",
+            "zh-CN": "已连接",
+          },
+          hash: "b9fc9b653867355312a43bd36280b289",
+        },
+        "5/declaration/body/5/argument/5/19/9/7/7/3/3/1/1": {
+          content: {
+            en: "UI Components",
+            "zh-CN": "UI 组件",
+          },
+          hash: "e703f557fbc66ecd955f2b477e77852a",
+        },
+        "5/declaration/body/5/argument/5/19/9/7/7/3/3/1/3": {
+          content: {
+            en: "shadcn/ui",
+            "zh-CN": "shadcn/ui",
+          },
+          hash: "7d822f489eee28c06512ad7f06e78bb7",
+        },
+        "5/declaration/body/5/argument/5/19/9/7/7/3/3/3/1": {
+          content: {
+            en: "• Button",
+            "zh-CN": "• 按钮",
+          },
+          hash: "b2b34f0c1dc721d52708a7b4feef311f",
+        },
+        "5/declaration/body/5/argument/5/19/9/7/7/3/3/3/11": {
+          content: {
+            en: "• Chart",
+            "zh-CN": "• 图表",
+          },
+          hash: "9b393254cc33a56aa5a87b6f9fe26405",
+        },
+        "5/declaration/body/5/argument/5/19/9/7/7/3/3/3/3": {
+          content: {
+            en: "• Card",
+            "zh-CN": "• 卡片",
+          },
+          hash: "8676ac569004e1b709cb7182033821a5",
+        },
+        "5/declaration/body/5/argument/5/19/9/7/7/3/3/3/5": {
+          content: {
+            en: "• Dialog",
+            "zh-CN": "• 对话框",
+          },
+          hash: "e757a083715edfc4d335a638f15fbfe3",
+        },
+        "5/declaration/body/5/argument/5/19/9/7/7/3/3/3/7": {
+          content: {
+            en: "• Table",
+            "zh-CN": "• 表格",
+          },
+          hash: "d43bce035bf591ee6c7a735e2578aeac",
+        },
+        "5/declaration/body/5/argument/5/19/9/7/7/3/3/3/9": {
+          content: {
+            en: "• Form",
+            "zh-CN": "• 表单",
+          },
+          hash: "3e5d39a20bb0f42950c75a168ee36a4b",
+        },
+        "5/declaration/body/5/argument/5/19/9/7/7/3/3/5": {
+          content: {
+            en: "+44 more components",
+            "zh-CN": "+44 更多组件",
+          },
+          hash: "232eae6109b57d2acc496c17b0c18e8c",
+        },
+        "5/declaration/body/5/argument/5/19/9/7/7/3/5/1/1": {
+          content: {
+            en: "Pre-built Features",
+            "zh-CN": "预构建功能",
+          },
+          hash: "74ea71ea56d4b5f57f35adfb43d06e07",
+        },
+        "5/declaration/body/5/argument/5/19/9/7/7/3/5/1/3": {
+          content: {
+            en: "READY",
+            "zh-CN": "就绪",
+          },
+          hash: "cf437d18fed5f6d0acd666532241812e",
+        },
+        "5/declaration/body/5/argument/5/19/9/7/7/3/5/3/1": {
+          content: {
+            en: "• Auth System",
+            "zh-CN": "• 认证系统",
+          },
+          hash: "d013b29373a6ad6bb76941e54e604a92",
+        },
+        "5/declaration/body/5/argument/5/19/9/7/7/3/5/3/11": {
+          content: {
+            en: "• User Settings",
+            "zh-CN": "• 用户设置",
+          },
+          hash: "21a71ac4f1288603814c5bb0c8699f44",
+        },
+        "5/declaration/body/5/argument/5/19/9/7/7/3/5/3/3": {
+          content: {
+            en: "• Dashboard",
+            "zh-CN": "• 仪表板",
+          },
+          hash: "883571ad19f93f7b23376ed3fefa2aae",
+        },
+        "5/declaration/body/5/argument/5/19/9/7/7/3/5/3/5": {
+          content: {
+            en: "• File Upload",
+            "zh-CN": "• 文件上传",
+          },
+          hash: "c01f569e07a2b4e4309053b0d7bbd0bd",
+        },
+        "5/declaration/body/5/argument/5/19/9/7/7/3/5/3/7": {
+          content: {
+            en: "• Admin Panel",
+            "zh-CN": "• 管理面板",
+          },
+          hash: "c73e6af0347508657d3c1349398858f9",
+        },
+        "5/declaration/body/5/argument/5/19/9/7/7/3/5/3/9": {
+          content: {
+            en: "• Billing",
+            "zh-CN": "• 计费",
+          },
+          hash: "336f391fa4ff3d7484777d496004ba39",
+        },
+        "5/declaration/body/5/argument/5/19/9/7/7/5/1/1": {
+          content: {
+            en: "TypeScript",
+            "zh-CN": "TypeScript",
+          },
+          hash: "d63d2a97f55baa75f353987658ddb0a0",
+        },
+        "5/declaration/body/5/argument/5/19/9/7/7/5/1/3": {
+          content: {
+            en: "100% Type-Safe",
+            "zh-CN": "100% 类型安全",
+          },
+          hash: "14fc617d2bbaf4311961839b09960600",
+        },
+        "5/declaration/body/5/argument/5/3/1": {
+          content: {
+            en: "<element:span><element:span></element:span><element:span></element:span></element:span> v2.0 PRODUCTION READY",
+            "zh-CN":
+              "<element:span><element:span></element:span><element:span></element:span></element:span> v2.0 生产就绪",
+          },
+          hash: "1113fb3f9f2879d568e26bfb8c2cd2be",
+        },
+        "5/declaration/body/5/argument/5/3/1/3": {
+          content: {
+            en: "OpenSource READY",
+            "zh-CN": "开源就绪",
+          },
+          hash: "4bfd3e63035e3546f7350dfc85650c88",
+        },
+        "5/declaration/body/5/argument/5/7": {
+          content: {
+            en: "SHIP YOUR<element:br></element:br><element:span>MICRO SaaS</element:span>",
+            "zh-CN":
+              "发布您的<element:br></element:br><element:span>微型 SaaS</element:span>",
+          },
+          hash: "07f63b42410dbd731ffbd58939e3e797",
+        },
         "6/0/init/0/1/value": {
           content: {
             en: "Production Ready",
@@ -2367,6 +3837,484 @@ export default {
             "zh-CN": "极速",
           },
           hash: "52954c277c6a846bfb1f48ef558a27f4",
+        },
+        "6/declaration/body/0/argument/5/3/3/5/1/3": {
+          content: {
+            en: "System Online",
+            "zh-CN": "系统在线",
+          },
+          hash: "6e3c70a761833de4bbc0adbf829d3c19",
+        },
+        "6/declaration/body/0/argument/5/3/3/5/3/1": {
+          content: {
+            en: "MICRO",
+            "zh-CN": "微型",
+          },
+          hash: "0ef1c3496935af00d169793d63f3b75d",
+        },
+        "6/declaration/body/0/argument/5/3/3/5/3/5/1": {
+          content: {
+            en: "SaaS STARTER",
+            "zh-CN": "SaaS 入门版",
+          },
+          hash: "cc8e71f010000e5fec070d6351e63795",
+        },
+        "6/declaration/body/0/argument/5/3/3/5/3/9": {
+          content: {
+            en: "STARTER",
+            "zh-CN": "入门版",
+          },
+          hash: "7f9428170aa24998169a929ed8a223d4",
+        },
+        "6/declaration/body/0/argument/5/3/3/5/5/1": {
+          content: {
+            en: "Deploy production-ready applications in minutes. The complete toolkit for the modern developer.",
+            "zh-CN": "几分钟内部署就绪可用的应用程序。现代开发者的完整工具包。",
+          },
+          hash: "10400dc92eede697a6f7a1da89c341b0",
+        },
+        "6/declaration/body/0/argument/5/3/3/5/7/1/1/1": {
+          content: {
+            en: "INITIALIZE PROJECT",
+            "zh-CN": "初始化项目",
+          },
+          hash: "1a3fec8106f0de565c50f6290e7dfec6",
+        },
+        "6/declaration/body/0/argument/5/3/7/11/1/0": {
+          content: {
+            en: "QUICK ACCESS",
+            "zh-CN": "快速访问",
+          },
+          hash: "26ff290a38cd58d5953c17493b249bad",
+        },
+        "6/declaration/body/0/argument/5/3/7/11/3/1/1/1": {
+          content: {
+            en: "SOURCE CODE",
+            "zh-CN": "源代码",
+          },
+          hash: "93c6989524d146328295305a1cbb3378",
+        },
+        "6/declaration/body/0/argument/5/3/7/11/5/1/1/1": {
+          content: {
+            en: "DOCUMENTATION",
+            "zh-CN": "文档",
+          },
+          hash: "256fb2afb542846b02596e55af54d6ca",
+        },
+        "6/declaration/body/0/argument/5/3/7/3/1/0": {
+          content: {
+            en: "STATUS MONITOR",
+            "zh-CN": "状态监控",
+          },
+          hash: "2d0cae7d377a60ce3e45160f0dfa19d6",
+        },
+        "6/declaration/body/0/argument/5/3/7/7/1/3/0": {
+          content: {
+            en: "99.9%",
+            "zh-CN": "99.9%",
+          },
+          hash: "ebf8401702bd148b6b1b8a3cbcbe256f",
+        },
+        "6/declaration/body/0/argument/5/3/7/7/1/5/0": {
+          content: {
+            en: "UPTIME",
+            "zh-CN": "正常运行时间",
+          },
+          hash: "454ef0404c04fc8e6378d7288034567d",
+        },
+        "6/declaration/body/0/argument/5/3/7/7/3/3/0": {
+          content: {
+            en: "50ms",
+            "zh-CN": "50毫秒",
+          },
+          hash: "c4a8eec0f6b2eb20c555098fc1649a85",
+        },
+        "6/declaration/body/0/argument/5/3/7/7/3/5/0": {
+          content: {
+            en: "LATENCY",
+            "zh-CN": "延迟",
+          },
+          hash: "a326c3388eaff0969adddde95142b95e",
+        },
+        "6/declaration/body/0/argument/5/3/7/7/5/3/0": {
+          content: {
+            en: "SOC2",
+            "zh-CN": "SOC2",
+          },
+          hash: "b63b5e3e17bc323a77a7f008043e396a",
+        },
+        "6/declaration/body/0/argument/5/3/7/7/5/5/0": {
+          content: {
+            en: "READY",
+            "zh-CN": "就绪",
+          },
+          hash: "cf437d18fed5f6d0acd666532241812e",
+        },
+        "6/declaration/body/0/argument/5/3/7/7/7/3/0": {
+          content: {
+            en: "v2.0",
+            "zh-CN": "v2.0",
+          },
+          hash: "64cceb3b0b81304b63f47ff31cee472c",
+        },
+        "6/declaration/body/0/argument/5/3/7/7/7/5/0": {
+          content: {
+            en: "VERSION",
+            "zh-CN": "版本",
+          },
+          hash: "60d805bd9abd470a9e3b79fe003d3036",
+        },
+        "6/declaration/body/0/argument/5/7/1/1/1": {
+          content: {
+            en: "GLOBAL CDN",
+            "zh-CN": "全球CDN",
+          },
+          hash: "03ed7a02ce16c3681ca48ef7d6afd854",
+        },
+        "6/declaration/body/0/argument/5/7/1/3/1": {
+          content: {
+            en: "E2E ENCRYPTION",
+            "zh-CN": "端到端加密",
+          },
+          hash: "702495d1d2a28a1956fba85d7de5d291",
+        },
+        "6/declaration/body/0/argument/5/7/3/1": {
+          content: {
+            en: "ID: 8X-992-ALPHA",
+            "zh-CN": "ID: 8X-992-ALPHA",
+          },
+          hash: "4907c577303c42982e5d6ac1cfdb364f",
+        },
+        "6/declaration/body/3/argument/1/1/3/1": {
+          content: {
+            en: "v2.0 NOW AVAILABLE",
+            "zh-CN": "v2.0 现已发布",
+          },
+          hash: "ca2f5fdb4b154df7632f0b606b670073",
+        },
+        "6/declaration/body/3/argument/1/1/3/3": {
+          content: {
+            en: "MICRO<element:br></element:br> SAAS STARTER",
+            "zh-CN": "微型SaaS 启动工具",
+          },
+          hash: "631e8d84b8af666b970bd3b05ce2c93a",
+        },
+        "6/declaration/body/3/argument/1/1/3/5": {
+          content: {
+            en: "The complete toolkit for the modern developer. Deploy production-ready applications in minutes, not months.",
+            "zh-CN":
+              "现代开发者的完整工具包。在几分钟内，而不是几个月内部署就绪的应用程序。",
+          },
+          hash: "de25ba386a46b8be0caf1879b7d04107",
+        },
+        "6/declaration/body/3/argument/1/1/3/7/1/1": {
+          content: {
+            en: "INITIALIZE PROJECT<element:Terminal></element:Terminal>",
+            "zh-CN": "初始化项目",
+          },
+          hash: "7e898f3d430c0402a360a4b3a7517cd4",
+        },
+        "6/declaration/body/3/argument/1/1/3/7/3/1": {
+          content: {
+            en: "<element:Github></element:Github> GITHUB",
+            "zh-CN": "<element:Github></element:Github> GITHUB",
+          },
+          hash: "e359a8dc1f2652bec413d0067c32afab",
+        },
+        "6/declaration/body/3/argument/1/1/7/7/3/1/5": {
+          content: {
+            en: "bash — 80x24",
+            "zh-CN": "bash — 80x24",
+          },
+          hash: "096657489892cb3594592f3ced30d679",
+        },
+        "6/declaration/body/3/argument/1/1/7/7/7/1/1/1": {
+          content: {
+            en: "❯",
+            "zh-CN": "❯",
+          },
+          hash: "26d58d6d3544aa73ce368f1b76077eb1",
+        },
+        "6/declaration/body/3/argument/1/1/7/7/7/3/1/1": {
+          content: {
+            en: "✔",
+            "zh-CN": "✔",
+          },
+          hash: "35b2e9cf1fd6b81ad95b30817e5b6be0",
+        },
+        "6/declaration/body/3/argument/1/1/7/7/7/3/1/3": {
+          content: {
+            en: "Downloading template...",
+            "zh-CN": "正在下载模板...",
+          },
+          hash: "04987284a7952837e0aa1b5b05fdf59c",
+        },
+        "6/declaration/body/3/argument/1/1/7/7/7/3/3/1": {
+          content: {
+            en: "✔",
+            "zh-CN": "✔",
+          },
+          hash: "35b2e9cf1fd6b81ad95b30817e5b6be0",
+        },
+        "6/declaration/body/3/argument/1/1/7/7/7/3/3/3": {
+          content: {
+            en: "Installing dependencies...",
+            "zh-CN": "正在安装依赖...",
+          },
+          hash: "fe1d8d4dcef63e8262dc081d2cfe5c15",
+        },
+        "6/declaration/body/3/argument/1/1/7/7/7/3/5/1": {
+          content: {
+            en: "✔",
+            "zh-CN": "✔",
+          },
+          hash: "35b2e9cf1fd6b81ad95b30817e5b6be0",
+        },
+        "6/declaration/body/3/argument/1/1/7/7/7/3/5/3": {
+          content: {
+            en: "Setting up database...",
+            "zh-CN": "正在设置数据库...",
+          },
+          hash: "402c8ea69c72f9f350b1470af25d25b5",
+        },
+        "6/declaration/body/3/argument/1/1/7/7/7/3/7/1": {
+          content: {
+            en: "❯",
+            "zh-CN": "❯",
+          },
+          hash: "26d58d6d3544aa73ce368f1b76077eb1",
+        },
+        "6/declaration/body/3/argument/1/1/7/7/7/3/7/3": {
+          content: {
+            en: "Ready to code!",
+            "zh-CN": "准备开始编码！",
+          },
+          hash: "68a72238acd5b16c97f420205721f13e",
+        },
+        "6/declaration/body/5/argument/1/1/3/11": {
+          content: {
+            en: "Complete UllrAI SaaS starter with authentication, payments, database, and deployment. Everything you need to go from idea to revenue.",
+            "zh-CN":
+              "完整的UllrAI SaaS入门套件，包含身份验证、支付、数据库和部署功能。您从构思到创收所需的一切。",
+          },
+          hash: "6902f058cf5b48291f258e7eeea59a8b",
+        },
+        "6/declaration/body/5/argument/1/1/3/15/1/1": {
+          content: {
+            en: "START NOW<element:Terminal></element:Terminal>",
+            "zh-CN": "立即开始<element:Terminal></element:Terminal>",
+          },
+          hash: "0ddb912d4ac58cf941509c704b97f580",
+        },
+        "6/declaration/body/5/argument/1/1/3/15/3/1": {
+          content: {
+            en: "<element:Github></element:Github> VIEW SOURCE",
+            "zh-CN": "<element:Github></element:Github> 查看源码",
+          },
+          hash: "1c661730bd1c62d744b05d05914ae49c",
+        },
+        "6/declaration/body/5/argument/1/1/3/3/1/3": {
+          content: {
+            en: "OpenSource READY",
+            "zh-CN": "开源就绪",
+          },
+          hash: "4bfd3e63035e3546f7350dfc85650c88",
+        },
+        "6/declaration/body/5/argument/1/1/3/7/1": {
+          content: {
+            en: "SHIP YOUR",
+            "zh-CN": "发布您的",
+          },
+          hash: "099c4b75ac4089b1f5a7fca3d2000a7a",
+        },
+        "6/declaration/body/5/argument/1/1/3/7/5": {
+          content: {
+            en: "MICRO SaaS",
+            "zh-CN": "微型SaaS",
+          },
+          hash: "9a2a2a4467a115d32e1fa46ad07b4084",
+        },
+        "6/declaration/body/5/argument/1/1/7/3/3/1/5": {
+          content: {
+            en: "<element:Terminal></element:Terminal> developer-console",
+            "zh-CN": "<element:Terminal></element:Terminal> 开发者控制台",
+          },
+          hash: "b729ad4a807413e8486d9b4cc7224b98",
+        },
+        "6/declaration/body/5/argument/1/1/7/3/3/3": {
+          content: {
+            en: "user@saas-starter:~/projects/my-app",
+            "zh-CN": "user@saas-starter:~/projects/my-app",
+          },
+          hash: "8efed3d76d62e48db6707ab3e8191421",
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/3/1/1/1": {
+          content: {
+            en: "➜",
+            "zh-CN": "➜",
+          },
+          hash: "f1f9af1d54b55d5a0f599b9c7b5ba91d",
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/3/3/11": {
+          content: {
+            en: "<element:span>➜</element:span> pnpm install",
+            "zh-CN": "<element:span>➜</element:span> pnpm install",
+          },
+          hash: "11cc462723b0081e788170e4c576793f",
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/3/3/15": {
+          content: {
+            en: "<element:span>➜</element:span> pnpm dev",
+            "zh-CN": "<element:span>➜</element:span> pnpm dev",
+          },
+          hash: "f7035e78dd2e6150e938fe6ec58f7b1e",
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/3/3/21/1": {
+          content: {
+            en: "✓ Ready in 1.2s",
+            "zh-CN": "✓ 1.2秒后准备就绪",
+          },
+          hash: "df1b3893a8d70531c38c2795d675698e",
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/3/3/21/3": {
+          content: {
+            en: "○ Local: <element:span>http://localhost:3000</element:span>",
+            "zh-CN": "○ 本地：",
+          },
+          hash: "de85a3b9161c411cb69b53420a65c4e4",
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/3/3/23/3": {
+          content: {
+            en: "Running...",
+            "zh-CN": "运行中...",
+          },
+          hash: "c78d7f75ad3c7edd1f0122fb0f7587e7",
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/3/3/3": {
+          content: {
+            en: "<element:span>➜</element:span> git clone https://github.com/ullrai/saas-starter",
+            "zh-CN": "git clone https://github.com/ullrai/saas-starter",
+          },
+          hash: "2eafec112c559d2c4b30443b67ccf25c",
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/3/3/5": {
+          content: {
+            en: "<element:span>➜</element:span> cd saas-starter",
+            "zh-CN": "<element:span>➜</element:span> cd saas-starter",
+          },
+          hash: "5fe457891d64c27f433a57603b6680c1",
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/3/3/9": {
+          content: {
+            en: "<element:span>➜</element:span> cp .env.example .env",
+            "zh-CN": "cp .env.example .env",
+          },
+          hash: "9f6dede3951f99228352db09df537461",
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/7/1/1": {
+          content: {
+            en: "What's Included",
+            "zh-CN": "包含内容",
+          },
+          hash: "556c48883be6a649e3072272c37f10cf",
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/7/1/3/3": {
+          content: {
+            en: "Production Ready",
+            "zh-CN": "生产就绪",
+          },
+          hash: "20aa4c07e47134dcac3e5d69474d9d74",
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/7/5/1/1/1": {
+          content: {
+            en: "✓",
+            "zh-CN": "✓",
+          },
+          hash: "c98e649bd9091a5238d8543d65e6c130",
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/7/5/1/1/3": {
+          content: {
+            en: "Authentication",
+            "zh-CN": "身份验证",
+          },
+          hash: "491fbb938cfe44df0438ad3e198d23e6",
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/7/5/1/11/1": {
+          content: {
+            en: "✓",
+            "zh-CN": "✓",
+          },
+          hash: "c98e649bd9091a5238d8543d65e6c130",
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/7/5/1/11/3": {
+          content: {
+            en: "i18n Ready",
+            "zh-CN": "国际化就绪",
+          },
+          hash: "e9cb3728ab19a1a79878a3f5fde3f891",
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/7/5/1/3/1": {
+          content: {
+            en: "✓",
+            "zh-CN": "✓",
+          },
+          hash: "c98e649bd9091a5238d8543d65e6c130",
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/7/5/1/3/3": {
+          content: {
+            en: "Database",
+            "zh-CN": "数据库",
+          },
+          hash: "995e559af78b6f78c0ea736cde8b737b",
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/7/5/1/5/1": {
+          content: {
+            en: "✓",
+            "zh-CN": "✓",
+          },
+          hash: "c98e649bd9091a5238d8543d65e6c130",
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/7/5/1/5/3": {
+          content: {
+            en: "Payments",
+            "zh-CN": "支付",
+          },
+          hash: "1ce1a8d31ed709fb29fce2057045d104",
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/7/5/1/7/1": {
+          content: {
+            en: "✓",
+            "zh-CN": "✓",
+          },
+          hash: "c98e649bd9091a5238d8543d65e6c130",
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/7/5/1/7/3": {
+          content: {
+            en: "File Upload",
+            "zh-CN": "文件上传",
+          },
+          hash: "d83c28574c7b4f3c4b151633ee74b436",
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/7/5/1/9/1": {
+          content: {
+            en: "✓",
+            "zh-CN": "✓",
+          },
+          hash: "c98e649bd9091a5238d8543d65e6c130",
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/7/5/1/9/3": {
+          content: {
+            en: "Admin Panel",
+            "zh-CN": "管理面板",
+          },
+          hash: "3b3bec539fb82de7563a8e4704608570",
+        },
+        "6/declaration/body/5/argument/1/1/7/3/7/7/7/1": {
+          content: {
+            en: "Built with <element:span>Next.js 15</element:span> + <element:span>shadcn/ui</element:span>",
+            "zh-CN": "使用+构建",
+          },
+          hash: "f76ef3db186b495e3935895a85d56f71",
         },
         "7/declaration/body/0/argument/1/1/3/15/1/1": {
           content: {
@@ -2671,30 +4619,30 @@ export default {
         "5/0/init/0/2/value": {
           content: {
             en: "Remove backgrounds in seconds with AI precision - no design skills needed",
-            "zh-CN": "几秒钟内用AI精准移除背景 - 无需设计技能",
+            "zh-CN": "几秒钟内使用AI精确移除背景 - 无需设计技能",
           },
-          hash: "050573be6a96e5960a1c9a5341a2346e",
+          hash: "a3cde80912b89974cdf5c3101ee8cbb1",
         },
         "5/0/init/1/2/value": {
           content: {
             en: "Generate professional headshots instantly - perfect for LinkedIn, resumes & more",
             "zh-CN": "即时生成专业头像 - 适合LinkedIn、简历等",
           },
-          hash: "b0feb2bf7ec5f66d206ad6b059bafd53",
+          hash: "8085ab680e31f36ad5c250847c41dede",
         },
         "5/0/init/2/2/value": {
           content: {
             en: "Convert any document to clean Markdown instantly - PDFs, Word docs, web pages",
-            "zh-CN": "即时将任何文档转换为干净的Markdown - PDF、Word文档、网页",
+            "zh-CN": "将任何文档即时转换为干净的Markdown - PDF、Word文档、网页",
           },
-          hash: "1f423d9776fcbb98ef74fad3d098cc57",
+          hash: "0210784d41baca72732d23889e9df25e",
         },
         "5/0/init/3/2/value": {
           content: {
             en: "Stay ahead with daily insights - data-driven analysis of global trends",
             "zh-CN": "通过每日洞察保持领先 - 全球趋势的数据驱动分析",
           },
-          hash: "a3135f28adee663ff4fd902d03a25029",
+          hash: "5340c94329c3692f0f0c36cdae5b4609",
         },
         "5/0/init/4/2/value": {
           content: {
@@ -2706,9 +4654,9 @@ export default {
         "5/0/init/5/2/value": {
           content: {
             en: "Access thousands of AI-generated transparent PNGs - perfect for any project",
-            "zh-CN": "访问数千个AI生成的透明PNG图片 - 适合任何项目",
+            "zh-CN": "访问数千个AI生成的透明PNG图像 - 适合任何项目",
           },
-          hash: "9e68bfc79962b566824f8c147766478b",
+          hash: "5669faf7d01bec20a354f12771fc273a",
         },
         "6/declaration/body/0/argument/1/1/1": {
           content: {
@@ -2717,12 +4665,26 @@ export default {
           },
           hash: "6b0424ad87e3e19bf93d443847db40c9",
         },
+        "6/declaration/body/0/argument/1/1/1/3": {
+          content: {
+            en: "UllrAI Lab",
+            "zh-CN": "UllrAI实验室",
+          },
+          hash: "8137d8a6a4a1e122ce7a794cbddbf045",
+        },
         "6/declaration/body/0/argument/1/1/3": {
           content: {
             en: "Explore our other tools",
             "zh-CN": "探索我们的其他工具",
           },
           hash: "ea509fdf5073086bef253319bf50de91",
+        },
+        "6/declaration/body/0/argument/1/1/3/1": {
+          content: {
+            en: "Explore our other tools",
+            "zh-CN": "探索我们的其他工具",
+          },
+          hash: "3849709803b4b892a65029899f6ffd6f",
         },
         "6/declaration/body/0/argument/1/1/5": {
           content: {
@@ -2732,12 +4694,34 @@ export default {
           },
           hash: "21297b99e16c5376da3889a288aa80ad",
         },
+        "6/declaration/body/0/argument/1/1/5/1": {
+          content: {
+            en: "AI-powered utilities that help creators, developers, and teams ship faster every day.",
+            "zh-CN":
+              "AI驱动的实用工具，帮助创作者、开发者和团队每天更快地交付产品。",
+          },
+          hash: "4f736cd0e15dac03516bfa7652070c0b",
+        },
         "6/declaration/body/0/argument/1/5": {
           content: {
             en: "Have an idea for another tool?<element:a>Let us know</element:a>",
             "zh-CN": "对另一个工具有想法吗？<element:a>告诉我们</element:a>",
           },
           hash: "4a84a3aabebf02729085474f76dadeb4",
+        },
+        "6/declaration/body/0/argument/1/5/1": {
+          content: {
+            en: "Have an idea for another tool?",
+            "zh-CN": "对另一个工具有想法吗？",
+          },
+          hash: "bc746a00f152f4e766a5e79845f4aa8f",
+        },
+        "6/declaration/body/0/argument/1/5/3/1": {
+          content: {
+            en: "Let us know",
+            "zh-CN": "告诉我们",
+          },
+          hash: "7e2f57b4da58029e6b8d48a5081c8472",
         },
       },
     },
@@ -2750,12 +4734,33 @@ export default {
           },
           hash: "d8d46b10e80a7087dce2d3543bed895d",
         },
+        "10/declaration/body/0/argument/1/11/1/1": {
+          content: {
+            en: "Trusted by innovative companies",
+            "zh-CN": "创新企业信赖之选",
+          },
+          hash: "83e57c9ba54bc1d63a9e54653edf6b41",
+        },
         "10/declaration/body/0/argument/1/15": {
           content: {
             en: "Want to share your success story?<element:a>Get in touch</element:a>",
             "zh-CN": "想分享您的成功故事吗？<element:a>联系我们</element:a>",
           },
           hash: "e269ab816e6fc4b43499013e8b063ed5",
+        },
+        "10/declaration/body/0/argument/1/15/1": {
+          content: {
+            en: "Want to share your success story?",
+            "zh-CN": "想分享您的成功故事吗？",
+          },
+          hash: "a6ac70610c7460de8c3e01618be5ea1f",
+        },
+        "10/declaration/body/0/argument/1/15/3/1": {
+          content: {
+            en: "Get in touch",
+            "zh-CN": "联系我们",
+          },
+          hash: "35323605e31c113fd664486afc33f3eb",
         },
         "10/declaration/body/0/argument/1/3/1/1": {
           content: {
@@ -2764,12 +4769,26 @@ export default {
           },
           hash: "5d1ff1bf355d94279bdbf486928fade3",
         },
+        "10/declaration/body/0/argument/1/3/1/1/3": {
+          content: {
+            en: "Metrics",
+            "zh-CN": "指标",
+          },
+          hash: "76712cf76855f695712cf05b994caebd",
+        },
         "10/declaration/body/0/argument/1/3/1/3": {
           content: {
             en: "Join thousands of developers",
             "zh-CN": "加入数千名开发者",
           },
           hash: "79e4c7c1c53313bacfbd381806e4a980",
+        },
+        "10/declaration/body/0/argument/1/3/1/3/1": {
+          content: {
+            en: "Join thousands of developers",
+            "zh-CN": "加入数千名开发者",
+          },
+          hash: "b004aaee548c739c1a2027651f24e828",
         },
         "10/declaration/body/0/argument/1/3/1/5": {
           content: {
@@ -2778,12 +4797,26 @@ export default {
           },
           hash: "e30bce583388397e99b0c14e68c5a6c5",
         },
+        "10/declaration/body/0/argument/1/3/1/5/1": {
+          content: {
+            en: "Building successful SaaS products with our starter kit",
+            "zh-CN": "使用我们的入门套件构建成功的SaaS产品",
+          },
+          hash: "e4c2375da039e19ffe20fd4eb7b44b9f",
+        },
         "10/declaration/body/0/argument/1/7/1/1": {
           content: {
             en: "<element:Users></element:Users> Customer Stories",
             "zh-CN": "<element:Users></element:Users> 客户故事",
           },
           hash: "e429f2cc62ea9270a40f33f01caaacbf",
+        },
+        "10/declaration/body/0/argument/1/7/1/1/3": {
+          content: {
+            en: "Community",
+            "zh-CN": "社区",
+          },
+          hash: "aa83f4456d11185e5e72dba3260bf00b",
         },
         "10/declaration/body/0/argument/1/7/1/3": {
           content: {
@@ -2792,6 +4825,13 @@ export default {
           },
           hash: "f57a79d3827b2afa6575af88991fafa9",
         },
+        "10/declaration/body/0/argument/1/7/1/3/1": {
+          content: {
+            en: "Loved by developers worldwide",
+            "zh-CN": "全球开发者喜爱",
+          },
+          hash: "64528aad0185140ce21bdc14fce14e6b",
+        },
         "10/declaration/body/0/argument/1/7/1/5": {
           content: {
             en: "See what our community has to say about their experience",
@@ -2799,13 +4839,20 @@ export default {
           },
           hash: "5bc0a3ccb2424fa85d7f70ebace4ebe9",
         },
+        "10/declaration/body/0/argument/1/7/1/5/1": {
+          content: {
+            en: "See what our community has to say about their experience",
+            "zh-CN": "看看我们的社区成员对他们的体验有何评价",
+          },
+          hash: "fb9ba548222e1d69672c5b7dab00e3af",
+        },
         "5/0/init/0/1/value": {
           content: {
-            en: "This starter kit saved me months of development time. The authentication system and payment integration work flawlessly out of the box.",
+            en: "This starter kit saved me months of development time. The payment integration work flawlessly out of the box.",
             "zh-CN":
-              "这个入门套件为我节省了数月的开发时间。认证系统和支付集成开箱即用，完美运行。",
+              "这个入门套件为我节省了数月的开发时间。支付集成开箱即用，运行完美。",
           },
-          hash: "1c8245fd2632a455f7646d136f62445f",
+          hash: "8501c482749ea6ee8605b8066dc57675",
         },
         "5/0/init/0/2/value/1/value": {
           content: {
@@ -2818,9 +4865,9 @@ export default {
           content: {
             en: "Clean code, excellent documentation, and responsive support. Everything I needed to launch my SaaS product quickly.",
             "zh-CN":
-              "代码简洁，文档出色，支持响应迅速。这是我快速推出SaaS产品所需的一切。",
+              "代码简洁，文档完善，支持响应迅速。我快速启动SaaS产品所需的一切。",
           },
-          hash: "f49f286761ad7cd9a326d2995b647076",
+          hash: "535d6df7f0f6a6a94ff93ec35355bfe9",
         },
         "5/0/init/1/2/value/1/value": {
           content: {
@@ -2832,9 +4879,9 @@ export default {
         "5/0/init/2/1/value": {
           content: {
             en: "The UI components are beautiful and the dark mode implementation is perfect. My users love the interface.",
-            "zh-CN": "UI组件美观，深色模式实现完美。我的用户都喜欢这个界面。",
+            "zh-CN": "UI组件精美，深色模式实现完美。我的用户非常喜欢这个界面。",
           },
-          hash: "a7aafbe1932e557ee7add892fdf40247",
+          hash: "48b000875dae162c112a39194efb042c",
         },
         "5/0/init/2/2/value/1/value": {
           content: {
@@ -2846,10 +4893,9 @@ export default {
         "5/0/init/3/1/value": {
           content: {
             en: "Best investment I've made for my startup. The code quality is enterprise-grade and the architecture is scalable.",
-            "zh-CN":
-              "为我的初创公司做出的最佳投资。代码质量达到企业级，架构可扩展。",
+            "zh-CN": "为我创业做的最佳投资。代码质量达到企业级，架构可扩展。",
           },
-          hash: "687664b21e2c8ca0523336f7d8b918b4",
+          hash: "077dee3839faefb7d67276a6cd49fb8a",
         },
         "5/0/init/3/2/value/1/value": {
           content: {
@@ -2862,9 +4908,9 @@ export default {
           content: {
             en: "Incredible attention to detail. The analytics dashboard and user management features are exactly what I needed.",
             "zh-CN":
-              "对细节的关注令人难以置信。分析仪表板和用户管理功能正是我所需要的。",
+              "对细节的关注令人难以置信。分析仪表板和用户管理功能正是我需要的。",
           },
-          hash: "a77c8874cf1100d787af03dc12f89e9e",
+          hash: "e441b46f68587df2d0d94e15b7beddc7",
         },
         "5/0/init/4/2/value/1/value": {
           content: {
@@ -2877,9 +4923,9 @@ export default {
           content: {
             en: "From idea to production in just 2 weeks. This starter kit is a game-changer for indie developers.",
             "zh-CN":
-              "仅用2周时间从想法到生产。这个入门套件是独立开发者的游戏改变者。",
+              "仅用2周时间从构思到上线。这个入门套件是独立开发者的游戏改变者。",
           },
-          hash: "0ac046eb58333f9782d98c586da0d264",
+          hash: "eada624711672c80854a73a488b15cb0",
         },
         "5/0/init/5/2/value/1/value": {
           content: {
@@ -2953,10 +4999,10 @@ export default {
         },
         "8/body/0/argument/1/15/3/3": {
           content: {
-            en: "{testimonial.author.role} - {testimonial.author.company}",
-            "zh-CN": "{testimonial.author.role}—{testimonial.author.company}",
+            en: "{testimonial.author.role} @ {testimonial.author.company}",
+            "zh-CN": "{testimonial.author.role} @ {testimonial.author.company}",
           },
-          hash: "a1120a21ea83dc6ac0d54a9cc21f3e08",
+          hash: "05314b4949d0417be555f0119bd4e44b",
         },
       },
     },
@@ -5299,7 +7345,7 @@ export default {
               en: "Your subscription renews on <expression/>",
               "zh-CN": "您的订阅将在 <expression/> 续订",
             },
-            hash: "db03b9cf2e10445faf18c25fb87480be",
+            hash: "ef21b5479a4be97df1f65ba4890a1db4",
           },
         "11/declaration/body/3/argument/5/expression/consequent/3/1/1/1/expression/consequent":
           {
@@ -5307,7 +7353,7 @@ export default {
               en: "Your subscription will end on <expression/>",
               "zh-CN": "您的订阅将在 <expression/> 到期",
             },
-            hash: "7b66185c962de094940e9d62cfb5f16a",
+            hash: "460a91119e5da13ca7a7542dcfc95781",
           },
         "11/declaration/body/3/argument/5/expression/consequent/3/3": {
           content: {

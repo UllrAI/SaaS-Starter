@@ -233,6 +233,5 @@ describe("Constants Configuration", () => {
         expect(constants.APP_NAME).toContain("DEV");
       }
     });
-
   });
 });

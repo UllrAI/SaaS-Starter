@@ -10,7 +10,10 @@ export function createMetadata(override: Metadata): Metadata {
     if (typeof override.title === "string") {
       title = override.title;
     } else if (typeof override.title === "object" && override.title !== null) {
-      const titleObj = override.title as Record<string, string | null | undefined>;
+      const titleObj = override.title as Record<
+        string,
+        string | null | undefined
+      >;
       title = titleObj.absolute || titleObj.default || APP_NAME;
     }
   }

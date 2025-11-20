@@ -154,9 +154,10 @@ function getDeviceDetailsHtml(deviceInfo?: DeviceInfo): string {
   }
 
   const { browser, os, location } = deviceInfo;
-  const deviceLine = browser && os
-    ? `<p style="font-size:14px;line-height:20px;color:#4b5563;margin:0 0 4px 0;"><strong>Device:</strong> ${escapeHtml(browser)} on ${escapeHtml(os)}</p>`
-    : "";
+  const deviceLine =
+    browser && os
+      ? `<p style="font-size:14px;line-height:20px;color:#4b5563;margin:0 0 4px 0;"><strong>Device:</strong> ${escapeHtml(browser)} on ${escapeHtml(os)}</p>`
+      : "";
   const locationLine = location
     ? `<p style="font-size:14px;line-height:20px;color:#4b5563;margin:0 0 4px 0;"><strong>Location:</strong> ${escapeHtml(location)} (approximate)</p>`
     : "";
@@ -196,14 +197,17 @@ function parseDeviceInfo(request: Request): DeviceInfo {
     .trim();
 
   const city = headers.get("cf-ipcity") ?? headers.get("x-vercel-ip-city");
-  const country = headers.get("cf-ipcountry") ?? headers.get("x-vercel-ip-country");
-  const region = headers.get("cf-ipregioncode") ?? headers.get("x-vercel-ip-country-region");
+  const country =
+    headers.get("cf-ipcountry") ?? headers.get("x-vercel-ip-country");
+  const region =
+    headers.get("cf-ipregioncode") ?? headers.get("x-vercel-ip-country-region");
 
   const locationParts = [city, region, country]
     .filter(Boolean)
     .map((part) => decodeURIComponent(part!));
 
-  const location = locationParts.length > 0 ? locationParts.join(", ") : undefined;
+  const location =
+    locationParts.length > 0 ? locationParts.join(", ") : undefined;
 
   return {
     browser: browser.name,

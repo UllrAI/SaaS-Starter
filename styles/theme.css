@@ -1,158 +1,169 @@
 :root {
   /* 
-     Light Mode: "Gallery"
-     背景极白，文字极黑，像美术馆的墙面与说明牌。
-     去除了暖色调，保持冷峻的工业白。
+     Light Mode: "Paper & Ink"
+     Not pure white, but a soft, high-quality paper white.
+     Text is a deep charcoal, not pure black.
+     Inspired by high-end code editors and technical documentation.
   */
-  --background: oklch(0.99 0 0);
-  --foreground: oklch(0.10 0 0);
+  --background: oklch(0.985 0.002 240);
+  /* Very subtle cool white */
+  --foreground: oklch(0.2 0.01 240);
+  /* Deep charcoal */
 
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.10 0 0);
+  /* Pure white for cards to pop slightly against the off-white bg */
+  --card-foreground: oklch(0.2 0.01 240);
 
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.10 0 0);
+  --popover-foreground: oklch(0.2 0.01 240);
 
-  /* Primary: 纯黑实体，不仅是颜色，是重量感 */
-  --primary: oklch(0 0 0);
-  --primary-foreground: oklch(1 0 0);
+  /* Primary: A sophisticated, deep indigo/slate. Serious but modern. */
+  --primary: oklch(0.25 0.04 260);
+  --primary-foreground: oklch(0.98 0 0);
 
-  /* Secondary: 极淡的灰，用于区分层级，但不抢眼 */
-  --secondary: oklch(0.96 0 0);
-  --secondary-foreground: oklch(0 0 0);
+  /* Secondary: Subtle gray for UI elements */
+  --secondary: oklch(0.96 0.005 240);
+  --secondary-foreground: oklch(0.25 0.04 260);
 
-  --muted: oklch(0.96 0 0);
-  --muted-foreground: oklch(0.45 0 0);
-  /* 提高对比度，更清晰、更经典 */
+  --muted: oklch(0.96 0.005 240);
+  --muted-foreground: oklch(0.55 0.02 240);
 
-  --accent: oklch(0.94 0 0);
-  --accent-foreground: oklch(0 0 0);
+  --accent: oklch(0.94 0.01 240);
+  --accent-foreground: oklch(0.25 0.04 260);
 
-  /* Destructive: 经典的“瑞士红”，克制而警醒，不偏色 */
-  --destructive: oklch(0.5 0.15 25);
-  --destructive-foreground: oklch(1 0 0);
+  /* Destructive: A technical red, like a syntax error */
+  --destructive: oklch(0.55 0.15 25);
+  --destructive-foreground: oklch(0.98 0 0);
 
-  --border: oklch(0.90 0 0);
-  --input: oklch(0.90 0 0);
-  --ring: oklch(0.10 0 0);
-  /* 聚焦环是黑色的，非常锐利 */
+  --border: oklch(0.92 0.005 240);
+  --input: oklch(0.92 0.005 240);
+  --ring: oklch(0.25 0.04 260);
 
-  /* Charts: 即使是图表，也是一组高级的莫兰迪/工业灰度色谱 */
-  --chart-1: oklch(0.10 0 0);
-  /* Black */
-  --chart-2: oklch(0.35 0 0);
-  /* Dark Grey */
-  --chart-3: oklch(0.55 0 0);
-  /* Medium Grey */
-  --chart-4: oklch(0.75 0 0);
-  /* Light Grey */
-  --chart-5: oklch(0.85 0 0);
-  /* Platinum */
+  /* Charts: Technical, data-viz inspired colors */
+  --chart-1: oklch(0.25 0.04 260);
+  /* Primary Slate */
+  --chart-2: oklch(0.45 0.12 200);
+  /* Teal */
+  --chart-3: oklch(0.5 0.14 300);
+  /* Purple */
+  --chart-4: oklch(0.6 0.15 60);
+  /* Amber */
+  --chart-5: oklch(0.55 0.15 25);
+  /* Red */
 
-  --sidebar: oklch(0.98 0 0);
-  --sidebar-foreground: oklch(0.10 0 0);
-  --sidebar-primary: oklch(0 0 0);
-  --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.95 0 0);
-  --sidebar-accent-foreground: oklch(0 0 0);
-  --sidebar-border: oklch(0.92 0 0);
-  --sidebar-ring: oklch(0.10 0 0);
+  --sidebar: oklch(0.98 0.002 240);
+  --sidebar-foreground: oklch(0.25 0.04 260);
+  --sidebar-primary: oklch(0.25 0.04 260);
+  --sidebar-primary-foreground: oklch(0.98 0 0);
+  --sidebar-accent: oklch(0.95 0.01 240);
+  --sidebar-accent-foreground: oklch(0.25 0.04 260);
+  --sidebar-border: oklch(0.92 0.005 240);
+  --sidebar-ring: oklch(0.25 0.04 260);
 
-  /* Fonts: 保持默认，但在排版上建议使用 tighter tracking */
-  --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  /* Fonts: Monospace is king for developers, but we keep sans for UI */
+  --font-sans:
+    ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --font-mono:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
 
   /* 
      THE RADIUS: ZERO.
-     直角是人类理性的象征。
+     Sharp, precise, engineered.
   */
   --radius: 0rem;
 
   /* 
-     Shadows: 几乎不可见，或者非常锐利。
-     这里去除了模糊感，模拟一种“扁平但有厚度”的卡片感。
+     Shadows: Sharp, technical, "hard" shadows.
+     No soft blurs.
   */
-  --shadow-x: 0;
-  --shadow-y: 1px;
+  --shadow-x: 4px;
+  --shadow-y: 4px;
   --shadow-blur: 0px;
-  /* 无模糊 */
   --shadow-spread: 0px;
-  --shadow-opacity: 0.08;
-  --shadow-color: oklch(0 0 0);
+  --shadow-color: oklch(0.2 0.01 240 / 0.1);
 
-  --shadow-2xs: 0 1px 0px 0px var(--border);
-  --shadow-xs: 0 1px 0px 0px var(--border);
-  --shadow-sm: 0 1px 2px 0px rgba(0, 0, 0, 0.05);
-  --shadow: 0 1px 2px 0px rgba(0, 0, 0, 0.05), 0 1px 0px 0px var(--border);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
-  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+  --shadow-sm: 2px 2px 0px 0px var(--border);
+  --shadow: 4px 4px 0px 0px var(--border);
+  --shadow-md: 6px 6px 0px 0px var(--border);
+  --shadow-lg: 8px 8px 0px 0px var(--border);
+  --shadow-xl: 12px 12px 0px 0px var(--border);
+  --shadow-2xl: 16px 16px 0px 0px var(--border);
 
-  /* 字体间距稍微收紧，增加现代感 */
-  --tracking-normal: -0.025em;
+  --tracking-normal: -0.02em;
   --spacing: 0.25rem;
 }
 
 .dark {
   /* 
-     Dark Mode: "Void"
-     不是单纯的黑，而是深邃的黑曜石色。
-     高光使用纯白，形成如同激光般的切割感。
+     Dark Mode: "Deep Space Code"
+     Not pure black, but a rich, deep slate/zinc.
+     Comfortable for long coding sessions.
   */
-  --background: oklch(0.05 0 0);
-  /* 极深的黑，接近 Vantablack */
-  --foreground: oklch(0.98 0 0);
-  /* 纯粹的光 */
+  --background: oklch(0.12 0.02 260);
+  /* Deep Slate */
+  --foreground: oklch(0.92 0.01 240);
+  /* Soft White */
 
-  --card: oklch(0.07 0 0);
-  /* 稍微提亮一点点，仅用于区分层级 */
-  --card-foreground: oklch(0.98 0 0);
+  --card: oklch(0.14 0.02 260);
+  /* Slightly lighter slate */
+  --card-foreground: oklch(0.92 0.01 240);
 
-  --popover: oklch(0.05 0 0);
-  --popover-foreground: oklch(0.98 0 0);
+  --popover: oklch(0.12 0.02 260);
+  --popover-foreground: oklch(0.92 0.01 240);
 
-  /* Primary: 在黑暗中，主色调是光（白色） */
-  --primary: oklch(1 0 0);
-  --primary-foreground: oklch(0 0 0);
-  /* 黑色文字在白色按钮上 */
+  /* Primary: Electric Blue/Indigo for focus */
+  --primary: oklch(0.65 0.18 260);
+  --primary-foreground: oklch(0.12 0.02 260);
 
-  --secondary: oklch(0.12 0 0);
-  --secondary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.18 0.03 260);
+  --secondary-foreground: oklch(0.92 0.01 240);
 
-  --muted: oklch(0.12 0 0);
-  --muted-foreground: oklch(0.60 0 0);
+  --muted: oklch(0.18 0.03 260);
+  --muted-foreground: oklch(0.65 0.05 260);
 
-  --accent: oklch(0.15 0 0);
-  --accent-foreground: oklch(1 0 0);
+  --accent: oklch(0.2 0.04 260);
+  --accent-foreground: oklch(0.92 0.01 240);
 
-  --destructive: oklch(0.4 0.15 25);
-  /* 深红，像黑暗中的余烬 */
-  --destructive-foreground: oklch(1 0 0);
+  --destructive: oklch(0.55 0.18 25);
+  --destructive-foreground: oklch(0.92 0.01 240);
 
-  --border: oklch(0.15 0 0);
-  /* 极细微的边界 */
-  --input: oklch(0.15 0 0);
-  --ring: oklch(0.8 0 0);
-  /* 聚焦时是一圈光环 */
+  --border: oklch(0.22 0.03 260);
+  --input: oklch(0.22 0.03 260);
+  --ring: oklch(0.65 0.18 260);
 
-  /* Charts: Dark Mode 下的反转灰度 */
-  --chart-1: oklch(0.98 0 0);
-  /* White */
-  --chart-2: oklch(0.75 0 0);
-  --chart-3: oklch(0.55 0 0);
-  --chart-4: oklch(0.35 0 0);
-  --chart-5: oklch(0.20 0 0);
+  /* Charts: Neon/Cyberpunk inspired for dark mode */
+  --chart-1: oklch(0.65 0.18 260);
+  /* Electric Blue */
+  --chart-2: oklch(0.7 0.16 180);
+  /* Cyan */
+  --chart-3: oklch(0.75 0.15 320);
+  /* Magenta */
+  --chart-4: oklch(0.8 0.14 60);
+  /* Yellow */
+  --chart-5: oklch(0.65 0.18 25);
+  /* Red */
 
-  --sidebar: oklch(0.07 0 0);
-  --sidebar-foreground: oklch(0.98 0 0);
-  --sidebar-primary: oklch(1 0 0);
-  --sidebar-primary-foreground: oklch(0 0 0);
-  --sidebar-accent: oklch(0.12 0 0);
-  --sidebar-accent-foreground: oklch(0.98 0 0);
-  --sidebar-border: oklch(0.12 0 0);
-  --sidebar-ring: oklch(0.8 0 0);
+  --sidebar: oklch(0.1 0.02 260);
+  --sidebar-foreground: oklch(0.92 0.01 240);
+  --sidebar-primary: oklch(0.65 0.18 260);
+  --sidebar-primary-foreground: oklch(0.12 0.02 260);
+  --sidebar-accent: oklch(0.16 0.03 260);
+  --sidebar-accent-foreground: oklch(0.92 0.01 240);
+  --sidebar-border: oklch(0.2 0.03 260);
+  --sidebar-ring: oklch(0.65 0.18 260);
+
+  /* Shadows in dark mode: Subtle glow or deep cut */
+  --shadow-color: oklch(0 0 0 / 0.3);
+  --shadow-sm: 2px 2px 0px 0px oklch(0 0 0 / 0.5);
+  --shadow: 4px 4px 0px 0px oklch(0 0 0 / 0.5);
+  --shadow-md: 6px 6px 0px 0px oklch(0 0 0 / 0.5);
+  --shadow-lg: 8px 8px 0px 0px oklch(0 0 0 / 0.5);
+  --shadow-xl: 12px 12px 0px 0px oklch(0 0 0 / 0.5);
+  --shadow-2xl: 16px 16px 0px 0px oklch(0 0 0 / 0.5);
 }
 
 @theme inline {
@@ -208,9 +219,5 @@
   --shadow-xl: var(--shadow-xl);
   --shadow-2xl: var(--shadow-2xl);
 
-  /* 
-     增加这一行，强制应用更紧凑的字间距，
-     这是打造“高端杂志感”或“瑞士排版风”的秘密武器 
-  */
   --tracking-tight: var(--tracking-normal);
 }

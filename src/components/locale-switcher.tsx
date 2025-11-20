@@ -17,10 +17,7 @@ import {
   SUPPORTED_LOCALES,
   getLocaleDisplayInfo,
 } from "@/lib/config/i18n";
-import {
-  setLingoLocale,
-  useLingoLocale,
-} from "lingo.dev/react/client";
+import { setLingoLocale, useLingoLocale } from "lingo.dev/react/client";
 
 type ButtonVariant = React.ComponentProps<typeof Button>["variant"];
 type ButtonSize = React.ComponentProps<typeof Button>["size"];
@@ -42,8 +39,7 @@ export function LocaleSwitcher({
   align = "end",
   showLabel = false,
 }: LocaleSwitcherProps) {
-  const availableLocales =
-    locales.length > 0 ? locales : SUPPORTED_LOCALES;
+  const availableLocales = locales.length > 0 ? locales : SUPPORTED_LOCALES;
   const localeFromCookie = useLingoLocale();
   const [isSwitching, setIsSwitching] = React.useState(false);
 
@@ -100,7 +96,11 @@ export function LocaleSwitcher({
           <span className="sr-only">Select language</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align={align} sideOffset={8} className="min-w-[12rem]">
+      <DropdownMenuContent
+        align={align}
+        sideOffset={8}
+        className="min-w-[12rem]"
+      >
         <DropdownMenuLabel>Language</DropdownMenuLabel>
         <DropdownMenuSeparator />
         {availableLocales.map((locale) => {
@@ -113,12 +113,10 @@ export function LocaleSwitcher({
               className="flex items-center justify-between gap-4 py-2"
               onSelect={() => handleLocaleSelect(locale)}
             >
-              <span className="text-sm font-medium leading-none">
+              <span className="text-sm leading-none font-medium">
                 {details.label}
               </span>
-              {isSelected && (
-                <Check className="text-primary h-4 w-4" />
-              )}
+              {isSelected && <Check className="text-primary h-4 w-4" />}
             </DropdownMenuItem>
           );
         })}

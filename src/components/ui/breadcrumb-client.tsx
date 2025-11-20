@@ -12,10 +12,7 @@ function Breadcrumb(props: React.ComponentProps<"nav">) {
   return <nav aria-label="breadcrumb" data-slot="breadcrumb" {...props} />;
 }
 
-function BreadcrumbList({
-  className,
-  ...props
-}: React.ComponentProps<"ol">) {
+function BreadcrumbList({ className, ...props }: React.ComponentProps<"ol">) {
   return (
     <ol
       data-slot="breadcrumb-list"
@@ -28,10 +25,7 @@ function BreadcrumbList({
   );
 }
 
-function BreadcrumbItem({
-  className,
-  ...props
-}: React.ComponentProps<"li">) {
+function BreadcrumbItem({ className, ...props }: React.ComponentProps<"li">) {
   return (
     <li
       data-slot="breadcrumb-item"
@@ -59,10 +53,7 @@ function BreadcrumbLink({
   );
 }
 
-function BreadcrumbPage({
-  className,
-  ...props
-}: React.ComponentProps<"span">) {
+function BreadcrumbPage({ className, ...props }: React.ComponentProps<"span">) {
   return (
     <span
       data-slot="breadcrumb-page"

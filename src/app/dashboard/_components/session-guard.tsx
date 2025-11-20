@@ -48,7 +48,7 @@ export function SessionGuard({ children }: SessionGuardProps) {
 function SessionGuardLoading() {
   return (
     // Match the rounded corners from SidebarInset so the overlay doesn't bleed past them.
-    <section className="absolute inset-0 flex items-center justify-center bg-background/80 rounded-2xl">
+    <section className="bg-background/80 absolute inset-0 flex items-center justify-center rounded-2xl">
       <div className="flex flex-col items-center gap-4">
         <div className="relative">
           <div className="bg-primary/10 absolute inset-0 animate-pulse rounded-full" />

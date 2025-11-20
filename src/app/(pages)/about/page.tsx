@@ -44,7 +44,8 @@ const teamMembers: TeamMember[] = [
     role: <>CEO & Founder</>,
     bio: (
       <>
-        Former tech lead at major SaaS companies. Passionate about developer tools.
+        Former tech lead at major SaaS companies. Passionate about developer
+        tools.
       </>
     ),
     image:
@@ -55,9 +56,7 @@ const teamMembers: TeamMember[] = [
     name: "Sarah Johnson",
     role: <>CTO</>,
     bio: (
-      <>
-        Full-stack engineer with 10+ years building scalable applications.
-      </>
+      <>Full-stack engineer with 10+ years building scalable applications.</>
     ),
     image:
       "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?fit=crop&crop=face",
@@ -67,9 +66,7 @@ const teamMembers: TeamMember[] = [
     name: "Mike Rodriguez",
     role: <>Head of Product</>,
     bio: (
-      <>
-        Product strategist focused on developer experience and user success.
-      </>
+      <>Product strategist focused on developer experience and user success.</>
     ),
     image:
       "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?fit=crop&crop=face",
@@ -83,7 +80,8 @@ const values: CompanyValue[] = [
     title: <>Mission-Driven</>,
     description: (
       <>
-        We&apos;re committed to democratizing SaaS development and making it accessible to everyone.
+        We&apos;re committed to democratizing SaaS development and making it
+        accessible to everyone.
       </>
     ),
   },
@@ -93,7 +91,8 @@ const values: CompanyValue[] = [
     title: <>Innovation First</>,
     description: (
       <>
-        We constantly push the boundaries of what&apos;s possible in developer tooling.
+        We constantly push the boundaries of what&apos;s possible in developer
+        tooling.
       </>
     ),
   },
@@ -103,7 +102,8 @@ const values: CompanyValue[] = [
     title: <>Community Focused</>,
     description: (
       <>
-        Our success is measured by the success of the developers who use our platform.
+        Our success is measured by the success of the developers who use our
+        platform.
       </>
     ),
   },
@@ -113,7 +113,8 @@ const values: CompanyValue[] = [
     title: <>Global Impact</>,
     description: (
       <>
-        Building tools that empower developers worldwide to create amazing products.
+        Building tools that empower developers worldwide to create amazing
+        products.
       </>
     ),
   },

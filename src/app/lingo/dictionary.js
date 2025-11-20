@@ -2433,6 +2433,111 @@ export default {
           },
           hash: "7c3667b512dcab3eb0d0489e03261967",
         },
+        "7/declaration/body/0/argument/1/1/7/1/11/1/1": {
+          content: {
+            en: "Deployments",
+            "zh-CN": "部署",
+          },
+          hash: "d6609525c0ec758580ed5fd6c38d1ff2",
+        },
+        "7/declaration/body/0/argument/1/1/7/1/11/1/3": {
+          content: {
+            en: "Past 7 days",
+            "zh-CN": "过去7天",
+          },
+          hash: "2ec651d9372762ade4c8bc7aafab3030",
+        },
+        "7/declaration/body/0/argument/1/1/7/1/11/5/1/1": {
+          content: {
+            en: "Success rate",
+            "zh-CN": "成功率",
+          },
+          hash: "914b4f146384a0699ed4853e22951015",
+        },
+        "7/declaration/body/0/argument/1/1/7/1/11/5/1/3": {
+          content: {
+            en: "99.9%",
+            "zh-CN": "99.9%",
+          },
+          hash: "ebf8401702bd148b6b1b8a3cbcbe256f",
+        },
+        "7/declaration/body/0/argument/1/1/7/1/11/5/3/1": {
+          content: {
+            en: "Build time",
+            "zh-CN": "构建时间",
+          },
+          hash: "0595918b3b5586fd944a3df3c950e589",
+        },
+        "7/declaration/body/0/argument/1/1/7/1/11/5/3/3": {
+          content: {
+            en: "1m 42s",
+            "zh-CN": "1分42秒",
+          },
+          hash: "82f2057ba1fec2baee1d732d36c82e58",
+        },
+        "7/declaration/body/0/argument/1/1/7/1/3/1/3/1": {
+          content: {
+            en: "UllrAI Dashboard",
+            "zh-CN": "UllrAI仪表板",
+          },
+          hash: "d57e9a8c3fd2985b2433e8f616db036a",
+        },
+        "7/declaration/body/0/argument/1/1/7/1/3/1/3/3": {
+          content: {
+            en: "Demo metrics",
+            "zh-CN": "演示指标",
+          },
+          hash: "341586dca2d122fe1421ed6f0e8a1071",
+        },
+        "7/declaration/body/0/argument/1/1/7/1/3/3": {
+          content: {
+            en: "<element:Activity></element:Activity> Demo",
+            "zh-CN": "<element:Activity></element:Activity> 演示",
+          },
+          hash: "afe3d19c708ceaa2ceb3acef9c8d5c7c",
+        },
+        "7/declaration/body/0/argument/1/1/7/1/7/1/1": {
+          content: {
+            en: "Monthly revenue",
+            "zh-CN": "月收入",
+          },
+          hash: "22359624809a9d18e781bfd1c50703a7",
+        },
+        "7/declaration/body/0/argument/1/1/7/1/7/1/3": {
+          content: {
+            en: "$84.2k",
+            "zh-CN": "$84.2k",
+          },
+          hash: "c9d7afacf15b4057c1974a99dd78ecde",
+        },
+        "7/declaration/body/0/argument/1/1/7/1/7/1/5": {
+          content: {
+            en: "+18% vs last month",
+            "zh-CN": "比上月增长18%",
+          },
+          hash: "39a5557ffdb5eb3ce5d3c752e0ef6d5e",
+        },
+        "7/declaration/body/0/argument/1/1/7/1/7/3/1": {
+          content: {
+            en: "Active users",
+            "zh-CN": "活跃用户",
+          },
+          hash: "ca0d9f2095793a051cd8a598073d7211",
+        },
+        "7/declaration/body/0/argument/1/1/7/1/7/3/3": {
+          content: {
+            en: "12.4k",
+            "zh-CN": "12.4k",
+          },
+          hash: "4b5b2ea91770a0f61379b48e2af0cf10",
+        },
+        "7/declaration/body/0/argument/1/1/7/1/7/3/5": {
+          content: {
+            en: "+1.2k this week",
+            "zh-CN": "本周增加1.2k",
+          },
+          hash: "2fa9d74e95f96897cce7a231d466bf8b",
+        },
         "7/declaration/body/0/argument/1/1/7/3/11/1/1": {
           content: {
             en: "Deployments",
@@ -2538,12 +2643,19 @@ export default {
           },
           hash: "2fa9d74e95f96897cce7a231d466bf8b",
         },
-        "7/declaration/body/0/argument/1/1/7/7/1": {
+        "7/declaration/body/0/argument/1/1/7/5/1": {
           content: {
             en: "<element:div></element:div> Easy Setup",
             "zh-CN": "<element:div></element:div> 轻松设置",
           },
           hash: "f8fd0932b1df20a9ed614dfd53de88fb",
+        },
+        "7/declaration/body/0/argument/1/1/7/7/1": {
+          content: {
+            en: "<element:Zap></element:Zap> Fast Deploy",
+            "zh-CN": "<element:Zap></element:Zap> 快速部署",
+          },
+          hash: "0e7cca9032f511058280f061e4f7aecd",
         },
         "7/declaration/body/0/argument/1/1/7/9/1": {
           content: {
@@ -3622,6 +3734,41 @@ export default {
           },
           hash: "0ef91fcb33b04612eb8a202f673d7881",
         },
+        "24/body/2/consequent/0/argument/1/1/1": {
+          content: {
+            en: "Sidebar",
+            "zh-CN": "侧边栏",
+          },
+          hash: "85fcd93a6f051c26d057e4b30d392317",
+        },
+        "24/body/2/consequent/0/argument/1/1/3": {
+          content: {
+            en: "Displays the mobile sidebar.",
+            "zh-CN": "显示移动端侧边栏。",
+          },
+          hash: "51aa5f202c817560f38d3527a9a1366d",
+        },
+        "25/body/1/argument/3": {
+          content: {
+            en: "Toggle Sidebar",
+            "zh-CN": "切换侧边栏",
+          },
+          hash: "0ef91fcb33b04612eb8a202f673d7881",
+        },
+        "26/body/1/argument-aria-label": {
+          content: {
+            en: "Toggle Sidebar",
+            "zh-CN": "切换侧边栏",
+          },
+          hash: "0ef91fcb33b04612eb8a202f673d7881",
+        },
+        "26/body/1/argument-title": {
+          content: {
+            en: "Toggle Sidebar",
+            "zh-CN": "切换侧边栏",
+          },
+          hash: "0ef91fcb33b04612eb8a202f673d7881",
+        },
       },
     },
     "../emails/magic-link.tsx": {
@@ -3743,26 +3890,61 @@ export default {
     },
     "dashboard/_components/app-sidebar.tsx": {
       entries: {
-        "13/0/init/0/1/value": {
+        "12/0/init/0/1/value": {
           content: {
             en: "Home",
             "zh-CN": "主页",
           },
           hash: "104a3db3b671c04e167eafbe21e57881",
         },
-        "13/0/init/1/1/value": {
+        "12/0/init/1/1/value": {
           content: {
             en: "Upload",
             "zh-CN": "上传",
           },
           hash: "4a6c84aa16db0f4e5697f49b45257bc7",
         },
-        "13/0/init/2/1/value": {
+        "12/0/init/2/1/value": {
           content: {
             en: "Settings",
             "zh-CN": "设置",
           },
           hash: "8df6777277469c1fd88cc18dde2f1cc3",
+        },
+        "13/0/init/0/1/value": {
+          content: {
+            en: "Admin Dashboard",
+            "zh-CN": "管理员仪表板",
+          },
+          hash: "bbb5815b611504951063a4dab820f36f",
+        },
+        "13/0/init/1/1/value": {
+          content: {
+            en: "User Management",
+            "zh-CN": "用户管理",
+          },
+          hash: "82b1e7d9d4c8a8592d956c2ef21bd58c",
+        },
+        "13/0/init/2/1/value": {
+          content: {
+            en: "Payments",
+            "zh-CN": "支付",
+          },
+          hash: "1ce1a8d31ed709fb29fce2057045d104",
+        },
+        "13/0/init/3/1/value": {
+          content: {
+            en: "Subscriptions",
+            "zh-CN": "订阅",
+          },
+          hash: "0d17f4d8d660df40b41d82e0171af6ad",
+        },
+        "13/0/init/4/1/value": {
+          content: {
+            en: "Uploads Managements",
+            "zh-CN": "上传管理",
+          },
+          hash: "86b4dcd6e7bb2e6cf47151539e570be0",
         },
         "14/0/init/0/1/value": {
           content: {
@@ -3799,6 +3981,49 @@ export default {
           },
           hash: "86b4dcd6e7bb2e6cf47151539e570be0",
         },
+        "15/0/init/0/1/value": {
+          content: {
+            en: "Admin Dashboard",
+            "zh-CN": "管理员仪表板",
+          },
+          hash: "bbb5815b611504951063a4dab820f36f",
+        },
+        "15/0/init/1/1/value": {
+          content: {
+            en: "User Management",
+            "zh-CN": "用户管理",
+          },
+          hash: "82b1e7d9d4c8a8592d956c2ef21bd58c",
+        },
+        "15/0/init/2/1/value": {
+          content: {
+            en: "Payments",
+            "zh-CN": "支付",
+          },
+          hash: "1ce1a8d31ed709fb29fce2057045d104",
+        },
+        "15/0/init/3/1/value": {
+          content: {
+            en: "Subscriptions",
+            "zh-CN": "订阅",
+          },
+          hash: "0d17f4d8d660df40b41d82e0171af6ad",
+        },
+        "15/0/init/4/1/value": {
+          content: {
+            en: "Uploads Managements",
+            "zh-CN": "上传管理",
+          },
+          hash: "86b4dcd6e7bb2e6cf47151539e570be0",
+        },
+        "16/body/7/argument": {
+          content: {
+            en: "<element:item.icon></element:item.icon><element:span>{item.title}</element:span>sss",
+            "zh-CN":
+              "<element:item.icon></element:item.icon><element:span>{item.title}</element:span>测试",
+          },
+          hash: "ec2238aa262b91350ed9a56959653d67",
+        },
         "16/declaration/body/6/argument/3/5/expression/right/1/1/1/expression/right":
           {
             content: {
@@ -3815,6 +4040,86 @@ export default {
             },
             hash: "ea7b215a42902966b2f131b58fedc6bd",
           },
+        "16/declaration/body/9/argument/3/5/expression/right/1/1/1/expression/right":
+          {
+            content: {
+              en: "Admin",
+              "zh-CN": "管理员",
+            },
+            hash: "1b1db62f967e180838caeff14b805a8c",
+          },
+        "16/declaration/body/9/argument/3/5/expression/right/5/expression/right/1/1/expression/right":
+          {
+            content: {
+              en: "Manage Tables",
+              "zh-CN": "管理表格",
+            },
+            hash: "ea7b215a42902966b2f131b58fedc6bd",
+          },
+        "17/declaration/body/5/argument/3/5/expression/right/1/1/1/expression/right":
+          {
+            content: {
+              en: "Admin",
+              "zh-CN": "管理员",
+            },
+            hash: "1b1db62f967e180838caeff14b805a8c",
+          },
+        "17/declaration/body/5/argument/3/5/expression/right/5/expression/right/1/1/expression/right":
+          {
+            content: {
+              en: "Manage Tables",
+              "zh-CN": "管理表格",
+            },
+            hash: "ea7b215a42902966b2f131b58fedc6bd",
+          },
+        "17/declaration/body/8/argument/3/5/expression/right/1/1/1/expression/right":
+          {
+            content: {
+              en: "Admin",
+              "zh-CN": "管理员",
+            },
+            hash: "1b1db62f967e180838caeff14b805a8c",
+          },
+        "17/declaration/body/8/argument/3/5/expression/right/5/expression/right/1/1/expression/right":
+          {
+            content: {
+              en: "Manage Tables",
+              "zh-CN": "管理表格",
+            },
+            hash: "ea7b215a42902966b2f131b58fedc6bd",
+          },
+        "18/declaration/body/9/argument/3/5/expression/right/1/1/1/expression/right":
+          {
+            content: {
+              en: "Admin",
+              "zh-CN": "管理员",
+            },
+            hash: "1b1db62f967e180838caeff14b805a8c",
+          },
+        "18/declaration/body/9/argument/3/5/expression/right/5/expression/right/1/1/expression/right":
+          {
+            content: {
+              en: "Manage Tables",
+              "zh-CN": "管理表格",
+            },
+            hash: "ea7b215a42902966b2f131b58fedc6bd",
+          },
+        "19/declaration/body/8/argument/3/3/expression/right/1/openingElement/0/value/expression/consequent":
+          {
+            content: {
+              en: "Admin",
+              "zh-CN": "管理员",
+            },
+            hash: "90eb20f1400db82ab874744e47836dc6",
+          },
+        "19/declaration/body/8/argument/3/3/expression/right/3/expression/right/openingElement/0/value/expression/consequent":
+          {
+            content: {
+              en: "Manage Tables",
+              "zh-CN": "管理表格",
+            },
+            hash: "9947f775f5a9d508a1f5581525681a8d",
+          },
       },
     },
     "dashboard/_components/session-guard.tsx": {
@@ -3826,10 +4131,45 @@ export default {
           },
           hash: "82b4ea7ed1439094d7c4be13aaba9a66",
         },
+        "7/body/0/argument/1/3/3": {
+          content: {
+            en: "Loading...",
+            "zh-CN": "加载中...",
+          },
+          hash: "82b4ea7ed1439094d7c4be13aaba9a66",
+        },
+        "8/body/0/argument/1/3/3": {
+          content: {
+            en: "Loading...",
+            "zh-CN": "加载中...",
+          },
+          hash: "82b4ea7ed1439094d7c4be13aaba9a66",
+        },
       },
     },
     "dashboard/_components/user-btn.tsx": {
       entries: {
+        "12/declaration/body/4/argument/1/1/3/5/1/1": {
+          content: {
+            en: "<element:Settings></element:Settings> Settings",
+            "zh-CN": "<element:Settings></element:Settings> 设置",
+          },
+          hash: "292ad169645e3d3c7195da7937aa0bd9",
+        },
+        "12/declaration/body/4/argument/1/1/3/9/1/expression/alternate": {
+          content: {
+            en: "<element:LogOut></element:LogOut> Log Out",
+            "zh-CN": "<element:LogOut></element:LogOut> 退出登录",
+          },
+          hash: "94566d276c3c9ed048fe046f7e8f5fa1",
+        },
+        "12/declaration/body/4/argument/1/1/3/9/1/expression/consequent/3": {
+          content: {
+            en: "Log Out",
+            "zh-CN": "退出登录",
+          },
+          hash: "0a29c741e0a1f63184ee7b85ce2da68c",
+        },
         "12/declaration/body/6/argument/1/1/3/5/1/1": {
           content: {
             en: "<element:Settings></element:Settings> Settings",
@@ -3845,6 +4185,69 @@ export default {
           hash: "94566d276c3c9ed048fe046f7e8f5fa1",
         },
         "12/declaration/body/6/argument/1/1/3/9/1/expression/consequent/3": {
+          content: {
+            en: "Log Out",
+            "zh-CN": "退出登录",
+          },
+          hash: "0a29c741e0a1f63184ee7b85ce2da68c",
+        },
+        "12/declaration/body/7/argument/1/1/3/5/1/1": {
+          content: {
+            en: "<element:Settings></element:Settings> Settings",
+            "zh-CN": "<element:Settings></element:Settings> 设置",
+          },
+          hash: "292ad169645e3d3c7195da7937aa0bd9",
+        },
+        "12/declaration/body/7/argument/1/1/3/9/1/expression/alternate": {
+          content: {
+            en: "<element:LogOut></element:LogOut> Log Out",
+            "zh-CN": "<element:LogOut></element:LogOut> 退出登录",
+          },
+          hash: "94566d276c3c9ed048fe046f7e8f5fa1",
+        },
+        "12/declaration/body/7/argument/1/1/3/9/1/expression/consequent/3": {
+          content: {
+            en: "Log Out",
+            "zh-CN": "退出登录",
+          },
+          hash: "0a29c741e0a1f63184ee7b85ce2da68c",
+        },
+        "12/declaration/body/8/argument/1/1/3/5/1/1": {
+          content: {
+            en: "<element:Settings></element:Settings> Settings",
+            "zh-CN": "<element:Settings></element:Settings> 设置",
+          },
+          hash: "292ad169645e3d3c7195da7937aa0bd9",
+        },
+        "12/declaration/body/8/argument/1/1/3/9/1/expression/alternate": {
+          content: {
+            en: "<element:LogOut></element:LogOut> Log Out",
+            "zh-CN": "<element:LogOut></element:LogOut> 退出登录",
+          },
+          hash: "94566d276c3c9ed048fe046f7e8f5fa1",
+        },
+        "12/declaration/body/8/argument/1/1/3/9/1/expression/consequent/3": {
+          content: {
+            en: "Log Out",
+            "zh-CN": "退出登录",
+          },
+          hash: "0a29c741e0a1f63184ee7b85ce2da68c",
+        },
+        "13/declaration/body/7/argument/1/1/3/5/1/1": {
+          content: {
+            en: "<element:Settings></element:Settings> Settings",
+            "zh-CN": "<element:Settings></element:Settings> 设置",
+          },
+          hash: "292ad169645e3d3c7195da7937aa0bd9",
+        },
+        "13/declaration/body/7/argument/1/1/3/9/1/expression/alternate": {
+          content: {
+            en: "<element:LogOut></element:LogOut> Log Out",
+            "zh-CN": "<element:LogOut></element:LogOut> 退出登录",
+          },
+          hash: "94566d276c3c9ed048fe046f7e8f5fa1",
+        },
+        "13/declaration/body/7/argument/1/1/3/9/1/expression/consequent/3": {
           content: {
             en: "Log Out",
             "zh-CN": "退出登录",

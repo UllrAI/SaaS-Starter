@@ -2706,6 +2706,126 @@
           "overrides": {},
           "content": "Complete UllrAI Micro SaaS starter with authentication, payments, database, and deployment."
         },
+        "7/declaration/body/0/argument/1/1/7/1/11/1/1": {
+          "type": "element",
+          "hash": "d6609525c0ec758580ed5fd6c38d1ff2",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Deployments"
+        },
+        "7/declaration/body/0/argument/1/1/7/1/11/1/3": {
+          "type": "element",
+          "hash": "2ec651d9372762ade4c8bc7aafab3030",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Past 7 days"
+        },
+        "7/declaration/body/0/argument/1/1/7/1/11/5/1/1": {
+          "type": "element",
+          "hash": "914b4f146384a0699ed4853e22951015",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Success rate"
+        },
+        "7/declaration/body/0/argument/1/1/7/1/11/5/1/3": {
+          "type": "element",
+          "hash": "ebf8401702bd148b6b1b8a3cbcbe256f",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "99.9%"
+        },
+        "7/declaration/body/0/argument/1/1/7/1/11/5/3/1": {
+          "type": "element",
+          "hash": "0595918b3b5586fd944a3df3c950e589",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Build time"
+        },
+        "7/declaration/body/0/argument/1/1/7/1/11/5/3/3": {
+          "type": "element",
+          "hash": "82f2057ba1fec2baee1d732d36c82e58",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "1m 42s"
+        },
+        "7/declaration/body/0/argument/1/1/7/1/3/1/3/1": {
+          "type": "element",
+          "hash": "d57e9a8c3fd2985b2433e8f616db036a",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "UllrAI Dashboard"
+        },
+        "7/declaration/body/0/argument/1/1/7/1/3/1/3/3": {
+          "type": "element",
+          "hash": "341586dca2d122fe1421ed6f0e8a1071",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Demo metrics"
+        },
+        "7/declaration/body/0/argument/1/1/7/1/3/3": {
+          "type": "element",
+          "hash": "afe3d19c708ceaa2ceb3acef9c8d5c7c",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:Activity></element:Activity> Demo"
+        },
+        "7/declaration/body/0/argument/1/1/7/1/7/1/1": {
+          "type": "element",
+          "hash": "22359624809a9d18e781bfd1c50703a7",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Monthly revenue"
+        },
+        "7/declaration/body/0/argument/1/1/7/1/7/1/3": {
+          "type": "element",
+          "hash": "c9d7afacf15b4057c1974a99dd78ecde",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "$84.2k"
+        },
+        "7/declaration/body/0/argument/1/1/7/1/7/1/5": {
+          "type": "element",
+          "hash": "39a5557ffdb5eb3ce5d3c752e0ef6d5e",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "+18% vs last month"
+        },
+        "7/declaration/body/0/argument/1/1/7/1/7/3/1": {
+          "type": "element",
+          "hash": "ca0d9f2095793a051cd8a598073d7211",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Active users"
+        },
+        "7/declaration/body/0/argument/1/1/7/1/7/3/3": {
+          "type": "element",
+          "hash": "4b5b2ea91770a0f61379b48e2af0cf10",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "12.4k"
+        },
+        "7/declaration/body/0/argument/1/1/7/1/7/3/5": {
+          "type": "element",
+          "hash": "2fa9d74e95f96897cce7a231d466bf8b",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "+1.2k this week"
+        },
         "7/declaration/body/0/argument/1/1/7/3/11/1/1": {
           "type": "element",
           "hash": "d6609525c0ec758580ed5fd6c38d1ff2",
@@ -2826,13 +2946,21 @@
           "overrides": {},
           "content": "+1.2k this week"
         },
-        "7/declaration/body/0/argument/1/1/7/7/1": {
+        "7/declaration/body/0/argument/1/1/7/5/1": {
           "type": "element",
           "hash": "f8fd0932b1df20a9ed614dfd53de88fb",
           "context": "",
           "skip": false,
           "overrides": {},
           "content": "<element:div></element:div> Easy Setup"
+        },
+        "7/declaration/body/0/argument/1/1/7/7/1": {
+          "type": "element",
+          "hash": "0e7cca9032f511058280f061e4f7aecd",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:Zap></element:Zap> Fast Deploy"
         },
         "7/declaration/body/0/argument/1/1/7/9/1": {
           "type": "element",
@@ -4302,6 +4430,14 @@
           "overrides": {},
           "content": "Uploads Managements"
         },
+        "16/body/7/argument": {
+          "type": "element",
+          "hash": "ec2238aa262b91350ed9a56959653d67",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "<element:item.icon></element:item.icon><element:span>{item.title}</element:span>sss"
+        },
         "16/declaration/body/6/argument/3/5/expression/right/1/1/1/expression/right": {
           "type": "element",
           "hash": "1b1db62f967e180838caeff14b805a8c",
@@ -4377,6 +4513,22 @@
         "18/declaration/body/9/argument/3/5/expression/right/5/expression/right/1/1/expression/right": {
           "type": "element",
           "hash": "ea7b215a42902966b2f131b58fedc6bd",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Manage Tables"
+        },
+        "19/declaration/body/8/argument/3/3/expression/right/1/openingElement/0/value/expression/consequent": {
+          "type": "element",
+          "hash": "90eb20f1400db82ab874744e47836dc6",
+          "context": "",
+          "skip": false,
+          "overrides": {},
+          "content": "Admin"
+        },
+        "19/declaration/body/8/argument/3/3/expression/right/3/expression/right/openingElement/0/value/expression/consequent": {
+          "type": "element",
+          "hash": "9947f775f5a9d508a1f5581525681a8d",
           "context": "",
           "skip": false,
           "overrides": {},

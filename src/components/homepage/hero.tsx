@@ -127,8 +127,7 @@ export function Hero() {
 
           {/* Right Visual */}
           <div className="relative lg:order-last">
-            <div className="absolute -left-6 top-10 hidden h-48 w-48 rounded-full bg-primary/30 opacity-60 blur-3xl lg:block" />
-            <div className="border-border/60 bg-background/70 relative mx-auto max-w-lg rounded-2xl border p-6 shadow-2xl backdrop-blur-lg">
+            <div className="border-border/60 bg-background/70 relative mx-auto max-w-lg rounded border p-6 shadow-md backdrop-blur-lg">
               {/* Header */}
               <div className="mb-8 flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -161,7 +160,7 @@ export function Hero() {
               </div>
 
               {/* Chart Area */}
-              <div className="border-border/60 mt-6 rounded-2xl border p-4">
+              <div className="border-border/60 mt-6 rounded-md border p-4">
                 <div className="mb-4 flex items-center justify-between text-xs text-muted-foreground">
                   <span>Deployments</span>
                   <span>Past 7 days</span>

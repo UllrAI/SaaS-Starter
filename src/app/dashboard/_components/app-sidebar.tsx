@@ -43,28 +43,28 @@ const navigation: {
   icon: LucideIcon;
   matchMode?: "exact" | "prefix";
 }[] = [
-  {
-    key: "Home",
-    title: <>Home</>,
-    url: "/dashboard",
-    icon: Home,
-    matchMode: "exact",
-  },
-  {
-    key: "Upload",
-    title: <>Upload</>,
-    url: "/dashboard/upload",
-    icon: Upload,
-    matchMode: "exact",
-  },
-  {
-    key: "Settings",
-    title: <>Settings</>,
-    url: "/dashboard/settings",
-    icon: Settings,
-    matchMode: "prefix",
-  },
-];
+    {
+      key: "Home",
+      title: <>Home</>,
+      url: "/dashboard",
+      icon: Home,
+      matchMode: "exact",
+    },
+    {
+      key: "Upload",
+      title: <>Upload</>,
+      url: "/dashboard/upload",
+      icon: Upload,
+      matchMode: "exact",
+    },
+    {
+      key: "Settings",
+      title: <>Settings</>,
+      url: "/dashboard/settings",
+      icon: Settings,
+      matchMode: "prefix",
+    },
+  ];
 
 const adminNavigation: {
   key: string;
@@ -73,42 +73,42 @@ const adminNavigation: {
   icon: LucideIcon;
   matchMode?: "exact" | "prefix";
 }[] = [
-  {
-    key: "Admin Dashboard",
-    title: <>Admin Dashboard</>,
-    url: "/dashboard/admin",
-    icon: BarChart3,
-    matchMode: "exact",
-  },
-  {
-    key: "User Management",
-    title: <>User Management</>,
-    url: "/dashboard/admin/users",
-    icon: Users,
-    matchMode: "exact",
-  },
-  {
-    key: "Payments",
-    title: <>Payments</>,
-    url: "/dashboard/admin/payments",
-    icon: CreditCard,
-    matchMode: "exact",
-  },
-  {
-    key: "Subscriptions",
-    title: <>Subscriptions</>,
-    url: "/dashboard/admin/subscriptions",
-    icon: Shield,
-    matchMode: "exact",
-  },
-  {
-    key: "Uploads Managements",
-    title: <>Uploads Managements</>,
-    url: "/dashboard/admin/uploads",
-    icon: Upload,
-    matchMode: "exact",
-  },
-];
+    {
+      key: "admin-dashboard",
+      title: <>Admin Dashboard</>,
+      url: "/dashboard/admin",
+      icon: BarChart3,
+      matchMode: "exact",
+    },
+    {
+      key: "user-management",
+      title: <>User Management</>,
+      url: "/dashboard/admin/users",
+      icon: Users,
+      matchMode: "exact",
+    },
+    {
+      key: "payments",
+      title: <>Payments</>,
+      url: "/dashboard/admin/payments",
+      icon: CreditCard,
+      matchMode: "exact",
+    },
+    {
+      key: "subscriptions",
+      title: <>Subscriptions</>,
+      url: "/dashboard/admin/subscriptions",
+      icon: Shield,
+      matchMode: "exact",
+    },
+    {
+      key: "uploads-managements",
+      title: <>Uploads Managements</>,
+      url: "/dashboard/admin/uploads",
+      icon: Upload,
+      matchMode: "exact",
+    },
+  ];
 
 const genericTableNavigation = Object.keys(enabledTablesMap).map((key) => ({
   key: key.charAt(0).toUpperCase() + key.slice(1),
@@ -156,7 +156,7 @@ function SidebarMenuLink({ item, pathname, allItems }: MenuItemProps) {
   };
 
   return (
-    <SidebarMenuButton isActive={isActive} tooltip={item.key} className="w-full" onClick={handleClick}>
+    <SidebarMenuButton isActive={isActive} tooltip={item.key} className="w-full cursor-pointer" onClick={handleClick}>
       <item.icon className="size-4" />
       <span>{item.title}</span>
     </SidebarMenuButton>
@@ -232,10 +232,10 @@ export function AppSidebar() {
 
         {showAdminSections && (
           <>
-            <SidebarSection title={open ? "Admin" : undefined} items={adminNavigation} pathname={pathname} />
+            <SidebarSection title={open ? <>Admin</> : undefined} items={adminNavigation} pathname={pathname} />
 
             {genericTableNavigation.length > 0 && (
-              <SidebarSection title={open ? "Manage Tables" : undefined} items={genericTableNavigation} pathname={pathname} />
+              <SidebarSection title={open ? <>Manage Tables</> : undefined} items={genericTableNavigation} pathname={pathname} />
             )}
           </>
         )}

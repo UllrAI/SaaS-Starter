@@ -68,10 +68,12 @@ export const auth = betterAuth({
   },
   plugins: [
     magicLink({
-      sendMagicLink: async ({ email, url }, request) => {
+      sendMagicLink: async ({ email, url }, context) => {
         if (process.env.NODE_ENV === "development") {
           console.log("✨ Magic link: " + url);
         }
+        // Extract request from better-auth context
+        const request = context?.request as Request | undefined;
         await sendMagicLink(email, url, request);
       },
     }),

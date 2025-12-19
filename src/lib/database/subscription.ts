@@ -185,7 +185,7 @@ export async function getUserPayments(userId: string, limit: number = 10) {
  */
 export async function isWebhookEventProcessed(
   eventId: string,
-  provider: string = "creem", // provider is unused
+  provider: string = "creem",
   tx?: Tx,
 ): Promise<boolean> {
   const dbase = getDb(tx);

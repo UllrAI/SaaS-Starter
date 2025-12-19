@@ -1,7 +1,13 @@
 import React from "react";
-import { createMetadata } from "@/lib/metadata";
-import { PricingSection } from "@/components/payment-options";
-import { PAYMENT_PROVIDER } from "@/lib/config/constants";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
 import {
   Check,
   Zap,
@@ -9,9 +15,16 @@ import {
   Info,
   ShieldCheck,
   Award,
-  X,
   Flag,
+  DollarSign,
+  Lock,
+  CreditCard,
 } from "lucide-react";
+import Link from "next/link";
+import { createMetadata } from "@/lib/metadata";
+import { PricingSection } from "@/components/payment-options";
+import { PAYMENT_PROVIDER } from "@/lib/config/constants";
+import { BackgroundPattern } from "@/components/ui/background-pattern";
 
 export const metadata = createMetadata({
   title: "Pricing Plans - Choose Your Perfect Plan",
@@ -26,8 +39,6 @@ export const metadata = createMetadata({
   ],
 });
 
-import { BackgroundPattern } from "@/components/ui/background-pattern";
-
 export default function PricingPage() {
   return (
     <section className="flex min-h-screen flex-col">
@@ -37,12 +48,13 @@ export default function PricingPage() {
 
         <div className="relative px-4 py-16">
           <div className="mx-auto max-w-6xl">
-            <div className="mb-16 text-center">
-              <div className="border-border bg-background/50 mb-6 inline-flex items-center rounded-full border px-3 py-1 text-sm backdrop-blur-sm">
-                <span className="text-muted-foreground">
-                  💰 Transparent Pricing
+            {/* Header */}
+            <div className="mb-20 text-center">
+              <Badge className="border-border bg-background/50 mb-6 inline-flex items-center border px-3 py-1 text-sm backdrop-blur-sm">
+                <span className="text-muted-foreground font-mono">
+                  PRICING.md
                 </span>
-              </div>
+              </Badge>
               <h1 className="text-foreground mb-6 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
                 Simple, transparent pricing
               </h1>
@@ -52,182 +64,219 @@ export default function PricingPage() {
               </p>
             </div>
 
-            <PricingSection />
-
-            {/* Customer Assurance Section */}
-            <div className="mt-20 text-center">
-              <div className="mx-auto max-w-4xl">
-                <h3 className="text-foreground mb-4 text-2xl font-semibold">
-                  Why choose our platform?
-                </h3>
-                <p className="text-muted-foreground mb-8">
-                  Join thousands of satisfied customers who trust our secure,
-                  reliable platform
-                </p>
-
-                <div className="mb-12 grid grid-cols-1 gap-6 md:grid-cols-4">
-                  <div className="border-border bg-background/50 hover:bg-background/80 flex flex-col items-center gap-3 rounded-xl border p-6 transition-colors">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/30">
-                      <Check className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
-                    </div>
-                    <div className="text-center">
-                      <h4 className="text-foreground mb-1 font-semibold">
-                        7-Day Free Trial
-                      </h4>
-                      <p className="text-muted-foreground text-sm">
-                        Full money-back*
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="border-border bg-background/50 hover:bg-background/80 flex flex-col items-center gap-3 rounded-xl border p-6 transition-colors">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30">
-                      <Zap className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-                    </div>
-                    <div className="text-center">
-                      <h4 className="text-foreground mb-1 font-semibold">
-                        Instant Activation
-                      </h4>
-                      <p className="text-muted-foreground text-sm">
-                        Start using immediately
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="border-border bg-background/50 hover:bg-background/80 flex flex-col items-center gap-3 rounded-xl border p-6 transition-colors">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-purple-100 dark:bg-purple-900/30">
-                      <Shield className="h-6 w-6 text-purple-600 dark:text-purple-400" />
-                    </div>
-                    <div className="text-center">
-                      <h4 className="text-foreground mb-1 font-semibold">
-                        Enterprise Security
-                      </h4>
-                      <p className="text-muted-foreground text-sm">
-                        Bank-grade protection
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="border-border bg-background/50 hover:bg-background/80 flex flex-col items-center gap-3 rounded-xl border p-6 transition-colors">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-orange-100 dark:bg-orange-900/30">
-                      <Info className="h-6 w-6 text-orange-600 dark:text-orange-400" />
-                    </div>
-                    <div className="text-center">
-                      <h4 className="text-foreground mb-1 font-semibold">
-                        24/7 Support
-                      </h4>
-                      <p className="text-muted-foreground text-sm">
-                        Always here to help
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="border-border bg-background/50 mb-4 inline-flex items-center rounded-full border px-4 py-2 text-sm backdrop-blur-sm">
-                  <span className="text-muted-foreground">💬 Need Help?</span>
-                </div>
-                <p className="text-muted-foreground">
-                  Have questions about our pricing?{" "}
-                  <a
-                    href="/contact"
-                    className="text-primary font-medium transition-colors hover:underline"
-                  >
-                    Contact our team
-                  </a>
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Security & Compliance Section */}
-      <div className="bg-muted/20 py-16">
-        <div className="mx-auto max-w-6xl px-4">
-          <div className="mb-12 text-center">
-            <h3 className="text-foreground mb-3 text-xl font-semibold">
-              Security & Compliance
-            </h3>
-            <p className="text-muted-foreground">
-              Industry-leading security standards and certifications
-            </p>
-          </div>
-
-          {/* Security Badges */}
-          <div className="mb-12 grid grid-cols-2 gap-4 md:grid-cols-4">
-            <div className="bg-background/60 border-border/50 flex flex-col items-center rounded-lg border p-4">
-              <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/30">
-                <ShieldCheck className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-              </div>
-              <span className="text-center text-xs font-medium">
-                SSL Encrypted
-              </span>
+            {/* Pricing Plans */}
+            <div className="mb-24">
+              <PricingSection />
             </div>
 
-            <div className="bg-background/60 border-border/50 flex flex-col items-center rounded-lg border p-4">
-              <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-lg bg-green-100 dark:bg-green-900/30">
-                <Award className="h-5 w-5 text-green-600 dark:text-green-400" />
+            {/* Platform Specifications */}
+            <div className="mb-24">
+              <div className="mb-10 flex items-center gap-2 border-b pb-4">
+                <Zap className="text-primary h-6 w-6" />
+                <h2 className="text-2xl font-bold">Platform Specifications</h2>
               </div>
-              <span className="text-center text-xs font-medium">
-                SOC 2 Compliant
-              </span>
-            </div>
 
-            <div className="bg-background/60 border-border/50 flex flex-col items-center rounded-lg border p-4">
-              <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-lg bg-purple-100 dark:bg-purple-900/30">
-                <X className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-              </div>
-              <span className="text-center text-xs font-medium">
-                GDPR Ready
-              </span>
-            </div>
-
-            <div className="bg-background/60 border-border/50 flex flex-col items-center rounded-lg border p-4">
-              <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-lg bg-orange-100 dark:bg-orange-900/30">
-                <Flag className="h-5 w-5 text-orange-600 dark:text-orange-400" />
-              </div>
-              <span className="text-center text-xs font-medium">
-                PCI DSS Level 1
-              </span>
-            </div>
-          </div>
-
-          {/* Payment Methods */}
-          <div className="text-center">
-            <p className="text-muted-foreground mb-6 text-sm">
-              Accepted payment methods
-            </p>
-            <div className="mb-8 flex items-center justify-center gap-4">
-              <div className="bg-background border-border/50 flex h-8 items-center rounded border px-3 opacity-70 transition-opacity hover:opacity-100">
-                <span className="text-xs font-bold">VISA</span>
-              </div>
-              <div className="bg-background border-border/50 flex h-8 items-center rounded border px-3 opacity-70 transition-opacity hover:opacity-100">
-                <span className="text-xs font-bold">MC</span>
-              </div>
-              <div className="bg-background border-border/50 flex h-8 items-center rounded border px-3 opacity-70 transition-opacity hover:opacity-100">
-                <span className="text-xs font-bold">AMEX</span>
-              </div>
-              <div className="bg-background border-border/50 flex h-8 items-center rounded border px-3 opacity-70 transition-opacity hover:opacity-100">
-                <span className="text-xs font-bold">PayPal</span>
-              </div>
-              <div className="bg-background border-border/50 flex h-8 items-center rounded border px-3 opacity-70 transition-opacity hover:opacity-100">
-                <span className="text-xs font-bold">Apple Pay</span>
-              </div>
-            </div>
-
-            {/* Powered by */}
-            <div className="border-border/30 border-t pt-6">
-              <p className="text-muted-foreground text-xs">
-                Powered by{" "}
-                <span className="text-primary font-semibold capitalize">
-                  {PAYMENT_PROVIDER}
-                </span>{" "}
-                - Modern Payment Infrastructure
+              <p className="text-muted-foreground mb-8 text-center">
+                Core infrastructure capabilities included in all plans
               </p>
+
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+                <Card className="shadow-sm">
+                  <CardHeader>
+                    <div className="bg-primary/10 text-primary mb-4 flex h-12 w-12 items-center justify-center border border-primary/20">
+                      <Check className="h-6 w-6" />
+                    </div>
+                    <CardTitle>7-Day Trial</CardTitle>
+                    <CardDescription className="font-mono text-xs">
+                      NO_CC_REQUIRED
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground text-sm leading-relaxed">
+                      Full access to all features. No credit card required for
+                      dev environment.
+                    </p>
+                  </CardContent>
+                </Card>
+
+                <Card className="shadow-sm">
+                  <CardHeader>
+                    <div className="bg-primary/10 text-primary mb-4 flex h-12 w-12 items-center justify-center border border-primary/20">
+                      <Zap className="h-6 w-6" />
+                    </div>
+                    <CardTitle>Instant Provisioning</CardTitle>
+                    <CardDescription className="font-mono text-xs">
+                      AUTOMATED_SETUP
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground text-sm leading-relaxed">
+                      Your environment is ready in less than 60 seconds. Zero
+                      configuration needed.
+                    </p>
+                  </CardContent>
+                </Card>
+
+                <Card className="shadow-sm">
+                  <CardHeader>
+                    <div className="bg-primary/10 text-primary mb-4 flex h-12 w-12 items-center justify-center border border-primary/20">
+                      <Shield className="h-6 w-6" />
+                    </div>
+                    <CardTitle>Enterprise Grade</CardTitle>
+                    <CardDescription className="font-mono text-xs">
+                      SOC2_TYPE_II
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground text-sm leading-relaxed">
+                      Compliant infrastructure with 99.99% uptime SLA guarantee.
+                    </p>
+                  </CardContent>
+                </Card>
+
+                <Card className="shadow-sm">
+                  <CardHeader>
+                    <div className="bg-primary/10 text-primary mb-4 flex h-12 w-12 items-center justify-center border border-primary/20">
+                      <Info className="h-6 w-6" />
+                    </div>
+                    <CardTitle>24/7 Support</CardTitle>
+                    <CardDescription className="font-mono text-xs">
+                      ENGINEERING_DIRECT
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground text-sm leading-relaxed">
+                      Direct access to engineering team via Slack or Discord.
+                    </p>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+
+            {/* Security & Compliance */}
+            <div className="mb-24">
+              <div className="mb-10 flex items-center gap-2 border-b pb-4">
+                <Lock className="text-primary h-6 w-6" />
+                <h2 className="text-2xl font-bold">Security & Compliance</h2>
+              </div>
+
+              <p className="text-muted-foreground mb-8 text-center font-mono text-sm">
+                /security/certifications
+              </p>
+
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+                <Card className="shadow-sm">
+                  <CardHeader className="text-center">
+                    <div className="bg-primary/10 text-primary mx-auto mb-4 flex h-12 w-12 items-center justify-center border border-primary/20">
+                      <ShieldCheck className="h-6 w-6" />
+                    </div>
+                    <CardTitle className="font-mono text-sm">
+                      SSL_ENCRYPTED
+                    </CardTitle>
+                    <CardDescription className="text-xs">
+                      TLS 1.3
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
+
+                <Card className="shadow-sm">
+                  <CardHeader className="text-center">
+                    <div className="bg-primary/10 text-primary mx-auto mb-4 flex h-12 w-12 items-center justify-center border border-primary/20">
+                      <Award className="h-6 w-6" />
+                    </div>
+                    <CardTitle className="font-mono text-sm">
+                      SOC2_COMPLIANT
+                    </CardTitle>
+                    <CardDescription className="text-xs">
+                      Type II
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
+
+                <Card className="shadow-sm">
+                  <CardHeader className="text-center">
+                    <div className="bg-primary/10 text-primary mx-auto mb-4 flex h-12 w-12 items-center justify-center border border-primary/20">
+                      <Shield className="h-6 w-6" />
+                    </div>
+                    <CardTitle className="font-mono text-sm">
+                      GDPR_READY
+                    </CardTitle>
+                    <CardDescription className="text-xs">
+                      EU Data Protection
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
+
+                <Card className="shadow-sm">
+                  <CardHeader className="text-center">
+                    <div className="bg-primary/10 text-primary mx-auto mb-4 flex h-12 w-12 items-center justify-center border border-primary/20">
+                      <Flag className="h-6 w-6" />
+                    </div>
+                    <CardTitle className="font-mono text-sm">PCI_DSS</CardTitle>
+                    <CardDescription className="text-xs">
+                      Level 1
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
+              </div>
+            </div>
+
+            {/* Payment Methods */}
+            <div>
+              <div className="mb-10 flex items-center gap-2 border-b pb-4">
+                <CreditCard className="text-primary h-6 w-6" />
+                <h2 className="text-2xl font-bold">Supported Payment Methods</h2>
+              </div>
+
+              <div className="mb-8 flex flex-wrap justify-center gap-3">
+                {["VISA", "Mastercard", "AMEX", "PayPal", "Apple Pay"].map(
+                  (method) => (
+                    <Badge
+                      key={method}
+                      variant="outline"
+                      className="border-border bg-background px-4 py-2 font-mono text-xs shadow-sm"
+                    >
+                      {method}
+                    </Badge>
+                  ),
+                )}
+              </div>
+
+              <div className="text-center">
+                <p className="text-muted-foreground font-mono text-sm">
+                  infrastructure_provider:{" "}
+                  <span className="text-primary font-bold uppercase">
+                    {PAYMENT_PROVIDER}
+                  </span>
+                </p>
+              </div>
             </div>
           </div>
         </div>
       </div>
+
+      {/* CTA Section */}
+      <section className="py-24">
+        <div className="container mx-auto px-6">
+          <div className="mx-auto max-w-3xl text-center">
+            <h2 className="mb-4 text-3xl font-bold tracking-tight">
+              Need a Custom Plan?
+            </h2>
+            <p className="text-muted-foreground mb-8 text-lg">
+              Enterprise customers with specific requirements can contact our
+              sales team for tailored solutions.
+            </p>
+            <div className="flex flex-wrap justify-center gap-4">
+              <Button asChild size="lg">
+                <Link href="/contact">Contact Sales</Link>
+              </Button>
+              <Button variant="outline" size="lg" asChild>
+                <Link href="/about">Learn More</Link>
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
     </section>
   );
 }

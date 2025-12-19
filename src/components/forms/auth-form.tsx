@@ -51,23 +51,23 @@ export function AuthForm({ mode, availableProviders }: AuthFormProps) {
   const isLogin = mode === "login";
 
   const config = {
-    title: isLogin ? "Welcome back" : "Get started today",
+    title: isLogin ? <>Welcome back</> : <>Get started today</>,
     description: isLogin
-      ? "Enter your email to receive a secure magic link and access your dashboard"
-      : "Create your account in seconds with just your email address",
-    badgeText: isLogin ? "Welcome back" : "Get started",
-    submitButtonText: isLogin ? "Send Magic Link" : "Create Account",
-    loadingText: "Sending magic link...",
+      ? <>Enter your email to receive a secure magic link and access your dashboard</>
+      : <>Create your account in seconds with just your email address</>,
+    badgeText: isLogin ? <>Welcome back</> : <>Get started</>,
+    submitButtonText: isLogin ? <>Send Magic Link</> : <>Create Account</>,
+    loadingText: <>Sending magic link...</>,
     submitIcon: Mail,
     alternativeActionText: isLogin
-      ? "New to our platform?"
-      : "Already have an account?",
+      ? <>New to our platform?</>
+      : <>Already have an account?</>,
     alternativeActionLink: (
       <Link
         href={isLogin ? "/signup" : "/login"}
         className="text-primary hover:text-primary/80 cursor-pointer font-medium underline-offset-4 transition-colors hover:underline"
       >
-        {isLogin ? "Create an account" : "Sign in instead"}
+        {isLogin ? <>Create an account</> : <>Sign in instead</>}
       </Link>
     ),
     showTerms: !isLogin,
@@ -77,7 +77,7 @@ export function AuthForm({ mode, availableProviders }: AuthFormProps) {
   const fields = [
     {
       name: "email" as const,
-      label: "Email address",
+      label: <>Email address</>,
       placeholder: "you@example.com",
       icon: Mail,
       type: "email",

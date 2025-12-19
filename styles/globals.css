@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Oxanium:wght@400;500;600;700&family=Merriweather:wght@400;700&family=Fira+Code:wght@400;500;600;700&display=swap");
+/* @import url("https://fonts.googleapis.com/css2?family=Oxanium:wght@400;500;600;700&family=Merriweather:wght@400;700&family=Fira+Code:wght@400;500;600;700&display=swap"); */
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "./markdoc.css";
@@ -11,20 +11,25 @@
   :root {
     font-family: var(--font-sans);
   }
+
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground font-sans;
     font-family: var(--font-sans);
     letter-spacing: var(--tracking-normal);
   }
+
   .font-sans {
     font-family: var(--font-sans) !important;
   }
+
   .font-serif {
     font-family: var(--font-serif) !important;
   }
+
   .font-mono {
     font-family: var(--font-mono) !important;
   }

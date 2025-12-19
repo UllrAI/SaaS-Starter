@@ -90,9 +90,17 @@ export function BillingPage({ subscription, payments }: BillingPageProps) {
           <CardContent>
             <div className="space-y-2">
               <p className="text-muted-foreground text-sm">
-                {subscription.canceledAt
-                  ? `Your subscription will end on ${subscription.currentPeriodEnd?.toLocaleDateString()}`
-                  : `Your subscription renews on ${subscription.currentPeriodEnd?.toLocaleDateString()}`}
+                {subscription.canceledAt ? (
+                  <>
+                    Your subscription will end on{" "}
+                    {subscription.currentPeriodEnd?.toLocaleDateString()}
+                  </>
+                ) : (
+                  <>
+                    Your subscription renews on{" "}
+                    {subscription.currentPeriodEnd?.toLocaleDateString()}
+                  </>
+                )}
               </p>
             </div>
             <Button
@@ -158,9 +166,11 @@ export function BillingPage({ subscription, payments }: BillingPageProps) {
                             : "default"
                         }
                       >
-                        {payment.paymentType === "one_time"
-                          ? "One Time Purchase"
-                          : "Subscription"}
+                        {payment.paymentType === "one_time" ? (
+                          <>One Time Purchase</>
+                        ) : (
+                          <>Subscription</>
+                        )}
                       </Badge>
                     </TableCell>
                     <TableCell>

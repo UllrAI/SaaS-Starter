@@ -972,8 +972,3 @@ jest.mock("./env.js", () => ({
     DB_CONNECT_TIMEOUT: 30,
   },
 }));
-
-// Mock @react-email/render to prevent rendering issues in tests
-jest.mock("@react-email/render", () => ({
-  render: jest.fn(() => "<html><body>Mock rendered email</body></html>"),
-}));

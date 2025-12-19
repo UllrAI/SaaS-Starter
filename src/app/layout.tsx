@@ -1,25 +1,19 @@
 import "@/styles/globals.css";
-import { ThemeProvider } from "@/providers/theme-provider";
-import { NuqsAdapter } from "nuqs/adapters/next/app";
-import { Toaster } from "@/components/ui/sonner";
 import Script from "next/script";
 import { createMetadata } from "@/lib/metadata";
-import {
-  APP_NAME,
-  APP_DESCRIPTION,
-  COMPANY_NAME,
-} from "@/lib/config/constants";
+import { APP_NAME, COMPANY_NAME } from "@/lib/config/constants";
 import env from "@/env";
 
-import NextTopLoader from "nextjs-toploader";
-import { CookieConsent } from "@/components/cookie-consent";
+import { LingoProvider, loadDictionary } from "lingo.dev/react/rsc";
+import { AppProviders } from "@/components/app-providers";
 
 export const metadata = createMetadata({
   title: {
     template: `%s | ${APP_NAME}`,
-    default: `${APP_NAME} - ${APP_DESCRIPTION}`,
+    default: `${APP_NAME}`,
   },
-  description: APP_DESCRIPTION,
+  description:
+    "Complete Micro UllrAI SaaS starter with authentication, payments, database, and deployment.",
   applicationName: APP_NAME,
   authors: [{ name: COMPANY_NAME, url: env.NEXT_PUBLIC_APP_URL }],
   creator: COMPANY_NAME,
@@ -48,28 +42,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <head />
-      <body suppressHydrationWarning>
-        <NuqsAdapter>
-          <ThemeProvider
-            attribute={"class"}
-            defaultTheme="light"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <NextTopLoader color="hsl(var(--primary))" showSpinner={false} />
-            {children}
-            <Toaster />
-            <CookieConsent />
-          </ThemeProvider>
-        </NuqsAdapter>
-        <Script
-          src="https://track.pixmiller.com/script.js"
-          data-website-id="9315890d-80ba-455a-b624-ab2ab48595f4"
-          strategy="lazyOnload"
-        />
-      </body>
-    </html>
+    <LingoProvider loadDictionary={(locale) => loadDictionary(locale)}>
+      <html lang="en" suppressHydrationWarning>
+        <head />
+        <body suppressHydrationWarning>
+          <AppProviders>{children}</AppProviders>
+          <Script
+            src="https://track.pixmiller.com/script.js"
+            data-website-id="9315890d-80ba-455a-b624-ab2ab48595f4"
+            strategy="lazyOnload"
+          />
+        </body>
+      </html>
+    </LingoProvider>
   );
 }

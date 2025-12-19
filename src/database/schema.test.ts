@@ -24,8 +24,9 @@ const getIndexConfigs = (table: Record<string, unknown>) => {
     ? configResult
     : Object.values(configResult ?? {});
 
-  return builders.map((entry: { build: (table: unknown) => { config: unknown } }) =>
-    entry.build(table).config,
+  return builders.map(
+    (entry: { build: (table: unknown) => { config: unknown } }) =>
+      entry.build(table).config,
   );
 };
 
@@ -1366,15 +1367,22 @@ describe("Database Schema", () => {
       const indexNames = configs.map((cfg) => cfg.name);
       expect(indexNames).toContain("accounts_userId_idx");
 
-      const userIndex = configs.find((cfg) => cfg.name === "accounts_userId_idx");
-      expect(userIndex?.columns.map((column: any) => column.name)).toEqual(["userId"]);
+      const userIndex = configs.find(
+        (cfg) => cfg.name === "accounts_userId_idx",
+      );
+      expect(userIndex?.columns.map((column: any) => column.name)).toEqual([
+        "userId",
+      ]);
     });
 
     it("subscriptions table indexes both userId and customerId", () => {
       const configs = getIndexConfigs(subscriptions);
       const indexNames = configs.map((cfg) => cfg.name);
       expect(indexNames).toEqual(
-        expect.arrayContaining(["subscriptions_userId_idx", "subscriptions_customerId_idx"]),
+        expect.arrayContaining([
+          "subscriptions_userId_idx",
+          "subscriptions_customerId_idx",
+        ]),
       );
     });
 

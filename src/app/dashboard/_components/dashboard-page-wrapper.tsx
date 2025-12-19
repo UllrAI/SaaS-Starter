@@ -1,3 +1,5 @@
+"use client";
+
 import { DashboardPageHeader } from "./dashboard-page-header";
 
 interface DashboardPageWrapperProps {

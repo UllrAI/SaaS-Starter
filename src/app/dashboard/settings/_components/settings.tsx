@@ -35,7 +35,7 @@ export type SettingsPageProps = BillingPageProps | Record<string, never>; // For
 
 // Unified tab configuration
 interface SettingsTabConfig {
-  name: string;
+  name: React.ReactNode;
   value: string;
   icon: ComponentType<{ className?: string }>;
   component: FC<SettingsPageProps>;
@@ -43,25 +43,25 @@ interface SettingsTabConfig {
 
 const settingsTabsConfig: SettingsTabConfig[] = [
   {
-    name: "Account & Security",
+    name: <>Account & Security</>,
     value: "account",
     icon: UserCircle,
     component: AccountPage as FC<SettingsPageProps>,
   },
   {
-    name: "Billing & Plans",
+    name: <>Billing & Plans</>,
     value: "billing",
     icon: CreditCard,
     component: BillingPage as FC<SettingsPageProps>,
   },
   {
-    name: "Emails & Notifications",
+    name: <>Emails & Notifications</>,
     value: "notifications",
     icon: Bell,
     component: NotificationPage as FC<SettingsPageProps>,
   },
   {
-    name: "Appearance",
+    name: <>Appearance</>,
     value: "appearance",
     icon: Palette,
     component: AppearancePage as FC<SettingsPageProps>,

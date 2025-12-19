@@ -3,7 +3,7 @@ import { describe, it, expect } from "@jest/globals";
 import { DashboardPageHeader } from "./dashboard-page-header";
 
 // Mock the UI components
-jest.mock("@/components/ui/breadcrumb", () => ({
+jest.mock("@/components/ui/breadcrumb-client", () => ({
   Breadcrumb: ({ children }: { children: React.ReactNode }) => (
     <nav data-testid="breadcrumb">{children}</nav>
   ),
@@ -78,6 +78,14 @@ jest.mock("@/components/mode-toggle", () => ({
   ModeToggle: ({ variant, size }: { variant?: string; size?: string }) => (
     <button data-testid="mode-toggle" data-variant={variant} data-size={size}>
       Toggle
+    </button>
+  ),
+}));
+
+jest.mock("@/components/locale-switcher", () => ({
+  LocaleSwitcher: ({ variant, size }: { variant?: string; size?: string }) => (
+    <button data-testid="locale-switcher" data-variant={variant} data-size={size}>
+      Language
     </button>
   ),
 }));
@@ -200,5 +208,14 @@ describe("DashboardPageHeader", () => {
     const modeToggle = screen.getByTestId("mode-toggle");
     expect(modeToggle).toHaveAttribute("data-variant", "ghost");
     expect(modeToggle).toHaveAttribute("data-size", "icon");
+  });
+
+  it("should render locale switcher with correct props", () => {
+    render(<DashboardPageHeader title="Test Title" />);
+
+    const localeSwitcher = screen.getByTestId("locale-switcher");
+    expect(localeSwitcher).toBeInTheDocument();
+    expect(localeSwitcher).toHaveAttribute("data-variant", "ghost");
+    expect(localeSwitcher).toHaveAttribute("data-size", "icon");
   });
 });

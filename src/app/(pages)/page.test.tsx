@@ -3,13 +3,11 @@ import type React from "react";
 import HomePage from "./page";
 
 const createMockSection = (label: string) =>
-  jest.fn(
-    () => (
-      <section data-testid="homepage-section" data-component={label}>
-        {label}
-      </section>
-    ),
-  );
+  jest.fn(() => (
+    <section data-testid="homepage-section" data-component={label}>
+      {label}
+    </section>
+  ));
 
 const mockHero = createMockSection("Hero");
 jest.mock("@/components/homepage/hero", () => ({
@@ -18,7 +16,8 @@ jest.mock("@/components/homepage/hero", () => ({
 
 const mockSocialProof = createMockSection("SocialProofUnified");
 jest.mock("@/components/homepage/social-proof-testimonials", () => ({
-  SocialProofUnified: (props: React.ComponentProps<any>) => mockSocialProof(props),
+  SocialProofUnified: (props: React.ComponentProps<any>) =>
+    mockSocialProof(props),
 }));
 
 const mockFeatures = createMockSection("Features");
@@ -45,7 +44,9 @@ describe("HomePage", () => {
     render(<HomePage />);
 
     const sections = screen.getAllByTestId("homepage-section");
-    expect(sections.map((section) => section.getAttribute("data-component"))).toEqual([
+    expect(
+      sections.map((section) => section.getAttribute("data-component")),
+    ).toEqual([
       "Hero",
       "SocialProofUnified",
       "Features",

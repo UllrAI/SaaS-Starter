@@ -4,9 +4,6 @@ import fs from "fs";
 import path from "path";
 import React from "react";
 
-// Mock the useSidebar hook
-const mockToggleSidebar = jest.fn();
-
 // Test component that mimics AppSidebar behavior without external dependencies
 const TestAppSidebar = ({
   pathname = "/dashboard",
@@ -56,11 +53,6 @@ const TestAppSidebar = ({
     onNavigate(url);
   };
 
-  const handleDoubleClick = (url: string) => () => {
-    onNavigate(url);
-    mockToggleSidebar();
-  };
-
   return (
     <div
       data-testid="app-sidebar"
@@ -90,7 +82,6 @@ const TestAppSidebar = ({
               data-testid={`nav-item-${item.title.toLowerCase()}`}
               className={`nav-item ${item.url === pathname ? "active" : ""}`}
               onClick={handleNavigation(item.url)}
-              onDoubleClick={handleDoubleClick(item.url)}
             >
               <span data-testid={`nav-icon-${item.title.toLowerCase()}`}>
                 {item.icon}
@@ -117,7 +108,6 @@ const TestAppSidebar = ({
                   data-testid={`admin-nav-item-${item.title.toLowerCase().replace(/\s+/g, "-")}`}
                   className={`nav-item ${item.url === pathname ? "active" : ""}`}
                   onClick={handleNavigation(item.url)}
-                  onDoubleClick={handleDoubleClick(item.url)}
                 >
                   <span
                     data-testid={`admin-nav-icon-${item.title.toLowerCase().replace(/\s+/g, "-")}`}
@@ -151,7 +141,6 @@ const TestAppSidebar = ({
                       data-testid={`table-nav-item-${item.title.toLowerCase()}`}
                       className={`nav-item ${pathname.startsWith(item.url) ? "active" : ""}`}
                       onClick={handleNavigation(item.url)}
-                      onDoubleClick={handleDoubleClick(item.url)}
                     >
                       <span
                         data-testid={`table-nav-icon-${item.title.toLowerCase()}`}
@@ -270,17 +259,6 @@ describe("AppSidebar Component Behavioral Tests", () => {
 
       fireEvent.click(screen.getByTestId("nav-item-upload"));
       expect(mockOnNavigate).toHaveBeenCalledWith("/dashboard/upload");
-    });
-
-    it("should handle double-click navigation with sidebar toggle", () => {
-      const mockOnNavigate = jest.fn();
-      render(
-        <TestAppSidebar session={mockSession} onNavigate={mockOnNavigate} />,
-      );
-
-      fireEvent.doubleClick(screen.getByTestId("nav-item-settings"));
-      expect(mockOnNavigate).toHaveBeenCalledWith("/dashboard/settings");
-      expect(mockToggleSidebar).toHaveBeenCalled();
     });
   });
 
@@ -571,11 +549,11 @@ describe("AppSidebar Component", () => {
     // Verify component imports
     expect(content).toContain('from "@/components/ui/sidebar"');
     expect(content).toContain('from "@/components/logo"');
+    expect(content).toContain('from "./user-btn"');
 
     // Verify Next.js imports
     expect(content).toContain('from "next/navigation"');
     expect(content).toContain('from "nextjs-toploader/app"');
-    expect(content).toContain('from "next/link"');
   });
 
   it("should define navigation arrays with proper structure", () => {
@@ -588,15 +566,15 @@ describe("AppSidebar Component", () => {
     expect(content).toContain("const genericTableNavigation =");
 
     // Verify navigation item structure
-    expect(content).toContain('title: "Home"');
+    expect(content).toContain("title: <>Home</>");
     expect(content).toContain('url: "/dashboard"');
     expect(content).toContain("icon: Home");
 
-    expect(content).toContain('title: "Upload"');
+    expect(content).toContain("title: <>Upload</>");
     expect(content).toContain('url: "/dashboard/upload"');
     expect(content).toContain("icon: Upload");
 
-    expect(content).toContain('title: "Settings"');
+    expect(content).toContain("title: <>Settings</>");
     expect(content).toContain('url: "/dashboard/settings"');
     expect(content).toContain("icon: Settings");
   });
@@ -606,23 +584,23 @@ describe("AppSidebar Component", () => {
     const content = fs.readFileSync(componentPath, "utf8");
 
     // Verify admin navigation items
-    expect(content).toContain('title: "Admin Dashboard"');
+    expect(content).toContain("title: <>Admin Dashboard</>");
     expect(content).toContain('url: "/dashboard/admin"');
     expect(content).toContain("icon: BarChart3");
 
-    expect(content).toContain('title: "User Management"');
+    expect(content).toContain("title: <>User Management</>");
     expect(content).toContain('url: "/dashboard/admin/users"');
     expect(content).toContain("icon: Users");
 
-    expect(content).toContain('title: "Payments"');
+    expect(content).toContain("title: <>Payments</>");
     expect(content).toContain('url: "/dashboard/admin/payments"');
     expect(content).toContain("icon: CreditCard");
 
-    expect(content).toContain('title: "Subscriptions"');
+    expect(content).toContain("title: <>Subscriptions</>");
     expect(content).toContain('url: "/dashboard/admin/subscriptions"');
     expect(content).toContain("icon: Shield");
 
-    expect(content).toContain('title: "Uploads Managements"');
+    expect(content).toContain("title: <>Uploads Managements</>");
     expect(content).toContain('url: "/dashboard/admin/uploads"');
     expect(content).toContain("icon: Upload");
   });
@@ -645,8 +623,10 @@ describe("AppSidebar Component", () => {
     // Verify hooks usage
     expect(content).toContain("const pathname = usePathname()");
     expect(content).toContain("const router = useRouter()");
-    expect(content).toContain("const { open, toggleSidebar } = useSidebar()");
+    expect(content).toContain("const { open } = useSidebar()");
     expect(content).toContain("const { data: session } = useSession()");
+    expect(content).toContain("const getUserRole = () =>");
+    expect(content).toContain("const getNormalizedUser = () =>");
   });
 
   it("should implement admin role checking", () => {
@@ -654,11 +634,8 @@ describe("AppSidebar Component", () => {
     const content = fs.readFileSync(componentPath, "utf8");
 
     // Verify admin role checking logic
-    expect(content).toContain("const isAdmin =");
-    expect(content).toContain("session?.user &&");
-    expect(content).toContain("isAdminRole(");
     expect(content).toContain(
-      '(session.user as { role?: UserRole }).role || "user"',
+      "const showAdminSections = isAdminRole(getUserRole());",
     );
   });
 
@@ -667,10 +644,10 @@ describe("AppSidebar Component", () => {
     const content = fs.readFileSync(componentPath, "utf8");
 
     // Verify navigation handler
-    expect(content).toContain(
-      "const handleNavigation = (url: string) => () =>",
-    );
-    expect(content).toContain("router.replace(url)");
+    expect(content).toContain("const handleLogoClick = () => {");
+    expect(content).toContain('router.push("/")');
+    expect(content).toContain("const handleClick = () => {");
+    expect(content).toContain("router.push(item.url);");
   });
 
   it("should render sidebar with proper structure", () => {
@@ -700,24 +677,17 @@ describe("AppSidebar Component", () => {
     const content = fs.readFileSync(componentPath, "utf8");
 
     // Verify navigation rendering
-    expect(content).toContain("{navigation.map((item) =>");
-    expect(content).toContain("<SidebarMenuItem key={item.title}>");
+    expect(content).toContain("function SidebarSection");
+    expect(content).toContain("<SidebarMenuItem key={item.key}>");
+    expect(content).toContain(
+      "<SidebarMenuLink\n                item={item}\n                pathname={pathname}\n                allItems={items}\n              />",
+    );
+    expect(content).toContain(
+      "<SidebarSection\n          title={undefined}\n          items={navigation}\n          pathname={pathname}\n        />",
+    );
     expect(content).toContain("<SidebarMenuButton");
-    expect(content).toContain("isActive={item.url === pathname}");
-    expect(content).toContain("tooltip={item.title}");
+    expect(content).toContain("tooltip={item.key}");
     expect(content).toContain('<item.icon className="size-4" />');
-    expect(content).toContain("<span>{item.title}</span>");
-  });
-
-  it("should implement click and double-click handlers", () => {
-    const componentPath = path.join(__dirname, "app-sidebar.tsx");
-    const content = fs.readFileSync(componentPath, "utf8");
-
-    // Verify click handlers
-    expect(content).toContain("onClick={handleNavigation(item.url)}");
-    expect(content).toContain("onDoubleClick={() =>");
-    expect(content).toContain("handleNavigation(item.url)()");
-    expect(content).toContain("toggleSidebar()");
   });
 
   it("should conditionally render admin navigation", () => {
@@ -725,9 +695,10 @@ describe("AppSidebar Component", () => {
     const content = fs.readFileSync(componentPath, "utf8");
 
     // Verify admin conditional rendering
-    expect(content).toContain("{isAdmin && (");
-    expect(content).toContain("{adminNavigation.map((item) =>");
-    expect(content).toContain("Admin");
+    expect(content).toContain("{showAdminSections && (");
+    expect(content).toContain(
+      "<SidebarSection\n              title={open ? <>Admin</> : undefined}\n              items={adminNavigation}\n              pathname={pathname}\n            />",
+    );
   });
 
   it("should conditionally render generic table navigation", () => {
@@ -736,9 +707,10 @@ describe("AppSidebar Component", () => {
 
     // Verify generic table conditional rendering
     expect(content).toContain("{genericTableNavigation.length > 0 && (");
-    expect(content).toContain("{genericTableNavigation.map((item) =>");
+    expect(content).toContain(
+      "<SidebarSection\n                title={open ? <>Manage Tables</> : undefined}\n                items={genericTableNavigation}\n                pathname={pathname}\n              />",
+    );
     expect(content).toContain("Manage Tables");
-    expect(content).toContain("pathname.startsWith(item.url)");
   });
 
   it("should render footer with user button", () => {
@@ -747,7 +719,7 @@ describe("AppSidebar Component", () => {
 
     // Verify footer content
     expect(content).toContain("<SidebarFooter");
-    expect(content).toContain("<UserButton />");
+    expect(content).toContain("<UserButton user={getNormalizedUser()} />");
   });
 
   it("should use proper CSS classes and styling", () => {
@@ -769,7 +741,7 @@ describe("AppSidebar Component", () => {
 
     // Verify TypeScript patterns
     expect(content).toContain(": {");
-    expect(content).toContain("title: string;");
+    expect(content).toContain("title: React.ReactNode;");
     expect(content).toContain("url: string;");
     expect(content).toContain("icon: LucideIcon;");
     expect(content).toContain("}[]");
@@ -825,10 +797,11 @@ describe("AppSidebar Component", () => {
     expect(content).toContain("usePathname()");
     expect(content).toContain("useRouter()");
     expect(content).toContain("useSession()");
+    expect(content).toContain("const getUserRole = () =>");
+    expect(content).toContain("const getNormalizedUser = () =>");
 
     // Verify state usage
     expect(content).toContain("open");
-    expect(content).toContain("toggleSidebar");
     expect(content).toContain("pathname");
     expect(content).toContain("router");
     expect(content).toContain("session");
@@ -839,7 +812,7 @@ describe("AppSidebar Component", () => {
     const content = fs.readFileSync(componentPath, "utf8");
 
     // Verify accessibility features
-    expect(content).toContain("tooltip={item.title}");
+    expect(content).toContain("tooltip={item.key}");
     expect(content).toContain("<span>{item.title}</span>");
     expect(content).toMatch(/aria-|tooltip/); // Should have accessibility features
   });

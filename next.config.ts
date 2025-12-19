@@ -1,6 +1,12 @@
 import type { NextConfig } from "next";
 import nextBundleAnalyzer from "@next/bundle-analyzer";
+import lingoCompiler from "lingo.dev/compiler";
 import env from "@/env";
+import {
+  SOURCE_LOCALE,
+  TARGET_LOCALES,
+  LINGO_MODEL_MAP,
+} from "@/lib/config/i18n";
 
 // Safely parse the R2 hostname
 let r2Hostname: string | undefined;
@@ -41,12 +47,25 @@ const nextConfig: NextConfig = {
   },
 };
 
+const withLingo = lingoCompiler.next({
+  sourceRoot: "src/app",
+  lingoDir: "lingo",
+  sourceLocale: SOURCE_LOCALE,
+  targetLocales: [...TARGET_LOCALES],
+  rsc: true,
+  useDirective: false,
+  debug: false,
+  models: LINGO_MODEL_MAP,
+});
+
+let config = withLingo(nextConfig);
+
 // 只有在 process.env.ANALYZE 为 'true' 时才启用 bundle analyzer
 if (process.env.ANALYZE === "true") {
   const withBundleAnalyzer = nextBundleAnalyzer({
     enabled: true,
   });
-  module.exports = withBundleAnalyzer(nextConfig);
-} else {
-  module.exports = nextConfig;
+  config = withBundleAnalyzer(config);
 }
+
+export default config;

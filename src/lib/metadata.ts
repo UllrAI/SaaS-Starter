@@ -1,28 +1,21 @@
 import { APP_NAME, OGIMAGE, TWITTERACCOUNT } from "@/lib/config/constants";
 import env from "@/env";
-import type { Metadata } from "next/types";
-
-import {
-  AbsoluteTemplateString,
-  DefaultTemplateString,
-} from "next/dist/lib/metadata/types/metadata-types";
+import type { Metadata } from "next";
 
 export function createMetadata(override: Metadata): Metadata {
+  // 处理 title
   let title = APP_NAME;
-  if (typeof override.title === "string") {
-    title = override.title;
-  } else if (
-    override.title &&
-    "absolute" in override.title &&
-    (override.title as AbsoluteTemplateString).absolute
-  ) {
-    title = (override.title as AbsoluteTemplateString).absolute;
-  } else if (
-    override.title &&
-    "default" in override.title &&
-    (override.title as DefaultTemplateString).default
-  ) {
-    title = (override.title as DefaultTemplateString).default;
+
+  if (override.title) {
+    if (typeof override.title === "string") {
+      title = override.title;
+    } else if (typeof override.title === "object" && override.title !== null) {
+      const titleObj = override.title as Record<
+        string,
+        string | null | undefined
+      >;
+      title = titleObj.absolute || titleObj.default || APP_NAME;
+    }
   }
 
   const description = override.description || "";
@@ -36,7 +29,7 @@ export function createMetadata(override: Metadata): Metadata {
       images: override.openGraph?.images ?? OGIMAGE,
       siteName: APP_NAME,
       type: "website",
-      locale: "en_US", // Default locale, can be overridden
+      locale: "en_US",
       ...override.openGraph,
     },
     twitter: {

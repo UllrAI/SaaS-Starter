@@ -1,178 +1,243 @@
-import React from "react";
+"use client";
+
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  ArrowRight,
-  Github,
-  Star,
-  Users,
-  Zap,
-  CheckCircle,
-  Shield,
-  Sparkles,
-  BowArrow,
-  Activity,
-} from "lucide-react";
-import { APP_DESCRIPTION, GITHUB_URL } from "@/lib/config/constants";
+import { Badge } from "@/components/ui/badge";
+import { Github, Terminal, Copy, Check } from "lucide-react";
+import { GITHUB_URL } from "@/lib/config/constants";
 import Link from "next/link";
 
 export function Hero() {
+  const [copied, setCopied] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const command = "git clone https://github.com/UllrAI/SaaS-Starter.git";
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(command);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   return (
-    <section className="relative overflow-hidden border-b border-border/60 bg-background">
-      <div className="relative mx-auto max-w-7xl px-6 py-20 lg:px-8 lg:py-28">
-        <div className="grid items-center gap-16 lg:grid-cols-[minmax(0,1fr)_520px]">
-          {/* Left Content */}
-          <div className="space-y-10">
-            {/* Status Badge */}
-            <div className="inline-flex flex-wrap items-center gap-3 text-xs font-medium uppercase tracking-wider text-muted-foreground/80">
-              <span className="border-border/60 bg-background/70 inline-flex items-center gap-2 rounded-full border px-3 py-1">
-                <Sparkles className="text-primary h-3 w-3" />
-                Fresh release
-              </span>
-              <span className="text-muted-foreground">Trusted by 10,000+ devs</span>
-            </div>
-
-            {/* Main Heading */}
-            <div className="space-y-6">
-              <h1 className="text-foreground text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
-                Build & Launch
-                <span className="text-primary/90 block">MicroSaaS in hours</span>
-              </h1>
-
-              <p className="text-muted-foreground max-w-2xl text-lg leading-relaxed sm:text-xl">
-                {APP_DESCRIPTION} Everything you need to go from idea to revenue with one cohesive starter.
-              </p>
-            </div>
-
-            {/* Trust Indicators */}
-            <div className="text-muted-foreground flex flex-wrap gap-x-6 gap-y-3 text-sm">
-              {[
-                { label: "Production Ready", icon: CheckCircle, accent: "text-emerald-500" },
-                { label: "Enterprise Security", icon: Shield, accent: "text-blue-500" },
-                { label: "Lightning Fast", icon: Zap, accent: "text-yellow-500" },
-              ].map(({ label, icon: Icon, accent }) => (
-                <span key={label} className="flex items-center gap-2">
-                  <Icon className={`${accent} h-4 w-4`} />
-                  {label}
+    <section className="bg-background border-border relative overflow-hidden border-b pt-24 pb-32 lg:pt-32 lg:pb-48">
+      <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8">
+        <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-16">
+          {/* Left Side: Content */}
+          <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
+            {/* Badge */}
+            <div
+              className={`transform transition-all duration-1000 ${mounted ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"}`}
+            >
+              <Badge
+                variant="outline"
+                className="border-primary/30 bg-primary/5 text-primary hover:bg-primary/10 mb-4 inline-flex cursor-default items-center gap-2 border px-4 py-2 font-mono text-sm font-bold transition-colors"
+              >
+                <span className="relative flex h-2 w-2">
+                  <span className="bg-primary absolute inline-flex h-full w-full animate-ping rounded-full opacity-75"></span>
+                  <span className="bg-primary relative inline-flex h-2 w-2 rounded-full"></span>
                 </span>
-              ))}
+                <>OpenSource READY</>
+              </Badge>
             </div>
 
-            {/* CTA Buttons */}
-            <div className="flex flex-col gap-4 pt-2 sm:flex-row">
+            {/* Massive Headline */}
+            <h1
+              className={`text-foreground mb-6 transform text-5xl leading-[0.9] font-black tracking-tighter transition-all delay-100 duration-1000 sm:text-6xl lg:text-7xl xl:text-8xl ${mounted ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"}`}
+            >
+              <>SHIP YOUR</>
+              <br />
+              <span className="from-foreground to-foreground/50 bg-gradient-to-b bg-clip-text pr-1 text-transparent">
+                MICRO SaaS
+              </span>
+            </h1>
+
+            {/* Subtext */}
+            <p
+              className={`text-muted-foreground mb-10 max-w-xl transform text-lg leading-relaxed transition-all delay-200 duration-1000 sm:text-xl lg:text-2xl ${mounted ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"}`}
+            >
+              Complete UllrAI SaaS starter with authentication, payments,
+              database, and deployment. Everything you need to go from idea to
+              revenue.
+            </p>
+
+            {/* CTAs */}
+            <div
+              className={`flex transform flex-col gap-4 transition-all delay-300 duration-1000 sm:flex-row lg:gap-6 ${mounted ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"}`}
+            >
               <Button
                 size="lg"
-                className="group h-12 px-8 text-base font-medium"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 h-14 px-10 text-base font-bold shadow-xl transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-lg active:translate-x-[8px] active:translate-y-[8px] lg:h-16 lg:px-12 lg:text-lg"
                 asChild
               >
                 <Link href="/signup">
-                  Start Building
-                  <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  START NOW
+                  <Terminal className="ml-3 h-5 w-5" />
                 </Link>
               </Button>
 
               <Button
                 variant="outline"
                 size="lg"
-                className="group border-border hover:bg-accent/70 h-12 px-8 text-base font-medium"
+                className="bg-background hover:bg-secondary h-14 border-2 px-10 text-base font-bold transition-colors lg:h-16 lg:px-12 lg:text-lg"
                 asChild
               >
                 <Link href={GITHUB_URL} target="_blank">
-                  <Github className="mr-2 h-4 w-4 transition-transform group-hover:scale-110" />
-                  View on GitHub
+                  <Github className="mr-2 h-5 w-5" />
+                  VIEW SOURCE
                 </Link>
               </Button>
             </div>
-
-            {/* Social Proof */}
-            <div className="text-muted-foreground flex flex-wrap items-center gap-6 text-sm">
-              <div className="flex items-center gap-2">
-                <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                <span className="font-semibold text-foreground">4.9/5</span>
-                <span>average rating</span>
-              </div>
-              <div className="bg-border h-4 w-px" />
-              <div className="flex items-center gap-2">
-                <Users className="h-4 w-4" />
-                <span>10,000+ developers shipped with us</span>
-              </div>
-            </div>
           </div>
 
-          {/* Right Visual */}
-          <div className="relative lg:order-last">
-            <div className="absolute -left-6 top-10 hidden h-48 w-48 rounded-full bg-primary/30 opacity-60 blur-3xl lg:block" />
-            <div className="border-border/60 bg-background/70 relative mx-auto max-w-lg rounded-2xl border p-6 shadow-2xl backdrop-blur-lg">
-              {/* Header */}
-              <div className="mb-8 flex items-center justify-between">
+          {/* Right Side: Interface Preview */}
+          <div
+            className={`perspective-container relative w-full transform transition-all delay-500 duration-1000 ${mounted ? "translate-y-0 opacity-100" : "translate-y-20 opacity-0"}`}
+          >
+            {/* Main Window Interface */}
+            <div className="border-foreground bg-card interface-3d group relative border-2 shadow-[24px_24px_0px_0px_var(--primary)]">
+              {/* Window Header */}
+              <div className="border-foreground bg-secondary flex items-center justify-between border-b-2 px-6 py-4">
                 <div className="flex items-center gap-3">
-                  <div className="bg-primary/10 flex h-12 w-12 items-center justify-center rounded-xl">
-                    <BowArrow className="text-primary h-5 w-5" />
+                  <div className="flex gap-2">
+                    <div className="bg-foreground h-3 w-3" />
+                    <div className="bg-foreground/50 h-3 w-3" />
+                    <div className="bg-foreground/25 h-3 w-3" />
                   </div>
-                  <div>
-                    <p className="text-foreground text-sm font-medium">UllrAI Dashboard</p>
-                    <p className="text-muted-foreground text-xs">Demo metrics</p>
-                  </div>
+                  <div className="bg-foreground/20 mx-2 h-6 w-px" />
+                  <span className="text-foreground flex items-center gap-2 font-mono text-sm font-bold">
+                    <Terminal className="h-4 w-4" />
+                    developer-console
+                  </span>
                 </div>
-                <div className="bg-emerald-500/10 text-emerald-500 inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium">
-                  <Activity className="h-3.5 w-3.5" />
-                  Demo
+                <div className="text-muted-foreground hidden font-mono text-xs font-bold sm:block">
+                  user@saas-starter:~/projects/my-app
                 </div>
               </div>
 
-              {/* Stats Grid */}
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="border-border/70 rounded-xl border p-4">
-                  <p className="text-muted-foreground text-xs uppercase tracking-wide">Monthly revenue</p>
-                  <p className="text-foreground mt-2 text-2xl font-semibold">$84.2k</p>
-                  <p className="text-emerald-500 text-xs font-medium">+18% vs last month</p>
-                </div>
-                <div className="border-border/70 rounded-xl border p-4">
-                  <p className="text-muted-foreground text-xs uppercase tracking-wide">Active users</p>
-                  <p className="text-foreground mt-2 text-2xl font-semibold">12.4k</p>
-                  <p className="text-blue-500 text-xs font-medium">+1.2k this week</p>
-                </div>
-              </div>
-
-              {/* Chart Area */}
-              <div className="border-border/60 mt-6 rounded-2xl border p-4">
-                <div className="mb-4 flex items-center justify-between text-xs text-muted-foreground">
-                  <span>Deployments</span>
-                  <span>Past 7 days</span>
-                </div>
-                <div className="flex h-24 items-end gap-2">
-                  {[40, 60, 45, 80, 55, 70, 85].map((height, i) => (
-                    <div
-                      key={i}
-                      className="bg-primary/30 flex-1 rounded-sm"
-                      style={{ height: `${height}%` }}
-                    />
-                  ))}
-                </div>
-                <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">Success rate</span>
-                    <span className="font-semibold text-foreground">99.9%</span>
+              {/* Window Body (Split View) */}
+              <div className="bg-background grid min-h-[400px] grid-cols-1 lg:grid-cols-12">
+                {/* Left: Terminal Setup */}
+                <div className="border-border overflow-hidden border-b p-6 text-left font-mono text-xs sm:p-8 lg:col-span-7 lg:border-r lg:border-b-0">
+                  <div className="bg-secondary/30 border-border mb-6 flex items-center justify-between gap-4 border border-dashed p-4">
+                    <div className="flex items-center gap-3 overflow-hidden">
+                      <span className="text-primary font-bold">➜</span>
+                      <span className="text-foreground truncate font-bold">
+                        {command}
+                      </span>
+                    </div>
+                    <button
+                      onClick={handleCopy}
+                      className="text-muted-foreground hover:text-primary flex-shrink-0 transition-colors"
+                    >
+                      {copied ? (
+                        <Check className="h-5 w-5" />
+                      ) : (
+                        <Copy className="h-5 w-5" />
+                      )}
+                    </button>
                   </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">Build time</span>
-                    <span className="font-semibold text-foreground">1m 42s</span>
+
+                  <div data-lingo-skip className="space-y-2 text-xs sm:text-xs">
+                    {/* Quick Start */}
+                    <div className="text-muted-foreground/65">
+                      <span data-lingo-skip className="text-green-500">➜</span> git clone https://github.com/UllrAI/SaaS-Starter.git
+                    </div>
+                    <div className="text-muted-foreground/65">
+                      <span data-lingo-skip className="text-green-500">➜</span> cd saas-starter
+                    </div>
+
+                    <div className="h-4" />
+
+                    <div className="text-muted-foreground/65">
+                      <span data-lingo-skip className="text-green-500">➜</span> cp .env.example .env
+                    </div>
+                    <div className="text-muted-foreground/65">
+                      <span data-lingo-skip className="text-green-500">➜</span> pnpm install
+                    </div>
+
+                    <div className="h-4" />
+
+                    <div className="text-foreground font-bold">
+                      <span data-lingo-skip className="text-primary">➜</span> pnpm dev
+                    </div>
+
+                    <div className="h-4" />
+
+                    {/* Output */}
+                    <div className="text-muted-foreground/65 space-y-1 pl-2">
+                      <div data-lingo-skip className="text-green-500">✓ Ready in 1.2s</div>
+                      <div data-lingo-skip>
+                        ○ Local:{" "}
+                        <span data-lingo-skip className="text-primary underline">
+                          http://localhost:3000
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="text-primary mt-6 flex animate-pulse items-center gap-2">
+                      <span data-lingo-skip className="bg-primary block h-4 w-2" />
+                      <span>Running...</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
 
-            {/* Floating Elements */}
-            <div className="border-border/70 bg-background absolute -top-5 right-4 rounded-xl border px-4 py-3 shadow-xl">
-              <div className="flex items-center gap-2 text-xs font-medium">
-                <div className="h-2 w-2 rounded-full bg-emerald-500" />
-                Easy Setup
-              </div>
-            </div>
+                {/* Right: What's Included */}
+                <div className="bg-secondary/5 flex flex-col p-6 text-left sm:p-8 lg:col-span-5">
+                  <div className="mb-6 space-y-2">
+                    <div className="text-muted-foreground text-xs font-bold tracking-widest uppercase">
+                      What&apos;s Included
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="bg-primary h-3 w-3 rounded-full" />
+                      <span className="text-foreground font-bold">
+                        Production Ready
+                      </span>
+                    </div>
+                  </div>
 
-            <div className="border-border/70 bg-background absolute -bottom-5 -left-4 rounded-xl border px-4 py-3 shadow-xl">
-              <div className="flex items-center gap-2 text-xs font-medium">
-                <Zap className="text-yellow-500 h-3.5 w-3.5" />
-                Fast Deploy
+                  {/* Features Grid */}
+                  <div className="flex-1 space-y-4">
+                    <div className="text-muted-foreground grid grid-cols-1 gap-3 text-sm">
+                      <div className="flex items-center gap-2">
+                        <span className="text-primary">✓</span>
+                        <span>Authentication</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-primary">✓</span>
+                        <span>Database</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-primary">✓</span>
+                        <span>Payments</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-primary">✓</span>
+                        <span>File Upload</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-primary">✓</span>
+                        <span>Admin Panel</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-primary">✓</span>
+                        <span>i18n Ready</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="border-border mt-auto border-t pt-6">
+                    <div className="text-muted-foreground text-xs">
+                      <>Built with</><br />
+                      <span data-lingo-skip className="text-primary font-mono">Next.js 15</span>
+                      <>&nbsp;</><>+</><>&nbsp;</>
+                      <span data-lingo-skip className="text-primary font-mono">shadcn/ui</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

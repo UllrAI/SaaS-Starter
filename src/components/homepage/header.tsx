@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { Logo } from "@/components/logo";
 import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/mode-toggle";
+import { LocaleSwitcher } from "@/components/locale-switcher";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,73 +21,87 @@ import { ChevronDown, Menu, UserCircle, ExternalLink } from "lucide-react";
 import { APP_NAME } from "@/lib/config/constants";
 
 interface NavItem {
-  title: string;
+  id: string;
+  title: React.ReactNode;
   href?: string;
-  description?: string;
+  description?: React.ReactNode;
   items?: NavItem[];
   icon?: React.ComponentType<{ className?: string }>;
-  badge?: string;
+  badge?: React.ReactNode;
   external?: boolean;
 }
 
 const navigationItems: NavItem[] = [
   {
-    title: "Features",
+    id: "nav-features",
+    title: <>Features</>,
     items: [
       {
-        title: "Authentication",
+        id: "nav-authentication",
+        title: <>Authentication</>,
         href: "/login",
-        description: "Secure user authentication with magic links",
+        description: <>Secure user authentication with magic links</>,
       },
       {
-        title: "Billing",
+        id: "nav-billing",
+        title: <>Billing</>,
         href: "/dashboard/settings?page=billing",
-        description: "Subscription management and payments",
+        description: <>Subscription management and payments</>,
       },
       {
-        title: "Dashboard",
+        id: "nav-dashboard",
+        title: <>Dashboard</>,
         href: "/dashboard",
-        description: "User dashboard and settings",
+        description: <>User dashboard and settings</>,
       },
     ],
   },
   {
-    title: "Pricing",
+    id: "nav-pricing",
+    title: <>Pricing</>,
     href: "/pricing",
   },
   {
-    title: "About",
+    id: "nav-about",
+    title: <>About</>,
     href: "/about",
   },
   {
-    title: "Blog",
+    id: "nav-blog",
+    title: <>Blog</>,
     href: "/blog",
   },
   {
-    title: "Contact",
+    id: "nav-contact",
+    title: <>Contact</>,
     href: "/contact",
   },
 ];
 
 const mobileNavItems: NavItem[] = [
   {
-    title: "Features",
+    id: "mobile-features",
+    title: <>Features</>,
     href: "/features",
   },
   {
-    title: "Pricing",
+    id: "mobile-pricing",
+    title: <>Pricing</>,
     href: "/pricing",
   },
   {
-    title: "About",
+    id: "mobile-about",
+    title: <>About</>,
     href: "/about",
   },
   {
-    title: "Blog",
+    id: "mobile-blog",
+    title: <>Blog</>,
     href: "/blog",
   },
   {
-    title: "Contact",
+    id: "mobile-contact",
+    title: <>Contact</>,
     href: "/contact",
   },
 ];
@@ -106,11 +121,11 @@ function NavigationDropdown({ item }: { item: NavItem }) {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-72 p-2" sideOffset={8}>
-        {item.items.map((subItem, index) => {
+        {item.items.map((subItem) => {
           const IconComponent = subItem.icon;
 
           return (
-            <DropdownMenuItem key={index} asChild>
+            <DropdownMenuItem key={subItem.id} asChild>
               {subItem.href ? (
                 <Link
                   href={subItem.href}
@@ -134,7 +149,7 @@ function NavigationDropdown({ item }: { item: NavItem }) {
                       )}
                     </div>
                     {subItem.description && (
-                      <p className="text-muted-foreground mt-1 text-xs leading-relaxed">
+                      <p className="text-muted-foreground/80 mt-1 text-xs leading-relaxed">
                         {subItem.description}
                       </p>
                     )}
@@ -288,9 +303,9 @@ function MobileNavigation({
 
         <div className="flex flex-col p-6">
           <nav className="space-y-4">
-            {mobileNavItems.map((item, index) => (
+            {mobileNavItems.map((item) => (
               <Link
-                key={index}
+                key={item.id}
                 href={item.href!}
                 className="text-foreground hover:text-primary block py-2 text-sm font-medium transition-colors"
                 onClick={onClose}
@@ -342,8 +357,8 @@ export function Header() {
 
             {/* Desktop Navigation */}
             <nav className="hidden items-center gap-1 md:flex">
-              {navigationItems.map((item, index) => (
-                <div key={index}>
+              {navigationItems.map((item) => (
+                <div key={item.id}>
                   {item.items ? (
                     <NavigationDropdown item={item} />
                   ) : (
@@ -369,6 +384,8 @@ export function Header() {
 
             {/* Right side actions */}
             <div className="flex items-center gap-3">
+              {/* Locale selector */}
+              <LocaleSwitcher variant="ghost" size="icon" />
               {/* Theme toggle */}
               <ModeToggle variant="ghost" size="icon" />
 

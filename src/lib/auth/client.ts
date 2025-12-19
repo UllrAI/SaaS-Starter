@@ -25,7 +25,6 @@ export const {
   changeEmail,
   deleteUser,
   linkSocial,
-  forgetPassword,
   useSession,
   verifyEmail,
   listAccounts,

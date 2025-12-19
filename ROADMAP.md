@@ -1,82 +1,125 @@
 # Roadmap | 路线图
 
-> **Language Select / 语言选择**: [English](#english) | [中文](#中文)  
-> **Documentation / 文档**: [README (EN)](./README.md) | [README (中文)](./README.zh-CN.md)
+> **Language Select / 语言选择**: [English](#english) | [中文](#中文) > **Documentation / 文档**: [README (EN)](./README.md) | [README (中文)](./README.zh-CN.md)
 
 ---
 
 ## English
 
-### 🎯 Code-First Admin Backend
+### ✅ **Shipped: Production-Ready Foundation**
+
+Core infrastructure battle-tested and deployed.
+
+- ✅ Authentication (Magic Links + OAuth: Google, GitHub, LinkedIn)
+- ✅ Complete billing system with subscription management
+- ✅ Admin dashboard with dynamic table configuration
+- ✅ Secure file uploads with Cloudflare R2
+- ✅ Multi-language support (EN, ZH-CN) with Lingo.dev
+- ✅ SEO-optimized marketing pages
+- ✅ Role-based access control (user, admin, super_admin)
+- ✅ Type-safe codebase with zero `any` types
+
+### 🎯 **Code-First Admin Backend**
 
 Transform any database into an admin interface through configuration files.
 
-- [ ] Auto-generate admin panels from database schema with table name configuration only
-- [ ] TypeScript configuration files define forms and validation rules
+- ✅ Dynamic table management with JSON configuration
+- ✅ Auto-generate CRUD from database schema
 
-### 🌍 Globalization & Cloud Deployment
+### 📈 **Multi-Tenant Architecture**
 
-International market reach and deployment flexibility.
+Team collaboration and workspace isolation.
 
-- [ ] Multi-language and multi-currency support
-- [ ] Docker deployment guides
+- ⏳ Workspace/organization data model
+- ⏳ Workspace-level billing and subscriptions
+- ⏳ Team member invitation and management
+- ⏳ Workspace roles (owner, admin, member)
+- ⏳ Resource isolation between workspaces
 
-### 📈 Scale & Enterprise
+### 🚀 **User Growth & Retention**
 
-Team collaboration and large-scale deployment features.
+Built-in tools for acquisition and engagement.
 
-- [ ] Multi-tenant workspaces and role management
-- [ ] Open API and Webhook systems
+- ⏳ User onboarding flow with progress tracking
+- ⏳ Email marketing campaigns with React Email
+- ⏳ User analytics dashboard (usage metrics)
+- ⏳ Basic A/B testing framework for pricing pages
 
-### 🚀 Growth Tools
+### 🔌 **Developer API & Integrations**
 
-Core features for user acquisition and retention.
+Open platform for third-party extensibility.
 
-- [ ] User onboarding and analytics dashboard
-- [ ] Email marketing and campaign automation
-- [ ] A/B testing framework
+- ⏳ OpenAPI 3.0 specification for all endpoints
+- ⏳ API key management for users
+- ⏳ Webhook system beyond payment events
+- ⏳ Zapier integration for workflow automation
 
-### 🔮 Future Vision
+### 💱 **Multi-Currency Billing**
 
-- **AI-Powered Insights**: Smart data analysis and recommendations
-- **White-label Platform**: Complete customization for resellers
-- **Plugin Ecosystem**: Third-party integration marketplace _-maybe-_
+Global payment support.
+
+- ⏳ Automatic currency selection by locale
+- ⏳ Currency preference in user settings
+
+**Note**: Focus is on solid, predictable functionality that solves real business problems.
 
 ---
 
 ## 中文
 
-### 🎯 代码优先后台
+### ✅ **已上线: 生产级基础架构**
+
+核心基础设施经过实战测试并部署。
+
+- ✅ 认证系统（Magic Links + OAuth: Google, GitHub, LinkedIn）
+- ✅ 完整的订阅计费和支付系统
+- ✅ 支持动态配置的管理后台
+- ✅ Cloudflare R2 安全文件上传
+- ✅ 多语言支持（英文、简体中文）
+- ✅ SEO 优化的营销页面
+- ✅ 基于角色的访问控制（用户、管理员、超级管理员）
+- ✅ 全栈类型安全，零 `any` 类型
+
+### 🎯 **代码优先后台**
 
 通过配置文件将任意数据库转换为管理界面。
 
-- [ ] 仅配置表名即可从数据库模式自动生成管理面板
-- [ ] TypeScript配置文件定义表单和验证规则
+- ✅ 基于 JSON 配置的动态表管理
+- ✅ 从数据库模式自动生成 CRUD
 
-### 🌍 全球化与云部署
+### 📈 **多租户架构**
 
-国际市场和部署灵活性。
+团队协作和工作空间隔离。
 
-- [ ] 多语言和多货币支持
-- [ ] Docker 部署指南
+- ⏳ 工作区/组织数据模型
+- ⏳ 工作区级别的计费和订阅
+- ⏳ 团队成员邀请和管理
+- ⏳ 工作区角色（所有者、管理员、成员）
+- ⏳ 工作区之间的资源隔离
 
-### 📈 规模化与企业级
+### 🚀 **用户增长与留存**
 
-团队协作和大规模部署功能。
+内置的用户获取和参与工具。
 
-- [ ] 多租户工作空间和角色管理
-- [ ] Open API 和 Webhook 系统
+- ⏳ 用户引导流程和进度跟踪
+- ⏳ React Email 邮件营销活动
+- ⏳ 用户分析仪表板（使用指标）
+- ⏳ 定价页面的基础 A/B 测试框架
 
-### 🚀 增长工具
+### 🔌 **开发者 API 与集成**
 
-用户获取和留存的核心功能。
+第三方可扩展的开放平台。
 
-- [ ] 用户引导和分析仪表板
-- [ ] 邮件营销和活动自动化
-- [ ] A/B测试框架
+- ⏳ 所有端点的 OpenAPI 3.0 规范
+- ⏳ 用户 API 密钥管理
+- ⏳ 支付之外的 Webhook 系统
+- ⏳ Zapier 集成实现工作流自动化
 
-### 🔮 未来愿景
+### 💱 **多货币计费**
 
-- **AI驱动洞察**: 智能数据分析和建议
-- **白标平台**: 为分销商提供完整定制化
-- **插件生态**: 第三方集成市场 _-maybe-_
+全球支付支持。
+
+- ⏳ 根据地区自动选择货币
+- ⏳ 用户设置中的货币偏好
+
+**注意**: 重点是解决实际业务问题的稳定、可预测功能。

@@ -2,8 +2,20 @@ import { render, screen } from "@testing-library/react";
 import type React from "react";
 
 const mockLinkSentCard = jest.fn(
-  ({ title, description, retryHref }: { title: string; description: React.ReactNode; retryHref: string }) => (
-    <div data-testid="link-sent-card" data-title={title} data-retry-href={retryHref}>
+  ({
+    title,
+    description,
+    retryHref,
+  }: {
+    title: string;
+    description: React.ReactNode;
+    retryHref: string;
+  }) => (
+    <div
+      data-testid="link-sent-card"
+      data-title={title}
+      data-retry-href={retryHref}
+    >
       {description}
     </div>
   ),

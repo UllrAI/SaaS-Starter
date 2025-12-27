@@ -4,7 +4,7 @@ import { createMetadata } from "@/lib/metadata";
 import { APP_NAME, COMPANY_NAME } from "@/lib/config/constants";
 import env from "@/env";
 
-import { LingoProvider, loadDictionary } from "lingo.dev/react/rsc";
+import { LingoProvider } from "@lingo.dev/compiler/react/next";
 import { AppProviders } from "@/components/app-providers";
 
 export const metadata = createMetadata({
@@ -42,18 +42,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <LingoProvider loadDictionary={(locale) => loadDictionary(locale)}>
-      <html lang="en" suppressHydrationWarning>
-        <head />
-        <body suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
+      <head />
+      <body suppressHydrationWarning>
+        <LingoProvider devWidget={{ enabled: false }}>
           <AppProviders>{children}</AppProviders>
-          <Script
-            src="https://track.pixmiller.com/script.js"
-            data-website-id="9315890d-80ba-455a-b624-ab2ab48595f4"
-            strategy="lazyOnload"
-          />
-        </body>
-      </html>
-    </LingoProvider>
+        </LingoProvider>
+        <Script
+          src="https://track.pixmiller.com/script.js"
+          data-website-id="9315890d-80ba-455a-b624-ab2ab48595f4"
+          strategy="lazyOnload"
+        />
+      </body>
+    </html>
   );
 }

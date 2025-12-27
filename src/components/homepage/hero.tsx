@@ -232,7 +232,7 @@ export function Hero() {
                   <div className="border-border mt-auto border-t pt-6">
                     <div className="text-muted-foreground text-xs">
                       <>Built with</><br />
-                      <span data-lingo-skip className="text-primary font-mono">Next.js 15</span>
+                      <span data-lingo-skip className="text-primary font-mono">Next.js 16</span>
                       <>&nbsp;</><>+</><>&nbsp;</>
                       <span data-lingo-skip className="text-primary font-mono">shadcn/ui</span>
                     </div>

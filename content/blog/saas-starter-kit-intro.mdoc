@@ -29,7 +29,7 @@ heroImage: https://images.unsplash.com/photo-1561886362-a2b38ce83470?q=80&w=1674
 **UllrAI SaaS Starter Kit** 是一个免费、开源、生产就绪的全栈 SaaS 入门套件。它集成了现代 Web 开发中备受推崇的技术和实践，旨在帮助开发者以前所未有的速度启动下一个 SaaS 项目，让您专注于业务逻辑而非基础架构的搭建。
 
 - **核心功能**：提供身份验证、支付订阅、数据库管理、文件上传、内容管理等 SaaS 应用的核心功能。
-- **技术栈**：基于 Next.js 15 App Router、TypeScript、PostgreSQL、Drizzle ORM，并集成了 Creem 支付、Resend 邮件服务和 Cloudflare R2 文件存储。
+- **技术栈**：基于 Next.js 16 App Router、TypeScript、PostgreSQL、Drizzle ORM，并集成了 Creem 支付、Resend 邮件服务和 Cloudflare R2 文件存储。
 - **适用场景**：
   - 快速搭建需要用户登录和付费订阅功能的全栈 SaaS 应用。
   - 作为学习现代全栈 Web 开发技术的实践项目。
@@ -75,7 +75,7 @@ heroImage: https://images.unsplash.com/photo-1561886362-a2b38ce83470?q=80&w=1674
 
 ### 1.3. 特性列表
 
-- **现代框架**: Next.js 15 (App Router, RSC), React 19, TypeScript
+- **现代框架**: Next.js 16 (App Router, RSC), React 19, TypeScript
 - **UI**: Tailwind CSS v4, shadcn/ui, Lucide Icons, Dark/Light Mode
 - **认证**: Better-Auth (魔术链接, OAuth - Google/GitHub/LinkedIn)
 - **数据库**: PostgreSQL + Drizzle ORM (类型安全查询, 迁移管理)
@@ -186,7 +186,7 @@ SaaS-Starter-main/
   - 集成 `NextTopLoader` 提供页面加载进度条。
   - 集成 `Toaster` 用于全局通知。
   - 集成 `CookieConsent` 用于 Cookie 同意管理。
-- **`middleware.ts`**: 在请求到达页面之前运行，是实现路由保护的核心。
+- **`proxy.ts`**: 在请求到达页面之前运行，是实现路由保护的核心。
   - 检查用户会话 Cookie。
   - 如果用户未登录但访问 `/dashboard/*`，重定向到 `/login`。
   - 如果用户已登录但访问 `/login` 或 `/signup`，重定向到 `/dashboard`。
@@ -218,7 +218,7 @@ SaaS-Starter-main/
   - 配置了 `images.remotePatterns`，允许从 Unsplash 和 Cloudflare R2 加载图片。
   - 集成了 `@next/bundle-analyzer`。当环境变量 `ANALYZE` 设置为 `true` 时，运行 `pnpm analyze` 会在构建后生成并打开包体积分析报告，帮助开发者优化前端资源大小。
 - **`package.json`**:
-  - `dev`: 启动开发服务器，开启了 Next.js 15 的 `--turbo` 模式以加快本地编译速度。
+  - `dev`: 启动开发服务器，开启了 Next.js 16 的 `--turbo` 模式以加快本地编译速度。
   - `build`: 为生产环境构建应用。
   - `start`: 启动生产服务器。
 
@@ -619,7 +619,7 @@ sequenceDiagram
 ### 10.2. 安全考虑
 
 - **环境变量**: **绝不**将 `.env` 文件提交到 Git 仓库。使用 Vercel 等平台的秘密管理工具来存储生产环境变量。
-- **路由保护**: `middleware.ts` 是第一道防线，但**必须**在 Server Actions 和 API 路由中使用 `requireAuth`、`requireAdmin` 等函数进行后端权限验证。
+- **路由保护**: `proxy.ts` 是第一道防线，但**必须**在 Server Actions 和 API 路由中使用 `requireAuth`、`requireAdmin` 等函数进行后端权限验证。
 - **SQL 注入**: 使用 Drizzle ORM 可以有效防止 SQL 注入攻击，因为它会自动参数化查询。
 - **XSS**: Next.js 和 React 默认会对 JSX 内容进行转义，防止跨站脚本攻击。处理用户生成的内容时，请使用成熟的库（如 `DOMPurify`）进行清理。
 - **Webhook 安全**: `src/lib/billing/creem/webhook.ts` 中的签名验证是确保 Webhook 请求来源可信的关键。

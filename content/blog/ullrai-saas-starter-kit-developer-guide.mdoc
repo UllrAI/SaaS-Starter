@@ -28,7 +28,7 @@ This documentation provides a comprehensive and in-depth technical reference for
 **UllrAI SaaS Starter Kit** is a free, open-source, production-ready full-stack SaaS starter kit. It integrates the most respected technologies and practices in modern web development, designed to help developers launch their next SaaS project at unprecedented speed, allowing you to focus on business logic rather than infrastructure setup.
 
 - **Core Features**: Provides authentication, payment subscriptions, database management, file uploads, content management, and other core SaaS application features.
-- **Technology Stack**: Based on Next.js 15 App Router, TypeScript, PostgreSQL, Drizzle ORM, and integrates Creem payments, Resend email service, and Cloudflare R2 file storage.
+- **Technology Stack**: Based on Next.js 16 App Router, TypeScript, PostgreSQL, Drizzle ORM, and integrates Creem payments, Resend email service, and Cloudflare R2 file storage.
 - **Use Cases**:
   - Quickly build full-stack SaaS applications requiring user login and paid subscription features.
   - As a practical project for learning modern full-stack web development technologies.
@@ -74,7 +74,7 @@ This documentation provides a comprehensive and in-depth technical reference for
 
 ### 1.3. Feature List
 
-- **Modern Framework**: Next.js 15 (App Router, RSC), React 19, TypeScript
+- **Modern Framework**: Next.js 16 (App Router, RSC), React 19, TypeScript
 - **UI**: Tailwind CSS v4, shadcn/ui, Lucide Icons, Dark/Light Mode
 - **Authentication**: Better-Auth (Magic Link, OAuth - Google/GitHub/LinkedIn)
 - **Database**: PostgreSQL + Drizzle ORM (Type-safe queries, Migration management)
@@ -185,7 +185,7 @@ SaaS-Starter-main/
   - Integrating `NextTopLoader` for page loading progress.
   - Integrating `Toaster` for global notifications.
   - Integrating `CookieConsent` for cookie consent management.
-- **`middleware.ts`**: Runs before requests reach pages, core for route protection.
+- **`proxy.ts`**: Runs before requests reach pages, core for route protection.
   - Checks user session cookies.
   - Redirects to `/login` if user is not logged in but accessing `/dashboard/*`.
   - Redirects to `/dashboard` if user is logged in but accessing `/login` or `/signup`.
@@ -217,7 +217,7 @@ The project uses Next.js App Router and leverages Route Groups for logical page 
   - Configures `images.remotePatterns` to allow loading images from Unsplash and Cloudflare R2.
   - Integrates `@next/bundle-analyzer`. When `ANALYZE` environment variable is set to `true`, running `pnpm analyze` generates and opens bundle size analysis report after build, helping developers optimize frontend resource size.
 - **`package.json`**:
-  - `dev`: Starts development server with Next.js 15's `--turbo` mode for faster local compilation.
+  - `dev`: Starts development server with Next.js 16's `--turbo` mode for faster local compilation.
   - `build`: Builds production application.
   - `start`: Starts production server.
 
@@ -618,7 +618,7 @@ All required and optional environment variables are detailed in the environment 
 ### 10.2. Security Considerations
 
 - **Environment Variables**: **Never** commit `.env` file to Git repository. Use secret management tools from platforms like Vercel to store production environment variables.
-- **Route Protection**: `middleware.ts` is the first line of defense, but **must** use functions like `requireAuth`, `requireAdmin` in Server Actions and API routes for backend permission verification.
+- **Route Protection**: `proxy.ts` is the first line of defense, but **must** use functions like `requireAuth`, `requireAdmin` in Server Actions and API routes for backend permission verification.
 - **SQL Injection**: Using Drizzle ORM effectively prevents SQL injection attacks because it automatically parameterizes queries.
 - **XSS**: Next.js and React escape JSX content by default, preventing cross-site scripting attacks. When handling user-generated content, use mature libraries (like `DOMPurify`) for sanitization.
 - **Webhook Security**: Signature verification in `src/lib/billing/creem/webhook.ts` is key to ensuring webhook requests come from trusted sources.

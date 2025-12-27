@@ -133,7 +133,7 @@ This project uses Next.js App Router with a `src` directory structure for better
 - `env.js` - Environment variable validation
 - `tsconfig.json` - TypeScript configuration with path mappings for `@/*` to `src/*`
 - `jest.config.js` - Jest configuration with proper module resolution for src structure
-- `middleware.ts` - Route protection and redirects
+- `proxy.ts` - Route protection and redirects
 - `lib/config/products.ts` - Product and pricing configuration
 - `keystatic.config.ts` - CMS configuration
 

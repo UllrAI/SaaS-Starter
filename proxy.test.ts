@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import authMiddleware from "./src/middleware";
+import authMiddleware from "./src/proxy";
 import { getSessionCookie } from "better-auth/cookies";
 
 // Mock better-auth/cookies

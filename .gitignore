@@ -30,6 +30,7 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+translation-server.log
 
 # env files (can opt-in for committing if needed)
 .env.local*

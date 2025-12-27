@@ -7,16 +7,14 @@ import {
   afterEach,
 } from "@jest/globals";
 
-// Mock lingo.dev compiler to avoid loading modules that rely on experimental VM flags
-const mockWithLingo = jest.fn((config: { sourceRoot: string }) => {
-  return (nextConfig: Record<string, unknown>) => nextConfig;
-});
+// Mock @lingo.dev/compiler/next to avoid loading modules that rely on experimental VM flags
+const mockWithLingo = jest.fn(
+  async (nextConfig: Record<string, unknown>) => nextConfig,
+);
 
-jest.mock("lingo.dev/compiler", () => ({
+jest.mock("@lingo.dev/compiler/next", () => ({
   __esModule: true,
-  default: {
-    next: mockWithLingo,
-  },
+  withLingo: mockWithLingo,
 }));
 
 // Mock next/bundle-analyzer
@@ -36,7 +34,7 @@ describe("next.config.ts", () => {
   let consoleErrorSpy: any;
   const importConfig = async () => {
     const mod = await import("./next.config");
-    return (mod as any).default ?? mod;
+    return (mod as any).default;
   };
 
   beforeEach(() => {
@@ -61,7 +59,8 @@ describe("next.config.ts", () => {
         R2_PUBLIC_URL: "https://test-r2.example.com",
       },
     }));
-    const nextConfig = await importConfig();
+    const getConfig = await importConfig();
+    const nextConfig = await getConfig();
     expect(nextConfig).toHaveProperty("analyzed", true);
   });
 
@@ -74,7 +73,8 @@ describe("next.config.ts", () => {
         R2_PUBLIC_URL: "https://test-r2.example.com",
       },
     }));
-    const nextConfig = await importConfig();
+    const getConfig = await importConfig();
+    const nextConfig = await getConfig();
     expect(nextConfig).not.toHaveProperty("analyzed");
   });
 
@@ -86,7 +86,8 @@ describe("next.config.ts", () => {
       },
     }));
 
-    const nextConfig = await importConfig();
+    const getConfig = await importConfig();
+    const nextConfig = await getConfig();
     expect(consoleErrorSpy).toHaveBeenCalledWith(
       "\x1b[33m%s\x1b[0m",
       "Warning: Invalid R2_PUBLIC_URL found in environment variables. Skipping R2 remote pattern.",
@@ -105,7 +106,8 @@ describe("next.config.ts", () => {
         R2_PUBLIC_URL: "https://valid-r2.example.com",
       },
     }));
-    const nextConfig = await importConfig();
+    const getConfig = await importConfig();
+    const nextConfig = await getConfig();
     expect((nextConfig as any).images.remotePatterns).toEqual([
       {
         protocol: "https",
@@ -130,7 +132,8 @@ describe("next.config.ts", () => {
         R2_PUBLIC_URL: undefined,
       },
     }));
-    const nextConfig = await importConfig();
+    const getConfig = await importConfig();
+    const nextConfig = await getConfig();
     expect((nextConfig as any).images.remotePatterns).toEqual([
       {
         protocol: "https",

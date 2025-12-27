@@ -3,7 +3,7 @@ export const LOCALE_CONFIG = {
     flag: "🇺🇸",
     label: "English",
   },
-  "zh-CN": {
+  "zh-Hans": {
     flag: "🇨🇳",
     label: "简体中文",
   },
@@ -31,6 +31,11 @@ export function getLocaleDisplayInfo(locale: string): LocaleDisplayInfo {
   );
 }
 
+export const LINGO_DEFAULT_MODEL = "openai:gpt-5-nano";
+// export const LINGO_DEFAULT_MODEL = "openrouter:google/gemini-3-flash-preview";
+
 export const LINGO_MODEL_MAP: Record<string, string> = {
-  "*:*": "openrouter:z-ai/glm-4.5-air:free",
+  "*:*": LINGO_DEFAULT_MODEL,
 };
+
+export const LINGO_PLURALIZATION_MODEL = LINGO_DEFAULT_MODEL;

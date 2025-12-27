@@ -1,11 +1,12 @@
 import type { NextConfig } from "next";
 import nextBundleAnalyzer from "@next/bundle-analyzer";
-import lingoCompiler from "lingo.dev/compiler";
+import { withLingo } from "@lingo.dev/compiler/next";
 import env from "@/env";
 import {
   SOURCE_LOCALE,
   TARGET_LOCALES,
   LINGO_MODEL_MAP,
+  LINGO_PLURALIZATION_MODEL,
 } from "@/lib/config/i18n";
 
 // Safely parse the R2 hostname
@@ -47,25 +48,30 @@ const nextConfig: NextConfig = {
   },
 };
 
-const withLingo = lingoCompiler.next({
-  sourceRoot: "src/app",
-  lingoDir: "lingo",
-  sourceLocale: SOURCE_LOCALE,
-  targetLocales: [...TARGET_LOCALES],
-  rsc: true,
-  useDirective: false,
-  debug: false,
-  models: LINGO_MODEL_MAP,
-});
-
-let config = withLingo(nextConfig);
-
-// 只有在 process.env.ANALYZE 为 'true' 时才启用 bundle analyzer
-if (process.env.ANALYZE === "true") {
-  const withBundleAnalyzer = nextBundleAnalyzer({
-    enabled: true,
+export default async function (): Promise<NextConfig> {
+  let config = await withLingo(nextConfig, {
+    sourceRoot: "src/app",
+    lingoDir: ".lingo",
+    sourceLocale: SOURCE_LOCALE,
+    targetLocales: [...TARGET_LOCALES],
+    models: LINGO_MODEL_MAP,
+    pluralization: {
+      enabled: false,
+      model: LINGO_PLURALIZATION_MODEL,
+    },
+    buildMode:
+      process.env.LINGO_BUILD_MODE === "translate"
+        ? "translate"
+        : "cache-only",
   });
-  config = withBundleAnalyzer(config);
-}
 
-export default config;
+  // 只有在 process.env.ANALYZE 为 'true' 时才启用 bundle analyzer
+  if (process.env.ANALYZE === "true") {
+    const withBundleAnalyzer = nextBundleAnalyzer({
+      enabled: true,
+    });
+    config = withBundleAnalyzer(config);
+  }
+
+  return config;
+}

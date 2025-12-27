@@ -17,7 +17,7 @@ import {
   SUPPORTED_LOCALES,
   getLocaleDisplayInfo,
 } from "@/lib/config/i18n";
-import { setLingoLocale, useLingoLocale } from "lingo.dev/react/client";
+import { useLingoContext } from "@lingo.dev/compiler/react";
 
 type ButtonVariant = React.ComponentProps<typeof Button>["variant"];
 type ButtonSize = React.ComponentProps<typeof Button>["size"];
@@ -40,27 +40,32 @@ export function LocaleSwitcher({
   showLabel = false,
 }: LocaleSwitcherProps) {
   const availableLocales = locales.length > 0 ? locales : SUPPORTED_LOCALES;
-  const localeFromCookie = useLingoLocale();
+  const { locale: currentLocale, setLocale, isLoading } = useLingoContext();
   const [isSwitching, setIsSwitching] = React.useState(false);
+  const isBusy = isSwitching || isLoading;
 
   const activeLocale = React.useMemo<SupportedLocale>(() => {
-    if (localeFromCookie) {
+    if (currentLocale) {
       const match = availableLocales.find(
-        (locale) => locale === localeFromCookie,
+        (locale) => locale === currentLocale,
       );
       if (match) {
         return match;
       }
     }
     return availableLocales[0];
-  }, [availableLocales, localeFromCookie]);
+  }, [availableLocales, currentLocale]);
 
-  const handleLocaleSelect = (locale: SupportedLocale) => {
-    if (locale === activeLocale || isSwitching) {
+  const handleLocaleSelect = async (locale: SupportedLocale) => {
+    if (locale === activeLocale || isBusy) {
       return;
     }
     setIsSwitching(true);
-    setLingoLocale(locale);
+    try {
+      await setLocale(locale);
+    } finally {
+      setIsSwitching(false);
+    }
   };
 
   if (!availableLocales.length) {
@@ -81,9 +86,9 @@ export function LocaleSwitcher({
             showLabel && size === "sm" && "h-9",
             className,
           )}
-          disabled={isSwitching}
+          disabled={isBusy}
         >
-          {isSwitching ? (
+          {isBusy ? (
             <Loader2 className="h-[1.2rem] w-[1.2rem] animate-spin" />
           ) : (
             <Languages className="h-[1.2rem] w-[1.2rem]" />
@@ -111,7 +116,7 @@ export function LocaleSwitcher({
             <DropdownMenuItem
               key={locale}
               className="flex items-center justify-between gap-4 py-2"
-              onSelect={() => handleLocaleSelect(locale)}
+              onSelect={() => void handleLocaleSelect(locale)}
             >
               <span className="text-sm leading-none font-medium">
                 {details.label}

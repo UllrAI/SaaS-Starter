@@ -19,7 +19,8 @@
 本入门套件提供了一系列强大的功能，可帮助您快速构建功能齐全的 SaaS 应用：
 
 - **身份验证 (Better-Auth + Resend):** 集成了 [Better-Auth](https://better-auth.com/)，提供安全的魔术链接登录和第三方 OAuth 功能。使用 [Resend](https://resend.com/) 提供可靠的邮件发送服务，并集成 Mailchecker 避免临时邮箱。
-- **现代 Web 框架 (Next.js 15 + TypeScript):** 基于最新的 [Next.js 15](https://nextjs.org/)，使用 App Router 和服务器组件。整个项目采用严格的 TypeScript 类型检查。
+- **现代 Web 框架 (Next.js 16 + TypeScript):** 基于最新的 [Next.js 16](https://nextjs.org/)，使用 App Router 和服务器组件。整个项目采用严格的 TypeScript 类型检查。
+- **国际化 (Lingo.dev Compiler):** 基于 `@lingo.dev/compiler` 的本地化工作流，适配 App Router。详见 `docs/i18n-lingo.md`。
 - **数据库与 ORM (Drizzle + PostgreSQL):** 使用 [Drizzle ORM](https://orm.drizzle.team/) 进行类型安全的数据库操作，并与 PostgreSQL 深度集成。支持模式迁移和优化的查询。
 - **支付与订阅 (Creem):** 集成了 [Creem](https://creem.io/) 作为支付提供商，轻松处理订阅和一次性支付。
 - **UI 组件库 (shadcn/ui + Tailwind CSS):** 使用 [shadcn/ui](https://ui.shadcn.com/) 构建，它是一个基于 Radix UI 和 Tailwind CSS 的可访问、可组合的组件库，内置主题支持。
@@ -44,7 +45,7 @@
 
 | 分类       | 技术                                                                                                                                                  |
 | :--------- | :---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **框架**   | [Next.js](https://nextjs.org/) 15                                                                                                                     |
+| **框架**   | [Next.js](https://nextjs.org/) 16                                                                                                                     |
 | **语言**   | [TypeScript](https://www.typescriptlang.org/)                                                                                                         |
 | **UI**     | [React](https://react.dev/), [shadcn/ui](https://ui.shadcn.com/), [Tailwind v4](https://tailwindcss.com/), [Lucide React](https://lucide.dev/) (图标) |
 | **认证**   | [Better-Auth](https://better-auth.com/)                                                                                                               |

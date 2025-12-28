@@ -19,91 +19,6 @@ interface Feature {
   category: React.ReactNode;
 }
 
-const features: Feature[] = [
-  {
-    id: "auth-users",
-    title: <>Authentication & Users</>,
-    description: (
-      <>
-        Complete auth system with OAuth, magic links, and user management.
-        Role-based access control included.
-      </>
-    ),
-    icon: Shield,
-    category: <>Security</>,
-  },
-  {
-    id: "payments-billing",
-    title: <>Payments & Billing</>,
-    description: (
-      <>
-        Flexible payment integration with subscriptions, and billing management.
-        Revenue tracking built-in.
-      </>
-    ),
-    icon: CreditCard,
-    category: <>Payments</>,
-  },
-  {
-    id: "database-api",
-    title: <>Database & API</>,
-    description: (
-      <>
-        Type-safe database with Drizzle ORM. RESTful APIs and real-time
-        subscriptions ready.
-      </>
-    ),
-    icon: Database,
-    category: <>Backend</>,
-  },
-  {
-    id: "analytics-insights",
-    title: <>Analytics & Insights</>,
-    description: (
-      <>
-        User behavior tracking, conversion metrics, and beautiful dashboards for
-        data-driven decisions.
-      </>
-    ),
-    icon: BarChart3,
-    category: <>Analytics</>,
-  },
-  {
-    id: "modern-ui-ux",
-    title: <>Modern UI/UX</>,
-    description: (
-      <>
-        Beautiful, responsive design with dark mode. Accessible components and
-        smooth animations.
-      </>
-    ),
-    icon: Palette,
-    category: <>Design</>,
-  },
-  {
-    id: "production-deploy",
-    title: <>Production Deploy</>,
-    description: (
-      <>
-        One-click deployment to Vercel, AWS, or Docker. CI/CD pipelines and
-        monitoring included.
-      </>
-    ),
-    icon: Rocket,
-    category: <>DevOps</>,
-  },
-];
-
-const featureStats: {
-  id: string;
-  label: React.ReactNode;
-  value: React.ReactNode;
-}[] = [
-    { id: "components", label: <>Components</>, value: <>50+</> },
-    { id: "integrations", label: <>Integrations</>, value: <>10+</> },
-    { id: "type-safe", label: <>Type Safe</>, value: <>100%</> },
-  ];
-
 function FeatureCard({ feature }: { feature: Feature }) {
   const IconComponent = feature.icon;
 
@@ -133,6 +48,103 @@ function FeatureCard({ feature }: { feature: Feature }) {
 }
 
 export function Features() {
+  const features: Feature[] = [
+    {
+      id: "auth-users",
+      title: <>Authentication & Users</>,
+      description: (
+        <>
+          Complete auth system with OAuth, magic links, and user management.
+          Role-based access control included.
+        </>
+      ),
+      icon: Shield,
+      category: <>Security</>,
+    },
+    {
+      id: "payments-billing",
+      title: <>Payments & Billing</>,
+      description: (
+        <>
+          Flexible payment integration with subscriptions, and billing
+          management. Revenue tracking built-in.
+        </>
+      ),
+      icon: CreditCard,
+      category: <>Payments</>,
+    },
+    {
+      id: "database-api",
+      title: <>Database & API</>,
+      description: (
+        <>
+          Type-safe database with Drizzle ORM. RESTful APIs and real-time
+          subscriptions ready.
+        </>
+      ),
+      icon: Database,
+      category: <>Backend</>,
+    },
+    {
+      id: "analytics-insights",
+      title: <>Analytics & Insights</>,
+      description: (
+        <>
+          User behavior tracking, conversion metrics, and beautiful dashboards
+          for data-driven decisions.
+        </>
+      ),
+      icon: BarChart3,
+      category: <>Analytics</>,
+    },
+    {
+      id: "modern-ui-ux",
+      title: <>Modern UI/UX</>,
+      description: (
+        <>
+          Beautiful, responsive design with dark mode. Accessible components
+          and smooth animations.
+        </>
+      ),
+      icon: Palette,
+      category: <>Design</>,
+    },
+    {
+      id: "production-deploy",
+      title: <>Production Deploy</>,
+      description: (
+        <>
+          One-click deployment to Vercel, AWS, or Docker. CI/CD pipelines and
+          monitoring included.
+        </>
+      ),
+      icon: Rocket,
+      category: <>DevOps</>,
+    },
+  ];
+
+  const featureStats: {
+    id: string;
+    label: React.ReactNode;
+    value: React.ReactNode;
+  }[] = [
+    {
+      id: "components",
+      label: <>Components</>,
+      value: <span data-lingo-skip>50+</span>,
+    },
+    {
+      id: "integrations",
+      label: <>Integrations</>,
+      value: <span data-lingo-skip>10+</span>,
+    },
+    {
+      id: "type-safe",
+      label: <>Type Safe</>,
+      value: <span data-lingo-skip>100%</span>,
+    },
+  ];
+
   return (
     <section className="bg-background border-border relative border-b py-24">
       <div className="relative mx-auto max-w-7xl px-6 lg:px-8">

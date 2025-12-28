@@ -105,7 +105,7 @@ export function GenericForm({
         return (
           <Input
             type="tel"
-            placeholder="+1 (555) 123-4567"
+            placeholder={"+1 (555) 123-4567"}
             {...field}
             value={String(value)}
           />
@@ -123,7 +123,7 @@ export function GenericForm({
               type="text"
               {...field}
               value={String(value)}
-              placeholder="#000000"
+              placeholder={"#000000"}
               className="flex-1"
             />
           </div>
@@ -184,7 +184,10 @@ export function GenericForm({
       case "currency":
         return (
           <div className="relative">
-            <span className="absolute top-1/2 left-3 -translate-y-1/2 transform text-gray-500">
+            <span
+              className="absolute top-1/2 left-3 -translate-y-1/2 transform text-gray-500"
+              data-lingo-skip
+            >
               $
             </span>
             <Input
@@ -194,7 +197,7 @@ export function GenericForm({
               className="pl-8"
               {...field}
               onChange={(e) => field.onChange(Number(e.target.value))}
-              placeholder="0.00"
+              placeholder={(0).toFixed(2)}
             />
           </div>
         );

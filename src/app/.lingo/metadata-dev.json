@@ -1,0 +1,1059 @@
+{
+  "entries": {
+    "ff157f14e5ee": {
+      "type": "content",
+      "sourceText": "Loading...",
+      "context": {
+        "componentName": "Loading",
+        "filePath": "loading.tsx"
+      },
+      "hash": "ff157f14e5ee",
+      "location": {
+        "filePath": "loading.tsx",
+        "line": 20,
+        "column": 10
+      }
+    },
+    "f85fe992eabd": {
+      "type": "content",
+      "sourceText": "Error 404",
+      "context": {
+        "componentName": "NotFound",
+        "filePath": "not-found.tsx"
+      },
+      "hash": "f85fe992eabd",
+      "location": {
+        "filePath": "not-found.tsx",
+        "line": 15,
+        "column": 10
+      }
+    },
+    "9dc6e90df7af": {
+      "type": "content",
+      "sourceText": "404",
+      "context": {
+        "componentName": "NotFound",
+        "filePath": "not-found.tsx"
+      },
+      "hash": "9dc6e90df7af",
+      "location": {
+        "filePath": "not-found.tsx",
+        "line": 20,
+        "column": 10
+      }
+    },
+    "265030f7b76d": {
+      "type": "content",
+      "sourceText": "Page Not Found",
+      "context": {
+        "componentName": "NotFound",
+        "filePath": "not-found.tsx"
+      },
+      "hash": "265030f7b76d",
+      "location": {
+        "filePath": "not-found.tsx",
+        "line": 27,
+        "column": 10
+      }
+    },
+    "69d0c047aa0a": {
+      "type": "content",
+      "sourceText": "The page you're looking for doesn't exist or has been moved. Let's get you back on track.",
+      "context": {
+        "componentName": "NotFound",
+        "filePath": "not-found.tsx"
+      },
+      "hash": "69d0c047aa0a",
+      "location": {
+        "filePath": "not-found.tsx",
+        "line": 30,
+        "column": 10
+      }
+    },
+    "3eb9be0656d5": {
+      "type": "content",
+      "sourceText": "Go to Dashboard",
+      "context": {
+        "componentName": "NotFound",
+        "filePath": "not-found.tsx"
+      },
+      "hash": "3eb9be0656d5",
+      "location": {
+        "filePath": "not-found.tsx",
+        "line": 39,
+        "column": 12
+      }
+    },
+    "48f2b4eb13b2": {
+      "type": "content",
+      "sourceText": "Back to Home",
+      "context": {
+        "componentName": "NotFound",
+        "filePath": "not-found.tsx"
+      },
+      "hash": "48f2b4eb13b2",
+      "location": {
+        "filePath": "not-found.tsx",
+        "line": 46,
+        "column": 12
+      }
+    },
+    "157a7f0f1794": {
+      "type": "content",
+      "sourceText": "Need help? <Link0>Contact our support team </Link0>",
+      "context": {
+        "componentName": "NotFound",
+        "filePath": "not-found.tsx"
+      },
+      "hash": "157a7f0f1794",
+      "location": {
+        "filePath": "not-found.tsx",
+        "line": 55,
+        "column": 10
+      }
+    },
+    "52208cf678c3": {
+      "type": "content",
+      "sourceText": "We value your privacy",
+      "context": {
+        "componentName": "CookieConsent",
+        "filePath": "../components/cookie-consent.tsx"
+      },
+      "hash": "52208cf678c3",
+      "location": {
+        "filePath": "../components/cookie-consent.tsx",
+        "line": 34,
+        "column": 10
+      }
+    },
+    "2e8f6ba34468": {
+      "type": "content",
+      "sourceText": "We use cookies to enhance your browsing experience, serve personalized items or content, and analyze our traffic. By clicking \"Accept All\", you consent to our use of cookies.",
+      "context": {
+        "componentName": "CookieConsent",
+        "filePath": "../components/cookie-consent.tsx"
+      },
+      "hash": "2e8f6ba34468",
+      "location": {
+        "filePath": "../components/cookie-consent.tsx",
+        "line": 35,
+        "column": 10
+      }
+    },
+    "9f97b7064f0a": {
+      "type": "content",
+      "sourceText": "Essential Only",
+      "context": {
+        "componentName": "CookieConsent",
+        "filePath": "../components/cookie-consent.tsx"
+      },
+      "hash": "9f97b7064f0a",
+      "location": {
+        "filePath": "../components/cookie-consent.tsx",
+        "line": 42,
+        "column": 10
+      }
+    },
+    "6cf0bafc6010": {
+      "type": "content",
+      "sourceText": "Accept All",
+      "context": {
+        "componentName": "CookieConsent",
+        "filePath": "../components/cookie-consent.tsx"
+      },
+      "hash": "6cf0bafc6010",
+      "location": {
+        "filePath": "../components/cookie-consent.tsx",
+        "line": 48,
+        "column": 10
+      }
+    },
+    "ea9a1ecc7b77": {
+      "type": "attribute",
+      "sourceText": "Close cookie notice",
+      "context": {
+        "attributeName": "aria-label",
+        "componentName": "CookieConsent",
+        "filePath": "../components/cookie-consent.tsx"
+      },
+      "hash": "ea9a1ecc7b77",
+      "location": {
+        "filePath": "../components/cookie-consent.tsx",
+        "line": 54,
+        "column": 10
+      }
+    },
+    "b6a688241324": {
+      "type": "content",
+      "sourceText": "Dashboard",
+      "context": {
+        "componentName": "AuthButtons",
+        "filePath": "../components/homepage/header.tsx"
+      },
+      "hash": "b6a688241324",
+      "location": {
+        "filePath": "../components/homepage/header.tsx",
+        "line": 219,
+        "column": 12
+      }
+    },
+    "1b3994ce939c": {
+      "type": "content",
+      "sourceText": "Sign In",
+      "context": {
+        "componentName": "AuthButtons",
+        "filePath": "../components/homepage/header.tsx"
+      },
+      "hash": "1b3994ce939c",
+      "location": {
+        "filePath": "../components/homepage/header.tsx",
+        "line": 229,
+        "column": 28
+      }
+    },
+    "486c5aa9148d": {
+      "type": "content",
+      "sourceText": "Get Started",
+      "context": {
+        "componentName": "AuthButtons",
+        "filePath": "../components/homepage/header.tsx"
+      },
+      "hash": "486c5aa9148d",
+      "location": {
+        "filePath": "../components/homepage/header.tsx",
+        "line": 232,
+        "column": 29
+      }
+    },
+    "0a5ad6dc85dc": {
+      "type": "content",
+      "sourceText": "Dashboard",
+      "context": {
+        "componentName": "MobileAuthButtons",
+        "filePath": "../components/homepage/header.tsx"
+      },
+      "hash": "0a5ad6dc85dc",
+      "location": {
+        "filePath": "../components/homepage/header.tsx",
+        "line": 267,
+        "column": 12
+      }
+    },
+    "21dacd496b51": {
+      "type": "content",
+      "sourceText": "Sign In",
+      "context": {
+        "componentName": "MobileAuthButtons",
+        "filePath": "../components/homepage/header.tsx"
+      },
+      "hash": "21dacd496b51",
+      "location": {
+        "filePath": "../components/homepage/header.tsx",
+        "line": 277,
+        "column": 28
+      }
+    },
+    "7df33026900e": {
+      "type": "content",
+      "sourceText": "Get Started",
+      "context": {
+        "componentName": "MobileAuthButtons",
+        "filePath": "../components/homepage/header.tsx"
+      },
+      "hash": "7df33026900e",
+      "location": {
+        "filePath": "../components/homepage/header.tsx",
+        "line": 280,
+        "column": 29
+      }
+    },
+    "c1b9da2cd5ed": {
+      "type": "content",
+      "sourceText": "Navigation Menu",
+      "context": {
+        "componentName": "MobileNavigation",
+        "filePath": "../components/homepage/header.tsx"
+      },
+      "hash": "c1b9da2cd5ed",
+      "location": {
+        "filePath": "../components/homepage/header.tsx",
+        "line": 298,
+        "column": 40
+      }
+    },
+    "101443566b3f": {
+      "type": "content",
+      "sourceText": "Toggle menu",
+      "context": {
+        "componentName": "Header",
+        "filePath": "../components/homepage/header.tsx"
+      },
+      "hash": "101443566b3f",
+      "location": {
+        "filePath": "../components/homepage/header.tsx",
+        "line": 403,
+        "column": 42
+      }
+    },
+    "3e2a796b4a42": {
+      "type": "content",
+      "sourceText": "Complete UllrAI Micro SaaS starter with authentication, payments, database, and deployment.",
+      "context": {
+        "componentName": "Footer",
+        "filePath": "../components/homepage/footer.tsx"
+      },
+      "hash": "3e2a796b4a42",
+      "location": {
+        "filePath": "../components/homepage/footer.tsx",
+        "line": 185,
+        "column": 14
+      }
+    },
+    "32273ad2821d": {
+      "type": "content",
+      "sourceText": "© {currentYear}{COMPANY_NAME}. All rights reserved.",
+      "context": {
+        "componentName": "Footer",
+        "filePath": "../components/homepage/footer.tsx"
+      },
+      "hash": "32273ad2821d",
+      "location": {
+        "filePath": "../components/homepage/footer.tsx",
+        "line": 237,
+        "column": 14
+      }
+    },
+    "1a21ba53234d": {
+      "type": "content",
+      "sourceText": "by UllrAI, for developers",
+      "context": {
+        "componentName": "Footer",
+        "filePath": "../components/homepage/footer.tsx"
+      },
+      "hash": "1a21ba53234d",
+      "location": {
+        "filePath": "../components/homepage/footer.tsx",
+        "line": 244,
+        "column": 14
+      }
+    },
+    "4c4b4fbcfa42": {
+      "type": "content",
+      "sourceText": "Close",
+      "context": {
+        "componentName": "SheetContent",
+        "filePath": "../components/ui/sheet.tsx"
+      },
+      "hash": "4c4b4fbcfa42",
+      "location": {
+        "filePath": "../components/ui/sheet.tsx",
+        "line": 77,
+        "column": 10
+      }
+    },
+    "633ab2b5ac19": {
+      "type": "content",
+      "sourceText": "Light",
+      "context": {
+        "componentName": "ModeToggle",
+        "filePath": "../components/mode-toggle.tsx"
+      },
+      "hash": "633ab2b5ac19",
+      "location": {
+        "filePath": "../components/mode-toggle.tsx",
+        "line": 64,
+        "column": 22
+      }
+    },
+    "fc6abaf0bb43": {
+      "type": "content",
+      "sourceText": "Toggle theme",
+      "context": {
+        "componentName": "ModeToggle",
+        "filePath": "../components/mode-toggle.tsx"
+      },
+      "hash": "fc6abaf0bb43",
+      "location": {
+        "filePath": "../components/mode-toggle.tsx",
+        "line": 79,
+        "column": 6
+      }
+    },
+    "071b501434e5": {
+      "type": "content",
+      "sourceText": "Select language",
+      "context": {
+        "componentName": "LocaleSwitcher",
+        "filePath": "../components/locale-switcher.tsx"
+      },
+      "hash": "071b501434e5",
+      "location": {
+        "filePath": "../components/locale-switcher.tsx",
+        "line": 101,
+        "column": 10
+      }
+    },
+    "feab2f5f92ed": {
+      "type": "content",
+      "sourceText": "Language",
+      "context": {
+        "componentName": "LocaleSwitcher",
+        "filePath": "../components/locale-switcher.tsx"
+      },
+      "hash": "feab2f5f92ed",
+      "location": {
+        "filePath": "../components/locale-switcher.tsx",
+        "line": 109,
+        "column": 8
+      }
+    },
+    "1d640db6350c": {
+      "type": "content",
+      "sourceText": "Launch your SaaS in hours",
+      "context": {
+        "componentName": "CallToAction",
+        "filePath": "../components/homepage/call-to-action.tsx"
+      },
+      "hash": "1d640db6350c",
+      "location": {
+        "filePath": "../components/homepage/call-to-action.tsx",
+        "line": 26,
+        "column": 14
+      }
+    },
+    "b5e6c1253c45": {
+      "type": "content",
+      "sourceText": "Everything you need to ship a Micro SaaS",
+      "context": {
+        "componentName": "CallToAction",
+        "filePath": "../components/homepage/call-to-action.tsx"
+      },
+      "hash": "b5e6c1253c45",
+      "location": {
+        "filePath": "../components/homepage/call-to-action.tsx",
+        "line": 29,
+        "column": 14
+      }
+    },
+    "ab55ed2b1ea9": {
+      "type": "content",
+      "sourceText": "Auth, billing, and marketing pages already wired together so your next release can focus on the product, not the scaffolding.",
+      "context": {
+        "componentName": "CallToAction",
+        "filePath": "../components/homepage/call-to-action.tsx"
+      },
+      "hash": "ab55ed2b1ea9",
+      "location": {
+        "filePath": "../components/homepage/call-to-action.tsx",
+        "line": 32,
+        "column": 14
+      }
+    },
+    "f5c760cd1415": {
+      "type": "content",
+      "sourceText": "Start free trial",
+      "context": {
+        "componentName": "CallToAction",
+        "filePath": "../components/homepage/call-to-action.tsx"
+      },
+      "hash": "f5c760cd1415",
+      "location": {
+        "filePath": "../components/homepage/call-to-action.tsx",
+        "line": 55,
+        "column": 16
+      }
+    },
+    "f3639f732adb": {
+      "type": "content",
+      "sourceText": "See what's inside",
+      "context": {
+        "componentName": "CallToAction",
+        "filePath": "../components/homepage/call-to-action.tsx"
+      },
+      "hash": "f3639f732adb",
+      "location": {
+        "filePath": "../components/homepage/call-to-action.tsx",
+        "line": 67,
+        "column": 16
+      }
+    },
+    "2951b50e7336": {
+      "type": "content",
+      "sourceText": "Cancel anytime • Keep your code • Works with your current stack",
+      "context": {
+        "componentName": "CallToAction",
+        "filePath": "../components/homepage/call-to-action.tsx"
+      },
+      "hash": "2951b50e7336",
+      "location": {
+        "filePath": "../components/homepage/call-to-action.tsx",
+        "line": 73,
+        "column": 12
+      }
+    },
+    "9a9cd28c083b": {
+      "type": "content",
+      "sourceText": "\"{expression0}\"",
+      "context": {
+        "componentName": "TestimonialCard",
+        "filePath": "../components/homepage/social-proof-testimonials.tsx"
+      },
+      "hash": "9a9cd28c083b",
+      "location": {
+        "filePath": "../components/homepage/social-proof-testimonials.tsx",
+        "line": 204,
+        "column": 8
+      }
+    },
+    "b400068cf2ae": {
+      "type": "content",
+      "sourceText": "{expression0} @ {expression1}",
+      "context": {
+        "componentName": "TestimonialCard",
+        "filePath": "../components/homepage/social-proof-testimonials.tsx"
+      },
+      "hash": "b400068cf2ae",
+      "location": {
+        "filePath": "../components/homepage/social-proof-testimonials.tsx",
+        "line": 224,
+        "column": 12
+      }
+    },
+    "72edb7527f54": {
+      "type": "content",
+      "sourceText": "Metrics",
+      "context": {
+        "componentName": "SocialProofUnified",
+        "filePath": "../components/homepage/social-proof-testimonials.tsx"
+      },
+      "hash": "72edb7527f54",
+      "location": {
+        "filePath": "../components/homepage/social-proof-testimonials.tsx",
+        "line": 267,
+        "column": 14
+      }
+    },
+    "03912f55a7af": {
+      "type": "content",
+      "sourceText": "Join thousands of developers",
+      "context": {
+        "componentName": "SocialProofUnified",
+        "filePath": "../components/homepage/social-proof-testimonials.tsx"
+      },
+      "hash": "03912f55a7af",
+      "location": {
+        "filePath": "../components/homepage/social-proof-testimonials.tsx",
+        "line": 270,
+        "column": 14
+      }
+    },
+    "c2cf7c399142": {
+      "type": "content",
+      "sourceText": "Building successful SaaS products with our starter kit",
+      "context": {
+        "componentName": "SocialProofUnified",
+        "filePath": "../components/homepage/social-proof-testimonials.tsx"
+      },
+      "hash": "c2cf7c399142",
+      "location": {
+        "filePath": "../components/homepage/social-proof-testimonials.tsx",
+        "line": 273,
+        "column": 14
+      }
+    },
+    "3473d1cb892f": {
+      "type": "content",
+      "sourceText": "Community",
+      "context": {
+        "componentName": "SocialProofUnified",
+        "filePath": "../components/homepage/social-proof-testimonials.tsx"
+      },
+      "hash": "3473d1cb892f",
+      "location": {
+        "filePath": "../components/homepage/social-proof-testimonials.tsx",
+        "line": 292,
+        "column": 14
+      }
+    },
+    "6d8a183af4f2": {
+      "type": "content",
+      "sourceText": "Loved by developers worldwide",
+      "context": {
+        "componentName": "SocialProofUnified",
+        "filePath": "../components/homepage/social-proof-testimonials.tsx"
+      },
+      "hash": "6d8a183af4f2",
+      "location": {
+        "filePath": "../components/homepage/social-proof-testimonials.tsx",
+        "line": 296,
+        "column": 14
+      }
+    },
+    "c350006e7ed0": {
+      "type": "content",
+      "sourceText": "See what our community has to say about their experience",
+      "context": {
+        "componentName": "SocialProofUnified",
+        "filePath": "../components/homepage/social-proof-testimonials.tsx"
+      },
+      "hash": "c350006e7ed0",
+      "location": {
+        "filePath": "../components/homepage/social-proof-testimonials.tsx",
+        "line": 300,
+        "column": 14
+      }
+    },
+    "0d4a6252c025": {
+      "type": "content",
+      "sourceText": "Trusted by innovative companies",
+      "context": {
+        "componentName": "SocialProofUnified",
+        "filePath": "../components/homepage/social-proof-testimonials.tsx"
+      },
+      "hash": "0d4a6252c025",
+      "location": {
+        "filePath": "../components/homepage/social-proof-testimonials.tsx",
+        "line": 314,
+        "column": 12
+      }
+    },
+    "1df0c993dd96": {
+      "type": "content",
+      "sourceText": "Want to share your success story?",
+      "context": {
+        "componentName": "SocialProofUnified",
+        "filePath": "../components/homepage/social-proof-testimonials.tsx"
+      },
+      "hash": "1df0c993dd96",
+      "location": {
+        "filePath": "../components/homepage/social-proof-testimonials.tsx",
+        "line": 334,
+        "column": 10
+      }
+    },
+    "da8969094f9c": {
+      "type": "content",
+      "sourceText": "Get in touch",
+      "context": {
+        "componentName": "SocialProofUnified",
+        "filePath": "../components/homepage/social-proof-testimonials.tsx"
+      },
+      "hash": "da8969094f9c",
+      "location": {
+        "filePath": "../components/homepage/social-proof-testimonials.tsx",
+        "line": 339,
+        "column": 12
+      }
+    },
+    "27637445a390": {
+      "type": "content",
+      "sourceText": "OpenSource READY",
+      "context": {
+        "componentName": "Hero",
+        "filePath": "../components/homepage/hero.tsx"
+      },
+      "hash": "27637445a390",
+      "location": {
+        "filePath": "../components/homepage/hero.tsx",
+        "line": 43,
+        "column": 16
+      }
+    },
+    "0d215432b916": {
+      "type": "content",
+      "sourceText": "SHIP YOUR",
+      "context": {
+        "componentName": "Hero",
+        "filePath": "../components/homepage/hero.tsx"
+      },
+      "hash": "0d215432b916",
+      "location": {
+        "filePath": "../components/homepage/hero.tsx",
+        "line": 51,
+        "column": 14
+      }
+    },
+    "dc60ca177371": {
+      "type": "content",
+      "sourceText": "MICRO SaaS",
+      "context": {
+        "componentName": "Hero",
+        "filePath": "../components/homepage/hero.tsx"
+      },
+      "hash": "dc60ca177371",
+      "location": {
+        "filePath": "../components/homepage/hero.tsx",
+        "line": 53,
+        "column": 14
+      }
+    },
+    "7f5f01b9c583": {
+      "type": "content",
+      "sourceText": "Complete UllrAI SaaS starter with authentication, payments, database, and deployment. Everything you need to go from idea to revenue.",
+      "context": {
+        "componentName": "Hero",
+        "filePath": "../components/homepage/hero.tsx"
+      },
+      "hash": "7f5f01b9c583",
+      "location": {
+        "filePath": "../components/homepage/hero.tsx",
+        "line": 62,
+        "column": 14
+      }
+    },
+    "5ca2efaa38e7": {
+      "type": "content",
+      "sourceText": "START NOW",
+      "context": {
+        "componentName": "Hero",
+        "filePath": "../components/homepage/hero.tsx"
+      },
+      "hash": "5ca2efaa38e7",
+      "location": {
+        "filePath": "../components/homepage/hero.tsx",
+        "line": 79,
+        "column": 18
+      }
+    },
+    "bcdba13571bc": {
+      "type": "content",
+      "sourceText": "VIEW SOURCE",
+      "context": {
+        "componentName": "Hero",
+        "filePath": "../components/homepage/hero.tsx"
+      },
+      "hash": "bcdba13571bc",
+      "location": {
+        "filePath": "../components/homepage/hero.tsx",
+        "line": 92,
+        "column": 18
+      }
+    },
+    "3b0992453af3": {
+      "type": "content",
+      "sourceText": "developer-console",
+      "context": {
+        "componentName": "Hero",
+        "filePath": "../components/homepage/hero.tsx"
+      },
+      "hash": "3b0992453af3",
+      "location": {
+        "filePath": "../components/homepage/hero.tsx",
+        "line": 113,
+        "column": 18
+      }
+    },
+    "776ad5070487": {
+      "type": "content",
+      "sourceText": "user@saas-starter:~/projects/my-app",
+      "context": {
+        "componentName": "Hero",
+        "filePath": "../components/homepage/hero.tsx"
+      },
+      "hash": "776ad5070487",
+      "location": {
+        "filePath": "../components/homepage/hero.tsx",
+        "line": 118,
+        "column": 16
+      }
+    },
+    "c534cfbe1809": {
+      "type": "content",
+      "sourceText": "➜",
+      "context": {
+        "componentName": "Hero",
+        "filePath": "../components/homepage/hero.tsx"
+      },
+      "hash": "c534cfbe1809",
+      "location": {
+        "filePath": "../components/homepage/hero.tsx",
+        "line": 129,
+        "column": 22
+      }
+    },
+    "67ecb61bc5ab": {
+      "type": "content",
+      "sourceText": "What's Included",
+      "context": {
+        "componentName": "Hero",
+        "filePath": "../components/homepage/hero.tsx"
+      },
+      "hash": "67ecb61bc5ab",
+      "location": {
+        "filePath": "../components/homepage/hero.tsx",
+        "line": 194,
+        "column": 22
+      }
+    },
+    "e06b553560b0": {
+      "type": "content",
+      "sourceText": "Production Ready",
+      "context": {
+        "componentName": "Hero",
+        "filePath": "../components/homepage/hero.tsx"
+      },
+      "hash": "e06b553560b0",
+      "location": {
+        "filePath": "../components/homepage/hero.tsx",
+        "line": 199,
+        "column": 24
+      }
+    },
+    "4066b8c39411": {
+      "type": "content",
+      "sourceText": "✓",
+      "context": {
+        "componentName": "Hero",
+        "filePath": "../components/homepage/hero.tsx"
+      },
+      "hash": "4066b8c39411",
+      "location": {
+        "filePath": "../components/homepage/hero.tsx",
+        "line": 228,
+        "column": 24
+      }
+    },
+    "263c630a7465": {
+      "type": "content",
+      "sourceText": "Authentication",
+      "context": {
+        "componentName": "Hero",
+        "filePath": "../components/homepage/hero.tsx"
+      },
+      "hash": "263c630a7465",
+      "location": {
+        "filePath": "../components/homepage/hero.tsx",
+        "line": 209,
+        "column": 30
+      }
+    },
+    "b97ebbba5348": {
+      "type": "content",
+      "sourceText": "Database",
+      "context": {
+        "componentName": "Hero",
+        "filePath": "../components/homepage/hero.tsx"
+      },
+      "hash": "b97ebbba5348",
+      "location": {
+        "filePath": "../components/homepage/hero.tsx",
+        "line": 213,
+        "column": 30
+      }
+    },
+    "e491575b096c": {
+      "type": "content",
+      "sourceText": "Payments",
+      "context": {
+        "componentName": "Hero",
+        "filePath": "../components/homepage/hero.tsx"
+      },
+      "hash": "e491575b096c",
+      "location": {
+        "filePath": "../components/homepage/hero.tsx",
+        "line": 217,
+        "column": 30
+      }
+    },
+    "fbc327ab616c": {
+      "type": "content",
+      "sourceText": "File Upload",
+      "context": {
+        "componentName": "Hero",
+        "filePath": "../components/homepage/hero.tsx"
+      },
+      "hash": "fbc327ab616c",
+      "location": {
+        "filePath": "../components/homepage/hero.tsx",
+        "line": 221,
+        "column": 30
+      }
+    },
+    "513c6c9f2f2d": {
+      "type": "content",
+      "sourceText": "Admin Panel",
+      "context": {
+        "componentName": "Hero",
+        "filePath": "../components/homepage/hero.tsx"
+      },
+      "hash": "513c6c9f2f2d",
+      "location": {
+        "filePath": "../components/homepage/hero.tsx",
+        "line": 225,
+        "column": 30
+      }
+    },
+    "9ea7187fe075": {
+      "type": "content",
+      "sourceText": "i18n Ready",
+      "context": {
+        "componentName": "Hero",
+        "filePath": "../components/homepage/hero.tsx"
+      },
+      "hash": "9ea7187fe075",
+      "location": {
+        "filePath": "../components/homepage/hero.tsx",
+        "line": 229,
+        "column": 30
+      }
+    },
+    "294c92fc4b97": {
+      "type": "content",
+      "sourceText": "Built with",
+      "context": {
+        "componentName": "Hero",
+        "filePath": "../components/homepage/hero.tsx"
+      },
+      "hash": "294c92fc4b97",
+      "location": {
+        "filePath": "../components/homepage/hero.tsx",
+        "line": 236,
+        "column": 22
+      }
+    },
+    "b919bb68ac72": {
+      "type": "content",
+      "sourceText": "+",
+      "context": {
+        "componentName": "Hero",
+        "filePath": "../components/homepage/hero.tsx"
+      },
+      "hash": "b919bb68ac72",
+      "location": {
+        "filePath": "../components/homepage/hero.tsx",
+        "line": 238,
+        "column": 33
+      }
+    },
+    "efc548b08e2e": {
+      "type": "content",
+      "sourceText": "Features",
+      "context": {
+        "componentName": "Features",
+        "filePath": "../components/homepage/features.tsx"
+      },
+      "hash": "efc548b08e2e",
+      "location": {
+        "filePath": "../components/homepage/features.tsx",
+        "line": 143,
+        "column": 12
+      }
+    },
+    "0f15e8c629ca": {
+      "type": "content",
+      "sourceText": "Everything you need to",
+      "context": {
+        "componentName": "Features",
+        "filePath": "../components/homepage/features.tsx"
+      },
+      "hash": "0f15e8c629ca",
+      "location": {
+        "filePath": "../components/homepage/features.tsx",
+        "line": 147,
+        "column": 12
+      }
+    },
+    "1f3a328313a1": {
+      "type": "content",
+      "sourceText": "build and scale",
+      "context": {
+        "componentName": "Features",
+        "filePath": "../components/homepage/features.tsx"
+      },
+      "hash": "1f3a328313a1",
+      "location": {
+        "filePath": "../components/homepage/features.tsx",
+        "line": 149,
+        "column": 14
+      }
+    },
+    "2f108eeb8360": {
+      "type": "content",
+      "sourceText": "Skip months of development. Our SaaS Starter includes all the essential features you need to launch your product.",
+      "context": {
+        "componentName": "Features",
+        "filePath": "../components/homepage/features.tsx"
+      },
+      "hash": "2f108eeb8360",
+      "location": {
+        "filePath": "../components/homepage/features.tsx",
+        "line": 154,
+        "column": 12
+      }
+    },
+    "da500ce65c04": {
+      "type": "content",
+      "sourceText": "UllrAI Lab",
+      "context": {
+        "componentName": "OtherProducts",
+        "filePath": "../components/homepage/other-products.tsx"
+      },
+      "hash": "da500ce65c04",
+      "location": {
+        "filePath": "../components/homepage/other-products.tsx",
+        "line": 105,
+        "column": 12
+      }
+    },
+    "4472a97a29b8": {
+      "type": "content",
+      "sourceText": "Explore our other tools",
+      "context": {
+        "componentName": "OtherProducts",
+        "filePath": "../components/homepage/other-products.tsx"
+      },
+      "hash": "4472a97a29b8",
+      "location": {
+        "filePath": "../components/homepage/other-products.tsx",
+        "line": 108,
+        "column": 12
+      }
+    },
+    "bcbdbdfff8df": {
+      "type": "content",
+      "sourceText": "AI-powered utilities that help creators, developers, and teams ship faster every day.",
+      "context": {
+        "componentName": "OtherProducts",
+        "filePath": "../components/homepage/other-products.tsx"
+      },
+      "hash": "bcbdbdfff8df",
+      "location": {
+        "filePath": "../components/homepage/other-products.tsx",
+        "line": 111,
+        "column": 12
+      }
+    },
+    "3451ca61aae6": {
+      "type": "content",
+      "sourceText": "Have an idea for another tool?",
+      "context": {
+        "componentName": "OtherProducts",
+        "filePath": "../components/homepage/other-products.tsx"
+      },
+      "hash": "3451ca61aae6",
+      "location": {
+        "filePath": "../components/homepage/other-products.tsx",
+        "line": 164,
+        "column": 10
+      }
+    },
+    "d0ba1003dd5e": {
+      "type": "content",
+      "sourceText": "Let us know",
+      "context": {
+        "componentName": "OtherProducts",
+        "filePath": "../components/homepage/other-products.tsx"
+      },
+      "hash": "d0ba1003dd5e",
+      "location": {
+        "filePath": "../components/homepage/other-products.tsx",
+        "line": 169,
+        "column": 12
+      }
+    }
+  },
+  "stats": {
+    "totalEntries": 75,
+    "lastUpdated": "2025-12-28T07:33:22.047Z"
+  }
+}

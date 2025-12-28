@@ -78,11 +78,13 @@ export default function HomeRoute() {
             <DollarSign className="text-muted-foreground h-4 w-4" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold font-mono">$45,231.89</div>
+            <div className="text-2xl font-bold font-mono" data-lingo-skip>
+              $45,231.89
+            </div>
             <p className="text-muted-foreground text-xs">
               <span className="text-emerald-600 flex items-center gap-1 font-medium">
                 <TrendingUp className="h-3 w-3" />
-                +20.1%
+                <span data-lingo-skip>+20.1%</span>
               </span>
               <span className="opacity-70">from last month</span>
             </p>
@@ -95,11 +97,13 @@ export default function HomeRoute() {
             <Users className="text-muted-foreground h-4 w-4" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold font-mono">+2,350</div>
+            <div className="text-2xl font-bold font-mono" data-lingo-skip>
+              +2,350
+            </div>
             <p className="text-muted-foreground text-xs">
               <span className="text-emerald-600 flex items-center gap-1 font-medium">
                 <TrendingUp className="h-3 w-3" />
-                +180.1%
+                <span data-lingo-skip>+180.1%</span>
               </span>
               <span className="opacity-70">from last month</span>
             </p>
@@ -112,11 +116,13 @@ export default function HomeRoute() {
             <Activity className="text-muted-foreground h-4 w-4" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold font-mono">+12,234</div>
+            <div className="text-2xl font-bold font-mono" data-lingo-skip>
+              +12,234
+            </div>
             <p className="text-muted-foreground text-xs">
               <span className="text-emerald-600 flex items-center gap-1 font-medium">
                 <TrendingUp className="h-3 w-3" />
-                +19%
+                <span data-lingo-skip>+19%</span>
               </span>
               <span className="opacity-70">from last month</span>
             </p>
@@ -129,11 +135,13 @@ export default function HomeRoute() {
             <BarChart3 className="text-muted-foreground h-4 w-4" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold font-mono">+573</div>
+            <div className="text-2xl font-bold font-mono" data-lingo-skip>
+              +573
+            </div>
             <p className="text-muted-foreground text-xs">
               <span className="text-emerald-600 flex items-center gap-1 font-medium">
                 <TrendingUp className="h-3 w-3" />
-                +201
+                <span data-lingo-skip>+201</span>
               </span>
               <span className="opacity-70">since last hour</span>
             </p>

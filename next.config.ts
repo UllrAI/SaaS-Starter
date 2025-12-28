@@ -49,20 +49,33 @@ const nextConfig: NextConfig = {
 };
 
 export default async function (): Promise<NextConfig> {
+  const isDev = process.env.NODE_ENV !== "production";
+  const buildModeEnv = process.env.LINGO_BUILD_MODE;
+  const buildMode: "translate" | "cache-only" =
+    buildModeEnv === "translate"
+      ? "translate"
+      : buildModeEnv === "cache-only"
+        ? "cache-only"
+        : isDev
+          ? "translate"
+          : "cache-only";
+  const usePseudotranslator =
+    isDev && process.env.LINGO_USE_PSEUDOTRANSLATOR !== "false";
+
   let config = await withLingo(nextConfig, {
-    sourceRoot: "src/app",
+    sourceRoot: "src",
     lingoDir: ".lingo",
     sourceLocale: SOURCE_LOCALE,
     targetLocales: [...TARGET_LOCALES],
     models: LINGO_MODEL_MAP,
+    dev: {
+      usePseudotranslator,
+    },
     pluralization: {
       enabled: false,
       model: LINGO_PLURALIZATION_MODEL,
     },
-    buildMode:
-      process.env.LINGO_BUILD_MODE === "translate"
-        ? "translate"
-        : "cache-only",
+    buildMode,
   });
 
   // 只有在 process.env.ANALYZE 为 'true' 时才启用 bundle analyzer

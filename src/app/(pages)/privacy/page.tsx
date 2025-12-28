@@ -143,7 +143,8 @@ export default function PrivacyPage() {
                 12345
               </p>
               <p>
-                <strong>Phone:</strong> +1 (555) 123-4567
+                <strong>Phone:</strong>{" "}
+                <span data-lingo-skip>+1 (555) 123-4567</span>
               </p>
             </div>
           </div>

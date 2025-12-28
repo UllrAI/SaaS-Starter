@@ -152,7 +152,10 @@ export function BlogPostCard({
           className="text-primary hover:text-primary/80 inline-flex items-center gap-2 font-medium transition-all duration-200 group-hover:gap-3"
         >
           {readMoreText}
-          <span className="transition-transform group-hover:translate-x-1">
+          <span
+            className="transition-transform group-hover:translate-x-1"
+            data-lingo-skip
+          >
             →
           </span>
         </Link>

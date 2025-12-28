@@ -84,6 +84,7 @@ export default function ContactPage() {
                       <a
                         href="mailto:support@company.com"
                         className="font-mono text-xs"
+                        data-lingo-skip
                       >
                         support@company.com
                       </a>
@@ -131,7 +132,11 @@ export default function ContactPage() {
                       className="w-full"
                       asChild
                     >
-                      <a href="tel:+15551234567" className="font-mono text-xs">
+                      <a
+                        href="tel:+15551234567"
+                        className="font-mono text-xs"
+                        data-lingo-skip
+                      >
                         +1 (555) 123-4567
                       </a>
                     </Button>
@@ -152,7 +157,10 @@ export default function ContactPage() {
                     <p className="text-muted-foreground mb-4 text-sm">
                       Engineering headquarters
                     </p>
-                    <p className="font-mono text-xs leading-relaxed">
+                    <p
+                      className="font-mono text-xs leading-relaxed"
+                      data-lingo-skip
+                    >
                       123 Business St, City, State 12345
                     </p>
                   </CardContent>
@@ -180,13 +188,23 @@ export default function ContactPage() {
                       <span className="text-muted-foreground text-sm">
                         Monday - Friday
                       </span>
-                      <span className="font-mono text-sm">9:00 - 18:00</span>
+                      <span
+                        className="font-mono text-sm"
+                        data-lingo-skip
+                      >
+                        9:00 - 18:00
+                      </span>
                     </div>
                     <div className="flex justify-between border-b pb-2">
                       <span className="text-muted-foreground text-sm">
                         Saturday
                       </span>
-                      <span className="font-mono text-sm">10:00 - 16:00</span>
+                      <span
+                        className="font-mono text-sm"
+                        data-lingo-skip
+                      >
+                        10:00 - 16:00
+                      </span>
                     </div>
                     <div className="flex justify-between pb-2">
                       <span className="text-muted-foreground text-sm">
@@ -209,13 +227,20 @@ export default function ContactPage() {
                       <span className="text-muted-foreground text-sm">
                         Availability
                       </span>
-                      <span className="font-mono text-sm">24/7/365</span>
+                      <span
+                        className="font-mono text-sm"
+                        data-lingo-skip
+                      >
+                        24/7/365
+                      </span>
                     </div>
                     <div className="flex justify-between border-b pb-2">
                       <span className="text-muted-foreground text-sm">
                         Response Time
                       </span>
-                      <span className="font-mono text-sm">&lt; 1 hour</span>
+                      <span className="font-mono text-sm">
+                        Under 1 hour
+                      </span>
                     </div>
                     <div className="flex justify-between pb-2">
                       <span className="text-muted-foreground text-sm">

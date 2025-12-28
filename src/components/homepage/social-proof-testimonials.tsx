@@ -18,172 +18,39 @@ import {
   Terminal,
 } from "lucide-react";
 
-const testimonials = [
-  {
-    id: 1,
-    content: (
-      <>
-        This starter kit saved me months of development time. The payment
-        integration work flawlessly out of the box.
-      </>
-    ),
-    author: {
-      name: "Sarah Chen",
-      role: <>Founder</>,
-      company: "TechFlow",
-      avatar:
-        "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=150&h=150&fit=crop&crop=face",
-      initials: "SC",
-    },
-    rating: 5,
-    featured: true,
-  },
-  {
-    id: 2,
-    content: (
-      <>
-        Clean code, excellent documentation, and responsive support. Everything
-        I needed to launch my SaaS product quickly.
-      </>
-    ),
-    author: {
-      name: "Marcus Rodriguez",
-      role: <>CTO</>,
-      company: "DataViz Pro",
-      avatar:
-        "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
-      initials: "MR",
-    },
-    rating: 5,
-    featured: false,
-  },
-  {
-    id: 3,
-    content: (
-      <>
-        The UI components are beautiful and the dark mode implementation is
-        perfect. My users love the interface.
-      </>
-    ),
-    author: {
-      name: "Emily Watson",
-      role: <>Product Manager</>,
-      company: "CloudSync",
-      avatar:
-        "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
-      initials: "EW",
-    },
-    rating: 5,
-    featured: false,
-  },
-  {
-    id: 4,
-    content: (
-      <>
-        Best investment I&apos;ve made for my startup. The code quality is
-        enterprise-grade and the architecture is scalable.
-      </>
-    ),
-    author: {
-      name: "David Kim",
-      role: <>Lead Developer</>,
-      company: "InnovateLab",
-      avatar:
-        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
-      initials: "DK",
-    },
-    rating: 5,
-    featured: true,
-  },
-  {
-    id: 5,
-    content: (
-      <>
-        Incredible attention to detail. The analytics dashboard and user
-        management features are exactly what I needed.
-      </>
-    ),
-    author: {
-      name: "Lisa Thompson",
-      role: <>Entrepreneur</>,
-      company: "StartupHub",
-      avatar:
-        "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=150&h=150&fit=crop&crop=face",
-      initials: "LT",
-    },
-    rating: 5,
-    featured: false,
-  },
-  {
-    id: 6,
-    content: (
-      <>
-        From idea to production in just 2 weeks. This starter kit is a
-        game-changer for indie developers.
-      </>
-    ),
-    author: {
-      name: "Alex Johnson",
-      role: <>Indie Developer</>,
-      company: "Solo Ventures",
-      avatar:
-        "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face",
-      initials: "AJ",
-    },
-    rating: 5,
-    featured: false,
-  },
-];
+type Testimonial = {
+  id: number;
+  content: React.ReactNode;
+  author: {
+    name: string;
+    role: React.ReactNode;
+    company: string;
+    avatar: string;
+    initials: string;
+  };
+  rating: number;
+  featured: boolean;
+};
 
-const stats = [
-  {
-    id: "developers",
-    icon: Users,
-    value: "10,000+",
-    label: <>Developers</>,
-    description: <>Trust our starter</>,
-  },
-  {
-    id: "projects",
-    icon: TrendingUp,
-    value: "500+",
-    label: <>Projects</>,
-    description: <>Built and launched</>,
-  },
-  {
-    id: "uptime",
-    icon: Award,
-    value: "99.9%",
-    label: <>Uptime</>,
-    description: <>Guaranteed reliability</>,
-  },
-  {
-    id: "rating",
-    icon: CheckCircle,
-    value: "4.9/5",
-    label: <>Rating</>,
-    description: <>Average user rating</>,
-  },
-];
+type Stat = {
+  id: string;
+  icon: React.ComponentType<{ className?: string }>;
+  value: string;
+  label: React.ReactNode;
+  description: React.ReactNode;
+};
 
-const companies = [
-  { id: "supabase", name: "Supabase", icon: Zap, color: "text-foreground" },
-  { id: "neno", name: "Neno", icon: Database, color: "text-foreground" },
-  { id: "github", name: "GitHub", icon: Github, color: "text-foreground" },
-  { id: "slack", name: "Slack", icon: Slack, color: "text-foreground" },
-  { id: "figma", name: "Figma", icon: Figma, color: "text-foreground" },
-  {
-    id: "linkedin",
-    name: "Linkedin",
-    icon: Linkedin,
-    color: "text-foreground",
-  },
-];
+type Company = {
+  id: string;
+  name: string;
+  icon: React.ComponentType<{ className?: string }>;
+  color: string;
+};
 
 function TestimonialCard({
   testimonial,
 }: {
-  testimonial: (typeof testimonials)[0];
+  testimonial: Testimonial;
 }) {
   return (
     <Card className="border-border bg-card hover:border-primary h-full border transition-all duration-300 hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[4px_4px_0px_0px_var(--border)]">
@@ -231,7 +98,7 @@ function TestimonialCard({
   );
 }
 
-function StatCard({ stat }: { stat: (typeof stats)[0] }) {
+function StatCard({ stat }: { stat: Stat }) {
   const IconComponent = stat.icon;
 
   return (
@@ -253,6 +120,168 @@ function StatCard({ stat }: { stat: (typeof stats)[0] }) {
 }
 
 export function SocialProofUnified() {
+  const testimonials: Testimonial[] = [
+    {
+      id: 1,
+      content: (
+        <>
+          This starter kit saved me months of development time. The payment
+          integration work flawlessly out of the box.
+        </>
+      ),
+      author: {
+        name: "Sarah Chen",
+        role: <>Founder</>,
+        company: "TechFlow",
+        avatar:
+          "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=150&h=150&fit=crop&crop=face",
+        initials: "SC",
+      },
+      rating: 5,
+      featured: true,
+    },
+    {
+      id: 2,
+      content: (
+        <>
+          Clean code, excellent documentation, and responsive support.
+          Everything I needed to launch my SaaS product quickly.
+        </>
+      ),
+      author: {
+        name: "Marcus Rodriguez",
+        role: <>CTO</>,
+        company: "DataViz Pro",
+        avatar:
+          "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+        initials: "MR",
+      },
+      rating: 5,
+      featured: false,
+    },
+    {
+      id: 3,
+      content: (
+        <>
+          The UI components are beautiful and the dark mode implementation is
+          perfect. My users love the interface.
+        </>
+      ),
+      author: {
+        name: "Emily Watson",
+        role: <>Product Manager</>,
+        company: "CloudSync",
+        avatar:
+          "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
+        initials: "EW",
+      },
+      rating: 5,
+      featured: false,
+    },
+    {
+      id: 4,
+      content: (
+        <>
+          Best investment I&apos;ve made for my startup. The code quality is
+          enterprise-grade and the architecture is scalable.
+        </>
+      ),
+      author: {
+        name: "David Kim",
+        role: <>Lead Developer</>,
+        company: "InnovateLab",
+        avatar:
+          "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+        initials: "DK",
+      },
+      rating: 5,
+      featured: true,
+    },
+    {
+      id: 5,
+      content: (
+        <>
+          Incredible attention to detail. The analytics dashboard and user
+          management features are exactly what I needed.
+        </>
+      ),
+      author: {
+        name: "Lisa Thompson",
+        role: <>Entrepreneur</>,
+        company: "StartupHub",
+        avatar:
+          "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=150&h=150&fit=crop&crop=face",
+        initials: "LT",
+      },
+      rating: 5,
+      featured: false,
+    },
+    {
+      id: 6,
+      content: (
+        <>
+          From idea to production in just 2 weeks. This starter kit is a
+          game-changer for indie developers.
+        </>
+      ),
+      author: {
+        name: "Alex Johnson",
+        role: <>Indie Developer</>,
+        company: "Solo Ventures",
+        avatar:
+          "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face",
+        initials: "AJ",
+      },
+      rating: 5,
+      featured: false,
+    },
+  ];
+
+  const stats: Stat[] = [
+    {
+      id: "developers",
+      icon: Users,
+      value: "10,000+",
+      label: <>Developers</>,
+      description: <>Trust our starter</>,
+    },
+    {
+      id: "projects",
+      icon: TrendingUp,
+      value: "500+",
+      label: <>Projects</>,
+      description: <>Built and launched</>,
+    },
+    {
+      id: "uptime",
+      icon: Award,
+      value: "99.9%",
+      label: <>Uptime</>,
+      description: <>Guaranteed reliability</>,
+    },
+    {
+      id: "rating",
+      icon: CheckCircle,
+      value: "4.9/5",
+      label: <>Rating</>,
+      description: <>Average user rating</>,
+    },
+  ];
+
+  const companies: Company[] = [
+    { id: "supabase", name: "Supabase", icon: Zap, color: "text-foreground" },
+    { id: "neno", name: "Neno", icon: Database, color: "text-foreground" },
+    { id: "github", name: "GitHub", icon: Github, color: "text-foreground" },
+    { id: "slack", name: "Slack", icon: Slack, color: "text-foreground" },
+    { id: "figma", name: "Figma", icon: Figma, color: "text-foreground" },
+    {
+      id: "linkedin",
+      name: "Linkedin",
+      icon: Linkedin,
+      color: "text-foreground",
+    },
+  ];
+
   return (
     <section className="bg-background border-border relative border-b py-24">
       <div className="relative mx-auto max-w-7xl px-6 lg:px-8">

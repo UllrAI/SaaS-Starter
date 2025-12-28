@@ -18,6 +18,7 @@ const contactMethods = [
     action: "support@company.com",
     href: "mailto:support@company.com",
     label: "EMAIL_GATEWAY",
+    actionSkip: true,
   },
   {
     icon: MessageSquare,
@@ -34,6 +35,7 @@ const contactMethods = [
     action: "+1 (555) 123-4567",
     href: "tel:+15551234567",
     label: "VOICE_CHANNEL",
+    actionSkip: true,
   },
   {
     icon: MapPin,
@@ -42,6 +44,7 @@ const contactMethods = [
     action: "123 Business St, City, State 12345",
     href: "#",
     label: "PHYSICAL_LOCATION",
+    actionSkip: true,
   },
 ];
 
@@ -77,6 +80,7 @@ export function ContactMethods() {
                 <a
                   href={method.href}
                   className="block font-mono text-xs"
+                  data-lingo-skip={method.actionSkip ? true : undefined}
                 >
                   {method.action}
                 </a>

@@ -5,6 +5,7 @@ import { APP_NAME, COMPANY_NAME } from "@/lib/config/constants";
 import env from "@/env";
 
 import { LingoProvider } from "@lingo.dev/compiler/react/next";
+import { getServerLocale } from "@lingo.dev/compiler/virtual/locale/server";
 import { AppProviders } from "@/components/app-providers";
 
 export const metadata = createMetadata({
@@ -36,16 +37,18 @@ export const metadata = createMetadata({
   // manifest: "/manifest.json", // Will add later if PWA is implemented
 });
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getServerLocale();
+
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang={locale} suppressHydrationWarning>
       <head />
       <body suppressHydrationWarning>
-        <LingoProvider devWidget={{ enabled: false }}>
+        <LingoProvider initialLocale={locale} devWidget={{ enabled: false }}>
           <AppProviders>{children}</AppProviders>
         </LingoProvider>
         <Script

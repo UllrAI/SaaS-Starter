@@ -126,7 +126,9 @@ export function Hero() {
                 <div className="border-border overflow-hidden border-b p-6 text-left font-mono text-xs sm:p-8 lg:col-span-7 lg:border-r lg:border-b-0">
                   <div className="bg-secondary/30 border-border mb-6 flex items-center justify-between gap-4 border border-dashed p-4">
                     <div className="flex items-center gap-3 overflow-hidden">
-                      <span className="text-primary font-bold">➜</span>
+                      <span className="text-primary font-bold" data-lingo-skip>
+                        ➜
+                      </span>
                       <span className="text-foreground truncate font-bold">
                         {command}
                       </span>
@@ -205,27 +207,39 @@ export function Hero() {
                   <div className="flex-1 space-y-4">
                     <div className="text-muted-foreground grid grid-cols-1 gap-3 text-sm">
                       <div className="flex items-center gap-2">
-                        <span className="text-primary">✓</span>
+                        <span className="text-primary" data-lingo-skip>
+                          ✓
+                        </span>
                         <span><>Authentication</></span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-primary">✓</span>
+                        <span className="text-primary" data-lingo-skip>
+                          ✓
+                        </span>
                         <span><>Database</></span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-primary">✓</span>
+                        <span className="text-primary" data-lingo-skip>
+                          ✓
+                        </span>
                         <span><>Payments</></span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-primary">✓</span>
+                        <span className="text-primary" data-lingo-skip>
+                          ✓
+                        </span>
                         <span><>File Upload</></span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-primary">✓</span>
+                        <span className="text-primary" data-lingo-skip>
+                          ✓
+                        </span>
                         <span><>Admin Panel</></span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-primary">✓</span>
+                        <span className="text-primary" data-lingo-skip>
+                          ✓
+                        </span>
                         <span><>i18n Ready</></span>
                       </div>
                     </div>
@@ -234,9 +248,21 @@ export function Hero() {
                   <div className="border-border mt-auto border-t pt-6">
                     <div className="text-muted-foreground text-xs">
                       <>Built with</><br />
-                      <span data-lingo-skip className="text-primary font-mono">Next.js 16</span>
-                      <>&nbsp;</><>+</><>&nbsp;</>
-                      <span data-lingo-skip className="text-primary font-mono">shadcn/ui</span>
+                      <span
+                        data-lingo-skip
+                        className="text-primary font-mono"
+                      >
+                        Next.js 16
+                      </span>
+                      <span className="mx-1" data-lingo-skip>
+                        +
+                      </span>
+                      <span
+                        data-lingo-skip
+                        className="text-primary font-mono"
+                      >
+                        shadcn/ui
+                      </span>
                     </div>
                   </div>
                 </div>

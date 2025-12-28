@@ -17,7 +17,10 @@ export default function PagesNotFound() {
 
         {/* Large 404 Display */}
         <div className="mb-6">
-          <h1 className="text-primary/20 text-6xl font-bold tracking-tight select-none sm:text-7xl">
+          <h1
+            className="text-primary/20 text-6xl font-bold tracking-tight select-none sm:text-7xl"
+            data-lingo-skip
+          >
             404
           </h1>
         </div>

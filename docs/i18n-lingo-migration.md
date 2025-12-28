@@ -450,6 +450,13 @@ title: 工作原理
 **我可以查看转换后的代码吗？**
 可以。在构建输出中，查找已转换的文件。转换非常少，仅包含 `t()` 函数调用和基于哈希的查找。
 
+## 后续步骤
+
+- [配置参考](/compiler/configuration/reference) — 所有配置选项
+- [构建模式](/compiler/configuration/build-modes) — 了解 translate 与 cache-only
+- [开发工具](/compiler/development/tools) — Pseudotranslator、开发小部件和翻译服务器
+- [项目结构](/compiler/development/project-structure) — 了解 `.lingo/` 目录
+
 
 ---
 title: 迁移指南
@@ -1231,6 +1238,13 @@ const config: LingoConfig = {
 
 **“缺少语言环境 X 的翻译”**
 请使用 `usePseudotranslator: false` 启动开发服务器以生成真实翻译，或运行 CI 构建以填充 `.lingo/metadata.json`。
+
+## 后续步骤
+
+- [配置参考](/compiler/configuration/reference) — 所有配置选项
+- [自定义语言环境解析器](/compiler/features/custom-locale-resolvers) — 自定义语言检测
+- [手动覆盖](/compiler/features/manual-overrides) — 覆盖特定翻译
+- [最佳实践](/compiler/guides/best-practices) — 推荐模式与工作流
 
 ---
 title: 故障排查

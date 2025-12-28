@@ -31,81 +31,6 @@ interface NavItem {
   external?: boolean;
 }
 
-const navigationItems: NavItem[] = [
-  {
-    id: "nav-features",
-    title: <>Features</>,
-    items: [
-      {
-        id: "nav-authentication",
-        title: <>Authentication</>,
-        href: "/login",
-        description: <>Secure user authentication with magic links</>,
-      },
-      {
-        id: "nav-billing",
-        title: <>Billing</>,
-        href: "/dashboard/settings?page=billing",
-        description: <>Subscription management and payments</>,
-      },
-      {
-        id: "nav-dashboard",
-        title: <>Dashboard</>,
-        href: "/dashboard",
-        description: <>User dashboard and settings</>,
-      },
-    ],
-  },
-  {
-    id: "nav-pricing",
-    title: <>Pricing</>,
-    href: "/pricing",
-  },
-  {
-    id: "nav-about",
-    title: <>About</>,
-    href: "/about",
-  },
-  {
-    id: "nav-blog",
-    title: <>Blog</>,
-    href: "/blog",
-  },
-  {
-    id: "nav-contact",
-    title: <>Contact</>,
-    href: "/contact",
-  },
-];
-
-const mobileNavItems: NavItem[] = [
-  {
-    id: "mobile-features",
-    title: <>Features</>,
-    href: "/features",
-  },
-  {
-    id: "mobile-pricing",
-    title: <>Pricing</>,
-    href: "/pricing",
-  },
-  {
-    id: "mobile-about",
-    title: <>About</>,
-    href: "/about",
-  },
-  {
-    id: "mobile-blog",
-    title: <>Blog</>,
-    href: "/blog",
-  },
-  {
-    id: "mobile-contact",
-    title: <>Contact</>,
-    href: "/contact",
-  },
-];
-
 function NavigationDropdown({ item }: { item: NavItem }) {
   if (!item.items) return null;
 
@@ -286,9 +211,11 @@ function MobileAuthButtons({
 function MobileNavigation({
   isOpen,
   onClose,
+  items,
 }: {
   isOpen: boolean;
   onClose: () => void;
+  items: NavItem[];
 }) {
   const { data: session, isPending } = useSession();
 
@@ -303,7 +230,7 @@ function MobileNavigation({
 
         <div className="flex flex-col p-6">
           <nav className="space-y-4">
-            {mobileNavItems.map((item) => (
+            {items.map((item) => (
               <Link
                 key={item.id}
                 href={item.href!}
@@ -327,6 +254,80 @@ export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
   const { data: session, isPending } = useSession();
+  const navigationItems: NavItem[] = [
+    {
+      id: "nav-features",
+      title: <>Features</>,
+      items: [
+        {
+          id: "nav-authentication",
+          title: <>Authentication</>,
+          href: "/login",
+          description: <>Secure user authentication with magic links</>,
+        },
+        {
+          id: "nav-billing",
+          title: <>Billing</>,
+          href: "/dashboard/settings?page=billing",
+          description: <>Subscription management and payments</>,
+        },
+        {
+          id: "nav-dashboard",
+          title: <>Dashboard</>,
+          href: "/dashboard",
+          description: <>User dashboard and settings</>,
+        },
+      ],
+    },
+    {
+      id: "nav-pricing",
+      title: <>Pricing</>,
+      href: "/pricing",
+    },
+    {
+      id: "nav-about",
+      title: <>About</>,
+      href: "/about",
+    },
+    {
+      id: "nav-blog",
+      title: <>Blog</>,
+      href: "/blog",
+    },
+    {
+      id: "nav-contact",
+      title: <>Contact</>,
+      href: "/contact",
+    },
+  ];
+
+  const mobileNavItems: NavItem[] = [
+    {
+      id: "mobile-features",
+      title: <>Features</>,
+      href: "/features",
+    },
+    {
+      id: "mobile-pricing",
+      title: <>Pricing</>,
+      href: "/pricing",
+    },
+    {
+      id: "mobile-about",
+      title: <>About</>,
+      href: "/about",
+    },
+    {
+      id: "mobile-blog",
+      title: <>Blog</>,
+      href: "/blog",
+    },
+    {
+      id: "mobile-contact",
+      title: <>Contact</>,
+      href: "/contact",
+    },
+  ];
 
   useEffect(() => {
     const handleScroll = () => {
@@ -411,6 +412,7 @@ export function Header() {
       <MobileNavigation
         isOpen={isMobileMenuOpen}
         onClose={() => setIsMobileMenuOpen(false)}
+        items={mobileNavItems}
       />
     </>
   );

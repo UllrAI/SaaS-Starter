@@ -17,7 +17,10 @@ export default function NotFound() {
 
         {/* Large 404 Display */}
         <div className="mb-6">
-          <h1 className="text-primary/20 text-8xl font-bold tracking-tight select-none sm:text-9xl">
+          <h1
+            className="text-primary/20 text-8xl font-bold tracking-tight select-none sm:text-9xl"
+            data-lingo-skip
+          >
             404
           </h1>
         </div>

@@ -6,13 +6,13 @@ import { Logo } from "@/components/logo";
 import { ArrowRight, CheckCircle } from "lucide-react";
 import Link from "next/link";
 
-const proofPoints = [
-  { id: "production-ready", label: <>Production ready</> },
-  { id: "soc2-friendly", label: <>SOC2-friendly</> },
-  { id: "zero-setup-fees", label: <>Zero setup fees</> },
-];
-
 export function CallToAction() {
+  const proofPoints = [
+    { id: "production-ready", label: <>Production ready</> },
+    { id: "soc2-friendly", label: <>SOC2-friendly</> },
+    { id: "zero-setup-fees", label: <>Zero setup fees</> },
+  ];
+
   return (
     <section className="border-border bg-background border-t">
       <div className="mx-auto max-w-5xl px-6 py-24 sm:py-32">

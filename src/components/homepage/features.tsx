@@ -16,7 +16,7 @@ interface Feature {
   title: React.ReactNode;
   description: React.ReactNode;
   icon: React.ComponentType<{ className?: string }>;
-  category: string;
+  category: React.ReactNode;
 }
 
 const features: Feature[] = [
@@ -30,7 +30,7 @@ const features: Feature[] = [
       </>
     ),
     icon: Shield,
-    category: "Security",
+    category: <>Security</>,
   },
   {
     id: "payments-billing",
@@ -42,7 +42,7 @@ const features: Feature[] = [
       </>
     ),
     icon: CreditCard,
-    category: "Payments",
+    category: <>Payments</>,
   },
   {
     id: "database-api",
@@ -54,7 +54,7 @@ const features: Feature[] = [
       </>
     ),
     icon: Database,
-    category: "Backend",
+    category: <>Backend</>,
   },
   {
     id: "analytics-insights",
@@ -66,7 +66,7 @@ const features: Feature[] = [
       </>
     ),
     icon: BarChart3,
-    category: "Analytics",
+    category: <>Analytics</>,
   },
   {
     id: "modern-ui-ux",
@@ -78,7 +78,7 @@ const features: Feature[] = [
       </>
     ),
     icon: Palette,
-    category: "Design",
+    category: <>Design</>,
   },
   {
     id: "production-deploy",
@@ -90,7 +90,7 @@ const features: Feature[] = [
       </>
     ),
     icon: Rocket,
-    category: "DevOps",
+    category: <>DevOps</>,
   },
 ];
 
@@ -99,10 +99,10 @@ const featureStats: {
   label: React.ReactNode;
   value: React.ReactNode;
 }[] = [
-  { id: "components", label: <>Components</>, value: <>50+</> },
-  { id: "integrations", label: <>Integrations</>, value: <>10+</> },
-  { id: "type-safe", label: <>Type Safe</>, value: <>100%</> },
-];
+    { id: "components", label: <>Components</>, value: <>50+</> },
+    { id: "integrations", label: <>Integrations</>, value: <>10+</> },
+    { id: "type-safe", label: <>Type Safe</>, value: <>100%</> },
+  ];
 
 function FeatureCard({ feature }: { feature: Feature }) {
   const IconComponent = feature.icon;

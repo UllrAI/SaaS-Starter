@@ -59,9 +59,11 @@ export function Hero() {
             <p
               className={`text-muted-foreground mb-10 max-w-xl transform text-lg leading-relaxed transition-all delay-200 duration-1000 sm:text-xl lg:text-2xl ${mounted ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"}`}
             >
-              Complete UllrAI SaaS starter with authentication, payments,
-              database, and deployment. Everything you need to go from idea to
-              revenue.
+              <>
+                Complete UllrAI SaaS starter with authentication, payments,
+                database, and deployment. Everything you need to go from idea to
+                revenue.
+              </>
             </p>
 
             {/* CTAs */}
@@ -74,7 +76,7 @@ export function Hero() {
                 asChild
               >
                 <Link href="/signup">
-                  START NOW
+                  <>START NOW</>
                   <Terminal className="ml-3 h-5 w-5" />
                 </Link>
               </Button>
@@ -87,7 +89,7 @@ export function Hero() {
               >
                 <Link href={GITHUB_URL} target="_blank">
                   <Github className="mr-2 h-5 w-5" />
-                  VIEW SOURCE
+                  <>VIEW SOURCE</>
                 </Link>
               </Button>
             </div>
@@ -180,7 +182,7 @@ export function Hero() {
 
                     <div className="text-primary mt-6 flex animate-pulse items-center gap-2">
                       <span data-lingo-skip className="bg-primary block h-4 w-2" />
-                      <span>Running...</span>
+                      <span><>Running...</></span>
                     </div>
                   </div>
                 </div>
@@ -189,12 +191,12 @@ export function Hero() {
                 <div className="bg-secondary/5 flex flex-col p-6 text-left sm:p-8 lg:col-span-5">
                   <div className="mb-6 space-y-2">
                     <div className="text-muted-foreground text-xs font-bold tracking-widest uppercase">
-                      What&apos;s Included
+                      <>What&apos;s Included</>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="bg-primary h-3 w-3 rounded-full" />
                       <span className="text-foreground font-bold">
-                        Production Ready
+                        <>Production Ready</>
                       </span>
                     </div>
                   </div>
@@ -204,27 +206,27 @@ export function Hero() {
                     <div className="text-muted-foreground grid grid-cols-1 gap-3 text-sm">
                       <div className="flex items-center gap-2">
                         <span className="text-primary">✓</span>
-                        <span>Authentication</span>
+                        <span><>Authentication</></span>
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="text-primary">✓</span>
-                        <span>Database</span>
+                        <span><>Database</></span>
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="text-primary">✓</span>
-                        <span>Payments</span>
+                        <span><>Payments</></span>
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="text-primary">✓</span>
-                        <span>File Upload</span>
+                        <span><>File Upload</></span>
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="text-primary">✓</span>
-                        <span>Admin Panel</span>
+                        <span><>Admin Panel</></span>
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="text-primary">✓</span>
-                        <span>i18n Ready</span>
+                        <span><>i18n Ready</></span>
                       </div>
                     </div>
                   </div>

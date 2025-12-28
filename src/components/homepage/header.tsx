@@ -216,7 +216,7 @@ function AuthButtons({
         <Button asChild size="sm">
           <Link href="/dashboard">
             <UserCircle className="mr-2 h-4 w-4" />
-            Dashboard
+            <>Dashboard</>
           </Link>
         </Button>
       </div>
@@ -226,10 +226,10 @@ function AuthButtons({
   return (
     <div className="hidden items-center gap-2 md:flex">
       <Button asChild variant="ghost" size="sm">
-        <Link href="/login">Sign In</Link>
+        <Link href="/login"><>Sign In</></Link>
       </Button>
       <Button asChild size="sm">
-        <Link href="/signup">Get Started</Link>
+        <Link href="/signup"><>Get Started</></Link>
       </Button>
     </div>
   );
@@ -264,7 +264,7 @@ function MobileAuthButtons({
         <Button asChild className="w-full">
           <Link href="/dashboard">
             <UserCircle className="mr-2 h-4 w-4" />
-            Dashboard
+            <>Dashboard</>
           </Link>
         </Button>
       </div>
@@ -274,10 +274,10 @@ function MobileAuthButtons({
   return (
     <div className="mt-8 space-y-3">
       <Button asChild className="w-full">
-        <Link href="/login">Sign In</Link>
+        <Link href="/login"><>Sign In</></Link>
       </Button>
       <Button asChild variant="outline" className="w-full">
-        <Link href="/signup">Get Started</Link>
+        <Link href="/signup"><>Get Started</></Link>
       </Button>
     </div>
   );
@@ -295,7 +295,7 @@ function MobileNavigation({
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
       <SheetContent side="right" className="w-80 p-0">
-        <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+        <SheetTitle className="sr-only"><>Navigation Menu</></SheetTitle>
         <div className="border-border flex items-center gap-2 border-b p-6">
           <Logo className="text-primary h-6 w-6" variant="icon-only" />
           <span className="text-lg font-bold">{APP_NAME}</span>
@@ -400,7 +400,7 @@ export function Header() {
                 onClick={() => setIsMobileMenuOpen(true)}
               >
                 <Menu className="h-5 w-5" />
-                <span className="sr-only">Toggle menu</span>
+                <span className="sr-only"><>Toggle menu</></span>
               </Button>
             </div>
           </div>

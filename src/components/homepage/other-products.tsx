@@ -20,7 +20,7 @@ interface Product {
   description: React.ReactNode;
   url: string;
   icon: React.ComponentType<{ className?: string }>;
-  badge?: string;
+  badge?: React.ReactNode;
 }
 
 const products: Product[] = [
@@ -47,7 +47,7 @@ const products: Product[] = [
     ),
     url: "https://headshots.fun/",
     icon: Sparkles,
-    badge: "Open Source",
+    badge: <>Open Source</>,
   },
   {
     id: "to-markdown",

@@ -205,7 +205,7 @@ export function Hero() {
 
                   {/* Features Grid */}
                   <div className="flex-1 space-y-4">
-                    <div className="text-muted-foreground grid grid-cols-1 gap-3 text-sm">
+                    <div className="text-muted-foreground grid grid-cols-1 gap-3 text-sm pb-4">
                       <div className="flex items-center gap-2">
                         <span className="text-primary" data-lingo-skip>
                           ✓

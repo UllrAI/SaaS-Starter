@@ -1,71 +1,70 @@
 :root {
   /* 
-     Light Mode: "Paper & Ink"
-     Not pure white, but a soft, high-quality paper white.
-     Text is a deep charcoal, not pure black.
-     Inspired by high-end code editors and technical documentation.
+     Light Mode: "Modern Clean"
+     Crisp, professional, and airy.
+     Designed for readability and a premium SaaS feel.
   */
-  --background: oklch(0.985 0.002 240);
-  /* Very subtle cool white */
-  --foreground: oklch(0.2 0.01 240);
-  /* Deep charcoal */
+  --background: oklch(0.99 0.002 240);
+  /* Almost pure white with a hint of cool gray for crispness */
+  --foreground: oklch(0.15 0.02 240);
+  /* Deep charcoal, high contrast but not harsh black */
 
   --card: oklch(1 0 0);
-  /* Pure white for cards to pop slightly against the off-white bg */
-  --card-foreground: oklch(0.2 0.01 240);
+  /* Pure white */
+  --card-foreground: oklch(0.15 0.02 240);
 
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.2 0.01 240);
+  --popover-foreground: oklch(0.15 0.02 240);
 
-  /* Primary: A sophisticated, deep indigo/slate. Serious but modern. */
-  --primary: oklch(0.25 0.04 260);
+  /* Primary: Sophisticated Indigo. Vibrant enough to guide the eye, deep enough to be serious. */
+  --primary: oklch(0.35 0.12 265);
   --primary-foreground: oklch(0.98 0 0);
 
-  /* Secondary: Subtle gray for UI elements */
-  --secondary: oklch(0.96 0.005 240);
-  --secondary-foreground: oklch(0.25 0.04 260);
+  /* Secondary: Subtle, elegant fill for secondary actions */
+  --secondary: oklch(0.97 0.01 240);
+  --secondary-foreground: oklch(0.35 0.12 265);
 
   --muted: oklch(0.96 0.005 240);
   --muted-foreground: oklch(0.55 0.02 240);
 
-  --accent: oklch(0.94 0.01 240);
-  --accent-foreground: oklch(0.25 0.04 260);
+  --accent: oklch(0.96 0.01 240);
+  /* Subtle interaction state */
+  --accent-foreground: oklch(0.35 0.12 265);
 
-  /* Destructive: A technical red, like a syntax error */
-  --destructive: oklch(0.55 0.15 25);
+  /* Destructive: Clear, communicative red */
+  --destructive: oklch(0.6 0.18 25);
   --destructive-foreground: oklch(0.98 0 0);
 
-  --border: oklch(0.92 0.005 240);
-  --input: oklch(0.92 0.005 240);
-  --ring: oklch(0.25 0.04 260);
+  --border: oklch(0.92 0.01 240);
+  /* Subtle division */
+  --input: oklch(0.92 0.01 240);
+  --ring: oklch(0.35 0.12 265);
+  /* Matches Primary */
 
-  /* Charts: Technical, data-viz inspired colors */
-  --chart-1: oklch(0.25 0.04 260);
-  /* Primary Slate */
-  --chart-2: oklch(0.45 0.12 200);
+  /* Charts: Balanced, distinct palette safe for color blindness */
+  --chart-1: oklch(0.35 0.12 265);
+  /* Primary Indigo */
+  --chart-2: oklch(0.55 0.15 180);
   /* Teal */
-  --chart-3: oklch(0.5 0.14 300);
-  /* Purple */
-  --chart-4: oklch(0.6 0.15 60);
+  --chart-3: oklch(0.6 0.16 30);
+  /* Terracotta */
+  --chart-4: oklch(0.65 0.18 85);
   /* Amber */
-  --chart-5: oklch(0.55 0.15 25);
-  /* Red */
+  --chart-5: oklch(0.5 0.15 320);
+  /* Magenta */
 
-  --sidebar: oklch(0.96 0.005 240);
-  /* Slightly darker than background for clear separation */
-  --sidebar-foreground: oklch(0.25 0.04 260);
-  --sidebar-primary: oklch(0.25 0.04 260);
+  --sidebar: oklch(0.985 0.002 240);
+  --sidebar-foreground: oklch(0.2 0.02 240);
+  --sidebar-primary: oklch(0.35 0.12 265);
   --sidebar-primary-foreground: oklch(0.98 0 0);
-  --sidebar-accent: oklch(0.93 0.01 240);
-  /* More noticeable hover state */
-  --sidebar-accent-foreground: oklch(0.25 0.04 260);
-  --sidebar-border: oklch(0.88 0.01 240);
-  /* Stronger border for clear division */
-  --sidebar-ring: oklch(0.25 0.04 260);
+  --sidebar-accent: oklch(0.96 0.01 240);
+  --sidebar-accent-foreground: oklch(0.35 0.12 265);
+  --sidebar-border: oklch(0.92 0.01 240);
+  --sidebar-ring: oklch(0.35 0.12 265);
 
-  /* Fonts: Monospace is king for developers, but we keep sans for UI */
+  /* Fonts */
   --font-sans:
-    ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
     Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
@@ -74,99 +73,93 @@
     "Courier New", monospace;
 
   /* 
-     THE RADIUS: ZERO.
-     Sharp, precise, engineered.
+     Radius: Modern, approachable, polished.
+     0.5rem (8px) is the industry standard for premium SaaS.
   */
   --radius: 0rem;
 
   /* 
-     Shadows: Sharp, technical, "hard" shadows.
-     No soft blurs.
+     Shadows: Soft, diffused, multi-layered.
+     Creates depth without heaviness.
   */
-  --shadow-x: 4px;
-  --shadow-y: 4px;
-  --shadow-blur: 0px;
-  --shadow-spread: 0px;
-  --shadow-color: oklch(0.2 0.01 240 / 0.1);
+  --shadow-color: 240 5% 50%;
+  /* HSL-ish for shadow alpha composition */
 
-  --shadow-sm: 2px 2px 0px 0px var(--border);
-  --shadow: 4px 4px 0px 0px var(--border);
-  --shadow-md: 6px 6px 0px 0px var(--border);
-  --shadow-lg: 8px 8px 0px 0px var(--border);
-  --shadow-xl: 12px 12px 0px 0px var(--border);
-  --shadow-2xl: 16px 16px 0px 0px var(--border);
+  --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-md: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+  --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
 
-  --tracking-normal: -0.02em;
+  --tracking-normal: 0em;
+  /* Inter looks best with normal tracking */
   --spacing: 0.25rem;
 }
 
 .dark {
   /* 
-     Dark Mode: "Deep Space Code"
-     Not pure black, but a rich, deep slate/zinc.
-     Comfortable for long coding sessions.
+     Dark Mode: "Midnight Pro"
+     Rich, deep indigo-slate background. 
+     Reduces eye strain while maintaining vibrancy.
   */
-  --background: oklch(0.12 0.02 260);
-  /* Deep Slate */
-  --foreground: oklch(0.92 0.01 240);
-  /* Soft White */
+  --background: oklch(0.12 0.03 260);
+  /* Deep Indigo/Slate */
+  --foreground: oklch(0.98 0.01 240);
 
-  --card: oklch(0.14 0.02 260);
-  /* Slightly lighter slate */
-  --card-foreground: oklch(0.92 0.01 240);
+  --card: oklch(0.15 0.03 260);
+  /* Slightly elevated surface */
+  --card-foreground: oklch(0.98 0.01 240);
 
-  --popover: oklch(0.12 0.02 260);
-  --popover-foreground: oklch(0.92 0.01 240);
+  --popover: oklch(0.15 0.03 260);
+  --popover-foreground: oklch(0.98 0.01 240);
 
-  /* Primary: Electric Blue/Indigo for focus */
-  --primary: oklch(0.65 0.18 260);
-  --primary-foreground: oklch(0.12 0.02 260);
+  /* Primary: More luminous in dark mode */
+  --primary: oklch(0.6 0.16 265);
+  --primary-foreground: oklch(0.12 0.03 260);
 
-  --secondary: oklch(0.18 0.03 260);
-  --secondary-foreground: oklch(0.92 0.01 240);
+  --secondary: oklch(0.2 0.04 260);
+  --secondary-foreground: oklch(0.98 0.01 240);
 
-  --muted: oklch(0.18 0.03 260);
-  --muted-foreground: oklch(0.65 0.05 260);
+  --muted: oklch(0.2 0.04 260);
+  --muted-foreground: oklch(0.7 0.03 260);
 
-  --accent: oklch(0.2 0.04 260);
-  --accent-foreground: oklch(0.92 0.01 240);
+  --accent: oklch(0.25 0.05 260);
+  --accent-foreground: oklch(0.98 0.01 240);
 
-  --destructive: oklch(0.55 0.18 25);
-  --destructive-foreground: oklch(0.92 0.01 240);
+  --destructive: oklch(0.6 0.18 25);
+  --destructive-foreground: oklch(0.98 0 0);
 
-  --border: oklch(0.22 0.03 260);
-  --input: oklch(0.22 0.03 260);
-  --ring: oklch(0.65 0.18 260);
+  --border: oklch(0.22 0.04 260);
+  --input: oklch(0.22 0.04 260);
+  --ring: oklch(0.6 0.16 265);
 
-  /* Charts: Neon/Cyberpunk inspired for dark mode */
-  --chart-1: oklch(0.65 0.18 260);
-  /* Electric Blue */
-  --chart-2: oklch(0.7 0.16 180);
-  /* Cyan */
-  --chart-3: oklch(0.75 0.15 320);
-  /* Magenta */
-  --chart-4: oklch(0.8 0.14 60);
-  /* Yellow */
-  --chart-5: oklch(0.65 0.18 25);
-  /* Red */
+  /* Charts: Luminous, neon-like for dark backgrounds */
+  --chart-1: oklch(0.6 0.16 265);
+  --chart-2: oklch(0.7 0.14 180);
+  --chart-3: oklch(0.75 0.15 30);
+  --chart-4: oklch(0.8 0.16 85);
+  --chart-5: oklch(0.65 0.18 320);
 
-  --sidebar: oklch(0.1 0.02 260);
-  --sidebar-foreground: oklch(0.92 0.01 240);
-  --sidebar-primary: oklch(0.65 0.18 260);
-  --sidebar-primary-foreground: oklch(0.12 0.02 260);
-  --sidebar-accent: oklch(0.16 0.03 260);
-  --sidebar-accent-foreground: oklch(0.92 0.01 240);
-  --sidebar-border: oklch(0.2 0.03 260);
-  --sidebar-ring: oklch(0.65 0.18 260);
+  --sidebar: oklch(0.1 0.03 260);
+  --sidebar-foreground: oklch(0.98 0.01 240);
+  --sidebar-primary: oklch(0.6 0.16 265);
+  --sidebar-primary-foreground: oklch(0.12 0.03 260);
+  --sidebar-accent: oklch(0.18 0.04 260);
+  --sidebar-accent-foreground: oklch(0.98 0.01 240);
+  --sidebar-border: oklch(0.2 0.04 260);
+  --sidebar-ring: oklch(0.6 0.16 265);
 
-  /* Shadows in dark mode: Subtle glow or deep cut */
-  --shadow-color: oklch(0 0 0 / 0.3);
-  --shadow-sm: 2px 2px 0px 0px oklch(0 0 0 / 0.5);
-  --shadow: 4px 4px 0px 0px oklch(0 0 0 / 0.5);
-  --shadow-md: 6px 6px 0px 0px oklch(0 0 0 / 0.5);
-  --shadow-lg: 8px 8px 0px 0px oklch(0 0 0 / 0.5);
-  --shadow-xl: 12px 12px 0px 0px oklch(0 0 0 / 0.5);
-  --shadow-2xl: 16px 16px 0px 0px oklch(0 0 0 / 0.5);
+  /* Shadows adjustments for dark mode */
+  --shadow-color: 0 0% 0%;
+  --shadow-xs: 0 1px 1px 0 rgb(0 0 0 / 0.5);
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.5);
+  --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.5), 0 2px 4px -2px rgb(0 0 0 / 0.5);
+  --shadow-md: 0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.5);
+  --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.5), 0 8px 10px -6px rgb(0 0 0 / 0.5);
+  --shadow-xl: 0 25px 50px -12px rgb(0 0 0 / 0.5);
+  --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.5);
 }
 
 @theme inline {

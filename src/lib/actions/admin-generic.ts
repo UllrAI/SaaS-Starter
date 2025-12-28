@@ -229,7 +229,7 @@ export const createRecord = adminAction
   .schema(
     z.object({
       tableName: tableNameSchema,
-      data: z.record(z.unknown()),
+      data: z.record(z.string(), z.unknown()),
     }),
   )
   .action(async ({ parsedInput: { tableName, data } }) => {
@@ -253,7 +253,7 @@ export const updateRecord = adminAction
     z.object({
       tableName: tableNameSchema,
       id: z.union([z.string(), z.number()]),
-      data: z.record(z.unknown()),
+      data: z.record(z.string(), z.unknown()),
     }),
   )
   .action(async ({ parsedInput: { tableName, id, data } }) => {

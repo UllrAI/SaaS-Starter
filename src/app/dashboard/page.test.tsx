@@ -52,8 +52,8 @@ describe("Dashboard Home Page", () => {
   it("should export correct metadata", () => {
     expect(metadata).toBeDefined();
     expect(metadata).toMatchObject({
-      title: "Home",
-      description: "Dashboard home page with overview and quick actions",
+      title: "Dashboard",
+      description: "System overview and metrics",
     });
   });
 
@@ -61,8 +61,8 @@ describe("Dashboard Home Page", () => {
     // Since the module is already imported, the mock was called during import time
     // We verify that the metadata was created with the correct structure instead
     expect(metadata).toMatchObject({
-      title: "Home",
-      description: "Dashboard home page with overview and quick actions",
+      title: "Dashboard",
+      description: "System overview and metrics",
     });
     expect(mockCreateMetadata).toBeDefined();
   });
@@ -71,17 +71,15 @@ describe("Dashboard Home Page", () => {
     expect(typeof metadata).toBe("object");
     expect(metadata).toHaveProperty("title");
     expect(metadata).toHaveProperty("description");
-    expect(metadata.title).toBe("Home");
-    expect(metadata.description).toBe(
-      "Dashboard home page with overview and quick actions",
-    );
+    expect(metadata.title).toBe("Dashboard");
+    expect(metadata.description).toBe("System overview and metrics");
   });
 
   it("should have descriptive metadata content", () => {
-    expect(metadata.title).toMatch(/Home/);
-    expect(metadata.description).toMatch(/Dashboard/);
+    expect(metadata.title).toMatch(/Dashboard/);
+    expect(metadata.description).toMatch(/System/);
     expect(metadata.description).toMatch(/overview/);
-    expect(metadata.description).toMatch(/quick actions/);
+    expect(metadata.description).toMatch(/metrics/);
   });
 
   it("should export a React component as default", async () => {
@@ -106,15 +104,14 @@ describe("Dashboard Home Page", () => {
   });
 
   it("should have meaningful page title", () => {
-    expect(metadata.title).toBe("Home");
+    expect(metadata.title).toBe("Dashboard");
     expect(metadata.title).not.toContain("undefined");
     expect(metadata.title).not.toContain("null");
   });
 
   it("should have descriptive page description", () => {
-    expect(metadata.description).toContain("Dashboard");
     expect(metadata.description).toContain("overview");
-    expect(metadata.description).toContain("quick actions");
+    expect(metadata.description).toContain("metrics");
     expect(metadata.description.length).toBeGreaterThan(20);
   });
 

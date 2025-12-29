@@ -7,7 +7,7 @@
     "dev:slow": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
     "test": "jest",
     "test:coverage": "jest --coverage",
     "db:generate": "drizzle-kit generate --config=src/database/config.ts",

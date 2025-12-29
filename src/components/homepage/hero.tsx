@@ -1,20 +1,17 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Github, Terminal, Copy, Check } from "lucide-react";
 import { GITHUB_URL } from "@/lib/config/constants";
 import Link from "next/link";
+import { useHydrated } from "@/hooks/use-hydrated";
 
 export function Hero() {
   const [copied, setCopied] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const mounted = useHydrated();
   const command = "git clone https://github.com/UllrAI/SaaS-Starter.git";
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(command);

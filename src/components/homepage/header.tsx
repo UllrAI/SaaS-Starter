@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession } from "@/lib/auth/client";
@@ -19,6 +19,7 @@ import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ChevronDown, Menu, UserCircle, ExternalLink } from "lucide-react";
 import { APP_NAME } from "@/lib/config/constants";
+import { useHydrated } from "@/hooks/use-hydrated";
 
 interface NavItem {
   id: string;
@@ -120,11 +121,7 @@ function AuthButtons({
   session: Session | null;
   isPending: boolean;
 }) {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = useHydrated();
 
   if (!mounted || isPending) {
     return (
@@ -168,11 +165,7 @@ function MobileAuthButtons({
   session: Session | null;
   isPending: boolean;
 }) {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = useHydrated();
 
   if (!mounted || isPending) {
     return (

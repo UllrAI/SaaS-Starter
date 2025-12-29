@@ -1,28 +1,29 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { X } from "lucide-react";
+import { useHydrated } from "@/hooks/use-hydrated";
+
+const COOKIE_CONSENT_KEY = "cookieConsent";
 
 export function CookieConsent() {
-  const [showConsent, setShowConsent] = useState(false);
+  const hydrated = useHydrated();
+  const [dismissed, setDismissed] = useState(false);
 
-  useEffect(() => {
-    // Check if user has already consented
-    const hasConsented = localStorage.getItem("cookieConsent");
-    if (!hasConsented) {
-      setShowConsent(true);
-    }
-  }, []);
+  const storedConsent = hydrated
+    ? localStorage.getItem(COOKIE_CONSENT_KEY)
+    : null;
+  const showConsent = hydrated && !dismissed && !storedConsent;
 
   const acceptCookies = () => {
-    localStorage.setItem("cookieConsent", "accepted");
-    setShowConsent(false);
+    localStorage.setItem(COOKIE_CONSENT_KEY, "accepted");
+    setDismissed(true);
   };
 
   const declineCookies = () => {
-    localStorage.setItem("cookieConsent", "declined");
+    localStorage.setItem(COOKIE_CONSENT_KEY, "declined");
     // Here you would implement logic to disable non-essential cookies
-    setShowConsent(false);
+    setDismissed(true);
   };
 
   if (!showConsent) return null;
@@ -52,7 +53,7 @@ export function CookieConsent() {
             Accept All
           </button>
           <button
-            onClick={() => setShowConsent(false)}
+            onClick={() => setDismissed(true)}
             className="hover:bg-accent rounded-md p-1 transition-colors"
             aria-label="Close cookie notice"
           >

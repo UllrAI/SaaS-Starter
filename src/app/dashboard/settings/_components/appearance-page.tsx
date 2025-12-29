@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
   Card,
   CardContent,
@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/card";
 import { LucideIcon, Monitor, Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
+import { useHydrated } from "@/hooks/use-hydrated";
 
 const ThemeCard = ({
   title,
@@ -98,11 +99,7 @@ const ThemeCard = ({
 
 export function AppearancePage() {
   const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = useHydrated();
 
   const themes = [
     { name: "Light", value: "light", icon: Sun },

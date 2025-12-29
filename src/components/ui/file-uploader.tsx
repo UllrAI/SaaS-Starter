@@ -65,10 +65,6 @@ interface UploadedFile {
 const FilePreview = ({ file }: { file: FileWithPreview }) => {
   const [hasError, setHasError] = useState(false);
 
-  useEffect(() => {
-    setHasError(false);
-  }, [file]);
-
   if (!file.preview || hasError) {
     return (
       <div className="text-muted-foreground flex h-12 w-12 items-center justify-center rounded bg-gray-100 dark:bg-gray-800">
@@ -426,7 +422,10 @@ export function FileUploader({
                 key={index}
                 className="bg-background flex items-center space-x-4 rounded-lg border p-4"
               >
-                <FilePreview file={fileState.file} />
+                <FilePreview
+                  key={`${fileState.file.name}-${fileState.file.size}-${fileState.file.lastModified}`}
+                  file={fileState.file}
+                />
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-medium">
                     {fileState.file.name}

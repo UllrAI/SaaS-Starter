@@ -15,7 +15,7 @@ try {
   if (env.R2_PUBLIC_URL) {
     r2Hostname = new URL(env.R2_PUBLIC_URL).hostname;
   }
-} catch (error) {
+} catch {
   console.error(
     "\x1b[33m%s\x1b[0m", // Yellow color for warning
     `Warning: Invalid R2_PUBLIC_URL found in environment variables. Skipping R2 remote pattern.`,
@@ -48,7 +48,7 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default async function (): Promise<NextConfig> {
+export default async function createNextConfig(): Promise<NextConfig> {
   const isDev = process.env.NODE_ENV !== "production";
   const buildModeEnv = process.env.LINGO_BUILD_MODE;
   const buildMode: "translate" | "cache-only" =

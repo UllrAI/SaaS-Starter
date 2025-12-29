@@ -234,13 +234,15 @@ describe("Auth Server Configuration", () => {
       const { magicLink } = await import("better-auth/plugins");
       const { sendMagicLink } = await import("@/emails/magic-link");
 
+      const mockRequest = new Request("http://test-url");
+
       // Mock magicLink to call the provided function
       const mockMagicLinkCall = jest.fn();
       (magicLink as jest.Mock).mockImplementation((config) => {
         // Call the sendMagicLink function to trigger line coverage
         config.sendMagicLink(
           { email: "test@example.com", url: "http://test-url" },
-          {},
+          { request: mockRequest },
         );
         return mockMagicLinkCall;
       });
@@ -254,7 +256,7 @@ describe("Auth Server Configuration", () => {
       expect(sendMagicLink).toHaveBeenCalledWith(
         "test@example.com",
         "http://test-url",
-        {},
+        mockRequest,
       );
     } finally {
       process.env.NODE_ENV = originalNodeEnv;
@@ -280,13 +282,15 @@ describe("Auth Server Configuration", () => {
       const { magicLink } = await import("better-auth/plugins");
       const { sendMagicLink } = await import("@/emails/magic-link");
 
+      const mockRequest = new Request("http://test-url");
+
       // Mock magicLink to call the provided function
       const mockMagicLinkCall = jest.fn();
       (magicLink as jest.Mock).mockImplementation((config) => {
         // Call the sendMagicLink function to trigger line coverage
         config.sendMagicLink(
           { email: "test@example.com", url: "http://test-url" },
-          {},
+          { request: mockRequest },
         );
         return mockMagicLinkCall;
       });
@@ -298,7 +302,7 @@ describe("Auth Server Configuration", () => {
       expect(sendMagicLink).toHaveBeenCalledWith(
         "test@example.com",
         "http://test-url",
-        {},
+        mockRequest,
       );
     } finally {
       process.env.NODE_ENV = originalNodeEnv;

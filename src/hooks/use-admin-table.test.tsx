@@ -503,7 +503,7 @@ describe("useAdminTable", () => {
       await waitFor(() => {
         expect(mockQueryAction).toHaveBeenCalledWith(
           expect.objectContaining({
-            page: 1, // page resets due to search/filter change
+            page: 2, // latest explicit page change should win
             search: "test search",
             filter: "custom",
           }),
@@ -520,7 +520,7 @@ describe("useAdminTable", () => {
 
       await waitFor(() => {
         expect(mockQueryAction).toHaveBeenCalledWith({
-          page: 1, // page is 1 due to search/filter reset
+          page: 2, // refresh should keep the latest page
           limit: 20,
           search: "test search",
           filter: "custom",

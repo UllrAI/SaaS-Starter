@@ -350,11 +350,11 @@ describe("procedures", () => {
     it("should define correct output schema", async () => {
       await import("./procedures");
 
-      expect(mockOutputSchema).toHaveBeenCalledWith(
+      const schema = mockOutputSchema.mock.calls[0]?.[0];
+
+      expect(schema).toEqual(
         expect.objectContaining({
-          _def: expect.objectContaining({
-            shape: expect.any(Function),
-          }),
+          parse: expect.any(Function),
         }),
       );
     });

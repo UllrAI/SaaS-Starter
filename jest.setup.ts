@@ -2,10 +2,6 @@ import "@testing-library/jest-dom";
 
 // Jest setup for test environment
 
-// Store original console for selective mocking in individual tests
-// Individual tests should handle their own console mocking to avoid conflicts
-const originalConsoleReference = global.console;
-
 // Type definitions for test mocks
 export interface MockSession {
   user?: {
@@ -499,7 +495,16 @@ const mockCrypto: MockCrypto = {
 };
 
 // Mock crypto module to avoid ES module issues
-jest.mock("uncrypto", () => mockCrypto);
+jest.mock("uncrypto", () => mockCrypto, { virtual: true });
+
+// Mock lingo react client to avoid ESM-only dependency in Jest
+jest.mock("@lingo.dev/compiler/react", () => ({
+  useLingoContext: () => ({
+    locale: "en",
+    setLocale: jest.fn().mockResolvedValue(undefined),
+    isLoading: false,
+  }),
+}));
 
 // Type-safe better-auth mock
 type BetterAuthConfig = Record<string, unknown>;
@@ -595,42 +600,6 @@ jest.mock("postgres", () => mockPostgres);
 type MockQueryResult<T = unknown> = Promise<T[]>;
 type MockQueryBuilder = {
   returning: jest.MockedFunction<() => MockQueryResult>;
-};
-type MockInsertBuilder = {
-  values: jest.MockedFunction<
-    (values: unknown) => {
-      onConflictDoUpdate: jest.MockedFunction<
-        (config: unknown) => MockQueryBuilder
-      >;
-      onConflictDoNothing: jest.MockedFunction<() => MockQueryResult>;
-    }
-  >;
-};
-type MockSelectBuilder = {
-  from: jest.MockedFunction<
-    (table: unknown) => {
-      where: jest.MockedFunction<
-        (condition: unknown) => {
-          orderBy: jest.MockedFunction<
-            (field: unknown) => {
-              limit: jest.MockedFunction<(count: number) => MockQueryResult>;
-            }
-          >;
-          limit: jest.MockedFunction<(count: number) => MockQueryResult>;
-        }
-      >;
-      orderBy: jest.MockedFunction<
-        (field: unknown) => {
-          limit: jest.MockedFunction<(count: number) => MockQueryResult>;
-        }
-      >;
-    }
-  >;
-  orderBy: jest.MockedFunction<
-    (field: unknown) => {
-      limit: jest.MockedFunction<(count: number) => MockQueryResult>;
-    }
-  >;
 };
 
 const mockReturning: jest.MockedFunction<() => MockQueryResult> = jest
@@ -890,11 +859,11 @@ class MockNextRequest {
     };
 
     this.cookies = {
-      get: (name: string) => null,
+      get: () => null,
       getAll: () => [],
-      has: (name: string) => false,
-      set: (name: string, value: string) => {},
-      delete: (name: string) => {},
+      has: () => false,
+      set: () => {},
+      delete: () => {},
     };
   }
 

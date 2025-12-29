@@ -20,11 +20,10 @@ jest.mock("@lingo.dev/compiler/next", () => ({
 // Mock next/bundle-analyzer
 jest.mock("@next/bundle-analyzer", () => {
   const mockWithBundleAnalyzer = jest.fn(
-    (config: { enabled: boolean }) =>
-      (nextConfig: Record<string, unknown>) => ({
-        ...nextConfig,
-        analyzed: true,
-      }),
+    () => (nextConfig: Record<string, unknown>) => ({
+      ...nextConfig,
+      analyzed: true,
+    }),
   );
   return mockWithBundleAnalyzer;
 });

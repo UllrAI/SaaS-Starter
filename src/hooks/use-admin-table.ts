@@ -107,11 +107,15 @@ export function useAdminTable<T>({
   ]);
 
   // Reset page to 1 when search or filter changes
-  useEffect(() => {
-    if (!isInitialMount.current) {
-      setCurrentPage(1);
-    }
-  }, [debouncedSearchTerm, filter]);
+  const updateSearchTerm = useCallback((term: string) => {
+    setSearchTerm(term);
+    setCurrentPage(1);
+  }, []);
+
+  const updateFilter = useCallback((nextFilter: string) => {
+    setFilter(nextFilter);
+    setCurrentPage(1);
+  }, []);
 
   const refresh = useCallback(() => {
     startTransition(async () => {
@@ -140,8 +144,8 @@ export function useAdminTable<T>({
     error,
     searchTerm,
     filter,
-    setSearchTerm,
-    setFilter,
+    setSearchTerm: updateSearchTerm,
+    setFilter: updateFilter,
     setCurrentPage,
     refresh,
   };

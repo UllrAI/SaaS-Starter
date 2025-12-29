@@ -16,7 +16,6 @@ import {
   ShieldCheck,
   Award,
   Flag,
-  DollarSign,
   Lock,
   CreditCard,
 } from "lucide-react";

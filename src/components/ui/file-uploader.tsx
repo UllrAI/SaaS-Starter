@@ -50,6 +50,24 @@ const getFileTypeIcon = (contentType: string): React.ReactNode => {
   return <FileIcon className="h-8 w-8 text-gray-500" />;
 };
 
+const isAllowedUploadUrl = (url: string): boolean => {
+  try {
+    const parsedUrl = new URL(url);
+    const hostname = parsedUrl.hostname.toLowerCase();
+
+    if (!UPLOAD_CONFIG.ALLOWED_UPLOAD_URL_PROTOCOLS.includes(parsedUrl.protocol))
+      return false;
+
+    if (UPLOAD_CONFIG.ALLOWED_UPLOAD_HOSTS.includes(hostname)) return true;
+
+    return UPLOAD_CONFIG.ALLOWED_UPLOAD_HOST_SUFFIXES.some((suffix) =>
+      hostname.endsWith(suffix),
+    );
+  } catch {
+    return false;
+  }
+};
+
 interface FileWithPreview extends File {
   preview?: string;
 }
@@ -284,6 +302,10 @@ export function FileUploader({
           );
 
         const { presignedUrl, publicUrl, key } = await response.json();
+
+        if (!presignedUrl || !isAllowedUploadUrl(presignedUrl)) {
+          throw new Error("Unsafe upload URL received.");
+        }
 
         const uploadResponse = await fetch(presignedUrl, {
           method: "PUT",

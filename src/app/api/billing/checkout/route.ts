@@ -11,6 +11,34 @@ const checkoutSchema = z.object({
   billingCycle: z.enum(["monthly", "yearly"]).optional(),
 });
 
+const BILLING_REDIRECT_HOSTS = ["creem.io"];
+const BILLING_REDIRECT_HOST_SUFFIXES = [".creem.io"];
+
+const assertTrustedBillingUrl = (url: string, label: string): string => {
+  let parsedUrl: URL;
+  try {
+    parsedUrl = new URL(url);
+  } catch {
+    throw new Error(`Invalid ${label}.`);
+  }
+
+  if (parsedUrl.protocol !== "https:") {
+    throw new Error(`Invalid ${label}.`);
+  }
+
+  const hostname = parsedUrl.hostname.toLowerCase();
+  if (BILLING_REDIRECT_HOSTS.includes(hostname)) return parsedUrl.toString();
+  if (
+    BILLING_REDIRECT_HOST_SUFFIXES.some((suffix) =>
+      hostname.endsWith(suffix),
+    )
+  ) {
+    return parsedUrl.toString();
+  }
+
+  throw new Error(`Invalid ${label}.`);
+};
+
 export async function POST(request: NextRequest) {
   let session: Session | null = null;
   try {
@@ -46,13 +74,17 @@ export async function POST(request: NextRequest) {
         const { portalUrl } = await billing.createCustomerPortalUrl(
           existingSubscription.customerId,
         );
+        const safePortalUrl = assertTrustedBillingUrl(
+          portalUrl,
+          "management URL",
+        );
 
         // 返回 409 Conflict 状态码，并附带管理链接
         return NextResponse.json(
           {
             error:
               "You already have an active subscription. Please manage your plan from the billing portal.",
-            managementUrl: portalUrl,
+            managementUrl: safePortalUrl,
           },
           { status: 409 },
         );
@@ -92,7 +124,12 @@ export async function POST(request: NextRequest) {
     const { checkoutUrl } =
       await billing.createCheckoutSession(checkoutOptions);
 
-    return NextResponse.json({ checkoutUrl });
+    const safeCheckoutUrl = assertTrustedBillingUrl(
+      checkoutUrl,
+      "checkout URL",
+    );
+
+    return NextResponse.json({ checkoutUrl: safeCheckoutUrl });
   } catch (error) {
     console.error("[Checkout API Error]", {
       message: error instanceof Error ? error.message : "Unknown error",

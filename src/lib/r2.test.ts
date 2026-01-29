@@ -21,6 +21,9 @@ const mockSend = jest.fn() as jest.MockedFunction<
 const mockGetSignedUrl = jest.fn() as jest.MockedFunction<
   (...args: any[]) => Promise<string>
 >;
+const mockLookup = jest.fn() as jest.MockedFunction<
+  (...args: any[]) => Promise<Array<{ address: string; family: number }>>
+>;
 
 jest.mock("@aws-sdk/client-s3", () => ({
   S3Client: jest.fn().mockImplementation(() => ({
@@ -34,6 +37,10 @@ jest.mock("@aws-sdk/client-s3", () => ({
 
 jest.mock("@aws-sdk/s3-request-presigner", () => ({
   getSignedUrl: mockGetSignedUrl,
+}));
+
+jest.mock("dns/promises", () => ({
+  lookup: mockLookup,
 }));
 
 // Mock upload config functions
@@ -78,6 +85,7 @@ describe("R2 Storage Functions", () => {
     mockGetSignedUrl.mockResolvedValue("https://mock-presigned-url.com");
     mockSend.mockResolvedValue({});
     mockRandomUUID.mockReturnValue("mock-uuid-123");
+    mockLookup.mockResolvedValue([{ address: "93.184.216.34", family: 4 }]);
 
     // Mock Date.now for consistent testing
     jest.spyOn(Date, "now").mockReturnValue(1234567890000);
@@ -193,6 +201,19 @@ describe("R2 Storage Functions", () => {
       expect(result.success).toBe(true);
       expect(result.url).toBe("https://mock-public-url.com/test-key");
       expect(result.key).toBe("test-key");
+    });
+
+    it("should block private or local addresses", async () => {
+      const { uploadFromUrl } = await import("./r2");
+
+      const result = await uploadFromUrl(
+        "http://127.0.0.1/secret.txt",
+        "test-key",
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.error).toBe("Blocked URL host");
+      expect(mockFetch).not.toHaveBeenCalled();
     });
 
     it("should handle fetch errors", async () => {

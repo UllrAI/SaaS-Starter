@@ -38,6 +38,37 @@ const formatPrice = (price: number, currency: string = "USD") => {
   }).format(price);
 };
 
+const BILLING_REDIRECT_HOSTS = ["creem.io"];
+const BILLING_REDIRECT_HOST_SUFFIXES = [".creem.io"];
+
+const getSafeBillingRedirectUrl = (url: unknown): string | null => {
+  if (typeof url !== "string" || url.length === 0) return null;
+  try {
+    const parsedUrl = new URL(url);
+    const hostname = parsedUrl.hostname.toLowerCase();
+
+    if (
+      hostname === window.location.hostname &&
+      parsedUrl.protocol === window.location.protocol
+    ) {
+      return parsedUrl.toString();
+    }
+
+    if (parsedUrl.protocol !== "https:") return null;
+    if (BILLING_REDIRECT_HOSTS.includes(hostname)) return parsedUrl.toString();
+    if (
+      BILLING_REDIRECT_HOST_SUFFIXES.some((suffix) =>
+        hostname.endsWith(suffix),
+      )
+    ) {
+      return parsedUrl.toString();
+    }
+    return null;
+  } catch {
+    return null;
+  }
+};
+
 export function PricingSection({ className }: { className?: string }) {
   const [paymentMode, setPaymentMode] = useState<PaymentMode>("subscription");
   const [billingCycle, setBillingCycle] = useState<BillingCycle>("yearly");
@@ -90,23 +121,35 @@ export function PricingSection({ className }: { className?: string }) {
       const data = await response.json();
 
       if (response.status === 409) {
+        const safeManagementUrl = getSafeBillingRedirectUrl(
+          data.managementUrl,
+        );
         toast.error(data.error || "Subscription already active.", {
-          action: {
-            label: "Manage Plan",
-            onClick: () => {
-              if (data.managementUrl) {
-                window.location.href = data.managementUrl;
+          ...(safeManagementUrl
+            ? {
+                action: {
+                  label: "Manage Plan",
+                  onClick: () => {
+                    window.location.href = safeManagementUrl;
+                  },
+                },
               }
-            },
-          },
+            : {}),
         });
+        if (data.managementUrl && !safeManagementUrl) {
+          console.warn("Blocked unsafe managementUrl redirect.");
+        }
         return;
       }
 
-      if (response.ok && data.checkoutUrl) {
+      const safeCheckoutUrl = getSafeBillingRedirectUrl(data.checkoutUrl);
+      if (response.ok && safeCheckoutUrl) {
         isRedirecting = true;
-        window.location.href = data.checkoutUrl;
+        window.location.href = safeCheckoutUrl;
       } else {
+        if (response.ok && data.checkoutUrl && !safeCheckoutUrl) {
+          throw new Error("Received an unsafe checkout URL.");
+        }
         throw new Error(data.error || "Failed to create checkout session.");
       }
     } catch (error) {

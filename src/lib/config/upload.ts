@@ -94,6 +94,23 @@ export const UPLOAD_CONFIG = {
   ALLOWED_FILE_TYPES: Object.keys(
     MIME_TYPE_TO_EXTENSION,
   ) as (keyof typeof MIME_TYPE_TO_EXTENSION)[],
+
+  /**
+   * 允许上传目标的协议列表。
+   * 默认仅允许 HTTPS。
+   */
+  ALLOWED_UPLOAD_URL_PROTOCOLS: ["https:"] as string[],
+
+  /**
+   * 允许上传目标的主机名（精确匹配）。
+   * 如使用自定义域名，请将其添加到此列表。
+   */
+  ALLOWED_UPLOAD_HOSTS: [] as string[],
+
+  /**
+   * 允许上传目标的主机名后缀匹配（用于供应商域名）。
+   */
+  ALLOWED_UPLOAD_HOST_SUFFIXES: [".r2.cloudflarestorage.com"] as string[],
 } as const;
 
 /**

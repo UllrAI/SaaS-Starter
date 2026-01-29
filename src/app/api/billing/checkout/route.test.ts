@@ -127,7 +127,7 @@ describe("Billing Checkout API", () => {
         status: "active",
       });
       mockCreateCustomerPortalUrl.mockResolvedValue({
-        portalUrl: "https://portal.example.com",
+        portalUrl: "https://portal.creem.io/customer-123",
       });
 
       const { POST } = await import("./route");
@@ -142,7 +142,7 @@ describe("Billing Checkout API", () => {
 
       expect(response.status).toBe(409);
       expect(data.error).toContain("already have an active subscription");
-      expect(data.managementUrl).toBe("https://portal.example.com");
+      expect(data.managementUrl).toBe("https://portal.creem.io/customer-123");
     });
 
     it("should return 409 when user has trialing subscription", async () => {
@@ -152,7 +152,7 @@ describe("Billing Checkout API", () => {
         status: "trialing",
       });
       mockCreateCustomerPortalUrl.mockResolvedValue({
-        portalUrl: "https://portal.example.com",
+        portalUrl: "https://portal.creem.io/customer-123",
       });
 
       const { POST } = await import("./route");
@@ -166,7 +166,7 @@ describe("Billing Checkout API", () => {
       const data = await response.json();
 
       expect(response.status).toBe(409);
-      expect(data.managementUrl).toBe("https://portal.example.com");
+      expect(data.managementUrl).toBe("https://portal.creem.io/customer-123");
     });
 
     it("should proceed when user has canceled subscription", async () => {
@@ -176,7 +176,7 @@ describe("Billing Checkout API", () => {
         status: "canceled",
       });
       mockCreateCheckoutSession.mockResolvedValue({
-        checkoutUrl: "https://checkout.example.com",
+        checkoutUrl: "https://checkout.creem.io/session-123",
       });
 
       const { POST } = await import("./route");
@@ -190,7 +190,7 @@ describe("Billing Checkout API", () => {
       const data = await response.json();
 
       expect(response.status).toBe(200);
-      expect(data.checkoutUrl).toBe("https://checkout.example.com");
+      expect(data.checkoutUrl).toBe("https://checkout.creem.io/session-123");
     });
 
     it("should proceed with one-time payment regardless of subscription status", async () => {
@@ -200,7 +200,7 @@ describe("Billing Checkout API", () => {
         status: "active",
       });
       mockCreateCheckoutSession.mockResolvedValue({
-        checkoutUrl: "https://checkout.example.com",
+        checkoutUrl: "https://checkout.creem.io/session-123",
       });
 
       const { POST } = await import("./route");
@@ -213,7 +213,7 @@ describe("Billing Checkout API", () => {
       const data = await response.json();
 
       expect(response.status).toBe(200);
-      expect(data.checkoutUrl).toBe("https://checkout.example.com");
+      expect(data.checkoutUrl).toBe("https://checkout.creem.io/session-123");
       expect(mockGetUserSubscription).not.toHaveBeenCalled();
     });
 
@@ -221,7 +221,7 @@ describe("Billing Checkout API", () => {
       mockGetSession.mockResolvedValue(mockSession);
       mockGetUserSubscription.mockResolvedValue(null);
       mockCreateCheckoutSession.mockResolvedValue({
-        checkoutUrl: "https://checkout.example.com",
+        checkoutUrl: "https://checkout.creem.io/session-123",
       });
 
       const { POST } = await import("./route");
@@ -247,14 +247,14 @@ describe("Billing Checkout API", () => {
 
       const data = await response.json();
       expect(response.status).toBe(200);
-      expect(data.checkoutUrl).toBe("https://checkout.example.com");
+      expect(data.checkoutUrl).toBe("https://checkout.creem.io/session-123");
     });
 
     it("should handle optional billingCycle parameter", async () => {
       mockGetSession.mockResolvedValue(mockSession);
       mockGetUserSubscription.mockResolvedValue(null);
       mockCreateCheckoutSession.mockResolvedValue({
-        checkoutUrl: "https://checkout.example.com",
+        checkoutUrl: "https://checkout.creem.io/session-123",
       });
 
       const { POST } = await import("./route");
@@ -354,7 +354,7 @@ describe("Billing Checkout API", () => {
       mockGetSession.mockResolvedValue(mockSession);
       mockGetUserSubscription.mockResolvedValue(null);
       mockCreateCheckoutSession.mockResolvedValue({
-        checkoutUrl: "https://checkout.example.com",
+        checkoutUrl: "https://checkout.creem.io/session-123",
       });
 
       const { POST } = await import("./route");

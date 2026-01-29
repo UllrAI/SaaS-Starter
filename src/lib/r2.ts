@@ -6,6 +6,8 @@ import {
   DeleteObjectsCommand,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { lookup } from "dns/promises";
+import { isIP } from "net";
 import env from "@/env";
 import {
   UPLOAD_CONFIG,
@@ -111,6 +113,110 @@ interface UploadResult {
   error?: string;
 }
 
+const BLOCKED_URL_ERROR = "Blocked URL host";
+
+const PRIVATE_IPV4_RANGES: Array<[number, number]> = [
+  [0x00000000, 0x00ffffff], // 0.0.0.0/8
+  [0x0a000000, 0x0affffff], // 10.0.0.0/8
+  [0x64400000, 0x647fffff], // 100.64.0.0/10
+  [0x7f000000, 0x7fffffff], // 127.0.0.0/8
+  [0xa9fe0000, 0xa9feffff], // 169.254.0.0/16
+  [0xac100000, 0xac1fffff], // 172.16.0.0/12
+  [0xc0000000, 0xc00000ff], // 192.0.0.0/24
+  [0xc0000200, 0xc00002ff], // 192.0.2.0/24
+  [0xc0a80000, 0xc0a8ffff], // 192.168.0.0/16
+  [0xc6120000, 0xc613ffff], // 198.18.0.0/15
+  [0xc6336400, 0xc63364ff], // 198.51.100.0/24
+  [0xcb007100, 0xcb0071ff], // 203.0.113.0/24
+  [0xe0000000, 0xefffffff], // 224.0.0.0/4
+  [0xf0000000, 0xffffffff], // 240.0.0.0/4
+];
+
+const isPrivateIpv4 = (ip: string): boolean => {
+  const parts = ip.split(".").map((part) => Number(part));
+  if (parts.length !== 4 || parts.some((part) => Number.isNaN(part)))
+    return true;
+  const value = parts.reduce((acc, part) => acc * 256 + part, 0);
+  return PRIVATE_IPV4_RANGES.some(
+    ([start, end]) => value >= start && value <= end,
+  );
+};
+
+const isPrivateIpv6 = (ip: string): boolean => {
+  const normalized = ip.toLowerCase();
+  if (normalized === "::" || normalized === "::1") return true;
+  if (normalized.startsWith("fc") || normalized.startsWith("fd")) return true;
+  if (/^fe[89ab]/.test(normalized)) return true;
+  if (normalized.startsWith("ff")) return true;
+  if (normalized.startsWith("2001:db8")) return true;
+  if (normalized.startsWith("::ffff:")) {
+    const v4Part = normalized.replace("::ffff:", "");
+    if (v4Part.includes(".")) {
+      return isPrivateIpv4(v4Part);
+    }
+  }
+  return false;
+};
+
+const isPrivateIpAddress = (ip: string): boolean => {
+  const ipVersion = isIP(ip);
+  if (ipVersion === 4) return isPrivateIpv4(ip);
+  if (ipVersion === 6) return isPrivateIpv6(ip);
+  return true;
+};
+
+const assertSafeRemoteUrl = async (url: string): Promise<URL> => {
+  let parsedUrl: URL;
+  try {
+    parsedUrl = new URL(url);
+  } catch {
+    throw new Error("Invalid URL");
+  }
+
+  if (!["http:", "https:"].includes(parsedUrl.protocol)) {
+    throw new Error("Unsupported URL protocol");
+  }
+
+  if (parsedUrl.username || parsedUrl.password) {
+    throw new Error(BLOCKED_URL_ERROR);
+  }
+
+  const hostname = parsedUrl.hostname.toLowerCase();
+  if (
+    hostname === "localhost" ||
+    hostname.endsWith(".localhost") ||
+    hostname.endsWith(".local") ||
+    hostname.endsWith(".internal")
+  ) {
+    throw new Error(BLOCKED_URL_ERROR);
+  }
+
+  if (isIP(hostname)) {
+    if (isPrivateIpAddress(hostname)) {
+      throw new Error(BLOCKED_URL_ERROR);
+    }
+    return parsedUrl;
+  }
+
+  let records: Array<{ address: string; family: number }>;
+  try {
+    records = await lookup(hostname, { all: true });
+  } catch {
+    throw new Error(BLOCKED_URL_ERROR);
+  }
+  if (!records.length) {
+    throw new Error(BLOCKED_URL_ERROR);
+  }
+
+  for (const record of records) {
+    if (isPrivateIpAddress(record.address)) {
+      throw new Error(BLOCKED_URL_ERROR);
+    }
+  }
+
+  return parsedUrl;
+};
+
 /**
  * Upload a file from URL to R2 (server-side)
  */
@@ -120,8 +226,13 @@ export async function uploadFromUrl(
   contentType?: string,
 ): Promise<UploadResult> {
   try {
+    const parsedUrl = await assertSafeRemoteUrl(url);
+
     // Fetch the file from URL
-    const response = await fetch(url);
+    const response = await fetch(parsedUrl.toString(), { redirect: "manual" });
+    if (response.status >= 300 && response.status < 400) {
+      throw new Error("Redirects are not allowed when fetching remote files.");
+    }
     if (!response.ok) {
       throw new Error(`Failed to fetch file from URL: ${response.statusText}`);
     }

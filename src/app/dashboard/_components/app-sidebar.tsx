@@ -10,11 +10,9 @@ import {
   CreditCard,
   BarChart3,
   LucideIcon,
-  Database,
 } from "lucide-react";
 import { APP_NAME } from "@/lib/config/constants";
 import { isAdminRole } from "@/lib/config/roles";
-import { enabledTablesMap } from "@/lib/config/admin-tables";
 
 import {
   Sidebar,
@@ -109,14 +107,6 @@ const adminNavigation: {
     matchMode: "exact",
   },
 ];
-
-const genericTableNavigation = Object.keys(enabledTablesMap).map((key) => ({
-  key: key.charAt(0).toUpperCase() + key.slice(1),
-  title: <>{key.charAt(0).toUpperCase() + key.slice(1)}</>,
-  url: `/dashboard/admin/tables/${key}`,
-  icon: Database,
-  matchMode: "exact" as const,
-}));
 
 interface MenuItemProps {
   item: {
@@ -249,14 +239,6 @@ export function AppSidebar() {
               items={adminNavigation}
               pathname={pathname}
             />
-
-            {genericTableNavigation.length > 0 && (
-              <SidebarSection
-                title={open ? <>Manage Tables</> : undefined}
-                items={genericTableNavigation}
-                pathname={pathname}
-              />
-            )}
           </>
         )}
       </SidebarContent>

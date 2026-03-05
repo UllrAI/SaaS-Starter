@@ -109,13 +109,6 @@ export function AppearancePage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold tracking-tight">Appearance</h2>
-        <p className="text-muted-foreground mt-1">
-          Customize the look and feel of your dashboard
-        </p>
-      </div>
-
       <Card className="w-full">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">

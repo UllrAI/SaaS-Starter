@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useCallback } from "react";
+import { type ComponentProps, type ReactNode, useCallback } from "react";
 import { Badge } from "@/components/ui/badge";
 import { ExternalLink } from "lucide-react";
 import { AdminTableBase } from "@/components/admin/admin-table-base";
@@ -21,19 +21,17 @@ interface PaymentManagementTableProps {
   };
 }
 
+type BadgeVariant = ComponentProps<typeof Badge>["variant"];
+
+const STATUS_BADGE_VARIANT_MAP: Record<string, BadgeVariant> = {
+  succeeded: "secondary",
+  pending: "outline",
+  failed: "destructive",
+  canceled: "outline",
+};
+
 const getStatusBadgeVariant = (status: string) => {
-  switch (status) {
-    case "succeeded":
-      return "secondary";
-    case "pending":
-      return "outline";
-    case "failed":
-      return "destructive";
-    case "canceled":
-      return "outline";
-    default:
-      return "secondary";
-  }
+  return STATUS_BADGE_VARIANT_MAP[status] ?? "secondary";
 };
 
 const formatCurrency = (amount: number, currency: string, locale: string) => {

@@ -92,11 +92,11 @@ export function BillingOverview({ subscription, payments }: BillingOverviewProps
             <CardTitle className="text-base">
               {subscription
                 ? `${subscription.tierId.charAt(0).toUpperCase()}${subscription.tierId.slice(1)}`
-                : "Free"}
+                : <>Free</>}
             </CardTitle>
           </CardHeader>
           <CardContent className="flex items-center gap-2 text-sm">
-            <CreditCard className="text-muted-foreground h-4 w-4" />
+            {/* <CreditCard className="text-muted-foreground h-4 w-4" /> */}
             {subscription ? (
               <Badge
                 className="capitalize"
@@ -124,8 +124,8 @@ export function BillingOverview({ subscription, payments }: BillingOverviewProps
           <CardContent className="text-muted-foreground flex items-center gap-2 text-sm">
             <CalendarClock className="h-4 w-4" />
             {subscription?.canceledAt
-              ? "Subscription ends at period close"
-              : "Based on your current billing cycle"}
+              ? <>Subscription ends at period close</>
+              : <>Based on your current billing cycle</>}
           </CardContent>
         </Card>
 
@@ -160,9 +160,6 @@ export function BillingOverview({ subscription, payments }: BillingOverviewProps
           ) : (
             <Button onClick={() => router.push("/pricing")}>View Plans</Button>
           )}
-          <Button variant="outline" asChild>
-            <Link href="/dashboard/settings">Open Settings</Link>
-          </Button>
         </CardContent>
       </Card>
 

@@ -232,6 +232,8 @@ Keystatic CMS is configured for local development only (security measure). Blog 
 3. Use TypeScript interfaces for props
 4. Keep components under 400 lines
 5. Co-locate page-specific components in `_components/` directories
+6. Keep localizable copy directly in JSX text nodes/fragments or JSX string attributes (`placeholder`/`alt`/`aria-label`/`title`)
+7. For reusable copy, prefer small JSX subcomponents instead of exported string maps/helpers
 
 #### Working with Forms
 
@@ -505,3 +507,18 @@ export function App() {
 - Do not hallucinate React hooks (e.g., `useTranslation`).
 - Do not hallucinate React components (e.g., `FormattedMessage`).
 - Do not hallucinate methods (e.g., `localizeText`).
+
+## i18n 方案（公共组件文案约束）
+
+- 原因：Lingo 编译器通过 Babel AST 解析，仅会提取 JSX 渲染树内的可翻译内容；变量/对象中的字符串不会被翻译。
+- 可提取内容（示例）：JSX 文本节点、JSX fragment 文本、JSX 字符串属性（`placeholder`/`alt`/`aria-label`/`title`/`label`）、以及 JSX 文本 + 表达式组合（如 `<p>Hello {name}</p>`）。
+- 所有需要本地化的文案必须以 JSX 文本节点或 JSX fragment 直接出现在组件渲染树内。
+- 避免在组件外部用 helper/switch 返回 JSX 文案；需要复用时，封装小型 JSX 组件并在渲染树内使用；列表用组件内联数组定义 `title`/`desc` 等内容。
+- 避免将可本地化文案放在字符串变量、模板字面量或对象映射表中（这些不会被提取）；保持文案与 JSX 直接相邻。
+- 需要复用文案时，优先封装小型 JSX 组件（如 `StylePresetLabel`），不要导出字符串映射。
+- 动态文本用 JSX 组合（例如 `<span data-lingo-skip>{count}</span> <>items</>`），避免模板字符串拼接；`data-lingo-skip` 必须是属性，不要写在 `className` 中。
+- 避免 IIFE/匿名函数包裹 JSX（例如 `{(() => { ... })()}`）；避免在 `map`/回调等嵌套函数中直接写 JSX 文案，改用子组件或将文案提升到渲染树。
+- `placeholder`/`alt`/`aria-label`/`title` 等属性若是可本地化文案，必须在 JSX 中直接写字符串字面量，避免在组件外先拼接再传入。
+- 如需自定义 locale 解析器，路径应为 `src/.lingo/locale-resolver.server.ts` 与 `src/.lingo/locale-resolver.client.ts`（受 `sourceRoot=src` 与 `lingoDir=.lingo` 影响）。
+- 语言切换与读取统一使用 `@lingo.dev/compiler/react`（当前使用 `useLingoContext` 提供 `locale`/`setLocale`，或 `useLocale`/`setLocale`），避免混用 `lingo.dev/react/client` 造成 locale/cookie 不一致。
+- 数字/日期格式化使用当前 locale（如 `useLingoContext().locale` + `resolveIntlLocale` 或 `resolveLocale`），避免写死 `en-US` 或省略 locale。

@@ -38,7 +38,6 @@ import { z } from "zod";
 import { requireAdmin } from "../auth/permissions";
 import { revalidatePath } from "next/cache";
 import { creemClient } from "../billing/creem/client";
-import env from "@/env";
 import {
   deleteFiles as deleteFilesFromR2,
   deleteFile as deleteFileFromR2,
@@ -517,9 +516,8 @@ export const cancelSubscriptionAction = adminAction
       throw new Error("Subscription not found");
     }
 
-    await creemClient.cancelSubscription({
-      xApiKey: env.CREEM_API_KEY,
-      id: subscription.subscriptionId,
+    await creemClient.subscriptions.cancel(subscription.subscriptionId, {
+      mode: "immediate",
     });
 
     revalidatePath("/dashboard/admin/subscriptions");

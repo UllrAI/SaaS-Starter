@@ -422,13 +422,9 @@ sequenceDiagram
 
 提供了一套强大的、可扩展的数据管理系统。
 
-- **通用表格管理器**: `src/components/admin/generic-table/generic-table-manager.tsx` 是一个核心组件，可以为任何在 `src/lib/config/admin-tables.ts` 中声明的表自动生成一个完整的 CRUD 管理界面。
-- **配置驱动**:
-  1. 在 `src/lib/config/admin-tables.ts` 中添加 Drizzle 表对象。
-  1. 在 `src/app/dashboard/_components/app-sidebar.tsx` 的 `genericTableNavigation` 中添加导航链接。
-  1. 即可在 `/dashboard/admin/tables/[tableName]` 访问新的管理页面。
-- **Server Actions**: 所有 CRUD 操作都通过 `src/lib/actions/admin-generic.ts` 中的类型安全的 Server Actions 完成，无需编写额外的 API 路由。
-- **Schema 解析**: `src/lib/admin/schema-generator.ts` 动态解析 Drizzle schema，自动生成表单和验证规则 (Zod)，极大地简化了后台开发。
+- **模块化管理页面**: 提供用户、支付、订阅、上传等独立后台页面，便于按业务域演进功能。
+- **统一权限控制**: 后台操作统一受管理员权限校验保护。
+- **Server Actions**: 管理端读写通过 `src/lib/actions/admin.ts` 中的类型安全 Server Actions 完成，无需额外 API 路由。
 
 ---
 
@@ -439,8 +435,8 @@ sequenceDiagram
 - **添加新页面**: 在 `src/app/(pages)` 或 `src/app/(dashboard)` 中创建新路由。
 - **添加新后台管理表**:
   1. 在 `src/database/schema.ts` 中定义新表。
-  1. 在 `src/lib/config/admin-tables.ts` 的 `enabledTablesMap` 中注册该表。
-  1. 在 `src/app/dashboard/_components/app-sidebar.tsx` 中添加导航链接。
+  1. 在 `src/lib/actions/admin.ts` 中添加对应查询/变更逻辑。
+  1. 在 `src/app/dashboard/admin/` 下新增对应管理页面并在 `src/app/dashboard/_components/app-sidebar.tsx` 中添加导航链接。
 - **添加新支付提供商**:
   1. 在 `src/lib/billing/` 下创建新的提供商实现文件，需遵循 `src/lib/billing/provider.ts` 的 `PaymentProvider` 接口。
   1. 在 `src/lib/billing/index.ts` 中修改 `PAYMENT_PROVIDER` 逻辑以切换到新提供商。

@@ -421,13 +421,9 @@ sequenceDiagram
 
 Provides a powerful, extensible data management system.
 
-- **Generic Table Manager**: `components/admin/generic-table/generic-table-manager.tsx` is a core component that can automatically generate a complete CRUD management interface for any table declared in `src/lib/config/admin-tables.ts`.
-- **Configuration-Driven**:
-  1. Add Drizzle table object in `src/lib/config/admin-tables.ts`.
-  1. Add navigation link in `genericTableNavigation` in `src/app/dashboard/_components/app-sidebar.tsx`.
-  1. Access new management page at `/dashboard/admin/tables/[tableName]`.
-- **Server Actions**: All CRUD operations completed through type-safe Server Actions in `src/lib/actions/admin-generic.ts`, no need to write additional API routes.
-- **Schema Parsing**: `src/lib/admin/schema-generator.ts` dynamically parses Drizzle schema, automatically generates forms and validation rules (Zod), greatly simplifying backend development.
+- **Modular management pages**: Includes dedicated admin pages for users, payments, subscriptions, and uploads to keep each business domain isolated.
+- **Unified permission guard**: All admin operations are protected by admin-level authorization checks.
+- **Server Actions**: Management reads/writes are handled by type-safe Server Actions in `src/lib/actions/admin.ts`, without adding extra API routes.
 
 ---
 
@@ -438,8 +434,8 @@ Provides a powerful, extensible data management system.
 - **Add New Pages**: Create new routes in `app/(pages)` or `app/(dashboard)`.
 - **Add New Admin Management Tables**:
   1. Define new table in `database/schema.ts`.
-  1. Register the table in `enabledTablesMap` in `src/lib/config/admin-tables.ts`.
-  1. Add navigation link in `src/app/dashboard/_components/app-sidebar.tsx`.
+  1. Add corresponding query/mutation logic in `src/lib/actions/admin.ts`.
+  1. Create a dedicated management page under `src/app/dashboard/admin/` and add its navigation in `src/app/dashboard/_components/app-sidebar.tsx`.
 - **Add New Payment Provider**:
   1. Create new provider implementation file under `src/lib/billing/`, must follow `PaymentProvider` interface in `src/lib/billing/provider.ts`.
   1. Modify `PAYMENT_PROVIDER` logic in `src/lib/billing/index.ts` to switch to new provider.

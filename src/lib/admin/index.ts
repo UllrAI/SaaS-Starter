@@ -1,17 +1,4 @@
-// 统一导出 admin 相关的类型和配置
-export {
-  type TableConfig,
-  type ColumnType,
-  type ColumnInfo,
-  type SchemaInfo,
-} from "./types";
-export {
-  adminTableConfig,
-  getTableConfig,
-  isUserRelatedTable,
-  getUserRelatedColumn,
-} from "./config";
-export { getTableSchema } from "./schema-generator";
+// 统一导出 admin 相关能力
 export {
   getAdminStats,
   type AdminStatsWithCharts,

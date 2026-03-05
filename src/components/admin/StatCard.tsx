@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { LucideIcon } from "lucide-react";
+import { resolveIntlLocale } from "@/lib/locale";
 
 interface StatCardProps {
   title: string;
@@ -8,6 +9,7 @@ interface StatCardProps {
   description?: string;
   icon: LucideIcon;
   loading?: boolean;
+  locale?: string;
 }
 
 export function StatCard({
@@ -16,7 +18,10 @@ export function StatCard({
   description,
   icon: Icon,
   loading,
+  locale,
 }: StatCardProps) {
+  const intlLocale = resolveIntlLocale(locale);
+
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -25,7 +30,13 @@ export function StatCard({
       </CardHeader>
       <CardContent>
         <div className="text-2xl font-bold">
-          {loading ? <Skeleton className="h-8 w-24" /> : value.toLocaleString()}
+          {loading ? (
+            <Skeleton className="h-8 w-24" />
+          ) : typeof value === "number" ? (
+            value.toLocaleString(intlLocale)
+          ) : (
+            value
+          )}
         </div>
         {description && (
           <div className="text-muted-foreground text-xs">

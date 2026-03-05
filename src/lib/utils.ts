@@ -1,6 +1,7 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { type Node } from "@markdoc/markdoc";
+import { resolveIntlLocale } from "@/lib/locale";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -37,9 +38,10 @@ export function renderMarkdoc(nodeOrNodes: Node | Node[]): string {
 export function formatCurrency(
   amountInCents: number,
   currency: string = "USD",
+  locale?: string,
 ): string {
   const amountInDollars = amountInCents / 100;
-  return new Intl.NumberFormat("en-US", {
+  return new Intl.NumberFormat(resolveIntlLocale(locale), {
     style: "currency",
     currency,
   }).format(amountInDollars);

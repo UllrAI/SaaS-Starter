@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { formatFileSize } from "@/lib/config/upload";
+import { useIntlLocale } from "@/hooks/use-intl-locale";
 
 // This type is also used by lib/admin/stats.ts
 export interface AdminStats {
@@ -42,6 +43,8 @@ interface AdminStatsCardsProps {
 }
 
 export function AdminStatsCards({ initialStats }: AdminStatsCardsProps) {
+  const intlLocale = useIntlLocale();
+
   if (!initialStats) {
     return (
       <Card>
@@ -57,13 +60,12 @@ export function AdminStatsCards({ initialStats }: AdminStatsCardsProps) {
 
   const stats = initialStats;
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-US", {
+  const formatStatsCurrency = (amountInCents: number) =>
+    new Intl.NumberFormat(intlLocale, {
       style: "currency",
       currency: "USD",
       minimumFractionDigits: 0,
-    }).format(amount / 100); // Assuming amount is in cents
-  };
+    }).format(amountInCents / 100);
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -74,7 +76,7 @@ export function AdminStatsCards({ initialStats }: AdminStatsCardsProps) {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
-            {stats.users.total.toLocaleString()}
+            {stats.users.total.toLocaleString(intlLocale)}
           </div>
           <div className="mt-1 flex items-center gap-2">
             <Badge variant="secondary" className="text-xs">
@@ -96,7 +98,7 @@ export function AdminStatsCards({ initialStats }: AdminStatsCardsProps) {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
-            {stats.subscriptions.active.toLocaleString()}
+            {stats.subscriptions.active.toLocaleString(intlLocale)}
           </div>
           <p className="text-muted-foreground flex items-center gap-1 text-xs">
             <TrendingUp className="h-3 w-3 text-emerald-600" />
@@ -113,7 +115,7 @@ export function AdminStatsCards({ initialStats }: AdminStatsCardsProps) {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
-            {formatCurrency(stats.payments.totalRevenue)}
+            {formatStatsCurrency(stats.payments.totalRevenue)}
           </div>
           <p className="text-muted-foreground flex items-center gap-1 text-xs">
             <TrendingUp className="h-3 w-3 text-emerald-600" />
@@ -129,7 +131,7 @@ export function AdminStatsCards({ initialStats }: AdminStatsCardsProps) {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
-            {stats.uploads.total.toLocaleString()}
+            {stats.uploads.total.toLocaleString(intlLocale)}
           </div>
           <p className="text-muted-foreground text-xs">
             {formatFileSize(stats.uploads.totalSize)} total

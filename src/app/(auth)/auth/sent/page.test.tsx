@@ -25,11 +25,6 @@ jest.mock("@/components/auth/link-sent-card", () => ({
   LinkSentCard: (props: React.ComponentProps<any>) => mockLinkSentCard(props),
 }));
 
-const mockUseSearchParams = jest.fn();
-jest.mock("next/navigation", () => ({
-  useSearchParams: () => mockUseSearchParams(),
-}));
-
 describe("MagicLinkSent page", () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -37,12 +32,11 @@ describe("MagicLinkSent page", () => {
   });
 
   it("passes the provided email address to the description", async () => {
-    mockUseSearchParams.mockReturnValue({
-      get: (key: string) => (key === "email" ? "test@example.com" : null),
-    });
-
     const pageModule = await import("./page");
-    render(pageModule.default());
+    const element = await pageModule.default({
+      searchParams: Promise.resolve({ email: "test@example.com" }),
+    });
+    render(element);
 
     const card = screen.getByTestId("link-sent-card");
     expect(card).toHaveAttribute("data-title", "Check your email");
@@ -52,12 +46,11 @@ describe("MagicLinkSent page", () => {
   });
 
   it("falls back to generic copy when email is missing", async () => {
-    mockUseSearchParams.mockReturnValue({
-      get: () => null,
-    });
-
     const pageModule = await import("./page");
-    render(pageModule.default());
+    const element = await pageModule.default({
+      searchParams: Promise.resolve({}),
+    });
+    render(element);
 
     const card = screen.getByTestId("link-sent-card");
     expect(card.textContent).toContain("your email address");

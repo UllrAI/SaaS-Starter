@@ -2,8 +2,10 @@ import { StatCard } from "@/components/admin/StatCard";
 import { Users, UserCheck, UserX, TrendingUp } from "lucide-react";
 import { getSubscriptionStats } from "@/lib/admin/stats";
 import type { AdminStats } from "../../_components/admin-stats-cards";
+import { getServerLocale } from "@lingo.dev/compiler/virtual/locale/server";
 
 export async function SubscriptionStatsCards() {
+  const locale = await getServerLocale();
   const stats: AdminStats["subscriptions"] = await getSubscriptionStats();
 
   // MRR calculation is complex and often requires historical data.
@@ -17,24 +19,28 @@ export async function SubscriptionStatsCards() {
         value={stats.total}
         description="All-time subscriptions"
         icon={Users}
+        locale={locale}
       />
       <StatCard
         title="Active Subscriptions"
         value={stats.active}
         description="Currently active plans"
         icon={UserCheck}
+        locale={locale}
       />
       <StatCard
         title="Canceled Subscriptions"
         value={stats.canceled}
         description="Subscriptions marked for cancellation"
         icon={UserX}
+        locale={locale}
       />
       <StatCard
         title="MRR (Placeholder)"
         value={monthlyRecurringRevenue}
         description="Monthly Recurring Revenue"
         icon={TrendingUp}
+        locale={locale}
       />
     </div>
   );

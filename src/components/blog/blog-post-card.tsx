@@ -23,6 +23,7 @@ interface BlogPostCardProps {
   className?: string;
   author?: string;
   content: string;
+  locale?: string;
 }
 
 export function BlogPostCard({
@@ -36,6 +37,7 @@ export function BlogPostCard({
   className,
   author,
   content,
+  locale,
 }: BlogPostCardProps) {
   const isFeatured = variant === "featured";
   const hasImage = !!heroImage;
@@ -133,6 +135,7 @@ export function BlogPostCard({
             className="justify-start"
             author={author}
             readTime={calculateReadingTime(content)}
+            locale={locale}
           />
         </div>
       </CardHeader>

@@ -23,6 +23,7 @@ import { formatCurrency } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
 import type { Subscription, PaymentRecord } from "@/types/billing";
 import { useRouter } from "nextjs-toploader/app";
+import { useIntlLocale } from "@/hooks/use-intl-locale";
 
 interface BillingPageProps {
   subscription: Subscription | null;
@@ -30,6 +31,7 @@ interface BillingPageProps {
 }
 
 export function BillingPage({ subscription, payments }: BillingPageProps) {
+  const intlLocale = useIntlLocale();
   const [isPortalLoading, setIsPortalLoading] = useState(false);
   const router = useRouter();
 
@@ -93,12 +95,16 @@ export function BillingPage({ subscription, payments }: BillingPageProps) {
                 {subscription.canceledAt ? (
                   <>
                     Your subscription will end on{" "}
-                    {subscription.currentPeriodEnd?.toLocaleDateString()}
+                    {subscription.currentPeriodEnd?.toLocaleDateString(
+                      intlLocale,
+                    )}
                   </>
                 ) : (
                   <>
                     Your subscription renews on{" "}
-                    {subscription.currentPeriodEnd?.toLocaleDateString()}
+                    {subscription.currentPeriodEnd?.toLocaleDateString(
+                      intlLocale,
+                    )}
                   </>
                 )}
               </p>
@@ -153,7 +159,9 @@ export function BillingPage({ subscription, payments }: BillingPageProps) {
                 {payments.map((payment) => (
                   <TableRow key={payment.id}>
                     <TableCell className="text-sm">
-                      {new Date(payment.createdAt).toLocaleDateString()}
+                      {new Date(payment.createdAt).toLocaleDateString(
+                        intlLocale,
+                      )}
                     </TableCell>
                     <TableCell className="font-medium">
                       {payment.tierName}
@@ -174,7 +182,11 @@ export function BillingPage({ subscription, payments }: BillingPageProps) {
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      {formatCurrency(payment.amount, payment.currency)}
+                      {formatCurrency(
+                        payment.amount,
+                        payment.currency,
+                        intlLocale,
+                      )}
                     </TableCell>
                     <TableCell>
                       <Badge

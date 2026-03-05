@@ -1,11 +1,15 @@
-"use client";
-
-import { useSearchParams } from "next/navigation";
 import { LinkSentCard } from "@/components/auth/link-sent-card";
 
-export default function MagicLinkSent() {
-  const searchParams = useSearchParams();
-  const email = searchParams.get("email");
+interface MagicLinkSentPageProps {
+  searchParams: Promise<{
+    email?: string;
+  }>;
+}
+
+export default async function MagicLinkSent({
+  searchParams,
+}: MagicLinkSentPageProps) {
+  const { email } = await searchParams;
 
   const description = (
     <>

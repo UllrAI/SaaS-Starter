@@ -25,6 +25,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { adminTableConfig } from "@/lib/admin/config";
 import { FieldValues } from "react-hook-form";
+import { useIntlLocale } from "@/hooks/use-intl-locale";
 
 interface RecordItem {
   id: string | number;
@@ -73,7 +74,7 @@ function isDateValue(value: unknown): boolean {
 }
 
 // Enhanced helper function to format date with better error handling
-function formatDate(date: unknown): string {
+function formatDate(date: unknown, locale: string): string {
   try {
     let dateObj: Date;
 
@@ -92,13 +93,13 @@ function formatDate(date: unknown): string {
 
     // Format as MM/dd/yyyy HH:mm
     const formatted =
-      dateObj.toLocaleDateString("en-US", {
+      dateObj.toLocaleDateString(locale, {
         month: "2-digit",
         day: "2-digit",
         year: "numeric",
       }) +
       " " +
-      dateObj.toLocaleTimeString("en-US", {
+      dateObj.toLocaleTimeString(locale, {
         hour: "2-digit",
         minute: "2-digit",
         hour12: false,
@@ -129,6 +130,7 @@ export function GenericTableManager({
   initialData,
   initialPagination,
 }: GenericTableManagerProps) {
+  const intlLocale = useIntlLocale();
   const [isPending, startTransition] = useTransition();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingRecord, setEditingRecord] = useState<RecordItem | null>(null);
@@ -286,7 +288,7 @@ export function GenericTableManager({
               return (
                 <span className="font-mono">
                   $
-                  {Number(value).toLocaleString("en-US", {
+                  {Number(value).toLocaleString(intlLocale, {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}
@@ -323,7 +325,9 @@ export function GenericTableManager({
 
             case "date":
               return (
-                <span className="font-mono text-sm">{formatDate(value)}</span>
+                <span className="font-mono text-sm">
+                  {formatDate(value, intlLocale)}
+                </span>
               );
 
             case "user_id":
@@ -440,7 +444,9 @@ export function GenericTableManager({
               // Last resort: check if the value looks like a date
               if (isDateValue(value)) {
                 return (
-                  <span className="font-mono text-sm">{formatDate(value)}</span>
+                  <span className="font-mono text-sm">
+                    {formatDate(value, intlLocale)}
+                  </span>
                 );
               }
 
@@ -477,7 +483,7 @@ export function GenericTableManager({
         ),
       },
     ];
-  }, [schemaInfo, tableConfig, data, selectedIds, handleDelete]);
+  }, [schemaInfo, tableConfig, data, selectedIds, handleDelete, intlLocale]);
 
   const handleFormSubmit = async (formData: FieldValues) => {
     startTransition(async () => {

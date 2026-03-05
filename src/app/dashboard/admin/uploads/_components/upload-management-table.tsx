@@ -24,6 +24,7 @@ import {
   batchDeleteUploadsAction,
 } from "@/lib/actions/admin";
 import Image from "next/image";
+import { useIntlLocale } from "@/hooks/use-intl-locale";
 
 interface Upload {
   id: string;
@@ -56,6 +57,7 @@ export function UploadManagementTable({
   initialData,
   initialPagination,
 }: UploadManagementTableProps) {
+  const intlLocale = useIntlLocale();
   const [isPending, startTransition] = useTransition();
   const [selectedUpload, setSelectedUpload] = useState<Upload | null>(null);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
@@ -199,7 +201,7 @@ export function UploadManagementTable({
       label: "Uploaded",
       render: (upload) => (
         <p className="text-sm">
-          {new Date(upload.createdAt).toLocaleDateString()}
+          {new Date(upload.createdAt).toLocaleDateString(intlLocale)}
         </p>
       ),
     },

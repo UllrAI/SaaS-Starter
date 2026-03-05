@@ -1,5 +1,6 @@
 import "@/styles/globals.css";
 import Script from "next/script";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import { createMetadata } from "@/lib/metadata";
 import { APP_NAME, COMPANY_NAME } from "@/lib/config/constants";
 import env from "@/env";
@@ -7,6 +8,18 @@ import env from "@/env";
 import { LingoProvider } from "@lingo.dev/compiler/react/next";
 import { getServerLocale } from "@lingo.dev/compiler/virtual/locale/server";
 import { AppProviders } from "@/components/app-providers";
+
+const fontSans = Inter({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  display: "swap",
+});
+
+const fontMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
+  display: "swap",
+});
 
 export const metadata = createMetadata({
   title: {
@@ -45,9 +58,13 @@ export default async function RootLayout({
   const locale = await getServerLocale();
 
   return (
-    <html lang={locale} suppressHydrationWarning>
+    <html
+      lang={locale}
+      className={`${fontSans.variable} ${fontMono.variable}`}
+      suppressHydrationWarning
+    >
       <head />
-      <body suppressHydrationWarning>
+      <body>
         <LingoProvider initialLocale={locale} devWidget={{ enabled: false }}>
           <AppProviders>{children}</AppProviders>
         </LingoProvider>

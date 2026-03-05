@@ -6,8 +6,10 @@ import {
   getUploadStatsDetails,
   type UploadStatsDetails,
 } from "@/lib/admin/stats";
+import { getServerLocale } from "@lingo.dev/compiler/virtual/locale/server";
 
 export async function UploadStatsCards() {
+  const locale = await getServerLocale();
   const stats: UploadStatsDetails = await getUploadStatsDetails();
 
   return (
@@ -17,18 +19,21 @@ export async function UploadStatsCards() {
         value={stats.total}
         description={`${stats.recentUploads} in last 24h`}
         icon={Upload}
+        locale={locale}
       />
       <StatCard
         title="Storage Used"
         value={stats.totalSizeFormatted}
         description={`Avg: ${stats.averageSizeFormatted}`}
         icon={HardDrive}
+        locale={locale}
       />
       <StatCard
         title="Top File Type"
         value={stats.topFileTypes?.[0]?.type || "N/A"}
         description={`${stats.topFileTypes?.[0]?.count || 0} files`}
         icon={FileText}
+        locale={locale}
       />
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

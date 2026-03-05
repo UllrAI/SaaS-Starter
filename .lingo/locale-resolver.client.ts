@@ -5,7 +5,6 @@ import {
   isMarketingPath,
   normalizeLocaleCandidate,
   resolvePreferredLocale,
-  withLocalePrefix,
 } from "../src/lib/config/i18n-routing";
 
 function getLocaleCookie(): string | null {
@@ -52,20 +51,4 @@ export function getClientLocale(): string {
 export function persistLocale(locale: string): void {
   const nextLocale = normalizeLocaleCandidate(locale) ?? SOURCE_LOCALE;
   persistLocaleCookie(nextLocale);
-
-  const { pathname, search, hash } = window.location;
-  const pathLocale = extractLocaleFromPath(pathname);
-  const basePathname = pathLocale.locale ? pathLocale.strippedPathname : pathname;
-
-  if (isMarketingPath(basePathname)) {
-    const nextPathname = withLocalePrefix(basePathname, nextLocale);
-    const currentUrl = `${pathname}${search}${hash}`;
-    const nextUrl = `${nextPathname}${search}${hash}`;
-    if (nextUrl !== currentUrl) {
-      window.location.assign(nextUrl);
-    }
-    return;
-  }
-
-  window.location.reload();
 }

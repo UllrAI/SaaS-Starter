@@ -32,6 +32,12 @@ yarn-debug.log*
 yarn-error.log*
 translation-server.log
 
+# lingo compiler ephemeral runtime artifacts
+src/.lingo/translation-server.log
+src/.lingo/metadata-build*
+src/.lingo/**/*.mdb
+src/.lingo/**/*.sqlite
+
 # env files (can opt-in for committing if needed)
 .env.local*
 .env.development*

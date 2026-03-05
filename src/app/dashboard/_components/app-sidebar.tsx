@@ -34,74 +34,80 @@ import { Logo } from "@/components/logo";
 import { cn } from "@/lib/utils";
 import { useSession } from "@/lib/auth/client";
 
-const navigation: {
-  key: string;
-  title: React.ReactNode;
+const SidebarLabelHome = () => <>Home</>;
+const SidebarLabelUpload = () => <>Upload</>;
+const SidebarLabelSettings = () => <>Settings</>;
+const SidebarLabelAdminDashboard = () => <>Admin Dashboard</>;
+const SidebarLabelUserManagement = () => <>User Management</>;
+const SidebarLabelPayments = () => <>Payments</>;
+const SidebarLabelSubscriptions = () => <>Subscriptions</>;
+const SidebarLabelUploadsManagement = () => <>Uploads Management</>;
+const SidebarLabelAdmin = () => <>Admin</>;
+
+type NavigationItem = {
+  id: string;
+  Label: React.ComponentType;
   url: string;
   icon: LucideIcon;
   matchMode?: "exact" | "prefix";
-}[] = [
+};
+
+const navigation: NavigationItem[] = [
   {
-    key: "Home",
-    title: <>Home</>,
+    id: "home",
+    Label: SidebarLabelHome,
     url: "/dashboard",
     icon: Home,
     matchMode: "exact",
   },
   {
-    key: "Upload",
-    title: <>Upload</>,
+    id: "upload",
+    Label: SidebarLabelUpload,
     url: "/dashboard/upload",
     icon: Upload,
     matchMode: "exact",
   },
   {
-    key: "Settings",
-    title: <>Settings</>,
+    id: "settings",
+    Label: SidebarLabelSettings,
     url: "/dashboard/settings",
     icon: Settings,
     matchMode: "prefix",
   },
 ];
 
-const adminNavigation: {
-  key: string;
-  title: React.ReactNode;
-  url: string;
-  icon: LucideIcon;
-  matchMode?: "exact" | "prefix";
-}[] = [
+const adminNavigation: NavigationItem[] = [
   {
-    key: "admin-dashboard",
-    title: <>Admin Dashboard</>,
+    id: "admin-dashboard",
+    Label: SidebarLabelAdminDashboard,
     url: "/dashboard/admin",
     icon: BarChart3,
     matchMode: "exact",
   },
   {
-    key: "user-management",
-    title: <>User Management</>,
+    id: "user-management",
+    Label: SidebarLabelUserManagement,
     url: "/dashboard/admin/users",
     icon: Users,
     matchMode: "exact",
   },
   {
-    key: "payments",
-    title: <>Payments</>,
+    id: "payments",
+    Label: SidebarLabelPayments,
     url: "/dashboard/admin/payments",
     icon: CreditCard,
     matchMode: "exact",
   },
   {
-    key: "subscriptions",
-    title: <>Subscriptions</>,
+    id: "subscriptions",
+    Label: SidebarLabelSubscriptions,
     url: "/dashboard/admin/subscriptions",
     icon: Shield,
     matchMode: "exact",
   },
   {
-    key: "uploads-managements",
-    title: <>Uploads Managements</>,
+    id: "uploads-management",
+    Label: SidebarLabelUploadsManagement,
     url: "/dashboard/admin/uploads",
     icon: Upload,
     matchMode: "exact",
@@ -109,20 +115,16 @@ const adminNavigation: {
 ];
 
 interface MenuItemProps {
-  item: {
-    key: string;
-    title: React.ReactNode;
-    url: string;
-    icon: LucideIcon;
-    matchMode?: "exact" | "prefix";
-  };
+  item: NavigationItem;
   pathname: string;
-  allItems: MenuItemProps["item"][];
+  allItems: NavigationItem[];
 }
 
 function SidebarMenuLink({ item, pathname, allItems }: MenuItemProps) {
   const router = useRouter();
   const itemMatchMode = item.matchMode || "exact";
+  const Label = item.Label;
+  const label = <Label />;
 
   const isMatch =
     itemMatchMode === "exact"
@@ -147,12 +149,12 @@ function SidebarMenuLink({ item, pathname, allItems }: MenuItemProps) {
   return (
     <SidebarMenuButton
       isActive={isActive}
-      tooltip={item.key}
+      tooltip={{ children: label }}
       className="w-full cursor-pointer"
       onClick={handleClick}
     >
       <item.icon className="size-4" />
-      <span>{item.title}</span>
+      <span>{label}</span>
     </SidebarMenuButton>
   );
 }
@@ -174,7 +176,7 @@ function SidebarSection({ title, items, pathname }: MenuSectionProps) {
         )}
         <SidebarMenu>
           {items.map((item) => (
-            <SidebarMenuItem key={item.key}>
+            <SidebarMenuItem key={item.id}>
               <SidebarMenuLink
                 item={item}
                 pathname={pathname}
@@ -235,7 +237,7 @@ export function AppSidebar() {
         {showAdminSections && (
           <>
             <SidebarSection
-              title={open ? <>Admin</> : undefined}
+              title={open ? <SidebarLabelAdmin /> : undefined}
               items={adminNavigation}
               pathname={pathname}
             />

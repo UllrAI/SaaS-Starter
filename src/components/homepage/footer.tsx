@@ -15,16 +15,40 @@ import {
 } from "@/lib/config/constants";
 import { Github, Twitter, Mail, Heart } from "lucide-react";
 
-interface FooterLink {
+const FooterSectionTitleProduct = () => <>Product</>;
+const FooterSectionTitleOtherProducts = () => <>Other Products</>;
+const FooterSectionTitleCompany = () => <>Company</>;
+const FooterSectionTitleResources = () => <>Resources</>;
+const FooterSectionTitleLegal = () => <>Legal</>;
+
+const FooterLabelFeatures = () => <>Features</>;
+const FooterLabelPricing = () => <>Pricing</>;
+const FooterLabelDocumentation = () => <>Documentation</>;
+const FooterLabelChangelog = () => <>Changelog</>;
+const FooterLabelAbout = () => <>About</>;
+const FooterLabelBlog = () => <>Blog</>;
+const FooterLabelContact = () => <>Contact</>;
+const FooterLabelCareers = () => <>Careers</>;
+const FooterLabelHelpCenter = () => <>Help Center</>;
+const FooterLabelCommunity = () => <>Community</>;
+const FooterLabelTutorials = () => <>Tutorials</>;
+const FooterLabelTemplates = () => <>Templates</>;
+const FooterLabelPrivacy = () => <>Privacy</>;
+const FooterLabelTerms = () => <>Terms</>;
+const FooterLabelSecurity = () => <>Security</>;
+
+type FooterLink = {
   id: string;
-  name: React.ReactNode;
   href: string;
   external?: boolean;
-}
+} & (
+  | { kind: "i18n"; Label: React.ComponentType }
+  | { kind: "text"; labelText: string }
+);
 
 interface FooterSection {
   id: string;
-  title: React.ReactNode;
+  Title: React.ComponentType;
   links: FooterLink[];
 }
 
@@ -37,39 +61,63 @@ interface FooterSocialLink {
 const footerSections: FooterSection[] = [
   {
     id: "foot-product",
-    title: <>Product</>,
+    Title: FooterSectionTitleProduct,
     links: [
-      { id: "foot-features", name: <>Features</>, href: "/#features" },
-      { id: "foot-pricing", name: <>Pricing</>, href: "/pricing" },
-      { id: "foot-docs", name: <>Documentation</>, href: "/docs" },
-      { id: "foot-changelog", name: <>Changelog</>, href: "/changelog" },
+      {
+        id: "foot-features",
+        kind: "i18n",
+        Label: FooterLabelFeatures,
+        href: "/#features",
+      },
+      {
+        id: "foot-pricing",
+        kind: "i18n",
+        Label: FooterLabelPricing,
+        href: "/pricing",
+      },
+      {
+        id: "foot-docs",
+        kind: "i18n",
+        Label: FooterLabelDocumentation,
+        href: "/docs",
+      },
+      {
+        id: "foot-changelog",
+        kind: "i18n",
+        Label: FooterLabelChangelog,
+        href: "/changelog",
+      },
     ],
   },
   {
     id: "foot-other-products",
-    title: <>Other Products</>,
+    Title: FooterSectionTitleOtherProducts,
     links: [
       {
         id: "foot-pixmiller",
-        name: "PixMiller",
+        kind: "text",
+        labelText: "PixMiller",
         href: "https://pixmiller.com/",
         external: true,
       },
       {
         id: "foot-headshots",
-        name: "HeadShots.fun",
+        kind: "text",
+        labelText: "HeadShots.fun",
         href: "https://headshots.fun/",
         external: true,
       },
       {
         id: "foot-tomarkdown",
-        name: "To Markdown",
+        kind: "text",
+        labelText: "To Markdown",
         href: "https://to-markdown.com/",
         external: true,
       },
       {
         id: "foot-hipng",
-        name: "HiPNG.com",
+        kind: "text",
+        labelText: "HiPNG.com",
         href: "https://hipng.com/",
         external: true,
       },
@@ -77,31 +125,71 @@ const footerSections: FooterSection[] = [
   },
   {
     id: "foot-company",
-    title: <>Company</>,
+    Title: FooterSectionTitleCompany,
     links: [
-      { id: "foot-about", name: <>About</>, href: "/about" },
-      { id: "foot-blog", name: <>Blog</>, href: "/blog" },
-      { id: "foot-contact", name: <>Contact</>, href: "/contact" },
-      { id: "foot-careers", name: <>Careers</>, href: "/careers" },
+      { id: "foot-about", kind: "i18n", Label: FooterLabelAbout, href: "/about" },
+      { id: "foot-blog", kind: "i18n", Label: FooterLabelBlog, href: "/blog" },
+      {
+        id: "foot-contact",
+        kind: "i18n",
+        Label: FooterLabelContact,
+        href: "/contact",
+      },
+      {
+        id: "foot-careers",
+        kind: "i18n",
+        Label: FooterLabelCareers,
+        href: "/careers",
+      },
     ],
   },
   {
     id: "foot-resources",
-    title: <>Resources</>,
+    Title: FooterSectionTitleResources,
     links: [
-      { id: "foot-help", name: <>Help Center</>, href: "/help" },
-      { id: "foot-community", name: <>Community</>, href: "/community" },
-      { id: "foot-tutorials", name: <>Tutorials</>, href: "/tutorials" },
-      { id: "foot-templates", name: <>Templates</>, href: "/templates" },
+      {
+        id: "foot-help",
+        kind: "i18n",
+        Label: FooterLabelHelpCenter,
+        href: "/help",
+      },
+      {
+        id: "foot-community",
+        kind: "i18n",
+        Label: FooterLabelCommunity,
+        href: "/community",
+      },
+      {
+        id: "foot-tutorials",
+        kind: "i18n",
+        Label: FooterLabelTutorials,
+        href: "/tutorials",
+      },
+      {
+        id: "foot-templates",
+        kind: "i18n",
+        Label: FooterLabelTemplates,
+        href: "/templates",
+      },
     ],
   },
   {
     id: "foot-legal",
-    title: <>Legal</>,
+    Title: FooterSectionTitleLegal,
     links: [
-      { id: "foot-privacy", name: <>Privacy</>, href: "/privacy" },
-      { id: "foot-terms", name: <>Terms</>, href: "/terms" },
-      { id: "foot-security", name: <>Security</>, href: "/security" },
+      {
+        id: "foot-privacy",
+        kind: "i18n",
+        Label: FooterLabelPrivacy,
+        href: "/privacy",
+      },
+      { id: "foot-terms", kind: "i18n", Label: FooterLabelTerms, href: "/terms" },
+      {
+        id: "foot-security",
+        kind: "i18n",
+        Label: FooterLabelSecurity,
+        href: "/security",
+      },
     ],
   },
 ];
@@ -127,6 +215,10 @@ const socialLinks: FooterSocialLink[] = [
 function FooterLinkComponent({ link }: { link: FooterLink }) {
   const linkClasses =
     "text-sm text-muted-foreground transition-colors hover:text-foreground";
+  const label =
+    link.kind === "i18n"
+      ? React.createElement(link.Label)
+      : link.labelText;
 
   if (link.external) {
     return (
@@ -136,14 +228,14 @@ function FooterLinkComponent({ link }: { link: FooterLink }) {
         target="_blank"
         rel="noopener noreferrer"
       >
-        {link.name}
+        {label}
       </a>
     );
   }
 
   return (
     <Link href={link.href} className={linkClasses}>
-      {link.name}
+      {label}
     </Link>
   );
 }
@@ -212,7 +304,7 @@ export function Footer() {
                 {footerSections.map((section) => (
                   <div key={section.id}>
                     <h3 className="text-foreground mb-4 text-sm font-semibold">
-                      {section.title}
+                      <section.Title />
                     </h3>
                     <ul className="space-y-3">
                       {section.links.map((link) => (

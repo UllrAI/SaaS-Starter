@@ -18,6 +18,7 @@ const TestAppSidebar = ({
   const navigation = [
     { title: "Home", url: "/dashboard", icon: "🏠" },
     { title: "Upload", url: "/dashboard/upload", icon: "📤" },
+    { title: "Billing", url: "/dashboard/billing", icon: "💼" },
     { title: "Settings", url: "/dashboard/settings", icon: "⚙️" },
   ];
 
@@ -103,6 +104,7 @@ describe("AppSidebar", () => {
 
     expect(screen.getByTestId("nav-item-home")).toBeInTheDocument();
     expect(screen.getByTestId("nav-item-upload")).toBeInTheDocument();
+    expect(screen.getByTestId("nav-item-billing")).toBeInTheDocument();
     expect(screen.getByTestId("nav-item-settings")).toBeInTheDocument();
   });
 
@@ -135,5 +137,6 @@ describe("AppSidebar", () => {
     expect(content).not.toContain("Manage Tables");
     expect(content).not.toContain("/dashboard/admin/tables/");
     expect(content).not.toContain("@/lib/config/admin-tables");
+    expect(content).toContain('url: "/dashboard/billing"');
   });
 });

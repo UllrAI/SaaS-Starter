@@ -138,13 +138,13 @@ describe("AuthForm", () => {
 
     it("preserves callback url when switching between login and signup", () => {
       render(
-        <AuthForm mode="login" callbackURL="/dashboard/settings?page=billing" />,
+        <AuthForm mode="login" callbackURL="/dashboard/billing" />,
       );
 
       const signupLink = screen.getByText("Create an account");
       expect(signupLink.closest("a")).toHaveAttribute(
         "href",
-        "/signup?callbackUrl=%2Fdashboard%2Fsettings%3Fpage%3Dbilling",
+        "/signup?callbackUrl=%2Fdashboard%2Fbilling",
       );
     });
   });
@@ -224,7 +224,7 @@ describe("AuthForm", () => {
       mockSignIn.magicLink = jest.fn().mockResolvedValue({ error: null });
 
       render(
-        <AuthForm mode="login" callbackURL="/dashboard/settings?page=billing" />,
+        <AuthForm mode="login" callbackURL="/dashboard/billing" />,
       );
 
       fireEvent.change(screen.getByPlaceholderText("you@example.com"), {
@@ -235,7 +235,7 @@ describe("AuthForm", () => {
       await waitFor(() => {
         expect(mockSignIn.magicLink).toHaveBeenCalledWith({
           email: "test@example.com",
-          callbackURL: "/dashboard/settings?page=billing",
+          callbackURL: "/dashboard/billing",
         });
       });
     });

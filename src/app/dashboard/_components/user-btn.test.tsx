@@ -399,7 +399,7 @@ describe("UserButton Component Static Analysis", () => {
     const content = fs.readFileSync(componentPath, "utf8");
 
     // Verify settings link
-    expect(content).toContain('Link href="/dashboard/settings?page=account"');
+    expect(content).toContain('Link href="/dashboard/settings"');
     expect(content).toContain('<Settings className="size-4" />');
     expect(content).toContain("Settings");
   });

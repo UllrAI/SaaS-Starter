@@ -78,7 +78,7 @@ describe("LoginPage", () => {
     const pageModule = await import("./page");
     const element = await pageModule.default({
       searchParams: Promise.resolve({
-        callbackUrl: "/dashboard/settings?page=billing",
+        callbackUrl: "/dashboard/billing",
       }),
     });
 
@@ -87,7 +87,7 @@ describe("LoginPage", () => {
     expect(mockAuthForm).toHaveBeenCalledWith(
       expect.objectContaining({
         mode: "login",
-        callbackURL: "/dashboard/settings?page=billing",
+        callbackURL: "/dashboard/billing",
       }),
     );
   });

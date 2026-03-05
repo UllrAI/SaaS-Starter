@@ -1,40 +1,43 @@
 import React from "react";
-import { auth } from "@/lib/auth/server";
-import { headers } from "next/headers";
-import { DashboardPageWrapper } from "../_components/dashboard-page-wrapper";
-import { Settings } from "./_components/settings";
-import {
-  getUserSubscription,
-  getUserPayments,
-} from "@/lib/database/subscription";
+import { redirect } from "next/navigation";
 import { createMetadata } from "@/lib/metadata";
+import { DashboardPageWrapper } from "../_components/dashboard-page-wrapper";
+import { AccountPage } from "./_components/account-page";
+import { AppearancePage } from "./_components/appearance-page";
 
 export const metadata = createMetadata({
   title: "Settings",
-  description: "Manage your account and subscription settings.",
+  description: "Manage your account profile and dashboard appearance.",
 });
 
-export default async function SettingsPage() {
-  const requestHeaders = await headers();
-  const session = await auth.api.getSession({ headers: requestHeaders });
+interface SettingsPageProps {
+  searchParams: Promise<{ page?: string }>;
+}
 
-  // Parallel data fetching for better performance (removed activeSessions fetch)
-  const [subscription, payments] = await Promise.all([
-    session?.user?.id
-      ? getUserSubscription(session.user.id)
-      : Promise.resolve(null),
-    session?.user?.id
-      ? getUserPayments(session.user.id, 20)
-      : Promise.resolve([]),
-  ]);
+const legacySettingsRouteMap: Record<string, string> = {
+  account: "/dashboard/settings",
+  appearance: "/dashboard/settings",
+  notifications: "/dashboard/settings",
+  billing: "/dashboard/billing",
+};
+
+export default async function SettingsPage({ searchParams }: SettingsPageProps) {
+  const { page } = await searchParams;
+  const legacyTarget = page ? legacySettingsRouteMap[page] : undefined;
+
+  if (legacyTarget) {
+    redirect(legacyTarget);
+  }
 
   return (
-    <DashboardPageWrapper title="Settings">
-      <Settings
-        session={session}
-        subscription={subscription}
-        payments={payments}
-      />
+    <DashboardPageWrapper
+      title="Settings"
+      description="Manage your account profile and personalize dashboard appearance."
+    >
+      <section className="space-y-8">
+        <AccountPage />
+        <AppearancePage />
+      </section>
     </DashboardPageWrapper>
   );
 }

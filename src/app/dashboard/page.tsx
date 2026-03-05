@@ -21,6 +21,7 @@ import {
   Clock,
   CheckCircle2,
 } from "lucide-react";
+import Link from "next/link";
 
 export const metadata = createMetadata({
   title: "Dashboard",
@@ -215,25 +216,34 @@ export default function HomeRoute() {
           <CardContent>
             <div className="grid gap-2">
               <Button
+                asChild
                 variant="outline"
                 className="justify-start gap-2 shadow-xs"
               >
-                <ArrowUpRight className="h-4 w-4" />
-                Upgrade Plan
+                <Link href="/dashboard/billing">
+                  <ArrowUpRight className="h-4 w-4" />
+                  Upgrade Plan
+                </Link>
               </Button>
               <Button
+                asChild
                 variant="outline"
                 className="justify-start gap-2 shadow-xs"
               >
-                <Users className="h-4 w-4" />
-                Manage Team
+                <Link href="/dashboard/settings">
+                  <Users className="h-4 w-4" />
+                  Open Settings
+                </Link>
               </Button>
               <Button
+                asChild
                 variant="outline"
                 className="justify-start gap-2 shadow-xs"
               >
-                <CheckCircle2 className="h-4 w-4" />
-                Verify Domain
+                <Link href="/dashboard/upload">
+                  <CheckCircle2 className="h-4 w-4" />
+                  Upload Assets
+                </Link>
               </Button>
             </div>
           </CardContent>

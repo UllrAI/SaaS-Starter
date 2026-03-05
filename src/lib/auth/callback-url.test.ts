@@ -11,8 +11,8 @@ describe("callback-url utils", () => {
   });
 
   it("keeps valid internal paths including query and hash", () => {
-    expect(normalizeCallbackUrl("/dashboard/settings?page=billing#invoices")).toBe(
-      "/dashboard/settings?page=billing#invoices",
+    expect(normalizeCallbackUrl("/dashboard/billing?tab=history#invoices")).toBe(
+      "/dashboard/billing?tab=history#invoices",
     );
   });
 
@@ -35,8 +35,8 @@ describe("callback-url utils", () => {
   });
 
   it("builds login redirect path with encoded callback url", () => {
-    expect(buildLoginRedirectPath("/dashboard/settings?page=billing")).toBe(
-      "/login?callbackUrl=%2Fdashboard%2Fsettings%3Fpage%3Dbilling",
+    expect(buildLoginRedirectPath("/dashboard/billing")).toBe(
+      "/login?callbackUrl=%2Fdashboard%2Fbilling",
     );
   });
 });

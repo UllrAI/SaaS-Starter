@@ -90,7 +90,9 @@ const mockGetProductTierByProductId = jest.fn();
 const mockRequireAdmin = jest.fn();
 
 const mockCreemClient = {
-  cancelSubscription: jest.fn(),
+  subscriptions: {
+    cancel: jest.fn(),
+  },
 };
 
 const mockDeleteFileFromR2 = jest.fn();
@@ -934,7 +936,7 @@ describe("Admin Actions", () => {
         }),
       });
 
-      mockCreemClient.cancelSubscription.mockResolvedValue({ success: true });
+      mockCreemClient.subscriptions.cancel.mockResolvedValue({ success: true });
 
       const { cancelSubscriptionAction } = await import("./admin");
 
@@ -942,10 +944,10 @@ describe("Admin Actions", () => {
         parsedInput: { subscriptionId: "sub_123" },
       });
 
-      expect(mockCreemClient.cancelSubscription).toHaveBeenCalledWith({
-        xApiKey: mockEnv.CREEM_API_KEY,
-        id: "sub_123",
-      });
+      expect(mockCreemClient.subscriptions.cancel).toHaveBeenCalledWith(
+        "sub_123",
+        { mode: "immediate" },
+      );
       expect(result).toEqual({
         success: true,
         message: "Subscription cancellation initiated.",

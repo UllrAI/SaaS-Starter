@@ -2,15 +2,14 @@ import { StatCard } from "@/components/admin/StatCard";
 import { Upload, HardDrive, FileText } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  getUploadStatsDetails,
-  type UploadStatsDetails,
-} from "@/lib/admin/stats";
+import { getUploadStatsDetails } from "@/lib/admin/stats";
 import { getServerLocale } from "@lingo.dev/compiler/virtual/locale/server";
 
 export async function UploadStatsCards() {
-  const locale = await getServerLocale();
-  const stats: UploadStatsDetails = await getUploadStatsDetails();
+  const [locale, stats] = await Promise.all([
+    getServerLocale(),
+    getUploadStatsDetails(),
+  ]);
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

@@ -92,6 +92,8 @@ const FilePreview = ({ file }: { file: FileWithPreview }) => {
   }
 
   return (
+    // Local blob/data previews are intentionally rendered with native img.
+    // eslint-disable-next-line @next/next/no-img-element
     <img
       src={file.preview}
       alt={file.name}
@@ -140,16 +142,21 @@ export function FileUploader({
   const [isDragOver, setIsDragOver] = useState(false);
   const [globalError, setGlobalError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const filesRef = useRef<FileUploadState[]>([]);
+
+  useEffect(() => {
+    filesRef.current = files;
+  }, [files]);
 
   useEffect(() => {
     return () => {
-      files.forEach((f) => {
+      filesRef.current.forEach((f) => {
         if (f.file.preview?.startsWith("blob:")) {
           URL.revokeObjectURL(f.file.preview);
         }
       });
     };
-  }, [files]);
+  }, []);
 
   const validateFile = useCallback(
     (file: File): string | null => {
@@ -197,6 +204,8 @@ export function FileUploader({
           file.type === "image/svg+xml"
         )
           return resolve(file);
+
+        const inputObjectUrl = URL.createObjectURL(file);
         const img = new window.Image();
         img.onload = () => {
           const canvas = document.createElement("canvas");
@@ -214,7 +223,8 @@ export function FileUploader({
           const ctx = canvas.getContext("2d");
           ctx?.drawImage(img, 0, 0, width, height);
           canvas.toBlob(
-            (blob) =>
+            (blob) => {
+              URL.revokeObjectURL(inputObjectUrl);
               resolve(
                 blob
                   ? new File([blob], file.name, {
@@ -222,13 +232,17 @@ export function FileUploader({
                       lastModified: Date.now(),
                     })
                   : file,
-              ),
+              );
+            },
             file.type,
             imageCompressionQuality,
           );
         };
-        img.onerror = () => resolve(file);
-        img.src = URL.createObjectURL(file);
+        img.onerror = () => {
+          URL.revokeObjectURL(inputObjectUrl);
+          resolve(file);
+        };
+        img.src = inputObjectUrl;
       });
     },
     [
@@ -249,24 +263,33 @@ export function FileUploader({
         return;
       }
 
-      const preparedFiles: FileUploadState[] = [];
-      for (const file of fileArray) {
-        const error = validateFile(file);
-        if (error) {
-          setGlobalError(error);
-          return;
-        }
-        const processedFile = await compressImage(file);
-        const preview = await createPreview(processedFile);
-        const fileWithPreview: FileWithPreview = Object.assign(processedFile, {
-          preview,
-        });
-        preparedFiles.push({
-          file: fileWithPreview,
-          progress: 0,
-          status: "pending",
-        });
+      const firstValidationError = fileArray
+        .map((file) => validateFile(file))
+        .find((error): error is string => Boolean(error));
+
+      if (firstValidationError) {
+        setGlobalError(firstValidationError);
+        return;
       }
+
+      const preparedFiles = await Promise.all(
+        fileArray.map(async (file) => {
+          const processedFile = await compressImage(file);
+          const preview = await createPreview(processedFile);
+          const fileWithPreview: FileWithPreview = Object.assign(
+            processedFile,
+            {
+              preview,
+            },
+          );
+
+          return {
+            file: fileWithPreview,
+            progress: 0,
+            status: "pending" as const,
+          };
+        }),
+      );
 
       setFiles((prev) => [...prev, ...preparedFiles]);
     },

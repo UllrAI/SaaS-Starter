@@ -30,6 +30,7 @@ import type { PaymentMode, BillingCycle } from "@/types/billing";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "./ui/skeleton";
 import { useIntlLocale } from "@/hooks/use-intl-locale";
+import { getSafeBillingRedirectUrl } from "@/lib/billing/url";
 
 // Helper: Format Price
 const formatPrice = (
@@ -41,37 +42,6 @@ const formatPrice = (
     style: "currency",
     currency,
   }).format(price);
-};
-
-const BILLING_REDIRECT_HOSTS = ["creem.io"];
-const BILLING_REDIRECT_HOST_SUFFIXES = [".creem.io"];
-
-const getSafeBillingRedirectUrl = (url: unknown): string | null => {
-  if (typeof url !== "string" || url.length === 0) return null;
-  try {
-    const parsedUrl = new URL(url);
-    const hostname = parsedUrl.hostname.toLowerCase();
-
-    if (
-      hostname === window.location.hostname &&
-      parsedUrl.protocol === window.location.protocol
-    ) {
-      return parsedUrl.toString();
-    }
-
-    if (parsedUrl.protocol !== "https:") return null;
-    if (BILLING_REDIRECT_HOSTS.includes(hostname)) return parsedUrl.toString();
-    if (
-      BILLING_REDIRECT_HOST_SUFFIXES.some((suffix) =>
-        hostname.endsWith(suffix),
-      )
-    ) {
-      return parsedUrl.toString();
-    }
-    return null;
-  } catch {
-    return null;
-  }
 };
 
 export function PricingSection({ className }: { className?: string }) {
@@ -129,6 +99,7 @@ export function PricingSection({ className }: { className?: string }) {
       if (response.status === 409) {
         const safeManagementUrl = getSafeBillingRedirectUrl(
           data.managementUrl,
+          window.location,
         );
         toast.error(data.error || "Subscription already active.", {
           ...(safeManagementUrl
@@ -148,7 +119,10 @@ export function PricingSection({ className }: { className?: string }) {
         return;
       }
 
-      const safeCheckoutUrl = getSafeBillingRedirectUrl(data.checkoutUrl);
+      const safeCheckoutUrl = getSafeBillingRedirectUrl(
+        data.checkoutUrl,
+        window.location,
+      );
       if (response.ok && safeCheckoutUrl) {
         isRedirecting = true;
         window.location.href = safeCheckoutUrl;

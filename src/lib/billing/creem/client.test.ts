@@ -58,9 +58,11 @@ describe("Creem Client", () => {
 
       const clientModule = await import("./client");
 
-      expect(mockCreemConstructor).toHaveBeenCalledWith({
-        serverIdx: 1, // test_mode should use serverIdx 1
-      });
+      expect(mockCreemConstructor).toHaveBeenCalledWith(
+        expect.objectContaining({
+          serverIdx: 1, // test_mode should use serverIdx 1
+        }),
+      );
 
       expect(clientModule.creemClient).toBe(mockCreemInstance);
     });
@@ -71,9 +73,11 @@ describe("Creem Client", () => {
       jest.resetModules();
       const clientModule = await import("./client");
 
-      expect(mockCreemConstructor).toHaveBeenCalledWith({
-        serverIdx: 0, // live_mode should use serverIdx 0
-      });
+      expect(mockCreemConstructor).toHaveBeenCalledWith(
+        expect.objectContaining({
+          serverIdx: 0, // live_mode should use serverIdx 0
+        }),
+      );
 
       expect(clientModule.creemClient).toBe(mockCreemInstance);
     });
@@ -84,9 +88,11 @@ describe("Creem Client", () => {
       jest.resetModules();
       await import("./client");
 
-      expect(mockCreemConstructor).toHaveBeenCalledWith({
-        serverIdx: 1, // unknown values should default to test mode
-      });
+      expect(mockCreemConstructor).toHaveBeenCalledWith(
+        expect.objectContaining({
+          serverIdx: 1, // unknown values should default to test mode
+        }),
+      );
     });
 
     it("should use test mode when CREEM_ENVIRONMENT is undefined", async () => {
@@ -95,9 +101,11 @@ describe("Creem Client", () => {
       jest.resetModules();
       await import("./client");
 
-      expect(mockCreemConstructor).toHaveBeenCalledWith({
-        serverIdx: 1, // undefined should default to test mode
-      });
+      expect(mockCreemConstructor).toHaveBeenCalledWith(
+        expect.objectContaining({
+          serverIdx: 1, // undefined should default to test mode
+        }),
+      );
     });
 
     it("should use test mode when CREEM_ENVIRONMENT is empty string", async () => {
@@ -106,9 +114,11 @@ describe("Creem Client", () => {
       jest.resetModules();
       await import("./client");
 
-      expect(mockCreemConstructor).toHaveBeenCalledWith({
-        serverIdx: 1, // empty string should default to test mode
-      });
+      expect(mockCreemConstructor).toHaveBeenCalledWith(
+        expect.objectContaining({
+          serverIdx: 1, // empty string should default to test mode
+        }),
+      );
     });
   });
 
@@ -217,9 +227,11 @@ describe("Creem Client", () => {
       jest.resetModules();
       await import("./client");
 
-      expect(mockCreemConstructor).toHaveBeenCalledWith({
-        serverIdx: 0,
-      });
+      expect(mockCreemConstructor).toHaveBeenCalledWith(
+        expect.objectContaining({
+          serverIdx: 0,
+        }),
+      );
     });
 
     it("should use serverIdx 1 for test_mode", async () => {
@@ -228,9 +240,11 @@ describe("Creem Client", () => {
       jest.resetModules();
       await import("./client");
 
-      expect(mockCreemConstructor).toHaveBeenCalledWith({
-        serverIdx: 1,
-      });
+      expect(mockCreemConstructor).toHaveBeenCalledWith(
+        expect.objectContaining({
+          serverIdx: 1,
+        }),
+      );
     });
 
     it("should use serverIdx 1 for any non-live_mode value", async () => {
@@ -257,9 +271,11 @@ describe("Creem Client", () => {
         jest.resetModules();
         await import("./client");
 
-        expect(mockCreemConstructor).toHaveBeenCalledWith({
-          serverIdx: 1,
-        });
+        expect(mockCreemConstructor).toHaveBeenCalledWith(
+          expect.objectContaining({
+            serverIdx: 1,
+          }),
+        );
       }
     });
 
@@ -281,9 +297,11 @@ describe("Creem Client", () => {
         jest.resetModules();
         await import("./client");
 
-        expect(mockCreemConstructor).toHaveBeenCalledWith({
-          serverIdx: 1, // Should default to test mode for non-exact matches
-        });
+        expect(mockCreemConstructor).toHaveBeenCalledWith(
+          expect.objectContaining({
+            serverIdx: 1, // Should default to test mode for non-exact matches
+          }),
+        );
       }
     });
   });
@@ -299,9 +317,11 @@ describe("Creem Client", () => {
         "./client"
       );
 
-      expect(mockCreemConstructor).toHaveBeenCalledWith({
-        serverIdx: 0, // live mode
-      });
+      expect(mockCreemConstructor).toHaveBeenCalledWith(
+        expect.objectContaining({
+          serverIdx: 0, // live mode
+        }),
+      );
       expect(creemClient).toBe(mockCreemInstance);
       expect(creemApiKey).toBe("live_api_key_prod_123");
       expect(creemWebhookSecret).toBe("live_webhook_secret_456");
@@ -317,9 +337,11 @@ describe("Creem Client", () => {
         "./client"
       );
 
-      expect(mockCreemConstructor).toHaveBeenCalledWith({
-        serverIdx: 1, // test mode
-      });
+      expect(mockCreemConstructor).toHaveBeenCalledWith(
+        expect.objectContaining({
+          serverIdx: 1, // test mode
+        }),
+      );
       expect(creemClient).toBe(mockCreemInstance);
       expect(creemApiKey).toBe("test_api_key_dev_789");
       expect(creemWebhookSecret).toBe("test_webhook_secret_012");
@@ -335,9 +357,11 @@ describe("Creem Client", () => {
         "./client"
       );
 
-      expect(mockCreemConstructor).toHaveBeenCalledWith({
-        serverIdx: 1, // defaults to test mode
-      });
+      expect(mockCreemConstructor).toHaveBeenCalledWith(
+        expect.objectContaining({
+          serverIdx: 1, // defaults to test mode
+        }),
+      );
       expect(creemClient).toBe(mockCreemInstance);
       expect(creemApiKey).toBe("minimal_api_key");
       expect(creemWebhookSecret).toBeUndefined();
@@ -496,7 +520,9 @@ describe("Creem Client", () => {
       jest.resetModules();
       const { creemApiKey: key1 } = await import("./client");
       expect(key1).toBe("initial_key");
-      expect(mockCreemConstructor).toHaveBeenLastCalledWith({ serverIdx: 1 });
+      expect(mockCreemConstructor).toHaveBeenLastCalledWith(
+        expect.objectContaining({ serverIdx: 1 }),
+      );
 
       // Changed configuration
       mockEnv.CREEM_API_KEY = "changed_key";
@@ -505,7 +531,9 @@ describe("Creem Client", () => {
       jest.resetModules();
       const { creemApiKey: key2 } = await import("./client");
       expect(key2).toBe("changed_key");
-      expect(mockCreemConstructor).toHaveBeenLastCalledWith({ serverIdx: 0 });
+      expect(mockCreemConstructor).toHaveBeenLastCalledWith(
+        expect.objectContaining({ serverIdx: 0 }),
+      );
     });
   });
 });

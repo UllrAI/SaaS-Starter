@@ -17,8 +17,10 @@ export const metadata: Metadata = createMetadata({
 const reader = createReader(process.cwd(), keystaticConfig);
 
 export default async function BlogPage() {
-  const locale = await getServerLocale();
-  const posts = await reader.collections.posts.all();
+  const [locale, posts] = await Promise.all([
+    getServerLocale(),
+    reader.collections.posts.all(),
+  ]);
 
   // Sort posts by published date (newest first), then by title
   const sortedPosts = posts.toSorted((a, b) => {
@@ -67,6 +69,11 @@ export default async function BlogPage() {
       />
     );
   };
+
+  const [featuredPostCards, regularPostCards] = await Promise.all([
+    Promise.all(featuredPosts.map((post) => renderPostCard(post, "featured"))),
+    Promise.all(regularPosts.map((post) => renderPostCard(post, "regular"))),
+  ]);
 
   return (
     <>
@@ -123,11 +130,7 @@ export default async function BlogPage() {
                       </p>
                     </div>
                     <div className="grid gap-6 sm:gap-8 lg:gap-12">
-                      {await Promise.all(
-                        featuredPosts.map((post) =>
-                          renderPostCard(post, "featured"),
-                        ),
-                      )}
+                      {featuredPostCards}
                     </div>
                   </section>
                 )}
@@ -146,11 +149,7 @@ export default async function BlogPage() {
                       </div>
                     )}
                     <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:gap-8">
-                      {await Promise.all(
-                        regularPosts.map((post) =>
-                          renderPostCard(post, "regular"),
-                        ),
-                      )}
+                      {regularPostCards}
                     </div>
                   </section>
                 )}

@@ -157,7 +157,7 @@ describe("Billing Portal API", () => {
         status: "active",
       });
       mockCreateCustomerPortalUrl.mockResolvedValue({
-        portalUrl: "https://portal.example.com",
+        portalUrl: "https://portal.creem.io",
       });
 
       const { GET } = await import("./route");
@@ -167,7 +167,7 @@ describe("Billing Portal API", () => {
       const data = await response.json();
 
       expect(response.status).toBe(200);
-      expect(data.portalUrl).toBe("https://portal.example.com");
+      expect(data.portalUrl).toBe("https://portal.creem.io/");
       expect(mockCreateCustomerPortalUrl).toHaveBeenCalledWith("cus-123");
     });
 
@@ -243,7 +243,7 @@ describe("Billing Portal API", () => {
         status: "active",
       });
       mockCreateCustomerPortalUrl.mockResolvedValue({
-        portalUrl: "https://portal.example.com",
+        portalUrl: "https://portal.creem.io",
       });
 
       const { GET } = await import("./route");
@@ -261,7 +261,7 @@ describe("Billing Portal API", () => {
         status: "active",
       });
       mockCreateCustomerPortalUrl.mockResolvedValue({
-        portalUrl: "https://portal.example.com",
+        portalUrl: "https://portal.creem.io",
       });
 
       const { GET } = await import("./route");

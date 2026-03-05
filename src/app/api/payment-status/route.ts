@@ -70,21 +70,35 @@ export async function GET(request: NextRequest) {
 
         if (checkoutResponse?.status) {
           // Map Creem checkout status to our payment status
-          switch (checkoutResponse.status) {
+          const normalizedStatus = String(checkoutResponse.status).toLowerCase();
+          switch (normalizedStatus) {
             case "completed":
+            case "succeeded":
               return NextResponse.json({
                 status: "success",
                 message: "Payment completed successfully",
                 sessionId,
               });
+            case "failed":
             case "expired":
               return NextResponse.json({
                 status: "failed",
-                message: "Payment session expired",
+                message:
+                  normalizedStatus === "expired"
+                    ? "Payment session expired"
+                    : "Payment failed",
+                sessionId,
+              });
+            case "canceled":
+            case "cancelled":
+              return NextResponse.json({
+                status: "cancelled",
+                message: "Payment was cancelled",
                 sessionId,
               });
             case "pending":
             case "processing":
+            case "open":
             default:
               return NextResponse.json({
                 status: "pending",

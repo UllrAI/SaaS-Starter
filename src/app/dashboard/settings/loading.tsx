@@ -1,18 +1,24 @@
 import { Skeleton } from "@/components/ui/skeleton";
+import { DashboardPageWrapper } from "../_components/dashboard-page-wrapper";
 
 export default function DashboardSettingsLoading() {
   return (
-    <section className="space-y-8">
-      <section className="space-y-4">
-        <Skeleton className="h-8 w-48" />
-        <Skeleton className="h-4 w-80" />
-        <Skeleton className="h-24 w-full" />
+    <DashboardPageWrapper
+      title="Settings"
+      description="Manage your account profile and personalize dashboard appearance."
+    >
+      <section className="space-y-8">
+        <section className="space-y-4">
+          <Skeleton className="h-8 w-48" />
+          <Skeleton className="h-4 w-80" />
+          <Skeleton className="h-24 w-full" />
+        </section>
+        <section className="space-y-4">
+          <Skeleton className="h-8 w-48" />
+          <Skeleton className="h-4 w-80" />
+          <Skeleton className="h-52 w-full" />
+        </section>
       </section>
-      <section className="space-y-4">
-        <Skeleton className="h-8 w-48" />
-        <Skeleton className="h-4 w-80" />
-        <Skeleton className="h-52 w-full" />
-      </section>
-    </section>
+    </DashboardPageWrapper>
   );
 }

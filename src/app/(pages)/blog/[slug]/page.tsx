@@ -87,8 +87,8 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     notFound();
   }
 
-  const locale = await getServerLocale();
-  const [content, author] = await Promise.all([
+  const [locale, content, author] = await Promise.all([
+    getServerLocale(),
     post.content(),
     post.author ? reader.collections.authors.read(post.author) : null,
   ]);

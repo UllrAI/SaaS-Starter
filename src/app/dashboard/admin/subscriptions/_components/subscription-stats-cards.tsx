@@ -1,12 +1,13 @@
 import { StatCard } from "@/components/admin/StatCard";
 import { Users, UserCheck, UserX, TrendingUp } from "lucide-react";
 import { getSubscriptionStats } from "@/lib/admin/stats";
-import type { AdminStats } from "../../_components/admin-stats-cards";
 import { getServerLocale } from "@lingo.dev/compiler/virtual/locale/server";
 
 export async function SubscriptionStatsCards() {
-  const locale = await getServerLocale();
-  const stats: AdminStats["subscriptions"] = await getSubscriptionStats();
+  const [locale, stats] = await Promise.all([
+    getServerLocale(),
+    getSubscriptionStats(),
+  ]);
 
   // MRR calculation is complex and often requires historical data.
   // We'll keep it as a placeholder for now as per the original implementation.

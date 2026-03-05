@@ -15,10 +15,7 @@ type SessionFunction = (options: {
 type SubscriptionFunction = (
   userId: string,
 ) => Promise<MockSubscription | null>;
-type CheckoutFunction = (params: {
-  xApiKey: string;
-  checkoutId: string;
-}) => Promise<MockCreemCheckout>;
+type CheckoutFunction = (checkoutId: string) => Promise<MockCreemCheckout>;
 
 // Mock external dependencies with proper types
 const mockGetSession = jest.fn() as jest.MockedFunction<SessionFunction>;
@@ -46,9 +43,10 @@ beforeAll(() => {
   jest.doMock("@/lib/billing/creem/client", () => ({
     __esModule: true,
     creemClient: {
-      retrieveCheckout: mockRetrieveCheckout,
+      checkouts: {
+        retrieve: mockRetrieveCheckout,
+      },
     },
-    creemApiKey: "test-api-key",
   }));
 });
 

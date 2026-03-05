@@ -1,12 +1,13 @@
 import { StatCard } from "@/components/admin/StatCard";
 import { Users, UserCheck, Shield, UserX } from "lucide-react";
 import { getUserStats } from "@/lib/admin/stats";
-import type { AdminStats } from "../../_components/admin-stats-cards";
 import { getServerLocale } from "@lingo.dev/compiler/virtual/locale/server";
 
 export async function UserStatsCards() {
-  const locale = await getServerLocale();
-  const stats: AdminStats["users"] = await getUserStats();
+  const [locale, stats] = await Promise.all([
+    getServerLocale(),
+    getUserStats(),
+  ]);
 
   const verificationRate =
     stats.total > 0 ? ((stats.verified / stats.total) * 100).toFixed(1) : "0";

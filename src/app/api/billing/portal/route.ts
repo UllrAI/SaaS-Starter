@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth/server";
 import { billing } from "@/lib/billing";
 import { getUserSubscription } from "@/lib/database/subscription";
+import { assertTrustedBillingUrl } from "@/lib/billing/url";
 
 export async function GET(request: NextRequest) {
   try {
@@ -22,7 +23,9 @@ export async function GET(request: NextRequest) {
       subscription.customerId,
     );
 
-    return NextResponse.json({ portalUrl });
+    return NextResponse.json({
+      portalUrl: assertTrustedBillingUrl(portalUrl, "management URL"),
+    });
   } catch (error) {
     console.error("[Portal API Error]", error);
     const message =

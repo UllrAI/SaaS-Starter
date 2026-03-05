@@ -13,8 +13,12 @@ jest.mock("@/env", () => ({
 
 // Mock all dependencies before importing anything
 const mockCreemClient = {
-  createCheckout: jest.fn(),
-  generateCustomerLinks: jest.fn(),
+  checkouts: {
+    create: jest.fn(),
+  },
+  customers: {
+    generateBillingLinks: jest.fn(),
+  },
 };
 
 const mockGetProductTierById = jest.fn();
@@ -261,29 +265,26 @@ describe("Creem Provider Implementation", () => {
       };
 
       mockGetProductTierById.mockReturnValue(mockTier);
-      mockCreemClient.createCheckout.mockResolvedValue(mockCheckoutResponse);
+      mockCreemClient.checkouts.create.mockResolvedValue(mockCheckoutResponse);
 
       const result =
         await creemProvider.createCheckoutSession(mockCheckoutOptions);
 
       expect(mockGetProductTierById).toHaveBeenCalledWith("pro");
-      expect(mockCreemClient.createCheckout).toHaveBeenCalledWith({
-        xApiKey: "test_api_key",
-        createCheckoutRequest: {
-          productId: "prod_monthly",
-          successUrl: "https://example.com/success",
-          customer: {
-            email: "user@example.com",
-            name: "John Doe",
-          },
-          metadata: {
-            userId: "user123",
-            tierId: "pro",
-            paymentMode: "subscription",
-            billingCycle: "monthly",
-            cancelUrl: "https://example.com/cancel",
-            failureUrl: "https://example.com/failure",
-          },
+      expect(mockCreemClient.checkouts.create).toHaveBeenCalledWith({
+        productId: "prod_monthly",
+        successUrl: "https://example.com/success",
+        customer: {
+          email: "user@example.com",
+          name: "John Doe",
+        },
+        metadata: {
+          userId: "user123",
+          tierId: "pro",
+          paymentMode: "subscription",
+          billingCycle: "monthly",
+          cancelUrl: "https://example.com/cancel",
+          failureUrl: "https://example.com/failure",
         },
       });
       expect(result).toEqual({
@@ -309,17 +310,15 @@ describe("Creem Provider Implementation", () => {
       };
 
       mockGetProductTierById.mockReturnValue(mockTier);
-      mockCreemClient.createCheckout.mockResolvedValue({
+      mockCreemClient.checkouts.create.mockResolvedValue({
         checkoutUrl: "https://checkout.creem.io/session-yearly",
       });
 
       await creemProvider.createCheckoutSession(yearlyOptions);
 
-      expect(mockCreemClient.createCheckout).toHaveBeenCalledWith(
+      expect(mockCreemClient.checkouts.create).toHaveBeenCalledWith(
         expect.objectContaining({
-          createCheckoutRequest: expect.objectContaining({
-            productId: "prod_yearly",
-          }),
+          productId: "prod_yearly",
         }),
       );
     });
@@ -342,17 +341,15 @@ describe("Creem Provider Implementation", () => {
       };
 
       mockGetProductTierById.mockReturnValue(mockTier);
-      mockCreemClient.createCheckout.mockResolvedValue({
+      mockCreemClient.checkouts.create.mockResolvedValue({
         checkoutUrl: "https://checkout.creem.io/session-onetime",
       });
 
       await creemProvider.createCheckoutSession(oneTimeOptions);
 
-      expect(mockCreemClient.createCheckout).toHaveBeenCalledWith(
+      expect(mockCreemClient.checkouts.create).toHaveBeenCalledWith(
         expect.objectContaining({
-          createCheckoutRequest: expect.objectContaining({
-            productId: "prod_one_time",
-          }),
+          productId: "prod_one_time",
         }),
       );
     });
@@ -375,20 +372,18 @@ describe("Creem Provider Implementation", () => {
       };
 
       mockGetProductTierById.mockReturnValue(mockTier);
-      mockCreemClient.createCheckout.mockResolvedValue({
+      mockCreemClient.checkouts.create.mockResolvedValue({
         checkoutUrl: "https://checkout.creem.io/session-123",
       });
 
       await creemProvider.createCheckoutSession(optionsWithoutName);
 
-      expect(mockCreemClient.createCheckout).toHaveBeenCalledWith(
+      expect(mockCreemClient.checkouts.create).toHaveBeenCalledWith(
         expect.objectContaining({
-          createCheckoutRequest: expect.objectContaining({
-            customer: {
-              email: "user@example.com",
-              name: undefined,
-            },
-          }),
+          customer: {
+            email: "user@example.com",
+            name: undefined,
+          },
         }),
       );
     });
@@ -400,7 +395,7 @@ describe("Creem Provider Implementation", () => {
         creemProvider.createCheckoutSession(mockCheckoutOptions),
       ).rejects.toThrow('Pricing tier with id "pro" not found.');
 
-      expect(mockCreemClient.createCheckout).not.toHaveBeenCalled();
+      expect(mockCreemClient.checkouts.create).not.toHaveBeenCalled();
     });
 
     it("should throw error when product ID not found for payment mode", async () => {
@@ -446,7 +441,7 @@ describe("Creem Provider Implementation", () => {
       };
 
       mockGetProductTierById.mockReturnValue(mockTier);
-      mockCreemClient.createCheckout.mockResolvedValue(invalidApiResponse);
+      mockCreemClient.checkouts.create.mockResolvedValue(invalidApiResponse);
 
       await expect(
         creemProvider.createCheckoutSession(mockCheckoutOptions),
@@ -466,7 +461,7 @@ describe("Creem Provider Implementation", () => {
       };
 
       mockGetProductTierById.mockReturnValue(mockTier);
-      mockCreemClient.createCheckout.mockRejectedValue(new Error("API Error"));
+      mockCreemClient.checkouts.create.mockRejectedValue(new Error("API Error"));
 
       await expect(
         creemProvider.createCheckoutSession(mockCheckoutOptions),
@@ -480,19 +475,18 @@ describe("Creem Provider Implementation", () => {
         customerPortalLink: "https://portal.creem.io/customer-123",
       };
 
-      mockCreemClient.generateCustomerLinks.mockResolvedValue(
+      mockCreemClient.customers.generateBillingLinks.mockResolvedValue(
         mockPortalResponse,
       );
 
       const result =
         await creemProvider.createCustomerPortalUrl("customer-123");
 
-      expect(mockCreemClient.generateCustomerLinks).toHaveBeenCalledWith({
-        xApiKey: "test_api_key",
-        createCustomerPortalLinkRequestEntity: {
+      expect(mockCreemClient.customers.generateBillingLinks).toHaveBeenCalledWith(
+        {
           customerId: "customer-123",
         },
-      });
+      );
       expect(result).toEqual({
         portalUrl: "https://portal.creem.io/customer-123",
       });
@@ -503,7 +497,7 @@ describe("Creem Provider Implementation", () => {
         someOtherField: "value",
       };
 
-      mockCreemClient.generateCustomerLinks.mockResolvedValue(
+      mockCreemClient.customers.generateBillingLinks.mockResolvedValue(
         invalidApiResponse,
       );
 
@@ -513,7 +507,7 @@ describe("Creem Provider Implementation", () => {
     });
 
     it("should handle Creem portal API errors", async () => {
-      mockCreemClient.generateCustomerLinks.mockRejectedValue(
+      mockCreemClient.customers.generateBillingLinks.mockRejectedValue(
         new Error("Portal API Error"),
       );
 

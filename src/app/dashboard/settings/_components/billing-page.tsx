@@ -24,6 +24,7 @@ import { Loader2 } from "lucide-react";
 import type { Subscription, PaymentRecord } from "@/types/billing";
 import { useRouter } from "nextjs-toploader/app";
 import { useIntlLocale } from "@/hooks/use-intl-locale";
+import { getSafeBillingRedirectUrl } from "@/lib/billing/url";
 
 interface BillingPageProps {
   subscription: Subscription | null;
@@ -41,10 +42,19 @@ export function BillingPage({ subscription, payments }: BillingPageProps) {
     try {
       const response = await fetch("/api/billing/portal");
       const data = await response.json();
-      if (response.ok && data.portalUrl) {
-        window.location.href = data.portalUrl;
+      const safePortalUrl = getSafeBillingRedirectUrl(
+        data.portalUrl,
+        window.location,
+      );
+      if (response.ok && safePortalUrl) {
+        window.location.href = safePortalUrl;
       } else {
-        throw new Error(data.error || "Could not create portal session.");
+        throw new Error(
+          data.error ||
+            (response.ok
+              ? "Received an unsafe management URL."
+              : "Could not create portal session."),
+        );
       }
     } catch (error) {
       toast.error(

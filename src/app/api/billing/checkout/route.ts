@@ -4,40 +4,13 @@ import { billing } from "@/lib/billing";
 import { Session } from "@/types/auth";
 import { z } from "zod";
 import { getUserSubscription } from "@/lib/database/subscription";
+import { assertTrustedBillingUrl } from "@/lib/billing/url";
 
 const checkoutSchema = z.object({
   tierId: z.string(),
   paymentMode: z.enum(["subscription", "one_time"]),
   billingCycle: z.enum(["monthly", "yearly"]).optional(),
 });
-
-const BILLING_REDIRECT_HOSTS = ["creem.io"];
-const BILLING_REDIRECT_HOST_SUFFIXES = [".creem.io"];
-
-const assertTrustedBillingUrl = (url: string, label: string): string => {
-  let parsedUrl: URL;
-  try {
-    parsedUrl = new URL(url);
-  } catch {
-    throw new Error(`Invalid ${label}.`);
-  }
-
-  if (parsedUrl.protocol !== "https:") {
-    throw new Error(`Invalid ${label}.`);
-  }
-
-  const hostname = parsedUrl.hostname.toLowerCase();
-  if (BILLING_REDIRECT_HOSTS.includes(hostname)) return parsedUrl.toString();
-  if (
-    BILLING_REDIRECT_HOST_SUFFIXES.some((suffix) =>
-      hostname.endsWith(suffix),
-    )
-  ) {
-    return parsedUrl.toString();
-  }
-
-  throw new Error(`Invalid ${label}.`);
-};
 
 export async function POST(request: NextRequest) {
   let session: Session | null = null;

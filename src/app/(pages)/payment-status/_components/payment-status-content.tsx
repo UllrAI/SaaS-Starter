@@ -19,7 +19,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type PaymentStatus = "success" | "failed" | "pending" | "cancelled";
 
@@ -117,8 +117,19 @@ export function PaymentStatusContent() {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const pollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
+    let isActive = true;
+    const abortController = new AbortController();
+
+    const clearPollTimeout = () => {
+      if (pollTimeoutRef.current) {
+        clearTimeout(pollTimeoutRef.current);
+        pollTimeoutRef.current = null;
+      }
+    };
+
     const checkPaymentStatus = async () => {
       try {
         const statusParam = searchParams.get("status") as PaymentStatus;
@@ -144,18 +155,24 @@ export function PaymentStatusContent() {
           : "sessionId";
         const response = await fetch(
           `/api/payment-status?${sessionIdParam ? `${paramName}=${sessionIdParam}` : ""}`,
+          { signal: abortController.signal },
         );
         if (response.ok) {
           const data = await response.json();
+          if (!isActive) return;
+
           setStatus(data.status as PaymentStatus);
+          setError(null);
 
           // Only set up auto-refresh for pending status
           if (data.status === "pending" && sessionIdParam) {
-            setTimeout(() => {
-              checkPaymentStatus();
+            clearPollTimeout();
+            pollTimeoutRef.current = setTimeout(() => {
+              void checkPaymentStatus();
             }, 5000); // Check again in 5 seconds
           }
         } else {
+          if (!isActive) return;
           // Fallback to URL parameter or default to pending
           setStatus(
             statusParam && statusParam in statusConfigs
@@ -164,6 +181,9 @@ export function PaymentStatusContent() {
           );
         }
       } catch (err) {
+        if (!isActive) return;
+        if (err instanceof DOMException && err.name === "AbortError") return;
+
         console.error("Error checking payment status:", err);
         setError("Failed to check payment status");
         // Fallback to URL parameter or default to pending
@@ -172,11 +192,17 @@ export function PaymentStatusContent() {
           statusParam && statusParam in statusConfigs ? statusParam : "pending",
         );
       } finally {
-        setIsLoading(false);
+        if (isActive) setIsLoading(false);
       }
     };
 
-    checkPaymentStatus();
+    void checkPaymentStatus();
+
+    return () => {
+      isActive = false;
+      abortController.abort();
+      clearPollTimeout();
+    };
   }, [searchParams]); // Re-run when search params change
 
   // Show loading state while checking status

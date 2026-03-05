@@ -33,18 +33,14 @@ describe("authMiddleware", () => {
     jest.clearAllMocks();
   });
 
-  it("should redirect logged-in users from auth pages to /dashboard", async () => {
+  it("should allow logged-in users to access /login", async () => {
     (getSessionCookie as jest.Mock).mockReturnValue("some-session-cookie");
 
     const request = new NextRequest("http://localhost/login");
     const response = await authMiddleware(request);
 
-    expect(NextResponse.redirect).toHaveBeenCalledWith(
-      new URL("/dashboard", request.url),
-    );
-    expect(response?.headers.get("location")).toBe(
-      "http://localhost/dashboard",
-    );
+    expect(NextResponse.next).toHaveBeenCalled();
+    expect(response).toEqual({});
   });
 
   it("should redirect unauthenticated users from dashboard pages to /login with callbackUrl", async () => {
@@ -59,6 +55,20 @@ describe("authMiddleware", () => {
     expect(NextResponse.redirect).toHaveBeenCalledWith(loginUrl);
     expect(response?.headers.get("location")).toBe(
       "http://localhost/login?callbackUrl=%2Fdashboard%2Fsettings",
+    );
+  });
+
+  it("should preserve dashboard query params in callbackUrl", async () => {
+    (getSessionCookie as jest.Mock).mockReturnValue(undefined);
+
+    const request = new NextRequest(
+      "http://localhost/dashboard/settings?page=billing&tab=invoices",
+    );
+    const response = await authMiddleware(request);
+
+    expect(NextResponse.redirect).toHaveBeenCalled();
+    expect(response?.headers.get("location")).toBe(
+      "http://localhost/login?callbackUrl=%2Fdashboard%2Fsettings%3Fpage%3Dbilling%26tab%3Dinvoices",
     );
   });
 
@@ -82,32 +92,24 @@ describe("authMiddleware", () => {
     expect(response).toEqual({});
   });
 
-  it("should redirect logged-in users from /signup to /dashboard", async () => {
+  it("should allow logged-in users to access /signup", async () => {
     (getSessionCookie as jest.Mock).mockReturnValue("some-session-cookie");
 
     const request = new NextRequest("http://localhost/signup");
     const response = await authMiddleware(request);
 
-    expect(NextResponse.redirect).toHaveBeenCalledWith(
-      new URL("/dashboard", request.url),
-    );
-    expect(response?.headers.get("location")).toBe(
-      "http://localhost/dashboard",
-    );
+    expect(NextResponse.next).toHaveBeenCalled();
+    expect(response).toEqual({});
   });
 
-  it("should redirect logged-in users from /auth/sent to /dashboard", async () => {
+  it("should allow logged-in users to access /auth/sent", async () => {
     (getSessionCookie as jest.Mock).mockReturnValue("some-session-cookie");
 
     const request = new NextRequest("http://localhost/auth/sent");
     const response = await authMiddleware(request);
 
-    expect(NextResponse.redirect).toHaveBeenCalledWith(
-      new URL("/dashboard", request.url),
-    );
-    expect(response?.headers.get("location")).toBe(
-      "http://localhost/dashboard",
-    );
+    expect(NextResponse.next).toHaveBeenCalled();
+    expect(response).toEqual({});
   });
 
   it("should allow unauthenticated users to access /login", async () => {

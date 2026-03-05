@@ -12,17 +12,31 @@ import { Mail } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { getAvailableSocialProviders } from "@/lib/auth/providers";
 import { AuthFormBase } from "@/components/auth/auth-form-base";
+import {
+  DEFAULT_CALLBACK_URL,
+  normalizeCallbackUrl,
+} from "@/lib/auth/callback-url";
 
 type AuthMode = "login" | "signup";
 
 interface AuthFormProps {
   mode: AuthMode;
   availableProviders?: ReturnType<typeof getAvailableSocialProviders>;
+  callbackURL?: string;
 }
 
-export function AuthForm({ mode, availableProviders }: AuthFormProps) {
+export function AuthForm({
+  mode,
+  availableProviders,
+  callbackURL = DEFAULT_CALLBACK_URL,
+}: AuthFormProps) {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const resolvedCallbackURL = normalizeCallbackUrl(callbackURL);
+  const callbackQuery =
+    resolvedCallbackURL === DEFAULT_CALLBACK_URL
+      ? ""
+      : `?callbackUrl=${encodeURIComponent(resolvedCallbackURL)}`;
 
   const form = useForm<z.infer<typeof authSchema>>({
     resolver: zodResolver(authSchema),
@@ -34,7 +48,7 @@ export function AuthForm({ mode, availableProviders }: AuthFormProps) {
   const onSubmit = async (data: z.infer<typeof authSchema>) => {
     const result = await signIn.magicLink({
       email: data.email,
-      callbackURL: "/dashboard",
+      callbackURL: resolvedCallbackURL,
     });
 
     if (result.error) {
@@ -64,14 +78,14 @@ export function AuthForm({ mode, availableProviders }: AuthFormProps) {
       : <>Already have an account?</>,
     alternativeActionLink: (
       <Link
-        href={isLogin ? "/signup" : "/login"}
+        href={isLogin ? `/signup${callbackQuery}` : `/login${callbackQuery}`}
         className="text-primary hover:text-primary/80 cursor-pointer font-medium underline-offset-4 transition-colors hover:underline"
       >
         {isLogin ? <>Create an account</> : <>Sign in instead</>}
       </Link>
     ),
     showTerms: !isLogin,
-    callbackURL: "/dashboard",
+    callbackURL: resolvedCallbackURL,
   };
 
   const fields = [

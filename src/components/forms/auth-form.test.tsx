@@ -45,6 +45,7 @@ jest.mock("@/components/auth/auth-form-base", () => ({
       submitButtonText: string;
       alternativeActionText: string;
       alternativeActionLink: React.ReactNode;
+      callbackURL: string;
     };
     fields: Array<{ name: string; type: string; placeholder: string }>;
   }) => (
@@ -134,6 +135,18 @@ describe("AuthForm", () => {
       const signupLink = screen.getByText("Create an account");
       expect(signupLink.closest("a")).toHaveAttribute("href", "/signup");
     });
+
+    it("preserves callback url when switching between login and signup", () => {
+      render(
+        <AuthForm mode="login" callbackURL="/dashboard/settings?page=billing" />,
+      );
+
+      const signupLink = screen.getByText("Create an account");
+      expect(signupLink.closest("a")).toHaveAttribute(
+        "href",
+        "/signup?callbackUrl=%2Fdashboard%2Fsettings%3Fpage%3Dbilling",
+      );
+    });
   });
 
   describe("Signup Mode", () => {
@@ -204,6 +217,26 @@ describe("AuthForm", () => {
       await waitFor(() => {
         expect(mockToast.error).toHaveBeenCalledWith(errorMessage);
         expect(mockPush).not.toHaveBeenCalled();
+      });
+    });
+
+    it("uses a custom callback url when provided", async () => {
+      mockSignIn.magicLink = jest.fn().mockResolvedValue({ error: null });
+
+      render(
+        <AuthForm mode="login" callbackURL="/dashboard/settings?page=billing" />,
+      );
+
+      fireEvent.change(screen.getByPlaceholderText("you@example.com"), {
+        target: { value: "test@example.com" },
+      });
+      fireEvent.click(screen.getByRole("button", { name: /Send Magic Link/i }));
+
+      await waitFor(() => {
+        expect(mockSignIn.magicLink).toHaveBeenCalledWith({
+          email: "test@example.com",
+          callbackURL: "/dashboard/settings?page=billing",
+        });
       });
     });
   });

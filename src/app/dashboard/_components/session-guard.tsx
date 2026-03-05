@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useSession } from "@/lib/auth/client";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { Loader2, Sparkles } from "lucide-react";
+import { buildLoginRedirectPath } from "@/lib/auth/callback-url";
 
 interface SessionGuardProps {
   children: React.ReactNode;
@@ -13,14 +14,21 @@ interface SessionGuardProps {
 export function SessionGuard({ children }: SessionGuardProps) {
   const { data: session, isPending } = useSession();
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const hasRedirectedRef = useRef(false);
+  const isAuthenticated = !!session?.user;
+  const callbackUrl = useMemo(() => {
+    const query = searchParams.toString();
+    return query ? `${pathname}?${query}` : pathname;
+  }, [pathname, searchParams]);
 
   useEffect(() => {
     if (isPending) {
       return;
     }
 
-    if (session?.user) {
+    if (isAuthenticated) {
       hasRedirectedRef.current = false;
       return;
     }
@@ -29,17 +37,21 @@ export function SessionGuard({ children }: SessionGuardProps) {
       return;
     }
 
-    hasRedirectedRef.current = true;
-
-    const currentPath = window.location.pathname;
-    if (currentPath.startsWith("/dashboard")) {
-      toast.error("Your session has expired. Please log in again.");
-      router.replace("/login");
+    if (!pathname.startsWith("/dashboard")) {
+      return;
     }
-  }, [session, isPending, router]);
 
-  if (isPending || !session?.user) {
+    hasRedirectedRef.current = true;
+    toast.error("Your session has expired. Please log in again.");
+    router.replace(buildLoginRedirectPath(callbackUrl));
+  }, [callbackUrl, isAuthenticated, isPending, pathname, router]);
+
+  if (isPending) {
     return <SessionGuardLoading />;
+  }
+
+  if (!isAuthenticated) {
+    return null;
   }
 
   return <>{children}</>;

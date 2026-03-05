@@ -13,6 +13,27 @@ interface ModeToggleProps {
   showLabel?: boolean;
 }
 
+const THEME_ORDER = ["light", "dark", "system"] as const;
+
+const THEME_META = {
+  light: {
+    label: "Light",
+    icon: <Sun className="h-[1.2rem] w-[1.2rem] transition-all" />,
+  },
+  dark: {
+    label: "Dark",
+    icon: <Moon className="h-[1.2rem] w-[1.2rem] transition-all" />,
+  },
+  system: {
+    label: "System",
+    icon: <Monitor className="h-[1.2rem] w-[1.2rem] transition-all" />,
+  },
+} as const;
+
+function resolveTheme(theme: string | undefined): keyof typeof THEME_META {
+  return theme === "light" || theme === "dark" ? theme : "system";
+}
+
 export function ModeToggle({
   className,
   variant = "outline",
@@ -27,35 +48,14 @@ export function ModeToggle({
   }, []);
 
   const cycleTheme = () => {
-    const themes = ["light", "dark", "system"];
-    const currentIndex = themes.indexOf(theme || "light");
-    const nextIndex = (currentIndex + 1) % themes.length;
-    setTheme(themes[nextIndex]);
+    const activeTheme = resolveTheme(theme);
+    const currentIndex = THEME_ORDER.indexOf(activeTheme);
+    const nextIndex = (currentIndex + 1) % THEME_ORDER.length;
+    setTheme(THEME_ORDER[nextIndex]);
   };
 
-  const getThemeIcon = () => {
-    switch (theme) {
-      case "light":
-        return <Sun className="h-[1.2rem] w-[1.2rem] transition-all" />;
-      case "dark":
-        return <Moon className="h-[1.2rem] w-[1.2rem] transition-all" />;
-      case "system":
-      default:
-        return <Monitor className="h-[1.2rem] w-[1.2rem] transition-all" />;
-    }
-  };
-
-  const getThemeLabel = () => {
-    switch (theme) {
-      case "light":
-        return "Light";
-      case "dark":
-        return "Dark";
-      case "system":
-      default:
-        return "System";
-    }
-  };
+  const activeTheme = resolveTheme(theme);
+  const themeMeta = THEME_META[activeTheme];
 
   if (!mounted) {
     return (
@@ -72,10 +72,10 @@ export function ModeToggle({
       size={size}
       className={className}
       onClick={cycleTheme}
-      title={`Current theme: ${getThemeLabel()}. Click to cycle themes.`}
+      title={`Current theme: ${themeMeta.label}. Click to cycle themes.`}
     >
-      {getThemeIcon()}
-      {showLabel && <span className="ml-2">{getThemeLabel()}</span>}
+      {themeMeta.icon}
+      {showLabel && <span className="ml-2">{themeMeta.label}</span>}
       <span className="sr-only">Toggle theme</span>
     </Button>
   );

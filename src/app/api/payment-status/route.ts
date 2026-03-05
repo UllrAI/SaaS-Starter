@@ -2,6 +2,57 @@ import { auth } from "@/lib/auth/server";
 import { getUserSubscription } from "@/lib/database/subscription";
 import { NextRequest, NextResponse } from "next/server";
 
+const CHECKOUT_STATUS_MAP = {
+  completed: {
+    status: "success",
+    message: "Payment completed successfully",
+  },
+  succeeded: {
+    status: "success",
+    message: "Payment completed successfully",
+  },
+  failed: {
+    status: "failed",
+    message: "Payment failed",
+  },
+  expired: {
+    status: "failed",
+    message: "Payment session expired",
+  },
+  canceled: {
+    status: "cancelled",
+    message: "Payment was cancelled",
+  },
+  cancelled: {
+    status: "cancelled",
+    message: "Payment was cancelled",
+  },
+  pending: {
+    status: "pending",
+    message: "Payment is being processed. This may take a few minutes.",
+  },
+  processing: {
+    status: "pending",
+    message: "Payment is being processed. This may take a few minutes.",
+  },
+  open: {
+    status: "pending",
+    message: "Payment is being processed. This may take a few minutes.",
+  },
+} as const;
+
+function resolveCheckoutStatus(
+  normalizedStatus: string,
+): { status: string; message: string } {
+  return (
+    CHECKOUT_STATUS_MAP[normalizedStatus as keyof typeof CHECKOUT_STATUS_MAP] ??
+    {
+      status: "pending",
+      message: "Payment is being processed. This may take a few minutes.",
+    }
+  );
+}
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -69,44 +120,13 @@ export async function GET(request: NextRequest) {
         const checkoutResponse = await creemClient.checkouts.retrieve(sessionId);
 
         if (checkoutResponse?.status) {
-          // Map Creem checkout status to our payment status
           const normalizedStatus = String(checkoutResponse.status).toLowerCase();
-          switch (normalizedStatus) {
-            case "completed":
-            case "succeeded":
-              return NextResponse.json({
-                status: "success",
-                message: "Payment completed successfully",
-                sessionId,
-              });
-            case "failed":
-            case "expired":
-              return NextResponse.json({
-                status: "failed",
-                message:
-                  normalizedStatus === "expired"
-                    ? "Payment session expired"
-                    : "Payment failed",
-                sessionId,
-              });
-            case "canceled":
-            case "cancelled":
-              return NextResponse.json({
-                status: "cancelled",
-                message: "Payment was cancelled",
-                sessionId,
-              });
-            case "pending":
-            case "processing":
-            case "open":
-            default:
-              return NextResponse.json({
-                status: "pending",
-                message:
-                  "Payment is being processed. This may take a few minutes.",
-                sessionId,
-              });
-          }
+          const resolvedStatus = resolveCheckoutStatus(normalizedStatus);
+          return NextResponse.json({
+            status: resolvedStatus.status,
+            message: resolvedStatus.message,
+            sessionId,
+          });
         }
 
         // Fallback if no status available

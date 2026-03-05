@@ -64,14 +64,9 @@ export async function GET(request: NextRequest) {
     if (sessionId) {
       try {
         // Check checkout status with Creem
-        const { creemClient, creemApiKey } = await import(
-          "@/lib/billing/creem/client"
-        );
+        const { creemClient } = await import("@/lib/billing/creem/client");
 
-        const checkoutResponse = await creemClient.retrieveCheckout({
-          xApiKey: creemApiKey,
-          checkoutId: sessionId,
-        });
+        const checkoutResponse = await creemClient.checkouts.retrieve(sessionId);
 
         if (checkoutResponse?.status) {
           // Map Creem checkout status to our payment status
@@ -82,16 +77,10 @@ export async function GET(request: NextRequest) {
                 message: "Payment completed successfully",
                 sessionId,
               });
-            case "failed":
+            case "expired":
               return NextResponse.json({
                 status: "failed",
-                message: "Payment failed",
-                sessionId,
-              });
-            case "canceled":
-              return NextResponse.json({
-                status: "cancelled",
-                message: "Payment was cancelled",
+                message: "Payment session expired",
                 sessionId,
               });
             case "pending":

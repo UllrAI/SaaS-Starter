@@ -32,8 +32,8 @@ export function getLocaleDisplayInfo(locale: string): LocaleDisplayInfo {
 }
 
 // export const LINGO_DEFAULT_MODEL = "openai:gpt-5-nano";
-export const LINGO_DEFAULT_MODEL = "openrouter:openai/gpt-oss-safeguard-20b";
-// export const LINGO_DEFAULT_MODEL = "openrouter:google/gemini-3-flash-preview";
+// export const LINGO_DEFAULT_MODEL = "openrouter:openai/gpt-oss-safeguard-20b";
+export const LINGO_DEFAULT_MODEL = "openrouter:google/gemini-3-flash-preview";
 
 export const LINGO_MODEL_MAP: Record<string, string> = {
   "*:*": LINGO_DEFAULT_MODEL,

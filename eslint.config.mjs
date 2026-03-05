@@ -1,11 +1,12 @@
 import { defineConfig, globalIgnores } from 'eslint/config'
+import { fixupConfigRules } from '@eslint/compat'
 import nextVitals from 'eslint-config-next/core-web-vitals'
 import nextTs from 'eslint-config-next/typescript'
 import prettier from 'eslint-config-prettier/flat'
 
 const eslintConfig = defineConfig([
-  ...nextVitals,
-  ...nextTs,
+  ...fixupConfigRules(nextVitals),
+  ...fixupConfigRules(nextTs),
   prettier,
   {
     rules: {

@@ -1,7 +1,7 @@
 import type { PaymentProvider } from "../provider";
 import type { CreateCheckoutOptions } from "@/types/billing";
 import { z } from "zod";
-import { creemClient, creemApiKey, creemWebhookSecret } from "./client";
+import { creemClient, creemWebhookSecret } from "./client";
 import { getProductTierById } from "@/lib/config/products";
 import { handleCreemWebhook } from "./webhook";
 
@@ -59,10 +59,7 @@ const creemProvider: PaymentProvider = {
         },
       };
 
-      const response = await creemClient.createCheckout({
-        xApiKey: creemApiKey,
-        createCheckoutRequest: checkoutRequestData,
-      });
+      const response = await creemClient.checkouts.create(checkoutRequestData);
 
       const parsed = CreemCheckoutResponseSchema.safeParse(response);
 
@@ -86,11 +83,8 @@ const creemProvider: PaymentProvider = {
     customerId: string,
   ): Promise<{ portalUrl: string }> {
     try {
-      const response = await creemClient.generateCustomerLinks({
-        xApiKey: creemApiKey,
-        createCustomerPortalLinkRequestEntity: {
-          customerId: customerId,
-        },
+      const response = await creemClient.customers.generateBillingLinks({
+        customerId,
       });
 
       const parsed = CreemCustomerPortalResponseSchema.safeParse(response);

@@ -2,6 +2,7 @@ import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "./_components/app-sidebar";
 import { SessionGuard } from "./_components/session-guard";
 import { cookies } from "next/headers";
+import { Suspense } from "react";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -15,7 +16,9 @@ export default async function AppLayout({ children }: DashboardLayoutProps) {
 
   return (
     <SidebarProvider defaultOpen={defaultSidebarOpen}>
-      <AppSidebar />
+      <Suspense fallback={<div className="bg-sidebar w-14" />}>
+        <AppSidebar />
+      </Suspense>
       <SidebarInset className="flex flex-col">
         <SessionGuard>{children}</SessionGuard>
       </SidebarInset>

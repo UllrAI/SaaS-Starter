@@ -9,6 +9,7 @@ import { PaymentWithUser } from "@/types/billing";
 import { useAdminTable } from "@/hooks/use-admin-table";
 import { Button } from "@/components/ui/button";
 import { getPayments } from "@/lib/actions/admin";
+import { useIntlLocale } from "@/hooks/use-intl-locale";
 
 interface PaymentManagementTableProps {
   initialData: PaymentWithUser[];
@@ -35,15 +36,15 @@ const getStatusBadgeVariant = (status: string) => {
   }
 };
 
-const formatCurrency = (amount: number, currency: string) => {
-  return new Intl.NumberFormat("en-US", {
+const formatCurrency = (amount: number, currency: string, locale: string) => {
+  return new Intl.NumberFormat(locale, {
     style: "currency",
     currency: currency.toUpperCase(),
   }).format(amount / 100);
 };
 
-const formatDate = (dateString: string | Date) => {
-  return new Date(dateString).toLocaleDateString("en-US", {
+const formatDate = (dateString: string | Date, locale: string) => {
+  return new Date(dateString).toLocaleDateString(locale, {
     year: "numeric",
     month: "short",
     day: "numeric",
@@ -67,11 +68,13 @@ const getPaymentMethodLabel = (paymentType: string) => {
   return map[paymentType] || "Unknown";
 };
 
-const columns: Array<{
+const createColumns = (
+  locale: string,
+): Array<{
   key: keyof PaymentWithUser | string;
   label: string;
   render?: (item: PaymentWithUser) => ReactNode;
-}> = [
+}> => [
   {
     key: "user",
     label: "User",
@@ -88,7 +91,7 @@ const columns: Array<{
     label: "Amount",
     render: (payment) => (
       <div className="font-medium">
-        {formatCurrency(payment.amount, payment.currency)}
+        {formatCurrency(payment.amount, payment.currency, locale)}
       </div>
     ),
   },
@@ -116,7 +119,7 @@ const columns: Array<{
   {
     key: "created",
     label: "Created",
-    render: (payment) => formatDate(payment.createdAt),
+    render: (payment) => formatDate(payment.createdAt, locale),
   },
   {
     key: "actions",
@@ -146,6 +149,7 @@ export function PaymentManagementTable({
   initialData,
   initialPagination,
 }: PaymentManagementTableProps) {
+  const intlLocale = useIntlLocale();
   // FIX: Wrap queryAction with useCallback
   const queryPayments = useCallback(
     async ({
@@ -188,6 +192,8 @@ export function PaymentManagementTable({
     initialData,
     initialPagination,
   });
+
+  const columns = createColumns(intlLocale);
 
   return (
     <AdminTableBase<PaymentWithUser>

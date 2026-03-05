@@ -67,6 +67,7 @@ export default async function createNextConfig(): Promise<NextConfig> {
     lingoDir: ".lingo",
     sourceLocale: SOURCE_LOCALE,
     targetLocales: [...TARGET_LOCALES],
+    useDirective: false,
     models: LINGO_MODEL_MAP,
     dev: {
       usePseudotranslator,

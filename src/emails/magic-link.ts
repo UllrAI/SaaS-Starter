@@ -1,5 +1,6 @@
 import { sendEmail } from "@/lib/email";
 import { APP_NAME, COMPANY_NAME } from "@/lib/config/constants";
+import { resolveIntlLocale } from "@/lib/locale";
 import { userAgent } from "next/server";
 
 interface DeviceInfo {
@@ -78,9 +79,10 @@ export function getMagicLinkEmailHTML(
   email: string,
   url: string,
   deviceInfo?: DeviceInfo,
+  locale: string = "en",
 ): string {
   const now = new Date();
-  const formattedDate = now.toLocaleDateString("en-US", {
+  const formattedDate = now.toLocaleDateString(resolveIntlLocale(locale), {
     year: "numeric",
     month: "long",
     day: "numeric",

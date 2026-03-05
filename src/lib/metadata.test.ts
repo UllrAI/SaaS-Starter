@@ -25,7 +25,7 @@ describe("createMetadata", () => {
     expect(result.openGraph?.images).toBe(mockOGImage);
     expect(result.openGraph?.siteName).toBe(expectedAppName);
     expect((result.openGraph as Record<string, unknown>)?.type).toBe("website");
-    expect(result.openGraph?.locale).toBe("en_US");
+    expect(result.openGraph?.locale).toBeUndefined();
     expect((result.twitter as Record<string, unknown>)?.card).toBe(
       "summary_large_image",
     );
@@ -172,7 +172,7 @@ describe("createMetadata", () => {
     expect(result.openGraph?.url).toBe(mockAppUrl);
     expect(result.openGraph?.siteName).toBe(expectedAppName);
     expect((result.openGraph as Record<string, unknown>)?.type).toBe("website");
-    expect(result.openGraph?.locale).toBe("en_US");
+    expect(result.openGraph?.locale).toBeUndefined();
   });
 
   it("should set correct default twitter card properties", () => {

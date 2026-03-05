@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { renderMarkdoc } from "@/lib/utils";
+import { getServerLocale } from "@lingo.dev/compiler/virtual/locale/server";
 
 interface BlogPostPageProps {
   params: Promise<{
@@ -86,10 +87,11 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     notFound();
   }
 
-  const content = await post.content();
-  const author = post.author
-    ? await reader.collections.authors.read(post.author)
-    : null;
+  const locale = await getServerLocale();
+  const [content, author] = await Promise.all([
+    post.content(),
+    post.author ? reader.collections.authors.read(post.author) : null,
+  ]);
 
   return (
     <>
@@ -102,6 +104,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         tags={post.tags ? [...post.tags] : undefined}
         content={renderMarkdoc(content.node)}
         author={author?.name || "Anonymous"}
+        locale={locale}
       />
 
       {/* Article Content */}

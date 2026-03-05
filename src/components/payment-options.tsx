@@ -29,10 +29,15 @@ import { useRouter } from "nextjs-toploader/app";
 import type { PaymentMode, BillingCycle } from "@/types/billing";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "./ui/skeleton";
+import { useIntlLocale } from "@/hooks/use-intl-locale";
 
 // Helper: Format Price
-const formatPrice = (price: number, currency: string = "USD") => {
-  return new Intl.NumberFormat("en-US", {
+const formatPrice = (
+  price: number,
+  locale: string,
+  currency: string = "USD",
+) => {
+  return new Intl.NumberFormat(locale, {
     style: "currency",
     currency,
   }).format(price);
@@ -70,6 +75,7 @@ const getSafeBillingRedirectUrl = (url: unknown): string | null => {
 };
 
 export function PricingSection({ className }: { className?: string }) {
+  const intlLocale = useIntlLocale();
   const [paymentMode, setPaymentMode] = useState<PaymentMode>("subscription");
   const [billingCycle, setBillingCycle] = useState<BillingCycle>("yearly");
   const [loadingState, setLoadingState] = useState<{
@@ -286,10 +292,14 @@ export function PricingSection({ className }: { className?: string }) {
                   <div className="flex items-baseline justify-center gap-1">
                     <span className="text-foreground font-mono text-4xl font-bold tracking-tight">
                       {paymentMode === "one_time"
-                        ? formatPrice(price, tier.currency)
+                        ? formatPrice(price, intlLocale, tier.currency)
                         : billingCycle === "monthly"
-                          ? formatPrice(price, tier.currency)
-                          : formatPrice(Math.round(price / 12), tier.currency)}
+                          ? formatPrice(price, intlLocale, tier.currency)
+                          : formatPrice(
+                              Math.round(price / 12),
+                              intlLocale,
+                              tier.currency,
+                            )}
                     </span>
                     {paymentMode === "subscription" && (
                       <span className="text-muted-foreground font-mono text-sm">

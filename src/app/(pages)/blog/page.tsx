@@ -6,6 +6,7 @@ import { BackgroundPattern } from "@/components/ui/background-pattern";
 import { BlogPostCard } from "@/components/blog/blog-post-card";
 import type { Metadata } from "next";
 import { renderMarkdoc } from "@/lib/utils";
+import { getServerLocale } from "@lingo.dev/compiler/virtual/locale/server";
 
 export const metadata: Metadata = createMetadata({
   title: "Blog",
@@ -16,10 +17,11 @@ export const metadata: Metadata = createMetadata({
 const reader = createReader(process.cwd(), keystaticConfig);
 
 export default async function BlogPage() {
+  const locale = await getServerLocale();
   const posts = await reader.collections.posts.all();
 
   // Sort posts by published date (newest first), then by title
-  const sortedPosts = posts.sort((a, b) => {
+  const sortedPosts = posts.toSorted((a, b) => {
     const dateA = a.entry.publishedDate
       ? new Date(a.entry.publishedDate)
       : new Date(0);
@@ -37,6 +39,34 @@ export default async function BlogPage() {
   // Separate featured posts
   const featuredPosts = sortedPosts.filter((post) => post.entry.featured);
   const regularPosts = sortedPosts.filter((post) => !post.entry.featured);
+
+  const renderPostCard = async (
+    post: (typeof posts)[number],
+    variant: "featured" | "regular",
+  ) => {
+    const [content, author] = await Promise.all([
+      post.entry.content(),
+      post.entry.author
+        ? reader.collections.authors.read(post.entry.author)
+        : Promise.resolve(null),
+    ]);
+
+    return (
+      <BlogPostCard
+        key={post.slug}
+        slug={post.slug}
+        title={post.entry.title}
+        excerpt={post.entry.excerpt || undefined}
+        heroImage={post.entry.heroImage || undefined}
+        publishedDate={post.entry.publishedDate || undefined}
+        featured={post.entry.featured}
+        variant={variant}
+        content={renderMarkdoc(content.node)}
+        author={author?.name || "Anonymous"}
+        locale={locale}
+      />
+    );
+  };
 
   return (
     <>
@@ -94,30 +124,9 @@ export default async function BlogPage() {
                     </div>
                     <div className="grid gap-6 sm:gap-8 lg:gap-12">
                       {await Promise.all(
-                        featuredPosts.map(async (post) => {
-                          const content = await post.entry.content();
-                          const author = post.entry.author
-                            ? await reader.collections.authors.read(
-                                post.entry.author,
-                              )
-                            : null;
-                          return (
-                            <BlogPostCard
-                              key={post.slug}
-                              slug={post.slug}
-                              title={post.entry.title}
-                              excerpt={post.entry.excerpt || undefined}
-                              heroImage={post.entry.heroImage || undefined}
-                              publishedDate={
-                                post.entry.publishedDate || undefined
-                              }
-                              featured={post.entry.featured}
-                              variant="featured"
-                              content={renderMarkdoc(content.node)}
-                              author={author?.name || "Anonymous"}
-                            />
-                          );
-                        }),
+                        featuredPosts.map((post) =>
+                          renderPostCard(post, "featured"),
+                        ),
                       )}
                     </div>
                   </section>
@@ -138,30 +147,9 @@ export default async function BlogPage() {
                     )}
                     <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:gap-8">
                       {await Promise.all(
-                        regularPosts.map(async (post) => {
-                          const content = await post.entry.content();
-                          const author = post.entry.author
-                            ? await reader.collections.authors.read(
-                                post.entry.author,
-                              )
-                            : null;
-                          return (
-                            <BlogPostCard
-                              key={post.slug}
-                              slug={post.slug}
-                              title={post.entry.title}
-                              excerpt={post.entry.excerpt || undefined}
-                              heroImage={post.entry.heroImage || undefined}
-                              publishedDate={
-                                post.entry.publishedDate || undefined
-                              }
-                              featured={post.entry.featured}
-                              variant="regular"
-                              content={renderMarkdoc(content.node)}
-                              author={author?.name || "Anonymous"}
-                            />
-                          );
-                        }),
+                        regularPosts.map((post) =>
+                          renderPostCard(post, "regular"),
+                        ),
                       )}
                     </div>
                   </section>

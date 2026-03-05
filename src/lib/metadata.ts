@@ -29,7 +29,6 @@ export function createMetadata(override: Metadata): Metadata {
       images: override.openGraph?.images ?? OGIMAGE,
       siteName: APP_NAME,
       type: "website",
-      locale: "en_US",
       ...override.openGraph,
     },
     twitter: {

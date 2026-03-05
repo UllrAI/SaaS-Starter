@@ -190,7 +190,7 @@ export async function getAdminStatsWithCharts(): Promise<AdminStatsWithCharts> {
 
     const recentUsersData = Object.entries(userCountsByDate)
       .map(([date, count]) => ({ date, count }))
-      .sort((a, b) => b.date.localeCompare(a.date));
+      .toSorted((a, b) => b.date.localeCompare(a.date));
 
     const revenueByMonth = monthlyRevenueRaw.reduce(
       (acc, payment) => {
@@ -211,7 +211,7 @@ export async function getAdminStatsWithCharts(): Promise<AdminStatsWithCharts> {
         revenue: data.revenue,
         count: data.count,
       }))
-      .sort((a, b) => b.month.localeCompare(a.month));
+      .toSorted((a, b) => b.month.localeCompare(a.month));
 
     return {
       ...basicStats,
@@ -292,7 +292,7 @@ export async function getUploadStatsDetails(): Promise<UploadStatsDetails> {
         count,
         percentage: Math.round((count / (total || 1)) * 100),
       }))
-      .sort((a, b) => b.count - a.count);
+      .toSorted((a, b) => b.count - a.count);
 
     const averageSize = total > 0 ? totalSize / total : 0;
 

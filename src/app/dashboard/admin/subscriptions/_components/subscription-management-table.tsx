@@ -22,6 +22,7 @@ import {
   cancelSubscriptionAction,
 } from "@/lib/actions/admin";
 import { SubscriptionStatus } from "@/types/billing";
+import { useIntlLocale } from "@/hooks/use-intl-locale";
 
 interface SubscriptionManagementTableProps {
   initialData: SubscriptionWithUser[];
@@ -37,6 +38,7 @@ export function SubscriptionManagementTable({
   initialData,
   initialPagination,
 }: SubscriptionManagementTableProps) {
+  const intlLocale = useIntlLocale();
   const [isPending, startTransition] = useTransition();
   const [cancellingSubscription, setCancellingSubscription] =
     useState<SubscriptionWithUser | null>(null);
@@ -117,7 +119,7 @@ export function SubscriptionManagementTable({
 
   const formatDate = (dateString?: Date | string | null) => {
     if (!dateString) return "N/A";
-    return new Date(dateString).toLocaleDateString("en-US", {
+    return new Date(dateString).toLocaleDateString(intlLocale, {
       year: "numeric",
       month: "short",
       day: "numeric",

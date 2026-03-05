@@ -10,6 +10,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { AlertTriangle } from "lucide-react";
+import { useIntlLocale } from "@/hooks/use-intl-locale";
 
 interface RevenueData {
   month: string;
@@ -22,10 +23,12 @@ interface RevenueChartProps {
 }
 
 export function RevenueChart({ chartData }: RevenueChartProps) {
+  const intlLocale = useIntlLocale();
+
   // Transform the data for the chart
   const transformedData = chartData
     .map((item) => ({
-      month: new Date(item.month + "-01").toLocaleDateString("en-US", {
+      month: new Date(item.month + "-01").toLocaleDateString(intlLocale, {
         month: "short",
         year: "numeric",
       }),
@@ -46,7 +49,7 @@ export function RevenueChart({ chartData }: RevenueChartProps) {
   }
 
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat("en-US", {
+    return new Intl.NumberFormat(intlLocale, {
       style: "currency",
       currency: "USD",
       minimumFractionDigits: 0,

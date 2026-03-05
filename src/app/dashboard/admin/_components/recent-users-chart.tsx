@@ -10,6 +10,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { AlertTriangle } from "lucide-react";
+import { useIntlLocale } from "@/hooks/use-intl-locale";
 
 interface ChartData {
   date: string;
@@ -21,10 +22,12 @@ interface RecentUsersChartProps {
 }
 
 export function RecentUsersChart({ chartData }: RecentUsersChartProps) {
+  const intlLocale = useIntlLocale();
+
   // Transform the data for the chart
   const transformedData = chartData
     .map((item) => ({
-      date: new Date(item.date).toLocaleDateString("en-US", {
+      date: new Date(item.date).toLocaleDateString(intlLocale, {
         month: "short",
         day: "numeric",
       }),

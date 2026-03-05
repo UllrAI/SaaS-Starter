@@ -29,6 +29,7 @@ import type { UserRole } from "@/lib/config/roles";
 import { useAdminTable } from "@/hooks/use-admin-table";
 import type { UserWithSubscription } from "@/types/billing";
 import { getUsers, updateUserAction } from "@/lib/actions/admin";
+import { useIntlLocale } from "@/hooks/use-intl-locale";
 
 interface UserManagementTableProps {
   initialData: UserWithSubscription[];
@@ -44,6 +45,7 @@ export function UserManagementTable({
   initialData,
   initialPagination,
 }: UserManagementTableProps) {
+  const intlLocale = useIntlLocale();
   const [isPending, startTransition] = useTransition();
   const [editingUser, setEditingUser] = useState<UserWithSubscription | null>(
     null,
@@ -108,7 +110,7 @@ export function UserManagementTable({
   };
 
   const formatDate = (dateString: Date) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
+    return new Date(dateString).toLocaleDateString(intlLocale, {
       year: "numeric",
       month: "short",
       day: "numeric",

@@ -1,6 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { CalendarDays, Clock, Sparkles, User } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { resolveIntlLocale } from "@/lib/locale";
 
 interface BlogPostMetaProps {
   publishedDate?: string;
@@ -9,6 +10,7 @@ interface BlogPostMetaProps {
   readTime?: string;
   author?: string;
   showBadge?: boolean;
+  locale?: string;
 
   variant?: "overlay" | "default";
   className?: string;
@@ -21,6 +23,7 @@ export function BlogPostMeta({
   readTime,
   author,
   showBadge = true,
+  locale,
 
   variant = "default",
   className,
@@ -37,6 +40,8 @@ export function BlogPostMeta({
   const articleBadgeClasses = isOverlay
     ? "bg-background/90 text-foreground border-border backdrop-blur-sm"
     : "bg-muted/50 text-muted-foreground border-muted";
+
+  const intlLocale = resolveIntlLocale(locale);
 
   return (
     <div className={cn("space-y-4", className)}>
@@ -91,7 +96,7 @@ export function BlogPostMeta({
             <div className="flex items-center gap-2">
               <CalendarDays className="h-4 w-4 flex-shrink-0" />
               <span className="whitespace-nowrap">
-                {new Date(publishedDate).toLocaleDateString("en-US", {
+                {new Date(publishedDate).toLocaleDateString(intlLocale, {
                   year: "numeric",
                   month: "short",
                   day: "numeric",

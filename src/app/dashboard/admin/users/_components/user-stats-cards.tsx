@@ -2,8 +2,10 @@ import { StatCard } from "@/components/admin/StatCard";
 import { Users, UserCheck, Shield, UserX } from "lucide-react";
 import { getUserStats } from "@/lib/admin/stats";
 import type { AdminStats } from "../../_components/admin-stats-cards";
+import { getServerLocale } from "@lingo.dev/compiler/virtual/locale/server";
 
 export async function UserStatsCards() {
+  const locale = await getServerLocale();
   const stats: AdminStats["users"] = await getUserStats();
 
   const verificationRate =
@@ -17,24 +19,28 @@ export async function UserStatsCards() {
         value={stats.total}
         description="All registered users"
         icon={Users}
+        locale={locale}
       />
       <StatCard
         title="Verified Users"
         value={stats.verified}
         description={`${verificationRate}% verification rate`}
         icon={UserCheck}
+        locale={locale}
       />
       <StatCard
         title="Admin Users"
         value={stats.admins}
         description="Admin and super admin users"
         icon={Shield}
+        locale={locale}
       />
       <StatCard
         title="Unverified Users"
         value={unverified}
         description="Require email verification"
         icon={UserX}
+        locale={locale}
       />
     </div>
   );

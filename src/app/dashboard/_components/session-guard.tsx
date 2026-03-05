@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { useSession } from "@/lib/auth/client";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Loader2, Sparkles } from "lucide-react";
 
@@ -13,7 +13,6 @@ interface SessionGuardProps {
 export function SessionGuard({ children }: SessionGuardProps) {
   const { data: session, isPending } = useSession();
   const router = useRouter();
-  const pathname = usePathname();
   const hasRedirectedRef = useRef(false);
 
   useEffect(() => {
@@ -32,11 +31,12 @@ export function SessionGuard({ children }: SessionGuardProps) {
 
     hasRedirectedRef.current = true;
 
-    if (pathname.startsWith("/dashboard")) {
+    const currentPath = window.location.pathname;
+    if (currentPath.startsWith("/dashboard")) {
       toast.error("Your session has expired. Please log in again.");
       router.replace("/login");
     }
-  }, [session, isPending, router, pathname]);
+  }, [session, isPending, router]);
 
   if (isPending || !session?.user) {
     return <SessionGuardLoading />;

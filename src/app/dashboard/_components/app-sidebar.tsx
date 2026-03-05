@@ -9,6 +9,7 @@ import {
   Users,
   CreditCard,
   BarChart3,
+  Wallet,
   LucideIcon,
 } from "lucide-react";
 import { APP_NAME } from "@/lib/config/constants";
@@ -36,6 +37,7 @@ import { useSession } from "@/lib/auth/client";
 
 const SidebarLabelHome = () => <>Home</>;
 const SidebarLabelUpload = () => <>Upload</>;
+const SidebarLabelBilling = () => <>Billing</>;
 const SidebarLabelSettings = () => <>Settings</>;
 const SidebarLabelAdminDashboard = () => <>Admin Dashboard</>;
 const SidebarLabelUserManagement = () => <>User Management</>;
@@ -68,11 +70,18 @@ const navigation: NavigationItem[] = [
     matchMode: "exact",
   },
   {
+    id: "billing",
+    Label: SidebarLabelBilling,
+    url: "/dashboard/billing",
+    icon: Wallet,
+    matchMode: "exact",
+  },
+  {
     id: "settings",
     Label: SidebarLabelSettings,
     url: "/dashboard/settings",
     icon: Settings,
-    matchMode: "prefix",
+    matchMode: "exact",
   },
 ];
 

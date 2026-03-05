@@ -114,7 +114,7 @@ export function UserButton({ user }: UserButtonProps) {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <Link href="/dashboard/settings?page=account">
+              <Link href="/dashboard/settings">
                 <DropdownMenuItem className="cursor-pointer">
                   <Settings className="size-4" />
                   Settings

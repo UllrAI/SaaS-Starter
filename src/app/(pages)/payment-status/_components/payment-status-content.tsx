@@ -55,7 +55,7 @@ const statusConfigs: Record<PaymentStatus, StatusConfig> = {
     },
     secondaryAction: {
       text: "Manage Billing",
-      href: "/dashboard/settings?page=billing",
+      href: "/dashboard/billing",
     },
   },
   failed: {
@@ -89,7 +89,7 @@ const statusConfigs: Record<PaymentStatus, StatusConfig> = {
     },
     secondaryAction: {
       text: "Check Status",
-      href: "/dashboard/settings?page=billing",
+      href: "/dashboard/billing",
     },
   },
   cancelled: {

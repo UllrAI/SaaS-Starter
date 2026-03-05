@@ -261,7 +261,7 @@ export function Header() {
         {
           id: "nav-billing",
           title: <>Billing</>,
-          href: "/dashboard/settings?page=billing",
+          href: "/dashboard/billing",
           description: <>Subscription management and payments</>,
         },
         {

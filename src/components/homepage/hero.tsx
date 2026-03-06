@@ -8,6 +8,8 @@ import { GITHUB_URL } from "@/lib/config/constants";
 import Link from "next/link";
 import { useHydrated } from "@/hooks/use-hydrated";
 
+const UI_STACK_LABEL = "Next.js 16 + shadcn/ui";
+
 export function Hero() {
   const [copied, setCopied] = useState(false);
   const mounted = useHydrated();
@@ -45,9 +47,8 @@ export function Hero() {
             <h1
               className={`text-foreground mb-6 transform text-5xl leading-[0.9] font-black tracking-tighter transition-all delay-100 duration-1000 sm:text-6xl lg:text-7xl xl:text-8xl ${mounted ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"}`}
             >
-              <>SHIP YOUR</>
-              <br />
-              <span className="from-foreground to-foreground/50 bg-gradient-to-b bg-clip-text pr-1 text-transparent">
+              <span className="block">SHIP YOUR</span>
+              <span className="from-foreground to-foreground/50 block bg-gradient-to-b bg-clip-text pr-1 text-transparent">
                 MICRO SaaS
               </span>
             </h1>
@@ -244,21 +245,12 @@ export function Hero() {
 
                   <div className="border-border mt-auto border-t pt-6">
                     <div className="text-muted-foreground text-xs">
-                      <>Built with</><br />
+                      <span className="block">Built with</span>
                       <span
                         data-lingo-skip
-                        className="text-primary font-mono"
+                        className="text-primary block font-mono"
                       >
-                        Next.js 16
-                      </span>
-                      <span className="mx-1" data-lingo-skip>
-                        +
-                      </span>
-                      <span
-                        data-lingo-skip
-                        className="text-primary font-mono"
-                      >
-                        shadcn/ui
+                        {UI_STACK_LABEL}
                       </span>
                     </div>
                   </div>

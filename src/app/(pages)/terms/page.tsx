@@ -213,7 +213,7 @@ export default function TermsPage() {
       <div className="container mx-auto px-6">
         <div className="mx-auto max-w-4xl">
           <h1 className="text-foreground mb-12 text-center text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
-            Terms of <span className="text-primary">Service</span>
+            Terms of Service
           </h1>
 
           <p className="text-muted-foreground mb-10 text-center text-xl leading-relaxed">

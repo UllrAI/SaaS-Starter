@@ -1,24 +1,20 @@
-import { createReader } from "@keystatic/core/reader";
-import keystaticConfig from "@/keystatic.config";
 import { notFound } from "next/navigation";
-import Markdoc from "@markdoc/markdoc";
-import React from "react";
 import { createMetadata } from "@/lib/metadata";
 import { BlogPostHeader } from "@/components/blog/blog-post-header";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { renderMarkdoc } from "@/lib/utils";
 import { getRequestLocale } from "@/lib/i18n/server-locale";
 import { createPageMetadata } from "@/lib/i18n/page-metadata";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import { getAllPosts, getAuthorBySlug, getPostBySlug } from "@/lib/content/blog";
 
 interface BlogPostPageProps {
   params: Promise<{
     slug: string;
   }>;
 }
-
-const reader = createReader(process.cwd(), keystaticConfig);
 
 async function BlogPostNotFoundMetadataTitle() {
   return <>Post Not Found</>;
@@ -29,8 +25,7 @@ async function BlogPostNotFoundMetadataDescription() {
 }
 
 export async function generateStaticParams() {
-  const posts = await reader.collections.posts.all();
-  return posts.map((post) => ({
+  return getAllPosts().map((post) => ({
     slug: post.slug,
   }));
 }
@@ -39,7 +34,7 @@ export async function generateMetadata({
   params,
 }: BlogPostPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const post = await reader.collections.posts.read(slug);
+  const post = getPostBySlug(slug);
 
   if (!post) {
     return createPageMetadata({
@@ -54,7 +49,7 @@ export async function generateMetadata({
   const publishedTime = post.publishedDate
     ? new Date(post.publishedDate).toISOString()
     : undefined;
-  const modifiedTime = publishedTime; // Use published date as modified time for now
+  const modifiedTime = publishedTime;
 
   return createMetadata({
     title: post.title,
@@ -90,16 +85,15 @@ export async function generateMetadata({
 
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const { slug } = await params;
-  const post = await reader.collections.posts.read(slug);
+  const post = getPostBySlug(slug);
 
   if (!post) {
     notFound();
   }
 
-  const [locale, content, author] = await Promise.all([
+  const [locale, author] = await Promise.all([
     getRequestLocale(),
-    post.content(),
-    post.author ? reader.collections.authors.read(post.author) : null,
+    Promise.resolve(getAuthorBySlug(post.author)),
   ]);
 
   return (
@@ -111,7 +105,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         publishedDate={post.publishedDate || undefined}
         featured={post.featured}
         tags={post.tags ? [...post.tags] : undefined}
-        content={renderMarkdoc(content.node)}
+        content={post.content}
         author={author?.name || "Anonymous"}
         locale={locale}
       />
@@ -120,8 +114,10 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       <section className="bg-background py-12 sm:py-16">
         <div className="container mx-auto px-4 sm:px-6">
           <div className="mx-auto max-w-4xl">
-            <article className="prose prose-base prose-slate dark:prose-invert sm:prose-lg markdoc-content mx-auto max-w-none">
-              {Markdoc.renderers.react(Markdoc.transform(content.node), React)}
+            <article className="prose prose-base prose-slate dark:prose-invert sm:prose-lg markdown-content mx-auto max-w-none">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                {post.content}
+              </ReactMarkdown>
             </article>
           </div>
         </div>

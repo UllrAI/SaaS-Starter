@@ -1,38 +1,9 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { type Node } from "@markdoc/markdoc";
 import { resolveIntlLocale } from "@/lib/locale";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
-}
-
-export function renderMarkdoc(nodeOrNodes: Node | Node[]): string {
-  if (Array.isArray(nodeOrNodes)) {
-    return nodeOrNodes.map((n: Node) => renderMarkdoc(n)).join("");
-  }
-
-  const node = nodeOrNodes;
-
-  if (typeof node === "string") {
-    return node;
-  }
-
-  if (!node || typeof node !== "object") {
-    return "";
-  }
-
-  // Handle text nodes
-  if (node.type === "text" && typeof node.attributes?.content === "string") {
-    return node.attributes.content;
-  }
-
-  // Handle nodes with children
-  if ("children" in node && Array.isArray(node.children)) {
-    return node.children.map((child: Node) => renderMarkdoc(child)).join("");
-  }
-
-  return "";
 }
 
 export function formatCurrency(
@@ -48,8 +19,17 @@ export function formatCurrency(
 }
 
 export function calculateReadingTime(text: string): string {
-  // Remove HTML tags
-  const plainText = text.replace(/<[^>]+>/g, "");
+  const plainText = text
+    .replace(/```[\s\S]*?```/g, " ")
+    .replace(/`([^`]+)`/g, "$1")
+    .replace(/!\[([^\]]*)\]\([^)]+\)/g, "$1")
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/^#{1,6}\s+/gm, "")
+    .replace(/^\s*[-*+]\s+/gm, "")
+    .replace(/^\s*\d+\.\s+/gm, "")
+    .replace(/^\s*>\s?/gm, "")
+    .replace(/[*_~#>|-]/g, " ");
   const wordsPerMinute = 200;
   const noOfWords = plainText
     .split(/\s/g)

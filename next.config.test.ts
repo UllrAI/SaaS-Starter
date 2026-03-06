@@ -17,6 +17,12 @@ jest.mock("@lingo.dev/compiler/next", () => ({
   withLingo: mockWithLingo,
 }));
 
+jest.mock("@content-collections/next", () => ({
+  __esModule: true,
+  withContentCollections: async (nextConfig: Record<string, unknown>) =>
+    nextConfig,
+}));
+
 // Mock next/bundle-analyzer
 jest.mock("@next/bundle-analyzer", () => {
   const mockWithBundleAnalyzer = jest.fn(

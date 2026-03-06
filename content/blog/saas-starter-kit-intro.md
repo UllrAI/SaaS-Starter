@@ -81,7 +81,7 @@ heroImage: https://images.unsplash.com/photo-1561886362-a2b38ce83470?q=80&w=1674
 - **数据库**: PostgreSQL + Drizzle ORM (类型安全查询, 迁移管理)
 - **支付订阅**: Creem 集成 (一次性支付, 订阅, 客户门户, Webhooks)
 - **文件上传**: Cloudflare R2 集成 (客户端预签名直传, 服务端代理上传, 图片压缩)
-- **内容管理**: Keystatic (Markdown/MDX 博客系统)
+- **内容管理**: Content Collections (Markdown 博客系统)
 - **邮件服务**: Resend + React Email (事务性邮件模板)
 - **表单处理**: React Hook Form + Zod (类型安全的表单验证)
 - **代码质量**: ESLint, Prettier
@@ -112,8 +112,8 @@ graph TD
         D -- Storage API --> J[Cloudflare R2];
     end
     
-    subgraph "内容管理 (CMS)"
-        K[Keystatic] -- Reads/Writes --> L[Markdown/JSON in Git];
+    subgraph "内容管理"
+        K[Content Collections] -- Indexes --> L[Markdown/JSON in Git];
         B -- Reads data --> L;
     end
     
@@ -141,7 +141,6 @@ SaaS-Starter-main/
 │   │   ├── (dashboard)/  # 受保护的仪表盘页面
 │   │   ├── (pages)/      # 公开页面 (首页、关于、博客等)
 │   │   ├── api/          # API 路由
-│   │   ├── keystatic/    # Keystatic CMS 管理界面
 │   │   ├── layout.tsx    # 根布局
 │   │   └── not-found.tsx # 全局 404 页面
 │   ├── components/       # React 组件
@@ -170,7 +169,7 @@ SaaS-Starter-main/
 │   │   └── r2.ts         # Cloudflare R2 文件上传服务
 │   ├── schemas/          # Zod 验证 schema
 │   └── types/            # TypeScript 类型定义
-├── content/              # Keystatic 管理的内容 (Markdown, JSON)
+├── content/              # 仓库管理的内容 (Markdown, JSON)
 ├── public/               # 静态资源
 ├── scripts/              # 辅助脚本 (如设置管理员)
 └── styles/               # 全局样式与 CSS
@@ -409,14 +408,14 @@ sequenceDiagram
     Server-->>Client: 返回上传结果
 ```
 
-### 4.5. 博客与内容管理 (Keystatic)
+### 4.5. 博客与内容管理 (Content Collections)
 
-- **CMS**: 使用 `Keystatic` 作为 Git-based CMS，所有内容存储在 `content/` 目录下的 Markdown 和 JSON 文件中。
-- **管理界面**: 在开发环境中，通过访问 `/keystatic` 进入管理后台。为了安全，此界面在生产环境中默认禁用。
+- **内容管线**: 使用 `Content Collections` 为 `content/` 目录下的 Markdown 和 JSON 内容建立索引。
+- **编写方式**: 直接编辑 `content/blog/*.md` 博客文章，并在 `content/authors/*.json` 中维护作者信息。
 - **内容读取**:
-  - `@keystatic/core/reader` 用于在服务器端安全地读取 `content/` 目录下的内容。
-  - `src/app/(pages)/blog/page.tsx`: 博客列表页，读取所有文章。
-  - `src/app/(pages)/blog/[slug]/page.tsx`: 博客详情页，读取单篇文章，并使用 `@markdoc/markdoc` 解析 Markdoc 内容。
+  - `content-collections.ts` 定义内容 schema 和生成的集合。
+  - `src/app/(pages)/blog/page.tsx`: 博客列表页，读取所有索引后的文章。
+  - `src/app/(pages)/blog/[slug]/page.tsx`: 博客详情页，读取单篇文章，并使用 `react-markdown` 渲染 Markdown 内容。
 
 ### 4.6. 管理后台 (Admin Dashboard)
 
@@ -445,43 +444,15 @@ sequenceDiagram
 
 ### 5.2. API 参考
 
-{% table %}
-- 路由
-- 方法
-- 描述
----
-- `/api/auth/[...all]`
-- GET, POST
-- 处理所有 `better-auth` 认证请求。
----
-- `/api/billing/checkout`
-- POST
-- 创建支付会话。
----
-- `/api/billing/portal`
-- GET
-- 获取客户门户 URL。
----
-- `/api/billing/webhooks/creem`
-- POST
-- 接收 Creem Webhook 事件。
----
-- `/api/upload/presigned-url`
-- POST
-- 为客户端直传获取预签名 URL。
----
-- `/api/upload/server-upload`
-- POST
-- 服务器端代理上传文件。
----
-- `/api/payment-status`
-- GET
-- 查询支付状态。
----
-- `/api/keystatic/[...params]`
-- GET, POST
-- Keystatic CMS 的 API 接口 (仅开发环境)。
-{% /table %}
+| 路由 | 方法 | 描述 |
+| --- | --- | --- |
+| `/api/auth/[...all]` | GET, POST | 处理所有 `better-auth` 认证请求。 |
+| `/api/billing/checkout` | POST | 创建支付会话。 |
+| `/api/billing/portal` | GET | 获取客户门户 URL。 |
+| `/api/billing/webhooks/creem` | POST | 接收 Creem Webhook 事件。 |
+| `/api/upload/presigned-url` | POST | 为客户端直传获取预签名 URL。 |
+| `/api/upload/server-upload` | POST | 服务器端代理上传文件。 |
+| `/api/payment-status` | GET | 查询支付状态。 |
 
 ### 5.3. Hook 和事件
 
@@ -531,52 +502,23 @@ sequenceDiagram
 
 ### 8.1. CLI 命令
 
-{% table %}
-- 脚本
-- 描述
----
-- `pnpm dev`
-- 启动开发服务器（Turbo 模式）
----
-- `pnpm build`
-- 构建生产应用
----
-- `pnpm start`
-- 启动生产服务器
----
-- `pnpm lint`
-- 运行 ESLint 检查
----
-- `pnpm test`
-- 运行 Jest 单元测试
----
-- `pnpm prettier:format`
-- 格式化所有代码
----
-- `pnpm db:generate`
-- 为开发环境生成迁移文件
----
-- `pnpm db:generate:prod`
-- 为生产环境生成迁移文件
----
-- `pnpm db:migrate:dev`
-- 应用开发迁移
----
-- `pnpm db:migrate:prod`
-- 应用生产迁移
----
-- `pnpm db:push`
-- (仅开发) 将 Schema 推送到数据库
----
-- `pnpm analyze`
-- 构建并分析包体积
----
-- `pnpm set:admin`
-- (本地) 提升用户为超级管理员
----
-- `pnpm set:admin:prod`
-- (生产) 提升用户为超级管理员
-{% /table %}
+| 脚本 | 描述 |
+| --- | --- |
+| `pnpm dev` | 启动开发服务器（Turbo 模式） |
+| `pnpm content:build` | 生成 Content Collections 内容输出 |
+| `pnpm build` | 构建生产应用 |
+| `pnpm start` | 启动生产服务器 |
+| `pnpm lint` | 运行 ESLint 检查 |
+| `pnpm test` | 运行 Jest 单元测试 |
+| `pnpm prettier:format` | 格式化所有代码 |
+| `pnpm db:generate` | 为开发环境生成迁移文件 |
+| `pnpm db:generate:prod` | 为生产环境生成迁移文件 |
+| `pnpm db:migrate:dev` | 应用开发迁移 |
+| `pnpm db:migrate:prod` | 应用生产迁移 |
+| `pnpm db:push` | (仅开发) 将 Schema 推送到数据库 |
+| `pnpm analyze` | 构建并分析包体积 |
+| `pnpm set:admin` | (本地) 提升用户为超级管理员 |
+| `pnpm set:admin:prod` | (生产) 提升用户为超级管理员 |
 
 ### 8.2. 配置选项
 
@@ -589,7 +531,6 @@ sequenceDiagram
 - `cn(...inputs)`: 安全地合并 Tailwind CSS 类名，并解决冲突。
 - `formatCurrency(amount, currency)`: 将以分为单位的金额格式化为货币字符串。
 - `calculateReadingTime(text)`: 根据文本内容计算预计阅读时间。
-- `renderMarkdoc(node)`: 将 Markdoc AST 节点转换为纯文本字符串，用于生成摘要。
 
 ---
 
@@ -645,7 +586,7 @@ sequenceDiagram
   - [Better-Auth](https://better-auth.com/docs)
   - [Creem](https://creem.io/docs)
   - [shadcn/ui](https://ui.shadcn.com/docs)
-  - [Keystatic](https://keystatic.com/docs)
+  - [Content Collections](https://www.content-collections.dev/)
 
 ### 11.2. 贡献指南
 
@@ -663,9 +604,9 @@ sequenceDiagram
 
 ### 12.1. 常见问题 FAQ
 
-**Q: 为什么我无法访问 `/keystatic` 管理后台？**
+**Q: 如何新增或更新博客内容？**
 
-A: Keystatic 管理界面默认只在开发环境 (`NODE_ENV=development`) 中启用，以确保生产环境的安全。您需要在本地运行 `pnpm dev` 来访问它。
+A: 直接编辑 `content/blog/` 中的 Markdown 文件，并在需要时更新 `content/authors/` 下的作者 JSON。若要手动刷新带类型的内容输出，可运行 `pnpm content:build`，然后再测试或构建。
 
 **Q: 文件上传失败，提示 CORS 错误。**
 

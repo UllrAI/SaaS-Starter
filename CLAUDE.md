@@ -55,7 +55,7 @@ pnpm run set:admin:prod  # Promote user to admin (production)
 - **Auth**: Better-Auth with Magic Link via Resend
 - **Payments**: Creem payment provider with webhook integration
 - **File Storage**: Cloudflare R2 with presigned URL uploads
-- **CMS**: Keystatic (local development only)
+- **Content**: Content Collections with repository-managed Markdown
 - **Styling**: Tailwind CSS v4 with shadcn/ui components
 - **Email**: React Email with Resend
 - **Package Manager**: pnpm
@@ -103,7 +103,6 @@ This project uses Next.js App Router with a `src` directory structure for better
 - `app/(auth)/` - Authentication pages (login, signup, auth/sent)
 - `app/(pages)/` - Public marketing pages
 - `app/dashboard/` - Protected user area
-- `app/keystatic/` - CMS interface (development only)
 - `app/api/` - API routes and webhooks
 
 #### Library Organization (src/lib/)
@@ -135,7 +134,7 @@ This project uses Next.js App Router with a `src` directory structure for better
 - `jest.config.js` - Jest configuration with proper module resolution for src structure
 - `proxy.ts` - Route protection and redirects
 - `lib/config/products.ts` - Product and pricing configuration
-- `keystatic.config.ts` - CMS configuration
+- `content-collections.ts` - Content Collections configuration
 
 ## Code Quality Standards
 
@@ -205,7 +204,7 @@ Better-Auth handles all authentication through magic links sent via Resend. OAut
 
 ### Content Management
 
-Keystatic CMS is configured for local development only (security measure). Blog content uses Markdoc for rendering. Production deployments should use headless CMS or static content.
+Blog content is stored as Markdown files in `content/blog/` and indexed through Content Collections at build time. Authors live in `content/authors/`. There is no runtime CMS dashboard or content API.
 
 ### Payment Integration
 

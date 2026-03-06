@@ -26,7 +26,7 @@ This starter kit provides a comprehensive set of powerful features to help you q
 - **UI Component Library (shadcn/ui + Tailwind CSS):** Built with [shadcn/ui](https://ui.shadcn.com/), an accessible, composable component library based on Radix UI and Tailwind CSS with built-in theme support.
 - **Form Handling (Zod + React Hook Form):** Powerful, type-safe form validation through [Zod](https://zod.dev/) and [React Hook Form](https://react-hook-form.com/).
 - **File Upload (Cloudflare R2):** Secure file upload system based on Cloudflare R2, supporting client-side direct upload with various file type and size restrictions.
-- **Blog System (Keystatic):** Integrated [Keystatic](https://keystatic.com/) as CMS, providing Markdown/MDX content management capabilities for easy blog creation and management.
+- **Blog System (Content Collections):** Uses [Content Collections](https://www.content-collections.dev/) with plain Markdown files for type-safe blog content, metadata generation, and sitemap output.
 - **Code Quality:** Built-in ESLint and Prettier to ensure consistent code style and quality.
 
 ---
@@ -161,12 +161,13 @@ pnpm db:migrate:prod
 > - Production environment migrations should be automated through CI/CD pipelines.
 > - Always backup production database before applying migrations.
 
-### 5. Content Management (Keystatic)
+### 5. Content Management (Content Collections)
 
-The project uses Keystatic as a Content Management System (CMS) for managing blog posts and other content.
+The project uses Content Collections plus plain Markdown files for blog content. Posts live in `content/blog/*.md`, authors live in `content/authors/*.json`, and build-time generation produces typed collections for the blog pages and sitemap.
 
-- **Access Method:** In development environment, you can access Keystatic's management interface by visiting the `/keystatic` path.
-- **Production Environment Limitation:** For security reasons, Keystatic's management interface and related APIs are disabled by default in production environment. This means you cannot access the management backend through the `/keystatic` path after deployment to production servers.
+- **Authoring workflow:** Add or edit posts directly in the repository with frontmatter and Markdown content.
+- **Generated content data:** Run `pnpm content:build` to refresh the generated collections manually. The command is already wired into the build, test, and type-check scripts.
+- **Production behavior:** There is no CMS admin route or runtime content API. All blog content is built from the repository content files.
 
 ### 6. Start Development Server
 

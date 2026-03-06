@@ -42,7 +42,7 @@ const includedItems = [
     return <>Cloudflare R2 upload flows for browser and server uploads</>;
   },
   function FeaturesIncludedItemContent() {
-    return <>Keystatic blog content and marketing pages</>;
+    return <>Markdown blog content, typed collections, and marketing pages</>;
   },
 ];
 

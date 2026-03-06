@@ -26,7 +26,7 @@
 - **UI 组件库 (shadcn/ui + Tailwind CSS):** 使用 [shadcn/ui](https://ui.shadcn.com/) 构建，它是一个基于 Radix UI 和 Tailwind CSS 的可访问、可组合的组件库，内置主题支持。
 - **表单处理 (Zod + React Hook Form):** 通过 [Zod](https://zod.dev/) 和 [React Hook Form](https://react-hook-form.com/) 实现强大的、类型安全的表单验证。
 - **文件上传 (Cloudflare R2):** 基于 Cloudflare R2 的安全文件上传系统，支持客户端直传和多种文件类型与大小限制。
-- **博客系统 (Keystatic):** 集成 [Keystatic](https://keystatic.com/) 作为 CMS，提供 Markdown/MDX 内容管理能力，方便创建和管理博客文章。
+- **博客系统 (Content Collections):** 使用 [Content Collections](https://www.content-collections.dev/) 配合原生 Markdown 文件，提供类型安全的博客内容、元数据生成和站点地图输出。
 - **代码质量:** 内置 ESLint 和 Prettier，确保代码风格统一和质量。
 
 ---
@@ -161,12 +161,13 @@ pnpm db:migrate:prod
 > - 生产环境迁移应通过 CI/CD 流程自动化执行。
 > - 在应用迁移前，务必备份生产数据库。
 
-### 5. 内容管理 (Keystatic)
+### 5. 内容管理 (Content Collections)
 
-项目使用 Keystatic 作为内容管理系统 (CMS)，用于管理博客文章等内容。
+项目使用 Content Collections 配合原生 Markdown 文件来管理博客内容。文章位于 `content/blog/*.md`，作者信息位于 `content/authors/*.json`，构建时会生成带类型的内容集合供博客页面和 sitemap 使用。
 
-- **访问方式:** 在开发环境中，您可以通过访问 `/keystatic` 路径来进入 Keystatic 的管理界面。
-- **生产环境限制:** 为了安全起见，Keystatic 的管理界面和相关 API 在生产环境中默认是禁用的。这意味着在部署到生产服务器后，无法通过 `/keystatic` 路径访问管理后台。
+- **编写方式:** 直接在仓库中新增或编辑带 frontmatter 的 Markdown 文件。
+- **生成内容数据:** 如需手动刷新生成结果，可运行 `pnpm content:build`。构建、测试和类型检查脚本已自动串联该命令。
+- **生产行为:** 项目不再提供 CMS 管理后台路由或运行时内容 API，博客内容完全由仓库中的内容文件构建。
 
 ### 6. 启动开发服务器
 

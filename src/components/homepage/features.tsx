@@ -138,8 +138,9 @@ const features: Feature[] = [
     Description: function FeatureDescriptionContent() {
       return (
         <>
-          Keystatic-powered blog content, metadata generation, sitemap output,
-          and structured page shells are included for marketing content.
+          Markdown blog content, Content Collections indexing, metadata
+          generation, sitemap output, and structured page shells are included
+          for marketing content.
         </>
       );
     },

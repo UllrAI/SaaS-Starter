@@ -74,7 +74,7 @@ export function BlogPostCard({
             className="object-cover transition-transform duration-300 group-hover:scale-105"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent" />
 
           {/* Badge overlay */}
           <div className="absolute top-3 right-3 sm:top-4 sm:right-4">
@@ -98,7 +98,7 @@ export function BlogPostCard({
         </div>
       )}
 
-      <CardHeader className="pb-4">
+      <CardHeader>
         {/* Badge for non-image posts */}
         {!hasImage && (
           <div className="mb-4 flex justify-end">

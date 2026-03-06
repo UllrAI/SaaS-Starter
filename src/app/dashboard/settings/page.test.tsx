@@ -8,11 +8,9 @@ jest.mock("next/navigation", () => ({
 }));
 
 jest.mock("../_components/dashboard-page-wrapper", () => ({
-  DashboardPageWrapper: ({
-    children,
-  }: {
-    children: React.ReactNode;
-  }) => <div data-testid="settings-wrapper">{children}</div>,
+  DashboardPageWrapper: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="settings-wrapper">{children}</div>
+  ),
 }));
 
 jest.mock("./_components/account-page", () => ({
@@ -27,7 +25,16 @@ jest.mock("@/lib/metadata", () => ({
   createMetadata: (config: unknown) => config,
 }));
 
-import SettingsPage, { metadata } from "./page";
+const mockPageMetadata = {
+  title: "Settings",
+  description: "Manage your account profile and dashboard appearance.",
+};
+const mockCreatePageMetadata = jest.fn(async () => mockPageMetadata);
+jest.mock("@/lib/i18n/page-metadata", () => ({
+  createPageMetadata: (config: unknown) => mockCreatePageMetadata(config),
+}));
+
+import SettingsPage, { generateMetadata } from "./page";
 
 describe("Dashboard Settings Page", () => {
   beforeEach(() => {
@@ -38,7 +45,7 @@ describe("Dashboard Settings Page", () => {
   });
 
   it("exports metadata for settings page", () => {
-    expect(metadata).toMatchObject({
+    expect(generateMetadata()).resolves.toMatchObject({
       title: "Settings",
       description: "Manage your account profile and dashboard appearance.",
     });

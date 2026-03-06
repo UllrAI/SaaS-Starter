@@ -19,7 +19,6 @@ describe("Product Configuration", () => {
       PRODUCT_TIERS.forEach((tier) => {
         expect(tier).toHaveProperty("id");
         expect(tier).toHaveProperty("name");
-        expect(tier).toHaveProperty("descriptionId");
         expect(tier).toHaveProperty("isPopular");
         expect(tier).toHaveProperty("features");
         expect(tier).toHaveProperty("pricing");
@@ -28,7 +27,6 @@ describe("Product Configuration", () => {
 
         expect(typeof tier.id).toBe("string");
         expect(typeof tier.name).toBe("string");
-        expect(typeof tier.descriptionId).toBe("string");
         expect(typeof tier.isPopular).toBe("boolean");
         expect(Array.isArray(tier.features)).toBe(true);
         expect(typeof tier.pricing).toBe("object");
@@ -151,7 +149,6 @@ describe("Product Configuration", () => {
       if (tier) {
         expect(tier).toHaveProperty("id", "pro");
         expect(tier).toHaveProperty("name", "Professional");
-        expect(tier).toHaveProperty("descriptionId", "pro");
         expect(tier).toHaveProperty("isPopular", true);
         expect(tier).toHaveProperty("features");
         expect(tier).toHaveProperty("pricing");
@@ -237,7 +234,6 @@ describe("Product Configuration", () => {
       if (tier) {
         expect(tier).toHaveProperty("id");
         expect(tier).toHaveProperty("name");
-        expect(tier).toHaveProperty("descriptionId");
         expect(tier).toHaveProperty("isPopular");
         expect(tier).toHaveProperty("features");
         expect(tier).toHaveProperty("pricing");
@@ -258,7 +254,6 @@ describe("Product Configuration", () => {
       const mockTier: PricingTier = {
         id: "test",
         name: "Test Tier",
-        descriptionId: "plus",
         isPopular: false,
         features: [mockFeature],
         pricing: {
@@ -304,11 +299,11 @@ describe("Product Configuration", () => {
       });
     });
 
-    it("should have non-empty description ids", () => {
+    it("should have non-empty tier names", () => {
       PRODUCT_TIERS.forEach((tier) => {
-        expect(tier.descriptionId.trim()).toBe(tier.descriptionId);
-        expect(tier.descriptionId).not.toBe("");
-        expect(tier.descriptionId.length).toBeGreaterThan(1);
+        expect(tier.name.trim()).toBe(tier.name);
+        expect(tier.name).not.toBe("");
+        expect(tier.name.length).toBeGreaterThan(1);
       });
     });
 

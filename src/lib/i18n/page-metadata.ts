@@ -14,7 +14,10 @@ type MetadataTitleInput =
       template?: string | null;
     };
 
-type MetadataOverrideInput = Omit<Metadata, "title" | "description" | "keywords"> & {
+type MetadataOverrideInput = Omit<
+  Metadata,
+  "title" | "description" | "keywords"
+> & {
   title?: MetadataTitleInput;
   description?: MetadataText;
   keywords?: MetadataText[];
@@ -30,13 +33,17 @@ function extractTextContent(node: ReactNode): string {
   }
 
   if (isValidElement(node)) {
-    return extractTextContent((node.props as { children?: ReactNode }).children);
+    return extractTextContent(
+      (node.props as { children?: ReactNode }).children,
+    );
   }
 
   return "";
 }
 
-async function resolveMetadataText(value?: MetadataText): Promise<string | undefined> {
+async function resolveMetadataText(
+  value?: MetadataText,
+): Promise<string | undefined> {
   if (!value) {
     return undefined;
   }
@@ -87,7 +94,8 @@ export async function createPageMetadata(
 ): Promise<Metadata> {
   const keywords = metadata.keywords
     ? (await Promise.all(metadata.keywords.map(resolveMetadataText))).filter(
-        (value): value is string => value !== undefined,
+        (value): value is string =>
+          value !== undefined && value.trim().length > 0,
       )
     : undefined;
 

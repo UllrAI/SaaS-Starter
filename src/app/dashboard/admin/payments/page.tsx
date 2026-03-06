@@ -12,18 +12,20 @@ import { PaymentStatsCards } from "./_components/payment-stats-cards";
 import { PaymentManagementTable } from "./_components/payment-management-table";
 import { StatsCardsSkeleton } from "../_components/stats-cards-skeleton";
 import { getPayments } from "@/lib/actions/admin";
-import { createLocalizedMetadata } from "@/lib/i18n/page-metadata";
+import { createPageMetadata } from "@/lib/i18n/page-metadata";
+
+async function PaymentManagementMetadataTitle() {
+  return <>Payment Management</>;
+}
+
+async function PaymentManagementMetadataDescription() {
+  return <>Monitor and manage all payment transactions</>;
+}
 
 export async function generateMetadata() {
-  return createLocalizedMetadata({
-    en: {
-      title: "Payment Management",
-      description: "Monitor and manage all payment transactions",
-    },
-    "zh-Hans": {
-      title: "支付管理",
-      description: "监控并管理所有支付交易记录。",
-    },
+  return createPageMetadata({
+    title: PaymentManagementMetadataTitle,
+    description: PaymentManagementMetadataDescription,
   });
 }
 

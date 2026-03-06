@@ -6,7 +6,7 @@ import env from "@/env";
 
 import { LingoProvider } from "@lingo.dev/compiler/react/next";
 import { AppProviders } from "@/components/app-providers";
-import { createLocalizedMetadata } from "@/lib/i18n/page-metadata";
+import { createPageMetadata } from "@/lib/i18n/page-metadata";
 import { getRequestLocale } from "@/lib/i18n/server-locale";
 
 const fontSans = Inter({
@@ -21,59 +21,39 @@ const fontMono = JetBrains_Mono({
   display: "swap",
 });
 
+async function RootMetadataDescription() {
+  return (
+    <>
+      Complete Micro UllrAI SaaS starter with authentication, payments,
+      database, and deployment.
+    </>
+  );
+}
+
 export async function generateMetadata() {
-  return createLocalizedMetadata({
-    en: {
-      title: {
-        template: `%s | ${APP_NAME}`,
-        default: `${APP_NAME}`,
-      },
-      description:
-        "Complete Micro UllrAI SaaS starter with authentication, payments, database, and deployment.",
-      applicationName: APP_NAME,
-      authors: [{ name: COMPANY_NAME, url: env.NEXT_PUBLIC_APP_URL }],
-      creator: COMPANY_NAME,
-      publisher: COMPANY_NAME,
-      robots: {
+  return createPageMetadata({
+    title: {
+      template: `%s | ${APP_NAME}`,
+      default: APP_NAME,
+    },
+    description: RootMetadataDescription,
+    applicationName: APP_NAME,
+    authors: [{ name: COMPANY_NAME, url: env.NEXT_PUBLIC_APP_URL }],
+    creator: COMPANY_NAME,
+    publisher: COMPANY_NAME,
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
         index: true,
         follow: true,
-        googleBot: {
-          index: true,
-          follow: true,
-          "max-video-preview": -1,
-          "max-image-preview": "large",
-          "max-snippet": -1,
-        },
-      },
-      alternates: {
-        canonical: env.NEXT_PUBLIC_APP_URL,
+        "max-video-preview": -1,
+        "max-image-preview": "large",
+        "max-snippet": -1,
       },
     },
-    "zh-Hans": {
-      title: {
-        template: `%s | ${APP_NAME}`,
-        default: `${APP_NAME}`,
-      },
-      description:
-        "面向自托管产品团队的 UllrAI 微型 SaaS 启动套件，内置身份验证、支付、数据库与部署基础。",
-      applicationName: APP_NAME,
-      authors: [{ name: COMPANY_NAME, url: env.NEXT_PUBLIC_APP_URL }],
-      creator: COMPANY_NAME,
-      publisher: COMPANY_NAME,
-      robots: {
-        index: true,
-        follow: true,
-        googleBot: {
-          index: true,
-          follow: true,
-          "max-video-preview": -1,
-          "max-image-preview": "large",
-          "max-snippet": -1,
-        },
-      },
-      alternates: {
-        canonical: env.NEXT_PUBLIC_APP_URL,
-      },
+    alternates: {
+      canonical: env.NEXT_PUBLIC_APP_URL,
     },
   });
 }

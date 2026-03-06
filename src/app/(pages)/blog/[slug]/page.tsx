@@ -10,7 +10,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { renderMarkdoc } from "@/lib/utils";
 import { getRequestLocale } from "@/lib/i18n/server-locale";
-import { createLocalizedMetadata } from "@/lib/i18n/page-metadata";
+import { createPageMetadata } from "@/lib/i18n/page-metadata";
 
 interface BlogPostPageProps {
   params: Promise<{
@@ -19,6 +19,14 @@ interface BlogPostPageProps {
 }
 
 const reader = createReader(process.cwd(), keystaticConfig);
+
+async function BlogPostNotFoundMetadataTitle() {
+  return <>Post Not Found</>;
+}
+
+async function BlogPostNotFoundMetadataDescription() {
+  return <>The requested blog post could not be found.</>;
+}
 
 export async function generateStaticParams() {
   const posts = await reader.collections.posts.all();
@@ -34,15 +42,9 @@ export async function generateMetadata({
   const post = await reader.collections.posts.read(slug);
 
   if (!post) {
-    return createLocalizedMetadata({
-      en: {
-        title: "Post Not Found",
-        description: "The requested blog post could not be found.",
-      },
-      "zh-Hans": {
-        title: "文章未找到",
-        description: "未找到请求的博客文章。",
-      },
+    return createPageMetadata({
+      title: BlogPostNotFoundMetadataTitle,
+      description: BlogPostNotFoundMetadataDescription,
     });
   }
 

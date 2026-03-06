@@ -5,6 +5,7 @@ import { Moon, Sun, Monitor } from "lucide-react";
 import { useTheme } from "next-themes";
 
 import { Button } from "@/components/ui/button";
+import { defineCopyCatalog } from "@/lib/i18n/copy-catalog";
 
 interface ModeToggleProps {
   className?: string;
@@ -16,23 +17,33 @@ interface ModeToggleProps {
 const THEME_ORDER = ["light", "dark", "system"] as const;
 type ThemeKey = (typeof THEME_ORDER)[number];
 
-const THEME_LABELS: Record<ThemeKey, React.ComponentType> = {
-  light: function ThemeLabelLight() {
-    return <>Light</>;
+const THEME_COPY = defineCopyCatalog([
+  {
+    id: "light",
+    Label: function ThemeLabelLight() {
+      return <>Light</>;
+    },
+    Icon: Sun,
   },
-  dark: function ThemeLabelDark() {
-    return <>Dark</>;
+  {
+    id: "dark",
+    Label: function ThemeLabelDark() {
+      return <>Dark</>;
+    },
+    Icon: Moon,
   },
-  system: function ThemeLabelSystem() {
-    return <>System</>;
+  {
+    id: "system",
+    Label: function ThemeLabelSystem() {
+      return <>System</>;
+    },
+    Icon: Monitor,
   },
-};
-
-const THEME_ICONS: Record<ThemeKey, React.ComponentType<{ className?: string }>> = {
-  light: Sun,
-  dark: Moon,
-  system: Monitor,
-};
+] satisfies ReadonlyArray<{
+  id: ThemeKey;
+  Label: React.ComponentType;
+  Icon: React.ComponentType<{ className?: string }>;
+}>);
 
 function resolveTheme(theme: string | undefined): ThemeKey {
   return theme === "light" || theme === "dark" ? theme : "system";
@@ -59,9 +70,9 @@ export function ModeToggle({
   };
 
   const activeTheme = resolveTheme(theme);
-  const ActiveThemeLabel = THEME_LABELS[activeTheme];
-  const ActiveThemeIcon = THEME_ICONS[activeTheme];
-  const FallbackThemeLabel = THEME_LABELS.light;
+  const ActiveThemeLabel = THEME_COPY.get(activeTheme).Label;
+  const ActiveThemeIcon = THEME_COPY.get(activeTheme).Icon;
+  const FallbackThemeLabel = THEME_COPY.get("light").Label;
 
   if (!mounted) {
     return (

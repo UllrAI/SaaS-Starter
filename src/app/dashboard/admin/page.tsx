@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/card";
 import { requireAdmin } from "@/lib/auth/permissions";
 import { DashboardPageWrapper } from "../_components/dashboard-page-wrapper";
-import { createLocalizedMetadata } from "@/lib/i18n/page-metadata";
+import { createPageMetadata } from "@/lib/i18n/page-metadata";
 import { AdminStatsCards } from "./_components/admin-stats-cards";
 import {
   getAdminStatsWithCharts,
@@ -17,17 +17,18 @@ import { RecentUsersChart } from "./_components/recent-users-chart";
 import { RevenueChart } from "./_components/revenue-chart";
 import { getRequestLocale } from "@/lib/i18n/server-locale";
 
+async function AdminDashboardMetadataTitle() {
+  return <>Admin Dashboard</>;
+}
+
+async function AdminDashboardMetadataDescription() {
+  return <>Administrative dashboard for managing users, payments, and system overview</>;
+}
+
 export async function generateMetadata() {
-  return createLocalizedMetadata({
-    en: {
-      title: "Admin Dashboard",
-      description:
-        "Administrative dashboard for managing users, payments, and system overview",
-    },
-    "zh-Hans": {
-      title: "管理控制台",
-      description: "查看管理员视角下的用户、支付与系统总览。",
-    },
+  return createPageMetadata({
+    title: AdminDashboardMetadataTitle,
+    description: AdminDashboardMetadataDescription,
   });
 }
 

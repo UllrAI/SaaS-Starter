@@ -7,18 +7,20 @@ import {
   getUserSubscription,
 } from "@/lib/database/subscription";
 import { BillingOverview } from "./_components/billing-overview";
-import { createLocalizedMetadata } from "@/lib/i18n/page-metadata";
+import { createPageMetadata } from "@/lib/i18n/page-metadata";
+
+async function BillingPageMetadataTitle() {
+  return <>Billing</>;
+}
+
+async function BillingPageMetadataDescription() {
+  return <>Manage your subscription plan and billing history.</>;
+}
 
 export async function generateMetadata() {
-  return createLocalizedMetadata({
-    en: {
-      title: "Billing",
-      description: "Manage your subscription plan and billing history.",
-    },
-    "zh-Hans": {
-      title: "账单",
-      description: "管理您的订阅方案与支付历史。",
-    },
+  return createPageMetadata({
+    title: BillingPageMetadataTitle,
+    description: BillingPageMetadataDescription,
   });
 }
 

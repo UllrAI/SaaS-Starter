@@ -16,19 +16,25 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { BackgroundPattern } from "@/components/ui/background-pattern";
-import { createLocalizedMetadata } from "@/lib/i18n/page-metadata";
+import { createPageMetadata } from "@/lib/i18n/page-metadata";
+
+async function AboutPageMetadataTitle() {
+  return <>About Us</>;
+}
+
+async function AboutPageMetadataDescription() {
+  return (
+    <>
+      Learn about our mission to help developers build and launch SaaS products
+      faster than ever before.
+    </>
+  );
+}
 
 export async function generateMetadata() {
-  return createLocalizedMetadata({
-    en: {
-      title: "About Us",
-      description:
-        "Learn about our mission to help developers build and launch SaaS products faster than ever before.",
-    },
-    "zh-Hans": {
-      title: "关于我们",
-      description: "了解我们如何通过更实用的基础设施帮助开发者更快构建和发布 SaaS 产品。",
-    },
+  return createPageMetadata({
+    title: AboutPageMetadataTitle,
+    description: AboutPageMetadataDescription,
   });
 }
 

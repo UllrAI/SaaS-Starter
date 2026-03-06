@@ -3,20 +3,26 @@ import keystaticConfig from "@/keystatic.config";
 import { Sparkles, BookOpen } from "lucide-react";
 import { BackgroundPattern } from "@/components/ui/background-pattern";
 import { BlogPostCard } from "@/components/blog/blog-post-card";
-import { createLocalizedMetadata } from "@/lib/i18n/page-metadata";
+import { createPageMetadata } from "@/lib/i18n/page-metadata";
 import { getRequestLocale } from "@/lib/i18n/server-locale";
 
+async function BlogPageMetadataTitle() {
+  return <>Blog</>;
+}
+
+async function BlogPageMetadataDescription() {
+  return (
+    <>
+      Read our latest blog posts and insights about technology, development,
+      and industry trends.
+    </>
+  );
+}
+
 export async function generateMetadata() {
-  return createLocalizedMetadata({
-    en: {
-      title: "Blog",
-      description:
-        "Read our latest blog posts and insights about technology, development, and industry trends.",
-    },
-    "zh-Hans": {
-      title: "博客",
-      description: "阅读我们关于技术、开发实践和行业趋势的最新文章与洞察。",
-    },
+  return createPageMetadata({
+    title: BlogPageMetadataTitle,
+    description: BlogPageMetadataDescription,
   });
 }
 

@@ -7,8 +7,6 @@ export type ProductFeatureId =
   | "localization-setup"
   | "implementation-guidance";
 
-export type PricingTierDescriptionId = "plus" | "pro" | "team";
-
 export interface ProductFeature {
   id: ProductFeatureId;
   included: boolean;
@@ -17,7 +15,6 @@ export interface ProductFeature {
 export interface PricingTier {
   id: string;
   name: string;
-  descriptionId: PricingTierDescriptionId;
   isPopular: boolean;
   features: ProductFeature[];
   pricing: {
@@ -39,7 +36,6 @@ export const PRODUCT_TIERS: PricingTier[] = [
   {
     id: "plus",
     name: "Plus",
-    descriptionId: "plus",
     isPopular: false,
     features: [
       { id: "marketing-foundation", included: true },
@@ -67,7 +63,6 @@ export const PRODUCT_TIERS: PricingTier[] = [
   {
     id: "pro",
     name: "Professional",
-    descriptionId: "pro",
     isPopular: true,
     features: [
       { id: "marketing-foundation", included: true },
@@ -95,7 +90,6 @@ export const PRODUCT_TIERS: PricingTier[] = [
   {
     id: "team",
     name: "Team",
-    descriptionId: "team",
     isPopular: false,
     features: [
       { id: "marketing-foundation", included: true },

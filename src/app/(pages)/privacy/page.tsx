@@ -1,25 +1,26 @@
 import React from "react";
 
 import { COMPANY_NAME, PRIVACY_EMAIL } from "@/lib/config/constants";
-import { createLocalizedMetadata } from "@/lib/i18n/page-metadata";
+import { createPageMetadata } from "@/lib/i18n/page-metadata";
 
 import env from "@/env";
 
+async function PrivacyPageMetadataTitle() {
+  return <>Privacy Policy</>;
+}
+
+async function PrivacyPageMetadataDescription() {
+  return (
+    <>Learn how {COMPANY_NAME} collects, uses, and protects your personal information.</>
+  );
+}
+
 export async function generateMetadata() {
-  return createLocalizedMetadata({
-    en: {
-      title: "Privacy Policy",
-      description: `Learn how ${COMPANY_NAME} collects, uses, and protects your personal information.`,
-      alternates: {
-        canonical: `${env.NEXT_PUBLIC_APP_URL}/privacy`,
-      },
-    },
-    "zh-Hans": {
-      title: "隐私政策",
-      description: `了解 ${COMPANY_NAME} 如何收集、使用和保护您的个人信息。`,
-      alternates: {
-        canonical: `${env.NEXT_PUBLIC_APP_URL}/privacy`,
-      },
+  return createPageMetadata({
+    title: PrivacyPageMetadataTitle,
+    description: PrivacyPageMetadataDescription,
+    alternates: {
+      canonical: `${env.NEXT_PUBLIC_APP_URL}/privacy`,
     },
   });
 }

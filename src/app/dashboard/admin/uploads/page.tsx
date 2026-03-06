@@ -12,18 +12,20 @@ import { UploadManagementTable } from "./_components/upload-management-table";
 import { UploadStatsCards } from "./_components/upload-stats-cards";
 import { StatsCardsSkeleton } from "../_components/stats-cards-skeleton";
 import { getUploads } from "@/lib/actions/admin";
-import { createLocalizedMetadata } from "@/lib/i18n/page-metadata";
+import { createPageMetadata } from "@/lib/i18n/page-metadata";
+
+async function UploadManagementMetadataTitle() {
+  return <>Upload Management</>;
+}
+
+async function UploadManagementMetadataDescription() {
+  return <>Manage user uploads, file storage, and content moderation</>;
+}
 
 export async function generateMetadata() {
-  return createLocalizedMetadata({
-    en: {
-      title: "Upload Management",
-      description: "Manage user uploads, file storage, and content moderation",
-    },
-    "zh-Hans": {
-      title: "上传管理",
-      description: "管理用户上传、文件存储与内容审核。",
-    },
+  return createPageMetadata({
+    title: UploadManagementMetadataTitle,
+    description: UploadManagementMetadataDescription,
   });
 }
 

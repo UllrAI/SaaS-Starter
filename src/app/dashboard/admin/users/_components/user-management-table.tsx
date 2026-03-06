@@ -30,6 +30,7 @@ import { useAdminTable } from "@/hooks/use-admin-table";
 import type { UserWithSubscription } from "@/types/billing";
 import { getUsers, updateUserAction } from "@/lib/actions/admin";
 import { useIntlLocale } from "@/hooks/use-intl-locale";
+import { defineCopyCatalog } from "@/lib/i18n/copy-catalog";
 
 interface UserManagementTableProps {
   initialData: UserWithSubscription[];
@@ -41,22 +42,32 @@ interface UserManagementTableProps {
   };
 }
 
-type CopyComponent = React.ComponentType;
-
-const ROLE_LABELS: Record<UserRole, CopyComponent> = {
-  user: function RoleUserLabel() {
-    return <>User</>;
+const ROLE_COPY = defineCopyCatalog([
+  {
+    id: "user",
+    Label: function RoleUserLabel() {
+      return <>User</>;
+    },
   },
-  admin: function RoleAdminLabel() {
-    return <>Admin</>;
+  {
+    id: "admin",
+    Label: function RoleAdminLabel() {
+      return <>Admin</>;
+    },
   },
-  super_admin: function RoleSuperAdminLabel() {
-    return <>Super Admin</>;
+  {
+    id: "super_admin",
+    Label: function RoleSuperAdminLabel() {
+      return <>Super Admin</>;
+    },
   },
-};
+] satisfies ReadonlyArray<{
+  id: UserRole;
+  Label: React.ComponentType;
+}>);
 
 function RoleLabel({ role }: { role: UserRole }) {
-  const LabelComponent = ROLE_LABELS[role];
+  const LabelComponent = ROLE_COPY.get(role).Label;
   return <LabelComponent />;
 }
 

@@ -10,7 +10,7 @@ import Link from "next/link";
 import { Sparkles } from "lucide-react";
 import { BlogPostMeta } from "./blog-post-meta";
 import Image from "next/image";
-import { cn, calculateReadingTime } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 
 interface BlogPostCardProps {
   slug: string;
@@ -22,7 +22,7 @@ interface BlogPostCardProps {
   variant?: "featured" | "regular";
   className?: string;
   author?: string;
-  content: string;
+  readTime?: string;
   locale?: string;
 }
 
@@ -36,7 +36,7 @@ export function BlogPostCard({
   variant = "regular",
   className,
   author,
-  content,
+  readTime,
   locale,
 }: BlogPostCardProps) {
   const isFeatured = variant === "featured";
@@ -134,7 +134,7 @@ export function BlogPostCard({
             showBadge={false} // Don't show badge here as it's already shown above
             className="justify-start"
             author={author}
-            readTime={calculateReadingTime(content)}
+            readTime={readTime}
             locale={locale}
           />
         </div>

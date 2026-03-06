@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { signIn } from "@/lib/auth/client";
 import { authSchema } from "@/schemas/auth.schema";
 import { useForm } from "react-hook-form";
@@ -18,6 +18,7 @@ import {
 } from "@/lib/auth/callback-url";
 
 type AuthMode = "login" | "signup";
+type AuthPendingAction = "magic-link" | "social" | null;
 
 interface AuthFormProps {
   mode: AuthMode;
@@ -30,13 +31,21 @@ export function AuthForm({
   availableProviders,
   callbackURL = DEFAULT_CALLBACK_URL,
 }: AuthFormProps) {
-  const [loading, setLoading] = useState(false);
+  const [pendingAction, setPendingAction] = useState<AuthPendingAction>(null);
   const router = useRouter();
   const resolvedCallbackURL = normalizeCallbackUrl(callbackURL);
   const callbackQuery =
     resolvedCallbackURL === DEFAULT_CALLBACK_URL
       ? ""
       : `?callbackUrl=${encodeURIComponent(resolvedCallbackURL)}`;
+
+  useEffect(() => {
+    router.prefetch("/auth/sent");
+
+    if (resolvedCallbackURL.startsWith("/")) {
+      router.prefetch(resolvedCallbackURL);
+    }
+  }, [resolvedCallbackURL, router]);
 
   const form = useForm<z.infer<typeof authSchema>>({
     resolver: zodResolver(authSchema),
@@ -53,7 +62,7 @@ export function AuthForm({
 
     if (result.error) {
       toast.error(result.error.message);
-      setLoading(false);
+      setPendingAction(null);
       return;
     }
 
@@ -71,7 +80,7 @@ export function AuthForm({
       : <>Create your account in seconds with just your email address</>,
     badgeText: isLogin ? <>Welcome back</> : <>Get started</>,
     submitButtonText: isLogin ? <>Send Magic Link</> : <>Create Account</>,
-    loadingText: <>Sending magic link...</>,
+    magicLinkLoadingText: <>Sending magic link...</>,
     submitIcon: Mail,
     alternativeActionText: isLogin
       ? <>New to our platform?</>
@@ -102,8 +111,8 @@ export function AuthForm({
     <AuthFormBase
       form={form}
       onSubmit={onSubmit}
-      loading={loading}
-      setLoading={setLoading}
+      pendingAction={pendingAction}
+      setPendingAction={setPendingAction}
       config={config}
       fields={fields}
       availableProviders={availableProviders}

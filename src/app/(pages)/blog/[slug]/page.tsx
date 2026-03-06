@@ -9,7 +9,8 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { renderMarkdoc } from "@/lib/utils";
-import { getServerLocale } from "@lingo.dev/compiler/virtual/locale/server";
+import { getRequestLocale } from "@/lib/i18n/server-locale";
+import { createLocalizedMetadata } from "@/lib/i18n/page-metadata";
 
 interface BlogPostPageProps {
   params: Promise<{
@@ -33,9 +34,15 @@ export async function generateMetadata({
   const post = await reader.collections.posts.read(slug);
 
   if (!post) {
-    return createMetadata({
-      title: "Post Not Found",
-      description: "The requested blog post could not be found.",
+    return createLocalizedMetadata({
+      en: {
+        title: "Post Not Found",
+        description: "The requested blog post could not be found.",
+      },
+      "zh-Hans": {
+        title: "文章未找到",
+        description: "未找到请求的博客文章。",
+      },
     });
   }
 
@@ -88,7 +95,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   }
 
   const [locale, content, author] = await Promise.all([
-    getServerLocale(),
+    getRequestLocale(),
     post.content(),
     post.author ? reader.collections.authors.read(post.author) : null,
   ]);

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Loader2, Github } from "lucide-react";
 import { signIn } from "@/lib/auth/client";
+import { redirectBrowserTo } from "@/lib/browser-redirect";
 
 // Social provider configurations
 const socialProviders = {
@@ -46,6 +47,7 @@ const socialProviders = {
 } as const;
 
 type SocialProvider = keyof typeof socialProviders;
+type SocialProviderConfig = (typeof socialProviders)[SocialProvider];
 
 interface SocialLoginButtonsProps {
   callbackURL?: string;
@@ -63,21 +65,42 @@ export function SocialLoginButtons({
   const [activeProvider, setActiveProvider] = useState<SocialProvider | null>(
     null,
   );
+  const [isRedirecting, setIsRedirecting] = useState(false);
+
+  const redirectToProvider = (url: string) => {
+    setIsRedirecting(true);
+    redirectBrowserTo(url);
+  };
 
   const handleSocialLogin = async (provider: SocialProvider) => {
+    if (isRedirecting) {
+      return;
+    }
+
     setActiveProvider(provider);
     onLoadingChange?.(true);
 
     try {
-      await signIn.social({
+      const result = await signIn.social({
         provider,
         callbackURL,
+        disableRedirect: true,
       });
+
+      if (result.error) {
+        throw new Error(result.error.message);
+      }
+
+      const redirectUrl = result.data?.url;
+      if (!redirectUrl) {
+        throw new Error("Authentication provider redirect URL is missing.");
+      }
+
+      redirectToProvider(redirectUrl);
     } catch {
       toast.error(
         "Something went wrong. Contact support if the issue persists",
       );
-    } finally {
       setActiveProvider(null);
       onLoadingChange?.(false);
     }
@@ -101,7 +124,14 @@ export function SocialLoginButtons({
         const isLoading = activeProvider === provider;
         const isDisabled =
           (activeProvider !== null && activeProvider !== provider) ||
-          externalLoading;
+          externalLoading ||
+          isRedirecting;
+
+        const buttonLabel = isLoading ? (
+          <SocialLoginPendingLabel provider={config} />
+        ) : (
+          <SocialLoginDefaultLabel provider={config} IconComponent={IconComponent} />
+        );
 
         return (
           <Button
@@ -112,20 +142,38 @@ export function SocialLoginButtons({
             onClick={() => handleSocialLogin(provider)}
             className="h-12 w-full cursor-pointer border-2 transition-all duration-200"
           >
-            {isLoading ? (
-              <span className="flex items-center gap-2">
-                <Loader2 className="h-4 w-4 animate-spin" />
-                <span>Connecting...</span>
-              </span>
-            ) : (
-              <span className="flex items-center gap-3">
-                <IconComponent className="h-5 w-5" />
-                <span className="font-medium">Continue with {config.name}</span>
-              </span>
-            )}
+            {buttonLabel}
           </Button>
         );
       })}
     </div>
+  );
+}
+
+function SocialLoginPendingLabel({
+  provider,
+}: {
+  provider: SocialProviderConfig;
+}) {
+  return (
+    <span className="flex items-center gap-2">
+      <Loader2 className="h-4 w-4 animate-spin" />
+      <span>Redirecting to {provider.name}...</span>
+    </span>
+  );
+}
+
+function SocialLoginDefaultLabel({
+  provider,
+  IconComponent,
+}: {
+  provider: SocialProviderConfig;
+  IconComponent: SocialProviderConfig["icon"];
+}) {
+  return (
+    <span className="flex items-center gap-3">
+      <IconComponent className="h-5 w-5" />
+      <span className="font-medium">Continue with {provider.name}</span>
+    </span>
   );
 }

@@ -25,17 +25,17 @@ type PaymentStatus = "success" | "failed" | "pending" | "cancelled";
 
 interface StatusConfig {
   icon: React.ReactNode;
-  title: string;
-  description: string;
+  Title: React.ComponentType;
+  Description: React.ComponentType;
   badgeVariant: "default" | "destructive" | "secondary" | "outline";
-  badgeText: string;
+  BadgeText: React.ComponentType;
   primaryAction: {
-    text: string;
+    Text: React.ComponentType;
     href: string;
     variant: "default" | "destructive" | "outline" | "secondary";
   };
   secondaryAction?: {
-    text: string;
+    Text: React.ComponentType;
     href: string;
   };
 }
@@ -43,69 +43,125 @@ interface StatusConfig {
 const statusConfigs: Record<PaymentStatus, StatusConfig> = {
   success: {
     icon: <CheckCircle className="h-20 w-20 text-emerald-500" />,
-    title: "Payment Successful!",
-    description:
-      "Thank you for your purchase! Your subscription has been activated and you now have access to all premium features.",
+    Title: function PaymentStatusTitleSuccess() {
+      return <>Payment Successful!</>;
+    },
+    Description: function PaymentStatusDescriptionSuccess() {
+      return (
+        <>
+          Thank you for your purchase! Your subscription has been activated and
+          you now have access to all premium features.
+        </>
+      );
+    },
     badgeVariant: "default",
-    badgeText: "Payment Completed",
+    BadgeText: function PaymentStatusBadgeSuccess() {
+      return <>Payment Completed</>;
+    },
     primaryAction: {
-      text: "Access Dashboard",
+      Text: function PaymentStatusPrimarySuccess() {
+        return <>Access Dashboard</>;
+      },
       href: "/dashboard",
       variant: "default",
     },
     secondaryAction: {
-      text: "Manage Billing",
+      Text: function PaymentStatusSecondarySuccess() {
+        return <>Manage Billing</>;
+      },
       href: "/dashboard/billing",
     },
   },
   failed: {
     icon: <XCircle className="h-20 w-20 text-red-500" />,
-    title: "Payment Failed",
-    description:
-      "We couldn't process your payment. Please check your payment method and try again, or contact our support team for assistance.",
+    Title: function PaymentStatusTitleFailed() {
+      return <>Payment Failed</>;
+    },
+    Description: function PaymentStatusDescriptionFailed() {
+      return (
+        <>
+          We couldn&apos;t process your payment. Please check your payment
+          method and try again, or contact our support team for assistance.
+        </>
+      );
+    },
     badgeVariant: "destructive",
-    badgeText: "Payment Failed",
+    BadgeText: function PaymentStatusBadgeFailed() {
+      return <>Payment Failed</>;
+    },
     primaryAction: {
-      text: "Try Again",
+      Text: function PaymentStatusPrimaryFailed() {
+        return <>Try Again</>;
+      },
       href: "/pricing",
       variant: "default",
     },
     secondaryAction: {
-      text: "Contact Support",
+      Text: function PaymentStatusSecondaryFailed() {
+        return <>Contact Support</>;
+      },
       href: "/contact",
     },
   },
   pending: {
     icon: <Clock className="h-20 w-20 text-amber-500" />,
-    title: "Payment Processing",
-    description:
-      "Your payment is being processed. This may take a few minutes. The page will automatically refresh to show the latest status.",
+    Title: function PaymentStatusTitlePending() {
+      return <>Payment Processing</>;
+    },
+    Description: function PaymentStatusDescriptionPending() {
+      return (
+        <>
+          Your payment is being processed. This may take a few minutes. The
+          page will automatically refresh to show the latest status.
+        </>
+      );
+    },
     badgeVariant: "secondary",
-    badgeText: "Processing",
+    BadgeText: function PaymentStatusBadgePending() {
+      return <>Processing</>;
+    },
     primaryAction: {
-      text: "Go to Dashboard",
+      Text: function PaymentStatusPrimaryPending() {
+        return <>Go to Dashboard</>;
+      },
       href: "/dashboard",
       variant: "outline",
     },
     secondaryAction: {
-      text: "Check Status",
+      Text: function PaymentStatusSecondaryPending() {
+        return <>Check Status</>;
+      },
       href: "/dashboard/billing",
     },
   },
   cancelled: {
     icon: <AlertCircle className="h-20 w-20 text-slate-500" />,
-    title: "Payment Cancelled",
-    description:
-      "You cancelled the payment process. No charges have been made to your account. You can try again anytime.",
+    Title: function PaymentStatusTitleCancelled() {
+      return <>Payment Cancelled</>;
+    },
+    Description: function PaymentStatusDescriptionCancelled() {
+      return (
+        <>
+          You cancelled the payment process. No charges have been made to your
+          account. You can try again anytime.
+        </>
+      );
+    },
     badgeVariant: "outline",
-    badgeText: "Cancelled",
+    BadgeText: function PaymentStatusBadgeCancelled() {
+      return <>Cancelled</>;
+    },
     primaryAction: {
-      text: "View Plans",
+      Text: function PaymentStatusPrimaryCancelled() {
+        return <>View Plans</>;
+      },
       href: "/pricing",
       variant: "default",
     },
     secondaryAction: {
-      text: "Go to Dashboard",
+      Text: function PaymentStatusSecondaryCancelled() {
+        return <>Go to Dashboard</>;
+      },
       href: "/dashboard",
     },
   },
@@ -247,6 +303,11 @@ export function PaymentStatusContent() {
   }
 
   const config = statusConfigs[status];
+  const Title = config.Title;
+  const Description = config.Description;
+  const BadgeText = config.BadgeText;
+  const PrimaryActionText = config.primaryAction.Text;
+  const SecondaryActionText = config.secondaryAction?.Text;
 
   return (
     <section className="bg-background relative flex min-h-screen items-center justify-center overflow-hidden">
@@ -264,7 +325,7 @@ export function PaymentStatusContent() {
             {status === "failed" && <AlertCircle className="h-3 w-3" />}
             {status === "pending" && <Clock className="h-3 w-3" />}
             {status === "cancelled" && <XCircle className="h-3 w-3" />}
-            {config.badgeText}
+            <BadgeText />
           </Badge>
         </div>
 
@@ -283,12 +344,12 @@ export function PaymentStatusContent() {
 
             {/* Title */}
             <h1 className="text-foreground mb-4 text-3xl font-bold tracking-tight sm:text-4xl">
-              {config.title}
+              <Title />
             </h1>
 
             {/* Description */}
             <p className="text-muted-foreground mx-auto mb-8 max-w-lg text-lg leading-relaxed">
-              {config.description}
+              <Description />
             </p>
 
             {/* Session ID */}
@@ -330,7 +391,7 @@ export function PaymentStatusContent() {
                   {status === "failed" && <ArrowRight className="h-4 w-4" />}
                   {status === "pending" && <Home className="h-4 w-4" />}
                   {status === "cancelled" && <ArrowRight className="h-4 w-4" />}
-                  {config.primaryAction.text}
+                  <PrimaryActionText />
                 </Link>
               </Button>
 
@@ -349,7 +410,7 @@ export function PaymentStatusContent() {
                     {status === "failed" && <Mail className="h-4 w-4" />}
                     {status === "pending" && <CreditCard className="h-4 w-4" />}
                     {status === "cancelled" && <Home className="h-4 w-4" />}
-                    {config.secondaryAction.text}
+                    {SecondaryActionText ? <SecondaryActionText /> : null}
                   </Link>
                 </Button>
               )}

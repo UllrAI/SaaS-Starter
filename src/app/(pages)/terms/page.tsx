@@ -1,107 +1,201 @@
 import React from "react";
 
-import { createMetadata } from "@/lib/metadata";
 import { COMPANY_NAME, LEGAL_EMAIL } from "@/lib/config/constants";
+import { createLocalizedMetadata } from "@/lib/i18n/page-metadata";
 
-export const metadata = createMetadata({
-  title: "Terms of Service",
-  description: `Read our terms of service to understand your rights and responsibilities when using ${COMPANY_NAME}.`,
-});
+export async function generateMetadata() {
+  return createLocalizedMetadata({
+    en: {
+      title: "Terms of Service",
+      description: `Read our terms of service to understand your rights and responsibilities when using ${COMPANY_NAME}.`,
+    },
+    "zh-Hans": {
+      title: "服务条款",
+      description: `阅读 ${COMPANY_NAME} 的服务条款，了解您在使用本服务时的权利与责任。`,
+    },
+  });
+}
 
 const termsSections = [
   {
     id: "acceptance",
-    title: "Acceptance of Terms",
-
-    content: [
-      `By accessing or using ${COMPANY_NAME}, you agree to be bound by these Terms of Service`,
-      "If you disagree with any part of these terms, you may not access the service",
-      "These terms apply to all visitors, users, and others who access the service",
-      "We may update these terms from time to time without prior notice",
+    Title: function TermsSectionTitleAcceptance() {
+      return <>Acceptance of Terms</>;
+    },
+    Items: [
+      function TermsSectionItemAcceptanceBoundByTerms() {
+        return <>By accessing or using {COMPANY_NAME}, you agree to be bound by these Terms of Service</>;
+      },
+      function TermsSectionItemAcceptanceDisagree() {
+        return <>If you disagree with any part of these terms, you may not access the service</>;
+      },
+      function TermsSectionItemAcceptanceAppliesToAll() {
+        return <>These terms apply to all visitors, users, and others who access the service</>;
+      },
+      function TermsSectionItemAcceptanceUpdates() {
+        return <>We may update these terms from time to time without prior notice</>;
+      },
     ],
   },
   {
     id: "user-accounts",
-    title: "User Accounts",
-
-    content: [
-      "You must provide accurate and complete information when creating an account",
-      "You are responsible for maintaining the security of your account",
-      "You must notify us immediately of any unauthorized use of your account",
-      "One person or legal entity may not maintain more than one free account",
-      "Accounts registered by bots or automated methods are not permitted",
+    Title: function TermsSectionTitleUserAccounts() {
+      return <>User Accounts</>;
+    },
+    Items: [
+      function TermsSectionItemAccountsAccurate() {
+        return <>You must provide accurate and complete information when creating an account</>;
+      },
+      function TermsSectionItemAccountsSecurity() {
+        return <>You are responsible for maintaining the security of your account</>;
+      },
+      function TermsSectionItemAccountsUnauthorizedUse() {
+        return <>You must notify us immediately of any unauthorized use of your account</>;
+      },
+      function TermsSectionItemAccountsOneFreeAccount() {
+        return <>One person or legal entity may not maintain more than one free account</>;
+      },
+      function TermsSectionItemAccountsBots() {
+        return <>Accounts registered by bots or automated methods are not permitted</>;
+      },
     ],
   },
   {
     id: "acceptable-use",
-    title: "Acceptable Use",
-
-    content: [
-      "Use the service only for lawful purposes and in accordance with these terms",
-      "Do not use the service to transmit harmful, offensive, or illegal content",
-      "Do not attempt to gain unauthorized access to our systems or networks",
-      "Do not interfere with or disrupt the service or servers",
-      "Do not use the service to compete with or replicate our business model",
+    Title: function TermsSectionTitleAcceptableUse() {
+      return <>Acceptable Use</>;
+    },
+    Items: [
+      function TermsSectionItemUseLawful() {
+        return <>Use the service only for lawful purposes and in accordance with these terms</>;
+      },
+      function TermsSectionItemUseHarmfulContent() {
+        return <>Do not use the service to transmit harmful, offensive, or illegal content</>;
+      },
+      function TermsSectionItemUseUnauthorizedAccess() {
+        return <>Do not attempt to gain unauthorized access to our systems or networks</>;
+      },
+      function TermsSectionItemUseDisruptService() {
+        return <>Do not interfere with or disrupt the service or servers</>;
+      },
+      function TermsSectionItemUseCompete() {
+        return <>Do not use the service to compete with or replicate our business model</>;
+      },
     ],
   },
   {
     id: "payment-terms",
-    title: "Payment and Billing",
-
-    content: [
-      "Paid plans are billed in advance on a monthly or annual basis",
-      "All fees are non-refundable except as required by law",
-      "You authorize us to charge your payment method for all fees",
-      "Price changes will be communicated with 30 days notice",
-      "Failure to pay may result in service suspension or termination",
+    Title: function TermsSectionTitlePaymentBilling() {
+      return <>Payment and Billing</>;
+    },
+    Items: [
+      function TermsSectionItemPaymentAdvance() {
+        return <>Paid plans are billed in advance on a monthly or annual basis</>;
+      },
+      function TermsSectionItemPaymentNonRefundable() {
+        return <>All fees are non-refundable except as required by law</>;
+      },
+      function TermsSectionItemPaymentChargeAuthorization() {
+        return <>You authorize us to charge your payment method for all fees</>;
+      },
+      function TermsSectionItemPaymentPriceChanges() {
+        return <>Price changes will be communicated with 30 days notice</>;
+      },
+      function TermsSectionItemPaymentSuspension() {
+        return <>Failure to pay may result in service suspension or termination</>;
+      },
     ],
   },
   {
     id: "intellectual-property",
-    title: "Intellectual Property",
-
-    content: [
-      "The service and its content are protected by copyright and other laws",
-      "You retain ownership of content you create using our service",
-      "You grant us a license to use your content to provide the service",
-      "You may not copy, modify, or distribute our proprietary content",
-      "Respect the intellectual property rights of others",
+    Title: function TermsSectionTitleIntellectualProperty() {
+      return <>Intellectual Property</>;
+    },
+    Items: [
+      function TermsSectionItemIpProtected() {
+        return <>The service and its content are protected by copyright and other laws</>;
+      },
+      function TermsSectionItemIpOwnership() {
+        return <>You retain ownership of content you create using our service</>;
+      },
+      function TermsSectionItemIpLicense() {
+        return <>You grant us a license to use your content to provide the service</>;
+      },
+      function TermsSectionItemIpCopying() {
+        return <>You may not copy, modify, or distribute our proprietary content</>;
+      },
+      function TermsSectionItemIpRespectRights() {
+        return <>Respect the intellectual property rights of others</>;
+      },
     ],
   },
   {
     id: "service-availability",
-    title: "Service Availability",
-
-    content: [
-      "We strive to maintain high service availability but cannot guarantee 100% uptime",
-      "Scheduled maintenance will be announced in advance when possible",
-      "We may modify or discontinue features with reasonable notice",
-      "Emergency maintenance may occur without prior notice",
-      "Service level agreements are specified in your subscription plan",
+    Title: function TermsSectionTitleServiceAvailability() {
+      return <>Service Availability</>;
+    },
+    Items: [
+      function TermsSectionItemAvailabilityUptime() {
+        return <>We strive to maintain high service availability but cannot guarantee 100% uptime</>;
+      },
+      function TermsSectionItemAvailabilityMaintenance() {
+        return <>Scheduled maintenance will be announced in advance when possible</>;
+      },
+      function TermsSectionItemAvailabilityModifyFeatures() {
+        return <>We may modify or discontinue features with reasonable notice</>;
+      },
+      function TermsSectionItemAvailabilityEmergencyMaintenance() {
+        return <>Emergency maintenance may occur without prior notice</>;
+      },
+      function TermsSectionItemAvailabilitySla() {
+        return <>Service level agreements are specified in your subscription plan</>;
+      },
     ],
   },
   {
     id: "termination",
-    title: "Termination",
-
-    content: [
-      "You may terminate your account at any time through your account settings",
-      "We may terminate accounts that violate these terms",
-      "Upon termination, your right to use the service ceases immediately",
-      "We will provide reasonable notice before terminating paid accounts",
-      "Data export options are available before account termination",
+    Title: function TermsSectionTitleTermination() {
+      return <>Termination</>;
+    },
+    Items: [
+      function TermsSectionItemTerminationAnyTime() {
+        return <>You may terminate your account at any time through your account settings</>;
+      },
+      function TermsSectionItemTerminationViolations() {
+        return <>We may terminate accounts that violate these terms</>;
+      },
+      function TermsSectionItemTerminationCeases() {
+        return <>Upon termination, your right to use the service ceases immediately</>;
+      },
+      function TermsSectionItemTerminationNotice() {
+        return <>We will provide reasonable notice before terminating paid accounts</>;
+      },
+      function TermsSectionItemTerminationExport() {
+        return <>Data export options are available before account termination</>;
+      },
     ],
   },
   {
     id: "disclaimers",
-    title: "Disclaimers and Limitations",
-
-    content: [
-      "The service is provided 'as is' without warranties of any kind",
-      "We disclaim all warranties, express or implied, including merchantability",
-      "We are not liable for indirect, incidental, or consequential damages",
-      "Our total liability is limited to the amount you paid in the last 12 months",
-      "Some jurisdictions do not allow these limitations",
+    Title: function TermsSectionTitleDisclaimers() {
+      return <>Disclaimers and Limitations</>;
+    },
+    Items: [
+      function TermsSectionItemDisclaimersAsIs() {
+        return <>The service is provided &apos;as is&apos; without warranties of any kind</>;
+      },
+      function TermsSectionItemDisclaimersMerchantability() {
+        return <>We disclaim all warranties, express or implied, including merchantability</>;
+      },
+      function TermsSectionItemDisclaimersIndirectDamages() {
+        return <>We are not liable for indirect, incidental, or consequential damages</>;
+      },
+      function TermsSectionItemDisclaimersLiabilityCap() {
+        return <>Our total liability is limited to the amount you paid in the last 12 months</>;
+      },
+      function TermsSectionItemDisclaimersJurisdictions() {
+        return <>Some jurisdictions do not allow these limitations</>;
+      },
     ],
   },
 ];
@@ -126,21 +220,27 @@ export default function TermsPage() {
           </div>
 
           <div className="space-y-8">
-            {termsSections.map((section) => (
+            {termsSections.map((section) => {
+              const Title = section.Title;
+
+              return (
               <div key={section.id} id={section.id}>
-                <h2 className="mb-4 text-2xl font-semibold">{section.title}</h2>
+                <h2 className="mb-4 text-2xl font-semibold">
+                  <Title />
+                </h2>
                 <ul className="space-y-2 pl-5">
-                  {section.content.map((item, itemIndex) => (
+                  {section.Items.map((Item, itemIndex) => (
                     <li
                       key={itemIndex}
                       className="text-muted-foreground list-disc"
                     >
-                      {item}
+                      <Item />
                     </li>
                   ))}
                 </ul>
               </div>
-            ))}
+              );
+            })}
           </div>
 
           <div className="mt-12">

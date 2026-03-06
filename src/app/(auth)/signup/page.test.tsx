@@ -33,9 +33,10 @@ jest.mock("@/lib/auth/providers", () => ({
 }));
 
 const mockMetadata = { title: "mock signup metadata" };
-const mockCreateMetadata = jest.fn(() => mockMetadata);
-jest.mock("@/lib/metadata", () => ({
-  createMetadata: (config: unknown) => mockCreateMetadata(config),
+const mockCreateLocalizedMetadata = jest.fn(() => mockMetadata);
+jest.mock("@/lib/i18n/page-metadata", () => ({
+  createLocalizedMetadata: (config: unknown) =>
+    mockCreateLocalizedMetadata(config),
 }));
 
 describe("SignUpPage", () => {
@@ -44,13 +45,19 @@ describe("SignUpPage", () => {
     jest.resetModules();
   });
 
-  it("exports metadata created from signup copy", async () => {
+  it("creates localized metadata from signup page copy", async () => {
     const pageModule = await import("./page");
 
-    expect(pageModule.metadata).toBe(mockMetadata);
-    expect(mockCreateMetadata).toHaveBeenCalledWith({
-      title: "Sign Up",
-      description: "Create your account with magic link",
+    expect(await pageModule.generateMetadata()).toBe(mockMetadata);
+    expect(mockCreateLocalizedMetadata).toHaveBeenCalledWith({
+      en: {
+        title: "Sign Up",
+        description: "Create your account with magic link",
+      },
+      "zh-Hans": {
+        title: "注册",
+        description: "使用魔法链接创建您的账户",
+      },
     });
   });
 

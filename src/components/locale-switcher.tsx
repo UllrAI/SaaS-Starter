@@ -34,6 +34,19 @@ export type LocaleSwitcherProps = {
   showLabel?: boolean;
 };
 
+function getMarketingLocaleHref(locale: SupportedLocale): string | null {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  return resolveLocaleSwitchUrl({
+    pathname: window.location.pathname,
+    search: window.location.search,
+    hash: window.location.hash,
+    locale,
+  });
+}
+
 export function LocaleSwitcher({
   locales = SUPPORTED_LOCALES,
   className,
@@ -42,42 +55,25 @@ export function LocaleSwitcher({
   align = "end",
   showLabel = false,
 }: LocaleSwitcherProps) {
+  const [isMounted, setIsMounted] = React.useState(false);
+  const [isPending, startTransition] = React.useTransition();
   const availableLocales = locales.length > 0 ? locales : SUPPORTED_LOCALES;
-  const { locale: currentLocale } = useLingoContext();
+  const { locale: currentLocale, setLocale } = useLingoContext();
   const normalizedCurrentLocale = normalizeLocaleCandidate(currentLocale);
+  const activeLocale = normalizedCurrentLocale ?? availableLocales[0];
 
-  const activeLocale = React.useMemo<SupportedLocale>(() => {
-    if (normalizedCurrentLocale) {
-      return normalizedCurrentLocale;
-    }
-
-    return availableLocales[0];
-  }, [availableLocales, normalizedCurrentLocale]);
+  React.useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const handleLocaleSelect = (locale: SupportedLocale) => {
     if (normalizedCurrentLocale && locale === normalizedCurrentLocale) {
       return;
     }
 
-    persistLocale(locale);
-
-    if (typeof window === "undefined") {
-      return;
-    }
-
-    const nextUrl = resolveLocaleSwitchUrl({
-      pathname: window.location.pathname,
-      search: window.location.search,
-      hash: window.location.hash,
-      locale,
+    startTransition(() => {
+      void setLocale(locale);
     });
-
-    if (nextUrl) {
-      window.location.assign(nextUrl);
-      return;
-    }
-
-    window.location.reload();
   };
 
   if (!availableLocales.length) {
@@ -92,6 +88,7 @@ export function LocaleSwitcher({
         <Button
           variant={variant}
           size={size}
+          disabled={isPending}
           className={cn(
             "gap-2",
             showLabel && size !== "icon" && "px-3",
@@ -102,7 +99,7 @@ export function LocaleSwitcher({
           <Languages className="h-[1.2rem] w-[1.2rem]" />
           {showLabel && (
             <span className="text-sm font-medium">
-              {activeLocaleDetails.label}
+              {activeLocaleDetails.nativeName}
             </span>
           )}
           <span className="sr-only">Select language</span>
@@ -118,15 +115,33 @@ export function LocaleSwitcher({
         {availableLocales.map((locale) => {
           const details = getLocaleDisplayInfo(locale);
           const isSelected = locale === activeLocale;
+          const localeHref = isMounted ? getMarketingLocaleHref(locale) : null;
+
+          if (localeHref && !isSelected) {
+            return (
+              <DropdownMenuItem key={locale} asChild className="py-2">
+                <a
+                  href={localeHref}
+                  className="flex w-full items-center justify-between gap-4"
+                  onClick={() => persistLocale(locale)}
+                >
+                  <span className="text-sm leading-none font-medium">
+                    {details.nativeName}
+                  </span>
+                </a>
+              </DropdownMenuItem>
+            );
+          }
 
           return (
             <DropdownMenuItem
               key={locale}
               className="flex items-center justify-between gap-4 py-2"
-              onSelect={() => handleLocaleSelect(locale)}
+              disabled={isPending || isSelected}
+              onClick={() => handleLocaleSelect(locale)}
             >
               <span className="text-sm leading-none font-medium">
-                {details.label}
+                {details.nativeName}
               </span>
               {isSelected && <Check className="text-primary h-4 w-4" />}
             </DropdownMenuItem>

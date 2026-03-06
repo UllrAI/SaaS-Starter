@@ -6,15 +6,13 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import { getPaymentStats } from "@/lib/admin/stats";
-import { getServerLocale } from "@lingo.dev/compiler/virtual/locale/server";
-import { resolveIntlLocale } from "@/lib/locale";
+import { getRequestIntlLocale } from "@/lib/i18n/server-locale";
 
 export async function PaymentStatsCards() {
-  const [rawLocale, stats] = await Promise.all([
-    getServerLocale(),
+  const [locale, stats] = await Promise.all([
+    getRequestIntlLocale(),
     getPaymentStats(),
   ]);
-  const locale = resolveIntlLocale(rawLocale);
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat(locale, {

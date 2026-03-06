@@ -34,6 +34,29 @@ interface SubscriptionManagementTableProps {
   };
 }
 
+type CopyComponent = React.ComponentType;
+
+const SUBSCRIPTION_STATUS_LABELS: Record<string, CopyComponent> = {
+  active: function SubscriptionStatusActiveLabel() {
+    return <>Active</>;
+  },
+  trialing: function SubscriptionStatusTrialingLabel() {
+    return <>Trialing</>;
+  },
+  canceled: function SubscriptionStatusCanceledLabel() {
+    return <>Canceled</>;
+  },
+  past_due: function SubscriptionStatusPastDueLabel() {
+    return <>Past Due</>;
+  },
+  incomplete: function SubscriptionStatusIncompleteLabel() {
+    return <>Incomplete</>;
+  },
+  unpaid: function SubscriptionStatusUnpaidLabel() {
+    return <>Unpaid</>;
+  },
+};
+
 export function SubscriptionManagementTable({
   initialData,
   initialPagination,
@@ -128,12 +151,12 @@ export function SubscriptionManagementTable({
 
   const columns: Array<{
     key: keyof SubscriptionWithUser | string;
-    label: string;
+    label: ReactNode;
     render?: (item: SubscriptionWithUser) => ReactNode;
   }> = [
     {
       key: "user",
-      label: "User",
+      label: <>User</>,
       render: (sub) => (
         <UserAvatarCell
           name={sub.user?.name}
@@ -144,24 +167,32 @@ export function SubscriptionManagementTable({
     },
     {
       key: "plan",
-      label: "Plan",
+      label: <>Plan</>,
       render: (sub) => <div className="font-medium">{sub.planName}</div>,
     },
     {
       key: "status",
-      label: "Status",
-      render: (sub) => (
-        <Badge
-          variant={getStatusBadgeVariant(sub.status)}
-          className="capitalize"
-        >
-          {sub.status}
-        </Badge>
-      ),
+      label: <>Status</>,
+      render: (sub) => {
+        const SubscriptionStatusLabel =
+          SUBSCRIPTION_STATUS_LABELS[sub.status] ??
+          function SubscriptionStatusFallbackLabel() {
+            return <>Unknown</>;
+          };
+
+        return (
+          <Badge
+            variant={getStatusBadgeVariant(sub.status)}
+            className="capitalize"
+          >
+            <SubscriptionStatusLabel />
+          </Badge>
+        );
+      },
     },
     {
       key: "period",
-      label: "Current Period",
+      label: <>Current Period</>,
       render: (sub) => (
         <div className="flex items-center gap-1 text-sm">
           <Calendar className="h-3 w-3" />
@@ -174,7 +205,7 @@ export function SubscriptionManagementTable({
     },
     {
       key: "actions",
-      label: "Actions",
+      label: <>Actions</>,
       render: (sub) => (
         <Button
           variant="outline"
@@ -190,11 +221,11 @@ export function SubscriptionManagementTable({
   ];
 
   const statusFilterOptions = [
-    { value: "all", label: "All Statuses" },
-    { value: "active", label: "Active" },
-    { value: "trialing", label: "Trialing" },
-    { value: "canceled", label: "Canceled" },
-    { value: "past_due", label: "Past Due" },
+    { value: "all", label: <>All Statuses</> },
+    { value: "active", label: <>Active</> },
+    { value: "trialing", label: <>Trialing</> },
+    { value: "canceled", label: <>Canceled</> },
+    { value: "past_due", label: <>Past Due</> },
   ];
 
   return (

@@ -13,8 +13,12 @@ import { Mail, Phone, MapPin, MessageSquare } from "lucide-react";
 const contactMethods = [
   {
     icon: Mail,
-    title: "Email Support",
-    description: "Technical support via email",
+    Title: function ContactMethodTitleEmail() {
+      return <>Email Support</>;
+    },
+    Description: function ContactMethodDescriptionEmail() {
+      return <>Technical support via email</>;
+    },
     action: "support@company.com",
     href: "mailto:support@company.com",
     label: "EMAIL_GATEWAY",
@@ -22,16 +26,24 @@ const contactMethods = [
   },
   {
     icon: MessageSquare,
-    title: "Live Chat",
-    description: "Real-time developer support",
+    Title: function ContactMethodTitleChat() {
+      return <>Live Chat</>;
+    },
+    Description: function ContactMethodDescriptionChat() {
+      return <>Real-time developer support</>;
+    },
     action: "Start Chat",
     href: "#",
     label: "CHAT_INTERFACE",
   },
   {
     icon: Phone,
-    title: "Phone Support",
-    description: "Direct engineering line",
+    Title: function ContactMethodTitlePhone() {
+      return <>Phone Support</>;
+    },
+    Description: function ContactMethodDescriptionPhone() {
+      return <>Direct engineering line</>;
+    },
     action: "+1 (555) 123-4567",
     href: "tel:+15551234567",
     label: "VOICE_CHANNEL",
@@ -39,8 +51,12 @@ const contactMethods = [
   },
   {
     icon: MapPin,
-    title: "Visit Us",
-    description: "Engineering headquarters",
+    Title: function ContactMethodTitleVisit() {
+      return <>Visit Us</>;
+    },
+    Description: function ContactMethodDescriptionVisit() {
+      return <>Engineering headquarters</>;
+    },
     action: "123 Business St, City, State 12345",
     href: "#",
     label: "PHYSICAL_LOCATION",
@@ -53,23 +69,27 @@ export function ContactMethods() {
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
       {contactMethods.map((method) => {
         const Icon = method.icon;
+        const Title = method.Title;
+        const Description = method.Description;
         return (
           <Card
-            key={method.title}
+            key={method.label}
             className="group shadow-sm transition-all hover:shadow-md"
           >
             <CardHeader>
               <div className="bg-primary/10 text-primary mb-4 flex h-12 w-12 items-center justify-center border border-primary/20 transition-transform group-hover:scale-110">
                 <Icon className="h-6 w-6" />
               </div>
-              <CardTitle className="text-lg">{method.title}</CardTitle>
+              <CardTitle className="text-lg">
+                <Title />
+              </CardTitle>
               <p className="text-muted-foreground font-mono text-[10px] uppercase">
                 {method.label}
               </p>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground mb-4 text-sm">
-                {method.description}
+                <Description />
               </p>
               <Button
                 variant="outline"

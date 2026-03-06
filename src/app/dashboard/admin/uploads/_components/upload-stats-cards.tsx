@@ -3,11 +3,11 @@ import { Upload, HardDrive, FileText } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getUploadStatsDetails } from "@/lib/admin/stats";
-import { getServerLocale } from "@lingo.dev/compiler/virtual/locale/server";
+import { getRequestLocale } from "@/lib/i18n/server-locale";
 
 export async function UploadStatsCards() {
   const [locale, stats] = await Promise.all([
-    getServerLocale(),
+    getRequestLocale(),
     getUploadStatsDetails(),
   ]);
 

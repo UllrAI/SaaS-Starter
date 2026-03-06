@@ -80,6 +80,12 @@ interface UploadedFile {
   fileName: string;
 }
 
+interface PresignedUploadPayload {
+  presignedUrl: string;
+  publicUrl: string;
+  key: string;
+}
+
 const FilePreview = ({ file }: { file: FileWithPreview }) => {
   const [hasError, setHasError] = useState(false);
 
@@ -253,6 +259,75 @@ export function FileUploader({
     ],
   );
 
+  const uploadToPresignedUrl = useCallback(
+    (
+      presignedUrl: string,
+      file: File,
+      onProgress: (progress: number) => void,
+    ): Promise<void> =>
+      new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+
+        xhr.open("PUT", presignedUrl);
+        xhr.setRequestHeader("Content-Type", file.type);
+
+        xhr.upload.onprogress = (event) => {
+          if (!event.lengthComputable) {
+            return;
+          }
+
+          onProgress(Math.round((event.loaded / event.total) * 100));
+        };
+
+        xhr.onerror = () => reject(new Error("Network error during upload."));
+        xhr.onabort = () => reject(new Error("Upload was aborted."));
+        xhr.onload = () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            onProgress(100);
+            resolve();
+            return;
+          }
+
+          reject(new Error(`Upload failed with status ${xhr.status}.`));
+        };
+
+        xhr.send(file);
+      }),
+    [],
+  );
+
+  const completeUpload = useCallback(
+    async ({
+      key,
+      url,
+      file,
+    }: {
+      key: string;
+      url: string;
+      file: File;
+    }): Promise<UploadedFile> => {
+      const response = await fetch("/api/upload/complete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fileName: file.name,
+          contentType: file.type,
+          size: file.size,
+          key,
+          url,
+        }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to finalize upload");
+      }
+
+      return data.file as UploadedFile;
+    },
+    [],
+  );
+
   const handleFiles = useCallback(
     async (newFiles: FileList | File[]) => {
       setGlobalError(null);
@@ -324,32 +399,35 @@ export function FileUploader({
             (await response.json()).error || "Failed to get upload URL",
           );
 
-        const { presignedUrl, publicUrl, key } = await response.json();
+        const { presignedUrl, publicUrl, key }: PresignedUploadPayload =
+          await response.json();
 
         if (!presignedUrl || !isAllowedUploadUrl(presignedUrl)) {
           throw new Error("Unsafe upload URL received.");
         }
 
-        const uploadResponse = await fetch(presignedUrl, {
-          method: "PUT",
-          body: file,
-          headers: { "Content-Type": file.type },
+        await uploadToPresignedUrl(presignedUrl, file, (progress) => {
+          setFiles((prev) =>
+            prev.map((f, i) => (i === fileIndex ? { ...f, progress } : f)),
+          );
         });
 
-        if (!uploadResponse.ok)
-          throw new Error(`Upload failed: ${uploadResponse.statusText}`);
-
-        const uploadedFile: UploadedFile = {
-          url: publicUrl,
+        const uploadedFile = await completeUpload({
           key,
-          size: file.size,
-          contentType: file.type,
-          fileName: file.name,
-        };
+          url: publicUrl,
+          file,
+        });
 
         setFiles((prev) =>
           prev.map((f, i) =>
-            i === fileIndex ? { ...f, status: "completed", uploadedFile } : f,
+            i === fileIndex
+              ? {
+                  ...f,
+                  progress: 100,
+                  status: "completed",
+                  uploadedFile,
+                }
+              : f,
           ),
         );
 
@@ -381,7 +459,7 @@ export function FileUploader({
         },
       );
     }
-  }, [files, onUploadComplete]);
+  }, [completeUpload, files, onUploadComplete, uploadToPresignedUrl]);
 
   const removeFile = useCallback((index: number) => {
     setFiles((prev) => {

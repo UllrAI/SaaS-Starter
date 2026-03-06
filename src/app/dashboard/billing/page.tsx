@@ -1,18 +1,26 @@
 import React from "react";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth/server";
-import { createMetadata } from "@/lib/metadata";
 import { DashboardPageWrapper } from "../_components/dashboard-page-wrapper";
 import {
   getUserPayments,
   getUserSubscription,
 } from "@/lib/database/subscription";
 import { BillingOverview } from "./_components/billing-overview";
+import { createLocalizedMetadata } from "@/lib/i18n/page-metadata";
 
-export const metadata = createMetadata({
-  title: "Billing",
-  description: "Manage your subscription plan and billing history.",
-});
+export async function generateMetadata() {
+  return createLocalizedMetadata({
+    en: {
+      title: "Billing",
+      description: "Manage your subscription plan and billing history.",
+    },
+    "zh-Hans": {
+      title: "账单",
+      description: "管理您的订阅方案与支付历史。",
+    },
+  });
+}
 
 export default async function DashboardBillingPage() {
   const requestHeaders = await headers();

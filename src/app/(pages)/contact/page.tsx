@@ -9,24 +9,29 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import {
-  Mail,
-  MessageSquare,
-  Phone,
-  MapPin,
   Clock,
   HelpCircle,
   ExternalLink,
   Send,
 } from "lucide-react";
 import Link from "next/link";
-import { createMetadata } from "@/lib/metadata";
 import { BackgroundPattern } from "@/components/ui/background-pattern";
 import { COMPANY_NAME } from "@/lib/config/constants";
+import { createLocalizedMetadata } from "@/lib/i18n/page-metadata";
+import { ContactMethods } from "./contact-methods";
 
-export const metadata = createMetadata({
-  title: "Contact Us",
-  description: `Get in touch with our team. We are here to help with any questions about ${COMPANY_NAME}.`,
-});
+export async function generateMetadata() {
+  return createLocalizedMetadata({
+    en: {
+      title: "Contact Us",
+      description: `Get in touch with our team. We are here to help with any questions about ${COMPANY_NAME}.`,
+    },
+    "zh-Hans": {
+      title: "联系我们",
+      description: `联系 ${COMPANY_NAME} 团队，获取关于产品、部署和使用方式的帮助。`,
+    },
+  });
+}
 
 export default function ContactPage() {
   return (
@@ -60,112 +65,7 @@ export default function ContactPage() {
                 <h2 className="text-2xl font-bold">Contact Channels</h2>
               </div>
 
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-                <Card className="shadow-sm">
-                  <CardHeader>
-                    <div className="bg-primary/10 text-primary mb-4 flex h-12 w-12 items-center justify-center border border-primary/20">
-                      <Mail className="h-6 w-6" />
-                    </div>
-                    <CardTitle>Email Support</CardTitle>
-                    <CardDescription className="font-mono text-xs">
-                      EMAIL_GATEWAY
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground mb-4 text-sm">
-                      Technical support via email
-                    </p>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="w-full"
-                      asChild
-                    >
-                      <a
-                        href="mailto:support@company.com"
-                        className="font-mono text-xs"
-                        data-lingo-skip
-                      >
-                        support@company.com
-                      </a>
-                    </Button>
-                  </CardContent>
-                </Card>
-
-                <Card className="shadow-sm">
-                  <CardHeader>
-                    <div className="bg-primary/10 text-primary mb-4 flex h-12 w-12 items-center justify-center border border-primary/20">
-                      <MessageSquare className="h-6 w-6" />
-                    </div>
-                    <CardTitle>Live Chat</CardTitle>
-                    <CardDescription className="font-mono text-xs">
-                      CHAT_INTERFACE
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground mb-4 text-sm">
-                      Real-time developer support
-                    </p>
-                    <Button variant="outline" size="sm" className="w-full">
-                      <span className="font-mono text-xs">Start Chat</span>
-                    </Button>
-                  </CardContent>
-                </Card>
-
-                <Card className="shadow-sm">
-                  <CardHeader>
-                    <div className="bg-primary/10 text-primary mb-4 flex h-12 w-12 items-center justify-center border border-primary/20">
-                      <Phone className="h-6 w-6" />
-                    </div>
-                    <CardTitle>Phone Support</CardTitle>
-                    <CardDescription className="font-mono text-xs">
-                      VOICE_CHANNEL
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground mb-4 text-sm">
-                      Direct engineering line
-                    </p>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="w-full"
-                      asChild
-                    >
-                      <a
-                        href="tel:+15551234567"
-                        className="font-mono text-xs"
-                        data-lingo-skip
-                      >
-                        +1 (555) 123-4567
-                      </a>
-                    </Button>
-                  </CardContent>
-                </Card>
-
-                <Card className="shadow-sm">
-                  <CardHeader>
-                    <div className="bg-primary/10 text-primary mb-4 flex h-12 w-12 items-center justify-center border border-primary/20">
-                      <MapPin className="h-6 w-6" />
-                    </div>
-                    <CardTitle>Visit Us</CardTitle>
-                    <CardDescription className="font-mono text-xs">
-                      PHYSICAL_LOCATION
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground mb-4 text-sm">
-                      Engineering headquarters
-                    </p>
-                    <p
-                      className="font-mono text-xs leading-relaxed"
-                      data-lingo-skip
-                    >
-                      123 Business St, City, State 12345
-                    </p>
-                  </CardContent>
-                </Card>
-              </div>
+              <ContactMethods />
             </div>
 
             {/* Support Hours */}

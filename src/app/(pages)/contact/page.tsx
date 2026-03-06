@@ -8,15 +8,16 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
-import {
-  Clock,
-  HelpCircle,
-  ExternalLink,
-  Send,
-} from "lucide-react";
+import { Clock, HelpCircle, ExternalLink, Send } from "lucide-react";
 import Link from "next/link";
 import { BackgroundPattern } from "@/components/ui/background-pattern";
-import { COMPANY_NAME } from "@/lib/config/constants";
+import {
+  COMPANY_NAME,
+  CONTACT_EMAIL,
+  DOCS_URL,
+  GITHUB_DISCUSSIONS_URL,
+  GITHUB_RELEASES_URL,
+} from "@/lib/config/constants";
 import { createPageMetadata } from "@/lib/i18n/page-metadata";
 import { ContactMethods } from "./contact-methods";
 
@@ -25,7 +26,12 @@ async function ContactPageMetadataTitle() {
 }
 
 async function ContactPageMetadataDescription() {
-  return <>Get in touch with our team. We are here to help with any questions about {COMPANY_NAME}.</>;
+  return (
+    <>
+      Get in touch with our team. We are here to help with any questions about{" "}
+      {COMPANY_NAME}.
+    </>
+  );
 }
 
 export async function generateMetadata() {
@@ -90,10 +96,7 @@ export default function ContactPage() {
                       <span className="text-muted-foreground text-sm">
                         Monday - Friday
                       </span>
-                      <span
-                        className="font-mono text-sm"
-                        data-lingo-skip
-                      >
+                      <span className="font-mono text-sm" data-lingo-skip>
                         9:00 - 18:00
                       </span>
                     </div>
@@ -101,10 +104,7 @@ export default function ContactPage() {
                       <span className="text-muted-foreground text-sm">
                         Saturday
                       </span>
-                      <span
-                        className="font-mono text-sm"
-                        data-lingo-skip
-                      >
+                      <span className="font-mono text-sm" data-lingo-skip>
                         10:00 - 16:00
                       </span>
                     </div>
@@ -129,10 +129,7 @@ export default function ContactPage() {
                       <span className="text-muted-foreground text-sm">
                         Availability
                       </span>
-                      <span
-                        className="font-mono text-sm"
-                        data-lingo-skip
-                      >
+                      <span className="font-mono text-sm" data-lingo-skip>
                         24/7/365
                       </span>
                     </div>
@@ -140,9 +137,7 @@ export default function ContactPage() {
                       <span className="text-muted-foreground text-sm">
                         Response Time
                       </span>
-                      <span className="font-mono text-sm">
-                        Under 1 hour
-                      </span>
+                      <span className="font-mono text-sm">Under 1 hour</span>
                     </div>
                     <div className="flex justify-between pb-2">
                       <span className="text-muted-foreground text-sm">
@@ -183,14 +178,14 @@ export default function ContactPage() {
                 <Card className="shadow-sm">
                   <CardHeader>
                     <CardTitle className="text-lg">
-                      Do you offer phone support?
+                      Do you offer enterprise support?
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p className="text-muted-foreground text-sm leading-relaxed">
-                      Yes, phone support is available for enterprise customers.
-                      Standard tier customers can upgrade to access phone
-                      support.
+                      Yes. Enterprise support is handled through dedicated email
+                      workflows and structured issue triage so requests stay
+                      traceable from report to resolution.
                     </p>
                   </CardContent>
                 </Card>
@@ -203,8 +198,9 @@ export default function ContactPage() {
                   </CardHeader>
                   <CardContent>
                     <p className="text-muted-foreground text-sm leading-relaxed">
-                      Absolutely! Contact our sales team via email or chat to
-                      schedule a personalized demo of our platform.
+                      Yes. Send your use case to {CONTACT_EMAIL} and include the
+                      product area you want to review so we can route it
+                      correctly.
                     </p>
                   </CardContent>
                 </Card>
@@ -217,11 +213,16 @@ export default function ContactPage() {
                   </CardHeader>
                   <CardContent>
                     <p className="text-muted-foreground mb-3 text-sm leading-relaxed">
-                      Our comprehensive documentation covers all features,
-                      APIs, and integrations.
+                      Our comprehensive documentation covers all features, APIs,
+                      and integrations.
                     </p>
                     <Button variant="outline" size="sm" asChild>
-                      <a href="#" className="inline-flex items-center gap-2">
+                      <a
+                        href={DOCS_URL}
+                        className="inline-flex items-center gap-2"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
                         <span className="text-xs">View Docs</span>
                         <ExternalLink className="h-3 w-3" />
                       </a>
@@ -241,33 +242,58 @@ export default function ContactPage() {
               <div className="grid gap-4 md:grid-cols-3">
                 <Card className="shadow-sm transition-all hover:shadow-md">
                   <CardHeader>
-                    <CardTitle className="text-base">
-                      Documentation
-                    </CardTitle>
+                    <CardTitle className="text-base">Documentation</CardTitle>
                     <CardDescription className="text-xs">
                       Complete guides and API references
                     </CardDescription>
                   </CardHeader>
+                  <CardContent>
+                    <Button variant="outline" size="sm" asChild>
+                      <a href={DOCS_URL} target="_blank" rel="noreferrer">
+                        Open Docs
+                      </a>
+                    </Button>
+                  </CardContent>
                 </Card>
 
                 <Card className="shadow-sm transition-all hover:shadow-md">
                   <CardHeader>
-                    <CardTitle className="text-base">
-                      Community Forum
-                    </CardTitle>
+                    <CardTitle className="text-base">Community Forum</CardTitle>
                     <CardDescription className="text-xs">
                       Connect with other developers
                     </CardDescription>
                   </CardHeader>
+                  <CardContent>
+                    <Button variant="outline" size="sm" asChild>
+                      <a
+                        href={GITHUB_DISCUSSIONS_URL}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Join Discussions
+                      </a>
+                    </Button>
+                  </CardContent>
                 </Card>
 
                 <Card className="shadow-sm transition-all hover:shadow-md">
                   <CardHeader>
-                    <CardTitle className="text-base">Status Page</CardTitle>
+                    <CardTitle className="text-base">Release Notes</CardTitle>
                     <CardDescription className="text-xs">
-                      Real-time system status updates
+                      Track shipping history and starter changes
                     </CardDescription>
                   </CardHeader>
+                  <CardContent>
+                    <Button variant="outline" size="sm" asChild>
+                      <a
+                        href={GITHUB_RELEASES_URL}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        View Releases
+                      </a>
+                    </Button>
+                  </CardContent>
                 </Card>
               </div>
             </div>

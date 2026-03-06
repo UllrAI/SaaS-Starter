@@ -4,6 +4,22 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Clock } from "lucide-react";
+import { createPageMetadata } from "@/lib/i18n/page-metadata";
+
+async function PaymentStatusMetadataTitle() {
+  return <>Payment Status</>;
+}
+
+async function PaymentStatusMetadataDescription() {
+  return <>Review the latest billing result and next steps for your account.</>;
+}
+
+export async function generateMetadata() {
+  return createPageMetadata({
+    title: PaymentStatusMetadataTitle,
+    description: PaymentStatusMetadataDescription,
+  });
+}
 
 function PaymentStatusSkeleton() {
   return (

@@ -233,6 +233,90 @@ describe("R2 Storage Functions", () => {
       expect(result.success).toBe(false);
       expect(result.error).toBe("Failed to fetch file from URL: Not Found");
     });
+
+    it("should reject invalid URLs before fetching", async () => {
+      const { uploadFromUrl } = await import("./r2");
+
+      const result = await uploadFromUrl("not-a-valid-url", "test-key");
+
+      expect(result.success).toBe(false);
+      expect(result.error).toBe("Invalid URL");
+      expect(mockFetch).not.toHaveBeenCalled();
+    });
+
+    it("should reject unsupported protocols", async () => {
+      const { uploadFromUrl } = await import("./r2");
+
+      const result = await uploadFromUrl("ftp://example.com/file.jpg", "test-key");
+
+      expect(result.success).toBe(false);
+      expect(result.error).toBe("Unsupported URL protocol");
+      expect(mockFetch).not.toHaveBeenCalled();
+    });
+
+    it("should reject credentialed remote URLs", async () => {
+      const { uploadFromUrl } = await import("./r2");
+
+      const result = await uploadFromUrl(
+        "https://user:pass@example.com/file.jpg",
+        "test-key",
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.error).toBe("Blocked URL host");
+      expect(mockFetch).not.toHaveBeenCalled();
+    });
+
+    it("should reject internal hostnames", async () => {
+      const { uploadFromUrl } = await import("./r2");
+
+      const result = await uploadFromUrl(
+        "https://assets.internal/secret.txt",
+        "test-key",
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.error).toBe("Blocked URL host");
+      expect(mockFetch).not.toHaveBeenCalled();
+    });
+
+    it("should reject hosts that resolve to private addresses", async () => {
+      const { uploadFromUrl } = await import("./r2");
+
+      mockLookup.mockResolvedValue([{ address: "10.0.0.8", family: 4 }]);
+
+      const result = await uploadFromUrl(
+        "https://files.example.com/image.jpg",
+        "test-key",
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.error).toBe("Blocked URL host");
+      expect(mockFetch).not.toHaveBeenCalled();
+    });
+
+    it("should reject redirects from remote URLs", async () => {
+      const { uploadFromUrl } = await import("./r2");
+
+      mockFetch.mockResolvedValue({
+        ok: false,
+        status: 302,
+        statusText: "Found",
+        headers: {
+          get: jest.fn().mockReturnValue("image/jpeg"),
+        },
+      } as any as Response);
+
+      const result = await uploadFromUrl(
+        "https://example.com/redirect.jpg",
+        "test-key",
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.error).toBe(
+        "Redirects are not allowed when fetching remote files.",
+      );
+    });
   });
 
   describe("uploadBuffer", () => {
@@ -353,6 +437,23 @@ describe("R2 Storage Functions", () => {
       });
 
       await expect(fileExists("missing-key")).resolves.toBe(false);
+    });
+
+    it("should log unexpected errors and return false", async () => {
+      const { fileExists } = await import("./r2");
+
+      mockSend.mockRejectedValueOnce(new Error("Timeout"));
+      const consoleSpy = jest
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
+
+      await expect(fileExists("test-key")).resolves.toBe(false);
+      expect(consoleSpy).toHaveBeenCalledWith(
+        "Error checking file existence:",
+        expect.any(Error),
+      );
+
+      consoleSpy.mockRestore();
     });
   });
 

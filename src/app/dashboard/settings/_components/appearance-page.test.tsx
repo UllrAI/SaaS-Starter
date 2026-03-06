@@ -26,8 +26,12 @@ describe("AppearancePage Component", () => {
   it("should render appearance page with theme options", () => {
     render(<AppearancePage />);
 
-    expect(screen.getByText("Appearance")).toBeInTheDocument();
     expect(screen.getByText("Theme Preferences")).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Choose your preferred theme for the dashboard interface",
+      ),
+    ).toBeInTheDocument();
     expect(screen.getByText("Light")).toBeInTheDocument();
     expect(screen.getByText("Dark")).toBeInTheDocument();
     expect(screen.getByText("System")).toBeInTheDocument();

@@ -17,6 +17,7 @@
 # next.js
 /.next/
 /out/
+.content-collections
 
 # production
 /build

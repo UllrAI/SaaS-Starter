@@ -169,7 +169,7 @@ export default function PricingPage() {
           <div className="mx-auto max-w-6xl">
             <div className="mb-20 text-center">
               <Badge className="border-border bg-background/50 mb-6 inline-flex items-center border px-3 py-1 text-sm backdrop-blur-sm">
-                <Boxes className="mr-2 h-3 w-3" />
+                <Boxes className="text-muted-foreground mr-2 h-3 w-3" />
                 <span className="text-muted-foreground font-mono">
                   STARTER_PRICING
                 </span>

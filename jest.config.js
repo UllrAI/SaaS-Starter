@@ -14,7 +14,7 @@ const customJestConfig = {
   moduleNameMapper: {
     // 处理 tsconfig.json 中那些不符合通用模式的特定别名
     "^@/env$": "<rootDir>/env.js",
-    "^@/keystatic.config$": "<rootDir>/keystatic.config.ts",
+    "^content-collections$": "<rootDir>/.content-collections/generated",
     // 处理模块别名 (这部分很快会被 next/jest 自动配置)
     "^@/(.*)$": "<rootDir>/src/$1",
   },

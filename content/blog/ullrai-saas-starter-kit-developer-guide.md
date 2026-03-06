@@ -80,7 +80,7 @@ This documentation provides a comprehensive and in-depth technical reference for
 - **Database**: PostgreSQL + Drizzle ORM (Type-safe queries, Migration management)
 - **Payment Subscriptions**: Creem integration (One-time payments, Subscriptions, Customer portal, Webhooks)
 - **File Upload**: Cloudflare R2 integration (Client-side presigned direct upload, Server-side proxy upload, Image compression)
-- **Content Management**: Keystatic (Markdown/MDX blog system)
+- **Content Management**: Content Collections (Markdown blog system)
 - **Email Service**: Resend + React Email (Transactional email templates)
 - **Form Handling**: React Hook Form + Zod (Type-safe form validation)
 - **Code Quality**: ESLint, Prettier
@@ -89,7 +89,7 @@ This documentation provides a comprehensive and in-depth technical reference for
 
 ### 1.4. Technical Architecture Diagram
 
-[![Technical Architecture Diagram](https://mermaid.ink/img/pako:eNqNk1tPwjAUx79K09cRkuVSLqsv-g1MfDBkw8TEB1rOHGMd2zLWQkhCmAlKXP7bFr6F09Ol59d-_Z_Tt8N6DhoCVlSHoA3IqmKCU3-JOHy2hHhLUWOZ-_Ek1pj1Qv-KCWp7vdfJlsIe20g-kXGXGjQpIqQiEpMUpGOGJB9JGhCdhRJJWnNwCuI_gdWCTfZH5pB6Cri_7j6Fz5vF-Ow3SrqLAHaMvBVSLGj0bYG6vWm0LcSgBm0A6ZKjmzJdLlFmQgQZ8VsXuPFd4x4GzWfH6VpXILdvuJBsWKjXIW3ywQoTqPRNWDcnW3UqaEpGOzBW-a6V7N3x0wIgqtd6I3_sxJ6-77jEtJXHBhJ47QvqUpEVX6VCRBKrn2RfqDgvQU-XfgQsG3RFgNpj4Hx2v4DH7ZPQR2X8aRlQdGWKoKGbWXhQZJG3k4LhlDVs6Rf6QFyS6qYWWKGV4jZp4rJPJ1kVWJA6wPdg0r3qWANyf7K5yJT3rn7-Acr4J7o)]([https://mermaid.live/edit#pako:eNqNk1tPwjAUx79K09cRkuVSLqsv-g1MfDBkw8TEB1rOHGMd2zLWQkhCmAlKXP7bFr6F09Ol59d-_Z_Tt8N6DhoCVlSHoA3IqmKCU3-JOHy2hHhLUWOZ-_Ek1pj1Qv-KCWp7vdfJlsIe20g-kXGXGjQpIqQiEpMUpGOGJB9JGhCdhRJJWnNwCuI_gdWCTfZH5pB6Cri_7j6Fz5vF-Ow3SrqLAHaMvBVSLGj0bYG6vWm0LcSgBm0A6ZKjmzJdLlFmQgQZ8VsXuPFd4x4GzWfH6VpXILdvuJBsWKjXIW3ywQoTqPRNWDcnW3UqaEpGOzBW-a6V7N3x0wIgqtd6I3_sxJ6-77jEtJXHBhJ47QvqUpEVX6VCRBKrn2RfqDgvQU-XfgQsG3RFgNpj4Hx2v4DH7ZPQR2X8aRlQdGWKoKGbWXhQZJG3k4LhlDVs6Rf6QFyS6qYWWKGV4jZp4rJPJ1kVWJA6wPdg0r3qWANyf7K5yJT3rn7-Acr4J7o)](https://mermaid.live/edit#pako:eNqNk1tPwjAUx79K09cRkuVSLqsv-g1MfDBkw8TEB1rOHGMd2zLWQkhCmAlKXP7bFr6F09Ol59d-_Z_Tt8N6DhoCVlSHoA3IqmKCU3-JOHy2hHhLUWOZ-_Ek1pj1Qv-KCWp7vdfJlsIe20g-kXGXGjQpIqQiEpMUpGOGJB9JGhCdhRJJWnNwCuI_gdWCTfZH5pB6Cri_7j6Fz5vF-Ow3SrqLAHaMvBVSLGj0bYG6vWm0LcSgBm0A6ZKjmzJdLlFmQgQZ8VsXuPFd4x4GzWfH6VpXILdvuJBsWKjXIW3ywQoTqPRNWDcnW3UqaEpGOzBW-a6V7N3x0wIgqtd6I3_sxJ6-77jEtJXHBhJ47QvqUpEVX6VCRBKrn2RfqDgvQU-XfgQsG3RFgNpj4Hx2v4DH7ZPQR2X8aRlQdGWKoKGbWXhQZJG3k4LhlDVs6Rf6QFyS6qYWWKGV4jZp4rJPJ1kVWJA6wPdg0r3qWANyf7K5yJT3rn7-Acr4J7o)
+[![Technical Architecture Diagram](https://mermaid.ink/img/pako:eNqNk1tPwjAUx79K09cRkuVSLqsv-g1MfDBkw8TEB1rOHGMd2zLWQkhCmAlKXP7bFr6F09Ol59d-_Z_Tt8N6DhoCVlSHoA3IqmKCU3-JOHy2hHhLUWOZ-_Ek1pj1Qv-KCWp7vdfJlsIe20g-kXGXGjQpIqQiEpMUpGOGJB9JGhCdhRJJWnNwCuI_gdWCTfZH5pB6Cri_7j6Fz5vF-Ow3SrqLAHaMvBVSLGj0bYG6vWm0LcSgBm0A6ZKjmzJdLlFmQgQZ8VsXuPFd4x4GzWfH6VpXILdvuJBsWKjXIW3ywQoTqPRNWDcnW3UqaEpGOzBW-a6V7N3x0wIgqtd6I3_sxJ6-77jEtJXHBhJ47QvqUpEVX6VCRBKrn2RfqDgvQU-XfgQsG3RFgNpj4Hx2v4DH7ZPQR2X8aRlQdGWKoKGbWXhQZJG3k4LhlDVs6Rf6QFyS6qYWWKGV4jZp4rJPJ1kVWJA6wPdg0r3qWANyf7K5yJT3rn7-Acr4J7o)](https://mermaid.live/edit#pako:eNqNk1tPwjAUx79K09cRkuVSLqsv-g1MfDBkw8TEB1rOHGMd2zLWQkhCmAlKXP7bFr6F09Ol59d-_Z_Tt8N6DhoCVlSHoA3IqmKCU3-JOHy2hHhLUWOZ-_Ek1pj1Qv-KCWp7vdfJlsIe20g-kXGXGjQpIqQiEpMUpGOGJB9JGhCdhRJJWnNwCuI_gdWCTfZH5pB6Cri_7j6Fz5vF-Ow3SrqLAHaMvBVSLGj0bYG6vWm0LcSgBm0A6ZKjmzJdLlFmQgQZ8VsXuPFd4x4GzWfH6VpXILdvuJBsWKjXIW3ywQoTqPRNWDcnW3UqaEpGOzBW-a6V7N3x0wIgqtd6I3_sxJ6-77jEtJXHBhJ47QvqUpEVX6VCRBKrn2RfqDgvQU-XfgQsG3RFgNpj4Hx2v4DH7ZPQR2X8aRlQdGWKoKGbWXhQZJG3k4LhlDVs6Rf6QFyS6qYWWKGV4jZp4rJPJ1kVWJA6wPdg0r3qWANyf7K5yJT3rn7-Acr4J7o)
 
 ```mermaid
 graph TD
@@ -111,8 +111,8 @@ graph TD
         D -- Storage API --> J[Cloudflare R2];
     end
     
-    subgraph "Content Management (CMS)"
-        K[Keystatic] -- Reads/Writes --> L[Markdown/JSON in Git];
+    subgraph "Content Management"
+        K[Content Collections] -- Indexes --> L[Markdown/JSON in Git];
         B -- Reads data --> L;
     end
     
@@ -140,7 +140,6 @@ SaaS-Starter-main/
 │   │   ├── (dashboard)/  # Protected dashboard pages
 │   │   ├── (pages)/      # Public pages (home, about, blog, etc.)
 │   │   ├── api/          # API routes
-│   │   ├── keystatic/    # Keystatic CMS admin interface
 │   │   ├── layout.tsx    # Root layout
 │   │   └── not-found.tsx # Global 404 page
 │   ├── components/       # React components
@@ -169,7 +168,7 @@ SaaS-Starter-main/
 │   │   └── r2.ts         # Cloudflare R2 file upload service
 │   ├── schemas/          # Zod validation schemas
 │   └── types/            # TypeScript type definitions
-├── content/              # Keystatic-managed content (Markdown, JSON)
+├── content/              # Repository-managed content (Markdown, JSON)
 ├── public/               # Static assets
 ├── scripts/              # Helper scripts (like setting up admin)
 └── styles/               # Global styles and CSS
@@ -408,14 +407,14 @@ sequenceDiagram
     Server-->>Client: Return upload result
 ```
 
-### 4.5. Blog & Content Management (Keystatic)
+### 4.5. Blog & Content Management (Content Collections)
 
-- **CMS**: Uses `Keystatic` as Git-based CMS, all content stored in Markdown and JSON files under `content/` directory.
-- **Admin Interface**: In development environment, access `/keystatic` to enter admin dashboard. For security, this interface is disabled by default in production.
+- **Content Pipeline**: Uses `Content Collections` to index repository-managed Markdown and JSON content under the `content/` directory.
+- **Authoring Workflow**: Blog posts are edited directly in `content/blog/*.md`, while author data lives in `content/authors/*.json`.
 - **Content Reading**:
-  - `@keystatic/core/reader` used for safely reading content under `content/` directory on server-side.
-  - `src/app/(pages)/blog/page.tsx`: Blog list page, reads all articles.
-  - `src/app/(pages)/blog/[slug]/page.tsx`: Blog detail page, reads single article and uses `@markdoc/markdoc` to parse Markdoc content.
+  - `content-collections.ts` defines the content schema and generated collections.
+  - `src/app/(pages)/blog/page.tsx`: Blog list page, reads all indexed articles.
+  - `src/app/(pages)/blog/[slug]/page.tsx`: Blog detail page, reads a single article and renders Markdown with `react-markdown`.
 
 ### 4.6. Admin Dashboard
 
@@ -444,43 +443,15 @@ Provides a powerful, extensible data management system.
 
 ### 5.2. API Reference
 
-{% table %}
-- Route
-- Method
-- Description
----
-- `/api/auth/[...all]`
-- GET, POST
-- Handle all `better-auth` authentication requests.
----
-- `/api/billing/checkout`
-- POST
-- Create payment session.
----
-- `/api/billing/portal`
-- GET
-- Get customer portal URL.
----
-- `/api/billing/webhooks/creem`
-- POST
-- Receive Creem webhook events.
----
-- `/api/upload/presigned-url`
-- POST
-- Get presigned URL for client-side direct upload.
----
-- `/api/upload/server-upload`
-- POST
-- Server-side proxy file upload.
----
-- `/api/payment-status`
-- GET
-- Query payment status.
----
-- `/api/keystatic/[...params]`
-- GET, POST
-- Keystatic CMS API interface (development only).
-{% /table %}
+| Route | Method | Description |
+| --- | --- | --- |
+| `/api/auth/[...all]` | GET, POST | Handle all `better-auth` authentication requests. |
+| `/api/billing/checkout` | POST | Create payment session. |
+| `/api/billing/portal` | GET | Get customer portal URL. |
+| `/api/billing/webhooks/creem` | POST | Receive Creem webhook events. |
+| `/api/upload/presigned-url` | POST | Get presigned URL for client-side direct upload. |
+| `/api/upload/server-upload` | POST | Server-side proxy file upload. |
+| `/api/payment-status` | GET | Query payment status. |
 
 ### 5.3. Hooks and Events
 
@@ -530,52 +501,23 @@ Provides a powerful, extensible data management system.
 
 ### 8.1. CLI Commands
 
-{% table %}
-- Script
-- Description
----
-- `pnpm dev`
-- Start development server (Turbo mode)
----
-- `pnpm build`
-- Build production application
----
-- `pnpm start`
-- Start production server
----
-- `pnpm lint`
-- Run ESLint checks
----
-- `pnpm test`
-- Run Jest unit tests
----
-- `pnpm prettier:format`
-- Format all code
----
-- `pnpm db:generate`
-- Generate migration files for development
----
-- `pnpm db:generate:prod`
-- Generate migration files for production
----
-- `pnpm db:migrate:dev`
-- Apply development migrations
----
-- `pnpm db:migrate:prod`
-- Apply production migrations
----
-- `pnpm db:push`
-- (Development only) Push schema to database
----
-- `pnpm analyze`
-- Build and analyze bundle size
----
-- `pnpm set:admin`
-- (Local) Promote user to super admin
----
-- `pnpm set:admin:prod`
-- (Production) Promote user to super admin
-{% /table %}
+| Script | Description |
+| --- | --- |
+| `pnpm dev` | Start development server (Turbo mode) |
+| `pnpm content:build` | Generate Content Collections output |
+| `pnpm build` | Build production application |
+| `pnpm start` | Start production server |
+| `pnpm lint` | Run ESLint checks |
+| `pnpm test` | Run Jest unit tests |
+| `pnpm prettier:format` | Format all code |
+| `pnpm db:generate` | Generate migration files for development |
+| `pnpm db:generate:prod` | Generate migration files for production |
+| `pnpm db:migrate:dev` | Apply development migrations |
+| `pnpm db:migrate:prod` | Apply production migrations |
+| `pnpm db:push` | (Development only) Push schema to database |
+| `pnpm analyze` | Build and analyze bundle size |
+| `pnpm set:admin` | (Local) Promote user to super admin |
+| `pnpm set:admin:prod` | (Production) Promote user to super admin |
 
 ### 8.2. Configuration Options
 
@@ -588,7 +530,6 @@ All required and optional environment variables are detailed in the environment 
 - `cn(...inputs)`: Safely merge Tailwind CSS class names and resolve conflicts.
 - `formatCurrency(amount, currency)`: Format amounts in cents to currency strings.
 - `calculateReadingTime(text)`: Calculate estimated reading time based on text content.
-- `renderMarkdoc(node)`: Convert Markdoc AST nodes to plain text strings for generating summaries.
 
 ---
 
@@ -644,7 +585,7 @@ All required and optional environment variables are detailed in the environment 
   - [Better-Auth](https://better-auth.com/docs)
   - [Creem](https://creem.io/docs)
   - [shadcn/ui](https://ui.shadcn.com/docs)
-  - [Keystatic](https://keystatic.com/docs)
+  - [Content Collections](https://www.content-collections.dev/)
 
 ### 11.2. Contribution Guidelines
 
@@ -662,9 +603,9 @@ We welcome community contributions!
 
 ### 12.1. Common Issues FAQ
 
-**Q: Why can't I access the `/keystatic` admin dashboard?**
+**Q: How do I add or update blog content?**
 
-A: Keystatic admin interface is only enabled in development environment (`NODE_ENV=development`) by default for security. You need to run `pnpm dev` locally to access it.
+A: Add or edit Markdown files in `content/blog/` and update author JSON in `content/authors/` when needed. Run `pnpm content:build` if you want to regenerate the typed content output manually before testing or building.
 
 **Q: File upload fails with CORS error.**
 

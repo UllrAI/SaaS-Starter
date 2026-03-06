@@ -1,9 +1,6 @@
 import { MetadataRoute } from "next";
-import { createReader } from "@keystatic/core/reader";
-import keystaticConfig from "@/keystatic.config";
 import env from "@/env";
-
-const reader = createReader(process.cwd(), keystaticConfig);
+import { getAllPosts } from "@/lib/content/blog";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const lastModified = new Date();
@@ -63,15 +60,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ];
 
-  // Fetch dynamic blog posts from Keystatic
-  const blogPosts = await reader.collections.posts.all();
+  const blogPosts = getAllPosts();
   const blogPostEntries: MetadataRoute.Sitemap = blogPosts.map((post) => ({
     url: `${baseUrl}/blog/${post.slug}`,
-    lastModified: post.entry.publishedDate
-      ? new Date(post.entry.publishedDate)
+    lastModified: post.publishedDate
+      ? new Date(post.publishedDate)
       : lastModified,
     changeFrequency: "monthly" as const,
-    priority: post.entry.featured ? 0.8 : 0.7,
+    priority: post.featured ? 0.8 : 0.7,
   }));
 
   return [...staticPages, ...blogPostEntries];

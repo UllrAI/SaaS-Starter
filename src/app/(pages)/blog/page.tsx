@@ -1,10 +1,10 @@
-import { createReader } from "@keystatic/core/reader";
-import keystaticConfig from "@/keystatic.config";
 import { Sparkles, BookOpen } from "lucide-react";
 import { BackgroundPattern } from "@/components/ui/background-pattern";
 import { BlogPostCard } from "@/components/blog/blog-post-card";
 import { createPageMetadata } from "@/lib/i18n/page-metadata";
 import { getRequestLocale } from "@/lib/i18n/server-locale";
+import { calculateReadingTime } from "@/lib/utils";
+import { getAllPosts, getAuthorBySlug } from "@/lib/content/blog";
 
 async function BlogPageMetadataTitle() {
   return <>Blog</>;
@@ -26,62 +26,44 @@ export async function generateMetadata() {
   });
 }
 
-const reader = createReader(process.cwd(), keystaticConfig);
-
 export default async function BlogPage() {
-  const [locale, posts] = await Promise.all([
+  const [locale, sortedPosts] = await Promise.all([
     getRequestLocale(),
-    reader.collections.posts.all(),
+    Promise.resolve(getAllPosts()),
   ]);
 
-  // Sort posts by published date (newest first), then by title
-  const sortedPosts = posts.toSorted((a, b) => {
-    const dateA = a.entry.publishedDate
-      ? new Date(a.entry.publishedDate)
-      : new Date(0);
-    const dateB = b.entry.publishedDate
-      ? new Date(b.entry.publishedDate)
-      : new Date(0);
+  const featuredPosts = sortedPosts.filter((post) => post.featured);
+  const regularPosts = sortedPosts.filter((post) => !post.featured);
 
-    if (dateA.getTime() !== dateB.getTime()) {
-      return dateB.getTime() - dateA.getTime(); // Newest first
-    }
-
-    return a.entry.title.localeCompare(b.entry.title);
-  });
-
-  // Separate featured posts
-  const featuredPosts = sortedPosts.filter((post) => post.entry.featured);
-  const regularPosts = sortedPosts.filter((post) => !post.entry.featured);
-
-  const renderPostCard = async (
-    post: (typeof posts)[number],
+  const renderPostCard = (
+    post: (typeof sortedPosts)[number],
     variant: "featured" | "regular",
   ) => {
-    const author = post.entry.author
-      ? await reader.collections.authors.read(post.entry.author)
-      : null;
+    const author = getAuthorBySlug(post.author);
 
     return (
       <BlogPostCard
         key={post.slug}
         slug={post.slug}
-        title={post.entry.title}
-        excerpt={post.entry.excerpt || undefined}
-        heroImage={post.entry.heroImage || undefined}
-        publishedDate={post.entry.publishedDate || undefined}
-        featured={post.entry.featured}
+        title={post.title}
+        excerpt={post.excerpt || undefined}
+        heroImage={post.heroImage || undefined}
+        publishedDate={post.publishedDate || undefined}
+        featured={post.featured}
         variant={variant}
         author={author?.name || "Anonymous"}
+        readTime={calculateReadingTime(post.content)}
         locale={locale}
       />
     );
   };
 
-  const [featuredPostCards, regularPostCards] = await Promise.all([
-    Promise.all(featuredPosts.map((post) => renderPostCard(post, "featured"))),
-    Promise.all(regularPosts.map((post) => renderPostCard(post, "regular"))),
-  ]);
+  const featuredPostCards = featuredPosts.map((post) =>
+    renderPostCard(post, "featured"),
+  );
+  const regularPostCards = regularPosts.map((post) =>
+    renderPostCard(post, "regular"),
+  );
 
   return (
     <>

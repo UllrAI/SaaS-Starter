@@ -1,5 +1,6 @@
 import type { NextConfig } from "next";
 import nextBundleAnalyzer from "@next/bundle-analyzer";
+import { withContentCollections } from "@content-collections/next";
 import { withLingo } from "@lingo.dev/compiler/next";
 import env from "@/env";
 import {
@@ -87,5 +88,5 @@ export default async function createNextConfig(): Promise<NextConfig> {
     config = withBundleAnalyzer(config);
   }
 
-  return config;
+  return (await withContentCollections(config)) as NextConfig;
 }

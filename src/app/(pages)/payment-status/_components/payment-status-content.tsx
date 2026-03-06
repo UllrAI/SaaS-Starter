@@ -23,6 +23,15 @@ import { useEffect, useRef, useState } from "react";
 
 type PaymentStatus = "success" | "failed" | "pending" | "cancelled";
 
+const DIRECT_STATUS_MAP: Record<
+  Exclude<PaymentStatus, "success">,
+  PaymentStatus
+> = {
+  failed: "failed",
+  pending: "pending",
+  cancelled: "cancelled",
+};
+
 interface StatusConfig {
   icon: React.ReactNode;
   Title: React.ComponentType;
@@ -111,8 +120,8 @@ const statusConfigs: Record<PaymentStatus, StatusConfig> = {
     Description: function PaymentStatusDescriptionPending() {
       return (
         <>
-          Your payment is being processed. This may take a few minutes. The
-          page will automatically refresh to show the latest status.
+          Your payment is being processed. This may take a few minutes. The page
+          will automatically refresh to show the latest status.
         </>
       );
     },
@@ -189,63 +198,65 @@ export function PaymentStatusContent() {
     const checkPaymentStatus = async () => {
       try {
         const statusParam = searchParams.get("status") as PaymentStatus;
-        const sessionIdParam =
+        const checkoutIdParam =
           searchParams.get("session_id") || searchParams.get("checkout_id");
 
-        setSessionId(sessionIdParam);
+        setSessionId(checkoutIdParam);
 
-        // If we have a clear status from URL and it's success or failed, use it directly
-        if (
-          statusParam &&
-          statusParam in statusConfigs &&
-          (statusParam === "success" || statusParam === "failed")
-        ) {
-          setStatus(statusParam);
+        if (checkoutIdParam) {
+          const response = await fetch(
+            `/api/payment-status?checkout_id=${encodeURIComponent(checkoutIdParam)}`,
+            { signal: abortController.signal },
+          );
+
+          if (response.ok) {
+            const data = await response.json();
+            if (!isActive) return;
+
+            setStatus(data.status as PaymentStatus);
+            setError(null);
+
+            if (data.status === "pending") {
+              clearPollTimeout();
+              pollTimeoutRef.current = setTimeout(() => {
+                void checkPaymentStatus();
+              }, 5000);
+            }
+            return;
+          }
+        }
+
+        if (statusParam && statusParam in DIRECT_STATUS_MAP) {
+          setStatus(
+            DIRECT_STATUS_MAP[statusParam as keyof typeof DIRECT_STATUS_MAP],
+          );
+          setError(null);
           setIsLoading(false);
           return;
         }
 
-        // For pending, cancelled, or no status, check with the API
-        const paramName = sessionIdParam?.startsWith("ch_")
-          ? "checkout_id"
-          : "sessionId";
-        const response = await fetch(
-          `/api/payment-status?${sessionIdParam ? `${paramName}=${sessionIdParam}` : ""}`,
-          { signal: abortController.signal },
-        );
-        if (response.ok) {
-          const data = await response.json();
-          if (!isActive) return;
-
-          setStatus(data.status as PaymentStatus);
-          setError(null);
-
-          // Only set up auto-refresh for pending status
-          if (data.status === "pending" && sessionIdParam) {
-            clearPollTimeout();
-            pollTimeoutRef.current = setTimeout(() => {
-              void checkPaymentStatus();
-            }, 5000); // Check again in 5 seconds
-          }
-        } else {
-          if (!isActive) return;
-          // Fallback to URL parameter or default to pending
-          setStatus(
-            statusParam && statusParam in statusConfigs
-              ? statusParam
-              : "pending",
+        if (statusParam === "success") {
+          setStatus("pending");
+          setError(
+            "We are still verifying this payment because the checkout reference is missing.",
           );
+          setIsLoading(false);
+          return;
         }
+
+        setStatus("pending");
+        setError(null);
       } catch (err) {
         if (!isActive) return;
         if (err instanceof DOMException && err.name === "AbortError") return;
 
         console.error("Error checking payment status:", err);
         setError("Failed to check payment status");
-        // Fallback to URL parameter or default to pending
         const statusParam = searchParams.get("status") as PaymentStatus;
         setStatus(
-          statusParam && statusParam in statusConfigs ? statusParam : "pending",
+          statusParam && statusParam in DIRECT_STATUS_MAP
+            ? DIRECT_STATUS_MAP[statusParam as keyof typeof DIRECT_STATUS_MAP]
+            : "pending",
         );
       } finally {
         if (isActive) setIsLoading(false);

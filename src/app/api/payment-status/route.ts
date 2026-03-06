@@ -1,5 +1,3 @@
-import { auth } from "@/lib/auth/server";
-import { getUserSubscription } from "@/lib/database/subscription";
 import { NextRequest, NextResponse } from "next/server";
 
 const CHECKOUT_STATUS_MAP = {
@@ -41,117 +39,99 @@ const CHECKOUT_STATUS_MAP = {
   },
 } as const;
 
-function resolveCheckoutStatus(
-  normalizedStatus: string,
-): { status: string; message: string } {
+function resolveCheckoutStatus(normalizedStatus: string): {
+  status: string;
+  message: string;
+} {
   return (
-    CHECKOUT_STATUS_MAP[normalizedStatus as keyof typeof CHECKOUT_STATUS_MAP] ??
-    {
+    CHECKOUT_STATUS_MAP[
+      normalizedStatus as keyof typeof CHECKOUT_STATUS_MAP
+    ] ?? {
       status: "pending",
       message: "Payment is being processed. This may take a few minutes.",
     }
   );
 }
 
+const URL_STATUS_MAP = {
+  failed: {
+    status: "failed",
+    message: "Payment failed",
+  },
+  cancelled: {
+    status: "cancelled",
+    message: "Payment was cancelled",
+  },
+  pending: {
+    status: "pending",
+    message: "Payment is being processed. This may take a few minutes.",
+  },
+} as const;
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const sessionId =
-      searchParams.get("sessionId") || searchParams.get("checkout_id");
+    const checkoutId =
+      searchParams.get("checkout_id") || searchParams.get("sessionId");
+    const statusParam = searchParams.get("status");
 
-    if (!sessionId) {
-      return NextResponse.json(
-        { error: "Session ID is required" },
-        { status: 400 },
-      );
-    }
-
-    // Try to get user session, but don't require it for payment status check
-    const session = await auth.api.getSession({ headers: request.headers });
-    const userId = session?.user?.id;
-
-    // Check user's current subscription status if user is logged in
-    const subscription = userId ? await getUserSubscription(userId) : null;
-
-    if (subscription) {
-      // User has a subscription, check its status
-      if (
-        subscription.status === "active" ||
-        subscription.status === "trialing"
-      ) {
-        return NextResponse.json({
-          status: "success",
-          subscription,
-          message: "Payment successful and subscription is active",
-        });
-      } else if (
-        subscription.status === "past_due" ||
-        subscription.status === "unpaid"
-      ) {
-        return NextResponse.json({
-          status: "failed",
-          subscription,
-          message: "Payment failed or subscription is past due",
-        });
-      } else if (subscription.status === "canceled") {
-        // If there's a sessionId, it means this is a payment flow
-        // Don't treat existing canceled subscription as payment cancellation
-        if (sessionId) {
-          return NextResponse.json({
-            status: "pending",
-            message: "Payment is being processed",
-            sessionId,
-          });
-        }
-        return NextResponse.json({
-          status: "cancelled",
-          subscription,
-          message: "Subscription has been cancelled",
-        });
-      }
-    }
-
-    // If no subscription found or status is unclear, check with payment provider
-    if (sessionId) {
+    if (checkoutId) {
       try {
-        // Check checkout status with Creem
         const { creemClient } = await import("@/lib/billing/creem/client");
-
-        const checkoutResponse = await creemClient.checkouts.retrieve(sessionId);
+        const checkoutResponse =
+          await creemClient.checkouts.retrieve(checkoutId);
 
         if (checkoutResponse?.status) {
-          const normalizedStatus = String(checkoutResponse.status).toLowerCase();
+          const normalizedStatus = String(
+            checkoutResponse.status,
+          ).toLowerCase();
           const resolvedStatus = resolveCheckoutStatus(normalizedStatus);
           return NextResponse.json({
             status: resolvedStatus.status,
             message: resolvedStatus.message,
-            sessionId,
+            sessionId: checkoutId,
           });
         }
 
-        // Fallback if no status available
         return NextResponse.json({
           status: "pending",
           message: "Payment is being processed. This may take a few minutes.",
-          sessionId,
+          sessionId: checkoutId,
         });
       } catch (error) {
         console.error("Error checking Creem payment status:", error);
-        // If we can't check with Creem, return pending to avoid false negatives
         return NextResponse.json({
-          status: "pending",
-          message: "Payment status is being verified. Please wait a moment.",
-          sessionId,
+          status:
+            statusParam === "failed" || statusParam === "cancelled"
+              ? URL_STATUS_MAP[statusParam].status
+              : "pending",
+          message:
+            statusParam === "failed" || statusParam === "cancelled"
+              ? URL_STATUS_MAP[statusParam].message
+              : "Payment status is being verified. Please wait a moment.",
+          sessionId: checkoutId,
         });
       }
     }
 
-    // If no sessionId and no subscription, user might be checking status without context
-    // Default to pending to avoid showing incorrect cancelled status
-    return NextResponse.json({
-      status: "pending",
-      message: "Payment status is being verified",
-    });
+    if (statusParam && statusParam in URL_STATUS_MAP) {
+      return NextResponse.json(
+        URL_STATUS_MAP[statusParam as keyof typeof URL_STATUS_MAP],
+      );
+    }
+
+    if (statusParam === "success") {
+      return NextResponse.json({
+        status: "pending",
+        message:
+          "Payment completed, but we still need the checkout reference to verify it.",
+      });
+    }
+
+    return NextResponse.json(
+      { error: "Checkout ID or status is required" },
+      { status: 400 },
+    );
   } catch (error) {
     console.error("[Payment Status API Error]", error);
     return NextResponse.json(

@@ -1,6 +1,11 @@
 import React from "react";
+import Link from "next/link";
 
-import { COMPANY_NAME, PRIVACY_EMAIL } from "@/lib/config/constants";
+import {
+  COMPANY_NAME,
+  GITHUB_DISCUSSIONS_URL,
+  PRIVACY_EMAIL,
+} from "@/lib/config/constants";
 import { createPageMetadata } from "@/lib/i18n/page-metadata";
 
 import env from "@/env";
@@ -11,7 +16,10 @@ async function PrivacyPageMetadataTitle() {
 
 async function PrivacyPageMetadataDescription() {
   return (
-    <>Learn how {COMPANY_NAME} collects, uses, and protects your personal information.</>
+    <>
+      Learn how {COMPANY_NAME} collects, uses, and protects your personal
+      information.
+    </>
   );
 }
 
@@ -42,7 +50,9 @@ const privacySections = [
         return <>Device and browser information</>;
       },
       function PrivacySectionItemPaymentInformation() {
-        return <>Payment information (processed securely by our payment providers)</>;
+        return (
+          <>Payment information (processed securely by our payment providers)</>
+        );
       },
       function PrivacySectionItemSupportCommunications() {
         return <>Communications with our support team</>;
@@ -102,7 +112,9 @@ const privacySections = [
     },
     Items: [
       function PrivacySectionItemEncryption() {
-        return <>Industry-standard encryption for data in transit and at rest</>;
+        return (
+          <>Industry-standard encryption for data in transit and at rest</>
+        );
       },
       function PrivacySectionItemAudits() {
         return <>Regular security audits and assessments</>;
@@ -191,21 +203,21 @@ export default function PrivacyPage() {
               const Title = section.Title;
 
               return (
-              <div key={section.id} id={section.id}>
-                <h2 className="mb-4 text-2xl font-semibold">
-                  <Title />
-                </h2>
-                <ul className="space-y-2 pl-5">
-                  {section.Items.map((Item, itemIndex) => (
-                    <li
-                      key={itemIndex}
-                      className="text-muted-foreground list-disc"
-                    >
-                      <Item />
-                    </li>
-                  ))}
-                </ul>
-              </div>
+                <div key={section.id} id={section.id}>
+                  <h2 className="mb-4 text-2xl font-semibold">
+                    <Title />
+                  </h2>
+                  <ul className="space-y-2 pl-5">
+                    {section.Items.map((Item, itemIndex) => (
+                      <li
+                        key={itemIndex}
+                        className="text-muted-foreground list-disc"
+                      >
+                        <Item />
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               );
             })}
           </div>
@@ -223,12 +235,21 @@ export default function PrivacyPage() {
                 <strong>Email:</strong> {PRIVACY_EMAIL}
               </p>
               <p>
-                <strong>Address:</strong> 123 Privacy Street, Data City, DC
-                12345
+                <strong>Support:</strong>{" "}
+                <Link href="/contact" className="underline underline-offset-4">
+                  Contact page
+                </Link>
               </p>
               <p>
-                <strong>Phone:</strong>{" "}
-                <span data-lingo-skip>+1 (555) 123-4567</span>
+                <strong>Community:</strong>{" "}
+                <a
+                  href={GITHUB_DISCUSSIONS_URL}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="underline underline-offset-4"
+                >
+                  GitHub Discussions
+                </a>
               </p>
             </div>
           </div>

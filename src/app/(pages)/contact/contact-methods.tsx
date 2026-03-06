@@ -1,14 +1,13 @@
-"use client";
-
 import React from "react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Mail, Phone, MapPin, MessageSquare } from "lucide-react";
+import { BookOpen, Bug, Mail, MessageSquare } from "lucide-react";
+import {
+  CONTACT_EMAIL,
+  DOCS_URL,
+  GITHUB_DISCUSSIONS_URL,
+  GITHUB_ISSUES_URL,
+} from "@/lib/config/constants";
 
 const contactMethods = [
   {
@@ -19,48 +18,49 @@ const contactMethods = [
     Description: function ContactMethodDescriptionEmail() {
       return <>Technical support via email</>;
     },
-    action: "support@company.com",
-    href: "mailto:support@company.com",
+    action: CONTACT_EMAIL,
+    href: `mailto:${CONTACT_EMAIL}`,
     label: "EMAIL_GATEWAY",
     actionSkip: true,
   },
   {
     icon: MessageSquare,
     Title: function ContactMethodTitleChat() {
-      return <>Live Chat</>;
+      return <>Community Discussions</>;
     },
     Description: function ContactMethodDescriptionChat() {
-      return <>Real-time developer support</>;
+      return <>Ask product and integration questions in public</>;
     },
-    action: "Start Chat",
-    href: "#",
-    label: "CHAT_INTERFACE",
+    action: "Open Discussions",
+    href: GITHUB_DISCUSSIONS_URL,
+    label: "DISCUSSION_BOARD",
+    external: true,
   },
   {
-    icon: Phone,
-    Title: function ContactMethodTitlePhone() {
-      return <>Phone Support</>;
+    icon: Bug,
+    Title: function ContactMethodTitleIssues() {
+      return <>Bug Reports</>;
     },
-    Description: function ContactMethodDescriptionPhone() {
-      return <>Direct engineering line</>;
+    Description: function ContactMethodDescriptionIssues() {
+      return <>Report reproducible bugs and integration failures</>;
     },
-    action: "+1 (555) 123-4567",
-    href: "tel:+15551234567",
-    label: "VOICE_CHANNEL",
-    actionSkip: true,
+    action: "Open Issues",
+    href: GITHUB_ISSUES_URL,
+    label: "ISSUE_TRACKER",
+    external: true,
   },
   {
-    icon: MapPin,
-    Title: function ContactMethodTitleVisit() {
-      return <>Visit Us</>;
+    icon: BookOpen,
+    Title: function ContactMethodTitleDocs() {
+      return <>Documentation</>;
     },
-    Description: function ContactMethodDescriptionVisit() {
-      return <>Engineering headquarters</>;
+    Description: function ContactMethodDescriptionDocs() {
+      return <>Setup guides, billing flow notes, and deployment docs</>;
     },
-    action: "123 Business St, City, State 12345",
-    href: "#",
-    label: "PHYSICAL_LOCATION",
-    actionSkip: true,
+    action: "Read Docs",
+    href: DOCS_URL,
+    label: "DOCS_PORTAL",
+    external: true,
   },
 ];
 
@@ -77,7 +77,7 @@ export function ContactMethods() {
             className="group shadow-sm transition-all hover:shadow-md"
           >
             <CardHeader>
-              <div className="bg-primary/10 text-primary mb-4 flex h-12 w-12 items-center justify-center border border-primary/20 transition-transform group-hover:scale-110">
+              <div className="bg-primary/10 text-primary border-primary/20 mb-4 flex h-12 w-12 items-center justify-center border transition-transform group-hover:scale-110">
                 <Icon className="h-6 w-6" />
               </div>
               <CardTitle className="text-lg">
@@ -101,6 +101,8 @@ export function ContactMethods() {
                   href={method.href}
                   className="block font-mono text-xs"
                   data-lingo-skip={method.actionSkip ? true : undefined}
+                  target={method.external ? "_blank" : undefined}
+                  rel={method.external ? "noreferrer" : undefined}
                 >
                   {method.action}
                 </a>

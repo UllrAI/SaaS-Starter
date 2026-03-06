@@ -22,6 +22,7 @@ export const GITHUB_URL = "https://github.com/ullrai/saas-starter";
 export const GITHUB_ISSUES_URL = `${GITHUB_URL}/issues`;
 export const GITHUB_RELEASES_URL = `${GITHUB_URL}/releases`;
 export const GITHUB_DISCUSSIONS_URL = `${GITHUB_URL}/discussions`;
+export const DOCS_URL = `${GITHUB_URL}#readme`;
 export const VERCEL_DEPLOY_URL =
   "https://vercel.com/new/clone?repository-url=https://github.com/ullrai/saas-starter";
 

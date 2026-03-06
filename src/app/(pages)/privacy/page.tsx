@@ -1,89 +1,166 @@
 import React from "react";
 
-import { createMetadata } from "@/lib/metadata";
 import { COMPANY_NAME, PRIVACY_EMAIL } from "@/lib/config/constants";
+import { createLocalizedMetadata } from "@/lib/i18n/page-metadata";
 
 import env from "@/env";
 
-export const metadata = createMetadata({
-  title: "Privacy Policy",
-  description: `Learn how ${COMPANY_NAME} collects, uses, and protects your personal information.`,
-  alternates: {
-    canonical: `${env.NEXT_PUBLIC_APP_URL}/privacy`,
-  },
-});
+export async function generateMetadata() {
+  return createLocalizedMetadata({
+    en: {
+      title: "Privacy Policy",
+      description: `Learn how ${COMPANY_NAME} collects, uses, and protects your personal information.`,
+      alternates: {
+        canonical: `${env.NEXT_PUBLIC_APP_URL}/privacy`,
+      },
+    },
+    "zh-Hans": {
+      title: "隐私政策",
+      description: `了解 ${COMPANY_NAME} 如何收集、使用和保护您的个人信息。`,
+      alternates: {
+        canonical: `${env.NEXT_PUBLIC_APP_URL}/privacy`,
+      },
+    },
+  });
+}
 
 const privacySections = [
   {
     id: "information-collection",
-    title: "Information We Collect",
-
-    content: [
-      "Account information (name, email, password)",
-      "Usage data and analytics",
-      "Device and browser information",
-      "Payment information (processed securely by our payment providers)",
-      "Communications with our support team",
+    Title: function PrivacySectionTitleInformationCollection() {
+      return <>Information We Collect</>;
+    },
+    Items: [
+      function PrivacySectionItemAccountInformation() {
+        return <>Account information (name, email, password)</>;
+      },
+      function PrivacySectionItemUsageData() {
+        return <>Usage data and analytics</>;
+      },
+      function PrivacySectionItemDeviceInformation() {
+        return <>Device and browser information</>;
+      },
+      function PrivacySectionItemPaymentInformation() {
+        return <>Payment information (processed securely by our payment providers)</>;
+      },
+      function PrivacySectionItemSupportCommunications() {
+        return <>Communications with our support team</>;
+      },
     ],
   },
   {
     id: "information-use",
-    title: "How We Use Your Information",
-
-    content: [
-      "Provide and maintain our services",
-      "Process transactions and send related information",
-      "Send technical notices and support messages",
-      "Improve our services and develop new features",
-      "Comply with legal obligations",
+    Title: function PrivacySectionTitleInformationUse() {
+      return <>How We Use Your Information</>;
+    },
+    Items: [
+      function PrivacySectionItemProvideServices() {
+        return <>Provide and maintain our services</>;
+      },
+      function PrivacySectionItemProcessTransactions() {
+        return <>Process transactions and send related information</>;
+      },
+      function PrivacySectionItemSupportMessages() {
+        return <>Send technical notices and support messages</>;
+      },
+      function PrivacySectionItemImproveServices() {
+        return <>Improve our services and develop new features</>;
+      },
+      function PrivacySectionItemLegalObligations() {
+        return <>Comply with legal obligations</>;
+      },
     ],
   },
   {
     id: "information-sharing",
-    title: "Information Sharing",
-
-    content: [
-      "We do not sell your personal information",
-      "Service providers who assist in our operations",
-      "Legal compliance when required by law",
-      "Business transfers (mergers, acquisitions)",
-      "With your explicit consent",
+    Title: function PrivacySectionTitleInformationSharing() {
+      return <>Information Sharing</>;
+    },
+    Items: [
+      function PrivacySectionItemNoSale() {
+        return <>We do not sell your personal information</>;
+      },
+      function PrivacySectionItemServiceProviders() {
+        return <>Service providers who assist in our operations</>;
+      },
+      function PrivacySectionItemLegalCompliance() {
+        return <>Legal compliance when required by law</>;
+      },
+      function PrivacySectionItemBusinessTransfers() {
+        return <>Business transfers (mergers, acquisitions)</>;
+      },
+      function PrivacySectionItemConsent() {
+        return <>With your explicit consent</>;
+      },
     ],
   },
   {
     id: "data-security",
-    title: "Data Security",
-    // icon: Shield, // Removed icon
-    content: [
-      "Industry-standard encryption for data in transit and at rest",
-      "Regular security audits and assessments",
-      "Access controls and authentication measures",
-      "Secure data centers with physical security",
-      "Employee training on data protection",
+    Title: function PrivacySectionTitleDataSecurity() {
+      return <>Data Security</>;
+    },
+    Items: [
+      function PrivacySectionItemEncryption() {
+        return <>Industry-standard encryption for data in transit and at rest</>;
+      },
+      function PrivacySectionItemAudits() {
+        return <>Regular security audits and assessments</>;
+      },
+      function PrivacySectionItemAccessControls() {
+        return <>Access controls and authentication measures</>;
+      },
+      function PrivacySectionItemSecureDataCenters() {
+        return <>Secure data centers with physical security</>;
+      },
+      function PrivacySectionItemTraining() {
+        return <>Employee training on data protection</>;
+      },
     ],
   },
   {
     id: "your-rights",
-    title: "Your Rights",
-    // icon: Eye, // Removed icon
-    content: [
-      "Access your personal information",
-      "Correct inaccurate information",
-      "Delete your account and data",
-      "Export your data",
-      "Opt-out of marketing communications",
+    Title: function PrivacySectionTitleYourRights() {
+      return <>Your Rights</>;
+    },
+    Items: [
+      function PrivacySectionItemAccess() {
+        return <>Access your personal information</>;
+      },
+      function PrivacySectionItemCorrect() {
+        return <>Correct inaccurate information</>;
+      },
+      function PrivacySectionItemDelete() {
+        return <>Delete your account and data</>;
+      },
+      function PrivacySectionItemExport() {
+        return <>Export your data</>;
+      },
+      function PrivacySectionItemOptOut() {
+        return <>Opt-out of marketing communications</>;
+      },
     ],
   },
   {
     id: "data-retention",
-    title: "Data Retention",
-    // icon: Lock, // Removed icon
-    content: [
-      "Account data: Retained while your account is active",
-      "Usage data: Retained for up to 2 years for analytics",
-      "Support communications: Retained for 3 years",
-      "Legal compliance: As required by applicable laws",
-      "Deleted data: Permanently removed within 30 days",
+    Title: function PrivacySectionTitleDataRetention() {
+      return <>Data Retention</>;
+    },
+    Items: [
+      function PrivacySectionItemAccountRetention() {
+        return <>Account data: Retained while your account is active</>;
+      },
+      function PrivacySectionItemUsageRetention() {
+        return <>Usage data: Retained for up to 2 years for analytics</>;
+      },
+      function PrivacySectionItemSupportRetention() {
+        return <>Support communications: Retained for 3 years</>;
+      },
+      function PrivacySectionItemLegalRetention() {
+        return <>Legal compliance: As required by applicable laws</>;
+      },
+      function PrivacySectionItemDeletedData() {
+        return <>Deleted data: Permanently removed within 30 days</>;
+      },
     ],
   },
 ];
@@ -109,21 +186,27 @@ export default function PrivacyPage() {
           </div>
 
           <div className="space-y-8">
-            {privacySections.map((section) => (
+            {privacySections.map((section) => {
+              const Title = section.Title;
+
+              return (
               <div key={section.id} id={section.id}>
-                <h2 className="mb-4 text-2xl font-semibold">{section.title}</h2>
+                <h2 className="mb-4 text-2xl font-semibold">
+                  <Title />
+                </h2>
                 <ul className="space-y-2 pl-5">
-                  {section.content.map((item, itemIndex) => (
+                  {section.Items.map((Item, itemIndex) => (
                     <li
                       key={itemIndex}
                       className="text-muted-foreground list-disc"
                     >
-                      {item}
+                      <Item />
                     </li>
                   ))}
                 </ul>
               </div>
-            ))}
+              );
+            })}
           </div>
 
           <div className="mt-12">

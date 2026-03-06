@@ -154,9 +154,21 @@ This project uses Next.js App Router with a `src` directory structure for better
 - **No Mock Data**: All functionality must be properly implemented - no mock data or hardcoded examples
 - **Real Implementation**: Every feature should have complete, working implementation
 
+### i18n With Lingo
+
+- **Resolver Source of Truth**: Keep locale detection and persistence in `.lingo/locale-resolver.server.ts` and `.lingo/locale-resolver.client.ts`. Do not fork locale logic inside random components.
+- **Server Locale Access**: In app code, read locale through `src/lib/i18n/server-locale.ts` so request-level locale reads are cached and stay server-only.
+- **Client Locale Switching**: Prefer `useLingoContext().setLocale()` for same-route locale updates. If the URL itself must change for locale-prefixed marketing routes behind `proxy` rewrites, render real canonical `href`s, persist the locale on click, and let the browser navigate. App Router route replacement can treat prefixed and rewritten routes as the same internal page and fail to update the browser URL.
+- **Locale Display Names**: Language pickers should show each language in its own native name, for example `English` and `简体中文`. Do not translate locale names into the currently active locale.
+- **Boundary Discipline**: Keep `LingoProvider` in the root layout, but do not turn whole trees into client components just to access locale. Push `'use client'` down to the interactive leaf.
+- **Extraction-Friendly Copy**: Do not store translatable copy as raw strings or `ReactNode` values inside module-level config arrays/objects. Keep localized text in component render functions, or store component references like `Title`/`Description` so Lingo can extract them reliably.
+- **No Runtime Locale Branching For Copy**: Never render copy with locale conditionals such as `isChineseLocale ? "登录" : "Login"` or `locale.startsWith("zh") ? ... : ...`. Locale-dependent UI text must come from extraction-friendly JSX copy components, typed component maps, or Lingo hooks so the source stays DRY and translation extraction remains reliable.
+- **Production Translation QA**: Do not treat `pnpm dev` pseudotranslator output as final translation verification. For real locale QA, run `pnpm build` and `pnpm start`, then check the built app.
+- **Locale Verification Scope**: Locale-prefixed marketing routes can be verified via `/zh-Hans/...`. Non-prefixed routes such as `/login` inherit locale from resolver state, so verify them with the locale cookie/storage already set instead of assuming `/zh-Hans/login` should exist.
+
 ### UI/UX Guidelines
 
-- **Language**: All interface text in English
+- **Language**: Author source copy in English unless the feature requires another canonical source language. Shipped UI must respect the active locale and must not mix English and translated strings on the same view.
 - **SEO Optimization**: All copy should be SEO-friendly and descriptive
 - **Metadata**: Every page must have appropriate metadata configuration
 
@@ -188,6 +200,8 @@ This project uses Next.js App Router with a `src` directory structure for better
 ### Authentication Flow
 
 Better-Auth handles all authentication through magic links sent via Resend. OAuth providers (Google, GitHub, LinkedIn) are configured but optional. Sessions last 30 days with automatic renewal. User roles: user, admin, super_admin.
+
+- Auth screen loading should be action-scoped: only the button the user triggered should change copy or show an inline spinner. Other auth actions should be disabled to prevent duplicate submissions, but their labels should remain unchanged.
 
 ### Content Management
 

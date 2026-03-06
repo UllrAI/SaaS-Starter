@@ -19,7 +19,7 @@ describe("Product Configuration", () => {
       PRODUCT_TIERS.forEach((tier) => {
         expect(tier).toHaveProperty("id");
         expect(tier).toHaveProperty("name");
-        expect(tier).toHaveProperty("description");
+        expect(tier).toHaveProperty("descriptionId");
         expect(tier).toHaveProperty("isPopular");
         expect(tier).toHaveProperty("features");
         expect(tier).toHaveProperty("pricing");
@@ -28,7 +28,7 @@ describe("Product Configuration", () => {
 
         expect(typeof tier.id).toBe("string");
         expect(typeof tier.name).toBe("string");
-        expect(typeof tier.description).toBe("string");
+        expect(typeof tier.descriptionId).toBe("string");
         expect(typeof tier.isPopular).toBe("boolean");
         expect(Array.isArray(tier.features)).toBe(true);
         expect(typeof tier.pricing).toBe("object");
@@ -77,15 +77,11 @@ describe("Product Configuration", () => {
         expect(tier.features.length).toBeGreaterThan(0);
 
         tier.features.forEach((feature: ProductFeature) => {
-          expect(feature).toHaveProperty("name");
+          expect(feature).toHaveProperty("id");
           expect(feature).toHaveProperty("included");
-          expect(typeof feature.name).toBe("string");
+          expect(typeof feature.id).toBe("string");
           expect(typeof feature.included).toBe("boolean");
-          expect(feature.name.length).toBeGreaterThan(0);
-
-          if (feature.description) {
-            expect(typeof feature.description).toBe("string");
-          }
+          expect(feature.id.length).toBeGreaterThan(0);
         });
       });
     });
@@ -155,7 +151,7 @@ describe("Product Configuration", () => {
       if (tier) {
         expect(tier).toHaveProperty("id", "pro");
         expect(tier).toHaveProperty("name", "Professional");
-        expect(tier).toHaveProperty("description");
+        expect(tier).toHaveProperty("descriptionId", "pro");
         expect(tier).toHaveProperty("isPopular", true);
         expect(tier).toHaveProperty("features");
         expect(tier).toHaveProperty("pricing");
@@ -241,7 +237,7 @@ describe("Product Configuration", () => {
       if (tier) {
         expect(tier).toHaveProperty("id");
         expect(tier).toHaveProperty("name");
-        expect(tier).toHaveProperty("description");
+        expect(tier).toHaveProperty("descriptionId");
         expect(tier).toHaveProperty("isPopular");
         expect(tier).toHaveProperty("features");
         expect(tier).toHaveProperty("pricing");
@@ -255,15 +251,14 @@ describe("Product Configuration", () => {
     it("should export correct TypeScript interfaces", () => {
       // This tests that the types are exportable and structured correctly
       const mockFeature: ProductFeature = {
-        name: "Test Feature",
+        id: "marketing-foundation",
         included: true,
-        description: "Test description",
       };
 
       const mockTier: PricingTier = {
         id: "test",
         name: "Test Tier",
-        description: "Test description",
+        descriptionId: "plus",
         isPopular: false,
         features: [mockFeature],
         pricing: {
@@ -281,17 +276,17 @@ describe("Product Configuration", () => {
         currency: "USD",
       };
 
-      expect(mockFeature.name).toBe("Test Feature");
+      expect(mockFeature.id).toBe("marketing-foundation");
       expect(mockTier.id).toBe("test");
     });
   });
 
   describe("Data integrity", () => {
-    it("should have valid feature names", () => {
+    it("should have valid feature ids", () => {
       const allFeatures = PRODUCT_TIERS.flatMap((tier) => tier.features);
       allFeatures.forEach((feature) => {
-        expect(feature.name.trim()).toBe(feature.name); // No leading/trailing whitespace
-        expect(feature.name).not.toBe(""); // Not empty
+        expect(feature.id.trim()).toBe(feature.id);
+        expect(feature.id).not.toBe("");
       });
     });
 
@@ -309,11 +304,11 @@ describe("Product Configuration", () => {
       });
     });
 
-    it("should have non-empty descriptions", () => {
+    it("should have non-empty description ids", () => {
       PRODUCT_TIERS.forEach((tier) => {
-        expect(tier.description.trim()).toBe(tier.description);
-        expect(tier.description).not.toBe("");
-        expect(tier.description.length).toBeGreaterThan(5);
+        expect(tier.descriptionId.trim()).toBe(tier.descriptionId);
+        expect(tier.descriptionId).not.toBe("");
+        expect(tier.descriptionId.length).toBeGreaterThan(1);
       });
     });
 

@@ -23,7 +23,12 @@ import {
   LogIn,
   Terminal,
 } from "lucide-react";
-import { PRODUCT_TIERS, type PricingTier } from "@/lib/config/products";
+import {
+  PRODUCT_TIERS,
+  type PricingTier,
+  type PricingTierDescriptionId,
+  type ProductFeatureId,
+} from "@/lib/config/products";
 import { useSession } from "@/lib/auth/client";
 import { useRouter } from "nextjs-toploader/app";
 import type { PaymentMode, BillingCycle } from "@/types/billing";
@@ -44,6 +49,99 @@ const formatPrice = (
   }).format(price);
 };
 
+type CopyComponent = React.ComponentType;
+
+const PAYMENT_MODE_LABELS: Record<PaymentMode, CopyComponent> = {
+  subscription: function PricingModeSubscriptionLabel() {
+    return <>Subscription</>;
+  },
+  one_time: function PricingModeOneTimeLabel() {
+    return <>One-Time</>;
+  },
+};
+
+const BILLING_CYCLE_LABELS: Record<BillingCycle, CopyComponent> = {
+  monthly: function BillingCycleMonthlyLabel() {
+    return <>Monthly</>;
+  },
+  yearly: function BillingCycleYearlyLabel() {
+    return <>Yearly</>;
+  },
+};
+
+const TIER_UI_LABELS = {
+  discount: function BillingCycleDiscountLabel() {
+    return <>Save 17%</>;
+  },
+  recommended: function TierBadgeRecommendedLabel() {
+    return <>RECOMMENDED</>;
+  },
+  oneTime: function TierBillingOneTimeLabel() {
+    return <>One-time purchase, no automatic renewal</>;
+  },
+  annually: function TierBillingAnnualLabel() {
+    return <>Billed annually</>;
+  },
+  monthly: function TierBillingMonthlyLabel() {
+    return <>Billed monthly</>;
+  },
+  processing: function TierActionProcessingLabel() {
+    return <>PROCESSING</>;
+  },
+  loginToBuy: function TierActionLoginToBuyLabel() {
+    return <>LOGIN TO BUY</>;
+  },
+  loginAction: function TierToastLoginActionLabel() {
+    return <>Login</>;
+  },
+  managePlanAction: function TierToastManagePlanActionLabel() {
+    return <>Manage Plan</>;
+  },
+} as const;
+
+const TIER_DESCRIPTION_COMPONENTS: Record<
+  PricingTierDescriptionId,
+  CopyComponent
+> = {
+  plus: function TierDescriptionPlus() {
+    return <>Core starter package for solo builders shipping the basics</>;
+  },
+  pro: function TierDescriptionPro() {
+    return <>Full-featured starter package for teams shipping a real MVP</>;
+  },
+  team: function TierDescriptionTeam() {
+    return <>Everything in Professional plus rollout support for teams</>;
+  },
+};
+
+const TIER_FEATURE_COMPONENTS: Record<ProductFeatureId, CopyComponent> = {
+  "marketing-foundation": function TierFeatureMarketingFoundation() {
+    return <>Marketing pages and blog foundation</>;
+  },
+  "auth-dashboard": function TierFeatureAuthDashboard() {
+    return <>Authentication and protected dashboard</>;
+  },
+  "billing-flow": function TierFeatureBillingFlow() {
+    return <>Creem checkout and billing portal flow</>;
+  },
+  "admin-operations": function TierFeatureAdminOperations() {
+    return <>Admin operations screens</>;
+  },
+  "r2-uploads": function TierFeatureR2Uploads() {
+    return <>Cloudflare R2 upload workflows</>;
+  },
+  "localization-setup": function TierFeatureLocalizationSetup() {
+    return <>Localization setup</>;
+  },
+  "implementation-guidance": function TierFeatureImplementationGuidance() {
+    return <>Implementation guidance</>;
+  },
+};
+
+function TierActionGetLabel({ tierName }: { tierName: string }) {
+  return <>GET {tierName.toUpperCase()}</>;
+}
+
 export function PricingSection({ className }: { className?: string }) {
   const intlLocale = useIntlLocale();
   const [paymentMode, setPaymentMode] = useState<PaymentMode>("subscription");
@@ -56,6 +154,19 @@ export function PricingSection({ className }: { className?: string }) {
 
   const { data: session, isPending: isSessionLoading } = useSession();
   const router = useRouter();
+  const SubscriptionLabel = PAYMENT_MODE_LABELS.subscription;
+  const OneTimeLabel = PAYMENT_MODE_LABELS.one_time;
+  const MonthlyLabel = BILLING_CYCLE_LABELS.monthly;
+  const YearlyLabel = BILLING_CYCLE_LABELS.yearly;
+  const DiscountLabel = TIER_UI_LABELS.discount;
+  const RecommendedLabel = TIER_UI_LABELS.recommended;
+  const OneTimeBillingLabel = TIER_UI_LABELS.oneTime;
+  const AnnualBillingLabel = TIER_UI_LABELS.annually;
+  const MonthlyBillingLabel = TIER_UI_LABELS.monthly;
+  const ProcessingLabel = TIER_UI_LABELS.processing;
+  const LoginToBuyLabel = TIER_UI_LABELS.loginToBuy;
+  const LoginActionLabel = TIER_UI_LABELS.loginAction;
+  const ManagePlanActionLabel = TIER_UI_LABELS.managePlanAction;
 
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
@@ -68,9 +179,9 @@ export function PricingSection({ className }: { className?: string }) {
     cycle?: BillingCycle,
   ) => {
     if (!session?.user) {
-      toast.error("Please log in to continue purchase.", {
+      toast.error(<>Please log in to continue purchase.</>, {
         action: {
-          label: "Login",
+          label: <LoginActionLabel />,
           onClick: () => router.push("/login?redirect=/pricing"),
         },
       });
@@ -79,7 +190,7 @@ export function PricingSection({ className }: { className?: string }) {
     }
 
     setLoadingState({ tierId: tier.id, mode, cycle });
-    toast.info("Initializing secure checkout sequence...");
+    toast.info(<>Initializing secure checkout sequence...</>);
 
     let isRedirecting = false;
 
@@ -102,10 +213,11 @@ export function PricingSection({ className }: { className?: string }) {
           window.location,
         );
         toast.error(data.error || "Subscription already active.", {
+          description: undefined,
           ...(safeManagementUrl
             ? {
                 action: {
-                  label: "Manage Plan",
+                  label: <ManagePlanActionLabel />,
                   onClick: () => {
                     window.location.href = safeManagementUrl;
                   },
@@ -160,13 +272,13 @@ export function PricingSection({ className }: { className?: string }) {
               value="subscription"
               className="data-[state=active]:bg-background flex items-center gap-2 text-sm font-medium transition-all data-[state=active]:shadow-sm"
             >
-              <Calendar className="h-4 w-4" /> Subscription
+              <Calendar className="h-4 w-4" /> <SubscriptionLabel />
             </TabsTrigger>
             <TabsTrigger
               value="one_time"
               className="data-[state=active]:bg-background flex items-center gap-2 text-sm font-medium transition-all data-[state=active]:shadow-sm"
             >
-              <CreditCard className="h-4 w-4" /> Lifetime
+              <CreditCard className="h-4 w-4" /> <OneTimeLabel />
             </TabsTrigger>
           </TabsList>
         </Tabs>
@@ -185,7 +297,7 @@ export function PricingSection({ className }: { className?: string }) {
                   : "text-muted-foreground hover:text-foreground",
               )}
             >
-              Monthly
+              <MonthlyLabel />
             </Label>
             <Switch
               id="billing-toggle"
@@ -204,7 +316,7 @@ export function PricingSection({ className }: { className?: string }) {
                   : "text-muted-foreground hover:text-foreground",
               )}
             >
-              Yearly
+              <YearlyLabel />
             </Label>
           </div>
           <div className="flex h-7 items-center justify-center">
@@ -213,7 +325,7 @@ export function PricingSection({ className }: { className?: string }) {
                 variant="outline"
                 className="animate-in fade-in-0 border-emerald-500/30 bg-emerald-500/10 text-emerald-600 duration-300 dark:text-emerald-400"
               >
-                <Zap className="mr-1.5 h-3 w-3" /> Save 17%
+                <Zap className="mr-1.5 h-3 w-3" /> <DiscountLabel />
               </Badge>
             )}
           </div>
@@ -223,6 +335,7 @@ export function PricingSection({ className }: { className?: string }) {
       {/* Pricing Cards */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3 lg:gap-8">
         {PRODUCT_TIERS.map((tier) => {
+          const TierDescription = TIER_DESCRIPTION_COMPONENTS[tier.descriptionId];
           const price =
             paymentMode === "one_time"
               ? tier.prices.oneTime
@@ -250,7 +363,7 @@ export function PricingSection({ className }: { className?: string }) {
               {tier.isPopular && (
                 <div className="absolute -top-3 left-1/2 z-10 -translate-x-1/2">
                   <Badge className="bg-primary text-primary-foreground hover:bg-primary px-3 py-1 text-xs font-bold shadow-sm">
-                    RECOMMENDED
+                    <RecommendedLabel />
                   </Badge>
                 </div>
               )}
@@ -260,7 +373,7 @@ export function PricingSection({ className }: { className?: string }) {
                   {tier.name}
                 </CardTitle>
                 <CardDescription className="text-muted-foreground mx-auto max-w-[200px] text-sm leading-relaxed">
-                  {tier.description}
+                  <TierDescription />
                 </CardDescription>
                 <div className="mt-6 space-y-2">
                   <div className="flex items-baseline justify-center gap-1">
@@ -284,11 +397,11 @@ export function PricingSection({ className }: { className?: string }) {
                   <div className="flex h-5 items-center justify-center">
                     <p className="text-muted-foreground text-xs font-medium uppercase tracking-wide">
                       {paymentMode === "one_time" ? (
-                        <>One-time payment</>
+                        <OneTimeBillingLabel />
                       ) : billingCycle === "yearly" ? (
-                        <>Billed annually</>
+                        <AnnualBillingLabel />
                       ) : (
-                        <>Billed monthly</>
+                        <MonthlyBillingLabel />
                       )}
                     </p>
                   </div>
@@ -298,33 +411,37 @@ export function PricingSection({ className }: { className?: string }) {
               <CardContent className="flex flex-1 flex-col px-6 pt-0 pb-8">
                 <div className="bg-muted/30 mb-6 h-px w-full" />
                 <div className="mb-8 flex-1 space-y-4">
-                  {tier.features.map((feature, index) => (
-                    <div
-                      key={index}
-                      className="group/feature flex items-start gap-3"
-                    >
+                  {tier.features.map((feature, index) => {
+                    const TierFeatureLabel = TIER_FEATURE_COMPONENTS[feature.id];
+
+                    return (
                       <div
-                        className={cn(
-                          "mt-0.5 flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-sm border transition-colors",
-                          feature.included
-                            ? "border-primary/50 bg-primary/10 text-primary"
-                            : "border-muted bg-muted/50 text-muted-foreground",
-                        )}
+                        key={index}
+                        className="group/feature flex items-start gap-3"
                       >
-                        <Check className="h-3 w-3" />
+                        <div
+                          className={cn(
+                            "mt-0.5 flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-sm border transition-colors",
+                            feature.included
+                              ? "border-primary/50 bg-primary/10 text-primary"
+                              : "border-muted bg-muted/50 text-muted-foreground",
+                          )}
+                        >
+                          <Check className="h-3 w-3" />
+                        </div>
+                        <span
+                          className={cn(
+                            "text-sm leading-tight transition-colors",
+                            feature.included
+                              ? "text-foreground"
+                              : "text-muted-foreground line-through opacity-70",
+                          )}
+                        >
+                          <TierFeatureLabel />
+                        </span>
                       </div>
-                      <span
-                        className={cn(
-                          "text-sm leading-tight transition-colors",
-                          feature.included
-                            ? "text-foreground"
-                            : "text-muted-foreground line-through opacity-70",
-                        )}
-                      >
-                        {feature.name}
-                      </span>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
 
                 {!mounted || isSessionLoading ? (
@@ -346,16 +463,16 @@ export function PricingSection({ className }: { className?: string }) {
                     {isLoading ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        PROCESSING
+                        <ProcessingLabel />
                       </>
                     ) : !session?.user ? (
                       <>
                         <LogIn className="mr-2 h-4 w-4" />
-                        LOGIN TO BUY
+                        <LoginToBuyLabel />
                       </>
                     ) : (
                       <>
-                        GET {tier.name.toUpperCase()}
+                        <TierActionGetLabel tierName={tier.name} />
                         <Terminal className="ml-2 h-4 w-4 opacity-50" />
                       </>
                     )}

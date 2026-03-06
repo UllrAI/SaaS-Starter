@@ -175,7 +175,7 @@ export function UploadManagementTable({
     },
     {
       key: "user",
-      label: "User",
+      label: <>User</>,
       render: (upload) => (
         <UserAvatarCell
           name={upload.user.name}
@@ -186,7 +186,7 @@ export function UploadManagementTable({
     },
     {
       key: "fileName",
-      label: "File",
+      label: <>File</>,
       render: (upload) => (
         <div>
           <p className="max-w-xs truncate font-medium">{upload.fileName}</p>
@@ -198,7 +198,7 @@ export function UploadManagementTable({
     },
     {
       key: "createdAt",
-      label: "Uploaded",
+      label: <>Uploaded</>,
       render: (upload) => (
         <p className="text-sm">
           {new Date(upload.createdAt).toLocaleDateString(intlLocale)}
@@ -207,7 +207,7 @@ export function UploadManagementTable({
     },
     {
       key: "actions",
-      label: "Actions",
+      label: <>Actions</>,
       render: (upload) => (
         <div className="flex items-center space-x-1">
           <Button
@@ -239,14 +239,14 @@ export function UploadManagementTable({
   ];
 
   const filterOptions = [
-    { value: "all", label: "All Types" },
-    { value: "image", label: "Images" },
-    { value: "video", label: "Videos" },
-    { value: "audio", label: "Audio" },
-    { value: "pdf", label: "PDF" },
-    { value: "text", label: "Text" },
-    { value: "archive", label: "Archives" },
-    { value: "other", label: "Other" },
+    { value: "all", label: <>All Types</> },
+    { value: "image", label: <>Images</> },
+    { value: "video", label: <>Videos</> },
+    { value: "audio", label: <>Audio</> },
+    { value: "pdf", label: <>PDF</> },
+    { value: "text", label: <>Text</> },
+    { value: "archive", label: <>Archives</> },
+    { value: "other", label: <>Other</> },
   ];
 
   return (

@@ -8,16 +8,24 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { DashboardPageWrapper } from "../../_components/dashboard-page-wrapper";
-import { createMetadata } from "@/lib/metadata";
 import { UserManagementTable } from "./_components/user-management-table";
 import { UserStatsCards } from "./_components/user-stats-cards";
 import { StatsCardsSkeleton } from "../_components/stats-cards-skeleton";
 import { getUsers } from "@/lib/actions/admin";
+import { createLocalizedMetadata } from "@/lib/i18n/page-metadata";
 
-export const metadata = createMetadata({
-  title: "User Management",
-  description: "Manage user accounts, roles, and permissions",
-});
+export async function generateMetadata() {
+  return createLocalizedMetadata({
+    en: {
+      title: "User Management",
+      description: "Manage user accounts, roles, and permissions",
+    },
+    "zh-Hans": {
+      title: "用户管理",
+      description: "管理用户账户、角色与权限。",
+    },
+  });
+}
 
 export default async function UserManagementPage() {
   await requireAdmin();

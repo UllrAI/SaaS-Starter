@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth/server";
 import { createPresignedUrl } from "@/lib/r2";
-import { db } from "@/database";
-import { uploads } from "@/database/schema";
 import {
   isFileTypeAllowed,
   isFileSizeAllowed,
@@ -65,22 +63,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: result.error }, { status: 400 });
     }
 
-    // 5. 在数据库中存储待上传记录 (pending status)
-    // 注意：这里的状态是隐式的。上传成功后，客户端不需再通知服务端。
-    // 如果需要更严格的上传状态管理（例如，确认上传完成），则需要额外的步骤。
-    if (result.key && result.publicUrl) {
-      await db.insert(uploads).values({
-        userId: session.user.id,
-        fileKey: result.key,
-        url: result.publicUrl,
-        fileName,
-        fileSize: size,
-        contentType,
-        // status: 'pending' // 可以添加一个状态字段
-      });
-    }
-
-    // 6. 返回预签名 URL 给客户端
+    // 5. 返回预签名 URL 给客户端。上传完成后由单独的 complete 接口入库。
     return NextResponse.json({
       presignedUrl: result.presignedUrl,
       publicUrl: result.publicUrl,

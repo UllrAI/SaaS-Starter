@@ -29,6 +29,7 @@ jest.mock("@aws-sdk/client-s3", () => ({
   S3Client: jest.fn().mockImplementation(() => ({
     send: mockSend,
   })),
+  HeadObjectCommand: jest.fn(),
   PutObjectCommand: jest.fn(),
   GetObjectCommand: jest.fn(),
   DeleteObjectCommand: jest.fn(),
@@ -331,6 +332,27 @@ describe("R2 Storage Functions", () => {
       expect(result.error).toBe("Delete failed");
 
       consoleSpy.mockRestore();
+    });
+  });
+
+  describe("fileExists", () => {
+    it("should return true when the object exists", async () => {
+      const { fileExists } = await import("./r2");
+
+      mockSend.mockResolvedValueOnce({});
+
+      await expect(fileExists("test-key")).resolves.toBe(true);
+    });
+
+    it("should return false when the object is missing", async () => {
+      const { fileExists } = await import("./r2");
+
+      mockSend.mockRejectedValueOnce({
+        name: "NotFound",
+        $metadata: { httpStatusCode: 404 },
+      });
+
+      await expect(fileExists("missing-key")).resolves.toBe(false);
     });
   });
 

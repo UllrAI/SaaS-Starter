@@ -12,6 +12,7 @@ export const LOCALE_HEADER_NAME = "x-user-locale";
 const DEFAULT_LOCALE = SOURCE_LOCALE;
 
 const MARKETING_ROUTE_PREFIXES = [
+  "/features",
   "/about",
   "/pricing",
   "/blog",

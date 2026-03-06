@@ -29,7 +29,7 @@ interface TableColumn<T> {
 
 interface FilterOption {
   value: string;
-  label: string;
+  label: ReactNode;
 }
 
 interface PaginationData {

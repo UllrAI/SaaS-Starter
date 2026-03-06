@@ -1,5 +1,3 @@
-"use client";
-
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/logo";
@@ -8,9 +6,9 @@ import Link from "next/link";
 
 export function CallToAction() {
   const proofPoints = [
-    { id: "production-ready", label: <>Production ready</> },
-    { id: "soc2-friendly", label: <>SOC2-friendly</> },
-    { id: "zero-setup-fees", label: <>Zero setup fees</> },
+    { id: "typed", label: <>Type-safe data flow</> },
+    { id: "self-hosted", label: <>Self-hosted by default</> },
+    { id: "extensible", label: <>Built to customize</> },
   ];
 
   return (
@@ -23,15 +21,16 @@ export function CallToAction() {
 
           <div className="mx-auto mt-10 max-w-3xl space-y-6">
             <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase">
-              <>Launch your SaaS in hours</>
+              <>Ship the foundation first</>
             </p>
             <h2 className="text-foreground text-4xl font-bold tracking-tight sm:text-5xl">
-              <>Everything you need to ship a Micro SaaS</>
+              <>Start from a working product shell, not a blank repo</>
             </h2>
             <p className="text-muted-foreground text-lg leading-relaxed sm:text-xl">
               <>
-                Auth, billing, and marketing pages already wired together so
-                your next release can focus on the product, not the scaffolding.
+                The starter gives you auth, billing, uploads, admin pages, and
+                content scaffolding so your next sprint can focus on product
+                logic and customer workflows.
               </>
             </p>
           </div>
@@ -52,7 +51,7 @@ export function CallToAction() {
               asChild
             >
               <Link href="/pricing">
-                <>Start free trial</>
+                <>View pricing</>
                 <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Link>
             </Button>
@@ -70,7 +69,10 @@ export function CallToAction() {
           </div>
 
           <p className="text-muted-foreground mt-6 text-sm">
-            <>Cancel anytime • Keep your code • Works with your current stack</>
+            <>
+              Own the codebase, keep the architecture, and adapt the pieces you
+              actually need.
+            </>
           </p>
         </div>
       </div>

@@ -14,23 +14,27 @@ interface ModeToggleProps {
 }
 
 const THEME_ORDER = ["light", "dark", "system"] as const;
+type ThemeKey = (typeof THEME_ORDER)[number];
 
-const THEME_META = {
-  light: {
-    label: "Light",
-    icon: <Sun className="h-[1.2rem] w-[1.2rem] transition-all" />,
+const THEME_LABELS: Record<ThemeKey, React.ComponentType> = {
+  light: function ThemeLabelLight() {
+    return <>Light</>;
   },
-  dark: {
-    label: "Dark",
-    icon: <Moon className="h-[1.2rem] w-[1.2rem] transition-all" />,
+  dark: function ThemeLabelDark() {
+    return <>Dark</>;
   },
-  system: {
-    label: "System",
-    icon: <Monitor className="h-[1.2rem] w-[1.2rem] transition-all" />,
+  system: function ThemeLabelSystem() {
+    return <>System</>;
   },
-} as const;
+};
 
-function resolveTheme(theme: string | undefined): keyof typeof THEME_META {
+const THEME_ICONS: Record<ThemeKey, React.ComponentType<{ className?: string }>> = {
+  light: Sun,
+  dark: Moon,
+  system: Monitor,
+};
+
+function resolveTheme(theme: string | undefined): ThemeKey {
   return theme === "light" || theme === "dark" ? theme : "system";
 }
 
@@ -55,13 +59,19 @@ export function ModeToggle({
   };
 
   const activeTheme = resolveTheme(theme);
-  const themeMeta = THEME_META[activeTheme];
+  const ActiveThemeLabel = THEME_LABELS[activeTheme];
+  const ActiveThemeIcon = THEME_ICONS[activeTheme];
+  const FallbackThemeLabel = THEME_LABELS.light;
 
   if (!mounted) {
     return (
       <Button variant={variant} size={size} className={className} disabled>
         <Sun className="h-[1.2rem] w-[1.2rem]" />
-        {showLabel && <span className="ml-2">Light</span>}
+        {showLabel && (
+          <span className="ml-2">
+            <FallbackThemeLabel />
+          </span>
+        )}
       </Button>
     );
   }
@@ -72,10 +82,13 @@ export function ModeToggle({
       size={size}
       className={className}
       onClick={cycleTheme}
-      title={`Current theme: ${themeMeta.label}. Click to cycle themes.`}
     >
-      {themeMeta.icon}
-      {showLabel && <span className="ml-2">{themeMeta.label}</span>}
+      <ActiveThemeIcon className="h-[1.2rem] w-[1.2rem] transition-all" />
+      {showLabel && (
+        <span className="ml-2">
+          <ActiveThemeLabel />
+        </span>
+      )}
       <span className="sr-only">Toggle theme</span>
     </Button>
   );

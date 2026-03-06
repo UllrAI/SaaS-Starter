@@ -22,6 +22,7 @@ interface PaymentManagementTableProps {
 }
 
 type BadgeVariant = ComponentProps<typeof Badge>["variant"];
+type CopyComponent = React.ComponentType;
 
 const STATUS_BADGE_VARIANT_MAP: Record<string, BadgeVariant> = {
   succeeded: "secondary",
@@ -32,6 +33,39 @@ const STATUS_BADGE_VARIANT_MAP: Record<string, BadgeVariant> = {
 
 const getStatusBadgeVariant = (status: string) => {
   return STATUS_BADGE_VARIANT_MAP[status] ?? "secondary";
+};
+
+const PAYMENT_STATUS_LABELS: Record<string, CopyComponent> = {
+  succeeded: function PaymentStatusSucceededLabel() {
+    return <>Succeeded</>;
+  },
+  pending: function PaymentStatusPendingLabel() {
+    return <>Pending</>;
+  },
+  failed: function PaymentStatusFailedLabel() {
+    return <>Failed</>;
+  },
+  canceled: function PaymentStatusCanceledLabel() {
+    return <>Canceled</>;
+  },
+};
+
+const PAYMENT_METHOD_LABELS: Record<string, CopyComponent> = {
+  subscription: function PaymentMethodSubscriptionLabel() {
+    return <>Subscription</>;
+  },
+  one_time: function PaymentMethodOneTimeLabel() {
+    return <>One-time Payment</>;
+  },
+  card: function PaymentMethodCardLabel() {
+    return <>Credit Card</>;
+  },
+  bank_transfer: function PaymentMethodBankTransferLabel() {
+    return <>Bank Transfer</>;
+  },
+  paypal: function PaymentMethodPayPalLabel() {
+    return <>PayPal</>;
+  },
 };
 
 const formatCurrency = (amount: number, currency: string, locale: string) => {
@@ -55,27 +89,16 @@ const openProviderPayment = (paymentId: string) => {
   window.open(`https://www.creem.io/dashboard/payments/${paymentId}`, "_blank");
 };
 
-const getPaymentMethodLabel = (paymentType: string) => {
-  const map: Record<string, string> = {
-    subscription: "Subscription",
-    one_time: "One-time Payment",
-    card: "Credit Card",
-    bank_transfer: "Bank Transfer",
-    paypal: "PayPal",
-  };
-  return map[paymentType] || "Unknown";
-};
-
 const createColumns = (
   locale: string,
 ): Array<{
   key: keyof PaymentWithUser | string;
-  label: string;
+  label: ReactNode;
   render?: (item: PaymentWithUser) => ReactNode;
 }> => [
   {
     key: "user",
-    label: "User",
+    label: <>User</>,
     render: (payment) => (
       <UserAvatarCell
         name={payment.user?.name}
@@ -86,7 +109,7 @@ const createColumns = (
   },
   {
     key: "amount",
-    label: "Amount",
+    label: <>Amount</>,
     render: (payment) => (
       <div className="font-medium">
         {formatCurrency(payment.amount, payment.currency, locale)}
@@ -95,33 +118,49 @@ const createColumns = (
   },
   {
     key: "status",
-    label: "Status",
-    render: (payment) => (
-      <Badge
-        variant={getStatusBadgeVariant(payment.status)}
-        className="capitalize"
-      >
-        {payment.status}
-      </Badge>
-    ),
+    label: <>Status</>,
+    render: (payment) => {
+      const PaymentStatusLabel =
+        PAYMENT_STATUS_LABELS[payment.status] ??
+        function PaymentStatusFallbackLabel() {
+          return <>Unknown</>;
+        };
+
+      return (
+        <Badge
+          variant={getStatusBadgeVariant(payment.status)}
+          className="capitalize"
+        >
+          <PaymentStatusLabel />
+        </Badge>
+      );
+    },
   },
   {
     key: "method",
-    label: "Method",
-    render: (payment) => (
-      <div className="text-sm">
-        {getPaymentMethodLabel(payment.paymentType)}
-      </div>
-    ),
+    label: <>Method</>,
+    render: (payment) => {
+      const PaymentMethodLabel =
+        PAYMENT_METHOD_LABELS[payment.paymentType] ??
+        function PaymentMethodFallbackLabel() {
+          return <>Unknown</>;
+        };
+
+      return (
+        <div className="text-sm">
+          <PaymentMethodLabel />
+        </div>
+      );
+    },
   },
   {
     key: "created",
-    label: "Created",
+    label: <>Created</>,
     render: (payment) => formatDate(payment.createdAt, locale),
   },
   {
     key: "actions",
-    label: "Actions",
+    label: <>Actions</>,
     render: (payment) => (
       <Button
         variant="ghost"
@@ -136,11 +175,11 @@ const createColumns = (
 ];
 
 const statusFilterOptions = [
-  { value: "all", label: "All Statuses" },
-  { value: "succeeded", label: "Succeeded" },
-  { value: "pending", label: "Pending" },
-  { value: "failed", label: "Failed" },
-  { value: "canceled", label: "Canceled" },
+  { value: "all", label: <>All Statuses</> },
+  { value: "succeeded", label: <>Succeeded</> },
+  { value: "pending", label: <>Pending</> },
+  { value: "failed", label: <>Failed</> },
+  { value: "canceled", label: <>Canceled</> },
 ];
 
 export function PaymentManagementTable({

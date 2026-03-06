@@ -1,61 +1,57 @@
-/**
- * 定义产品特性
- */
+export type ProductFeatureId =
+  | "marketing-foundation"
+  | "auth-dashboard"
+  | "billing-flow"
+  | "admin-operations"
+  | "r2-uploads"
+  | "localization-setup"
+  | "implementation-guidance";
+
+export type PricingTierDescriptionId = "plus" | "pro" | "team";
+
 export interface ProductFeature {
-  name: string;
+  id: ProductFeatureId;
   included: boolean;
-  description?: string;
 }
 
-/**
- * 定义一个定价套餐
- */
 export interface PricingTier {
-  id: string; // 我们系统内部的套餐 ID，如 'free', 'pro', 'enterprise'
+  id: string;
   name: string;
-  description: string;
+  descriptionId: PricingTierDescriptionId;
   isPopular: boolean;
   features: ProductFeature[];
   pricing: {
-    // 针对不同支付提供商的产品ID
     creem: {
       oneTime: string;
       monthly: string;
       yearly: string;
     };
-    // stripe: { ... }; // 为未来扩展预留
   };
   prices: {
     oneTime: number;
     monthly: number;
     yearly: number;
   };
-  currency: "USD" | "EUR"; // 支持的货币
+  currency: "USD" | "EUR";
 }
 
-/**
- * 统一定义所有产品套餐
- * 每个计费模式 (one_time, monthly, yearly) 都需要一个唯一的产品ID。
- */
 export const PRODUCT_TIERS: PricingTier[] = [
   {
     id: "plus",
     name: "Plus",
-    description: "Best for growing teams and businesses",
+    descriptionId: "plus",
     isPopular: false,
     features: [
-      { name: "Unlimited projects", included: true },
-      { name: "Advanced analytics", included: true },
-      { name: "Priority support", included: true },
-      { name: "10GB storage", included: false },
-      { name: "Team collaboration", included: false },
-      { name: "API access", included: false },
-      { name: "Dedicated support", included: false },
-      { name: "Advanced security", included: false },
+      { id: "marketing-foundation", included: true },
+      { id: "auth-dashboard", included: true },
+      { id: "billing-flow", included: true },
+      { id: "admin-operations", included: false },
+      { id: "r2-uploads", included: false },
+      { id: "localization-setup", included: false },
+      { id: "implementation-guidance", included: false },
     ],
     pricing: {
       creem: {
-        // 示例ID, 请替换
         oneTime: "prod_1HVwfBIaKkJh9CgS7zD37h",
         monthly: "prod_6uhcfBUcRxprqDvep0U5Jw",
         yearly: "prod_7LJkGVgv4LOBuucrxANo2b",
@@ -71,21 +67,19 @@ export const PRODUCT_TIERS: PricingTier[] = [
   {
     id: "pro",
     name: "Professional",
-    description: "Best for growing teams and businesses",
+    descriptionId: "pro",
     isPopular: true,
     features: [
-      { name: "Unlimited projects", included: true },
-      { name: "Advanced analytics", included: true },
-      { name: "Priority support", included: true },
-      { name: "10GB storage", included: true },
-      { name: "Team collaboration", included: true },
-      { name: "API access", included: true },
-      { name: "Dedicated support", included: false },
-      { name: "Advanced security", included: false },
+      { id: "marketing-foundation", included: true },
+      { id: "auth-dashboard", included: true },
+      { id: "billing-flow", included: true },
+      { id: "admin-operations", included: true },
+      { id: "r2-uploads", included: true },
+      { id: "localization-setup", included: true },
+      { id: "implementation-guidance", included: false },
     ],
     pricing: {
       creem: {
-        // 示例ID, 请替换
         oneTime: "prod_6uhcfBUcRxprqDvep0U5Jw",
         monthly: "prod_6uhcfBUcRxprqDvep0U5Jw",
         yearly: "prod_6uhcfBUcRxprqDvep0U5Jw",
@@ -101,21 +95,19 @@ export const PRODUCT_TIERS: PricingTier[] = [
   {
     id: "team",
     name: "Team",
-    description: "Best for growing teams and businesses",
+    descriptionId: "team",
     isPopular: false,
     features: [
-      { name: "Unlimited projects", included: true },
-      { name: "Advanced analytics", included: true },
-      { name: "Priority support", included: true },
-      { name: "10GB storage", included: true },
-      { name: "Team collaboration", included: true },
-      { name: "API access", included: true },
-      { name: "Dedicated support", included: true },
-      { name: "Advanced security", included: true },
+      { id: "marketing-foundation", included: true },
+      { id: "auth-dashboard", included: true },
+      { id: "billing-flow", included: true },
+      { id: "admin-operations", included: true },
+      { id: "r2-uploads", included: true },
+      { id: "localization-setup", included: true },
+      { id: "implementation-guidance", included: true },
     ],
     pricing: {
       creem: {
-        // 示例ID, 请替换
         oneTime: "prod_6uhcfBUcRxprqDvep0U5Jw",
         monthly: "prod_6uhcfBUcRxprqDvep0U5Jw",
         yearly: "prod_6uhcfBUcRxprqDvep0U5Jw",
@@ -128,23 +120,12 @@ export const PRODUCT_TIERS: PricingTier[] = [
     },
     currency: "USD",
   },
-  // 可以添加更多套餐...
 ];
 
-/**
- * 根据内部套餐 ID 获取套餐详情
- * @param id - 套餐 ID ('pro', 'enterprise'等)
- * @returns PricingTier | undefined
- */
 export const getProductTierById = (id: string): PricingTier | undefined => {
   return PRODUCT_TIERS.find((tier) => tier.id === id);
 };
 
-/**
- * 根据支付提供商的产品ID反查套餐详情
- * @param productId - 支付提供商的产品 ID
- * @returns PricingTier | undefined
- */
 export const getProductTierByProductId = (
   productId: string,
 ): PricingTier | undefined => {
@@ -153,5 +134,6 @@ export const getProductTierByProductId = (
       return tier;
     }
   }
+
   return undefined;
 };

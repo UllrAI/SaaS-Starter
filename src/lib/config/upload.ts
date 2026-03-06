@@ -180,3 +180,14 @@ export const presignedUrlRequestSchema = z.object({
   contentType: z.string().min(1, "Content type cannot be empty."),
   size: z.number().positive("File size must be positive."),
 });
+
+export const uploadCompleteRequestSchema = z.object({
+  fileName: z
+    .string()
+    .min(1, "File name cannot be empty.")
+    .max(255, "File name is too long."),
+  contentType: z.string().min(1, "Content type cannot be empty."),
+  size: z.number().positive("File size must be positive."),
+  key: z.string().min(1, "Upload key cannot be empty."),
+  url: z.string().url("Upload URL must be valid."),
+});

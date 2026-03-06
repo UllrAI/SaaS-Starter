@@ -41,6 +41,29 @@ interface UserManagementTableProps {
   };
 }
 
+type CopyComponent = React.ComponentType;
+
+const ROLE_LABELS: Record<UserRole, CopyComponent> = {
+  user: function RoleUserLabel() {
+    return <>User</>;
+  },
+  admin: function RoleAdminLabel() {
+    return <>Admin</>;
+  },
+  super_admin: function RoleSuperAdminLabel() {
+    return <>Super Admin</>;
+  },
+};
+
+function RoleLabel({ role }: { role: UserRole }) {
+  const LabelComponent = ROLE_LABELS[role];
+  return <LabelComponent />;
+}
+
+function EmailStatusLabel({ verified }: { verified: boolean | null }) {
+  return verified ? <>Verified</> : <>Unverified</>;
+}
+
 export function UserManagementTable({
   initialData,
   initialPagination,
@@ -104,7 +127,7 @@ export function UserManagementTable({
         setEditingUser(null);
         refresh();
       } else if (result.serverError || result.validationErrors) {
-        toast.error(result.serverError || "Validation failed.");
+        toast.error(result.serverError || <>Validation failed.</>);
       }
     });
   };
@@ -119,12 +142,12 @@ export function UserManagementTable({
 
   const columns: Array<{
     key: keyof UserWithSubscription | string;
-    label: string;
+    label: ReactNode;
     render?: (item: UserWithSubscription) => ReactNode;
   }> = [
     {
       key: "user",
-      label: "User",
+      label: <>User</>,
       render: (user) => (
         <UserAvatarCell
           name={user.name}
@@ -135,7 +158,7 @@ export function UserManagementTable({
     },
     {
       key: "role",
-      label: "Role",
+      label: <>Role</>,
       render: (user) => (
         <Badge
           className="capitalize"
@@ -145,27 +168,27 @@ export function UserManagementTable({
               : "outline"
           }
         >
-          {user.role}
+          <RoleLabel role={user.role as UserRole} />
         </Badge>
       ),
     },
     {
       key: "status",
-      label: "Email Status",
+      label: <>Email Status</>,
       render: (user) => (
         <Badge variant={user.emailVerified ? "outline" : "default"}>
-          {user.emailVerified ? "Verified" : "Unverified"}
+          <EmailStatusLabel verified={user.emailVerified} />
         </Badge>
       ),
     },
     {
       key: "createdAt",
-      label: "Joined",
+      label: <>Joined</>,
       render: (user) => formatDate(user.createdAt),
     },
     {
       key: "actions",
-      label: "Actions",
+      label: <>Actions</>,
       render: (user) => (
         <Button variant="ghost" size="sm" onClick={() => handleEditUser(user)}>
           <Edit className="h-4 w-4" />
@@ -175,10 +198,10 @@ export function UserManagementTable({
   ];
 
   const roleFilterOptions = [
-    { value: "all", label: "All Roles" },
+    { value: "all", label: <>All Roles</> },
     ...userRoleEnum.enumValues.map((role) => ({
       value: role,
-      label: role.replace("_", " ").replace(/\b\w/g, (l) => l.toUpperCase()),
+      label: <RoleLabel role={role as UserRole} />,
     })),
   ];
 
@@ -240,7 +263,7 @@ export function UserManagementTable({
                   <SelectContent>
                     {userRoleEnum.enumValues.map((role) => (
                       <SelectItem key={role} value={role}>
-                        {role.replace("_", " ").toUpperCase()}
+                        <RoleLabel role={role as UserRole} />
                       </SelectItem>
                     ))}
                   </SelectContent>

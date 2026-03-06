@@ -1,13 +1,13 @@
 import "@/styles/globals.css";
 import Script from "next/script";
 import { Inter, JetBrains_Mono } from "next/font/google";
-import { createMetadata } from "@/lib/metadata";
 import { APP_NAME, COMPANY_NAME } from "@/lib/config/constants";
 import env from "@/env";
 
 import { LingoProvider } from "@lingo.dev/compiler/react/next";
-import { getServerLocale } from "@lingo.dev/compiler/virtual/locale/server";
 import { AppProviders } from "@/components/app-providers";
+import { createLocalizedMetadata } from "@/lib/i18n/page-metadata";
+import { getRequestLocale } from "@/lib/i18n/server-locale";
 
 const fontSans = Inter({
   subsets: ["latin"],
@@ -21,41 +21,69 @@ const fontMono = JetBrains_Mono({
   display: "swap",
 });
 
-export const metadata = createMetadata({
-  title: {
-    template: `%s | ${APP_NAME}`,
-    default: `${APP_NAME}`,
-  },
-  description:
-    "Complete Micro UllrAI SaaS starter with authentication, payments, database, and deployment.",
-  applicationName: APP_NAME,
-  authors: [{ name: COMPANY_NAME, url: env.NEXT_PUBLIC_APP_URL }],
-  creator: COMPANY_NAME,
-  publisher: COMPANY_NAME,
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      "max-video-preview": -1,
-      "max-image-preview": "large",
-      "max-snippet": -1,
+export async function generateMetadata() {
+  return createLocalizedMetadata({
+    en: {
+      title: {
+        template: `%s | ${APP_NAME}`,
+        default: `${APP_NAME}`,
+      },
+      description:
+        "Complete Micro UllrAI SaaS starter with authentication, payments, database, and deployment.",
+      applicationName: APP_NAME,
+      authors: [{ name: COMPANY_NAME, url: env.NEXT_PUBLIC_APP_URL }],
+      creator: COMPANY_NAME,
+      publisher: COMPANY_NAME,
+      robots: {
+        index: true,
+        follow: true,
+        googleBot: {
+          index: true,
+          follow: true,
+          "max-video-preview": -1,
+          "max-image-preview": "large",
+          "max-snippet": -1,
+        },
+      },
+      alternates: {
+        canonical: env.NEXT_PUBLIC_APP_URL,
+      },
     },
-  },
-  alternates: {
-    canonical: env.NEXT_PUBLIC_APP_URL,
-  },
-  // themeColor: [], // Will add later if specific theme colors are defined
-  // manifest: "/manifest.json", // Will add later if PWA is implemented
-});
+    "zh-Hans": {
+      title: {
+        template: `%s | ${APP_NAME}`,
+        default: `${APP_NAME}`,
+      },
+      description:
+        "面向自托管产品团队的 UllrAI 微型 SaaS 启动套件，内置身份验证、支付、数据库与部署基础。",
+      applicationName: APP_NAME,
+      authors: [{ name: COMPANY_NAME, url: env.NEXT_PUBLIC_APP_URL }],
+      creator: COMPANY_NAME,
+      publisher: COMPANY_NAME,
+      robots: {
+        index: true,
+        follow: true,
+        googleBot: {
+          index: true,
+          follow: true,
+          "max-video-preview": -1,
+          "max-image-preview": "large",
+          "max-snippet": -1,
+        },
+      },
+      alternates: {
+        canonical: env.NEXT_PUBLIC_APP_URL,
+      },
+    },
+  });
+}
 
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const locale = await getServerLocale();
+  const locale = await getRequestLocale();
 
   return (
     <html

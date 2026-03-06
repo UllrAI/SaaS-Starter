@@ -1,11 +1,11 @@
 export const LOCALE_CONFIG = {
   en: {
     flag: "🇺🇸",
-    label: "English",
+    nativeName: "English",
   },
   "zh-Hans": {
     flag: "🇨🇳",
-    label: "简体中文",
+    nativeName: "简体中文",
   },
 } as const;
 
@@ -23,10 +23,26 @@ export const TARGET_LOCALES = SUPPORTED_LOCALES.filter(
 
 export type LocaleDisplayInfo = (typeof LOCALE_CONFIG)[SupportedLocale];
 
+function getLocaleNativeName(locale: string): string {
+  const normalized = locale.trim().replace("_", "-");
+  if (!normalized) {
+    return locale.toUpperCase();
+  }
+
+  try {
+    const displayNames = new Intl.DisplayNames([normalized], {
+      type: "language",
+    });
+    return displayNames.of(normalized) ?? normalized.toUpperCase();
+  } catch {
+    return normalized.toUpperCase();
+  }
+}
+
 export function getLocaleDisplayInfo(locale: string): LocaleDisplayInfo {
   return (
     LOCALE_CONFIG[locale as SupportedLocale] ?? {
-      label: locale.toUpperCase(),
+      nativeName: getLocaleNativeName(locale),
     }
   );
 }

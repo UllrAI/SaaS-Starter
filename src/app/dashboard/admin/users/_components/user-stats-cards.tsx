@@ -1,11 +1,11 @@
 import { StatCard } from "@/components/admin/StatCard";
 import { Users, UserCheck, Shield, UserX } from "lucide-react";
 import { getUserStats } from "@/lib/admin/stats";
-import { getServerLocale } from "@lingo.dev/compiler/virtual/locale/server";
+import { getRequestLocale } from "@/lib/i18n/server-locale";
 
 export async function UserStatsCards() {
   const [locale, stats] = await Promise.all([
-    getServerLocale(),
+    getRequestLocale(),
     getUserStats(),
   ]);
 

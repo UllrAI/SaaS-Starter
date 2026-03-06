@@ -1,20 +1,19 @@
 "use client";
-
-import * as React from "react";
+import Link from "next/link";
 import {
-  Home,
-  Settings,
-  Upload,
-  Shield,
-  Users,
-  CreditCard,
   BarChart3,
-  Wallet,
+  CreditCard,
+  Home,
   LucideIcon,
+  Settings,
+  Shield,
+  Upload,
+  Users,
+  Wallet,
 } from "lucide-react";
+import { usePathname } from "next/navigation";
 import { APP_NAME } from "@/lib/config/constants";
 import { isAdminRole } from "@/lib/config/roles";
-
 import {
   Sidebar,
   SidebarContent,
@@ -28,8 +27,6 @@ import {
   SidebarRail,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { usePathname } from "next/navigation";
-import { useRouter } from "nextjs-toploader/app";
 import { UserButton } from "./user-btn";
 import { Logo } from "@/components/logo";
 import { cn } from "@/lib/utils";
@@ -130,7 +127,6 @@ interface MenuItemProps {
 }
 
 function SidebarMenuLink({ item, pathname, allItems }: MenuItemProps) {
-  const router = useRouter();
   const itemMatchMode = item.matchMode || "exact";
   const Label = item.Label;
   const label = <Label />;
@@ -147,23 +143,15 @@ function SidebarMenuLink({ item, pathname, allItems }: MenuItemProps) {
       : pathname.startsWith(otherItem.url);
   });
 
-  const maxMatchLength = Math.max(...matchingItems.map((i) => i.url.length));
-
+  const maxMatchLength = Math.max(...matchingItems.map((navItem) => navItem.url.length));
   const isActive = isMatch && item.url.length === maxMatchLength;
 
-  const handleClick = () => {
-    router.push(item.url);
-  };
-
   return (
-    <SidebarMenuButton
-      isActive={isActive}
-      tooltip={{ children: label }}
-      className="w-full cursor-pointer"
-      onClick={handleClick}
-    >
-      <item.icon className="size-4" />
-      <span>{label}</span>
+    <SidebarMenuButton asChild isActive={isActive} tooltip={{ children: label }}>
+      <Link href={item.url}>
+        <item.icon className="size-4" />
+        <span>{label}</span>
+      </Link>
     </SidebarMenuButton>
   );
 }
@@ -186,11 +174,7 @@ function SidebarSection({ title, items, pathname }: MenuSectionProps) {
         <SidebarMenu>
           {items.map((item) => (
             <SidebarMenuItem key={item.id}>
-              <SidebarMenuLink
-                item={item}
-                pathname={pathname}
-                allItems={items}
-              />
+              <SidebarMenuLink item={item} pathname={pathname} allItems={items} />
             </SidebarMenuItem>
           ))}
         </SidebarMenu>
@@ -201,7 +185,6 @@ function SidebarSection({ title, items, pathname }: MenuSectionProps) {
 
 export function AppSidebar() {
   const pathname = usePathname();
-  const router = useRouter();
   const { open } = useSidebar();
   const { data: session } = useSession();
 
@@ -219,10 +202,6 @@ export function AppSidebar() {
     };
   };
 
-  const handleLogoClick = () => {
-    router.push("/");
-  };
-
   return (
     <Sidebar collapsible="icon" variant="inset">
       <SidebarHeader
@@ -231,26 +210,20 @@ export function AppSidebar() {
           open ? "px-4" : "justify-center",
         )}
       >
-        <button onClick={handleLogoClick} className="cursor-pointer">
+        <Link href="/" className="flex items-center gap-2">
           <Logo className="m-0 size-5 p-1" />
-        </button>
-        {open && <span className="text-base font-semibold">{APP_NAME}</span>}
+          {open && <span className="text-base font-semibold">{APP_NAME}</span>}
+        </Link>
       </SidebarHeader>
-      <SidebarContent className="">
-        <SidebarSection
-          title={undefined}
-          items={navigation}
-          pathname={pathname}
-        />
+      <SidebarContent>
+        <SidebarSection title={undefined} items={navigation} pathname={pathname} />
 
         {showAdminSections && (
-          <>
-            <SidebarSection
-              title={open ? <SidebarLabelAdmin /> : undefined}
-              items={adminNavigation}
-              pathname={pathname}
-            />
-          </>
+          <SidebarSection
+            title={open ? <SidebarLabelAdmin /> : undefined}
+            items={adminNavigation}
+            pathname={pathname}
+          />
         )}
       </SidebarContent>
       <SidebarFooter className="border-sidebar-divider border-t p-2">

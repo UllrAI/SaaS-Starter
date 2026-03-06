@@ -1,10 +1,9 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
-import Link from "next/link";
 import { useRouter } from "nextjs-toploader/app";
 import { toast } from "sonner";
-import { CalendarClock, CreditCard, Loader2, ReceiptText } from "lucide-react";
+import { CalendarClock, Loader2, ReceiptText } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {

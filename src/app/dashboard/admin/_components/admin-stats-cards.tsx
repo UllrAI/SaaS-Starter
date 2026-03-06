@@ -1,30 +1,24 @@
-"use client";
-
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Shield,
-  Users,
-  CreditCard,
-  Upload,
-  AlertTriangle,
-  TrendingUp,
-} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatFileSize } from "@/lib/config/upload";
-import { useIntlLocale } from "@/hooks/use-intl-locale";
+import { resolveIntlLocale } from "@/lib/locale";
+import {
+  CreditCard,
+  Shield,
+  TrendingUp,
+  Upload,
+  Users,
+} from "lucide-react";
 
-// This type is also used by lib/admin/stats.ts
 export interface AdminStats {
   users: {
     total: number;
     verified: number;
-
     admins: number;
   };
   subscriptions: {
     total: number;
     active: number;
-
     canceled: number;
   };
   payments: {
@@ -39,26 +33,12 @@ export interface AdminStats {
 }
 
 interface AdminStatsCardsProps {
-  initialStats: AdminStats;
+  stats: AdminStats;
+  locale: string;
 }
 
-export function AdminStatsCards({ initialStats }: AdminStatsCardsProps) {
-  const intlLocale = useIntlLocale();
-
-  if (!initialStats) {
-    return (
-      <Card>
-        <CardContent className="p-6">
-          <div className="text-destructive flex items-center space-x-2">
-            <AlertTriangle className="h-4 w-4" />
-            <span>Failed to load statistics</span>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  const stats = initialStats;
+export function AdminStatsCards({ stats, locale }: AdminStatsCardsProps) {
+  const intlLocale = resolveIntlLocale(locale);
 
   const formatStatsCurrency = (amountInCents: number) =>
     new Intl.NumberFormat(intlLocale, {

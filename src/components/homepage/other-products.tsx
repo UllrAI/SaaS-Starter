@@ -1,95 +1,83 @@
-"use client";
-
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
   ExternalLink,
-  Image,
-  Zap,
   FileText,
-  TrendingUp,
-  Square,
-  Sparkles,
   FlaskConical,
+  Image,
+  Sparkles,
+  Square,
+  TrendingUp,
+  Zap,
 } from "lucide-react";
 
 interface Product {
   id: string;
   name: string;
-  description: React.ReactNode;
+  Description: React.ComponentType;
   url: string;
   icon: React.ComponentType<{ className?: string }>;
-  badge?: React.ReactNode;
+  BadgeLabel?: React.ComponentType;
 }
 
 const products: Product[] = [
   {
     id: "pixmiller",
     name: "PixMiller",
-    description: (
-      <>
-        Remove backgrounds in seconds with AI precision - no design skills
-        needed
-      </>
-    ),
+    Description: function ProductDescriptionPixMiller() {
+      return <>Remove backgrounds in seconds with AI-assisted image cleanup.</>;
+    },
     url: "https://pixmiller.com/",
     icon: Image,
   },
   {
     id: "headshots-fun",
     name: "HeadShots.fun",
-    description: (
-      <>
-        Generate professional headshots instantly - perfect for LinkedIn,
-        resumes & more
-      </>
-    ),
+    Description: function ProductDescriptionHeadshots() {
+      return (
+        <>Generate polished headshots for team profiles, resumes, and listings.</>
+      );
+    },
     url: "https://headshots.fun/",
     icon: Sparkles,
-    badge: <>Open Source</>,
+    BadgeLabel: function ProductBadgeOpenSource() {
+      return <>Open Source</>;
+    },
   },
   {
     id: "to-markdown",
     name: "To Markdown",
-    description: (
-      <>
-        Convert any document to clean Markdown instantly - PDFs, Word docs, web
-        pages
-      </>
-    ),
+    Description: function ProductDescriptionToMarkdown() {
+      return <>Convert docs and web pages into Markdown you can actually edit.</>;
+    },
     url: "https://to-markdown.com/",
     icon: FileText,
   },
   {
     id: "trend-x-day",
     name: "Trend X Day",
-    description: (
-      <>
-        Stay ahead with daily insights - data-driven analysis of global trends
-      </>
-    ),
+    Description: function ProductDescriptionTrendXDay() {
+      return <>Track daily product and creator trends with a simpler research loop.</>;
+    },
     url: "https://trendxday.com/",
     icon: TrendingUp,
   },
   {
     id: "ogimage-site",
     name: "OGimage.site",
-    description: (
-      <>Create stunning social media cards that boost engagement and clicks</>
-    ),
+    Description: function ProductDescriptionOgImage() {
+      return <>Generate open graph images for social cards and link previews.</>;
+    },
     url: "https://ogimage.site/",
     icon: Square,
   },
   {
     id: "hipng",
     name: "HiPNG.com",
-    description: (
-      <>
-        Access thousands of AI-generated transparent PNGs - perfect for any
-        project
-      </>
-    ),
+    Description: function ProductDescriptionHiPNG() {
+      return <>Browse transparent PNG assets for quick mockups and landing pages.</>;
+    },
     url: "https://hipng.com/",
     icon: Zap,
   },
@@ -105,12 +93,12 @@ export function OtherProducts() {
             <>UllrAI Lab</>
           </Badge>
           <h2 className="text-foreground text-3xl font-bold tracking-tight sm:text-4xl">
-            <>Explore our other tools</>
+            <>Explore the rest of the lab</>
           </h2>
           <p className="text-muted-foreground mt-4 text-lg leading-8">
             <>
-              AI-powered utilities that help creators, developers, and teams
-              ship faster every day.
+              Adjacent products from the same team, each focused on a narrower
+              workflow than the starter itself.
             </>
           </p>
         </div>
@@ -118,6 +106,8 @@ export function OtherProducts() {
         <div className="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-6 sm:mt-20 md:grid-cols-2 lg:mx-0 lg:max-w-none lg:grid-cols-3">
           {products.map((product) => {
             const IconComponent = product.icon;
+            const Description = product.Description;
+            const BadgeLabel = product.BadgeLabel;
             return (
               <Card
                 key={product.id}
@@ -133,9 +123,9 @@ export function OtherProducts() {
                         <h3 className="text-foreground font-bold">
                           {product.name}
                         </h3>
-                        {product.badge && (
+                        {BadgeLabel && (
                           <Badge variant="secondary" className="mt-1 text-xs">
-                            {product.badge}
+                            <BadgeLabel />
                           </Badge>
                         )}
                       </div>
@@ -144,7 +134,7 @@ export function OtherProducts() {
                   </div>
 
                   <p className="text-muted-foreground mt-4 text-sm leading-relaxed">
-                    {product.description}
+                    <Description />
                   </p>
 
                   <a

@@ -1,24 +1,30 @@
 import { createReader } from "@keystatic/core/reader";
 import keystaticConfig from "@/keystatic.config";
 import { Sparkles, BookOpen } from "lucide-react";
-import { createMetadata } from "@/lib/metadata";
 import { BackgroundPattern } from "@/components/ui/background-pattern";
 import { BlogPostCard } from "@/components/blog/blog-post-card";
-import type { Metadata } from "next";
-import { renderMarkdoc } from "@/lib/utils";
-import { getServerLocale } from "@lingo.dev/compiler/virtual/locale/server";
+import { createLocalizedMetadata } from "@/lib/i18n/page-metadata";
+import { getRequestLocale } from "@/lib/i18n/server-locale";
 
-export const metadata: Metadata = createMetadata({
-  title: "Blog",
-  description:
-    "Read our latest blog posts and insights about technology, development, and industry trends.",
-});
+export async function generateMetadata() {
+  return createLocalizedMetadata({
+    en: {
+      title: "Blog",
+      description:
+        "Read our latest blog posts and insights about technology, development, and industry trends.",
+    },
+    "zh-Hans": {
+      title: "博客",
+      description: "阅读我们关于技术、开发实践和行业趋势的最新文章与洞察。",
+    },
+  });
+}
 
 const reader = createReader(process.cwd(), keystaticConfig);
 
 export default async function BlogPage() {
   const [locale, posts] = await Promise.all([
-    getServerLocale(),
+    getRequestLocale(),
     reader.collections.posts.all(),
   ]);
 
@@ -46,12 +52,9 @@ export default async function BlogPage() {
     post: (typeof posts)[number],
     variant: "featured" | "regular",
   ) => {
-    const [content, author] = await Promise.all([
-      post.entry.content(),
-      post.entry.author
-        ? reader.collections.authors.read(post.entry.author)
-        : Promise.resolve(null),
-    ]);
+    const author = post.entry.author
+      ? await reader.collections.authors.read(post.entry.author)
+      : null;
 
     return (
       <BlogPostCard
@@ -63,7 +66,6 @@ export default async function BlogPage() {
         publishedDate={post.entry.publishedDate || undefined}
         featured={post.entry.featured}
         variant={variant}
-        content={renderMarkdoc(content.node)}
         author={author?.name || "Anonymous"}
         locale={locale}
       />

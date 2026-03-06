@@ -1,6 +1,7 @@
 import React from "react";
+import Link from "next/link";
+import { count, eq, sum } from "drizzle-orm";
 import { DashboardPageWrapper } from "./_components/dashboard-page-wrapper";
-import { createMetadata } from "@/lib/metadata";
 import {
   Card,
   CardContent,
@@ -8,199 +9,143 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { requireAuth } from "@/lib/auth/permissions";
+import { getUserPayments, getUserSubscription } from "@/lib/database/subscription";
+import { db } from "@/database";
+import { uploads } from "@/database/schema";
+import { formatCurrency } from "@/lib/utils";
+import { formatFileSize } from "@/lib/config/upload";
+import { createLocalizedMetadata } from "@/lib/i18n/page-metadata";
+import { getRequestLocale } from "@/lib/i18n/server-locale";
 import {
-  BarChart3,
-  Users,
-  TrendingUp,
-  DollarSign,
-  Activity,
-  Terminal,
-  ArrowUpRight,
-  Zap,
-  Clock,
-  CheckCircle2,
+  ArrowRight,
+  CreditCard,
+  Files,
+  ShieldCheck,
+  Sparkles,
+  UserCircle2,
 } from "lucide-react";
-import Link from "next/link";
 
-export const metadata = createMetadata({
-  title: "Dashboard",
-  description: "System overview and metrics",
-});
+export async function generateMetadata() {
+  return createLocalizedMetadata({
+    en: {
+      title: "Dashboard",
+      description: "Account overview, billing status, and starter setup progress.",
+    },
+    "zh-Hans": {
+      title: "控制台",
+      description: "查看账户概览、计费状态以及入门套件的设置进度。",
+    },
+  });
+}
 
-export default function HomeRoute() {
+const checklistLinks = [
+  {
+    id: "billing",
+    Title: function DashboardChecklistTitleBilling() {
+      return <>Review billing flow</>;
+    },
+    Description: function DashboardChecklistDescriptionBilling() {
+      return <>Check plan selection, checkout, and portal access.</>;
+    },
+    href: "/dashboard/billing",
+  },
+  {
+    id: "upload",
+    Title: function DashboardChecklistTitleUpload() {
+      return <>Verify uploads</>;
+    },
+    Description: function DashboardChecklistDescriptionUpload() {
+      return <>Test client and server uploads against your storage config.</>;
+    },
+    href: "/dashboard/upload",
+  },
+  {
+    id: "settings",
+    Title: function DashboardChecklistTitleSettings() {
+      return <>Finish account setup</>;
+    },
+    Description: function DashboardChecklistDescriptionSettings() {
+      return <>Update your profile and validate theme and locale preferences.</>;
+    },
+    href: "/dashboard/settings",
+  },
+];
+
+export default async function HomeRoute() {
+  const user = await requireAuth();
+  const [locale, subscription, payments, [uploadSummary]] = await Promise.all([
+    getRequestLocale(),
+    getUserSubscription(user.id),
+    getUserPayments(user.id, 5),
+    db
+      .select({
+        count: count(),
+        totalSize: sum(uploads.fileSize),
+      })
+      .from(uploads)
+      .where(eq(uploads.userId, user.id)),
+  ]);
+
+  const latestPayment = payments[0] ?? null;
+  const uploadedFileCount = uploadSummary?.count ?? 0;
+  const uploadedFileSize = Number(uploadSummary?.totalSize ?? 0);
+  const subscriptionLabel = subscription
+    ? `${subscription.tierId.charAt(0).toUpperCase()}${subscription.tierId.slice(1)}`
+    : "Free";
+
   return (
-    <DashboardPageWrapper title="Dashboard">
-      {/* System Status / Welcome Panel */}
-      <div className="bg-card text-card-foreground mb-8 border shadow-sm">
-        <div className="bg-muted/50 flex items-center justify-between border-b px-6 py-3">
-          <div className="flex items-center gap-2">
-            <Terminal className="text-primary h-4 w-4" />
-            <span className="font-mono text-sm font-bold">system_status</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="relative flex h-2 w-2">
-              <span className="bg-emerald-500 absolute inline-flex h-full w-full animate-ping rounded-full opacity-75"></span>
-              <span className="bg-emerald-500 relative inline-flex h-2 w-2 rounded-full"></span>
-            </span>
-            <span className="text-muted-foreground font-mono text-xs">
-              ONLINE
-            </span>
-          </div>
-        </div>
-        <div className="p-6">
-          <div className="mb-6">
-            <h1 className="text-foreground mb-2 text-2xl font-bold tracking-tight">
-              Welcome back, User
-            </h1>
-            <p className="text-muted-foreground font-mono text-sm">
-              System is running smoothly. All services operational.
-            </p>
-          </div>
-
-          <div className="flex flex-wrap gap-3">
-            <Button size="sm" className="gap-2 shadow-xs">
-              <Zap className="h-4 w-4" />
-              Deploy New Project
-            </Button>
-            <Button variant="outline" size="sm" className="gap-2 shadow-xs">
-              <Activity className="h-4 w-4" />
-              View Logs
-            </Button>
-          </div>
-        </div>
-      </div>
-
-      {/* Metrics Grid */}
-      <div className="mb-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-            <DollarSign className="text-muted-foreground h-4 w-4" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold font-mono" data-lingo-skip>
-              $45,231.89
-            </div>
-            <p className="text-muted-foreground text-xs">
-              <span className="text-emerald-600 flex items-center gap-1 font-medium">
-                <TrendingUp className="h-3 w-3" />
-                <span data-lingo-skip>+20.1%</span>
-              </span>
-              <span className="opacity-70">from last month</span>
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Users</CardTitle>
-            <Users className="text-muted-foreground h-4 w-4" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold font-mono" data-lingo-skip>
-              +2,350
-            </div>
-            <p className="text-muted-foreground text-xs">
-              <span className="text-emerald-600 flex items-center gap-1 font-medium">
-                <TrendingUp className="h-3 w-3" />
-                <span data-lingo-skip>+180.1%</span>
-              </span>
-              <span className="opacity-70">from last month</span>
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Conversions</CardTitle>
-            <Activity className="text-muted-foreground h-4 w-4" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold font-mono" data-lingo-skip>
-              +12,234
-            </div>
-            <p className="text-muted-foreground text-xs">
-              <span className="text-emerald-600 flex items-center gap-1 font-medium">
-                <TrendingUp className="h-3 w-3" />
-                <span data-lingo-skip>+19%</span>
-              </span>
-              <span className="opacity-70">from last month</span>
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Growth Rate</CardTitle>
-            <BarChart3 className="text-muted-foreground h-4 w-4" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold font-mono" data-lingo-skip>
-              +573
-            </div>
-            <p className="text-muted-foreground text-xs">
-              <span className="text-emerald-600 flex items-center gap-1 font-medium">
-                <TrendingUp className="h-3 w-3" />
-                <span data-lingo-skip>+201</span>
-              </span>
-              <span className="opacity-70">since last hour</span>
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Activity & Quick Actions */}
-      <div className="grid gap-4 md:grid-cols-2 lg:gap-8">
+    <DashboardPageWrapper
+      title="Dashboard"
+      description="Your real account state, recent billing activity, and setup progress."
+    >
+      <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
         <Card className="shadow-sm">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Terminal className="text-primary h-5 w-5" />
-              Recent Activity
+              <UserCircle2 className="text-primary h-5 w-5" />
+              Account overview
             </CardTitle>
-            <CardDescription>Latest system events and logs</CardDescription>
+            <CardDescription>
+              A summary of the account and starter modules currently in use.
+            </CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-start gap-3 text-sm">
-                <div className="bg-primary/10 text-primary mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-sm border border-primary/20">
-                  <Users className="h-3 w-3" />
-                </div>
-                <div className="grid gap-1">
-                  <p className="text-foreground font-medium leading-none">
-                    New user registered
-                  </p>
-                  <p className="text-muted-foreground font-mono text-xs">
-                    user_id: 8923 • 2m ago
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3 text-sm">
-                <div className="bg-emerald-500/10 text-emerald-600 mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-sm border border-emerald-500/20">
-                  <DollarSign className="h-3 w-3" />
-                </div>
-                <div className="grid gap-1">
-                  <p className="text-foreground font-medium leading-none">
-                    Payment received
-                  </p>
-                  <p className="text-muted-foreground font-mono text-xs">
-                    inv_2930 • $49.00 • 5m ago
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3 text-sm">
-                <div className="bg-blue-500/10 text-blue-600 mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-sm border border-blue-500/20">
-                  <Zap className="h-3 w-3" />
-                </div>
-                <div className="grid gap-1">
-                  <p className="text-foreground font-medium leading-none">
-                    Feature deployed
-                  </p>
-                  <p className="text-muted-foreground font-mono text-xs">
-                    v2.4.0 • main_branch • 1h ago
-                  </p>
-                </div>
-              </div>
+          <CardContent className="grid gap-4 md:grid-cols-3">
+            <div className="border-border space-y-2 border p-4">
+              <p className="text-muted-foreground text-xs uppercase">Plan</p>
+              <p className="text-lg font-semibold">{subscriptionLabel}</p>
+              <Badge
+                className="capitalize"
+                variant={
+                  subscription && ["active", "trialing"].includes(subscription.status)
+                    ? "default"
+                    : "secondary"
+                }
+              >
+                {subscription?.status ?? "no active subscription"}
+              </Badge>
+            </div>
+            <div className="border-border space-y-2 border p-4">
+              <p className="text-muted-foreground text-xs uppercase">Uploads</p>
+              <p className="text-lg font-semibold">{uploadedFileCount}</p>
+              <p className="text-muted-foreground text-sm">
+                {formatFileSize(uploadedFileSize)} stored
+              </p>
+            </div>
+            <div className="border-border space-y-2 border p-4">
+              <p className="text-muted-foreground text-xs uppercase">Payments</p>
+              <p className="text-lg font-semibold">{payments.length}</p>
+              <p className="text-muted-foreground text-sm">
+                {latestPayment
+                  ? formatCurrency(
+                      latestPayment.amount,
+                      latestPayment.currency,
+                      locale,
+                    )
+                  : "No payment records yet"}
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -208,44 +153,112 @@ export default function HomeRoute() {
         <Card className="shadow-sm">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Clock className="text-primary h-5 w-5" />
-              Quick Actions
+              <ShieldCheck className="text-primary h-5 w-5" />
+              Current account
             </CardTitle>
-            <CardDescription>Common administrative tasks</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4 text-sm">
+            <div className="border-border border p-4">
+              <p className="text-muted-foreground">Name</p>
+              <p className="font-medium">{user.name}</p>
+            </div>
+            <div className="border-border border p-4">
+              <p className="text-muted-foreground">Email</p>
+              <p className="font-medium">{user.email}</p>
+            </div>
+            <div className="border-border border p-4">
+              <p className="text-muted-foreground">Role</p>
+              <p className="font-medium capitalize">{user.role.replace("_", " ")}</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-[1fr_0.9fr]">
+        <Card className="shadow-sm">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Sparkles className="text-primary h-5 w-5" />
+              Setup checklist
+            </CardTitle>
+            <CardDescription>
+              The starter is already wired up. These are the next places to make
+              it match your product.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-3">
+            {checklistLinks.map((item) => {
+              const Title = item.Title;
+              const Description = item.Description;
+
+              return (
+                <div key={item.id} className="border-border border p-4">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <p className="font-medium">
+                        <Title />
+                      </p>
+                      <p className="text-muted-foreground mt-1 text-sm">
+                        <Description />
+                      </p>
+                    </div>
+                    <Button asChild size="sm" variant="outline">
+                      <Link href={item.href}>
+                        Open
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </Link>
+                    </Button>
+                  </div>
+                </div>
+              );
+            })}
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-sm">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <CreditCard className="text-primary h-5 w-5" />
+              Recent billing activity
+            </CardTitle>
+            <CardDescription>
+              Recent payment records attached to your current account.
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid gap-2">
-              <Button
-                asChild
-                variant="outline"
-                className="justify-start gap-2 shadow-xs"
-              >
-                <Link href="/dashboard/billing">
-                  <ArrowUpRight className="h-4 w-4" />
-                  Upgrade Plan
-                </Link>
-              </Button>
-              <Button
-                asChild
-                variant="outline"
-                className="justify-start gap-2 shadow-xs"
-              >
-                <Link href="/dashboard/settings">
-                  <Users className="h-4 w-4" />
-                  Open Settings
-                </Link>
-              </Button>
-              <Button
-                asChild
-                variant="outline"
-                className="justify-start gap-2 shadow-xs"
-              >
-                <Link href="/dashboard/upload">
-                  <CheckCircle2 className="h-4 w-4" />
-                  Upload Assets
-                </Link>
-              </Button>
-            </div>
+            {payments.length > 0 ? (
+              <div className="space-y-3">
+                {payments.map((payment) => (
+                  <div
+                    key={payment.paymentId}
+                    className="border-border flex items-center justify-between gap-4 border p-4"
+                  >
+                    <div>
+                      <p className="font-medium">{payment.tierName}</p>
+                      <p className="text-muted-foreground text-sm capitalize">
+                        {payment.status} • {payment.paymentType.replace("_", " ")}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-medium">
+                        {formatCurrency(payment.amount, payment.currency, locale)}
+                      </p>
+                      <p className="text-muted-foreground text-sm">
+                        {new Date(payment.createdAt).toLocaleDateString(locale)}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="border-border flex items-center gap-3 border p-4 text-sm">
+                <Files className="text-primary h-4 w-4" />
+                <span className="text-muted-foreground">
+                  No payment history yet. Visit billing when you are ready to
+                  test checkout.
+                </span>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

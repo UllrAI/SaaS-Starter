@@ -2,44 +2,220 @@ import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import {
-  Database,
-  Palette,
-  Rocket,
-  Shield,
-  BarChart3,
+  BadgeCheck,
   CreditCard,
-  Code,
+  Database,
+  FileText,
+  Globe,
+  LayoutDashboard,
+  LockKeyhole,
+  Package2,
 } from "lucide-react";
 
 interface Feature {
   id: string;
-  title: React.ReactNode;
-  description: React.ReactNode;
+  Title: React.ComponentType;
+  Description: React.ComponentType;
   icon: React.ComponentType<{ className?: string }>;
-  category: React.ReactNode;
+  Category: React.ComponentType;
 }
 
+const features: Feature[] = [
+  {
+    id: "app-router",
+    Title: function FeatureTitleAppRouter() {
+      return <>Next.js App Router foundation</>;
+    },
+    Description: function FeatureDescriptionAppRouter() {
+      return (
+        <>
+          Route groups, metadata helpers, loading states, error boundaries, and
+          page conventions are already wired in the codebase.
+        </>
+      );
+    },
+    icon: Package2,
+    Category: function FeatureCategoryArchitecture() {
+      return <>Architecture</>;
+    },
+  },
+  {
+    id: "auth",
+    Title: function FeatureTitleAuth() {
+      return <>Authentication and permissions</>;
+    },
+    Description: function FeatureDescriptionAuth() {
+      return (
+        <>
+          Better Auth sessions, guarded dashboard routes, role checks, and auth
+          flows for login, signup, and magic-link style access.
+        </>
+      );
+    },
+    icon: LockKeyhole,
+    Category: function FeatureCategoryAuth() {
+      return <>Auth</>;
+    },
+  },
+  {
+    id: "billing",
+    Title: function FeatureTitleBilling() {
+      return <>Billing workflow</>;
+    },
+    Description: function FeatureDescriptionBilling() {
+      return (
+        <>
+          Creem checkout, customer portal handoff, webhook handling, and
+          subscription records are connected end to end.
+        </>
+      );
+    },
+    icon: CreditCard,
+    Category: function FeatureCategoryMonetization() {
+      return <>Monetization</>;
+    },
+  },
+  {
+    id: "admin",
+    Title: function FeatureTitleAdmin() {
+      return <>Admin operations</>;
+    },
+    Description: function FeatureDescriptionAdmin() {
+      return (
+        <>
+          User, payment, subscription, and upload management screens give you a
+          working back office instead of an empty shell.
+        </>
+      );
+    },
+    icon: LayoutDashboard,
+    Category: function FeatureCategoryOperations() {
+      return <>Operations</>;
+    },
+  },
+  {
+    id: "data",
+    Title: function FeatureTitleData() {
+      return <>Typed database layer</>;
+    },
+    Description: function FeatureDescriptionData() {
+      return (
+        <>
+          Drizzle models, query helpers, and server-side data access keep the
+          app consistent without hand-written SQL scattered around the UI.
+        </>
+      );
+    },
+    icon: Database,
+    Category: function FeatureCategoryData() {
+      return <>Data</>;
+    },
+  },
+  {
+    id: "uploads",
+    Title: function FeatureTitleUploads() {
+      return <>Direct and server uploads</>;
+    },
+    Description: function FeatureDescriptionUploads() {
+      return (
+        <>
+          Cloudflare R2 upload flows support browser uploads, server uploads,
+          and administrative cleanup without leaking storage details into the
+          UI.
+        </>
+      );
+    },
+    icon: BadgeCheck,
+    Category: function FeatureCategoryStorage() {
+      return <>Storage</>;
+    },
+  },
+  {
+    id: "content",
+    Title: function FeatureTitleContent() {
+      return <>Content and SEO primitives</>;
+    },
+    Description: function FeatureDescriptionContent() {
+      return (
+        <>
+          Keystatic-powered blog content, metadata generation, sitemap output,
+          and structured page shells are included for marketing content.
+        </>
+      );
+    },
+    icon: FileText,
+    Category: function FeatureCategoryContent() {
+      return <>Content</>;
+    },
+  },
+  {
+    id: "i18n",
+    Title: function FeatureTitleI18n() {
+      return <>Localization-ready routing</>;
+    },
+    Description: function FeatureDescriptionI18n() {
+      return (
+        <>
+          Locale persistence, marketing URL handling, and translated UI strings
+          are in place for Multilingual.
+        </>
+      );
+    },
+    icon: Globe,
+    Category: function FeatureCategoryI18n() {
+      return <>i18n</>;
+    },
+  },
+];
+
+const featureStats = [
+  {
+    id: "modules",
+    Label: function FeatureStatLabelModules() {
+      return <>Core modules</>;
+    },
+    value: <span data-lingo-skip>8</span>,
+  },
+  {
+    id: "locales",
+    Label: function FeatureStatLabelLocales() {
+      return <>Locales shipped</>;
+    },
+    value: <span data-lingo-skip>2</span>,
+  },
+  {
+    id: "billing-options",
+    Label: function FeatureStatLabelCheckoutModes() {
+      return <>Checkout modes</>;
+    },
+    value: <span data-lingo-skip>3</span>,
+  },
+];
+
 function FeatureCard({ feature }: { feature: Feature }) {
-  const IconComponent = feature.icon;
+  const Icon = feature.icon;
+  const Title = feature.Title;
+  const Description = feature.Description;
+  const Category = feature.Category;
 
   return (
-    <Card className="group border-border bg-card hover:border-primary hover:bg-secondary/50 h-full border p-6 transition-all">
+    <Card className="group border-border bg-card hover:border-primary h-full border p-6 transition-all">
       <div className="space-y-4">
-        {/* Icon and Category */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-4">
           <div className="bg-secondary text-primary border-border group-hover:border-primary group-hover:bg-primary group-hover:text-primary-foreground flex h-12 w-12 items-center justify-center border transition-colors">
-            <IconComponent className="h-6 w-6" />
+            <Icon className="h-6 w-6" />
           </div>
           <Badge variant="outline" className="border-border font-mono text-xs">
-            {feature.category}
+            <Category />
           </Badge>
         </div>
 
-        {/* Content */}
         <div className="space-y-2">
-          <h3 className="text-foreground text-lg font-bold">{feature.title}</h3>
+          <h3 className="text-foreground text-lg font-bold">
+            <Title />
+          </h3>
           <p className="text-muted-foreground text-sm leading-relaxed">
-            {feature.description}
+            <Description />
           </p>
         </div>
       </div>
@@ -48,150 +224,55 @@ function FeatureCard({ feature }: { feature: Feature }) {
 }
 
 export function Features() {
-  const features: Feature[] = [
-    {
-      id: "auth-users",
-      title: <>Authentication & Users</>,
-      description: (
-        <>
-          Complete auth system with OAuth, magic links, and user management.
-          Role-based access control included.
-        </>
-      ),
-      icon: Shield,
-      category: <>Security</>,
-    },
-    {
-      id: "payments-billing",
-      title: <>Payments & Billing</>,
-      description: (
-        <>
-          Flexible payment integration with subscriptions, and billing
-          management. Revenue tracking built-in.
-        </>
-      ),
-      icon: CreditCard,
-      category: <>Payments</>,
-    },
-    {
-      id: "database-api",
-      title: <>Database & API</>,
-      description: (
-        <>
-          Type-safe database with Drizzle ORM. RESTful APIs and real-time
-          subscriptions ready.
-        </>
-      ),
-      icon: Database,
-      category: <>Backend</>,
-    },
-    {
-      id: "analytics-insights",
-      title: <>Analytics & Insights</>,
-      description: (
-        <>
-          User behavior tracking, conversion metrics, and beautiful dashboards
-          for data-driven decisions.
-        </>
-      ),
-      icon: BarChart3,
-      category: <>Analytics</>,
-    },
-    {
-      id: "modern-ui-ux",
-      title: <>Modern UI/UX</>,
-      description: (
-        <>
-          Beautiful, responsive design with dark mode. Accessible components
-          and smooth animations.
-        </>
-      ),
-      icon: Palette,
-      category: <>Design</>,
-    },
-    {
-      id: "production-deploy",
-      title: <>Production Deploy</>,
-      description: (
-        <>
-          One-click deployment to Vercel, AWS, or Docker. CI/CD pipelines and
-          monitoring included.
-        </>
-      ),
-      icon: Rocket,
-      category: <>DevOps</>,
-    },
-  ];
-
-  const featureStats: {
-    id: string;
-    label: React.ReactNode;
-    value: React.ReactNode;
-  }[] = [
-    {
-      id: "components",
-      label: <>Components</>,
-      value: <span data-lingo-skip>50+</span>,
-    },
-    {
-      id: "integrations",
-      label: <>Integrations</>,
-      value: <span data-lingo-skip>10+</span>,
-    },
-    {
-      id: "type-safe",
-      label: <>Type Safe</>,
-      value: <span data-lingo-skip>100%</span>,
-    },
-  ];
-
   return (
-    <section className="bg-background border-border relative border-b py-24">
-      <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
-        {/* Section Header */}
+    <section id="features" className="bg-background border-border border-b py-24">
+      <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto mb-16 max-w-2xl text-center">
           <Badge variant="outline" className="border-primary text-primary mb-4">
-            <Code className="mr-2 h-3 w-3" />
-            <>Features</>
+            <Package2 className="mr-2 h-3 w-3" />
+            <>Included modules</>
           </Badge>
 
           <h2 className="text-foreground text-3xl font-bold tracking-tight sm:text-4xl">
-            <>Everything you need to</>
+            <>The starter is opinionated where it should be,</>
             <span className="text-primary mt-1 block">
-              <>build and scale</>
+              <>and extensible where it matters.</>
             </span>
           </h2>
 
           <p className="text-muted-foreground mt-6 text-lg">
             <>
-              Skip months of development. Our SaaS Starter includes all the
-              essential features you need to launch your product.
+              This is not a demo landing page wrapped around empty routes. The
+              major app surfaces already exist and share the same design system
+              and data model.
             </>
           </p>
         </div>
 
-        {/* Features Grid */}
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {features.map((feature) => (
             <FeatureCard key={feature.id} feature={feature} />
           ))}
         </div>
 
-        {/* Bottom Stats */}
         <div className="bg-border border-border mt-16 grid gap-px border sm:grid-cols-3">
-          {featureStats.map((stat) => (
-            <div
-              key={stat.id}
-              className="bg-card hover:bg-secondary/50 p-8 text-center transition-colors"
-            >
-              <div className="text-foreground text-4xl font-bold tracking-tighter">
-                {stat.value}
+          {featureStats.map((stat) => {
+            const Label = stat.Label;
+
+            return (
+              <div
+                key={stat.id}
+                className="bg-card hover:bg-secondary/50 p-8 text-center transition-colors"
+              >
+                <div className="text-foreground text-4xl font-bold tracking-tighter">
+                  {stat.value}
+                </div>
+                <div className="text-muted-foreground mt-2 text-sm tracking-widest uppercase">
+                  <Label />
+                </div>
               </div>
-              <div className="text-muted-foreground mt-2 text-sm tracking-widest uppercase">
-                {stat.label}
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>

@@ -99,6 +99,7 @@ const mockUseRouter = useRouter as jest.MockedFunction<typeof useRouter>;
 const mockToast = toast as jest.Mocked<typeof toast>;
 
 const mockPush = jest.fn();
+const mockPrefetch = jest.fn();
 
 describe("AuthForm", () => {
   beforeEach(() => {
@@ -109,7 +110,7 @@ describe("AuthForm", () => {
       forward: jest.fn(),
       refresh: jest.fn(),
       replace: jest.fn(),
-      prefetch: jest.fn(),
+      prefetch: mockPrefetch,
     });
   });
 
@@ -127,6 +128,8 @@ describe("AuthForm", () => {
 
       // Should not show terms for login (not rendered in simplified mock)
       expect(screen.queryByText(/terms of service/i)).not.toBeInTheDocument();
+      expect(mockPrefetch).toHaveBeenCalledWith("/auth/sent");
+      expect(mockPrefetch).toHaveBeenCalledWith("/dashboard");
     });
 
     it("has correct link to signup page", () => {
@@ -146,6 +149,7 @@ describe("AuthForm", () => {
         "href",
         "/signup?callbackUrl=%2Fdashboard%2Fbilling",
       );
+      expect(mockPrefetch).toHaveBeenCalledWith("/dashboard/billing");
     });
   });
 

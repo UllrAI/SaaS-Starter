@@ -1,5 +1,6 @@
 import {
   S3Client,
+  HeadObjectCommand,
   PutObjectCommand,
   GetObjectCommand,
   DeleteObjectCommand,
@@ -301,6 +302,35 @@ export async function uploadBuffer(
       success: false,
       error: error instanceof Error ? error.message : "Failed to upload buffer",
     };
+  }
+}
+
+export async function fileExists(key: string): Promise<boolean> {
+  try {
+    const command = new HeadObjectCommand({
+      Bucket: env.R2_BUCKET_NAME,
+      Key: key,
+    });
+
+    await r2Client.send(command);
+    return true;
+  } catch (error) {
+    if (
+      error &&
+      typeof error === "object" &&
+      ("$metadata" in error || "name" in error)
+    ) {
+      const maybeStatus = (error as { $metadata?: { httpStatusCode?: number } })
+        .$metadata?.httpStatusCode;
+      const maybeName = (error as { name?: string }).name;
+
+      if (maybeStatus === 404 || maybeName === "NotFound") {
+        return false;
+      }
+    }
+
+    console.error("Error checking file existence:", error);
+    return false;
   }
 }
 

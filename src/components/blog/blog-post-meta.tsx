@@ -104,14 +104,18 @@ export function BlogPostMeta({
               </span>
             </div>
           )}
-          <div className="flex items-center gap-2">
-            <Clock className="h-4 w-4 flex-shrink-0" />
-            <span className="whitespace-nowrap">{readTime}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <User className="h-4 w-4 flex-shrink-0" />
-            <span className="whitespace-nowrap">{author}</span>
-          </div>
+          {readTime && (
+            <div className="flex items-center gap-2">
+              <Clock className="h-4 w-4 flex-shrink-0" />
+              <span className="whitespace-nowrap">{readTime}</span>
+            </div>
+          )}
+          {author && (
+            <div className="flex items-center gap-2">
+              <User className="h-4 w-4 flex-shrink-0" />
+              <span className="whitespace-nowrap">{author}</span>
+            </div>
+          )}
         </div>
       </div>
 

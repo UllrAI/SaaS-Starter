@@ -1,5 +1,3 @@
-"use client";
-
 import React from "react";
 import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
@@ -9,33 +7,32 @@ import { Logo } from "@/components/logo";
 import {
   APP_NAME,
   COMPANY_NAME,
+  CONTACT_EMAIL,
+  GITHUB_DISCUSSIONS_URL,
+  GITHUB_ISSUES_URL,
+  GITHUB_RELEASES_URL,
   GITHUB_URL,
   TWITTERACCOUNT,
-  CONTACT_EMAIL,
 } from "@/lib/config/constants";
-import { Github, Twitter, Mail, Heart } from "lucide-react";
+import { Github, Heart, Mail, Twitter } from "lucide-react";
 
 const FooterSectionTitleProduct = () => <>Product</>;
 const FooterSectionTitleOtherProducts = () => <>Other Products</>;
-const FooterSectionTitleCompany = () => <>Company</>;
-const FooterSectionTitleResources = () => <>Resources</>;
+const FooterSectionTitleProject = () => <>Project</>;
+const FooterSectionTitleSupport = () => <>Support</>;
 const FooterSectionTitleLegal = () => <>Legal</>;
 
 const FooterLabelFeatures = () => <>Features</>;
 const FooterLabelPricing = () => <>Pricing</>;
-const FooterLabelDocumentation = () => <>Documentation</>;
+const FooterLabelBlog = () => <>Blog</>;
 const FooterLabelChangelog = () => <>Changelog</>;
 const FooterLabelAbout = () => <>About</>;
-const FooterLabelBlog = () => <>Blog</>;
 const FooterLabelContact = () => <>Contact</>;
-const FooterLabelCareers = () => <>Careers</>;
-const FooterLabelHelpCenter = () => <>Help Center</>;
-const FooterLabelCommunity = () => <>Community</>;
-const FooterLabelTutorials = () => <>Tutorials</>;
-const FooterLabelTemplates = () => <>Templates</>;
+const FooterLabelGitHub = () => <>GitHub</>;
+const FooterLabelIssues = () => <>Issue Tracker</>;
+const FooterLabelDiscussions = () => <>Discussions</>;
 const FooterLabelPrivacy = () => <>Privacy</>;
 const FooterLabelTerms = () => <>Terms</>;
-const FooterLabelSecurity = () => <>Security</>;
 
 type FooterLink = {
   id: string;
@@ -67,7 +64,7 @@ const footerSections: FooterSection[] = [
         id: "foot-features",
         kind: "i18n",
         Label: FooterLabelFeatures,
-        href: "/#features",
+        href: "/features",
       },
       {
         id: "foot-pricing",
@@ -76,16 +73,17 @@ const footerSections: FooterSection[] = [
         href: "/pricing",
       },
       {
-        id: "foot-docs",
+        id: "foot-blog",
         kind: "i18n",
-        Label: FooterLabelDocumentation,
-        href: "/docs",
+        Label: FooterLabelBlog,
+        href: "/blog",
       },
       {
         id: "foot-changelog",
         kind: "i18n",
         Label: FooterLabelChangelog,
-        href: "/changelog",
+        href: GITHUB_RELEASES_URL,
+        external: true,
       },
     ],
   },
@@ -115,20 +113,19 @@ const footerSections: FooterSection[] = [
         external: true,
       },
       {
-        id: "foot-hipng",
+        id: "foot-vibesku",
         kind: "text",
-        labelText: "HiPNG.com",
-        href: "https://hipng.com/",
+        labelText: "VibeSKU.com",
+        href: "https://vibesku.com/",
         external: true,
       },
     ],
   },
   {
-    id: "foot-company",
-    Title: FooterSectionTitleCompany,
+    id: "foot-project",
+    Title: FooterSectionTitleProject,
     links: [
       { id: "foot-about", kind: "i18n", Label: FooterLabelAbout, href: "/about" },
-      { id: "foot-blog", kind: "i18n", Label: FooterLabelBlog, href: "/blog" },
       {
         id: "foot-contact",
         kind: "i18n",
@@ -136,40 +133,31 @@ const footerSections: FooterSection[] = [
         href: "/contact",
       },
       {
-        id: "foot-careers",
+        id: "foot-github",
         kind: "i18n",
-        Label: FooterLabelCareers,
-        href: "/careers",
+        Label: FooterLabelGitHub,
+        href: GITHUB_URL,
+        external: true,
       },
     ],
   },
   {
-    id: "foot-resources",
-    Title: FooterSectionTitleResources,
+    id: "foot-support",
+    Title: FooterSectionTitleSupport,
     links: [
       {
-        id: "foot-help",
+        id: "foot-issues",
         kind: "i18n",
-        Label: FooterLabelHelpCenter,
-        href: "/help",
+        Label: FooterLabelIssues,
+        href: GITHUB_ISSUES_URL,
+        external: true,
       },
       {
-        id: "foot-community",
+        id: "foot-discussions",
         kind: "i18n",
-        Label: FooterLabelCommunity,
-        href: "/community",
-      },
-      {
-        id: "foot-tutorials",
-        kind: "i18n",
-        Label: FooterLabelTutorials,
-        href: "/tutorials",
-      },
-      {
-        id: "foot-templates",
-        kind: "i18n",
-        Label: FooterLabelTemplates,
-        href: "/templates",
+        Label: FooterLabelDiscussions,
+        href: GITHUB_DISCUSSIONS_URL,
+        external: true,
       },
     ],
   },
@@ -184,12 +172,6 @@ const footerSections: FooterSection[] = [
         href: "/privacy",
       },
       { id: "foot-terms", kind: "i18n", Label: FooterLabelTerms, href: "/terms" },
-      {
-        id: "foot-security",
-        kind: "i18n",
-        Label: FooterLabelSecurity,
-        href: "/security",
-      },
     ],
   },
 ];
@@ -262,10 +244,8 @@ export function Footer() {
   return (
     <footer className="border-border bg-background border-t">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
-        {/* Main footer content */}
         <div className="py-16">
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-6">
-            {/* Brand section */}
             <div className="lg:col-span-2">
               <div className="mb-4 flex items-center gap-2">
                 <Logo className="text-primary h-6 w-6" variant="icon-only" />
@@ -275,11 +255,11 @@ export function Footer() {
               </div>
 
               <p className="text-muted-foreground mb-6 max-w-md text-sm">
-                Complete UllrAI Micro SaaS starter with authentication,
-                payments, database, and deployment.
+                A practical SaaS starter for teams that want auth, billing,
+                admin, upload, and content foundations without fake enterprise
+                promises.
               </p>
 
-              {/* Social links */}
               <div className="flex items-center gap-3">
                 {socialLinks.map((social) => (
                   <FooterSocialLinkComponent
@@ -298,7 +278,6 @@ export function Footer() {
               </div>
             </div>
 
-            {/* Links sections */}
             <div className="lg:col-span-4">
               <div className="grid grid-cols-2 gap-8 sm:grid-cols-5">
                 {footerSections.map((section) => (
@@ -322,7 +301,6 @@ export function Footer() {
 
         <Separator />
 
-        {/* Bottom section */}
         <div className="py-8">
           <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
             <div className="text-muted-foreground flex items-center gap-2 text-sm">

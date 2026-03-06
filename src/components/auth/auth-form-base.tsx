@@ -26,6 +26,8 @@ import { getAvailableSocialProviders } from "@/lib/auth/providers";
 import { ReactNode } from "react";
 import { UseFormReturn, FieldValues, Path } from "react-hook-form";
 
+type AuthPendingAction = "magic-link" | "social" | null;
+
 interface AuthFormField<T extends FieldValues> {
   name: Path<T>;
   label: ReactNode;
@@ -39,7 +41,7 @@ interface AuthFormConfig {
   description: ReactNode;
   badgeText: ReactNode;
   submitButtonText: ReactNode;
-  loadingText: ReactNode;
+  magicLinkLoadingText: ReactNode;
   submitIcon: React.ComponentType<{ className?: string }>;
   alternativeActionText: ReactNode;
   alternativeActionLink: ReactNode;
@@ -50,8 +52,8 @@ interface AuthFormConfig {
 interface AuthFormBaseProps<T extends FieldValues> {
   form: UseFormReturn<T>;
   onSubmit: (data: T) => Promise<void>;
-  loading: boolean;
-  setLoading: (loading: boolean) => void;
+  pendingAction: AuthPendingAction;
+  setPendingAction: (action: AuthPendingAction) => void;
   config: AuthFormConfig;
   fields: AuthFormField<T>[];
   availableProviders?: ReturnType<typeof getAvailableSocialProviders>;
@@ -60,21 +62,24 @@ interface AuthFormBaseProps<T extends FieldValues> {
 export function AuthFormBase<T extends FieldValues>({
   form,
   onSubmit,
-  loading,
-  setLoading,
+  pendingAction,
+  setPendingAction,
   config,
   fields,
   availableProviders,
 }: AuthFormBaseProps<T>) {
+  const isPending = pendingAction !== null;
+  const isMagicLinkPending = pendingAction === "magic-link";
+
   const handleSubmit = async (data: T) => {
     try {
-      setLoading(true);
+      setPendingAction("magic-link");
       await onSubmit(data);
     } catch {
       toast.error(
         "Something went wrong. Contact support if the issue persists",
       );
-      setLoading(false);
+      setPendingAction(null);
     }
   };
 
@@ -114,8 +119,10 @@ export function AuthFormBase<T extends FieldValues>({
                 <SocialLoginButtons
                   callbackURL={config.callbackURL}
                   availableProviders={availableProviders}
-                  loading={loading}
-                  onLoadingChange={setLoading}
+                  loading={isPending}
+                  onLoadingChange={(loading) => {
+                    setPendingAction(loading ? "social" : null);
+                  }}
                 />
 
                 {/* Divider */}
@@ -152,7 +159,7 @@ export function AuthFormBase<T extends FieldValues>({
                             placeholder={field.placeholder}
                             type={field.type || "text"}
                             {...formField}
-                            disabled={loading}
+                            disabled={isPending}
                             className="focus:border-primary/50 h-12 border-2 pl-10 shadow-sm transition-all focus:translate-x-[1px] focus:translate-y-[1px] focus:shadow-none"
                           />
                         </div>
@@ -167,13 +174,13 @@ export function AuthFormBase<T extends FieldValues>({
             {/* Submit Button */}
             <Button
               type="submit"
-              disabled={loading}
+              disabled={isPending}
               className="from-primary to-primary/90 hover:from-primary/90 hover:to-primary text-primary-foreground h-12 w-full cursor-pointer bg-gradient-to-r font-medium shadow transition-all duration-200 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-sm active:translate-x-[4px] active:translate-y-[4px] active:shadow-none"
             >
-              {loading ? (
+              {isMagicLinkPending ? (
                 <span className="flex items-center gap-2">
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  <span>{config.loadingText}</span>
+                  <span>{config.magicLinkLoadingText}</span>
                 </span>
               ) : (
                 <span className="flex items-center gap-2">

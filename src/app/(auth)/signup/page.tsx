@@ -1,15 +1,23 @@
 import { AuthForm } from "@/components/forms/auth-form";
 import { getAvailableSocialProviders } from "@/lib/auth/providers";
-import { createMetadata } from "@/lib/metadata";
 import {
   DEFAULT_CALLBACK_URL,
   normalizeCallbackUrl,
 } from "@/lib/auth/callback-url";
+import { createLocalizedMetadata } from "@/lib/i18n/page-metadata";
 
-export const metadata = createMetadata({
-  title: "Sign Up",
-  description: "Create your account with magic link",
-});
+export async function generateMetadata() {
+  return createLocalizedMetadata({
+    en: {
+      title: "Sign Up",
+      description: "Create your account with magic link",
+    },
+    "zh-Hans": {
+      title: "注册",
+      description: "使用魔法链接创建您的账户",
+    },
+  });
+}
 
 interface SignUpPageProps {
   searchParams?: Promise<{

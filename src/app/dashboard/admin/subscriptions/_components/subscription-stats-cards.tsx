@@ -1,17 +1,15 @@
 import { StatCard } from "@/components/admin/StatCard";
 import { Users, UserCheck, UserX, TrendingUp } from "lucide-react";
 import { getSubscriptionStats } from "@/lib/admin/stats";
-import { getServerLocale } from "@lingo.dev/compiler/virtual/locale/server";
+import { getRequestLocale } from "@/lib/i18n/server-locale";
 
 export async function SubscriptionStatsCards() {
   const [locale, stats] = await Promise.all([
-    getServerLocale(),
+    getRequestLocale(),
     getSubscriptionStats(),
   ]);
-
-  // MRR calculation is complex and often requires historical data.
-  // We'll keep it as a placeholder for now as per the original implementation.
-  const monthlyRecurringRevenue = "$0";
+  const activationRate =
+    stats.total === 0 ? 0 : Math.round((stats.active / stats.total) * 100);
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -37,9 +35,9 @@ export async function SubscriptionStatsCards() {
         locale={locale}
       />
       <StatCard
-        title="MRR (Placeholder)"
-        value={monthlyRecurringRevenue}
-        description="Monthly Recurring Revenue"
+        title="Activation Rate"
+        value={`${activationRate}%`}
+        description="Share of subscriptions currently active"
         icon={TrendingUp}
         locale={locale}
       />

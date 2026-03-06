@@ -91,6 +91,23 @@ describe("email", () => {
     });
   });
 
+  it("should send email with explicit html and text body", async () => {
+    mockSend.mockResolvedValue({ error: null, data: { id: "email-123" } });
+
+    await sendEmail("recipient@test.com", "HTML Test", {
+      html: "<p>Hello HTML</p>",
+      text: "Hello HTML",
+    });
+
+    expect(mockSend).toHaveBeenCalledWith({
+      from: "Test App <test@example.com>",
+      to: "recipient@test.com",
+      subject: "HTML Test",
+      html: "<p>Hello HTML</p>",
+      text: "Hello HTML",
+    });
+  });
+
   it("should throw error when email sending fails", async () => {
     const testError = new Error("Failed to send email");
     mockSend.mockResolvedValue({ error: testError, data: null });

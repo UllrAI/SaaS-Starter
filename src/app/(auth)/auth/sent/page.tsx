@@ -12,14 +12,13 @@ export default async function MagicLinkSent({
   const { email } = await searchParams;
 
   const description = (
-    <>
-      We&apos;ve sent a secure magic-link to <br />
-      <span className="text-foreground font-bold">
+    <div className="space-y-3">
+      <p>We&apos;ve sent a secure magic-link to</p>
+      <p className="text-foreground break-all font-bold">
         {email || "your email address"}
-      </span>
-      .
-      <br /> Click the link in the email to sign in.
-    </>
+      </p>
+      <p>Click the link in the email to sign in.</p>
+    </div>
   );
 
   return (

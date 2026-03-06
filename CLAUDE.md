@@ -204,7 +204,7 @@ Better-Auth handles all authentication through magic links sent via Resend. OAut
 
 ### Content Management
 
-Blog content is stored as Markdown files in `content/blog/` and indexed through Content Collections at build time. Authors live in `content/authors/`. There is no runtime CMS dashboard or content API.
+Blog content is stored as locale-scoped Markdown files in `content/blog/<locale>/` and indexed through Content Collections at build time. Authors live in `content/authors/`. There is no runtime CMS dashboard or content API.
 
 ### Payment Integration
 

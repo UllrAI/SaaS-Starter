@@ -163,7 +163,7 @@ pnpm db:migrate:prod
 
 ### 5. Content Management (Content Collections)
 
-The project uses Content Collections plus plain Markdown files for blog content. Posts live in `content/blog/*.md`, authors live in `content/authors/*.json`, and build-time generation produces typed collections for the blog pages and sitemap.
+The project uses Content Collections plus plain Markdown files for blog content. Posts live in locale-scoped paths such as `content/blog/en/*.md` and `content/blog/zh-Hans/*.md`, authors live in `content/authors/*.json`, and build-time generation produces typed collections for the blog pages and sitemap.
 
 - **Authoring workflow:** Add or edit posts directly in the repository with frontmatter and Markdown content.
 - **Generated content data:** Run `pnpm content:build` to refresh the generated collections manually. The command is already wired into the build, test, and type-check scripts.
@@ -333,12 +333,10 @@ We recommend using [Vercel](https://vercel.com) for deployment as it seamlessly 
    Push your code to a GitHub, GitLab, or Bitbucket repository.
 
 2. **Import Project in Vercel:**
-
    - Log into your Vercel account, click "Add New... > Project", then select your Git repository.
    - Vercel will automatically detect this is a Next.js project and configure the build settings.
 
 3. **Configure Environment Variables:**
-
    - In your Vercel project's "Settings" -> "Environment Variables", add all the environment variables you defined in your `.env` file. **Do not commit the `.env` file to your Git repository**.
 
 4. **Configure Production Database Migration:**

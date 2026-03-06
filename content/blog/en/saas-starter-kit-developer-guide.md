@@ -1,4 +1,5 @@
 ---
+slug: saas-starter-kit-developer-guide
 title: UllrAI SaaS Starter Kit Developer Documentation
 publishedDate: 2025-06-24
 author: admin
@@ -17,6 +18,7 @@ tags:
 featured: true
 heroImage: https://images.unsplash.com/photo-1561886362-a2b38ce83470?q=80&w=1674&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D
 ---
+
 # UllrAI SaaS Starter Kit Developer Documentation
 
 This documentation provides a comprehensive and in-depth technical reference for developers using the UllrAI SaaS Starter Kit. Whether you want to quickly launch a new project or perform deep customization and secondary development, this documentation will provide you with the necessary guidance.
@@ -39,38 +41,38 @@ This documentation provides a comprehensive and in-depth technical reference for
 
 1.**Clone the project**
 
-   ```bash
-   git clone https://github.com/ullrai/saas-starter.git
-   cd saas-starter
-   ```
+```bash
+git clone https://github.com/ullrai/saas-starter.git
+cd saas-starter
+```
 
 2.**Install dependencies**
 
-   ```bash
-   pnpm install
-   ```
+```bash
+pnpm install
+```
 
 3.**Configure environment**
-   Copy `.env.example` to `.env` and fill in all required environment variables.
+Copy `.env.example` to `.env` and fill in all required environment variables.
 
-   ```bash
-   cp .env.example .env
-   ```
+```bash
+cp .env.example .env
+```
 
 4.**Sync database**
-   Make sure your local PostgreSQL database is running, then execute:
+Make sure your local PostgreSQL database is running, then execute:
 
-   ```bash
-   pnpm db:push
-   ```
+```bash
+pnpm db:push
+```
 
 5.**Run development server**
 
-   ```bash
-   pnpm dev
-   ```
+```bash
+pnpm dev
+```
 
-   The application will run at `http://localhost:3000`.
+The application will run at `http://localhost:3000`.
 
 ### 1.3. Feature List
 
@@ -110,12 +112,12 @@ graph TD
         D -- Email API --> I[Resend];
         D -- Storage API --> J[Cloudflare R2];
     end
-    
+
     subgraph "Content Management"
         K[Content Collections] -- Indexes --> L[Markdown/JSON in Git];
         B -- Reads data --> L;
     end
-    
+
     G -- OAuth --> M[Google/GitHub/LinkedIn];
     H -- Webhooks --> D;
 
@@ -285,6 +287,7 @@ The project uses Next.js App Router and leverages Route Groups for logical page 
 ### 4.1. Authentication System (Better-Auth)
 
 This starter kit uses the `better-auth` library to provide a complete authentication solution.
+
 - **Core Configuration**: `src/lib/auth/server.ts`
   - Configures Drizzle database adapter.
   - Dynamically loads social login providers (Google, GitHub, LinkedIn), only enabled when corresponding `CLIENT_ID` and `SECRET` are provided in `.env`.
@@ -294,14 +297,14 @@ This starter kit uses the `better-auth` library to provide a complete authentica
 - **Client**: `src/lib/auth/client.ts`
   - Provides methods for interacting with the authentication system in client components, like `signIn`, `signOut`, `useSession`, etc.
 - **Authentication Flow (Magic Link)**:
-[![Magic Link](https://mermaid.ink/img/pako:eNp1k-1r00Acx_-V415NaNN2fVh74ETqA4KysYc30je35NaGJrl6SUQtBVeUVXHasQ1ZrYjCQBxL3ZvOWde_ppe0_4WXnh1ldiGQu-P7uXy_97tfFapUIxBBmzxxiaWSOzouMmwWLDB-Kpg5uqpXsOWAdZuwWet5Qyfig23AvW9-4yw47oC5265TukeZeWMWsUrYU8JCwm_v8Ldf-eF3QSw_mCleITaxtFA8qnuDXlcioXKiDo1FFxelDwSG_T3--kiIA--Un3eD-jnf7gWHPX5xMCGkVDDSCQLLS6trIIYregwL4zETF3U1auhWeUJI4RQR7H_xG02__cb_2PUPGkHrFVijZWL9B0j_wlbnzD-t8w-7o5dbMgmY481jSYH1lYeX6SURFWyYDIF_zMm-3-6M9vr--yPJX8kvxTKuFAx-nQhfErk2-v2708lVbBgbWC3fckJbNxVFufYERj_eDTtb0n8E8MYn3vs9-NMadj5fQaZr4_WDC0-qQJ7Ssk6AqNFoe4d7Ld7c5Y2fIKZhu7RBMdNgBBaZrkHkMJdEoEmYicMprI7LD50SMUkBIjHUyCZ2DacAC1ZNYOLmPKbUnJCMusUSRJvYsMXMrWjYmdz0y1UmzpywPHUtB6L5xHgPiKrwGUTJRFxJL8TjafFmc6nkfDoCn0OUziqpXC6XyWUzyVQmk0nUIvDF-K9xJbsgNETTHcoeyQ4bN1rtLzk3Xew)](https://mermaid.live/edit#pako:eNp1k-1r00Acx_-V415NaNN2fVh74ETqA4KysYc30je35NaGJrl6SUQtBVeUVXHasQ1ZrYjCQBxL3ZvOWde_ppe0_4WXnh1ldiGQu-P7uXy_97tfFapUIxBBmzxxiaWSOzouMmwWLDB-Kpg5uqpXsOWAdZuwWet5Qyfig23AvW9-4yw47oC5265TukeZeWMWsUrYU8JCwm_v8Ldf-eF3QSw_mCleITaxtFA8qnuDXlcioXKiDo1FFxelDwSG_T3--kiIA--Un3eD-jnf7gWHPX5xMCGkVDDSCQLLS6trIIYregwL4zETF3U1auhWeUJI4RQR7H_xG02__cb_2PUPGkHrFVijZWL9B0j_wlbnzD-t8w-7o5dbMgmY481jSYH1lYeX6SURFWyYDIF_zMm-3-6M9vr--yPJX8kvxTKuFAx-nQhfErk2-v2708lVbBgbWC3fckJbNxVFufYERj_eDTtb0n8E8MYn3vs9-NMadj5fQaZr4_WDC0-qQJ7Ssk6AqNFoe4d7Ld7c5Y2fIKZhu7RBMdNgBBaZrkHkMJdEoEmYicMprI7LD50SMUkBIjHUyCZ2DacAC1ZNYOLmPKbUnJCMusUSRJvYsMXMrWjYmdz0y1UmzpywPHUtB6L5xHgPiKrwGUTJRFxJL8TjafFmc6nkfDoCn0OUziqpXC6XyWUzyVQmk0nUIvDF-K9xJbsgNETTHcoeyQ4bN1rtLzk3Xew)
+  [![Magic Link](https://mermaid.ink/img/pako:eNp1k-1r00Acx_-V415NaNN2fVh74ETqA4KysYc30je35NaGJrl6SUQtBVeUVXHasQ1ZrYjCQBxL3ZvOWde_ppe0_4WXnh1ldiGQu-P7uXy_97tfFapUIxBBmzxxiaWSOzouMmwWLDB-Kpg5uqpXsOWAdZuwWet5Qyfig23AvW9-4yw47oC5265TukeZeWMWsUrYU8JCwm_v8Ldf-eF3QSw_mCleITaxtFA8qnuDXlcioXKiDo1FFxelDwSG_T3--kiIA--Un3eD-jnf7gWHPX5xMCGkVDDSCQLLS6trIIYregwL4zETF3U1auhWeUJI4RQR7H_xG02__cb_2PUPGkHrFVijZWL9B0j_wlbnzD-t8w-7o5dbMgmY481jSYH1lYeX6SURFWyYDIF_zMm-3-6M9vr--yPJX8kvxTKuFAx-nQhfErk2-v2708lVbBgbWC3fckJbNxVFufYERj_eDTtb0n8E8MYn3vs9-NMadj5fQaZr4_WDC0-qQJ7Ssk6AqNFoe4d7Ld7c5Y2fIKZhu7RBMdNgBBaZrkHkMJdEoEmYicMprI7LD50SMUkBIjHUyCZ2DacAC1ZNYOLmPKbUnJCMusUSRJvYsMXMrWjYmdz0y1UmzpywPHUtB6L5xHgPiKrwGUTJRFxJL8TjafFmc6nkfDoCn0OUziqpXC6XyWUzyVQmk0nUIvDF-K9xJbsgNETTHcoeyQ4bN1rtLzk3Xew)](https://mermaid.live/edit#pako:eNp1k-1r00Acx_-V415NaNN2fVh74ETqA4KysYc30je35NaGJrl6SUQtBVeUVXHasQ1ZrYjCQBxL3ZvOWde_ppe0_4WXnh1ldiGQu-P7uXy_97tfFapUIxBBmzxxiaWSOzouMmwWLDB-Kpg5uqpXsOWAdZuwWet5Qyfig23AvW9-4yw47oC5265TukeZeWMWsUrYU8JCwm_v8Ldf-eF3QSw_mCleITaxtFA8qnuDXlcioXKiDo1FFxelDwSG_T3--kiIA--Un3eD-jnf7gWHPX5xMCGkVDDSCQLLS6trIIYregwL4zETF3U1auhWeUJI4RQR7H_xG02__cb_2PUPGkHrFVijZWL9B0j_wlbnzD-t8w-7o5dbMgmY481jSYH1lYeX6SURFWyYDIF_zMm-3-6M9vr--yPJX8kvxTKuFAx-nQhfErk2-v2708lVbBgbWC3fckJbNxVFufYERj_eDTtb0n8E8MYn3vs9-NMadj5fQaZr4_WDC0-qQJ7Ssk6AqNFoe4d7Ld7c5Y2fIKZhu7RBMdNgBBaZrkHkMJdEoEmYicMprI7LD50SMUkBIjHUyCZ2DacAC1ZNYOLmPKbUnJCMusUSRJvYsMXMrWjYmdz0y1UmzpywPHUtB6L5xHgPiKrwGUTJRFxJL8TjafFmc6nkfDoCn0OUziqpXC6XyWUzyVQmk0nUIvDF-K9xJbsgNETTHcoeyQ4bN1rtLzk3Xew)
   ```mermaid
   sequenceDiagram
       participant User
       participant Client as Frontend (AuthForm)
       participant Server as Server (API)
       participant Resend as Email Service
-  
+
       User->>Client: Enter email and click login
       Client->>Server: POST /api/auth/magic-link
       Server->>Server: Generate time-limited Token
@@ -312,6 +315,7 @@ This starter kit uses the `better-auth` library to provide a complete authentica
       Server->>Server: Verify Token, create session
       Server-->>Client: Set session Cookie and redirect to /dashboard
   ```
+
 ### 4.2. Database & ORM (Drizzle)
 
 - **Schema Definition**: `database/schema.ts` is the single source of truth for all database tables, defining table structures, relationships, and constraints using Drizzle ORM syntax.
@@ -323,6 +327,7 @@ This starter kit uses the `better-auth` library to provide a complete authentica
   - `pnpm db:migrate:dev` & `pnpm db:migrate:prod`: Apply migration files to database.
 
 ### 4.3. Payment & Subscriptions (Creem)
+
 - **Abstraction Layer**: `src/lib/billing/index.ts` exports a unified `billing` object, making it easy to switch to other payment providers (like Stripe) in the future without modifying upper-level business code.
 - **Provider Implementation**: `src/lib/billing/creem/provider.ts` is the specific implementation for Creem payment provider, encapsulating logic for creating checkout sessions, customer portals, and handling webhooks.
 - **API Interfaces**:
@@ -334,14 +339,14 @@ This starter kit uses the `better-auth` library to provide a complete authentica
   - **Idempotency**: Records processed event IDs in `webhook_events` table to prevent duplicate processing of the same event.
   - **Transactional**: All database operations are completed in one transaction, ensuring data consistency.
 - **Payment Flow**:
-[![Payment Flow](https://mermaid.ink/img/pako:eNp1U11rE0EU_SvDPCWQJqn5aDIPfTAFn8RAWwTJy3T3Nlm6u7POzoo1BKwgDbWBCLG0VoT2qSgmedCKBvXPZDbJv3B2txtqTZaF3Zl7zj1n7tzbxBrTARPswlMPbA02DFrn1KrZKHwcyoWhGQ61Bdp2gS_ar5gGqA91kexf-u3vk88DlKhyFbbrqErrkFzE2gT-DHjA8j905NGFPLtamJwDhG7iYOBiZX09EiVo8uqHPByhGn4AAlVNatdwjIwgChtJEVR9tLmFMtQxMjuGaSp3Ga0B2h7zREyJkEH6QJYE6lQAqtzAVNx1DWbPFQLUyi2FON82N--kvGV5-qcnzz8uws4dB4ckaHbYkf33svtWtoeRFvJ7g_HodHbx7W45Ir-yf-y3uxFoqcnHsNNgbA8lYgdpjVmOCQL05H-FiEmzT8fTwcHky2_Z7aTQtD-Uv96Nf74Zj66XUhIb99EWp7ZLNaGKlkT--Vf_ZDjpXakmmfYvZ6evJ0fX_suDJVf7z_EzDt23guK4ggrPxSlc54aOieAepLAF3KLBEjfDXsGiARbUMFG_OuxSzxRBX7QUTXXVE8asmMmZV29gsktNV608R1f3fTMD810Otg68wjxbYHKvEObApImfY5JbzaYLa9lsQb2lcj4XRPcxKZTS-XK5XCyXirl8sVhcbaXwi1A1my6tKQzohmD8YTR74Qi2_gLtEE8s)](https://mermaid.live/edit#pako:eNp1U11rE0EU_SvDPCWQJqn5aDIPfTAFn8RAWwTJy3T3Nlm6u7POzoo1BKwgDbWBCLG0VoT2qSgmedCKBvXPZDbJv3B2txtqTZaF3Zl7zj1n7tzbxBrTARPswlMPbA02DFrn1KrZKHwcyoWhGQ61Bdp2gS_ar5gGqA91kexf-u3vk88DlKhyFbbrqErrkFzE2gT-DHjA8j905NGFPLtamJwDhG7iYOBiZX09EiVo8uqHPByhGn4AAlVNatdwjIwgChtJEVR9tLmFMtQxMjuGaSp3Ga0B2h7zREyJkEH6QJYE6lQAqtzAVNx1DWbPFQLUyi2FON82N--kvGV5-qcnzz8uws4dB4ckaHbYkf33svtWtoeRFvJ7g_HodHbx7W45Ir-yf-y3uxFoqcnHsNNgbA8lYgdpjVmOCQL05H-FiEmzT8fTwcHky2_Z7aTQtD-Uv96Nf74Zj66XUhIb99EWp7ZLNaGKlkT--Vf_ZDjpXakmmfYvZ6evJ0fX_suDJVf7z_EzDt23guK4ggrPxSlc54aOieAepLAF3KLBEjfDXsGiARbUMFG_OuxSzxRBX7QUTXXVE8asmMmZV29gsktNV608R1f3fTMD810Otg68wjxbYHKvEObApImfY5JbzaYLa9lsQb2lcj4XRPcxKZTS-XK5XCyXirl8sVhcbaXwi1A1my6tKQzohmD8YTR74Qi2_gLtEE8s)
+  [![Payment Flow](https://mermaid.ink/img/pako:eNp1U11rE0EU_SvDPCWQJqn5aDIPfTAFn8RAWwTJy3T3Nlm6u7POzoo1BKwgDbWBCLG0VoT2qSgmedCKBvXPZDbJv3B2txtqTZaF3Zl7zj1n7tzbxBrTARPswlMPbA02DFrn1KrZKHwcyoWhGQ61Bdp2gS_ar5gGqA91kexf-u3vk88DlKhyFbbrqErrkFzE2gT-DHjA8j905NGFPLtamJwDhG7iYOBiZX09EiVo8uqHPByhGn4AAlVNatdwjIwgChtJEVR9tLmFMtQxMjuGaSp3Ga0B2h7zREyJkEH6QJYE6lQAqtzAVNx1DWbPFQLUyi2FON82N--kvGV5-qcnzz8uws4dB4ckaHbYkf33svtWtoeRFvJ7g_HodHbx7W45Ir-yf-y3uxFoqcnHsNNgbA8lYgdpjVmOCQL05H-FiEmzT8fTwcHky2_Z7aTQtD-Uv96Nf74Zj66XUhIb99EWp7ZLNaGKlkT--Vf_ZDjpXakmmfYvZ6evJ0fX_suDJVf7z_EzDt23guK4ggrPxSlc54aOieAepLAF3KLBEjfDXsGiARbUMFG_OuxSzxRBX7QUTXXVE8asmMmZV29gsktNV608R1f3fTMD810Otg68wjxbYHKvEObApImfY5JbzaYLa9lsQb2lcj4XRPcxKZTS-XK5XCyXirl8sVhcbaXwi1A1my6tKQzohmD8YTR74Qi2_gLtEE8s)](https://mermaid.live/edit#pako:eNp1U11rE0EU_SvDPCWQJqn5aDIPfTAFn8RAWwTJy3T3Nlm6u7POzoo1BKwgDbWBCLG0VoT2qSgmedCKBvXPZDbJv3B2txtqTZaF3Zl7zj1n7tzbxBrTARPswlMPbA02DFrn1KrZKHwcyoWhGQ61Bdp2gS_ar5gGqA91kexf-u3vk88DlKhyFbbrqErrkFzE2gT-DHjA8j905NGFPLtamJwDhG7iYOBiZX09EiVo8uqHPByhGn4AAlVNatdwjIwgChtJEVR9tLmFMtQxMjuGaSp3Ga0B2h7zREyJkEH6QJYE6lQAqtzAVNx1DWbPFQLUyi2FON82N--kvGV5-qcnzz8uws4dB4ckaHbYkf33svtWtoeRFvJ7g_HodHbx7W45Ir-yf-y3uxFoqcnHsNNgbA8lYgdpjVmOCQL05H-FiEmzT8fTwcHky2_Z7aTQtD-Uv96Nf74Zj66XUhIb99EWp7ZLNaGKlkT--Vf_ZDjpXakmmfYvZ6evJ0fX_suDJVf7z_EzDt23guK4ggrPxSlc54aOieAepLAF3KLBEjfDXsGiARbUMFG_OuxSzxRBX7QUTXXVE8asmMmZV29gsktNV608R1f3fTMD810Otg68wjxbYHKvEObApImfY5JbzaYLa9lsQb2lcj4XRPcxKZTS-XK5XCyXirl8sVhcbaXwi1A1my6tKQzohmD8YTR74Qi2_gLtEE8s)
   ```mermaid
   sequenceDiagram
       participant User
       participant Client as Frontend (Pricing Page)
       participant Server as Server
       participant Creem
-  
+
       User->>Client: Click "Get Plan"
       Client->>Server: POST /api/billing/checkout
       Server->>Creem: Create Checkout Session
@@ -354,6 +359,7 @@ This starter kit uses the `better-auth` library to provide a complete authentica
       Server->>Server: (DB Transaction) Update user subscription status
       User->>Client: Redirect to /payment-status
   ```
+
 ### 4.4. File Upload (Cloudflare R2)
 
 The system supports two upload modes, providing optimal choices for different scenarios. All upload rules are centralized in `src/lib/config/upload.ts`.
@@ -372,7 +378,7 @@ sequenceDiagram
     participant FileUploader as Frontend Component
     participant Server as Server API
     participant R2 as Cloudflare R2
-    
+
     User->>FileUploader: Select/drag files
     FileUploader->>FileUploader: Client-side validation (type/size), image compression
     FileUploader->>Server: POST /api/upload/presigned-url (request upload URL)
@@ -398,7 +404,7 @@ sequenceDiagram
     participant Client as Client/Script
     participant Server as Server API
     participant R2 as Cloudflare R2
-    
+
     Client->>Server: POST /api/upload/server-upload (multipart/form-data)
     Server->>Server: Verify identity and file
     Server->>R2: Stream file
@@ -443,15 +449,15 @@ Provides a powerful, extensible data management system.
 
 ### 5.2. API Reference
 
-| Route | Method | Description |
-| --- | --- | --- |
-| `/api/auth/[...all]` | GET, POST | Handle all `better-auth` authentication requests. |
-| `/api/billing/checkout` | POST | Create payment session. |
-| `/api/billing/portal` | GET | Get customer portal URL. |
-| `/api/billing/webhooks/creem` | POST | Receive Creem webhook events. |
-| `/api/upload/presigned-url` | POST | Get presigned URL for client-side direct upload. |
-| `/api/upload/server-upload` | POST | Server-side proxy file upload. |
-| `/api/payment-status` | GET | Query payment status. |
+| Route                         | Method    | Description                                       |
+| ----------------------------- | --------- | ------------------------------------------------- |
+| `/api/auth/[...all]`          | GET, POST | Handle all `better-auth` authentication requests. |
+| `/api/billing/checkout`       | POST      | Create payment session.                           |
+| `/api/billing/portal`         | GET       | Get customer portal URL.                          |
+| `/api/billing/webhooks/creem` | POST      | Receive Creem webhook events.                     |
+| `/api/upload/presigned-url`   | POST      | Get presigned URL for client-side direct upload.  |
+| `/api/upload/server-upload`   | POST      | Server-side proxy file upload.                    |
+| `/api/payment-status`         | GET       | Query payment status.                             |
 
 ### 5.3. Hooks and Events
 
@@ -501,23 +507,23 @@ Provides a powerful, extensible data management system.
 
 ### 8.1. CLI Commands
 
-| Script | Description |
-| --- | --- |
-| `pnpm dev` | Start development server (Turbo mode) |
-| `pnpm content:build` | Generate Content Collections output |
-| `pnpm build` | Build production application |
-| `pnpm start` | Start production server |
-| `pnpm lint` | Run ESLint checks |
-| `pnpm test` | Run Jest unit tests |
-| `pnpm prettier:format` | Format all code |
-| `pnpm db:generate` | Generate migration files for development |
-| `pnpm db:generate:prod` | Generate migration files for production |
-| `pnpm db:migrate:dev` | Apply development migrations |
-| `pnpm db:migrate:prod` | Apply production migrations |
-| `pnpm db:push` | (Development only) Push schema to database |
-| `pnpm analyze` | Build and analyze bundle size |
-| `pnpm set:admin` | (Local) Promote user to super admin |
-| `pnpm set:admin:prod` | (Production) Promote user to super admin |
+| Script                  | Description                                |
+| ----------------------- | ------------------------------------------ |
+| `pnpm dev`              | Start development server (Turbo mode)      |
+| `pnpm content:build`    | Generate Content Collections output        |
+| `pnpm build`            | Build production application               |
+| `pnpm start`            | Start production server                    |
+| `pnpm lint`             | Run ESLint checks                          |
+| `pnpm test`             | Run Jest unit tests                        |
+| `pnpm prettier:format`  | Format all code                            |
+| `pnpm db:generate`      | Generate migration files for development   |
+| `pnpm db:generate:prod` | Generate migration files for production    |
+| `pnpm db:migrate:dev`   | Apply development migrations               |
+| `pnpm db:migrate:prod`  | Apply production migrations                |
+| `pnpm db:push`          | (Development only) Push schema to database |
+| `pnpm analyze`          | Build and analyze bundle size              |
+| `pnpm set:admin`        | (Local) Promote user to super admin        |
+| `pnpm set:admin:prod`   | (Production) Promote user to super admin   |
 
 ### 8.2. Configuration Options
 

@@ -1,14 +1,23 @@
 import { notFound } from "next/navigation";
 import { createMetadata } from "@/lib/metadata";
 import { BlogPostHeader } from "@/components/blog/blog-post-header";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { getRequestLocale } from "@/lib/i18n/server-locale";
 import { createPageMetadata } from "@/lib/i18n/page-metadata";
+import { Languages } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { getAllPosts, getAuthorBySlug, getPostBySlug } from "@/lib/content/blog";
+import {
+  getAllPostSlugs,
+  getAuthorBySlug,
+  getLocalizedBlogPath,
+  getLocalizedBlogPostPath,
+  getPostBySlug,
+  getPostLocalizations,
+} from "@/lib/content/blog";
 
 interface BlogPostPageProps {
   params: Promise<{
@@ -25,16 +34,16 @@ async function BlogPostNotFoundMetadataDescription() {
 }
 
 export async function generateStaticParams() {
-  return getAllPosts().map((post) => ({
-    slug: post.slug,
+  return getAllPostSlugs().map((slug) => ({
+    slug,
   }));
 }
 
 export async function generateMetadata({
   params,
 }: BlogPostPageProps): Promise<Metadata> {
-  const { slug } = await params;
-  const post = getPostBySlug(slug);
+  const [{ slug }, locale] = await Promise.all([params, getRequestLocale()]);
+  const post = getPostBySlug(slug, locale);
 
   if (!post) {
     return createPageMetadata({
@@ -43,6 +52,13 @@ export async function generateMetadata({
     });
   }
 
+  const localizations = getPostLocalizations(slug);
+  const languageAlternates = Object.fromEntries(
+    localizations.map((localizedPost) => [
+      localizedPost.locale,
+      getLocalizedBlogPostPath(slug, localizedPost.locale),
+    ]),
+  );
   const description =
     post.excerpt ||
     `Read our comprehensive blog post about ${post.title}. Discover insights, tips, and best practices in this detailed article.`;
@@ -78,23 +94,21 @@ export async function generateMetadata({
       images: post.heroImage ? [post.heroImage] : undefined,
     },
     alternates: {
-      canonical: `/blog/${slug}`,
+      canonical: getLocalizedBlogPostPath(slug, post.locale),
+      languages: languageAlternates,
     },
   });
 }
 
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
-  const { slug } = await params;
-  const post = getPostBySlug(slug);
+  const [{ slug }, locale] = await Promise.all([params, getRequestLocale()]);
+  const post = getPostBySlug(slug, locale);
 
   if (!post) {
     notFound();
   }
 
-  const [locale, author] = await Promise.all([
-    getRequestLocale(),
-    Promise.resolve(getAuthorBySlug(post.author)),
-  ]);
+  const author = getAuthorBySlug(post.author);
 
   return (
     <>
@@ -108,7 +122,27 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         content={post.content}
         author={author?.name || "Anonymous"}
         locale={locale}
+        backHref={getLocalizedBlogPath(locale)}
       />
+
+      {post.isFallback && (
+        <section className="bg-background pt-8 sm:pt-10">
+          <div className="container mx-auto px-4 sm:px-6">
+            <div className="mx-auto max-w-4xl">
+              <Alert className="border-amber-300/60 bg-amber-50/80 text-amber-950">
+                <Languages className="text-amber-700" />
+                <AlertTitle>
+                  This article is currently only available in English
+                </AlertTitle>
+                <AlertDescription>
+                  You are viewing the English version because a localized
+                  version is not available yet.
+                </AlertDescription>
+              </Alert>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Article Content */}
       <section className="bg-background py-12 sm:py-16">
@@ -134,7 +168,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
               Want to read more articles? Check out our blog for the latest
               insights and updates.
             </p>
-            <Link href="/blog">
+            <Link href={getLocalizedBlogPath(locale)}>
               <Button
                 size="lg"
                 className="bg-primary hover:bg-primary/90 text-primary-foreground transition-colors"

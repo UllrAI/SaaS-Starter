@@ -17,19 +17,21 @@ import {
 import Link from "next/link";
 import { BackgroundPattern } from "@/components/ui/background-pattern";
 import { COMPANY_NAME } from "@/lib/config/constants";
-import { createLocalizedMetadata } from "@/lib/i18n/page-metadata";
+import { createPageMetadata } from "@/lib/i18n/page-metadata";
 import { ContactMethods } from "./contact-methods";
 
+async function ContactPageMetadataTitle() {
+  return <>Contact Us</>;
+}
+
+async function ContactPageMetadataDescription() {
+  return <>Get in touch with our team. We are here to help with any questions about {COMPANY_NAME}.</>;
+}
+
 export async function generateMetadata() {
-  return createLocalizedMetadata({
-    en: {
-      title: "Contact Us",
-      description: `Get in touch with our team. We are here to help with any questions about ${COMPANY_NAME}.`,
-    },
-    "zh-Hans": {
-      title: "联系我们",
-      description: `联系 ${COMPANY_NAME} 团队，获取关于产品、部署和使用方式的帮助。`,
-    },
+  return createPageMetadata({
+    title: ContactPageMetadataTitle,
+    description: ContactPageMetadataDescription,
   });
 }
 

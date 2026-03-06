@@ -23,6 +23,7 @@ import {
 } from "@/lib/actions/admin";
 import { SubscriptionStatus } from "@/types/billing";
 import { useIntlLocale } from "@/hooks/use-intl-locale";
+import { defineCopyCatalog } from "@/lib/i18n/copy-catalog";
 
 interface SubscriptionManagementTableProps {
   initialData: SubscriptionWithUser[];
@@ -34,28 +35,53 @@ interface SubscriptionManagementTableProps {
   };
 }
 
-type CopyComponent = React.ComponentType;
-
-const SUBSCRIPTION_STATUS_LABELS: Record<string, CopyComponent> = {
-  active: function SubscriptionStatusActiveLabel() {
-    return <>Active</>;
+const SUBSCRIPTION_STATUS_COPY = defineCopyCatalog([
+  {
+    id: "active",
+    Label: function SubscriptionStatusActiveLabel() {
+      return <>Active</>;
+    },
   },
-  trialing: function SubscriptionStatusTrialingLabel() {
-    return <>Trialing</>;
+  {
+    id: "trialing",
+    Label: function SubscriptionStatusTrialingLabel() {
+      return <>Trialing</>;
+    },
   },
-  canceled: function SubscriptionStatusCanceledLabel() {
-    return <>Canceled</>;
+  {
+    id: "canceled",
+    Label: function SubscriptionStatusCanceledLabel() {
+      return <>Canceled</>;
+    },
   },
-  past_due: function SubscriptionStatusPastDueLabel() {
-    return <>Past Due</>;
+  {
+    id: "past_due",
+    Label: function SubscriptionStatusPastDueLabel() {
+      return <>Past Due</>;
+    },
   },
-  incomplete: function SubscriptionStatusIncompleteLabel() {
-    return <>Incomplete</>;
+  {
+    id: "incomplete",
+    Label: function SubscriptionStatusIncompleteLabel() {
+      return <>Incomplete</>;
+    },
   },
-  unpaid: function SubscriptionStatusUnpaidLabel() {
-    return <>Unpaid</>;
+  {
+    id: "unpaid",
+    Label: function SubscriptionStatusUnpaidLabel() {
+      return <>Unpaid</>;
+    },
   },
-};
+  {
+    id: "unknown",
+    Label: function SubscriptionStatusUnknownLabel() {
+      return <>Unknown</>;
+    },
+  },
+] satisfies ReadonlyArray<{
+  id: string;
+  Label: React.ComponentType;
+}>);
 
 export function SubscriptionManagementTable({
   initialData,
@@ -171,14 +197,14 @@ export function SubscriptionManagementTable({
       render: (sub) => <div className="font-medium">{sub.planName}</div>,
     },
     {
-      key: "status",
-      label: <>Status</>,
-      render: (sub) => {
-        const SubscriptionStatusLabel =
-          SUBSCRIPTION_STATUS_LABELS[sub.status] ??
-          function SubscriptionStatusFallbackLabel() {
-            return <>Unknown</>;
-          };
+    key: "status",
+    label: <>Status</>,
+    render: (sub) => {
+        const SubscriptionStatusLabel = (
+          SUBSCRIPTION_STATUS_COPY.entries.find(
+            (entry) => entry.id === sub.status,
+          ) ?? SUBSCRIPTION_STATUS_COPY.get("unknown")
+        ).Label;
 
         return (
           <Badge

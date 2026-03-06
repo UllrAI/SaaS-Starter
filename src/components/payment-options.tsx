@@ -26,8 +26,6 @@ import {
 import {
   PRODUCT_TIERS,
   type PricingTier,
-  type PricingTierDescriptionId,
-  type ProductFeatureId,
 } from "@/lib/config/products";
 import { useSession } from "@/lib/auth/client";
 import { useRouter } from "nextjs-toploader/app";
@@ -36,6 +34,7 @@ import { cn } from "@/lib/utils";
 import { Skeleton } from "./ui/skeleton";
 import { useIntlLocale } from "@/hooks/use-intl-locale";
 import { getSafeBillingRedirectUrl } from "@/lib/billing/url";
+import { defineCopyCatalog } from "@/lib/i18n/copy-catalog";
 
 // Helper: Format Price
 const formatPrice = (
@@ -49,94 +48,189 @@ const formatPrice = (
   }).format(price);
 };
 
-type CopyComponent = React.ComponentType;
+const PAYMENT_MODE_COPY = defineCopyCatalog([
+  {
+    id: "subscription",
+    Label: function PricingModeSubscriptionLabel() {
+      return <>Subscription</>;
+    },
+  },
+  {
+    id: "one_time",
+    Label: function PricingModeOneTimeLabel() {
+      return <>One-Time</>;
+    },
+  },
+] satisfies ReadonlyArray<{
+  id: PaymentMode;
+  Label: React.ComponentType;
+}>);
 
-const PAYMENT_MODE_LABELS: Record<PaymentMode, CopyComponent> = {
-  subscription: function PricingModeSubscriptionLabel() {
-    return <>Subscription</>;
+const BILLING_CYCLE_COPY = defineCopyCatalog([
+  {
+    id: "monthly",
+    Label: function BillingCycleMonthlyLabel() {
+      return <>Monthly</>;
+    },
   },
-  one_time: function PricingModeOneTimeLabel() {
-    return <>One-Time</>;
+  {
+    id: "yearly",
+    Label: function BillingCycleYearlyLabel() {
+      return <>Yearly</>;
+    },
   },
-};
+] satisfies ReadonlyArray<{
+  id: BillingCycle;
+  Label: React.ComponentType;
+}>);
 
-const BILLING_CYCLE_LABELS: Record<BillingCycle, CopyComponent> = {
-  monthly: function BillingCycleMonthlyLabel() {
-    return <>Monthly</>;
+const TIER_UI_COPY = defineCopyCatalog([
+  {
+    id: "discount",
+    Label: function BillingCycleDiscountLabel() {
+      return <>Save 17%</>;
+    },
   },
-  yearly: function BillingCycleYearlyLabel() {
-    return <>Yearly</>;
+  {
+    id: "recommended",
+    Label: function TierBadgeRecommendedLabel() {
+      return <>RECOMMENDED</>;
+    },
   },
-};
+  {
+    id: "oneTime",
+    Label: function TierBillingOneTimeLabel() {
+      return <>One-time purchase, no automatic renewal</>;
+    },
+  },
+  {
+    id: "annually",
+    Label: function TierBillingAnnualLabel() {
+      return <>Billed annually</>;
+    },
+  },
+  {
+    id: "monthly",
+    Label: function TierBillingMonthlyLabel() {
+      return <>Billed monthly</>;
+    },
+  },
+  {
+    id: "processing",
+    Label: function TierActionProcessingLabel() {
+      return <>PROCESSING</>;
+    },
+  },
+  {
+    id: "loginToBuy",
+    Label: function TierActionLoginToBuyLabel() {
+      return <>LOGIN TO BUY</>;
+    },
+  },
+  {
+    id: "loginAction",
+    Label: function TierToastLoginActionLabel() {
+      return <>Login</>;
+    },
+  },
+  {
+    id: "managePlanAction",
+    Label: function TierToastManagePlanActionLabel() {
+      return <>Manage Plan</>;
+    },
+  },
+] as const satisfies ReadonlyArray<{
+  id:
+    | "discount"
+    | "recommended"
+    | "oneTime"
+    | "annually"
+    | "monthly"
+    | "processing"
+    | "loginToBuy"
+    | "loginAction"
+    | "managePlanAction";
+  Label: React.ComponentType;
+}>);
 
-const TIER_UI_LABELS = {
-  discount: function BillingCycleDiscountLabel() {
-    return <>Save 17%</>;
+const PRICING_TIER_COPY = defineCopyCatalog([
+  {
+    id: "plus",
+    Description: function TierDescriptionPlus() {
+      return <>Core starter package for solo builders shipping the basics</>;
+    },
   },
-  recommended: function TierBadgeRecommendedLabel() {
-    return <>RECOMMENDED</>;
+  {
+    id: "pro",
+    Description: function TierDescriptionPro() {
+      return <>Full-featured starter package for teams shipping a real MVP</>;
+    },
   },
-  oneTime: function TierBillingOneTimeLabel() {
-    return <>One-time purchase, no automatic renewal</>;
+  {
+    id: "team",
+    Description: function TierDescriptionTeam() {
+      return <>Everything in Professional plus rollout support for teams</>;
+    },
   },
-  annually: function TierBillingAnnualLabel() {
-    return <>Billed annually</>;
-  },
-  monthly: function TierBillingMonthlyLabel() {
-    return <>Billed monthly</>;
-  },
-  processing: function TierActionProcessingLabel() {
-    return <>PROCESSING</>;
-  },
-  loginToBuy: function TierActionLoginToBuyLabel() {
-    return <>LOGIN TO BUY</>;
-  },
-  loginAction: function TierToastLoginActionLabel() {
-    return <>Login</>;
-  },
-  managePlanAction: function TierToastManagePlanActionLabel() {
-    return <>Manage Plan</>;
-  },
-} as const;
+] satisfies ReadonlyArray<{
+  id: PricingTier["id"];
+  Description: React.ComponentType;
+}>);
 
-const TIER_DESCRIPTION_COMPONENTS: Record<
-  PricingTierDescriptionId,
-  CopyComponent
-> = {
-  plus: function TierDescriptionPlus() {
-    return <>Core starter package for solo builders shipping the basics</>;
+const PRICING_FEATURE_COPY = defineCopyCatalog([
+  {
+    id: "marketing-foundation",
+    Label: function TierFeatureMarketingFoundation() {
+      return <>Marketing pages and blog foundation</>;
+    },
   },
-  pro: function TierDescriptionPro() {
-    return <>Full-featured starter package for teams shipping a real MVP</>;
+  {
+    id: "auth-dashboard",
+    Label: function TierFeatureAuthDashboard() {
+      return <>Authentication and protected dashboard</>;
+    },
   },
-  team: function TierDescriptionTeam() {
-    return <>Everything in Professional plus rollout support for teams</>;
+  {
+    id: "billing-flow",
+    Label: function TierFeatureBillingFlow() {
+      return <>Creem checkout and billing portal flow</>;
+    },
   },
-};
-
-const TIER_FEATURE_COMPONENTS: Record<ProductFeatureId, CopyComponent> = {
-  "marketing-foundation": function TierFeatureMarketingFoundation() {
-    return <>Marketing pages and blog foundation</>;
+  {
+    id: "admin-operations",
+    Label: function TierFeatureAdminOperations() {
+      return <>Admin operations screens</>;
+    },
   },
-  "auth-dashboard": function TierFeatureAuthDashboard() {
-    return <>Authentication and protected dashboard</>;
+  {
+    id: "r2-uploads",
+    Label: function TierFeatureR2Uploads() {
+      return <>Cloudflare R2 upload workflows</>;
+    },
   },
-  "billing-flow": function TierFeatureBillingFlow() {
-    return <>Creem checkout and billing portal flow</>;
+  {
+    id: "localization-setup",
+    Label: function TierFeatureLocalizationSetup() {
+      return <>Localization setup</>;
+    },
   },
-  "admin-operations": function TierFeatureAdminOperations() {
-    return <>Admin operations screens</>;
+  {
+    id: "implementation-guidance",
+    Label: function TierFeatureImplementationGuidance() {
+      return <>Implementation guidance</>;
+    },
   },
-  "r2-uploads": function TierFeatureR2Uploads() {
-    return <>Cloudflare R2 upload workflows</>;
-  },
-  "localization-setup": function TierFeatureLocalizationSetup() {
-    return <>Localization setup</>;
-  },
-  "implementation-guidance": function TierFeatureImplementationGuidance() {
-    return <>Implementation guidance</>;
-  },
-};
+] satisfies ReadonlyArray<{
+  id:
+    | "marketing-foundation"
+    | "auth-dashboard"
+    | "billing-flow"
+    | "admin-operations"
+    | "r2-uploads"
+    | "localization-setup"
+    | "implementation-guidance";
+  Label: React.ComponentType;
+}>);
 
 function TierActionGetLabel({ tierName }: { tierName: string }) {
   return <>GET {tierName.toUpperCase()}</>;
@@ -154,19 +248,19 @@ export function PricingSection({ className }: { className?: string }) {
 
   const { data: session, isPending: isSessionLoading } = useSession();
   const router = useRouter();
-  const SubscriptionLabel = PAYMENT_MODE_LABELS.subscription;
-  const OneTimeLabel = PAYMENT_MODE_LABELS.one_time;
-  const MonthlyLabel = BILLING_CYCLE_LABELS.monthly;
-  const YearlyLabel = BILLING_CYCLE_LABELS.yearly;
-  const DiscountLabel = TIER_UI_LABELS.discount;
-  const RecommendedLabel = TIER_UI_LABELS.recommended;
-  const OneTimeBillingLabel = TIER_UI_LABELS.oneTime;
-  const AnnualBillingLabel = TIER_UI_LABELS.annually;
-  const MonthlyBillingLabel = TIER_UI_LABELS.monthly;
-  const ProcessingLabel = TIER_UI_LABELS.processing;
-  const LoginToBuyLabel = TIER_UI_LABELS.loginToBuy;
-  const LoginActionLabel = TIER_UI_LABELS.loginAction;
-  const ManagePlanActionLabel = TIER_UI_LABELS.managePlanAction;
+  const SubscriptionLabel = PAYMENT_MODE_COPY.get("subscription").Label;
+  const OneTimeLabel = PAYMENT_MODE_COPY.get("one_time").Label;
+  const MonthlyLabel = BILLING_CYCLE_COPY.get("monthly").Label;
+  const YearlyLabel = BILLING_CYCLE_COPY.get("yearly").Label;
+  const DiscountLabel = TIER_UI_COPY.get("discount").Label;
+  const RecommendedLabel = TIER_UI_COPY.get("recommended").Label;
+  const OneTimeBillingLabel = TIER_UI_COPY.get("oneTime").Label;
+  const AnnualBillingLabel = TIER_UI_COPY.get("annually").Label;
+  const MonthlyBillingLabel = TIER_UI_COPY.get("monthly").Label;
+  const ProcessingLabel = TIER_UI_COPY.get("processing").Label;
+  const LoginToBuyLabel = TIER_UI_COPY.get("loginToBuy").Label;
+  const LoginActionLabel = TIER_UI_COPY.get("loginAction").Label;
+  const ManagePlanActionLabel = TIER_UI_COPY.get("managePlanAction").Label;
 
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
@@ -335,7 +429,7 @@ export function PricingSection({ className }: { className?: string }) {
       {/* Pricing Cards */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3 lg:gap-8">
         {PRODUCT_TIERS.map((tier) => {
-          const TierDescription = TIER_DESCRIPTION_COMPONENTS[tier.descriptionId];
+          const TierDescription = PRICING_TIER_COPY.get(tier.id).Description;
           const price =
             paymentMode === "one_time"
               ? tier.prices.oneTime
@@ -412,7 +506,8 @@ export function PricingSection({ className }: { className?: string }) {
                 <div className="bg-muted/30 mb-6 h-px w-full" />
                 <div className="mb-8 flex-1 space-y-4">
                   {tier.features.map((feature, index) => {
-                    const TierFeatureLabel = TIER_FEATURE_COMPONENTS[feature.id];
+                    const TierFeatureLabel =
+                      PRICING_FEATURE_COPY.get(feature.id).Label;
 
                     return (
                       <div

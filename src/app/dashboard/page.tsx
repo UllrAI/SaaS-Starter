@@ -17,7 +17,7 @@ import { db } from "@/database";
 import { uploads } from "@/database/schema";
 import { formatCurrency } from "@/lib/utils";
 import { formatFileSize } from "@/lib/config/upload";
-import { createLocalizedMetadata } from "@/lib/i18n/page-metadata";
+import { createPageMetadata } from "@/lib/i18n/page-metadata";
 import { getRequestLocale } from "@/lib/i18n/server-locale";
 import {
   ArrowRight,
@@ -28,16 +28,18 @@ import {
   UserCircle2,
 } from "lucide-react";
 
+async function DashboardMetadataTitle() {
+  return <>Dashboard</>;
+}
+
+async function DashboardMetadataDescription() {
+  return <>Account overview, billing status, and starter setup progress.</>;
+}
+
 export async function generateMetadata() {
-  return createLocalizedMetadata({
-    en: {
-      title: "Dashboard",
-      description: "Account overview, billing status, and starter setup progress.",
-    },
-    "zh-Hans": {
-      title: "控制台",
-      description: "查看账户概览、计费状态以及入门套件的设置进度。",
-    },
+  return createPageMetadata({
+    title: DashboardMetadataTitle,
+    description: DashboardMetadataDescription,
   });
 }
 

@@ -12,18 +12,20 @@ import { UserManagementTable } from "./_components/user-management-table";
 import { UserStatsCards } from "./_components/user-stats-cards";
 import { StatsCardsSkeleton } from "../_components/stats-cards-skeleton";
 import { getUsers } from "@/lib/actions/admin";
-import { createLocalizedMetadata } from "@/lib/i18n/page-metadata";
+import { createPageMetadata } from "@/lib/i18n/page-metadata";
+
+async function UserManagementMetadataTitle() {
+  return <>User Management</>;
+}
+
+async function UserManagementMetadataDescription() {
+  return <>Manage user accounts, roles, and permissions</>;
+}
 
 export async function generateMetadata() {
-  return createLocalizedMetadata({
-    en: {
-      title: "User Management",
-      description: "Manage user accounts, roles, and permissions",
-    },
-    "zh-Hans": {
-      title: "用户管理",
-      description: "管理用户账户、角色与权限。",
-    },
+  return createPageMetadata({
+    title: UserManagementMetadataTitle,
+    description: UserManagementMetadataDescription,
   });
 }
 

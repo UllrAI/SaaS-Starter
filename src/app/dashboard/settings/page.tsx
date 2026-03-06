@@ -3,18 +3,20 @@ import { redirect } from "next/navigation";
 import { DashboardPageWrapper } from "../_components/dashboard-page-wrapper";
 import { AccountPage } from "./_components/account-page";
 import { AppearancePage } from "./_components/appearance-page";
-import { createLocalizedMetadata } from "@/lib/i18n/page-metadata";
+import { createPageMetadata } from "@/lib/i18n/page-metadata";
+
+async function SettingsPageMetadataTitle() {
+  return <>Settings</>;
+}
+
+async function SettingsPageMetadataDescription() {
+  return <>Manage your account profile and dashboard appearance.</>;
+}
 
 export async function generateMetadata() {
-  return createLocalizedMetadata({
-    en: {
-      title: "Settings",
-      description: "Manage your account profile and dashboard appearance.",
-    },
-    "zh-Hans": {
-      title: "设置",
-      description: "管理您的账户资料与控制台外观。",
-    },
+  return createPageMetadata({
+    title: SettingsPageMetadataTitle,
+    description: SettingsPageMetadataDescription,
   });
 }
 

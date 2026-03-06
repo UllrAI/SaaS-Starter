@@ -10,6 +10,7 @@ import { useAdminTable } from "@/hooks/use-admin-table";
 import { Button } from "@/components/ui/button";
 import { getPayments } from "@/lib/actions/admin";
 import { useIntlLocale } from "@/hooks/use-intl-locale";
+import { defineCopyCatalog } from "@/lib/i18n/copy-catalog";
 
 interface PaymentManagementTableProps {
   initialData: PaymentWithUser[];
@@ -22,8 +23,6 @@ interface PaymentManagementTableProps {
 }
 
 type BadgeVariant = ComponentProps<typeof Badge>["variant"];
-type CopyComponent = React.ComponentType;
-
 const STATUS_BADGE_VARIANT_MAP: Record<string, BadgeVariant> = {
   succeeded: "secondary",
   pending: "outline",
@@ -35,38 +34,83 @@ const getStatusBadgeVariant = (status: string) => {
   return STATUS_BADGE_VARIANT_MAP[status] ?? "secondary";
 };
 
-const PAYMENT_STATUS_LABELS: Record<string, CopyComponent> = {
-  succeeded: function PaymentStatusSucceededLabel() {
-    return <>Succeeded</>;
+const PAYMENT_STATUS_COPY = defineCopyCatalog([
+  {
+    id: "succeeded",
+    Label: function PaymentStatusSucceededLabel() {
+      return <>Succeeded</>;
+    },
   },
-  pending: function PaymentStatusPendingLabel() {
-    return <>Pending</>;
+  {
+    id: "pending",
+    Label: function PaymentStatusPendingLabel() {
+      return <>Pending</>;
+    },
   },
-  failed: function PaymentStatusFailedLabel() {
-    return <>Failed</>;
+  {
+    id: "failed",
+    Label: function PaymentStatusFailedLabel() {
+      return <>Failed</>;
+    },
   },
-  canceled: function PaymentStatusCanceledLabel() {
-    return <>Canceled</>;
+  {
+    id: "canceled",
+    Label: function PaymentStatusCanceledLabel() {
+      return <>Canceled</>;
+    },
   },
-};
+  {
+    id: "unknown",
+    Label: function PaymentStatusUnknownLabel() {
+      return <>Unknown</>;
+    },
+  },
+] satisfies ReadonlyArray<{
+  id: string;
+  Label: React.ComponentType;
+}>);
 
-const PAYMENT_METHOD_LABELS: Record<string, CopyComponent> = {
-  subscription: function PaymentMethodSubscriptionLabel() {
-    return <>Subscription</>;
+const PAYMENT_METHOD_COPY = defineCopyCatalog([
+  {
+    id: "subscription",
+    Label: function PaymentMethodSubscriptionLabel() {
+      return <>Subscription</>;
+    },
   },
-  one_time: function PaymentMethodOneTimeLabel() {
-    return <>One-time Payment</>;
+  {
+    id: "one_time",
+    Label: function PaymentMethodOneTimeLabel() {
+      return <>One-time Payment</>;
+    },
   },
-  card: function PaymentMethodCardLabel() {
-    return <>Credit Card</>;
+  {
+    id: "card",
+    Label: function PaymentMethodCardLabel() {
+      return <>Credit Card</>;
+    },
   },
-  bank_transfer: function PaymentMethodBankTransferLabel() {
-    return <>Bank Transfer</>;
+  {
+    id: "bank_transfer",
+    Label: function PaymentMethodBankTransferLabel() {
+      return <>Bank Transfer</>;
+    },
   },
-  paypal: function PaymentMethodPayPalLabel() {
-    return <>PayPal</>;
+  {
+    id: "paypal",
+    Label: function PaymentMethodPayPalLabel() {
+      return <>PayPal</>;
+    },
   },
-};
+  {
+    id: "unknown",
+    Label: function PaymentMethodUnknownLabel() {
+      return <>Unknown</>;
+    },
+  },
+] satisfies ReadonlyArray<{
+  id: string;
+  Label: React.ComponentType;
+}>);
 
 const formatCurrency = (amount: number, currency: string, locale: string) => {
   return new Intl.NumberFormat(locale, {
@@ -120,11 +164,10 @@ const createColumns = (
     key: "status",
     label: <>Status</>,
     render: (payment) => {
-      const PaymentStatusLabel =
-        PAYMENT_STATUS_LABELS[payment.status] ??
-        function PaymentStatusFallbackLabel() {
-          return <>Unknown</>;
-        };
+      const PaymentStatusLabel = (
+        PAYMENT_STATUS_COPY.entries.find((entry) => entry.id === payment.status) ??
+        PAYMENT_STATUS_COPY.get("unknown")
+      ).Label;
 
       return (
         <Badge
@@ -140,11 +183,11 @@ const createColumns = (
     key: "method",
     label: <>Method</>,
     render: (payment) => {
-      const PaymentMethodLabel =
-        PAYMENT_METHOD_LABELS[payment.paymentType] ??
-        function PaymentMethodFallbackLabel() {
-          return <>Unknown</>;
-        };
+      const PaymentMethodLabel = (
+        PAYMENT_METHOD_COPY.entries.find(
+          (entry) => entry.id === payment.paymentType,
+        ) ?? PAYMENT_METHOD_COPY.get("unknown")
+      ).Label;
 
       return (
         <div className="text-sm">

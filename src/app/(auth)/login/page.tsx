@@ -4,18 +4,20 @@ import {
   DEFAULT_CALLBACK_URL,
   normalizeCallbackUrl,
 } from "@/lib/auth/callback-url";
-import { createLocalizedMetadata } from "@/lib/i18n/page-metadata";
+import { createPageMetadata } from "@/lib/i18n/page-metadata";
+
+async function LoginPageMetadataTitle() {
+  return <>Sign In</>;
+}
+
+async function LoginPageMetadataDescription() {
+  return <>Sign in to your account with magic link</>;
+}
 
 export async function generateMetadata() {
-  return createLocalizedMetadata({
-    en: {
-      title: "Sign In",
-      description: "Sign in to your account with magic link",
-    },
-    "zh-Hans": {
-      title: "登录",
-      description: "使用魔法链接登录您的账户",
-    },
+  return createPageMetadata({
+    title: LoginPageMetadataTitle,
+    description: LoginPageMetadataDescription,
   });
 }
 

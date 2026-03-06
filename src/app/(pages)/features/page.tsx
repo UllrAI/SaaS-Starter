@@ -3,20 +3,25 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Features } from "@/components/homepage/features";
 import { CheckCircle2, Package2, Wrench } from "lucide-react";
-import { createLocalizedMetadata } from "@/lib/i18n/page-metadata";
+import { createPageMetadata } from "@/lib/i18n/page-metadata";
+
+async function FeaturesPageMetadataTitle() {
+  return <>Features</>;
+}
+
+async function FeaturesPageMetadataDescription() {
+  return (
+    <>
+      Review the actual modules included in the SaaS Starter: auth, billing,
+      admin tooling, uploads, localization, and content infrastructure.
+    </>
+  );
+}
 
 export async function generateMetadata() {
-  return createLocalizedMetadata({
-    en: {
-      title: "Features",
-      description:
-        "Review the actual modules included in the SaaS Starter: auth, billing, admin tooling, uploads, localization, and content infrastructure.",
-    },
-    "zh-Hans": {
-      title: "功能",
-      description:
-        "查看 SaaS Starter 当前实际包含的模块：身份验证、计费、管理后台、上传、本地化与内容基础设施。",
-    },
+  return createPageMetadata({
+    title: FeaturesPageMetadataTitle,
+    description: FeaturesPageMetadataDescription,
   });
 }
 

@@ -1,18 +1,25 @@
 import React from "react";
 
 import { COMPANY_NAME, LEGAL_EMAIL } from "@/lib/config/constants";
-import { createLocalizedMetadata } from "@/lib/i18n/page-metadata";
+import { createPageMetadata } from "@/lib/i18n/page-metadata";
+
+async function TermsPageMetadataTitle() {
+  return <>Terms of Service</>;
+}
+
+async function TermsPageMetadataDescription() {
+  return (
+    <>
+      Read our terms of service to understand your rights and responsibilities
+      when using {COMPANY_NAME}.
+    </>
+  );
+}
 
 export async function generateMetadata() {
-  return createLocalizedMetadata({
-    en: {
-      title: "Terms of Service",
-      description: `Read our terms of service to understand your rights and responsibilities when using ${COMPANY_NAME}.`,
-    },
-    "zh-Hans": {
-      title: "服务条款",
-      description: `阅读 ${COMPANY_NAME} 的服务条款，了解您在使用本服务时的权利与责任。`,
-    },
+  return createPageMetadata({
+    title: TermsPageMetadataTitle,
+    description: TermsPageMetadataDescription,
   });
 }
 

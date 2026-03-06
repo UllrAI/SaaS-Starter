@@ -1,100 +1,227 @@
-import { describe, it, expect, jest } from "@jest/globals";
+import React from "react";
+import { beforeEach, describe, expect, it, jest } from "@jest/globals";
+import { render, screen } from "@testing-library/react";
 
-const mockMetadata = {
-  title: "Dashboard",
-  description: "Account overview, billing status, and starter setup progress.",
-};
-const mockCreatePageMetadata = jest.fn(async () => mockMetadata);
-jest.mock("@/lib/i18n/page-metadata", () => ({
-  createPageMetadata: (config: unknown) => mockCreatePageMetadata(config),
-}));
-
-// Mock all complex UI dependencies to avoid context issues
-jest.mock("./_components/dashboard-page-wrapper", () => ({
-  DashboardPageWrapper: ({
-    title,
-    children,
-  }: {
-    title: string;
-    children: React.ReactNode;
-  }) => {
-    // Use parameters to avoid unused variable warnings
-    return title && children ? null : null;
-  },
-}));
-
-jest.mock("@/components/ui/card", () => ({
-  Card: () => null,
-  CardContent: () => null,
-  CardDescription: () => null,
-  CardHeader: () => null,
-  CardTitle: () => null,
-}));
-
-jest.mock("@/components/ui/badge", () => ({
-  Badge: () => null,
-}));
-
-jest.mock("@/components/ui/button", () => ({
-  Button: () => null,
-}));
-
-jest.mock("lucide-react", () => ({
-  BarChart3: () => null,
-  Users: () => null,
-  TrendingUp: () => null,
-  DollarSign: () => null,
-  Activity: () => null,
-  Sparkles: () => null,
-  Rocket: () => null,
-  Zap: () => null,
-}));
-
-import { generateMetadata } from "./page";
+const mockCreatePageMetadata = jest.fn();
+const mockRequireAuth = jest.fn();
+const mockGetUserSubscription = jest.fn();
+const mockGetUserPayments = jest.fn();
+const mockGetRequestLocale = jest.fn();
+const mockDbSelect = jest.fn();
+const mockCount = jest.fn();
+const mockEq = jest.fn();
+const mockSum = jest.fn();
+const mockFormatCurrency = jest.fn();
+const mockFormatFileSize = jest.fn();
 
 describe("Dashboard Home Page", () => {
   beforeEach(() => {
+    jest.resetModules();
     jest.clearAllMocks();
-  });
 
-  it("should export correct metadata", async () => {
-    await expect(generateMetadata()).resolves.toMatchObject({
+    mockCreatePageMetadata.mockResolvedValue({
       title: "Dashboard",
-      description:
-        "Account overview, billing status, and starter setup progress.",
+      description: "Account overview, billing status, and starter setup progress.",
     });
+    mockRequireAuth.mockResolvedValue({
+      id: "user-123",
+      name: "Test User",
+      email: "test@example.com",
+      role: "super_admin",
+    });
+    mockGetUserSubscription.mockResolvedValue({
+      tierId: "pro",
+      status: "active",
+    });
+    mockGetUserPayments.mockResolvedValue([
+      {
+        paymentId: "pay_1",
+        amount: 1200,
+        currency: "usd",
+        status: "succeeded",
+        paymentType: "one_time",
+        tierName: "Pro",
+        createdAt: "2026-03-06T00:00:00.000Z",
+      },
+    ]);
+    mockGetRequestLocale.mockResolvedValue("en-US");
+    mockDbSelect.mockReturnValue({
+      from: jest.fn().mockReturnValue({
+        where: jest.fn().mockResolvedValue([{ count: 3, totalSize: "4096" }]),
+      }),
+    });
+    mockCount.mockReturnValue("count(*)");
+    mockEq.mockReturnValue("uploads.userId = user-123");
+    mockSum.mockReturnValue("sum(fileSize)");
+    mockFormatCurrency.mockImplementation(
+      (amount: number, currency: string, locale: string) =>
+        `${amount}-${currency}-${locale}`,
+    );
+    mockFormatFileSize.mockImplementation((value: number) => `${value} bytes`);
   });
 
-  it("should generate metadata from the current dashboard copy", async () => {
-    const metadata = await generateMetadata();
+  function loadPageModule() {
+    jest.doMock("@/lib/i18n/page-metadata", () => ({
+      createPageMetadata: (config: unknown) => mockCreatePageMetadata(config),
+    }));
+    jest.doMock("@/lib/auth/permissions", () => ({
+      requireAuth: mockRequireAuth,
+    }));
+    jest.doMock("@/lib/database/subscription", () => ({
+      getUserSubscription: mockGetUserSubscription,
+      getUserPayments: mockGetUserPayments,
+    }));
+    jest.doMock("@/lib/i18n/server-locale", () => ({
+      getRequestLocale: mockGetRequestLocale,
+    }));
+    jest.doMock("@/database", () => ({
+      db: {
+        select: mockDbSelect,
+      },
+    }));
+    jest.doMock("@/database/schema", () => ({
+      uploads: {
+        fileSize: "uploads.fileSize",
+        userId: "uploads.userId",
+      },
+    }));
+    jest.doMock("drizzle-orm", () => ({
+      count: mockCount,
+      eq: mockEq,
+      sum: mockSum,
+    }));
+    jest.doMock("@/lib/utils", () => ({
+      formatCurrency: mockFormatCurrency,
+    }));
+    jest.doMock("@/lib/config/upload", () => ({
+      formatFileSize: mockFormatFileSize,
+    }));
+    jest.doMock("next/link", () => ({
+      __esModule: true,
+      default: ({
+        children,
+        href,
+      }: {
+        children: React.ReactNode;
+        href: string;
+      }) => <a href={href}>{children}</a>,
+    }));
+    jest.doMock("./_components/dashboard-page-wrapper", () => ({
+      DashboardPageWrapper: ({
+        title,
+        description,
+        children,
+      }: {
+        title: string;
+        description: string;
+        children: React.ReactNode;
+      }) => (
+        <section>
+          <h1>{title}</h1>
+          <p>{description}</p>
+          {children}
+        </section>
+      ),
+    }));
+    jest.doMock("@/components/ui/card", () => ({
+      Card: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+      CardHeader: ({ children }: { children: React.ReactNode }) => (
+        <div>{children}</div>
+      ),
+      CardTitle: ({ children }: { children: React.ReactNode }) => <h2>{children}</h2>,
+      CardDescription: ({ children }: { children: React.ReactNode }) => (
+        <p>{children}</p>
+      ),
+      CardContent: ({ children }: { children: React.ReactNode }) => (
+        <div>{children}</div>
+      ),
+    }));
+    jest.doMock("@/components/ui/badge", () => ({
+      Badge: ({
+        children,
+        variant,
+      }: {
+        children: React.ReactNode;
+        variant: string;
+      }) => <span data-variant={variant}>{children}</span>,
+    }));
+    jest.doMock("@/components/ui/button", () => ({
+      Button: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+    }));
+    jest.doMock("lucide-react", () => {
+      const Icon = () => null;
 
-    expect(metadata).toMatchObject({
+      return {
+        ArrowRight: Icon,
+        CreditCard: Icon,
+        Files: Icon,
+        ShieldCheck: Icon,
+        Sparkles: Icon,
+        UserCircle2: Icon,
+      };
+    });
+
+    return require("./page") as typeof import("./page");
+  }
+
+  it("generates metadata from the dashboard copy", async () => {
+    const { generateMetadata } = loadPageModule();
+
+    await expect(generateMetadata()).resolves.toEqual({
       title: "Dashboard",
-      description:
-        "Account overview, billing status, and starter setup progress.",
+      description: "Account overview, billing status, and starter setup progress.",
     });
+    expect(mockCreatePageMetadata).toHaveBeenCalledTimes(1);
   });
 
-  it("should export a React component as default", async () => {
-    const { default: HomeRoute } = await import("./page");
-    expect(typeof HomeRoute).toBe("function");
-    expect(HomeRoute.name).toBe("HomeRoute");
+  it("renders the authenticated dashboard overview with subscription, uploads, and payments", async () => {
+    const { default: HomeRoute } = loadPageModule();
+
+    render(await HomeRoute());
+
+    expect(screen.getByRole("heading", { name: "Dashboard" })).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Your real account state, recent billing activity, and setup progress.",
+      ),
+    ).toBeInTheDocument();
+    expect(screen.getAllByText("Pro")).toHaveLength(2);
+    expect(screen.getByText("active")).toBeInTheDocument();
+    expect(screen.getByText("4096 bytes stored")).toBeInTheDocument();
+    expect(screen.getAllByText("1200-usd-en-US")).toHaveLength(2);
+    expect(screen.getByText("Test User")).toBeInTheDocument();
+    expect(screen.getByText("test@example.com")).toBeInTheDocument();
+    expect(screen.getByText("super admin")).toBeInTheDocument();
+    expect(screen.getAllByRole("link", { name: /Open/ })[0]).toHaveAttribute(
+      "href",
+      "/dashboard/billing",
+    );
+    expect(screen.getByText(/succeeded/i)).toBeInTheDocument();
+    expect(mockGetUserSubscription).toHaveBeenCalledWith("user-123");
+    expect(mockGetUserPayments).toHaveBeenCalledWith("user-123", 5);
   });
 
-  it("should have valid component exports", async () => {
-    const moduleExports = await import("./page");
-    expect(moduleExports).toHaveProperty("default");
-    expect(moduleExports).toHaveProperty("generateMetadata");
-    expect(typeof moduleExports.default).toBe("function");
-    expect(typeof moduleExports.generateMetadata).toBe("function");
-  });
+  it("renders free-state fallbacks when the account has no subscription or payments", async () => {
+    mockGetUserSubscription.mockResolvedValue(null);
+    mockGetUserPayments.mockResolvedValue([]);
+    mockDbSelect.mockReturnValue({
+      from: jest.fn().mockReturnValue({
+        where: jest.fn().mockResolvedValue([{ count: 0, totalSize: null }]),
+      }),
+    });
 
-  it("should create metadata for SEO optimization", async () => {
-    const metadata = await generateMetadata();
+    const { default: HomeRoute } = loadPageModule();
 
-    expect(metadata.title).toBeTruthy();
-    expect(metadata.description).toBeTruthy();
-    expect(String(metadata.title).length).toBeGreaterThan(0);
-    expect(metadata.description?.length).toBeGreaterThan(10);
+    render(await HomeRoute());
+
+    expect(screen.getByText("Free")).toBeInTheDocument();
+    expect(screen.getByText("no active subscription")).toBeInTheDocument();
+    expect(screen.getByText("0 bytes stored")).toBeInTheDocument();
+    expect(screen.getByText("No payment records yet")).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "No payment history yet. Visit billing when you are ready to test checkout.",
+      ),
+    ).toBeInTheDocument();
   });
 });

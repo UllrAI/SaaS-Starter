@@ -4,7 +4,12 @@ import { BlogPostCard } from "@/components/blog/blog-post-card";
 import { createPageMetadata } from "@/lib/i18n/page-metadata";
 import { getRequestLocale } from "@/lib/i18n/server-locale";
 import { calculateReadingTime } from "@/lib/utils";
-import { getAllPosts, getAuthorBySlug } from "@/lib/content/blog";
+import {
+  getAllPosts,
+  getAuthorBySlug,
+  getLocalizedBlogPath,
+  getLocalizedBlogPostPath,
+} from "@/lib/content/blog";
 
 async function BlogPageMetadataTitle() {
   return <>Blog</>;
@@ -13,24 +18,27 @@ async function BlogPageMetadataTitle() {
 async function BlogPageMetadataDescription() {
   return (
     <>
-      Read our latest blog posts and insights about technology, development,
-      and industry trends.
+      Read our latest blog posts and insights about technology, development, and
+      industry trends.
     </>
   );
 }
 
 export async function generateMetadata() {
+  const locale = await getRequestLocale();
+
   return createPageMetadata({
     title: BlogPageMetadataTitle,
     description: BlogPageMetadataDescription,
+    alternates: {
+      canonical: getLocalizedBlogPath(locale),
+    },
   });
 }
 
 export default async function BlogPage() {
-  const [locale, sortedPosts] = await Promise.all([
-    getRequestLocale(),
-    Promise.resolve(getAllPosts()),
-  ]);
+  const locale = await getRequestLocale();
+  const sortedPosts = getAllPosts(locale);
 
   const featuredPosts = sortedPosts.filter((post) => post.featured);
   const regularPosts = sortedPosts.filter((post) => !post.featured);
@@ -45,6 +53,7 @@ export default async function BlogPage() {
       <BlogPostCard
         key={post.slug}
         slug={post.slug}
+        href={getLocalizedBlogPostPath(post.slug, locale)}
         title={post.title}
         excerpt={post.excerpt || undefined}
         heroImage={post.heroImage || undefined}
@@ -54,6 +63,7 @@ export default async function BlogPage() {
         author={author?.name || "Anonymous"}
         readTime={calculateReadingTime(post.content)}
         locale={locale}
+        isFallback={post.isFallback}
       />
     );
   };

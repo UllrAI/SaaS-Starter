@@ -1,6 +1,8 @@
 import { MetadataRoute } from "next";
 import env from "@/env";
-import { getAllPosts } from "@/lib/content/blog";
+import { SUPPORTED_LOCALES } from "@/lib/config/i18n";
+import { withLocalePrefix } from "@/lib/config/i18n-routing";
+import { getAllLocalizedPosts } from "@/lib/content/blog";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const lastModified = new Date();
@@ -52,17 +54,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "yearly",
       priority: 0.3,
     },
-    {
-      url: `${baseUrl}/blog`,
-      lastModified,
-      changeFrequency: "weekly",
-      priority: 0.9,
-    },
   ];
 
-  const blogPosts = getAllPosts();
+  const blogIndexEntries: MetadataRoute.Sitemap = SUPPORTED_LOCALES.map(
+    (locale) => ({
+      url: `${baseUrl}${withLocalePrefix("/blog", locale)}`,
+      lastModified,
+      changeFrequency: "weekly" as const,
+      priority: locale === "en" ? 0.9 : 0.8,
+    }),
+  );
+
+  const blogPosts = getAllLocalizedPosts();
   const blogPostEntries: MetadataRoute.Sitemap = blogPosts.map((post) => ({
-    url: `${baseUrl}/blog/${post.slug}`,
+    url: `${baseUrl}${withLocalePrefix(`/blog/${post.slug}`, post.locale)}`,
     lastModified: post.publishedDate
       ? new Date(post.publishedDate)
       : lastModified,
@@ -70,5 +75,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: post.featured ? 0.8 : 0.7,
   }));
 
-  return [...staticPages, ...blogPostEntries];
+  return [...staticPages, ...blogIndexEntries, ...blogPostEntries];
 }

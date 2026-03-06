@@ -163,7 +163,7 @@ pnpm db:migrate:prod
 
 ### 5. 内容管理 (Content Collections)
 
-项目使用 Content Collections 配合原生 Markdown 文件来管理博客内容。文章位于 `content/blog/*.md`，作者信息位于 `content/authors/*.json`，构建时会生成带类型的内容集合供博客页面和 sitemap 使用。
+项目使用 Content Collections 配合原生 Markdown 文件来管理博客内容。文章位于 `content/blog/en/*.md`、`content/blog/zh-Hans/*.md` 等按语言划分的目录中，作者信息位于 `content/authors/*.json`，构建时会生成带类型的内容集合供博客页面和 sitemap 使用。
 
 - **编写方式:** 直接在仓库中新增或编辑带 frontmatter 的 Markdown 文件。
 - **生成内容数据:** 如需手动刷新生成结果，可运行 `pnpm content:build`。构建、测试和类型检查脚本已自动串联该命令。
@@ -333,12 +333,10 @@ pnpm analyze:dev
     将您的代码推送到 GitHub、GitLab 或 Bitbucket 仓库。
 
 2.  **在 Vercel 中导入项目:**
-
     - 登录您的 Vercel 账户，点击 "Add New... > Project"，然后选择您的 Git 仓库。
     - Vercel 会自动检测到这是一个 Next.js 项目并配置好构建设置。
 
 3.  **配置环境变量:**
-
     - 在 Vercel 项目的 "Settings" -> "Environment Variables" 中，添加您在 `.env` 文件中定义的所有环境变量。**请勿将 `.env` 文件提交到 Git 仓库中**。
 
 4.  **配置生产数据库迁移:**

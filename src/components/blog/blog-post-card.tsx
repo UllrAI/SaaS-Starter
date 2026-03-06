@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 
 interface BlogPostCardProps {
   slug: string;
+  href?: string;
   title: string;
   excerpt?: string;
   heroImage?: string;
@@ -24,10 +25,12 @@ interface BlogPostCardProps {
   author?: string;
   readTime?: string;
   locale?: string;
+  isFallback?: boolean;
 }
 
 export function BlogPostCard({
   slug,
+  href,
   title,
   excerpt,
   heroImage,
@@ -38,7 +41,9 @@ export function BlogPostCard({
   author,
   readTime,
   locale,
+  isFallback = false,
 }: BlogPostCardProps) {
+  const postHref = href ?? `/blog/${slug}`;
   const isFeatured = variant === "featured";
   const hasImage = !!heroImage;
 
@@ -119,7 +124,7 @@ export function BlogPostCard({
         <div className="space-y-3">
           <CardTitle className={titleSize}>
             <Link
-              href={`/blog/${slug}`}
+              href={postHref}
               className="group-hover:text-primary line-clamp-2 transition-colors duration-200"
             >
               {title}
@@ -137,6 +142,17 @@ export function BlogPostCard({
             readTime={readTime}
             locale={locale}
           />
+
+          {isFallback && (
+            <div>
+              <Badge
+                variant="outline"
+                className="border-amber-300/60 bg-amber-50 text-amber-900"
+              >
+                English only
+              </Badge>
+            </div>
+          )}
         </div>
       </CardHeader>
 
@@ -151,7 +167,7 @@ export function BlogPostCard({
         </CardDescription>
 
         <Link
-          href={`/blog/${slug}`}
+          href={postHref}
           className="text-primary hover:text-primary/80 inline-flex items-center gap-2 font-medium transition-all duration-200 group-hover:gap-3"
         >
           {readMoreText}

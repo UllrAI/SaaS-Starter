@@ -1,4 +1,5 @@
 ---
+slug: saas-starter-kit-developer-guide
 title: UllrAI SaaS Starter Kit 开发者文档
 publishedDate: 2025-06-23
 author: admin
@@ -18,6 +19,7 @@ tags:
 featured: true
 heroImage: https://images.unsplash.com/photo-1561886362-a2b38ce83470?q=80&w=1674&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D
 ---
+
 # UllrAI SaaS Starter Kit 开发者文档
 
 本文档旨在为使用 UllrAI SaaS Starter Kit 的开发者提供一份全面、深入的技术参考。无论您是希望快速启动一个新项目，还是对项目进行深度定制和二次开发，本文档都将为您提供必要的指导。
@@ -40,38 +42,38 @@ heroImage: https://images.unsplash.com/photo-1561886362-a2b38ce83470?q=80&w=1674
 
 1.**克隆项目**
 
-   ```bash
-   git clone https://github.com/ullrai/saas-starter.git
-   cd saas-starter
-   ```
+```bash
+git clone https://github.com/ullrai/saas-starter.git
+cd saas-starter
+```
 
 2.**安装依赖**
 
-   ```bash
-   pnpm install
-   ```
+```bash
+pnpm install
+```
 
 3.**配置环境**
-   复制 `.env.example` 为 `.env` 并填入所有必需的环境变量。
+复制 `.env.example` 为 `.env` 并填入所有必需的环境变量。
 
-   ```bash
-   cp .env.example .env
-   ```
+```bash
+cp .env.example .env
+```
 
 4.**同步数据库**
-   确保本地 PostgreSQL 数据库已启动，然后执行：
+确保本地 PostgreSQL 数据库已启动，然后执行：
 
-   ```bash
-   pnpm db:push
-   ```
+```bash
+pnpm db:push
+```
 
 5.**运行开发服务器**
 
-   ```bash
-   pnpm dev
-   ```
+```bash
+pnpm dev
+```
 
-   应用将在 `http://localhost:3000` 上运行。
+应用将在 `http://localhost:3000` 上运行。
 
 ### 1.3. 特性列表
 
@@ -111,12 +113,12 @@ graph TD
         D -- Email API --> I[Resend];
         D -- Storage API --> J[Cloudflare R2];
     end
-    
+
     subgraph "内容管理"
         K[Content Collections] -- Indexes --> L[Markdown/JSON in Git];
         B -- Reads data --> L;
     end
-    
+
     G -- OAuth --> M[Google/GitHub/LinkedIn];
     H -- Webhooks --> D;
 
@@ -286,6 +288,7 @@ SaaS-Starter-main/
 ### 4.1. 认证系统 (Better-Auth)
 
 本脚手架使用 `better-auth` 库提供了一套完整的认证解决方案。
+
 - **核心配置**: `src/lib/auth/server.ts`
   - 配置了 Drizzle 数据库适配器。
   - 动态加载社交登录提供商 (Google, GitHub, LinkedIn)，只有在 `.env` 中提供了对应的 `CLIENT_ID` 和 `SECRET` 时才会启用。
@@ -295,14 +298,14 @@ SaaS-Starter-main/
 - **客户端**: `src/lib/auth/client.ts`
   - 提供了在客户端组件中与认证系统交互的方法，如 `signIn`, `signOut`, `useSession` 等。
 - **认证流程 (Magic Link 魔法链接)**:
-[![魔法链接](https://mermaid.ink/img/pako:eNp1k-1r00Acx_-V415NaNN2fVh74ETqA4KysYc30je35NaGJrl6SUQtBVeUVXHasQ1ZrYjCQBxL3ZvOWde_ppe0_4WXnh1ldiGQu-P7uXy_97tfFapUIxBBmzxxiaWSOzouMmwWLDB-Kpg5uqpXsOWAdZuwWet5Qyfig23AvW9-4yw47oC5265TukeZeWMWsUrYU8JCwm_v8Ldf-eF3QSw_mCleITaxtFA8qnuDXlcioXKiDo1FFxelDwSG_T3--kiIA--Un3eD-jnf7gWHPX5xMCGkVDDSCQLLS6trIIYregwL4zETF3U1auhWeUJI4RQR7H_xG02__cb_2PUPGkHrFVijZWL9B0j_wlbnzD-t8w-7o5dbMgmY481jSYH1lYeX6SURFWyYDIF_zMm-3-6M9vr--yPJX8kvxTKuFAx-nQhfErk2-v2708lVbBgbWC3fckJbNxVFufYERj_eDTtb0n8E8MYn3vs9-NMadj5fQaZr4_WDC0-qQJ7Ssk6AqNFoe4d7Ld7c5Y2fIKZhu7RBMdNgBBaZrkHkMJdEoEmYicMprI7LD50SMUkBIjHUyCZ2DacAC1ZNYOLmPKbUnJCMusUSRJvYsMXMrWjYmdz0y1UmzpywPHUtB6L5xHgPiKrwGUTJRFxJL8TjafFmc6nkfDoCn0OUziqpXC6XyWUzyVQmk0nUIvDF-K9xJbsgNETTHcoeyQ4bN1rtLzk3Xew?type=png)](https://mermaid.live/edit#pako:eNp1k-1r00Acx_-V415NaNN2fVh74ETqA4KysYc30je35NaGJrl6SUQtBVeUVXHasQ1ZrYjCQBxL3ZvOWde_ppe0_4WXnh1ldiGQu-P7uXy_97tfFapUIxBBmzxxiaWSOzouMmwWLDB-Kpg5uqpXsOWAdZuwWet5Qyfig23AvW9-4yw47oC5265TukeZeWMWsUrYU8JCwm_v8Ldf-eF3QSw_mCleITaxtFA8qnuDXlcioXKiDo1FFxelDwSG_T3--kiIA--Un3eD-jnf7gWHPX5xMCGkVDDSCQLLS6trIIYregwL4zETF3U1auhWeUJI4RQR7H_xG02__cb_2PUPGkHrFVijZWL9B0j_wlbnzD-t8w-7o5dbMgmY481jSYH1lYeX6SURFWyYDIF_zMm-3-6M9vr--yPJX8kvxTKuFAx-nQhfErk2-v2708lVbBgbWC3fckJbNxVFufYERj_eDTtb0n8E8MYn3vs9-NMadj5fQaZr4_WDC0-qQJ7Ssk6AqNFoe4d7Ld7c5Y2fIKZhu7RBMdNgBBaZrkHkMJdEoEmYicMprI7LD50SMUkBIjHUyCZ2DacAC1ZNYOLmPKbUnJCMusUSRJvYsMXMrWjYmdz0y1UmzpywPHUtB6L5xHgPiKrwGUTJRFxJL8TjafFmc6nkfDoCn0OUziqpXC6XyWUzyVQmk0nUIvDF-K9xJbsgNETTHcoeyQ4bN1rtLzk3Xew)
+  [![魔法链接](https://mermaid.ink/img/pako:eNp1k-1r00Acx_-V415NaNN2fVh74ETqA4KysYc30je35NaGJrl6SUQtBVeUVXHasQ1ZrYjCQBxL3ZvOWde_ppe0_4WXnh1ldiGQu-P7uXy_97tfFapUIxBBmzxxiaWSOzouMmwWLDB-Kpg5uqpXsOWAdZuwWet5Qyfig23AvW9-4yw47oC5265TukeZeWMWsUrYU8JCwm_v8Ldf-eF3QSw_mCleITaxtFA8qnuDXlcioXKiDo1FFxelDwSG_T3--kiIA--Un3eD-jnf7gWHPX5xMCGkVDDSCQLLS6trIIYregwL4zETF3U1auhWeUJI4RQR7H_xG02__cb_2PUPGkHrFVijZWL9B0j_wlbnzD-t8w-7o5dbMgmY481jSYH1lYeX6SURFWyYDIF_zMm-3-6M9vr--yPJX8kvxTKuFAx-nQhfErk2-v2708lVbBgbWC3fckJbNxVFufYERj_eDTtb0n8E8MYn3vs9-NMadj5fQaZr4_WDC0-qQJ7Ssk6AqNFoe4d7Ld7c5Y2fIKZhu7RBMdNgBBaZrkHkMJdEoEmYicMprI7LD50SMUkBIjHUyCZ2DacAC1ZNYOLmPKbUnJCMusUSRJvYsMXMrWjYmdz0y1UmzpywPHUtB6L5xHgPiKrwGUTJRFxJL8TjafFmc6nkfDoCn0OUziqpXC6XyWUzyVQmk0nUIvDF-K9xJbsgNETTHcoeyQ4bN1rtLzk3Xew?type=png)](https://mermaid.live/edit#pako:eNp1k-1r00Acx_-V415NaNN2fVh74ETqA4KysYc30je35NaGJrl6SUQtBVeUVXHasQ1ZrYjCQBxL3ZvOWde_ppe0_4WXnh1ldiGQu-P7uXy_97tfFapUIxBBmzxxiaWSOzouMmwWLDB-Kpg5uqpXsOWAdZuwWet5Qyfig23AvW9-4yw47oC5265TukeZeWMWsUrYU8JCwm_v8Ldf-eF3QSw_mCleITaxtFA8qnuDXlcioXKiDo1FFxelDwSG_T3--kiIA--Un3eD-jnf7gWHPX5xMCGkVDDSCQLLS6trIIYregwL4zETF3U1auhWeUJI4RQR7H_xG02__cb_2PUPGkHrFVijZWL9B0j_wlbnzD-t8w-7o5dbMgmY481jSYH1lYeX6SURFWyYDIF_zMm-3-6M9vr--yPJX8kvxTKuFAx-nQhfErk2-v2708lVbBgbWC3fckJbNxVFufYERj_eDTtb0n8E8MYn3vs9-NMadj5fQaZr4_WDC0-qQJ7Ssk6AqNFoe4d7Ld7c5Y2fIKZhu7RBMdNgBBaZrkHkMJdEoEmYicMprI7LD50SMUkBIjHUyCZ2DacAC1ZNYOLmPKbUnJCMusUSRJvYsMXMrWjYmdz0y1UmzpywPHUtB6L5xHgPiKrwGUTJRFxJL8TjafFmc6nkfDoCn0OUziqpXC6XyWUzyVQmk0nUIvDF-K9xJbsgNETTHcoeyQ4bN1rtLzk3Xew)
   ```mermaid
   sequenceDiagram
       participant User
       participant Client as 客户端 (AuthForm)
       participant Server as 服务器 (API)
       participant Resend as 邮件服务
-  
+
       User->>Client: 输入邮箱并点击登录
       Client->>Server: POST /api/auth/magic-link
       Server->>Server: 生成有时效的 Token
@@ -313,6 +316,7 @@ SaaS-Starter-main/
       Server->>Server: 验证 Token, 创建会话
       Server-->>Client: 设置会话 Cookie 并重定向到 /dashboard
   ```
+
 ### 4.2. 数据库与 ORM (Drizzle)
 
 - **Schema 定义**: `src/database/schema.ts` 是所有数据库表的单一事实来源，使用 Drizzle ORM 的语法定义表结构、关系和约束。
@@ -324,6 +328,7 @@ SaaS-Starter-main/
   - `pnpm db:migrate:dev` & `pnpm db:migrate:prod`: 应用迁移文件到数据库。
 
 ### 4.3. 支付与订阅 (Creem)
+
 - **抽象层**: `src/lib/billing/index.ts` 导出一个统一的 `billing` 对象，未来可以轻松切换到其他支付提供商（如 Stripe），而无需修改上层业务代码。
 - **提供商实现**: `src/lib/billing/creem/provider.ts` 是 Creem 支付提供商的具体实现，封装了创建 Checkout 会话、客户门户和处理 Webhook 的逻辑。
 - **API 接口**:
@@ -335,14 +340,14 @@ SaaS-Starter-main/
   - **幂等性**: 在 `webhook_events` 表中记录已处理的事件 ID，防止同一事件被重复处理。
   - **事务性**: 所有数据库操作都在一个事务中完成，确保数据一致性。
 - **支付流程图**:
-[![支付流程图](https://mermaid.ink/img/pako:eNp1U11rE0EU_SvDPCWQJqn5aDIPfTAFn8RAWwTJy3T3Nlm6u7POzoo1BKwgDbWBCLG0VoT2qSgmedCKBvXPZDbJv3B2txtqTZaF3Zl7zj1n7tzbxBrTARPswlMPbA02DFrn1KrZKHwcyoWhGQ61Bdp2gS_ar5gGqA91kexf-u3vk88DlKhyFbbrqErrkFzE2gT-DHjA8j905NGFPLtamJwDhG7iYOBiZX09EiVo8uqHPByhGn4AAlVNatdwjIwgChtJEVR9tLmFMtQxMjuGaSp3Ga0B2h7zREyJkEH6QJYE6lQAqtzAVNx1DWbPFQLUyi2FON82N--kvGV5-qcnzz8uws4dB4ckaHbYkf33svtWtoeRFvJ7g_HodHbx7W45Ir-yf-y3uxFoqcnHsNNgbA8lYgdpjVmOCQL05H-FiEmzT8fTwcHky2_Z7aTQtD-Uv96Nf74Zj66XUhIb99EWp7ZLNaGKlkT--Vf_ZDjpXakmmfYvZ6evJ0fX_suDJVf7z_EzDt23guK4ggrPxSlc54aOieAepLAF3KLBEjfDXsGiARbUMFG_OuxSzxRBX7QUTXXVE8asmMmZV29gsktNV608R1f3fTMD810Otg68wjxbYHKvEObApImfY5JbzaYLa9lsQb2lcj4XRPcxKZTS-XK5XCyXirl8sVhcbaXwi1A1my6tKQzohmD8YTR74Qi2_gLtEE8s?type=png)](https://mermaid.live/edit#pako:eNp1U11rE0EU_SvDPCWQJqn5aDIPfTAFn8RAWwTJy3T3Nlm6u7POzoo1BKwgDbWBCLG0VoT2qSgmedCKBvXPZDbJv3B2txtqTZaF3Zl7zj1n7tzbxBrTARPswlMPbA02DFrn1KrZKHwcyoWhGQ61Bdp2gS_ar5gGqA91kexf-u3vk88DlKhyFbbrqErrkFzE2gT-DHjA8j905NGFPLtamJwDhG7iYOBiZX09EiVo8uqHPByhGn4AAlVNatdwjIwgChtJEVR9tLmFMtQxMjuGaSp3Ga0B2h7zREyJkEH6QJYE6lQAqtzAVNx1DWbPFQLUyi2FON82N--kvGV5-qcnzz8uws4dB4ckaHbYkf33svtWtoeRFvJ7g_HodHbx7W45Ir-yf-y3uxFoqcnHsNNgbA8lYgdpjVmOCQL05H-FiEmzT8fTwcHky2_Z7aTQtD-Uv96Nf74Zj66XUhIb99EWp7ZLNaGKlkT--Vf_ZDjpXakmmfYvZ6evJ0fX_suDJVf7z_EzDt23guK4ggrPxSlc54aOieAepLAF3KLBEjfDXsGiARbUMFG_OuxSzxRBX7QUTXXVE8asmMmZV29gsktNV608R1f3fTMD810Otg68wjxbYHKvEObApImfY5JbzaYLa9lsQb2lcj4XRPcxKZTS-XK5XCyXirl8sVhcbaXwi1A1my6tKQzohmD8YTR74Qi2_gLtEE8s)
+  [![支付流程图](https://mermaid.ink/img/pako:eNp1U11rE0EU_SvDPCWQJqn5aDIPfTAFn8RAWwTJy3T3Nlm6u7POzoo1BKwgDbWBCLG0VoT2qSgmedCKBvXPZDbJv3B2txtqTZaF3Zl7zj1n7tzbxBrTARPswlMPbA02DFrn1KrZKHwcyoWhGQ61Bdp2gS_ar5gGqA91kexf-u3vk88DlKhyFbbrqErrkFzE2gT-DHjA8j905NGFPLtamJwDhG7iYOBiZX09EiVo8uqHPByhGn4AAlVNatdwjIwgChtJEVR9tLmFMtQxMjuGaSp3Ga0B2h7zREyJkEH6QJYE6lQAqtzAVNx1DWbPFQLUyi2FON82N--kvGV5-qcnzz8uws4dB4ckaHbYkf33svtWtoeRFvJ7g_HodHbx7W45Ir-yf-y3uxFoqcnHsNNgbA8lYgdpjVmOCQL05H-FiEmzT8fTwcHky2_Z7aTQtD-Uv96Nf74Zj66XUhIb99EWp7ZLNaGKlkT--Vf_ZDjpXakmmfYvZ6evJ0fX_suDJVf7z_EzDt23guK4ggrPxSlc54aOieAepLAF3KLBEjfDXsGiARbUMFG_OuxSzxRBX7QUTXXVE8asmMmZV29gsktNV608R1f3fTMD810Otg68wjxbYHKvEObApImfY5JbzaYLa9lsQb2lcj4XRPcxKZTS-XK5XCyXirl8sVhcbaXwi1A1my6tKQzohmD8YTR74Qi2_gLtEE8s?type=png)](https://mermaid.live/edit#pako:eNp1U11rE0EU_SvDPCWQJqn5aDIPfTAFn8RAWwTJy3T3Nlm6u7POzoo1BKwgDbWBCLG0VoT2qSgmedCKBvXPZDbJv3B2txtqTZaF3Zl7zj1n7tzbxBrTARPswlMPbA02DFrn1KrZKHwcyoWhGQ61Bdp2gS_ar5gGqA91kexf-u3vk88DlKhyFbbrqErrkFzE2gT-DHjA8j905NGFPLtamJwDhG7iYOBiZX09EiVo8uqHPByhGn4AAlVNatdwjIwgChtJEVR9tLmFMtQxMjuGaSp3Ga0B2h7zREyJkEH6QJYE6lQAqtzAVNx1DWbPFQLUyi2FON82N--kvGV5-qcnzz8uws4dB4ckaHbYkf33svtWtoeRFvJ7g_HodHbx7W45Ir-yf-y3uxFoqcnHsNNgbA8lYgdpjVmOCQL05H-FiEmzT8fTwcHky2_Z7aTQtD-Uv96Nf74Zj66XUhIb99EWp7ZLNaGKlkT--Vf_ZDjpXakmmfYvZ6evJ0fX_suDJVf7z_EzDt23guK4ggrPxSlc54aOieAepLAF3KLBEjfDXsGiARbUMFG_OuxSzxRBX7QUTXXVE8asmMmZV29gsktNV608R1f3fTMD810Otg68wjxbYHKvEObApImfY5JbzaYLa9lsQb2lcj4XRPcxKZTS-XK5XCyXirl8sVhcbaXwi1A1my6tKQzohmD8YTR74Qi2_gLtEE8s)
   ```mermaid
   sequenceDiagram
       participant User
       participant Client as 客户端 (Pricing Page)
       participant Server as 服务器
       participant Creem
-  
+
       User->>Client: 点击 "Get Plan"
       Client->>Server: POST /api/billing/checkout
       Server->>Creem: Create Checkout Session
@@ -355,6 +360,7 @@ SaaS-Starter-main/
       Server->>Server: (DB Transaction) 更新用户订阅状态
       User->>Client: 重定向到 /payment-status
   ```
+
 ### 4.4. 文件上传 (Cloudflare R2)
 
 系统支持两种上传模式，为不同场景提供最佳选择。所有上传规则集中在 `src/lib/config/upload.ts`。
@@ -373,7 +379,7 @@ sequenceDiagram
     participant FileUploader as 客户端组件
     participant Server as 服务器 API
     participant R2 as Cloudflare R2
-    
+
     User->>FileUploader: 选择/拖拽文件
     FileUploader->>FileUploader: 客户端验证 (类型/大小), 图片压缩
     FileUploader->>Server: POST /api/upload/presigned-url (请求上传URL)
@@ -399,7 +405,7 @@ sequenceDiagram
     participant Client as 客户端/脚本
     participant Server as 服务器 API
     participant R2 as Cloudflare R2
-    
+
     Client->>Server: POST /api/upload/server-upload (multipart/form-data)
     Server->>Server: 验证身份和文件
     Server->>R2: 流式传输文件
@@ -444,15 +450,15 @@ sequenceDiagram
 
 ### 5.2. API 参考
 
-| 路由 | 方法 | 描述 |
-| --- | --- | --- |
-| `/api/auth/[...all]` | GET, POST | 处理所有 `better-auth` 认证请求。 |
-| `/api/billing/checkout` | POST | 创建支付会话。 |
-| `/api/billing/portal` | GET | 获取客户门户 URL。 |
-| `/api/billing/webhooks/creem` | POST | 接收 Creem Webhook 事件。 |
-| `/api/upload/presigned-url` | POST | 为客户端直传获取预签名 URL。 |
-| `/api/upload/server-upload` | POST | 服务器端代理上传文件。 |
-| `/api/payment-status` | GET | 查询支付状态。 |
+| 路由                          | 方法      | 描述                              |
+| ----------------------------- | --------- | --------------------------------- |
+| `/api/auth/[...all]`          | GET, POST | 处理所有 `better-auth` 认证请求。 |
+| `/api/billing/checkout`       | POST      | 创建支付会话。                    |
+| `/api/billing/portal`         | GET       | 获取客户门户 URL。                |
+| `/api/billing/webhooks/creem` | POST      | 接收 Creem Webhook 事件。         |
+| `/api/upload/presigned-url`   | POST      | 为客户端直传获取预签名 URL。      |
+| `/api/upload/server-upload`   | POST      | 服务器端代理上传文件。            |
+| `/api/payment-status`         | GET       | 查询支付状态。                    |
 
 ### 5.3. Hook 和事件
 
@@ -502,23 +508,23 @@ sequenceDiagram
 
 ### 8.1. CLI 命令
 
-| 脚本 | 描述 |
-| --- | --- |
-| `pnpm dev` | 启动开发服务器（Turbo 模式） |
-| `pnpm content:build` | 生成 Content Collections 内容输出 |
-| `pnpm build` | 构建生产应用 |
-| `pnpm start` | 启动生产服务器 |
-| `pnpm lint` | 运行 ESLint 检查 |
-| `pnpm test` | 运行 Jest 单元测试 |
-| `pnpm prettier:format` | 格式化所有代码 |
-| `pnpm db:generate` | 为开发环境生成迁移文件 |
-| `pnpm db:generate:prod` | 为生产环境生成迁移文件 |
-| `pnpm db:migrate:dev` | 应用开发迁移 |
-| `pnpm db:migrate:prod` | 应用生产迁移 |
-| `pnpm db:push` | (仅开发) 将 Schema 推送到数据库 |
-| `pnpm analyze` | 构建并分析包体积 |
-| `pnpm set:admin` | (本地) 提升用户为超级管理员 |
-| `pnpm set:admin:prod` | (生产) 提升用户为超级管理员 |
+| 脚本                    | 描述                              |
+| ----------------------- | --------------------------------- |
+| `pnpm dev`              | 启动开发服务器（Turbo 模式）      |
+| `pnpm content:build`    | 生成 Content Collections 内容输出 |
+| `pnpm build`            | 构建生产应用                      |
+| `pnpm start`            | 启动生产服务器                    |
+| `pnpm lint`             | 运行 ESLint 检查                  |
+| `pnpm test`             | 运行 Jest 单元测试                |
+| `pnpm prettier:format`  | 格式化所有代码                    |
+| `pnpm db:generate`      | 为开发环境生成迁移文件            |
+| `pnpm db:generate:prod` | 为生产环境生成迁移文件            |
+| `pnpm db:migrate:dev`   | 应用开发迁移                      |
+| `pnpm db:migrate:prod`  | 应用生产迁移                      |
+| `pnpm db:push`          | (仅开发) 将 Schema 推送到数据库   |
+| `pnpm analyze`          | 构建并分析包体积                  |
+| `pnpm set:admin`        | (本地) 提升用户为超级管理员       |
+| `pnpm set:admin:prod`   | (生产) 提升用户为超级管理员       |
 
 ### 8.2. 配置选项
 

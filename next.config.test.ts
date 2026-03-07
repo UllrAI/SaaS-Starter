@@ -42,6 +42,8 @@ describe("next.config.ts", () => {
     return (mod as any).default;
   };
 
+  const getLingoOptions = () => mockWithLingo.mock.calls.at(-1)?.[1];
+
   beforeEach(() => {
     jest.resetModules(); // Clear module cache before each test
     originalEnv = process.env; // Store original process.env
@@ -81,6 +83,63 @@ describe("next.config.ts", () => {
     const getConfig = await importConfig();
     const nextConfig = await getConfig();
     expect(nextConfig).not.toHaveProperty("analyzed");
+  });
+
+  it("uses translate mode by default", async () => {
+    delete process.env.LINGO_BUILD_MODE;
+    jest.doMock("@/env", () => ({
+      __esModule: true,
+      default: {
+        R2_PUBLIC_URL: "https://test-r2.example.com",
+      },
+    }));
+
+    const getConfig = await importConfig();
+    await getConfig();
+
+    expect(getLingoOptions()).toMatchObject({
+      buildMode: "translate",
+      dev: {
+        usePseudotranslator: true,
+      },
+    });
+  });
+
+  it("uses cache-only mode when LINGO_BUILD_MODE requests it", async () => {
+    process.env.LINGO_BUILD_MODE = "cache-only";
+    jest.doMock("@/env", () => ({
+      __esModule: true,
+      default: {
+        R2_PUBLIC_URL: "https://test-r2.example.com",
+      },
+    }));
+
+    const getConfig = await importConfig();
+    await getConfig();
+
+    expect(getLingoOptions()).toMatchObject({
+      buildMode: "cache-only",
+      dev: {
+        usePseudotranslator: true,
+      },
+    });
+  });
+
+  it("respects an explicit LINGO_BUILD_MODE override", async () => {
+    process.env.LINGO_BUILD_MODE = "translate";
+    jest.doMock("@/env", () => ({
+      __esModule: true,
+      default: {
+        R2_PUBLIC_URL: "https://test-r2.example.com",
+      },
+    }));
+
+    const getConfig = await importConfig();
+    await getConfig();
+
+    expect(getLingoOptions()).toMatchObject({
+      buildMode: "translate",
+    });
   });
 
   it("should handle invalid R2_PUBLIC_URL gracefully", async () => {

@@ -14,7 +14,7 @@ import {
   .AI_SDK_LOG_WARNINGS = false;
 process.env.DOTENV_CONFIG_QUIET = "true";
 
-// Safely parse the R2 hostname
+// Safely parse the R2 hostname.
 let r2Hostname: string | undefined;
 try {
   if (env.R2_PUBLIC_URL) {
@@ -54,18 +54,11 @@ const nextConfig: NextConfig = {
 };
 
 export default async function createNextConfig(): Promise<NextConfig> {
-  const isDev = process.env.NODE_ENV !== "production";
-  const buildModeEnv = process.env.LINGO_BUILD_MODE;
-  const buildMode: "translate" | "cache-only" =
-    buildModeEnv === "translate"
-      ? "translate"
-      : buildModeEnv === "cache-only"
-        ? "cache-only"
-        : isDev
-          ? "translate"
-          : "cache-only";
+  const buildMode =
+    process.env.LINGO_BUILD_MODE === "cache-only" ? "cache-only" : "translate";
   const usePseudotranslator =
-    isDev && process.env.LINGO_USE_PSEUDOTRANSLATOR !== "false";
+    process.env.NODE_ENV !== "production" &&
+    process.env.LINGO_USE_PSEUDOTRANSLATOR !== "false";
 
   let config = await withLingo(nextConfig, {
     sourceRoot: "src",
@@ -84,7 +77,7 @@ export default async function createNextConfig(): Promise<NextConfig> {
     buildMode,
   });
 
-  // 只有在 process.env.ANALYZE 为 'true' 时才启用 bundle analyzer
+  // Enable the bundle analyzer only when explicitly requested.
   if (process.env.ANALYZE === "true") {
     const withBundleAnalyzer = nextBundleAnalyzer({
       enabled: true,

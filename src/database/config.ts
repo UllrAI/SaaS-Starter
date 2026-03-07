@@ -5,7 +5,7 @@ import env from "@/env";
 export default defineConfig({
   dialect: "postgresql",
   schema: "./src/database/schema.ts",
-  out: "./src/database/migrations/development",
+  out: "./src/database/migrations",
   verbose: true,
   dbCredentials: {
     url: env.DATABASE_URL,

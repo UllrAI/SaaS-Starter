@@ -5,7 +5,6 @@
   "scripts": {
     "content:build": "node scripts/build-content-collections.mjs",
     "dev": "pnpm content:build && next dev --turbo",
-    "dev:slow": "pnpm content:build && next dev",
     "build": "pnpm content:build && AI_SDK_LOG_WARNINGS=false next build --webpack && node scripts/sync-lingo-cache.mjs",
     "start": "next start",
     "lint": "eslint .",
@@ -14,17 +13,13 @@
     "test:watch": "pnpm content:build && jest --watch",
     "test:coverage": "pnpm content:build && jest --coverage",
     "db:generate": "drizzle-kit generate --config=src/database/config.ts",
-    "db:generate:prod": "drizzle-kit generate --config=src/database/config.prod.ts",
     "db:migrate": "drizzle-kit migrate --config=src/database/config.ts",
-    "db:migrate:dev": "drizzle-kit migrate --config=src/database/config.ts",
-    "db:migrate:prod": "drizzle-kit migrate --config=src/database/config.prod.ts",
     "db:push": "drizzle-kit push --config=src/database/config.ts",
     "prettier:check": "prettier --check --ignore-path .gitignore .",
     "prettier:format": "prettier --write --ignore-path .gitignore .",
     "analyze": "pnpm content:build && ANALYZE=true next build",
     "analyze:dev": "pnpm content:build && ANALYZE=true next dev",
-    "set:admin": "tsx --env-file=.env scripts/set-admin.ts",
-    "set:admin:prod": "tsx scripts/set-admin.ts"
+    "set:admin": "node --env-file-if-exists=.env --import tsx scripts/set-admin.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1002.0",

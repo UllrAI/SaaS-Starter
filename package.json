@@ -15,6 +15,7 @@
     "db:generate": "drizzle-kit generate --config=src/database/config.ts",
     "db:migrate": "drizzle-kit migrate --config=src/database/config.ts",
     "db:push": "drizzle-kit push --config=src/database/config.ts",
+    "db:rebaseline": "node --env-file-if-exists=.env --import tsx scripts/rebaseline-drizzle.ts",
     "prettier:check": "prettier --check --ignore-path .gitignore .",
     "prettier:format": "prettier --write --ignore-path .gitignore .",
     "analyze": "pnpm content:build && ANALYZE=true next build",

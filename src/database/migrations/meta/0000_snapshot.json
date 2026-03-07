@@ -1,5 +1,5 @@
 {
-  "id": "0c3af88e-790f-4d7f-90aa-d9fc7ec82a2d",
+  "id": "b6f07a74-bde7-41ce-ad8b-6958a77d71ec",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -109,8 +109,12 @@
           "name": "accounts_userId_users_id_fk",
           "tableFrom": "accounts",
           "tableTo": "users",
-          "columnsFrom": ["userId"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -224,8 +228,12 @@
           "name": "payments_userId_users_id_fk",
           "tableFrom": "payments",
           "tableTo": "users",
-          "columnsFrom": ["userId"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -235,7 +243,9 @@
         "payments_paymentId_unique": {
           "name": "payments_paymentId_unique",
           "nullsNotDistinct": false,
-          "columns": ["paymentId"]
+          "columns": [
+            "paymentId"
+          ]
         }
       },
       "policies": {},
@@ -306,6 +316,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "impersonatedBy": {
+          "name": "impersonatedBy",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
         "userId": {
           "name": "userId",
           "type": "text",
@@ -319,8 +335,12 @@
           "name": "sessions_userId_users_id_fk",
           "tableFrom": "sessions",
           "tableTo": "users",
-          "columnsFrom": ["userId"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -330,7 +350,9 @@
         "sessions_token_unique": {
           "name": "sessions_token_unique",
           "nullsNotDistinct": false,
-          "columns": ["token"]
+          "columns": [
+            "token"
+          ]
         }
       },
       "policies": {},
@@ -448,8 +470,12 @@
           "name": "subscriptions_userId_users_id_fk",
           "tableFrom": "subscriptions",
           "tableTo": "users",
-          "columnsFrom": ["userId"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -459,7 +485,9 @@
         "subscriptions_subscriptionId_unique": {
           "name": "subscriptions_subscriptionId_unique",
           "nullsNotDistinct": false,
-          "columns": ["subscriptionId"]
+          "columns": [
+            "subscriptionId"
+          ]
         }
       },
       "policies": {},
@@ -558,8 +586,12 @@
           "name": "uploads_userId_users_id_fk",
           "tableFrom": "uploads",
           "tableTo": "users",
-          "columnsFrom": ["userId"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -612,6 +644,25 @@
           "notNull": true,
           "default": "'user'"
         },
+        "banned": {
+          "name": "banned",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "banReason": {
+          "name": "banReason",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "banExpires": {
+          "name": "banExpires",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
         "paymentProviderCustomerId": {
           "name": "paymentProviderCustomerId",
           "type": "text",
@@ -638,12 +689,16 @@
         "users_email_unique": {
           "name": "users_email_unique",
           "nullsNotDistinct": false,
-          "columns": ["email"]
+          "columns": [
+            "email"
+          ]
         },
         "users_paymentProviderCustomerId_unique": {
           "name": "users_paymentProviderCustomerId_unique",
           "nullsNotDistinct": false,
-          "columns": ["paymentProviderCustomerId"]
+          "columns": [
+            "paymentProviderCustomerId"
+          ]
         }
       },
       "policies": {},
@@ -795,7 +850,9 @@
         "webhook_events_eventId_unique": {
           "name": "webhook_events_eventId_unique",
           "nullsNotDistinct": false,
-          "columns": ["eventId"]
+          "columns": [
+            "eventId"
+          ]
         }
       },
       "policies": {},
@@ -807,7 +864,11 @@
     "public.user_role": {
       "name": "user_role",
       "schema": "public",
-      "values": ["user", "admin", "super_admin"]
+      "values": [
+        "user",
+        "admin",
+        "super_admin"
+      ]
     }
   },
   "schemas": {},

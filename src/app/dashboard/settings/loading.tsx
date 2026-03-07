@@ -1,11 +1,19 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { DashboardPageWrapper } from "../_components/dashboard-page-wrapper";
 
+function SettingsPageTitle() {
+  return <>Settings</>;
+}
+
+function SettingsPageDescription() {
+  return <>Manage your account profile and personalize dashboard appearance.</>;
+}
+
 export default function DashboardSettingsLoading() {
   return (
     <DashboardPageWrapper
-      title="Settings"
-      description="Manage your account profile and personalize dashboard appearance."
+      title={<SettingsPageTitle />}
+      description={<SettingsPageDescription />}
     >
       <section className="space-y-8">
         <section className="space-y-4">

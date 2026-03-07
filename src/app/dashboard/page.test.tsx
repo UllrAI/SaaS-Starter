@@ -2,7 +2,7 @@ import React from "react";
 import { beforeEach, describe, expect, it, jest } from "@jest/globals";
 import { render, screen } from "@testing-library/react";
 
-const mockCreatePageMetadata = jest.fn();
+const mockCreateMetadata = jest.fn();
 const mockRequireAuth = jest.fn();
 const mockGetUserSubscription = jest.fn();
 const mockGetUserPayments = jest.fn();
@@ -19,10 +19,7 @@ describe("Dashboard Home Page", () => {
     jest.resetModules();
     jest.clearAllMocks();
 
-    mockCreatePageMetadata.mockResolvedValue({
-      title: "Dashboard",
-      description: "Account overview, billing status, and starter setup progress.",
-    });
+    mockCreateMetadata.mockReturnValue({});
     mockRequireAuth.mockResolvedValue({
       id: "user-123",
       name: "Test User",
@@ -61,8 +58,8 @@ describe("Dashboard Home Page", () => {
   });
 
   function loadPageModule() {
-    jest.doMock("@/lib/i18n/page-metadata", () => ({
-      createPageMetadata: (config: unknown) => mockCreatePageMetadata(config),
+    jest.doMock("@/lib/metadata", () => ({
+      createMetadata: (config: unknown) => mockCreateMetadata(config),
     }));
     jest.doMock("@/lib/auth/permissions", () => ({
       requireAuth: mockRequireAuth,
@@ -167,11 +164,11 @@ describe("Dashboard Home Page", () => {
   it("generates metadata from the dashboard copy", async () => {
     const { generateMetadata } = loadPageModule();
 
-    await expect(generateMetadata()).resolves.toEqual({
+    await expect(generateMetadata()).resolves.toMatchObject({
       title: "Dashboard",
       description: "Account overview, billing status, and starter setup progress.",
     });
-    expect(mockCreatePageMetadata).toHaveBeenCalledTimes(1);
+    expect(mockCreateMetadata).toHaveBeenCalledWith({});
   });
 
   it("renders the authenticated dashboard overview with subscription, uploads, and payments", async () => {
@@ -182,7 +179,7 @@ describe("Dashboard Home Page", () => {
     expect(screen.getByRole("heading", { name: "Dashboard" })).toBeInTheDocument();
     expect(
       screen.getByText(
-        "Your real account state, recent billing activity, and setup progress.",
+        "Account overview, billing status, and starter setup progress.",
       ),
     ).toBeInTheDocument();
     expect(screen.getAllByText("Pro")).toHaveLength(2);
@@ -215,7 +212,7 @@ describe("Dashboard Home Page", () => {
     render(await HomeRoute());
 
     expect(screen.getByText("Free")).toBeInTheDocument();
-    expect(screen.getByText("no active subscription")).toBeInTheDocument();
+    expect(screen.getByText("No active subscription")).toBeInTheDocument();
     expect(screen.getByText("0 bytes stored")).toBeInTheDocument();
     expect(screen.getByText("No payment records yet")).toBeInTheDocument();
     expect(

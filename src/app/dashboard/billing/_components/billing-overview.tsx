@@ -31,6 +31,26 @@ interface BillingOverviewProps {
   payments: PaymentRecord[];
 }
 
+function RedirectingToSubscriptionManagementToast() {
+  return <>Redirecting to subscription management...</>;
+}
+
+function NoActiveSubscriptionLabel() {
+  return <>No active subscription</>;
+}
+
+function NotScheduledLabel() {
+  return <>Not scheduled</>;
+}
+
+function LatestPaymentDateLabel({ date }: { date: string }) {
+  return <>Latest: {date}</>;
+}
+
+function NoPaymentRecordsLabel() {
+  return <>No records yet</>;
+}
+
 export function BillingOverview({ subscription, payments }: BillingOverviewProps) {
   const intlLocale = useIntlLocale();
   const router = useRouter();
@@ -53,7 +73,7 @@ export function BillingOverview({ subscription, payments }: BillingOverviewProps
 
   const handleManageSubscription = async () => {
     setIsPortalLoading(true);
-    toast.info("Redirecting to subscription management...");
+    toast.info(<RedirectingToSubscriptionManagementToast />);
 
     try {
       const response = await fetch("/api/billing/portal");
@@ -108,7 +128,9 @@ export function BillingOverview({ subscription, payments }: BillingOverviewProps
                 {subscription.status}
               </Badge>
             ) : (
-              <span className="text-muted-foreground">No active subscription</span>
+              <span className="text-muted-foreground">
+                <NoActiveSubscriptionLabel />
+              </span>
             )}
           </CardContent>
         </Card>
@@ -117,7 +139,7 @@ export function BillingOverview({ subscription, payments }: BillingOverviewProps
           <CardHeader className="pb-2">
             <CardDescription>Next Billing Date</CardDescription>
             <CardTitle className="text-base">
-              {nextBillingDate || "Not scheduled"}
+              {nextBillingDate || <NotScheduledLabel />}
             </CardTitle>
           </CardHeader>
           <CardContent className="text-muted-foreground flex items-center gap-2 text-sm">
@@ -136,8 +158,14 @@ export function BillingOverview({ subscription, payments }: BillingOverviewProps
           <CardContent className="text-muted-foreground flex items-center gap-2 text-sm">
             <ReceiptText className="h-4 w-4" />
             {paymentSummary.latestDate
-              ? `Latest: ${new Date(paymentSummary.latestDate).toLocaleDateString(intlLocale)}`
-              : "No records yet"}
+              ? (
+                  <LatestPaymentDateLabel
+                    date={new Date(paymentSummary.latestDate).toLocaleDateString(
+                      intlLocale,
+                    )}
+                  />
+                )
+              : <NoPaymentRecordsLabel />}
           </CardContent>
         </Card>
       </section>

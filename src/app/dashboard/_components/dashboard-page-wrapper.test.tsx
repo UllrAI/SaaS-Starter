@@ -12,10 +12,10 @@ jest.mock("./dashboard-page-header", () => ({
     actions,
     showSidebarTrigger,
   }: {
-    title: string;
-    parentTitle?: string;
+    title: React.ReactNode;
+    parentTitle?: React.ReactNode;
     parentUrl?: string;
-    description?: string;
+    description?: React.ReactNode;
     actions?: React.ReactNode;
     showSidebarTrigger?: boolean;
   }) => (

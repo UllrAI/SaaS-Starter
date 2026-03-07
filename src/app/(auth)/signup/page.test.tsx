@@ -32,10 +32,9 @@ jest.mock("@/lib/auth/providers", () => ({
   getAvailableSocialProviders: () => mockGetAvailableSocialProviders(),
 }));
 
-const mockMetadata = { title: "mock signup metadata" };
-const mockCreatePageMetadata = jest.fn(() => mockMetadata);
-jest.mock("@/lib/i18n/page-metadata", () => ({
-  createPageMetadata: (config: unknown) => mockCreatePageMetadata(config),
+const mockCreateMetadata = jest.fn(() => ({}));
+jest.mock("@/lib/metadata", () => ({
+  createMetadata: (config: unknown) => mockCreateMetadata(config),
 }));
 
 describe("SignUpPage", () => {
@@ -47,11 +46,11 @@ describe("SignUpPage", () => {
   it("creates localized metadata from signup page copy", async () => {
     const pageModule = await import("./page");
 
-    expect(await pageModule.generateMetadata()).toBe(mockMetadata);
-    expect(mockCreatePageMetadata).toHaveBeenCalledWith({
-      title: expect.any(Function),
-      description: expect.any(Function),
+    await expect(pageModule.generateMetadata()).resolves.toMatchObject({
+      title: "Sign Up",
+      description: "Create your account with magic link",
     });
+    expect(mockCreateMetadata).toHaveBeenCalledWith({});
   });
 
   it("renders AuthForm in signup mode with providers", async () => {

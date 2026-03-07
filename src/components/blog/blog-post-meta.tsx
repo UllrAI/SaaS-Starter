@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { Badge } from "@/components/ui/badge";
 import { CalendarDays, Clock, Sparkles, User } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -8,7 +9,7 @@ interface BlogPostMetaProps {
   featured?: boolean;
   tags?: string[];
   readTime?: string;
-  author?: string;
+  author?: ReactNode;
   showBadge?: boolean;
   locale?: string;
 
@@ -21,7 +22,7 @@ export function BlogPostMeta({
   featured = false,
   tags = [],
   readTime,
-  author,
+  author = <>Anonymous</>,
   showBadge = true,
   locale,
 

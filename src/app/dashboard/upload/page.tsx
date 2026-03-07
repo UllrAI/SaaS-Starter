@@ -46,6 +46,74 @@ interface ServerUploadResult {
   error?: string;
 }
 
+function FileUploadPageTitle() {
+  return <>File Upload</>;
+}
+
+function UploadSuccessToast({
+  count,
+  viaServer = false,
+}: {
+  count: number;
+  viaServer?: boolean;
+}) {
+  if (viaServer) {
+    return count === 1 ? (
+      <>Successfully uploaded 1 file via server</>
+    ) : (
+      <>Successfully uploaded {count} files via server</>
+    );
+  }
+
+  return count === 1 ? (
+    <>Successfully uploaded 1 file</>
+  ) : (
+    <>Successfully uploaded {count} files</>
+  );
+}
+
+function ServerUploadWarningToast({
+  successCount,
+  failureCount,
+}: {
+  successCount: number;
+  failureCount: number;
+}) {
+  return (
+    <>
+      {successCount} files uploaded, {failureCount} failed
+    </>
+  );
+}
+
+function ServerUploadFailedToast() {
+  return <>Server upload failed</>;
+}
+
+function CopiedToClipboardToast() {
+  return <>Copied to clipboard</>;
+}
+
+function CopyToClipboardFailedToast() {
+  return <>Failed to copy to clipboard</>;
+}
+
+function UploadingLabel() {
+  return <>Uploading...</>;
+}
+
+function SelectFilesForServerUploadLabel() {
+  return <>Click to select files for server upload</>;
+}
+
+function CopyUrlLabel() {
+  return <>Copy URL</>;
+}
+
+function OpenFileLabel() {
+  return <>Open</>;
+}
+
 export default function UploadPage() {
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [serverUploadProgress, setServerUploadProgress] = useState(0);
@@ -53,7 +121,7 @@ export default function UploadPage() {
 
   const handleUploadComplete = (files: UploadedFile[]) => {
     setUploadedFiles((prev) => [...prev, ...files]);
-    toast.success(`Successfully uploaded ${files.length} file(s)`);
+    toast.success(<UploadSuccessToast count={files.length} />);
   };
 
   // 服务端上传
@@ -104,16 +172,19 @@ export default function UploadPage() {
 
       if (result.summary.failed > 0) {
         toast.warning(
-          `${result.summary.success} files uploaded, ${result.summary.failed} failed`,
+          <ServerUploadWarningToast
+            successCount={result.summary.success}
+            failureCount={result.summary.failed}
+          />,
         );
       } else {
         toast.success(
-          `Successfully uploaded ${result.summary.success} file(s) via server`,
+          <UploadSuccessToast count={result.summary.success} viaServer />,
         );
       }
     } catch (error) {
       console.error("Server upload error:", error);
-      toast.error("Server upload failed");
+      toast.error(<ServerUploadFailedToast />);
     } finally {
       setIsServerUploading(false);
       setServerUploadProgress(0);
@@ -123,14 +194,14 @@ export default function UploadPage() {
   const copyToClipboard = async (text: string) => {
     try {
       await navigator.clipboard.writeText(text);
-      toast.success("Copied to clipboard");
+      toast.success(<CopiedToClipboardToast />);
     } catch {
-      toast.error("Failed to copy to clipboard");
+      toast.error(<CopyToClipboardFailedToast />);
     }
   };
 
   return (
-    <DashboardPageWrapper title="File Upload">
+    <DashboardPageWrapper title={<FileUploadPageTitle />}>
       <Tabs defaultValue="client" className="w-full">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="client" className="flex items-center gap-2">
@@ -266,9 +337,11 @@ export default function UploadPage() {
                 >
                   <Server className="text-muted-foreground h-12 w-12" />
                   <p className="text-lg font-medium">
-                    {isServerUploading
-                      ? "Uploading..."
-                      : "Click to select files for server upload"}
+                    {isServerUploading ? (
+                      <UploadingLabel />
+                    ) : (
+                      <SelectFilesForServerUploadLabel />
+                    )}
                   </p>
                   <p className="text-muted-foreground text-sm">
                     Files will be processed on the server side
@@ -411,7 +484,7 @@ export default function UploadPage() {
                       onClick={() => copyToClipboard(file.url)}
                     >
                       <Copy className="mr-1 h-4 w-4" />
-                      Copy URL
+                      <CopyUrlLabel />
                     </Button>
 
                     {/* Open file button */}
@@ -421,7 +494,7 @@ export default function UploadPage() {
                       onClick={() => window.open(file.url, "_blank")}
                     >
                       <ExternalLink className="mr-1 h-4 w-4" />
-                      Open
+                      <OpenFileLabel />
                     </Button>
                   </div>
                 </div>

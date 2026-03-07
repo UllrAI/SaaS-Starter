@@ -12,21 +12,26 @@ import { UserManagementTable } from "./_components/user-management-table";
 import { UserStatsCards } from "./_components/user-stats-cards";
 import { StatsCardsSkeleton } from "../_components/stats-cards-skeleton";
 import { getUsers } from "@/lib/actions/admin";
-import { createPageMetadata } from "@/lib/i18n/page-metadata";
-
-async function UserManagementMetadataTitle() {
-  return <>User Management</>;
-}
-
-async function UserManagementMetadataDescription() {
-  return <>Manage user accounts, roles, and permissions</>;
-}
+import { createMetadata } from "@/lib/metadata";
 
 export async function generateMetadata() {
-  return createPageMetadata({
-    title: UserManagementMetadataTitle,
-    description: UserManagementMetadataDescription,
-  });
+  const metadata = createMetadata({});
+
+  return {
+    ...metadata,
+    title: "User Management",
+    description: "Manage user accounts, roles, and permissions",
+    openGraph: {
+      ...metadata.openGraph,
+      title: "User Management",
+      description: "Manage user accounts, roles, and permissions",
+    },
+    twitter: {
+      ...metadata.twitter,
+      title: "User Management",
+      description: "Manage user accounts, roles, and permissions",
+    },
+  };
 }
 
 export default async function UserManagementPage() {
@@ -36,8 +41,8 @@ export default async function UserManagementPage() {
 
   return (
     <DashboardPageWrapper
-      title="User Management"
-      parentTitle="Admin Dashboard"
+      title={<>User Management</>}
+      parentTitle={<>Admin Dashboard</>}
       parentUrl="/dashboard/admin"
     >
       <Suspense fallback={<StatsCardsSkeleton />}>

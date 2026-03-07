@@ -28,6 +28,14 @@ interface UserButtonProps {
   user?: AuthUser | null;
 }
 
+function LoggedOutToast() {
+  return <>You have been logged out successfully.</>;
+}
+
+function LogoutFailedToast() {
+  return <>Something went wrong. Please try again.</>;
+}
+
 export function UserButton({ user }: UserButtonProps) {
   const { isMobile, open } = useSidebar();
   const router = useRouter();
@@ -54,9 +62,9 @@ export function UserButton({ user }: UserButtonProps) {
         toast.error(error.message);
         return;
       }
-      toast.success("You have been logged out successfully.");
+      toast.success(<LoggedOutToast />);
     } catch {
-      toast.info("Something went wrong. Please try again.");
+      toast.info(<LogoutFailedToast />);
     } finally {
       setLoggingOut(false);
     }

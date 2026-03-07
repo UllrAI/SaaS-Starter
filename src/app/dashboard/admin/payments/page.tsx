@@ -12,21 +12,26 @@ import { PaymentStatsCards } from "./_components/payment-stats-cards";
 import { PaymentManagementTable } from "./_components/payment-management-table";
 import { StatsCardsSkeleton } from "../_components/stats-cards-skeleton";
 import { getPayments } from "@/lib/actions/admin";
-import { createPageMetadata } from "@/lib/i18n/page-metadata";
-
-async function PaymentManagementMetadataTitle() {
-  return <>Payment Management</>;
-}
-
-async function PaymentManagementMetadataDescription() {
-  return <>Monitor and manage all payment transactions</>;
-}
+import { createMetadata } from "@/lib/metadata";
 
 export async function generateMetadata() {
-  return createPageMetadata({
-    title: PaymentManagementMetadataTitle,
-    description: PaymentManagementMetadataDescription,
-  });
+  const metadata = createMetadata({});
+
+  return {
+    ...metadata,
+    title: "Payment Management",
+    description: "Monitor and manage all payment transactions",
+    openGraph: {
+      ...metadata.openGraph,
+      title: "Payment Management",
+      description: "Monitor and manage all payment transactions",
+    },
+    twitter: {
+      ...metadata.twitter,
+      title: "Payment Management",
+      description: "Monitor and manage all payment transactions",
+    },
+  };
 }
 
 export default async function PaymentsPage() {
@@ -35,8 +40,8 @@ export default async function PaymentsPage() {
 
   return (
     <DashboardPageWrapper
-      title="Payment Management"
-      parentTitle="Admin Dashboard"
+      title={<>Payment Management</>}
+      parentTitle={<>Admin Dashboard</>}
       parentUrl="/dashboard/admin"
     >
       <Suspense fallback={<StatsCardsSkeleton />}>

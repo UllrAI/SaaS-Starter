@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import {
   Breadcrumb,
   BreadcrumbList,
@@ -14,11 +15,11 @@ import { ModeToggle } from "@/components/mode-toggle";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 
 interface DashboardPageHeaderProps {
-  title: string;
-  parentTitle?: string;
+  title: ReactNode;
+  parentTitle?: ReactNode;
   parentUrl?: string;
-  description?: string;
-  actions?: React.ReactNode;
+  description?: ReactNode;
+  actions?: ReactNode;
   showSidebarTrigger?: boolean;
 }
 

@@ -23,6 +23,10 @@ import { authClient, useSession } from "@/lib/auth/client";
 import { Session } from "@/types/auth";
 import { Edit, Loader2 } from "lucide-react";
 
+function ProfileUpdatedToast() {
+  return <>Profile updated successfully</>;
+}
+
 // Props are no longer needed for active sessions
 export function AccountPage() {
   const { data: currentUserSession, isPending } = useSession();
@@ -143,7 +147,7 @@ function EditUserDialog({
                 name: name !== session?.user.name ? name : undefined,
                 fetchOptions: {
                   onSuccess: () => {
-                    toast.success("Profile updated successfully");
+                    toast.success(<ProfileUpdatedToast />);
                     setOpen(false);
                     router.refresh();
                   },

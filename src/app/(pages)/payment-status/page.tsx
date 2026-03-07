@@ -4,21 +4,28 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Clock } from "lucide-react";
-import { createPageMetadata } from "@/lib/i18n/page-metadata";
-
-async function PaymentStatusMetadataTitle() {
-  return <>Payment Status</>;
-}
-
-async function PaymentStatusMetadataDescription() {
-  return <>Review the latest billing result and next steps for your account.</>;
-}
+import { createMetadata } from "@/lib/metadata";
 
 export async function generateMetadata() {
-  return createPageMetadata({
-    title: PaymentStatusMetadataTitle,
-    description: PaymentStatusMetadataDescription,
-  });
+  const metadata = createMetadata({});
+
+  return {
+    ...metadata,
+    title: "Payment Status",
+    description: "Review the latest billing result and next steps for your account.",
+    openGraph: {
+      ...metadata.openGraph,
+      title: "Payment Status",
+      description:
+        "Review the latest billing result and next steps for your account.",
+    },
+    twitter: {
+      ...metadata.twitter,
+      title: "Payment Status",
+      description:
+        "Review the latest billing result and next steps for your account.",
+    },
+  };
 }
 
 function PaymentStatusSkeleton() {

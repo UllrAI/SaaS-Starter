@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { getRequestLocale } from "@/lib/i18n/server-locale";
-import { createPageMetadata } from "@/lib/i18n/page-metadata";
 import { Languages } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -25,14 +24,6 @@ interface BlogPostPageProps {
   }>;
 }
 
-async function BlogPostNotFoundMetadataTitle() {
-  return <>Post Not Found</>;
-}
-
-async function BlogPostNotFoundMetadataDescription() {
-  return <>The requested blog post could not be found.</>;
-}
-
 export async function generateStaticParams() {
   return getAllPostSlugs().map((slug) => ({
     slug,
@@ -46,10 +37,23 @@ export async function generateMetadata({
   const post = getPostBySlug(slug, locale);
 
   if (!post) {
-    return createPageMetadata({
-      title: BlogPostNotFoundMetadataTitle,
-      description: BlogPostNotFoundMetadataDescription,
-    });
+    const metadata = createMetadata({});
+
+    return {
+      ...metadata,
+      title: "Post Not Found",
+      description: "The requested blog post could not be found.",
+      openGraph: {
+        ...metadata.openGraph,
+        title: "Post Not Found",
+        description: "The requested blog post could not be found.",
+      },
+      twitter: {
+        ...metadata.twitter,
+        title: "Post Not Found",
+        description: "The requested blog post could not be found.",
+      },
+    };
   }
 
   const localizations = getPostLocalizations(slug);
@@ -120,7 +124,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         featured={post.featured}
         tags={post.tags ? [...post.tags] : undefined}
         content={post.content}
-        author={author?.name || "Anonymous"}
+        author={author?.name}
         locale={locale}
         backHref={getLocalizedBlogPath(locale)}
       />

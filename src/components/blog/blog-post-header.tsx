@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { BackgroundPattern } from "@/components/ui/background-pattern";
 import { Badge } from "@/components/ui/badge";
@@ -16,7 +17,7 @@ interface BlogPostHeaderProps {
   tags?: string[];
   backHref?: string;
   backText?: string;
-  author?: string;
+  author?: ReactNode;
   content: string;
   locale?: string;
 }

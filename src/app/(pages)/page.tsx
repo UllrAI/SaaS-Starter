@@ -3,26 +3,29 @@ import { SocialProofUnified } from "@/components/homepage/social-proof-testimoni
 import { Features } from "@/components/homepage/features";
 import { OtherProducts } from "@/components/homepage/other-products";
 import { CallToAction } from "@/components/homepage/call-to-action";
-import { createPageMetadata } from "@/lib/i18n/page-metadata";
-
-async function HomePageMetadataTitle() {
-  return <>Micro SaaS Starter</>;
-}
-
-async function HomePageMetadataDescription() {
-  return (
-    <>
-      Authentication, billing, uploads, and admin tooling for shipping a SaaS
-      product faster.
-    </>
-  );
-}
+import { createMetadata } from "@/lib/metadata";
 
 export async function generateMetadata() {
-  return createPageMetadata({
-    title: HomePageMetadataTitle,
-    description: HomePageMetadataDescription,
-  });
+  const metadata = createMetadata({});
+
+  return {
+    ...metadata,
+    title: "Micro SaaS Starter",
+    description:
+      "Authentication, billing, uploads, and admin tooling for shipping a SaaS product faster.",
+    openGraph: {
+      ...metadata.openGraph,
+      title: "Micro SaaS Starter",
+      description:
+        "Authentication, billing, uploads, and admin tooling for shipping a SaaS product faster.",
+    },
+    twitter: {
+      ...metadata.twitter,
+      title: "Micro SaaS Starter",
+      description:
+        "Authentication, billing, uploads, and admin tooling for shipping a SaaS product faster.",
+    },
+  };
 }
 
 export default function HomePage() {

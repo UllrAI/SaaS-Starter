@@ -18,27 +18,27 @@ import {
   GITHUB_DISCUSSIONS_URL,
   GITHUB_RELEASES_URL,
 } from "@/lib/config/constants";
-import { createPageMetadata } from "@/lib/i18n/page-metadata";
+import { createMetadata } from "@/lib/metadata";
 import { ContactMethods } from "./contact-methods";
 
-async function ContactPageMetadataTitle() {
-  return <>Contact Us</>;
-}
-
-async function ContactPageMetadataDescription() {
-  return (
-    <>
-      Get in touch with our team. We are here to help with any questions about{" "}
-      {COMPANY_NAME}.
-    </>
-  );
-}
-
 export async function generateMetadata() {
-  return createPageMetadata({
-    title: ContactPageMetadataTitle,
-    description: ContactPageMetadataDescription,
-  });
+  const metadata = createMetadata({});
+
+  return {
+    ...metadata,
+    title: "Contact Us",
+    description: `Get in touch with our team. We are here to help with any questions about ${COMPANY_NAME}.`,
+    openGraph: {
+      ...metadata.openGraph,
+      title: "Contact Us",
+      description: `Get in touch with our team. We are here to help with any questions about ${COMPANY_NAME}.`,
+    },
+    twitter: {
+      ...metadata.twitter,
+      title: "Contact Us",
+      description: `Get in touch with our team. We are here to help with any questions about ${COMPANY_NAME}.`,
+    },
+  };
 }
 
 export default function ContactPage() {

@@ -1,18 +1,23 @@
-import { createPageMetadata } from "@/lib/i18n/page-metadata";
-
-async function AuthSentMetadataTitle() {
-  return <>Check Your Email - Magic Link Sent</>;
-}
-
-async function AuthSentMetadataDescription() {
-  return <>We&apos;ve sent you a secure magic link to access your account</>;
-}
+import { createMetadata } from "@/lib/metadata";
 
 export async function generateMetadata() {
-  return createPageMetadata({
-    title: AuthSentMetadataTitle,
-    description: AuthSentMetadataDescription,
-  });
+  const metadata = createMetadata({});
+
+  return {
+    ...metadata,
+    title: "Check Your Email - Magic Link Sent",
+    description: "We've sent you a secure magic link to access your account",
+    openGraph: {
+      ...metadata.openGraph,
+      title: "Check Your Email - Magic Link Sent",
+      description: "We've sent you a secure magic link to access your account",
+    },
+    twitter: {
+      ...metadata.twitter,
+      title: "Check Your Email - Magic Link Sent",
+      description: "We've sent you a secure magic link to access your account",
+    },
+  };
 }
 
 export default function SentLayout({

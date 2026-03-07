@@ -1,22 +1,30 @@
-import { createPageMetadata } from "@/lib/i18n/page-metadata";
-
-async function PaymentStatusMetadataTitle() {
-  return <>Payment Status</>;
-}
-
-async function PaymentStatusMetadataDescription() {
-  return <>Check your payment status and next steps for your subscription.</>;
-}
+import { createMetadata } from "@/lib/metadata";
 
 export async function generateMetadata() {
-  return createPageMetadata({
-    title: PaymentStatusMetadataTitle,
-    description: PaymentStatusMetadataDescription,
+  const metadata = createMetadata({
     robots: {
       index: false,
       follow: false,
     },
   });
+
+  return {
+    ...metadata,
+    title: "Payment Status",
+    description: "Check your payment status and next steps for your subscription.",
+    openGraph: {
+      ...metadata.openGraph,
+      title: "Payment Status",
+      description:
+        "Check your payment status and next steps for your subscription.",
+    },
+    twitter: {
+      ...metadata.twitter,
+      title: "Payment Status",
+      description:
+        "Check your payment status and next steps for your subscription.",
+    },
+  };
 }
 
 export default function PaymentStatusLayout({

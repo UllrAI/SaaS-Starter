@@ -1,7 +1,7 @@
 import { Sparkles, BookOpen } from "lucide-react";
 import { BackgroundPattern } from "@/components/ui/background-pattern";
 import { BlogPostCard } from "@/components/blog/blog-post-card";
-import { createPageMetadata } from "@/lib/i18n/page-metadata";
+import { createMetadata } from "@/lib/metadata";
 import { getRequestLocale } from "@/lib/i18n/server-locale";
 import { calculateReadingTime } from "@/lib/utils";
 import {
@@ -11,29 +11,32 @@ import {
   getLocalizedBlogPostPath,
 } from "@/lib/content/blog";
 
-async function BlogPageMetadataTitle() {
-  return <>Blog</>;
-}
-
-async function BlogPageMetadataDescription() {
-  return (
-    <>
-      Read our latest blog posts and insights about technology, development, and
-      industry trends.
-    </>
-  );
-}
-
 export async function generateMetadata() {
   const locale = await getRequestLocale();
-
-  return createPageMetadata({
-    title: BlogPageMetadataTitle,
-    description: BlogPageMetadataDescription,
+  const metadata = createMetadata({
     alternates: {
       canonical: getLocalizedBlogPath(locale),
     },
   });
+
+  return {
+    ...metadata,
+    title: "Blog",
+    description:
+      "Read our latest blog posts and insights about technology, development, and industry trends.",
+    openGraph: {
+      ...metadata.openGraph,
+      title: "Blog",
+      description:
+        "Read our latest blog posts and insights about technology, development, and industry trends.",
+    },
+    twitter: {
+      ...metadata.twitter,
+      title: "Blog",
+      description:
+        "Read our latest blog posts and insights about technology, development, and industry trends.",
+    },
+  };
 }
 
 export default async function BlogPage() {
@@ -60,7 +63,7 @@ export default async function BlogPage() {
         publishedDate={post.publishedDate || undefined}
         featured={post.featured}
         variant={variant}
-        author={author?.name || "Anonymous"}
+        author={author?.name}
         readTime={calculateReadingTime(post.content)}
         locale={locale}
         isFallback={post.isFallback}

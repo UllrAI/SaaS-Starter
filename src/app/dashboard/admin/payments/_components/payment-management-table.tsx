@@ -283,14 +283,14 @@ export function PaymentManagementTable({
       error={error}
       searchTerm={searchTerm}
       onSearchChange={handleSearch}
-      searchPlaceholder="Search by user name, email, or payment ID..."
+      searchPlaceholder={<>Search by user name, email, or payment ID...</>}
       filterValue={statusFilter}
       onFilterChange={handleStatusFilter}
       filterOptions={statusFilterOptions}
-      filterPlaceholder="Filter by status"
+      filterPlaceholder={<>Filter by status</>}
       pagination={pagination}
       onPageChange={handlePageChange}
-      emptyMessage="No payments found"
+      emptyMessage={<>No payments found</>}
     />
   );
 }

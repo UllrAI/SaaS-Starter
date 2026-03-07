@@ -7,21 +7,26 @@ import {
   getUserSubscription,
 } from "@/lib/database/subscription";
 import { BillingOverview } from "./_components/billing-overview";
-import { createPageMetadata } from "@/lib/i18n/page-metadata";
-
-async function BillingPageMetadataTitle() {
-  return <>Billing</>;
-}
-
-async function BillingPageMetadataDescription() {
-  return <>Manage your subscription plan and billing history.</>;
-}
+import { createMetadata } from "@/lib/metadata";
 
 export async function generateMetadata() {
-  return createPageMetadata({
-    title: BillingPageMetadataTitle,
-    description: BillingPageMetadataDescription,
-  });
+  const metadata = createMetadata({});
+
+  return {
+    ...metadata,
+    title: "Billing",
+    description: "Manage your subscription plan and billing history.",
+    openGraph: {
+      ...metadata.openGraph,
+      title: "Billing",
+      description: "Manage your subscription plan and billing history.",
+    },
+    twitter: {
+      ...metadata.twitter,
+      title: "Billing",
+      description: "Manage your subscription plan and billing history.",
+    },
+  };
 }
 
 export default async function DashboardBillingPage() {
@@ -44,8 +49,8 @@ export default async function DashboardBillingPage() {
 
   return (
     <DashboardPageWrapper
-      title="Billing"
-      description="Manage your subscription, plan status, and payment history."
+      title={<>Billing</>}
+      description={<>Manage your subscription plan and billing history.</>}
     >
       <BillingOverview subscription={subscription} payments={payments} />
     </DashboardPageWrapper>

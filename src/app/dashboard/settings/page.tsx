@@ -3,21 +3,26 @@ import { redirect } from "next/navigation";
 import { DashboardPageWrapper } from "../_components/dashboard-page-wrapper";
 import { AccountPage } from "./_components/account-page";
 import { AppearancePage } from "./_components/appearance-page";
-import { createPageMetadata } from "@/lib/i18n/page-metadata";
-
-async function SettingsPageMetadataTitle() {
-  return <>Settings</>;
-}
-
-async function SettingsPageMetadataDescription() {
-  return <>Manage your account profile and dashboard appearance.</>;
-}
+import { createMetadata } from "@/lib/metadata";
 
 export async function generateMetadata() {
-  return createPageMetadata({
-    title: SettingsPageMetadataTitle,
-    description: SettingsPageMetadataDescription,
-  });
+  const metadata = createMetadata({});
+
+  return {
+    ...metadata,
+    title: "Settings",
+    description: "Manage your account profile and dashboard appearance.",
+    openGraph: {
+      ...metadata.openGraph,
+      title: "Settings",
+      description: "Manage your account profile and dashboard appearance.",
+    },
+    twitter: {
+      ...metadata.twitter,
+      title: "Settings",
+      description: "Manage your account profile and dashboard appearance.",
+    },
+  };
 }
 
 interface SettingsPageProps {
@@ -41,8 +46,8 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
 
   return (
     <DashboardPageWrapper
-      title="Settings"
-      description="Manage your account profile and personalize dashboard appearance."
+      title={<>Settings</>}
+      description={<>Manage your account profile and dashboard appearance.</>}
     >
       <section className="space-y-8">
         <AccountPage />

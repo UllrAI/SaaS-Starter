@@ -17,7 +17,7 @@ import { db } from "@/database";
 import { uploads } from "@/database/schema";
 import { formatCurrency } from "@/lib/utils";
 import { formatFileSize } from "@/lib/config/upload";
-import { createPageMetadata } from "@/lib/i18n/page-metadata";
+import { createMetadata } from "@/lib/metadata";
 import { getRequestLocale } from "@/lib/i18n/server-locale";
 import {
   ArrowRight,
@@ -28,19 +28,24 @@ import {
   UserCircle2,
 } from "lucide-react";
 
-async function DashboardMetadataTitle() {
-  return <>Dashboard</>;
-}
-
-async function DashboardMetadataDescription() {
-  return <>Account overview, billing status, and starter setup progress.</>;
-}
-
 export async function generateMetadata() {
-  return createPageMetadata({
-    title: DashboardMetadataTitle,
-    description: DashboardMetadataDescription,
-  });
+  const metadata = createMetadata({});
+
+  return {
+    ...metadata,
+    title: "Dashboard",
+    description: "Account overview, billing status, and starter setup progress.",
+    openGraph: {
+      ...metadata.openGraph,
+      title: "Dashboard",
+      description: "Account overview, billing status, and starter setup progress.",
+    },
+    twitter: {
+      ...metadata.twitter,
+      title: "Dashboard",
+      description: "Account overview, billing status, and starter setup progress.",
+    },
+  };
 }
 
 const checklistLinks = [
@@ -100,8 +105,8 @@ export default async function HomeRoute() {
 
   return (
     <DashboardPageWrapper
-      title="Dashboard"
-      description="Your real account state, recent billing activity, and setup progress."
+      title={<>Dashboard</>}
+      description={<>Account overview, billing status, and starter setup progress.</>}
     >
       <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
         <Card className="shadow-sm">
@@ -126,7 +131,7 @@ export default async function HomeRoute() {
                     : "secondary"
                 }
               >
-                {subscription?.status ?? "no active subscription"}
+                {subscription?.status ?? <>No active subscription</>}
               </Badge>
             </div>
             <div className="border-border space-y-2 border p-4">
@@ -146,7 +151,7 @@ export default async function HomeRoute() {
                       latestPayment.currency,
                       locale,
                     )
-                  : "No payment records yet"}
+                  : <>No payment records yet</>}
               </p>
             </div>
           </CardContent>
@@ -206,7 +211,7 @@ export default async function HomeRoute() {
                     </div>
                     <Button asChild size="sm" variant="outline">
                       <Link href={item.href}>
-                        Open
+                        <>Open</>
                         <ArrowRight className="ml-2 h-4 w-4" />
                       </Link>
                     </Button>

@@ -6,7 +6,7 @@ import env from "@/env";
 
 import { LingoProvider } from "@lingo.dev/compiler/react/next";
 import { AppProviders } from "@/components/app-providers";
-import { createPageMetadata } from "@/lib/i18n/page-metadata";
+import { createMetadata } from "@/lib/metadata";
 import { getRequestLocale } from "@/lib/i18n/server-locale";
 
 const fontSans = Inter({
@@ -21,22 +21,8 @@ const fontMono = JetBrains_Mono({
   display: "swap",
 });
 
-async function RootMetadataDescription() {
-  return (
-    <>
-      Complete Micro UllrAI SaaS starter with authentication, payments,
-      database, and deployment.
-    </>
-  );
-}
-
 export async function generateMetadata() {
-  return createPageMetadata({
-    title: {
-      template: `%s | ${APP_NAME}`,
-      default: APP_NAME,
-    },
-    description: RootMetadataDescription,
+  const metadata = createMetadata({
     applicationName: APP_NAME,
     authors: [{ name: COMPANY_NAME, url: env.NEXT_PUBLIC_APP_URL }],
     creator: COMPANY_NAME,
@@ -56,6 +42,28 @@ export async function generateMetadata() {
       canonical: env.NEXT_PUBLIC_APP_URL,
     },
   });
+
+  return {
+    ...metadata,
+    title: {
+      template: `%s | ${APP_NAME}`,
+      default: APP_NAME,
+    },
+    description:
+      "Complete Micro UllrAI SaaS starter with authentication, payments, database, and deployment.",
+    openGraph: {
+      ...metadata.openGraph,
+      title: APP_NAME,
+      description:
+        "Complete Micro UllrAI SaaS starter with authentication, payments, database, and deployment.",
+    },
+    twitter: {
+      ...metadata.twitter,
+      title: APP_NAME,
+      description:
+        "Complete Micro UllrAI SaaS starter with authentication, payments, database, and deployment.",
+    },
+  };
 }
 
 export default async function RootLayout({

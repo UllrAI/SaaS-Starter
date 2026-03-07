@@ -6,31 +6,32 @@ import {
   GITHUB_DISCUSSIONS_URL,
   PRIVACY_EMAIL,
 } from "@/lib/config/constants";
-import { createPageMetadata } from "@/lib/i18n/page-metadata";
+import { createMetadata } from "@/lib/metadata";
 
 import env from "@/env";
 
-async function PrivacyPageMetadataTitle() {
-  return <>Privacy Policy</>;
-}
-
-async function PrivacyPageMetadataDescription() {
-  return (
-    <>
-      Learn how {COMPANY_NAME} collects, uses, and protects your personal
-      information.
-    </>
-  );
-}
-
 export async function generateMetadata() {
-  return createPageMetadata({
-    title: PrivacyPageMetadataTitle,
-    description: PrivacyPageMetadataDescription,
+  const metadata = createMetadata({
     alternates: {
       canonical: `${env.NEXT_PUBLIC_APP_URL}/privacy`,
     },
   });
+
+  return {
+    ...metadata,
+    title: "Privacy Policy",
+    description: `Learn how ${COMPANY_NAME} collects, uses, and protects your personal information.`,
+    openGraph: {
+      ...metadata.openGraph,
+      title: "Privacy Policy",
+      description: `Learn how ${COMPANY_NAME} collects, uses, and protects your personal information.`,
+    },
+    twitter: {
+      ...metadata.twitter,
+      title: "Privacy Policy",
+      description: `Learn how ${COMPANY_NAME} collects, uses, and protects your personal information.`,
+    },
+  };
 }
 
 const privacySections = [

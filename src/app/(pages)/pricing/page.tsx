@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { BackgroundPattern } from "@/components/ui/background-pattern";
 import { PricingSection } from "@/components/payment-options";
 import { PAYMENT_PROVIDER } from "@/lib/config/constants";
-import { createPageMetadata } from "@/lib/i18n/page-metadata";
+import { createMetadata } from "@/lib/metadata";
 import {
   Boxes,
   CreditCard,
@@ -23,50 +23,33 @@ import {
 } from "lucide-react";
 
 export async function generateMetadata() {
-  return createPageMetadata({
-    title: PricingPageMetadataTitle,
-    description: PricingPageMetadataDescription,
+  const metadata = createMetadata({});
+
+  return {
+    ...metadata,
+    title: "Pricing",
+    description:
+      "Pricing for the SaaS Starter codebase. Review the current package structure, payment flow, and what is included before checkout.",
     keywords: [
-      PricingPageKeywordPricing,
-      PricingPageKeywordStarterKit,
-      PricingPageKeywordNextStarter,
-      PricingPageKeywordSaasStarter,
-      PricingPageKeywordBilling,
+      "pricing",
+      "starter kit",
+      "next.js starter",
+      "saas starter",
+      "billing",
     ],
-  });
-}
-
-async function PricingPageMetadataTitle() {
-  return <>Pricing</>;
-}
-
-async function PricingPageMetadataDescription() {
-  return (
-    <>
-      Pricing for the SaaS Starter codebase. Review the current package
-      structure, payment flow, and what is included before checkout.
-    </>
-  );
-}
-
-async function PricingPageKeywordPricing() {
-  return <>pricing</>;
-}
-
-async function PricingPageKeywordStarterKit() {
-  return <>starter kit</>;
-}
-
-async function PricingPageKeywordNextStarter() {
-  return <>next.js starter</>;
-}
-
-async function PricingPageKeywordSaasStarter() {
-  return <>saas starter</>;
-}
-
-async function PricingPageKeywordBilling() {
-  return <>billing</>;
+    openGraph: {
+      ...metadata.openGraph,
+      title: "Pricing",
+      description:
+        "Pricing for the SaaS Starter codebase. Review the current package structure, payment flow, and what is included before checkout.",
+    },
+    twitter: {
+      ...metadata.twitter,
+      title: "Pricing",
+      description:
+        "Pricing for the SaaS Starter codebase. Review the current package structure, payment flow, and what is included before checkout.",
+    },
+  };
 }
 
 const includedCards = [

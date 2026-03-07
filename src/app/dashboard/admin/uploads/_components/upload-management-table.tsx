@@ -281,11 +281,11 @@ export function UploadManagementTable({
         filterValue={fileTypeFilter}
         onFilterChange={handleFileTypeFilter}
         filterOptions={filterOptions}
-        filterPlaceholder="Filter by type"
+        filterPlaceholder={<>Filter by type</>}
         pagination={pagination}
         onPageChange={setCurrentPage}
-        searchPlaceholder="Search by filename, user email..."
-        emptyMessage="No uploads found"
+        searchPlaceholder={<>Search by filename, user email...</>}
+        emptyMessage={<>No uploads found</>}
       />
 
       {/* View Details Dialog */}

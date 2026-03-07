@@ -32,20 +32,9 @@ import { Logo } from "@/components/logo";
 import { cn } from "@/lib/utils";
 import { useSession } from "@/lib/auth/client";
 
-const SidebarLabelHome = () => <>Home</>;
-const SidebarLabelUpload = () => <>Upload</>;
-const SidebarLabelBilling = () => <>Billing</>;
-const SidebarLabelSettings = () => <>Settings</>;
-const SidebarLabelAdminDashboard = () => <>Admin Dashboard</>;
-const SidebarLabelUserManagement = () => <>User Management</>;
-const SidebarLabelPayments = () => <>Payments</>;
-const SidebarLabelSubscriptions = () => <>Subscriptions</>;
-const SidebarLabelUploadsManagement = () => <>Uploads Management</>;
-const SidebarLabelAdmin = () => <>Admin</>;
-
 type NavigationItem = {
   id: string;
-  Label: React.ComponentType;
+  label: React.ReactNode;
   url: string;
   icon: LucideIcon;
   matchMode?: "exact" | "prefix";
@@ -54,28 +43,28 @@ type NavigationItem = {
 const navigation: NavigationItem[] = [
   {
     id: "home",
-    Label: SidebarLabelHome,
+    label: <>Home</>,
     url: "/dashboard",
     icon: Home,
     matchMode: "exact",
   },
   {
     id: "upload",
-    Label: SidebarLabelUpload,
+    label: <>Upload</>,
     url: "/dashboard/upload",
     icon: Upload,
     matchMode: "exact",
   },
   {
     id: "billing",
-    Label: SidebarLabelBilling,
+    label: <>Billing</>,
     url: "/dashboard/billing",
     icon: Wallet,
     matchMode: "exact",
   },
   {
     id: "settings",
-    Label: SidebarLabelSettings,
+    label: <>Settings</>,
     url: "/dashboard/settings",
     icon: Settings,
     matchMode: "exact",
@@ -85,35 +74,35 @@ const navigation: NavigationItem[] = [
 const adminNavigation: NavigationItem[] = [
   {
     id: "admin-dashboard",
-    Label: SidebarLabelAdminDashboard,
+    label: <>Admin Dashboard</>,
     url: "/dashboard/admin",
     icon: BarChart3,
     matchMode: "exact",
   },
   {
     id: "user-management",
-    Label: SidebarLabelUserManagement,
+    label: <>User Management</>,
     url: "/dashboard/admin/users",
     icon: Users,
     matchMode: "exact",
   },
   {
     id: "payments",
-    Label: SidebarLabelPayments,
+    label: <>Payments</>,
     url: "/dashboard/admin/payments",
     icon: CreditCard,
     matchMode: "exact",
   },
   {
     id: "subscriptions",
-    Label: SidebarLabelSubscriptions,
+    label: <>Subscriptions</>,
     url: "/dashboard/admin/subscriptions",
     icon: Shield,
     matchMode: "exact",
   },
   {
     id: "uploads-management",
-    Label: SidebarLabelUploadsManagement,
+    label: <>Uploads Management</>,
     url: "/dashboard/admin/uploads",
     icon: Upload,
     matchMode: "exact",
@@ -128,8 +117,7 @@ interface MenuItemProps {
 
 function SidebarMenuLink({ item, pathname, allItems }: MenuItemProps) {
   const itemMatchMode = item.matchMode || "exact";
-  const Label = item.Label;
-  const label = <Label />;
+  const label = item.label;
 
   const isMatch =
     itemMatchMode === "exact"
@@ -220,7 +208,7 @@ export function AppSidebar() {
 
         {showAdminSections && (
           <SidebarSection
-            title={open ? <SidebarLabelAdmin /> : undefined}
+            title={open ? <>Admin</> : undefined}
             items={adminNavigation}
             pathname={pathname}
           />

@@ -1,6 +1,5 @@
 import { render, screen } from "@testing-library/react";
 import type React from "react";
-import HomePage from "./page";
 
 const createMockSection = (label: string) =>
   jest.fn(() => (
@@ -35,9 +34,57 @@ jest.mock("@/components/homepage/call-to-action", () => ({
   CallToAction: (props: React.ComponentProps<any>) => mockCallToAction(props),
 }));
 
+const mockCreateLocalizedAlternates = jest.fn(() => ({
+  canonical: "/",
+  languages: {
+    en: "/",
+    "zh-Hans": "/zh-Hans",
+  },
+}));
+const mockCreateMetadata = jest.fn(() => ({
+  openGraph: {
+    siteName: "UllrAI",
+  },
+  twitter: {
+    card: "summary_large_image",
+  },
+}));
+jest.mock("@/lib/metadata", () => ({
+  createLocalizedAlternates: (...args: unknown[]) =>
+    mockCreateLocalizedAlternates(...args),
+  createMetadata: (...args: unknown[]) => mockCreateMetadata(...args),
+}));
+
+const mockGetRequestLocale = jest.fn(async () => "zh-Hans");
+jest.mock("@/lib/i18n/server-locale", () => ({
+  getRequestLocale: () => mockGetRequestLocale(),
+}));
+
+import HomePage, { generateMetadata } from "./page";
+
 describe("HomePage", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+  });
+
+  it("builds localized metadata for the marketing homepage", async () => {
+    await expect(generateMetadata()).resolves.toMatchObject({
+      title: "Micro SaaS Starter",
+      description:
+        "Authentication, billing, uploads, and admin tooling for shipping a SaaS product faster.",
+    });
+
+    expect(mockGetRequestLocale).toHaveBeenCalledTimes(1);
+    expect(mockCreateLocalizedAlternates).toHaveBeenCalledWith("/", "zh-Hans");
+    expect(mockCreateMetadata).toHaveBeenCalledWith({
+      alternates: {
+        canonical: "/",
+        languages: {
+          en: "/",
+          "zh-Hans": "/zh-Hans",
+        },
+      },
+    });
   });
 
   it("renders the marketing sections in the expected order", () => {

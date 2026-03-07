@@ -147,4 +147,84 @@ describe("Payment Status API", () => {
       sessionId: "test-session-id",
     });
   });
+
+  it("treats missing provider states as pending while preserving the checkout id", async () => {
+    mockRetrieveCheckout.mockResolvedValue({});
+
+    const response = await GET(
+      createMockRequest(
+        "http://localhost:3000/api/payment-status?checkout_id=checkout-456",
+      ),
+    );
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(data).toEqual({
+      status: "pending",
+      message: "Payment is being processed. This may take a few minutes.",
+      sessionId: "checkout-456",
+    });
+  });
+
+  it("maps provider statuses that alias to pending and cancelled", async () => {
+    mockRetrieveCheckout.mockResolvedValueOnce({ status: "processing" });
+
+    const processingResponse = await GET(
+      createMockRequest(
+        "http://localhost:3000/api/payment-status?checkout_id=checkout-processing",
+      ),
+    );
+    expect(await processingResponse.json()).toEqual({
+      status: "pending",
+      message: "Payment is being processed. This may take a few minutes.",
+      sessionId: "checkout-processing",
+    });
+
+    mockRetrieveCheckout.mockResolvedValueOnce({ status: "canceled" });
+
+    const cancelledResponse = await GET(
+      createMockRequest(
+        "http://localhost:3000/api/payment-status?checkout_id=checkout-cancelled",
+      ),
+    );
+    expect(await cancelledResponse.json()).toEqual({
+      status: "cancelled",
+      message: "Payment was cancelled",
+      sessionId: "checkout-cancelled",
+    });
+  });
+
+  it("falls back to url-cancelled state when checkout verification errors", async () => {
+    mockRetrieveCheckout.mockRejectedValue(new Error("Creem API error"));
+
+    const response = await GET(
+      createMockRequest(
+        "http://localhost:3000/api/payment-status?checkout_id=checkout-789&status=cancelled",
+      ),
+    );
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(data).toEqual({
+      status: "cancelled",
+      message: "Payment was cancelled",
+      sessionId: "checkout-789",
+    });
+  });
+
+  it("returns 500 when the request URL is malformed", async () => {
+    const response = await GET({ url: "not-a-valid-url" } as never);
+    const data = await response.json();
+
+    expect(response.status).toBe(500);
+    expect(data).toEqual({
+      error: "Failed to check payment status",
+    });
+    expect(console.error).toHaveBeenCalledWith(
+      "[Payment Status API Error]",
+      expect.objectContaining({
+        message: expect.stringContaining("Invalid URL"),
+      }),
+    );
+  });
 });

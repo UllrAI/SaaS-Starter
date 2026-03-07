@@ -58,6 +58,25 @@ describe("lingo client locale resolver", () => {
     expect(getClientLocale()).toBe("zh-Hans");
   });
 
+  it("ignores locale prefixes outside marketing routes", async () => {
+    cookieValue = `${LOCALE_COOKIE_NAME}=en`;
+    window.history.replaceState({}, "", "/zh-Hans/dashboard");
+
+    const { getClientLocale } = await import("./locale-resolver.client");
+
+    expect(getClientLocale()).toBe("en");
+  });
+
+  it("ignores invalid cookie encoding and falls back to navigator locale", async () => {
+    cookieValue = `${LOCALE_COOKIE_NAME}=%E0%A4%A`;
+    setNavigatorLanguages(["zh-CN"], "zh-CN");
+    window.history.replaceState({}, "", "/dashboard");
+
+    const { getClientLocale } = await import("./locale-resolver.client");
+
+    expect(getClientLocale()).toBe("zh-Hans");
+  });
+
   it("persists the normalized locale cookie", async () => {
     const { persistLocale } = await import("./locale-resolver.client");
 
@@ -66,5 +85,13 @@ describe("lingo client locale resolver", () => {
     expect(cookieValue).toContain(`${LOCALE_COOKIE_NAME}=zh-Hans`);
     expect(cookieValue).toContain("max-age=31536000");
     expect(cookieValue).toContain("SameSite=Lax");
+  });
+
+  it("falls back to the source locale when persisting an unsupported value", async () => {
+    const { persistLocale } = await import("./locale-resolver.client");
+
+    persistLocale("fr-FR");
+
+    expect(cookieValue).toContain(`${LOCALE_COOKIE_NAME}=en`);
   });
 });

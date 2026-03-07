@@ -119,4 +119,29 @@ describe("LocaleSwitcher", () => {
 
     expect(mockPersistLocale).not.toHaveBeenCalled();
   });
+
+  it("keeps the active locale disabled and does not trigger handlers", async () => {
+    window.history.pushState({}, "", "/dashboard");
+
+    render(<LocaleSwitcher />);
+
+    const currentLocaleButton = await screen.findByRole("button", {
+      name: "简体中文",
+    });
+    expect(currentLocaleButton).toBeDisabled();
+
+    fireEvent.click(currentLocaleButton);
+
+    expect(mockSetLocale).not.toHaveBeenCalled();
+    expect(mockPersistLocale).not.toHaveBeenCalled();
+  });
+
+  it("falls back to supported locales when an empty locales prop is provided", async () => {
+    window.history.pushState({}, "", "/dashboard");
+
+    render(<LocaleSwitcher locales={[]} />);
+
+    expect(await screen.findByRole("button", { name: "English" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "简体中文" })).toBeDisabled();
+  });
 });

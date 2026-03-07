@@ -90,4 +90,36 @@ describe("SignUpPage", () => {
       }),
     );
   });
+
+  it("uses the first callbackUrl when search params contain repeated values", async () => {
+    const pageModule = await import("./page");
+    const element = await pageModule.default({
+      searchParams: Promise.resolve({
+        callbackUrl: ["/dashboard/team", "/dashboard/ignored"],
+      }),
+    });
+
+    render(element);
+
+    expect(mockAuthForm).toHaveBeenCalledWith(
+      expect.objectContaining({
+        mode: "signup",
+        callbackURL: "/dashboard/team",
+      }),
+    );
+  });
+
+  it("falls back to the default callback when search params are omitted", async () => {
+    const pageModule = await import("./page");
+    const element = await pageModule.default({});
+
+    render(element);
+
+    expect(mockAuthForm).toHaveBeenCalledWith(
+      expect.objectContaining({
+        mode: "signup",
+        callbackURL: "/dashboard",
+      }),
+    );
+  });
 });

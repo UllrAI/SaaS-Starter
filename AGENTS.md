@@ -132,6 +132,8 @@ pnpm set:admin
 - Do not branch translated copy with runtime locale conditionals such as `locale === "zh-Hans" ? "..." : "..."`.
 - Prefer small JSX subcomponents for reusable copy instead of exported string maps.
 - If a piece of copy is only used once or can be expressed directly at the call site, inline the JSX instead of wrapping it in a no-props helper component.
+- Inline JSX is only a safe default when it is created inside the component render path. Do not hoist localizable `ReactNode` fragments into module-level config arrays, objects, or other top-level constants and expect Lingo to extract them reliably.
+- For structured UI config such as sidebar navigation, dropdown items, and card definitions, either build the config inside the rendering component with inline JSX there, or use a small JSX subcomponent when the config must stay at module scope.
 - Prefer full-sentence JSX branches over concatenation such as `"More "`, `file(s)`, or mixed translated and untranslated fragments.
 - When a reusable component needs copy-bearing props such as titles, descriptions, empty states, or placeholders, prefer accepting JSX-friendly inputs at the call site and only coerce to plain strings at the final DOM or library boundary when required.
 - For fallback labels like anonymous authors, empty states, and button text, keep the fallback copy in JSX instead of `value || "..."` when the text is user-visible and localizable.

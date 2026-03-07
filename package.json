@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "content:build": "node scripts/build-content-collections.mjs",
-    "dev": "pnpm content:build && next dev --turbo",
-    "build": "pnpm content:build && AI_SDK_LOG_WARNINGS=false next build --webpack && node scripts/sync-lingo-cache.mjs",
+    "dev": "pnpm content:build && next dev",
+    "build": "pnpm content:build && next build",
     "start": "next start",
     "lint": "eslint .",
     "type-check": "pnpm content:build && node scripts/clean-next-types.mjs && tsc --noEmit",

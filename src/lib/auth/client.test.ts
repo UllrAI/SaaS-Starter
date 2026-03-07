@@ -1,20 +1,10 @@
 import { describe, it, expect, jest, beforeEach } from "@jest/globals";
 
-// Mock environment
-const mockEnv = {
-  NEXT_PUBLIC_APP_URL: "https://example.com",
-};
-
 // Mock better-auth modules
 const mockCreateAuthClient = jest.fn();
 const mockAdminClient = jest.fn(() => ({}));
 const mockMagicLinkClient = jest.fn(() => ({}));
 const mockInferAdditionalFields = jest.fn(() => ({}));
-
-jest.mock("@/env", () => ({
-  __esModule: true,
-  default: mockEnv,
-}));
 
 jest.mock("better-auth/react", () => ({
   createAuthClient: mockCreateAuthClient,
@@ -66,7 +56,6 @@ describe("Auth Client", () => {
     await import("./client");
 
     expect(mockCreateAuthClient).toHaveBeenCalledWith({
-      baseURL: "https://example.com",
       plugins: [
         expect.any(Object), // adminClient result
         expect.any(Object), // magicLinkClient result
@@ -204,12 +193,12 @@ describe("Auth Client", () => {
   });
 
   describe("Configuration Validation", () => {
-    it("should use environment variable for baseURL", async () => {
+    it("should rely on default same-origin auth baseURL", async () => {
       await import("./client");
 
       expect(mockCreateAuthClient).toHaveBeenCalledWith(
-        expect.objectContaining({
-          baseURL: "https://example.com",
+        expect.not.objectContaining({
+          baseURL: expect.anything(),
         }),
       );
     });

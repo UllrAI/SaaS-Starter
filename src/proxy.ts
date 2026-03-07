@@ -7,6 +7,7 @@ import {
   SOURCE_LOCALE,
   extractLocaleFromPath,
   isMarketingPath,
+  normalizeLocaleCandidate,
   resolvePreferredLocale,
   withLocalePrefix,
 } from "@/lib/config/i18n-routing";
@@ -33,6 +34,22 @@ function createLocalizedRequestHeaders(
 export default async function authMiddleware(request: NextRequest) {
   const requestUrl = new URL(request.url);
   const { pathname, search } = requestUrl;
+  const resolvedRequestLocale = normalizeLocaleCandidate(
+    request.headers.get(LOCALE_HEADER_NAME),
+  );
+
+  if (resolvedRequestLocale) {
+    const requestHeaders = createLocalizedRequestHeaders(
+      request,
+      resolvedRequestLocale,
+    );
+
+    return NextResponse.next({
+      request: {
+        headers: requestHeaders,
+      },
+    });
+  }
 
   const localeFromCookie = request.cookies.get(LOCALE_COOKIE_NAME)?.value;
   const preferredLocale = resolvePreferredLocale({

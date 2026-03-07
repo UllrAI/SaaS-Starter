@@ -18,11 +18,15 @@ import {
   GITHUB_DISCUSSIONS_URL,
   GITHUB_RELEASES_URL,
 } from "@/lib/config/constants";
-import { createMetadata } from "@/lib/metadata";
+import { createLocalizedAlternates, createMetadata } from "@/lib/metadata";
+import { getRequestLocale } from "@/lib/i18n/server-locale";
 import { ContactMethods } from "./contact-methods";
 
 export async function generateMetadata() {
-  const metadata = createMetadata({});
+  const locale = await getRequestLocale();
+  const metadata = createMetadata({
+    alternates: createLocalizedAlternates("/contact", locale),
+  });
 
   return {
     ...metadata,

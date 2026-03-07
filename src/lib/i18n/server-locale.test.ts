@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, jest } from "@jest/globals";
 
 const mockGetServerLocale = jest.fn<() => Promise<string | null | undefined>>();
 
-jest.mock("@lingo.dev/compiler/virtual/locale/server", () => ({
+jest.mock("@/.lingo/locale-resolver.server", () => ({
   getServerLocale: mockGetServerLocale,
 }));
 

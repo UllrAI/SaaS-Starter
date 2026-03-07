@@ -12,7 +12,8 @@ import { Button } from "@/components/ui/button";
 import { BackgroundPattern } from "@/components/ui/background-pattern";
 import { PricingSection } from "@/components/payment-options";
 import { PAYMENT_PROVIDER } from "@/lib/config/constants";
-import { createMetadata } from "@/lib/metadata";
+import { createLocalizedAlternates, createMetadata } from "@/lib/metadata";
+import { getRequestLocale } from "@/lib/i18n/server-locale";
 import {
   Boxes,
   CreditCard,
@@ -23,7 +24,10 @@ import {
 } from "lucide-react";
 
 export async function generateMetadata() {
-  const metadata = createMetadata({});
+  const locale = await getRequestLocale();
+  const metadata = createMetadata({
+    alternates: createLocalizedAlternates("/pricing", locale),
+  });
 
   return {
     ...metadata,

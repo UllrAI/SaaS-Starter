@@ -6,10 +6,14 @@ import {
   GITHUB_DISCUSSIONS_URL,
   LEGAL_EMAIL,
 } from "@/lib/config/constants";
-import { createMetadata } from "@/lib/metadata";
+import { createLocalizedAlternates, createMetadata } from "@/lib/metadata";
+import { getRequestLocale } from "@/lib/i18n/server-locale";
 
 export async function generateMetadata() {
-  const metadata = createMetadata({});
+  const locale = await getRequestLocale();
+  const metadata = createMetadata({
+    alternates: createLocalizedAlternates("/terms", locale),
+  });
 
   return {
     ...metadata,

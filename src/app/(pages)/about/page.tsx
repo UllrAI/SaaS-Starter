@@ -16,10 +16,14 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { BackgroundPattern } from "@/components/ui/background-pattern";
-import { createMetadata } from "@/lib/metadata";
+import { createLocalizedAlternates, createMetadata } from "@/lib/metadata";
+import { getRequestLocale } from "@/lib/i18n/server-locale";
 
 export async function generateMetadata() {
-  const metadata = createMetadata({});
+  const locale = await getRequestLocale();
+  const metadata = createMetadata({
+    alternates: createLocalizedAlternates("/about", locale),
+  });
 
   return {
     ...metadata,

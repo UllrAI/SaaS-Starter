@@ -1,7 +1,7 @@
 import "server-only";
 
 import { cache } from "react";
-import { getServerLocale } from "@lingo.dev/compiler/virtual/locale/server";
+import { getServerLocale } from "@/.lingo/locale-resolver.server";
 import { SOURCE_LOCALE, type SupportedLocale } from "@/lib/config/i18n";
 import { normalizeLocaleCandidate } from "@/lib/config/i18n-routing";
 import { resolveIntlLocale } from "@/lib/locale";

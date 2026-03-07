@@ -59,4 +59,12 @@ describe("blog content localization helpers", () => {
     ).toBe("/zh-Hans/blog/saas-starter-kit-developer-guide");
     expect(getAuthorBySlug("admin")?.name).toBe("UllrAI");
   });
+
+  it("returns undefined or empty collections for missing blog entities", () => {
+    expect(getPostBySlug("missing-post")).toBeUndefined();
+    expect(getPostLocalizations("missing-post")).toEqual([]);
+    expect(getAuthorBySlug()).toBeUndefined();
+    expect(getAuthorBySlug(null)).toBeUndefined();
+    expect(getAuthorBySlug("missing-author")).toBeUndefined();
+  });
 });

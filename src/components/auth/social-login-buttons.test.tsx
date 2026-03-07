@@ -111,4 +111,61 @@ describe("SocialLoginButtons", () => {
     expect(handleLoadingChange).toHaveBeenCalledWith(false);
     expect(mockRedirectBrowserTo).not.toHaveBeenCalled();
   });
+
+  it("renders the default provider list when none is provided", () => {
+    render(<SocialLoginButtons />);
+
+    expect(
+      screen.getByRole("button", { name: /Continue with Google/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /Continue with GitHub/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /Continue with LinkedIn/i }),
+    ).toBeInTheDocument();
+  });
+
+  it("returns nothing when there are no configured providers", () => {
+    const { container } = render(<SocialLoginButtons availableProviders={[]} />);
+
+    expect(container).toBeEmptyDOMElement();
+  });
+
+  it("surfaces a controlled error when the redirect url is missing", async () => {
+    mockSignIn.social = jest.fn().mockResolvedValue({
+      data: {},
+      error: null,
+    });
+
+    render(<SocialLoginButtons availableProviders={["linkedin"]} />);
+
+    fireEvent.click(
+      screen.getByRole("button", { name: /Continue with LinkedIn/i }),
+    );
+
+    await waitFor(() => {
+      expect(mockToast.error).toHaveBeenCalledWith(
+        "Something went wrong. Contact support if the issue persists",
+      );
+    });
+
+    expect(mockRedirectBrowserTo).not.toHaveBeenCalled();
+  });
+
+  it("disables actions while an external loading state is active", () => {
+    render(
+      <SocialLoginButtons
+        availableProviders={["google", "github"]}
+        loading
+      />,
+    );
+
+    expect(
+      screen.getByRole("button", { name: /Continue with Google/i }),
+    ).toBeDisabled();
+    expect(
+      screen.getByRole("button", { name: /Continue with GitHub/i }),
+    ).toBeDisabled();
+  });
 });

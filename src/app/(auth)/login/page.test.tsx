@@ -48,18 +48,17 @@ jest.mock("@/lib/i18n/server-locale", () => ({
   getRequestLocale: () => mockGetRequestLocale(),
 }));
 
+const mockResolveAuthFeedback = jest.fn();
 jest.mock("@/lib/auth/feedback", () => ({
   AUTH_BANNED_MESSAGE: "AUTH_BANNED",
-  resolveAuthFeedback: jest.fn(() => ({
-    key: "banned",
-    banReason: null,
-  })),
+  resolveAuthFeedback: (params: unknown) => mockResolveAuthFeedback(params),
 }));
 
 describe("LoginPage", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.resetModules();
+    mockResolveAuthFeedback.mockReturnValue(null);
   });
 
   it("creates localized metadata from login page copy", async () => {
@@ -111,6 +110,10 @@ describe("LoginPage", () => {
   });
 
   it("passes auth feedback from search params to AuthForm", async () => {
+    mockResolveAuthFeedback.mockReturnValueOnce({
+      key: "banned",
+      banReason: null,
+    });
     const pageModule = await import("./page");
     const element = await pageModule.default({
       searchParams: Promise.resolve({
@@ -127,6 +130,57 @@ describe("LoginPage", () => {
           key: "banned",
           banReason: null,
         },
+      }),
+    );
+  });
+
+  it("normalizes array search params before resolving callback and feedback", async () => {
+    mockResolveAuthFeedback.mockReturnValueOnce({
+      key: "session_expired",
+    });
+
+    const pageModule = await import("./page");
+    const element = await pageModule.default({
+      searchParams: Promise.resolve({
+        callbackUrl: ["/dashboard/team", "/ignored"],
+        authError: ["session_expired", "banned"],
+        error: ["INVALID_TOKEN", "EXPIRED_TOKEN"],
+        error_description: ["AUTH_BANNED", "ignored"],
+      }),
+    });
+
+    render(element);
+
+    expect(mockResolveAuthFeedback).toHaveBeenCalledWith({
+      authError: "session_expired",
+      error: "INVALID_TOKEN",
+      errorDescription: "AUTH_BANNED",
+    });
+    expect(mockAuthForm).toHaveBeenCalledWith(
+      expect.objectContaining({
+        callbackURL: "/dashboard/team",
+        initialFeedback: {
+          key: "session_expired",
+        },
+      }),
+    );
+  });
+
+  it("uses defaults when search params are omitted", async () => {
+    const pageModule = await import("./page");
+    const element = await pageModule.default({});
+
+    render(element);
+
+    expect(mockResolveAuthFeedback).toHaveBeenCalledWith({
+      authError: undefined,
+      error: undefined,
+      errorDescription: undefined,
+    });
+    expect(mockAuthForm).toHaveBeenCalledWith(
+      expect.objectContaining({
+        callbackURL: "/dashboard",
+        initialFeedback: null,
       }),
     );
   });

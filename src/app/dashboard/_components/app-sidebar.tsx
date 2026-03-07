@@ -40,75 +40,6 @@ type NavigationItem = {
   matchMode?: "exact" | "prefix";
 };
 
-const navigation: NavigationItem[] = [
-  {
-    id: "home",
-    label: <>Home</>,
-    url: "/dashboard",
-    icon: Home,
-    matchMode: "exact",
-  },
-  {
-    id: "upload",
-    label: <>Upload</>,
-    url: "/dashboard/upload",
-    icon: Upload,
-    matchMode: "exact",
-  },
-  {
-    id: "billing",
-    label: <>Billing</>,
-    url: "/dashboard/billing",
-    icon: Wallet,
-    matchMode: "exact",
-  },
-  {
-    id: "settings",
-    label: <>Settings</>,
-    url: "/dashboard/settings",
-    icon: Settings,
-    matchMode: "exact",
-  },
-];
-
-const adminNavigation: NavigationItem[] = [
-  {
-    id: "admin-dashboard",
-    label: <>Admin Dashboard</>,
-    url: "/dashboard/admin",
-    icon: BarChart3,
-    matchMode: "exact",
-  },
-  {
-    id: "user-management",
-    label: <>User Management</>,
-    url: "/dashboard/admin/users",
-    icon: Users,
-    matchMode: "exact",
-  },
-  {
-    id: "payments",
-    label: <>Payments</>,
-    url: "/dashboard/admin/payments",
-    icon: CreditCard,
-    matchMode: "exact",
-  },
-  {
-    id: "subscriptions",
-    label: <>Subscriptions</>,
-    url: "/dashboard/admin/subscriptions",
-    icon: Shield,
-    matchMode: "exact",
-  },
-  {
-    id: "uploads-management",
-    label: <>Uploads Management</>,
-    url: "/dashboard/admin/uploads",
-    icon: Upload,
-    matchMode: "exact",
-  },
-];
-
 interface MenuItemProps {
   item: NavigationItem;
   pathname: string;
@@ -189,6 +120,75 @@ export function AppSidebar() {
       image: session.user.image || undefined,
     };
   };
+
+  const navigation: NavigationItem[] = [
+    {
+      id: "home",
+      label: <>Home</>,
+      url: "/dashboard",
+      icon: Home,
+      matchMode: "exact",
+    },
+    {
+      id: "upload",
+      label: <>Upload</>,
+      url: "/dashboard/upload",
+      icon: Upload,
+      matchMode: "exact",
+    },
+    {
+      id: "billing",
+      label: <>Billing</>,
+      url: "/dashboard/billing",
+      icon: Wallet,
+      matchMode: "exact",
+    },
+    {
+      id: "settings",
+      label: <>Settings</>,
+      url: "/dashboard/settings",
+      icon: Settings,
+      matchMode: "exact",
+    },
+  ];
+
+  const adminNavigation: NavigationItem[] = [
+    {
+      id: "admin-dashboard",
+      label: <>Admin Dashboard</>,
+      url: "/dashboard/admin",
+      icon: BarChart3,
+      matchMode: "exact",
+    },
+    {
+      id: "user-management",
+      label: <>User Management</>,
+      url: "/dashboard/admin/users",
+      icon: Users,
+      matchMode: "exact",
+    },
+    {
+      id: "payments",
+      label: <>Payments</>,
+      url: "/dashboard/admin/payments",
+      icon: CreditCard,
+      matchMode: "exact",
+    },
+    {
+      id: "subscriptions",
+      label: <>Subscriptions</>,
+      url: "/dashboard/admin/subscriptions",
+      icon: Shield,
+      matchMode: "exact",
+    },
+    {
+      id: "uploads-management",
+      label: <>Uploads Management</>,
+      url: "/dashboard/admin/uploads",
+      icon: Upload,
+      matchMode: "exact",
+    },
+  ];
 
   return (
     <Sidebar collapsible="icon" variant="inset">

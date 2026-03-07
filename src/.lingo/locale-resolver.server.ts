@@ -4,7 +4,7 @@ import {
   LOCALE_HEADER_NAME,
   normalizeLocaleCandidate,
   resolvePreferredLocale,
-} from "../src/lib/config/i18n-routing";
+} from "@/lib/config/i18n-routing";
 
 export async function getServerLocale(): Promise<string> {
   const headerStore = await headers();

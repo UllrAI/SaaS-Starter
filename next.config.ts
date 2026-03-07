@@ -10,6 +10,10 @@ import {
   LINGO_PLURALIZATION_MODEL,
 } from "@/lib/config/i18n";
 
+(globalThis as typeof globalThis & { AI_SDK_LOG_WARNINGS?: false })
+  .AI_SDK_LOG_WARNINGS = false;
+process.env.DOTENV_CONFIG_QUIET = "true";
+
 // Safely parse the R2 hostname
 let r2Hostname: string | undefined;
 try {

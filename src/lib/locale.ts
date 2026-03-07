@@ -1,12 +1,12 @@
-const LOCALE_TO_INTL: Record<string, string> = {
-  en: "en-US",
-  "zh-Hans": "zh-CN",
-};
+import {
+  DEFAULT_INTL_LOCALE,
+  INTL_LOCALE_BY_SUPPORTED_LOCALE,
+} from "@/lib/config/i18n";
 
 export function resolveIntlLocale(locale?: string | null): string {
   if (!locale) {
-    return "en-US";
+    return DEFAULT_INTL_LOCALE;
   }
 
-  return LOCALE_TO_INTL[locale] ?? locale;
+  return INTL_LOCALE_BY_SUPPORTED_LOCALE[locale as keyof typeof INTL_LOCALE_BY_SUPPORTED_LOCALE] ?? locale;
 }

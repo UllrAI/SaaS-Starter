@@ -1,50 +1,55 @@
-export const LOCALE_CONFIG = {
-  en: {
-    flag: "🇺🇸",
-    nativeName: "English",
-  },
-  "zh-Hans": {
-    flag: "🇨🇳",
-    nativeName: "简体中文",
-  },
-} as const;
+export const SUPPORTED_LOCALES = ["en", "zh-Hans"] as const;
 
-export type SupportedLocale = keyof typeof LOCALE_CONFIG;
+export type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
+export type LocaleDisplayInfo = {
+  nativeName: string;
+};
 
 export const SOURCE_LOCALE = "en" as const;
-
-export const SUPPORTED_LOCALES = Object.keys(
-  LOCALE_CONFIG,
-) as SupportedLocale[];
+export const DEFAULT_INTL_LOCALE = "en-US" as const;
+export const INTL_LOCALE_BY_SUPPORTED_LOCALE: Record<SupportedLocale, string> = {
+  en: DEFAULT_INTL_LOCALE,
+  "zh-Hans": "zh-CN",
+};
 
 export const TARGET_LOCALES = SUPPORTED_LOCALES.filter(
   (locale) => locale !== SOURCE_LOCALE,
 );
 
-export type LocaleDisplayInfo = (typeof LOCALE_CONFIG)[SupportedLocale];
+const localeNativeNameCache = new Map<string, string>();
 
 function getLocaleNativeName(locale: string): string {
-  const normalized = locale.trim().replace("_", "-");
-  if (!normalized) {
-    return locale.toUpperCase();
+  const cachedName = localeNativeNameCache.get(locale);
+  if (cachedName) {
+    return cachedName;
   }
 
-  try {
-    const displayNames = new Intl.DisplayNames([normalized], {
-      type: "language",
-    });
-    return displayNames.of(normalized) ?? normalized.toUpperCase();
-  } catch {
-    return normalized.toUpperCase();
+  const normalized = locale.trim().replace(/_/g, "-");
+  let nativeName: string;
+
+  if (!normalized) {
+    nativeName = locale.toUpperCase();
+  } else {
+    try {
+      const [canonicalLocale] = Intl.getCanonicalLocales(normalized);
+      const displayNames = new Intl.DisplayNames([canonicalLocale], {
+        type: "language",
+      });
+
+      nativeName = displayNames.of(canonicalLocale) ?? canonicalLocale.toUpperCase();
+    } catch {
+      nativeName = normalized.toUpperCase();
+    }
   }
+
+  localeNativeNameCache.set(locale, nativeName);
+  return nativeName;
 }
 
 export function getLocaleDisplayInfo(locale: string): LocaleDisplayInfo {
-  return (
-    LOCALE_CONFIG[locale as SupportedLocale] ?? {
-      nativeName: getLocaleNativeName(locale),
-    }
-  );
+  return {
+    nativeName: getLocaleNativeName(locale),
+  };
 }
 
 // export const LINGO_DEFAULT_MODEL = "openai:gpt-5-nano";

@@ -1,5 +1,7 @@
 import { describe, expect, it } from "@jest/globals";
 import {
+  DEFAULT_INTL_LOCALE,
+  INTL_LOCALE_BY_SUPPORTED_LOCALE,
   LINGO_DEFAULT_MODEL,
   LINGO_MODEL_MAP,
   LINGO_PLURALIZATION_MODEL,
@@ -14,22 +16,38 @@ describe("i18n config", () => {
     expect(SOURCE_LOCALE).toBe("en");
     expect(SUPPORTED_LOCALES).toEqual(["en", "zh-Hans"]);
     expect(TARGET_LOCALES).toEqual(["zh-Hans"]);
+    expect(INTL_LOCALE_BY_SUPPORTED_LOCALE).toEqual({
+      en: DEFAULT_INTL_LOCALE,
+      "zh-Hans": "zh-CN",
+    });
   });
 
-  it("returns configured locale display info for supported locales", () => {
+  it("derives locale display info for supported locales via Intl", () => {
     expect(getLocaleDisplayInfo("en")).toEqual({
-      flag: "🇺🇸",
-      nativeName: "English",
+      nativeName: new Intl.DisplayNames(["en"], {
+        type: "language",
+      }).of("en"),
     });
     expect(getLocaleDisplayInfo("zh-Hans")).toEqual({
-      flag: "🇨🇳",
-      nativeName: "简体中文",
+      nativeName: new Intl.DisplayNames(["zh-Hans"], {
+        type: "language",
+      }).of("zh-Hans"),
     });
   });
 
   it("falls back to generated native names for unknown locales", () => {
-    expect(getLocaleDisplayInfo("fr").nativeName.toLowerCase()).toContain("fr");
+    expect(getLocaleDisplayInfo("fr")).toEqual({
+      nativeName: new Intl.DisplayNames(["fr"], {
+        type: "language",
+      }).of("fr"),
+    });
     expect(getLocaleDisplayInfo("  ").nativeName).toBe("  ");
+  });
+
+  it("falls back to uppercase locale tokens for invalid locale identifiers", () => {
+    expect(getLocaleDisplayInfo("not_a_locale")).toEqual({
+      nativeName: "NOT-A-LOCALE",
+    });
   });
 
   it("keeps lingo model configuration aligned", () => {

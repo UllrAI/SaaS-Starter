@@ -43,7 +43,16 @@ export function normalizeCallbackUrl(
 
 export function buildLoginRedirectPath(
   callbackUrl: string | null | undefined,
+  authError?: string,
 ): string {
   const safeCallback = normalizeCallbackUrl(callbackUrl);
-  return `/login?callbackUrl=${encodeURIComponent(safeCallback)}`;
+  const searchParams = new URLSearchParams({
+    callbackUrl: safeCallback,
+  });
+
+  if (authError) {
+    searchParams.set("authError", authError);
+  }
+
+  return `/login?${searchParams.toString()}`;
 }

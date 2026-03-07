@@ -3,6 +3,7 @@ import { AuthForm } from "./auth-form";
 import { signIn } from "@/lib/auth/client";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import type { AuthFeedback } from "@/lib/auth/feedback";
 
 // Mock environment variables
 process.env.BETTER_AUTH_SECRET = "test-secret";
@@ -37,6 +38,7 @@ jest.mock("@/components/auth/auth-form-base", () => ({
     onSubmit,
     config,
     fields,
+    feedback,
   }: {
     form?: unknown;
     onSubmit: (data: { email: string }) => Promise<void>;
@@ -48,9 +50,16 @@ jest.mock("@/components/auth/auth-form-base", () => ({
       callbackURL: string;
     };
     fields: Array<{ name: string; type: string; placeholder: string }>;
+    feedback?: AuthFeedback | null;
   }) => (
     <div data-testid="auth-form-base">
       <h1>{config.title}</h1>
+      {feedback ? (
+        <div data-testid="auth-feedback">
+          <strong>{feedback.title}</strong>
+          <span>{feedback.description}</span>
+        </div>
+      ) : null}
       <form
         onSubmit={async (e) => {
           e.preventDefault();
@@ -100,10 +109,15 @@ const mockToast = toast as jest.Mocked<typeof toast>;
 
 const mockPush = jest.fn();
 const mockPrefetch = jest.fn();
+const mockFetch = jest.fn();
 
 describe("AuthForm", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    global.fetch = mockFetch as unknown as typeof fetch;
+    mockFetch.mockResolvedValue({
+      json: async () => ({ status: "active" }),
+    });
     mockUseRouter.mockReturnValue({
       push: mockPush,
       back: jest.fn(),
@@ -192,9 +206,13 @@ describe("AuthForm", () => {
       fireEvent.click(submitButton);
 
       await waitFor(() => {
+        expect(mockFetch).toHaveBeenCalledWith(
+          "/api/auth/account-status?email=test%40example.com",
+        );
         expect(mockSignIn.magicLink).toHaveBeenCalledWith({
           email: "test@example.com",
           callbackURL: "/dashboard",
+          errorCallbackURL: "/login?callbackUrl=%2Fdashboard",
         });
         expect(mockPush).toHaveBeenCalledWith(
           "/auth/sent?email=test%40example.com",
@@ -240,7 +258,33 @@ describe("AuthForm", () => {
         expect(mockSignIn.magicLink).toHaveBeenCalledWith({
           email: "test@example.com",
           callbackURL: "/dashboard/billing",
+          errorCallbackURL: "/login?callbackUrl=%2Fdashboard%2Fbilling",
         });
+      });
+    });
+
+    it("shows a disabled-account message before sending magic link", async () => {
+      mockFetch.mockResolvedValue({
+        json: async () => ({
+          status: "banned",
+          message: "This account is disabled. Contact support.",
+        }),
+      });
+
+      render(<AuthForm mode="login" />);
+
+      fireEvent.change(screen.getByPlaceholderText("you@example.com"), {
+        target: { value: "test@example.com" },
+      });
+      fireEvent.click(screen.getByRole("button", { name: /Send Magic Link/i }));
+
+      await waitFor(() => {
+        expect(mockSignIn.magicLink).not.toHaveBeenCalled();
+        expect(mockToast.error).not.toHaveBeenCalled();
+        expect(mockPush).not.toHaveBeenCalled();
+        expect(screen.getByTestId("auth-feedback")).toHaveTextContent(
+          "This account is disabled. Contact support.",
+        );
       });
     });
   });

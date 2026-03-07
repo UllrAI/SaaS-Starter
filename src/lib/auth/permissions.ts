@@ -1,6 +1,7 @@
 import { auth } from "./server";
 import { redirect } from "next/navigation";
 import { UserRole, hasRole as checkRole } from "@/lib/config/roles";
+import { buildLoginRedirectPath } from "./callback-url";
 
 // 重新导出 UserRole 类型以保持向后兼容性
 export type { UserRole };
@@ -23,6 +24,9 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
     const { headers } = await import("next/headers");
     const session = await auth.api.getSession({
       headers: await headers(),
+      query: {
+        disableCookieCache: true,
+      },
     });
 
     if (!session?.user) {
@@ -56,7 +60,7 @@ export async function requireAuth(requiredRole?: UserRole): Promise<AuthUser> {
   const user = await getCurrentUser();
 
   if (!user) {
-    redirect("/login");
+    redirect(buildLoginRedirectPath("/dashboard", "session_expired"));
   }
 
   if (requiredRole && !hasRole(user.role, requiredRole)) {

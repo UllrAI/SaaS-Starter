@@ -39,4 +39,10 @@ describe("callback-url utils", () => {
       "/login?callbackUrl=%2Fdashboard%2Fbilling",
     );
   });
+
+  it("includes auth error when provided", () => {
+    expect(buildLoginRedirectPath("/dashboard", "session_expired")).toBe(
+      "/login?callbackUrl=%2Fdashboard&authError=session_expired",
+    );
+  });
 });

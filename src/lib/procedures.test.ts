@@ -230,6 +230,9 @@ describe("procedures", () => {
 
       expect(mockAuth.api.getSession).toHaveBeenCalledWith({
         headers: expect.any(Object),
+        query: {
+          disableCookieCache: true,
+        },
       });
       expect(mockContext.next).toHaveBeenCalledWith({
         ctx: {

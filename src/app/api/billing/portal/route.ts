@@ -6,7 +6,12 @@ import { assertTrustedBillingUrl } from "@/lib/billing/url";
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await auth.api.getSession({ headers: request.headers });
+    const session = await auth.api.getSession({
+      headers: request.headers,
+      query: {
+        disableCookieCache: true,
+      },
+    });
     if (!session?.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

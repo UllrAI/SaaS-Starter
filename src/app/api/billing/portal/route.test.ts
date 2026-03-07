@@ -269,7 +269,12 @@ describe("Billing Portal API", () => {
 
       await GET(request);
 
-      expect(mockGetSession).toHaveBeenCalledWith({ headers: request.headers });
+      expect(mockGetSession).toHaveBeenCalledWith({
+        headers: request.headers,
+        query: {
+          disableCookieCache: true,
+        },
+      });
     });
   });
 });

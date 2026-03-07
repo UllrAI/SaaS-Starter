@@ -158,7 +158,10 @@ export interface UserWithSubscription {
   email: string | null;
   emailVerified: boolean | null;
   image: string | null;
-  role: string;
+  role: "user" | "admin" | "super_admin";
+  banned: boolean;
+  banReason: string | null;
+  banExpires: Date | null;
   createdAt: Date;
   updatedAt: Date;
   subscriptions: {

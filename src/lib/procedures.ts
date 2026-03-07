@@ -32,6 +32,9 @@ export const authActionClient = actionClient
   .use(async ({ next }) => {
     const res = await auth.api.getSession({
       headers: await headers(),
+      query: {
+        disableCookieCache: true,
+      },
     });
 
     if (!res || !res.session || !res.user) {

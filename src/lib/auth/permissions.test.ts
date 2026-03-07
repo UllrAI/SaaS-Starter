@@ -32,6 +32,9 @@ jest.mock("@/lib/config/roles", () => ({
 }));
 
 describe("Auth Permissions", () => {
+  const expectedLoginRedirect =
+    "/login?callbackUrl=%2Fdashboard&authError=session_expired";
+
   beforeEach(() => {
     jest.clearAllMocks();
 
@@ -75,8 +78,10 @@ describe("Auth Permissions", () => {
 
       const { requireAuth } = await import("./permissions");
 
-      await expect(requireAuth()).rejects.toThrow("NEXT_REDIRECT: /login");
-      expect(mockRedirect).toHaveBeenCalledWith("/login");
+      await expect(requireAuth()).rejects.toThrow(
+        `NEXT_REDIRECT: ${expectedLoginRedirect}`,
+      );
+      expect(mockRedirect).toHaveBeenCalledWith(expectedLoginRedirect);
     });
 
     it("should redirect to login when session exists but no user", async () => {
@@ -87,8 +92,10 @@ describe("Auth Permissions", () => {
 
       const { requireAuth } = await import("./permissions");
 
-      await expect(requireAuth()).rejects.toThrow("NEXT_REDIRECT: /login");
-      expect(mockRedirect).toHaveBeenCalledWith("/login");
+      await expect(requireAuth()).rejects.toThrow(
+        `NEXT_REDIRECT: ${expectedLoginRedirect}`,
+      );
+      expect(mockRedirect).toHaveBeenCalledWith(expectedLoginRedirect);
     });
 
     it("should handle auth API errors gracefully", async () => {
@@ -98,8 +105,10 @@ describe("Auth Permissions", () => {
 
       const { requireAuth } = await import("./permissions");
 
-      await expect(requireAuth()).rejects.toThrow("NEXT_REDIRECT: /login");
-      expect(mockRedirect).toHaveBeenCalledWith("/login");
+      await expect(requireAuth()).rejects.toThrow(
+        `NEXT_REDIRECT: ${expectedLoginRedirect}`,
+      );
+      expect(mockRedirect).toHaveBeenCalledWith(expectedLoginRedirect);
     });
 
     it("should handle network timeout gracefully", async () => {
@@ -112,7 +121,9 @@ describe("Auth Permissions", () => {
 
       const { requireAuth } = await import("./permissions");
 
-      await expect(requireAuth()).rejects.toThrow("NEXT_REDIRECT: /login");
+      await expect(requireAuth()).rejects.toThrow(
+        `NEXT_REDIRECT: ${expectedLoginRedirect}`,
+      );
     });
   });
 
@@ -164,8 +175,10 @@ describe("Auth Permissions", () => {
 
       const { requireAdmin } = await import("./permissions");
 
-      await expect(requireAdmin()).rejects.toThrow("NEXT_REDIRECT: /login");
-      expect(mockRedirect).toHaveBeenCalledWith("/login");
+      await expect(requireAdmin()).rejects.toThrow(
+        `NEXT_REDIRECT: ${expectedLoginRedirect}`,
+      );
+      expect(mockRedirect).toHaveBeenCalledWith(expectedLoginRedirect);
     });
 
     it("should redirect to dashboard when authenticated as regular user", async () => {
@@ -266,9 +279,9 @@ describe("Auth Permissions", () => {
       const { requireSuperAdmin } = await import("./permissions");
 
       await expect(requireSuperAdmin()).rejects.toThrow(
-        "NEXT_REDIRECT: /login",
+        `NEXT_REDIRECT: ${expectedLoginRedirect}`,
       );
-      expect(mockRedirect).toHaveBeenCalledWith("/login");
+      expect(mockRedirect).toHaveBeenCalledWith(expectedLoginRedirect);
     });
   });
 
@@ -603,7 +616,9 @@ describe("Auth Permissions", () => {
       const firstResult = await requireAuth();
       expect(firstResult.id).toBe("user-123");
 
-      await expect(requireAuth()).rejects.toThrow("NEXT_REDIRECT: /login");
+      await expect(requireAuth()).rejects.toThrow(
+        `NEXT_REDIRECT: ${expectedLoginRedirect}`,
+      );
     });
   });
 });

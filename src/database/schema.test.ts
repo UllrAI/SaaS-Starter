@@ -91,6 +91,9 @@ describe("Database Schema", () => {
       expect(users).toHaveProperty("emailVerified");
       expect(users).toHaveProperty("image");
       expect(users).toHaveProperty("role");
+      expect(users).toHaveProperty("banned");
+      expect(users).toHaveProperty("banReason");
+      expect(users).toHaveProperty("banExpires");
       expect(users).toHaveProperty("paymentProviderCustomerId");
       expect(users).toHaveProperty("createdAt");
       expect(users).toHaveProperty("updatedAt");
@@ -108,6 +111,10 @@ describe("Database Schema", () => {
       expect(users.role.name).toBe("role");
       expect(users.role.notNull).toBe(true);
       expect(users.role.default).toBe("user");
+
+      expect(users.banned.name).toBe("banned");
+      expect(users.banned.notNull).toBe(true);
+      expect(users.banned.default).toBe(false);
     });
   });
 
@@ -123,6 +130,7 @@ describe("Database Schema", () => {
       expect(sessions).toHaveProperty("os");
       expect(sessions).toHaveProperty("browser");
       expect(sessions).toHaveProperty("deviceType");
+      expect(sessions).toHaveProperty("impersonatedBy");
       expect(sessions).toHaveProperty("userId");
     });
 

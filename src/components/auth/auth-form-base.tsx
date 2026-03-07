@@ -25,6 +25,7 @@ import { SocialLoginButtons } from "@/components/auth/social-login-buttons";
 import { getAvailableSocialProviders } from "@/lib/auth/providers";
 import { ReactNode } from "react";
 import { UseFormReturn, FieldValues, Path } from "react-hook-form";
+import type { AuthFeedback } from "@/lib/auth/feedback";
 
 type AuthPendingAction = "magic-link" | "social" | null;
 
@@ -57,6 +58,7 @@ interface AuthFormBaseProps<T extends FieldValues> {
   config: AuthFormConfig;
   fields: AuthFormField<T>[];
   availableProviders?: ReturnType<typeof getAvailableSocialProviders>;
+  feedback?: AuthFeedback | null;
 }
 
 export function AuthFormBase<T extends FieldValues>({
@@ -67,6 +69,7 @@ export function AuthFormBase<T extends FieldValues>({
   config,
   fields,
   availableProviders,
+  feedback,
 }: AuthFormBaseProps<T>) {
   const isPending = pendingAction !== null;
   const isMagicLinkPending = pendingAction === "magic-link";
@@ -77,7 +80,7 @@ export function AuthFormBase<T extends FieldValues>({
       await onSubmit(data);
     } catch {
       toast.error(
-        "Something went wrong. Contact support if the issue persists",
+        <>Something went wrong. Contact support if the issue persists.</>,
       );
       setPendingAction(null);
     }
@@ -108,6 +111,12 @@ export function AuthFormBase<T extends FieldValues>({
       </CardHeader>
 
       <CardContent className="space-y-6">
+        {feedback && (
+          <div className="border-destructive/20 bg-destructive/5 text-destructive rounded-md border px-3 py-2 text-sm">
+            {feedback.description}
+          </div>
+        )}
+
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(handleSubmit)}

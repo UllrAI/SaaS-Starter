@@ -1,5 +1,3 @@
-import type { ReactNode } from "react";
-
 export const AUTH_BANNED_MESSAGE = "AUTH_BANNED";
 
 export type AuthFeedbackKey =
@@ -11,15 +9,9 @@ export type AuthFeedbackKey =
   | "please_restart_the_process"
   | "sign_in_failed";
 
-export interface AuthFeedback {
-  title: ReactNode;
-  description: ReactNode;
-}
-
 export interface ResolvedAuthFeedback {
   key: AuthFeedbackKey;
   banReason?: string | null;
-  rawDescription?: string | null;
 }
 
 const AUTH_FEEDBACK_KEYS = new Set<AuthFeedbackKey>([
@@ -76,10 +68,7 @@ export function resolveAuthFeedback({
   }
 
   if (errorDescription) {
-    return {
-      key: "sign_in_failed",
-      rawDescription: errorDescription,
-    };
+    return { key: "sign_in_failed" };
   }
 
   return null;

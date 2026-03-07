@@ -3,7 +3,8 @@ import { AuthForm } from "./auth-form";
 import { signIn } from "@/lib/auth/client";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import type { AuthFeedback } from "@/lib/auth/feedback";
+import type { ResolvedAuthFeedback } from "@/lib/auth/feedback";
+import { AuthFeedbackAlert } from "@/components/auth/auth-feedback-alert";
 
 // Mock environment variables
 process.env.BETTER_AUTH_SECRET = "test-secret";
@@ -50,14 +51,13 @@ jest.mock("@/components/auth/auth-form-base", () => ({
       callbackURL: string;
     };
     fields: Array<{ name: string; type: string; placeholder: string }>;
-    feedback?: AuthFeedback | null;
+    feedback?: ResolvedAuthFeedback | null;
   }) => (
     <div data-testid="auth-form-base">
       <h1>{config.title}</h1>
       {feedback ? (
         <div data-testid="auth-feedback">
-          <strong>{feedback.title}</strong>
-          <span>{feedback.description}</span>
+          <AuthFeedbackAlert feedback={feedback} />
         </div>
       ) : null}
       <form

@@ -25,7 +25,8 @@ import { SocialLoginButtons } from "@/components/auth/social-login-buttons";
 import { getAvailableSocialProviders } from "@/lib/auth/providers";
 import { ReactNode } from "react";
 import { UseFormReturn, FieldValues, Path } from "react-hook-form";
-import type { AuthFeedback } from "@/lib/auth/feedback";
+import type { ResolvedAuthFeedback } from "@/lib/auth/feedback";
+import { AuthFeedbackAlert } from "@/components/auth/auth-feedback-alert";
 
 type AuthPendingAction = "magic-link" | "social" | null;
 
@@ -58,7 +59,7 @@ interface AuthFormBaseProps<T extends FieldValues> {
   config: AuthFormConfig;
   fields: AuthFormField<T>[];
   availableProviders?: ReturnType<typeof getAvailableSocialProviders>;
-  feedback?: AuthFeedback | null;
+  feedback?: ResolvedAuthFeedback | null;
 }
 
 export function AuthFormBase<T extends FieldValues>({
@@ -111,11 +112,7 @@ export function AuthFormBase<T extends FieldValues>({
       </CardHeader>
 
       <CardContent className="space-y-6">
-        {feedback && (
-          <div className="border-destructive/20 bg-destructive/5 text-destructive rounded-md border px-3 py-2 text-sm">
-            {feedback.description}
-          </div>
-        )}
+        <AuthFeedbackAlert feedback={feedback ?? null} />
 
         <Form {...form}>
           <form

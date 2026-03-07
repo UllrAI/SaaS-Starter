@@ -3,10 +3,22 @@ import { AppSidebar } from "./_components/app-sidebar";
 import { cookies } from "next/headers";
 import { Suspense } from "react";
 import { requireAuth } from "@/lib/auth/permissions";
+import { createMetadata } from "@/lib/metadata";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
 }
+
+export const metadata = createMetadata({
+  robots: {
+    index: false,
+    follow: false,
+    googleBot: {
+      index: false,
+      follow: false,
+    },
+  },
+});
 
 export default async function AppLayout({ children }: DashboardLayoutProps) {
   await requireAuth();

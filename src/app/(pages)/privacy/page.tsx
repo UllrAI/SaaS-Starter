@@ -7,14 +7,13 @@ import {
   PRIVACY_EMAIL,
 } from "@/lib/config/constants";
 import { createMetadata } from "@/lib/metadata";
-
-import env from "@/env";
+import { createLocalizedAlternates } from "@/lib/metadata";
+import { getRequestLocale } from "@/lib/i18n/server-locale";
 
 export async function generateMetadata() {
+  const locale = await getRequestLocale();
   const metadata = createMetadata({
-    alternates: {
-      canonical: `${env.NEXT_PUBLIC_APP_URL}/privacy`,
-    },
+    alternates: createLocalizedAlternates("/privacy", locale),
   });
 
   return {

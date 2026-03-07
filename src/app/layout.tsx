@@ -38,9 +38,6 @@ export async function generateMetadata() {
         "max-snippet": -1,
       },
     },
-    alternates: {
-      canonical: env.NEXT_PUBLIC_APP_URL,
-    },
   });
 
   return {
@@ -72,6 +69,28 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const locale = await getRequestLocale();
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": `${env.NEXT_PUBLIC_APP_URL}/#organization`,
+        name: COMPANY_NAME,
+        url: env.NEXT_PUBLIC_APP_URL,
+        logo: `${env.NEXT_PUBLIC_APP_URL}/logo.png`,
+      },
+      {
+        "@type": "WebSite",
+        "@id": `${env.NEXT_PUBLIC_APP_URL}/#website`,
+        name: APP_NAME,
+        url: env.NEXT_PUBLIC_APP_URL,
+        publisher: {
+          "@id": `${env.NEXT_PUBLIC_APP_URL}/#organization`,
+        },
+        inLanguage: locale,
+      },
+    ],
+  };
 
   return (
     <html
@@ -84,6 +103,13 @@ export default async function RootLayout({
         <LingoProvider initialLocale={locale} devWidget={{ enabled: false }}>
           <AppProviders>{children}</AppProviders>
         </LingoProvider>
+        <Script
+          id="website-structured-data"
+          type="application/ld+json"
+          strategy="beforeInteractive"
+        >
+          {JSON.stringify(structuredData)}
+        </Script>
         <Script
           src="https://track.pixmiller.com/script.js"
           data-website-id="9315890d-80ba-455a-b624-ab2ab48595f4"

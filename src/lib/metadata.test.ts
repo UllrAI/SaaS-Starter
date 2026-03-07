@@ -1,5 +1,5 @@
 import { describe, it, expect } from "@jest/globals";
-import { createMetadata } from "./metadata";
+import { createLocalizedAlternates, createMetadata } from "./metadata";
 import type { Metadata } from "next";
 import type { OpenGraph } from "next/dist/lib/metadata/types/opengraph-types";
 
@@ -21,7 +21,7 @@ describe("createMetadata", () => {
 
     expect(result.openGraph?.title).toBe(expectedAppName);
     expect(result.openGraph?.description).toBe("");
-    expect(result.openGraph?.url).toBe(mockAppUrl);
+    expect(result.openGraph?.url).toBeUndefined();
     expect(result.openGraph?.images).toBe(mockOGImage);
     expect(result.openGraph?.siteName).toBe(expectedAppName);
     expect((result.openGraph as Record<string, unknown>)?.type).toBe("website");
@@ -169,7 +169,7 @@ describe("createMetadata", () => {
     };
     const result = createMetadata(override);
 
-    expect(result.openGraph?.url).toBe(mockAppUrl);
+    expect(result.openGraph?.url).toBeUndefined();
     expect(result.openGraph?.siteName).toBe(expectedAppName);
     expect((result.openGraph as Record<string, unknown>)?.type).toBe("website");
     expect(result.openGraph?.locale).toBeUndefined();
@@ -185,5 +185,31 @@ describe("createMetadata", () => {
       "summary_large_image",
     );
     expect(result.twitter?.creator).toBe(mockTwitterAccount);
+  });
+
+  it("should reuse canonical as the default openGraph url", () => {
+    const override: Metadata = {
+      alternates: {
+        canonical: "/pricing",
+      },
+    };
+    const result = createMetadata(override);
+
+    expect(result.openGraph?.url).toBe("/pricing");
+  });
+});
+
+describe("createLocalizedAlternates", () => {
+  it("creates locale-aware canonical and hreflang entries", () => {
+    const result = createLocalizedAlternates("/pricing", "zh-Hans");
+
+    expect(result).toEqual({
+      canonical: "/zh-Hans/pricing",
+      languages: {
+        en: "/pricing",
+        "zh-Hans": "/zh-Hans/pricing",
+        "x-default": "/pricing",
+      },
+    });
   });
 });

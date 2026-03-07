@@ -7,11 +7,9 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        // Disallow specific paths if needed, e.g., admin panels, private user data
-        // disallow: ['/admin/', '/api/auth/session'],
+        disallow: ["/dashboard", "/dashboard/"],
       },
     ],
     sitemap: `${env.NEXT_PUBLIC_APP_URL}/sitemap.xml`,
-    // host: env.NEXT_PUBLIC_APP_URL, // Optional: Specifies the preferred domain (useful if you have multiple domains pointing to the same site)
   };
 }

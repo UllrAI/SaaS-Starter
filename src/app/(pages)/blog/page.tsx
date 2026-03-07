@@ -1,22 +1,19 @@
 import { Sparkles, BookOpen } from "lucide-react";
 import { BackgroundPattern } from "@/components/ui/background-pattern";
 import { BlogPostCard } from "@/components/blog/blog-post-card";
-import { createMetadata } from "@/lib/metadata";
+import { createLocalizedAlternates, createMetadata } from "@/lib/metadata";
 import { getRequestLocale } from "@/lib/i18n/server-locale";
 import { calculateReadingTime } from "@/lib/utils";
 import {
   getAllPosts,
   getAuthorBySlug,
-  getLocalizedBlogPath,
   getLocalizedBlogPostPath,
 } from "@/lib/content/blog";
 
 export async function generateMetadata() {
   const locale = await getRequestLocale();
   const metadata = createMetadata({
-    alternates: {
-      canonical: getLocalizedBlogPath(locale),
-    },
+    alternates: createLocalizedAlternates("/blog", locale),
   });
 
   return {

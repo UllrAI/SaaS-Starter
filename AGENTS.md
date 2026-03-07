@@ -139,6 +139,9 @@ pnpm set:admin
 - For fallback labels like anonymous authors, empty states, and button text, keep the fallback copy in JSX instead of `value || "..."` when the text is user-visible and localizable.
 - Avoid IIFEs or nested callback structures that hide localizable JSX from extraction when a small subcomponent would be clearer.
 - When content must stay unlocalized, use supported patterns such as `data-lingo-skip` as an attribute, not in `className`.
+- For small finite UI state sets such as auth feedback, payment status, and simple badges, prefer a single render-path component with a local `switch` over many zero-logic helper components that only `return <>...</>`.
+- Use module-scope label components only when structured config must stay at module scope for composition; if the copy is consumed in one place, render it inline or in one small leaf component instead of building `ReactNode` factories.
+- Never pass raw external error text such as URL query descriptions straight to the UI. Normalize external states to an allowlisted key and render a controlled localized fallback in JSX.
 
 ### Lingo integration constraints
 

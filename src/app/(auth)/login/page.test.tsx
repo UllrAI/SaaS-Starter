@@ -14,7 +14,6 @@ const mockAuthForm = jest.fn(
     initialFeedback?: {
       key: string;
       banReason?: string | null;
-      rawDescription?: string | null;
     } | null;
   }) => (
     <div

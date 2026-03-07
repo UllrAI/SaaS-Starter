@@ -15,7 +15,6 @@ import { AuthFormBase } from "@/components/auth/auth-form-base";
 import {
   type ResolvedAuthFeedback,
 } from "@/lib/auth/feedback";
-import { createAuthFeedback } from "@/lib/auth/feedback-copy";
 import {
   DEFAULT_CALLBACK_URL,
   buildLoginRedirectPath,
@@ -136,8 +135,6 @@ export function AuthForm({
     },
   ];
 
-  const renderedFeedback = createAuthFeedback(feedback);
-
   return (
     <AuthFormBase
       form={form}
@@ -147,7 +144,7 @@ export function AuthForm({
       config={config}
       fields={fields}
       availableProviders={availableProviders}
-      feedback={renderedFeedback}
+      feedback={feedback}
     />
   );
 }

@@ -49,11 +49,29 @@ interface AdminTableBaseProps<T> {
   filterValue?: string;
   onFilterChange?: (value: string) => void;
   filterOptions?: FilterOption[];
-  filterPlaceholder?: string;
+  filterPlaceholder?: string | ReactNode;
   pagination: PaginationData;
   onPageChange: (page: number) => void;
-  searchPlaceholder?: string;
-  emptyMessage?: string;
+  searchPlaceholder?: string | ReactNode;
+  emptyMessage?: ReactNode;
+}
+
+function extractTextContent(node: ReactNode): string {
+  if (typeof node === "string" || typeof node === "number") {
+    return String(node);
+  }
+
+  if (Array.isArray(node)) {
+    return node.map(extractTextContent).join("");
+  }
+
+  if (node && typeof node === "object" && "props" in node) {
+    return extractTextContent(
+      (node as { props?: { children?: ReactNode } }).props?.children,
+    );
+  }
+
+  return "";
 }
 
 export function AdminTableBase<T extends { id: string | number }>({
@@ -70,9 +88,11 @@ export function AdminTableBase<T extends { id: string | number }>({
   pagination,
   onPageChange,
   searchPlaceholder = "Search...",
-  emptyMessage = "No data found",
+  emptyMessage = <>No data found</>,
 }: AdminTableBaseProps<T>) {
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm);
+  const resolvedFilterPlaceholder = extractTextContent(filterPlaceholder);
+  const resolvedSearchPlaceholder = extractTextContent(searchPlaceholder);
 
   // Debounce search input
   useEffect(() => {
@@ -105,7 +125,7 @@ export function AdminTableBase<T extends { id: string | number }>({
         <div className="relative max-w-sm flex-1">
           <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
           <Input
-            placeholder={searchPlaceholder}
+            placeholder={resolvedSearchPlaceholder}
             value={debouncedSearchTerm}
             onChange={(e) => handleSearch(e.target.value)}
             className="pl-9"
@@ -114,7 +134,7 @@ export function AdminTableBase<T extends { id: string | number }>({
         {filterOptions && onFilterChange && (
           <Select value={filterValue} onValueChange={onFilterChange}>
             <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder={filterPlaceholder} />
+              <SelectValue placeholder={resolvedFilterPlaceholder} />
             </SelectTrigger>
             <SelectContent>
               {filterOptions.map((option) => (

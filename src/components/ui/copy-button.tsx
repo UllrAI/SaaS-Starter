@@ -12,6 +12,14 @@ interface CopyButtonProps {
   textToCopy: string;
 }
 
+function CopyToClipboardLabel() {
+  return <>Copy to clipboard</>;
+}
+
+function CopiedLabel() {
+  return <>Copied!</>;
+}
+
 export default function CopyButton({ textToCopy }: CopyButtonProps) {
   const [isCopied, setIsCopied] = useState(false);
 
@@ -46,11 +54,13 @@ export default function CopyButton({ textToCopy }: CopyButtonProps) {
             ) : (
               <Copy className="h-4 w-4" />
             )}
-            <span className="sr-only">Copy to clipboard</span>
+            <span className="sr-only">
+              <CopyToClipboardLabel />
+            </span>
           </Button>
         </TooltipTrigger>
         <TooltipContent>
-          <p>{isCopied ? "Copied!" : "Copy to clipboard"}</p>
+          <p>{isCopied ? <CopiedLabel /> : <CopyToClipboardLabel />}</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

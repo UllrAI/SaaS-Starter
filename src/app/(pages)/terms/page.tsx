@@ -6,26 +6,26 @@ import {
   GITHUB_DISCUSSIONS_URL,
   LEGAL_EMAIL,
 } from "@/lib/config/constants";
-import { createPageMetadata } from "@/lib/i18n/page-metadata";
-
-async function TermsPageMetadataTitle() {
-  return <>Terms of Service</>;
-}
-
-async function TermsPageMetadataDescription() {
-  return (
-    <>
-      Read our terms of service to understand your rights and responsibilities
-      when using {COMPANY_NAME}.
-    </>
-  );
-}
+import { createMetadata } from "@/lib/metadata";
 
 export async function generateMetadata() {
-  return createPageMetadata({
-    title: TermsPageMetadataTitle,
-    description: TermsPageMetadataDescription,
-  });
+  const metadata = createMetadata({});
+
+  return {
+    ...metadata,
+    title: "Terms of Service",
+    description: `Read our terms of service to understand your rights and responsibilities when using ${COMPANY_NAME}.`,
+    openGraph: {
+      ...metadata.openGraph,
+      title: "Terms of Service",
+      description: `Read our terms of service to understand your rights and responsibilities when using ${COMPANY_NAME}.`,
+    },
+    twitter: {
+      ...metadata.twitter,
+      title: "Terms of Service",
+      description: `Read our terms of service to understand your rights and responsibilities when using ${COMPANY_NAME}.`,
+    },
+  };
 }
 
 const termsSections = [

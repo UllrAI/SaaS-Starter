@@ -132,6 +132,10 @@ interface FileUploadState {
   uploadedFile?: UploadedFile;
 }
 
+function AddFilesButtonLabel({ hasFiles }: { hasFiles: boolean }) {
+  return hasFiles ? <>Add More Files</> : <>Add Files</>;
+}
+
 export function FileUploader({
   acceptedFileTypes = UPLOAD_CONFIG.ALLOWED_FILE_TYPES,
   maxFileSize = UPLOAD_CONFIG.MAX_FILE_SIZE,
@@ -606,7 +610,7 @@ export function FileUploader({
                 className="w-full"
               >
                 <Upload className="mr-2 h-4 w-4" />
-                Add {files.length > 0 ? "More " : ""}Files
+                <AddFilesButtonLabel hasFiles={files.length > 0} />
               </Button>
             )}
           </div>

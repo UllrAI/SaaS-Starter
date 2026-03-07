@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import {
   Card,
   CardContent,
@@ -22,7 +23,7 @@ interface BlogPostCardProps {
   featured?: boolean;
   variant?: "featured" | "regular";
   className?: string;
-  author?: string;
+  author?: ReactNode;
   readTime?: string;
   locale?: string;
   isFallback?: boolean;

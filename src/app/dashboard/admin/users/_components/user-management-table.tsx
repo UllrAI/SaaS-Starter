@@ -270,11 +270,11 @@ export function UserManagementTable({
         filterValue={roleFilter}
         onFilterChange={handleRoleFilter}
         filterOptions={roleFilterOptions}
-        filterPlaceholder="Filter by role"
+        filterPlaceholder={<>Filter by role</>}
         pagination={pagination}
         onPageChange={handlePageChange}
-        searchPlaceholder="Search users by name or email..."
-        emptyMessage="No users found"
+        searchPlaceholder={<>Search users by name or email...</>}
+        emptyMessage={<>No users found</>}
       />
       <Dialog
         open={!!editingUser}
@@ -347,7 +347,7 @@ export function UserManagementTable({
                 disabled={isPending}
               >
                 {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {editingUser.banned ? "Enable User" : "Disable User"}
+                {editingUser.banned ? <>Enable User</> : <>Disable User</>}
               </Button>
             )}
             <Button

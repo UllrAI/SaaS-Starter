@@ -1,13 +1,14 @@
+import type { ReactNode } from "react";
 import { DashboardPageHeader } from "./dashboard-page-header";
 
 interface DashboardPageWrapperProps {
-  title: string;
-  parentTitle?: string;
+  title: ReactNode;
+  parentTitle?: ReactNode;
   parentUrl?: string;
-  description?: string;
-  actions?: React.ReactNode;
+  description?: ReactNode;
+  actions?: ReactNode;
   showSidebarTrigger?: boolean;
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 export function DashboardPageWrapper({

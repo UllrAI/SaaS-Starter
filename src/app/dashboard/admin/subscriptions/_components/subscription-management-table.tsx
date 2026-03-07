@@ -83,6 +83,18 @@ const SUBSCRIPTION_STATUS_COPY = defineCopyCatalog([
   Label: React.ComponentType;
 }>);
 
+function NoSubscriptionsFoundMessage() {
+  return <>No subscriptions found</>;
+}
+
+function SearchSubscriptionsPlaceholder() {
+  return <>Search by user name, email, or subscription ID...</>;
+}
+
+function FilterBySubscriptionStatusPlaceholder() {
+  return <>Filter by status</>;
+}
+
 export function SubscriptionManagementTable({
   initialData,
   initialPagination,
@@ -263,14 +275,14 @@ export function SubscriptionManagementTable({
         error={error}
         searchTerm={searchTerm}
         onSearchChange={handleSearch}
-        searchPlaceholder="Search by user name, email, or subscription ID..."
+        searchPlaceholder={<SearchSubscriptionsPlaceholder />}
         filterValue={statusFilter}
         onFilterChange={handleStatusFilter}
         filterOptions={statusFilterOptions}
-        filterPlaceholder="Filter by status"
+        filterPlaceholder={<FilterBySubscriptionStatusPlaceholder />}
         pagination={pagination}
         onPageChange={handlePageChange}
-        emptyMessage="No subscriptions found"
+        emptyMessage={<NoSubscriptionsFoundMessage />}
       />
       <Dialog
         open={!!cancellingSubscription}

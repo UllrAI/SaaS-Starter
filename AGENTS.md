@@ -131,6 +131,10 @@ pnpm set:admin
 - Avoid storing translatable copy in module-level strings, template literals, object maps, or helper-returned string tables.
 - Do not branch translated copy with runtime locale conditionals such as `locale === "zh-Hans" ? "..." : "..."`.
 - Prefer small JSX subcomponents for reusable copy instead of exported string maps.
+- If a piece of copy is only used once or can be expressed directly at the call site, inline the JSX instead of wrapping it in a no-props helper component.
+- Prefer full-sentence JSX branches over concatenation such as `"More "`, `file(s)`, or mixed translated and untranslated fragments.
+- When a reusable component needs copy-bearing props such as titles, descriptions, empty states, or placeholders, prefer accepting JSX-friendly inputs at the call site and only coerce to plain strings at the final DOM or library boundary when required.
+- For fallback labels like anonymous authors, empty states, and button text, keep the fallback copy in JSX instead of `value || "..."` when the text is user-visible and localizable.
 - Avoid IIFEs or nested callback structures that hide localizable JSX from extraction when a small subcomponent would be clearer.
 - When content must stay unlocalized, use supported patterns such as `data-lingo-skip` as an attribute, not in `className`.
 
@@ -139,6 +143,7 @@ pnpm set:admin
 - Do not invent `useTranslation`, `FormattedMessage`, `localizeText`, or similar patterns.
 - Do not manually implement a parallel i18n system beside Lingo.
 - Keep `LingoProvider` at the root layout. Do not convert large trees to client components only to read locale.
+- For `generateMetadata`, return a metadata object literal directly from the route module when any localizable fields are involved. Do not wrap translatable metadata in helpers such as `createPageMetadata`, and if shared defaults are needed, spread only non-localizable metadata into the returned object while keeping `title`, `description`, and other translated fields visible in that object literal.
 - Real translation QA must use a production build: run `pnpm build` and `pnpm start`.
 
 ## 7. Data, Billing, and Security

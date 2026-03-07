@@ -3,62 +3,45 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Features } from "@/components/homepage/features";
 import { CheckCircle2, Package2, Wrench } from "lucide-react";
-import { createPageMetadata } from "@/lib/i18n/page-metadata";
-
-async function FeaturesPageMetadataTitle() {
-  return <>Features</>;
-}
-
-async function FeaturesPageMetadataDescription() {
-  return (
-    <>
-      Review the actual modules included in the SaaS Starter: auth, billing,
-      admin tooling, uploads, localization, and content infrastructure.
-    </>
-  );
-}
+import { createMetadata } from "@/lib/metadata";
 
 export async function generateMetadata() {
-  return createPageMetadata({
-    title: FeaturesPageMetadataTitle,
-    description: FeaturesPageMetadataDescription,
-  });
+  const metadata = createMetadata({});
+
+  return {
+    ...metadata,
+    title: "Features",
+    description:
+      "Review the actual modules included in the SaaS Starter: auth, billing, admin tooling, uploads, localization, and content infrastructure.",
+    openGraph: {
+      ...metadata.openGraph,
+      title: "Features",
+      description:
+        "Review the actual modules included in the SaaS Starter: auth, billing, admin tooling, uploads, localization, and content infrastructure.",
+    },
+    twitter: {
+      ...metadata.twitter,
+      title: "Features",
+      description:
+        "Review the actual modules included in the SaaS Starter: auth, billing, admin tooling, uploads, localization, and content infrastructure.",
+    },
+  };
 }
 
 const includedItems = [
-  function FeaturesIncludedItemAppRouter() {
-    return <>Next.js App Router structure with page/layout conventions</>;
-  },
-  function FeaturesIncludedItemAuth() {
-    return <>Better Auth login, signup, session, and permission guards</>;
-  },
-  function FeaturesIncludedItemBilling() {
-    return <>Creem checkout, portal redirect, subscription records, and webhooks</>;
-  },
-  function FeaturesIncludedItemAdmin() {
-    return <>Admin pages for users, payments, subscriptions, and uploads</>;
-  },
-  function FeaturesIncludedItemUploads() {
-    return <>Cloudflare R2 upload flows for browser and server uploads</>;
-  },
-  function FeaturesIncludedItemContent() {
-    return <>Markdown blog content, typed collections, and marketing pages</>;
-  },
+  <>Next.js App Router structure with page/layout conventions</>,
+  <>Better Auth login, signup, session, and permission guards</>,
+  <>Creem checkout, portal redirect, subscription records, and webhooks</>,
+  <>Admin pages for users, payments, subscriptions, and uploads</>,
+  <>Cloudflare R2 upload flows for browser and server uploads</>,
+  <>Markdown blog content, typed collections, and marketing pages</>,
 ];
 
 const customizationItems = [
-  function FeaturesCustomizationItemProduct() {
-    return <>Your own product logic, domain-specific data model, and integrations</>;
-  },
-  function FeaturesCustomizationItemInfrastructure() {
-    return <>Production infrastructure, deployment, secrets, and observability</>;
-  },
-  function FeaturesCustomizationItemBrand() {
-    return <>Brand assets, copy, and plan definitions that match your business</>;
-  },
-  function FeaturesCustomizationItemProviders() {
-    return <>Provider credentials for auth, billing, email, storage, and analytics</>;
-  },
+  <>Your own product logic, domain-specific data model, and integrations</>,
+  <>Production infrastructure, deployment, secrets, and observability</>,
+  <>Brand assets, copy, and plan definitions that match your business</>,
+  <>Provider credentials for auth, billing, email, storage, and analytics</>,
 ];
 
 export default function FeaturesPage() {
@@ -92,12 +75,10 @@ export default function FeaturesPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-sm leading-relaxed">
-                {includedItems.map((Item, index) => (
-                  <div key={`${Item.name}-${index}`} className="flex items-start gap-3">
+                {includedItems.map((item, index) => (
+                  <div key={index} className="flex items-start gap-3">
                     <CheckCircle2 className="text-primary mt-0.5 h-4 w-4 shrink-0" />
-                    <span>
-                      <Item />
-                    </span>
+                    <span>{item}</span>
                   </div>
                 ))}
               </CardContent>
@@ -111,12 +92,10 @@ export default function FeaturesPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-sm leading-relaxed">
-                {customizationItems.map((Item, index) => (
-                  <div key={`${Item.name}-${index}`} className="flex items-start gap-3">
+                {customizationItems.map((item, index) => (
+                  <div key={index} className="flex items-start gap-3">
                     <Wrench className="text-primary mt-0.5 h-4 w-4 shrink-0" />
-                    <span>
-                      <Item />
-                    </span>
+                    <span>{item}</span>
                   </div>
                 ))}
               </CardContent>

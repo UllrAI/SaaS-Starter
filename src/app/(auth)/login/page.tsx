@@ -4,22 +4,27 @@ import {
   DEFAULT_CALLBACK_URL,
   normalizeCallbackUrl,
 } from "@/lib/auth/callback-url";
-import { createPageMetadata } from "@/lib/i18n/page-metadata";
+import { createMetadata } from "@/lib/metadata";
 import { resolveAuthFeedback } from "@/lib/auth/feedback";
 
-async function LoginPageMetadataTitle() {
-  return <>Sign In</>;
-}
-
-async function LoginPageMetadataDescription() {
-  return <>Sign in to your account with magic link</>;
-}
-
 export async function generateMetadata() {
-  return createPageMetadata({
-    title: LoginPageMetadataTitle,
-    description: LoginPageMetadataDescription,
-  });
+  const metadata = createMetadata({});
+
+  return {
+    ...metadata,
+    title: "Sign In",
+    description: "Sign in to your account with magic link",
+    openGraph: {
+      ...metadata.openGraph,
+      title: "Sign In",
+      description: "Sign in to your account with magic link",
+    },
+    twitter: {
+      ...metadata.twitter,
+      title: "Sign In",
+      description: "Sign in to your account with magic link",
+    },
+  };
 }
 
 interface LoginPageProps {

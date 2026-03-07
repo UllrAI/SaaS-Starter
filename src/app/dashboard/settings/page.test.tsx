@@ -25,15 +25,6 @@ jest.mock("@/lib/metadata", () => ({
   createMetadata: (config: unknown) => config,
 }));
 
-const mockPageMetadata = {
-  title: "Settings",
-  description: "Manage your account profile and dashboard appearance.",
-};
-const mockCreatePageMetadata = jest.fn(async () => mockPageMetadata);
-jest.mock("@/lib/i18n/page-metadata", () => ({
-  createPageMetadata: (config: unknown) => mockCreatePageMetadata(config),
-}));
-
 import SettingsPage, { generateMetadata } from "./page";
 
 describe("Dashboard Settings Page", () => {

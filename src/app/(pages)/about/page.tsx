@@ -16,26 +16,29 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { BackgroundPattern } from "@/components/ui/background-pattern";
-import { createPageMetadata } from "@/lib/i18n/page-metadata";
-
-async function AboutPageMetadataTitle() {
-  return <>About Us</>;
-}
-
-async function AboutPageMetadataDescription() {
-  return (
-    <>
-      Learn about our mission to help developers build and launch SaaS products
-      faster than ever before.
-    </>
-  );
-}
+import { createMetadata } from "@/lib/metadata";
 
 export async function generateMetadata() {
-  return createPageMetadata({
-    title: AboutPageMetadataTitle,
-    description: AboutPageMetadataDescription,
-  });
+  const metadata = createMetadata({});
+
+  return {
+    ...metadata,
+    title: "About Us",
+    description:
+      "Learn about our mission to help developers build and launch SaaS products faster than ever before.",
+    openGraph: {
+      ...metadata.openGraph,
+      title: "About Us",
+      description:
+        "Learn about our mission to help developers build and launch SaaS products faster than ever before.",
+    },
+    twitter: {
+      ...metadata.twitter,
+      title: "About Us",
+      description:
+        "Learn about our mission to help developers build and launch SaaS products faster than ever before.",
+    },
+  };
 }
 
 export default function AboutPage() {

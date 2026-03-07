@@ -4,21 +4,26 @@ import {
   DEFAULT_CALLBACK_URL,
   normalizeCallbackUrl,
 } from "@/lib/auth/callback-url";
-import { createPageMetadata } from "@/lib/i18n/page-metadata";
-
-async function SignUpPageMetadataTitle() {
-  return <>Sign Up</>;
-}
-
-async function SignUpPageMetadataDescription() {
-  return <>Create your account with magic link</>;
-}
+import { createMetadata } from "@/lib/metadata";
 
 export async function generateMetadata() {
-  return createPageMetadata({
-    title: SignUpPageMetadataTitle,
-    description: SignUpPageMetadataDescription,
-  });
+  const metadata = createMetadata({});
+
+  return {
+    ...metadata,
+    title: "Sign Up",
+    description: "Create your account with magic link",
+    openGraph: {
+      ...metadata.openGraph,
+      title: "Sign Up",
+      description: "Create your account with magic link",
+    },
+    twitter: {
+      ...metadata.twitter,
+      title: "Sign Up",
+      description: "Create your account with magic link",
+    },
+  };
 }
 
 interface SignUpPageProps {

@@ -12,21 +12,26 @@ import { SubscriptionStatsCards } from "./_components/subscription-stats-cards";
 import { SubscriptionManagementTable } from "./_components/subscription-management-table";
 import { StatsCardsSkeleton } from "../_components/stats-cards-skeleton";
 import { getSubscriptions } from "@/lib/actions/admin";
-import { createPageMetadata } from "@/lib/i18n/page-metadata";
-
-async function SubscriptionManagementMetadataTitle() {
-  return <>Subscription Management</>;
-}
-
-async function SubscriptionManagementMetadataDescription() {
-  return <>Monitor and manage all user subscriptions</>;
-}
+import { createMetadata } from "@/lib/metadata";
 
 export async function generateMetadata() {
-  return createPageMetadata({
-    title: SubscriptionManagementMetadataTitle,
-    description: SubscriptionManagementMetadataDescription,
-  });
+  const metadata = createMetadata({});
+
+  return {
+    ...metadata,
+    title: "Subscription Management",
+    description: "Monitor and manage all user subscriptions",
+    openGraph: {
+      ...metadata.openGraph,
+      title: "Subscription Management",
+      description: "Monitor and manage all user subscriptions",
+    },
+    twitter: {
+      ...metadata.twitter,
+      title: "Subscription Management",
+      description: "Monitor and manage all user subscriptions",
+    },
+  };
 }
 
 export default async function SubscriptionsPage() {
@@ -35,8 +40,8 @@ export default async function SubscriptionsPage() {
 
   return (
     <DashboardPageWrapper
-      title="Subscription Management"
-      parentTitle="Admin Dashboard"
+      title={<>Subscription Management</>}
+      parentTitle={<>Admin Dashboard</>}
       parentUrl="/dashboard/admin"
     >
       <Suspense fallback={<StatsCardsSkeleton />}>

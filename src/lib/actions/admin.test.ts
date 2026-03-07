@@ -27,9 +27,16 @@ const mockUsers = {
   emailVerified: "users.emailVerified",
   image: "users.image",
   role: "users.role",
+  banned: "users.banned",
+  banReason: "users.banReason",
+  banExpires: "users.banExpires",
   createdAt: "users.createdAt",
   updatedAt: "users.updatedAt",
   paymentProviderCustomerId: "users.paymentProviderCustomerId",
+};
+
+const mockSessions = {
+  userId: "sessions.userId",
 };
 
 const mockSubscriptions = {
@@ -107,6 +114,7 @@ jest.mock("@/database", () => ({
 
 jest.mock("@/database/schema", () => ({
   users: mockUsers,
+  sessions: mockSessions,
   subscriptions: mockSubscriptions,
   payments: mockPayments,
   uploads: mockUploads,
@@ -222,6 +230,9 @@ describe("Admin Actions", () => {
           emailVerified: true,
           image: null,
           role: "user",
+          banned: false,
+          banReason: null,
+          banExpires: null,
           createdAt: new Date("2024-01-01"),
           updatedAt: new Date("2024-01-01"),
           subscriptionStatus: "active",
@@ -264,6 +275,9 @@ describe("Admin Actions", () => {
             emailVerified: true,
             image: null,
             role: "user",
+            banned: false,
+            banReason: null,
+            banExpires: null,
             createdAt: mockUsersData[0].createdAt,
             updatedAt: mockUsersData[0].updatedAt,
             subscriptions: [
@@ -414,6 +428,9 @@ describe("Admin Actions", () => {
           emailVerified: true,
           image: null,
           role: "user",
+          banned: false,
+          banReason: null,
+          banExpires: null,
           createdAt: new Date("2024-01-01"),
           updatedAt: new Date("2024-01-01"),
           subscriptionStatus: "active",
@@ -918,6 +935,78 @@ describe("Admin Actions", () => {
           ctx: { user: { id: "admin1", role: "admin" } },
         }),
       ).rejects.toThrow("Cannot modify your own role");
+    });
+  });
+
+  describe("setUserDisabledAction", () => {
+    it("should disable a user and revoke sessions", async () => {
+      mockDb.select.mockReturnValue({
+        from: jest.fn().mockReturnValue({
+          where: jest.fn().mockReturnValue({
+            limit: jest.fn().mockResolvedValue([{ role: "user", banned: false }]),
+          }),
+        }),
+      });
+
+      const deleteWhere = jest.fn().mockResolvedValue([]);
+      mockDb.delete.mockReturnValue({
+        where: deleteWhere,
+      });
+
+      const { setUserDisabledAction } = await import("./admin");
+
+      const result = await setUserDisabledAction({
+        parsedInput: { id: "user1", disabled: true },
+        ctx: { user: { id: "admin1", role: "admin" } },
+      });
+
+      expect(result).toEqual({
+        success: true,
+        disabled: true,
+      });
+      expect(mockEq).toHaveBeenCalledWith(mockSessions.userId, "user1");
+      expect(deleteWhere).toHaveBeenCalled();
+      expect(mockRevalidatePath).toHaveBeenCalledWith("/dashboard/admin/users");
+    });
+
+    it("should prevent disabling your own account", async () => {
+      mockDb.select.mockReturnValue({
+        from: jest.fn().mockReturnValue({
+          where: jest.fn().mockReturnValue({
+            limit: jest.fn().mockResolvedValue([{ role: "admin", banned: false }]),
+          }),
+        }),
+      });
+
+      const { setUserDisabledAction } = await import("./admin");
+
+      await expect(
+        setUserDisabledAction({
+          parsedInput: { id: "admin1", disabled: true },
+          ctx: { user: { id: "admin1", role: "admin" } },
+        }),
+      ).rejects.toThrow("Cannot disable your own account");
+    });
+
+    it("should prevent admin from disabling super_admin", async () => {
+      mockDb.select.mockReturnValue({
+        from: jest.fn().mockReturnValue({
+          where: jest.fn().mockReturnValue({
+            limit: jest.fn().mockResolvedValue([
+              { role: "super_admin", banned: false },
+            ]),
+          }),
+        }),
+      });
+
+      const { setUserDisabledAction } = await import("./admin");
+
+      await expect(
+        setUserDisabledAction({
+          parsedInput: { id: "super1", disabled: true },
+          ctx: { user: { id: "admin1", role: "admin" } },
+        }),
+      ).rejects.toThrow("Insufficient permissions to modify super_admin");
     });
   });
 

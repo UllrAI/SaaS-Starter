@@ -6,16 +6,23 @@ const mockAuthForm = jest.fn(
     mode,
     availableProviders,
     callbackURL,
+    initialFeedback,
   }: {
     mode: "login" | "signup";
     availableProviders?: string[];
     callbackURL?: string;
+    initialFeedback?: {
+      key: string;
+      banReason?: string | null;
+      rawDescription?: string | null;
+    } | null;
   }) => (
     <div
       data-testid="auth-form"
       data-mode={mode}
       data-provider-count={availableProviders?.length ?? 0}
       data-callback-url={callbackURL}
+      data-feedback-key={initialFeedback?.key ?? ""}
     >
       Auth form
     </div>
@@ -36,6 +43,19 @@ const mockMetadata = { title: "mock metadata" };
 const mockCreatePageMetadata = jest.fn(() => mockMetadata);
 jest.mock("@/lib/i18n/page-metadata", () => ({
   createPageMetadata: (config: unknown) => mockCreatePageMetadata(config),
+}));
+
+const mockGetRequestLocale = jest.fn(async () => "en");
+jest.mock("@/lib/i18n/server-locale", () => ({
+  getRequestLocale: () => mockGetRequestLocale(),
+}));
+
+jest.mock("@/lib/auth/feedback", () => ({
+  AUTH_BANNED_MESSAGE: "AUTH_BANNED",
+  resolveAuthFeedback: jest.fn(() => ({
+    key: "banned",
+    banReason: null,
+  })),
 }));
 
 describe("LoginPage", () => {
@@ -88,6 +108,27 @@ describe("LoginPage", () => {
       expect.objectContaining({
         mode: "login",
         callbackURL: "/dashboard/billing",
+      }),
+    );
+  });
+
+  it("passes auth feedback from search params to AuthForm", async () => {
+    const pageModule = await import("./page");
+    const element = await pageModule.default({
+      searchParams: Promise.resolve({
+        error: "banned",
+        error_description: "AUTH_BANNED",
+      }),
+    });
+
+    render(element);
+
+    expect(mockAuthForm).toHaveBeenCalledWith(
+      expect.objectContaining({
+        initialFeedback: {
+          key: "banned",
+          banReason: null,
+        },
       }),
     );
   });

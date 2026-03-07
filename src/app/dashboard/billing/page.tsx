@@ -26,7 +26,12 @@ export async function generateMetadata() {
 
 export default async function DashboardBillingPage() {
   const requestHeaders = await headers();
-  const session = await auth.api.getSession({ headers: requestHeaders });
+  const session = await auth.api.getSession({
+    headers: requestHeaders,
+    query: {
+      disableCookieCache: true,
+    },
+  });
 
   const [subscription, payments] = await Promise.all([
     session?.user?.id

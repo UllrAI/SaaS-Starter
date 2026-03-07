@@ -1,6 +1,7 @@
 import env from "@/env";
 import { createAuthClient } from "better-auth/react";
 import {
+  adminClient,
   magicLinkClient,
   inferAdditionalFields,
 } from "better-auth/client/plugins";
@@ -8,7 +9,11 @@ import type { auth } from "./server";
 
 export const authClient = createAuthClient({
   baseURL: env.NEXT_PUBLIC_APP_URL,
-  plugins: [magicLinkClient(), inferAdditionalFields<typeof auth>()],
+  plugins: [
+    adminClient(),
+    magicLinkClient(),
+    inferAdditionalFields<typeof auth>(),
+  ],
 });
 
 export const {

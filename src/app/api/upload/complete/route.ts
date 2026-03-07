@@ -15,7 +15,12 @@ import { fileExists } from "@/lib/r2";
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth.api.getSession({ headers: request.headers });
+    const session = await auth.api.getSession({
+      headers: request.headers,
+      query: {
+        disableCookieCache: true,
+      },
+    });
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

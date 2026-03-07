@@ -18,6 +18,7 @@ jest.mock("@/emails/magic-link", () => ({ sendMagicLink: jest.fn() }));
 jest.mock("@/lib/config/constants", () => ({ APP_NAME: "Test App" }));
 jest.mock("better-auth/plugins", () => ({
   magicLink: jest.fn(() => ({})),
+  admin: jest.fn(() => ({})),
 }));
 jest.mock("better-auth/adapters/drizzle", () => ({
   drizzleAdapter: jest.fn(() => ({})),
@@ -213,7 +214,10 @@ describe("Auth Server Configuration", () => {
     expect(config.baseURL).toBe("http://localhost:3000");
     expect(config.secret).toBe("test-secret");
     expect(config.trustedOrigins).toEqual(["http://localhost:3000"]);
+    expect(config.onAPIError.errorURL).toBe("http://localhost:3000/login");
     expect(config.session.expiresIn).toBe(60 * 60 * 24 * 30);
+    expect(config.session.cookieCache.enabled).toBe(true);
+    expect(config.plugins).toHaveLength(2);
   });
 
   it("should configure magicLink plugin with development console logging", async () => {

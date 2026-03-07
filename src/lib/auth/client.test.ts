@@ -7,6 +7,7 @@ const mockEnv = {
 
 // Mock better-auth modules
 const mockCreateAuthClient = jest.fn();
+const mockAdminClient = jest.fn(() => ({}));
 const mockMagicLinkClient = jest.fn(() => ({}));
 const mockInferAdditionalFields = jest.fn(() => ({}));
 
@@ -20,6 +21,7 @@ jest.mock("better-auth/react", () => ({
 }));
 
 jest.mock("better-auth/client/plugins", () => ({
+  adminClient: mockAdminClient,
   magicLinkClient: mockMagicLinkClient,
   inferAdditionalFields: mockInferAdditionalFields,
 }));
@@ -66,6 +68,7 @@ describe("Auth Client", () => {
     expect(mockCreateAuthClient).toHaveBeenCalledWith({
       baseURL: "https://example.com",
       plugins: [
+        expect.any(Object), // adminClient result
         expect.any(Object), // magicLinkClient result
         expect.any(Object), // inferAdditionalFields result
       ],
@@ -79,6 +82,12 @@ describe("Auth Client", () => {
     expect(mockMagicLinkClient).toHaveBeenCalled();
   });
 
+  it("should call adminClient plugin", async () => {
+    await import("./client");
+
+    expect(mockAdminClient).toHaveBeenCalled();
+  });
+
   it("should call inferAdditionalFields plugin", async () => {
     // Import the module to trigger initialization
     await import("./client");
@@ -90,7 +99,7 @@ describe("Auth Client", () => {
     const clientModule = await import("./client");
 
     // Check that all expected exports exist
-    const expectedExports = [
+      const expectedExports = [
       "signIn",
       "signOut",
       "signUp",
@@ -211,7 +220,8 @@ describe("Auth Client", () => {
       const callArgs = mockCreateAuthClient.mock.calls[0][0] as {
         plugins: unknown[];
       };
-      expect(callArgs.plugins).toHaveLength(2);
+      expect(callArgs.plugins).toHaveLength(3);
+      expect(mockAdminClient).toHaveBeenCalled();
       expect(mockMagicLinkClient).toHaveBeenCalled();
       expect(mockInferAdditionalFields).toHaveBeenCalled();
     });

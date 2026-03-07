@@ -68,6 +68,7 @@ describe("SocialLoginButtons", () => {
       expect(mockSignIn.social).toHaveBeenCalledWith({
         provider: "google",
         callbackURL: "/dashboard",
+        errorCallbackURL: "/login?callbackUrl=%2Fdashboard",
         disableRedirect: true,
       });
     });

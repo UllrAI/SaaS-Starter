@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { Loader2, Github } from "lucide-react";
 import { signIn } from "@/lib/auth/client";
 import { redirectBrowserTo } from "@/lib/browser-redirect";
+import { buildLoginRedirectPath } from "@/lib/auth/callback-url";
 
 // Social provider configurations
 const socialProviders = {
@@ -66,6 +67,7 @@ export function SocialLoginButtons({
     null,
   );
   const [isRedirecting, setIsRedirecting] = useState(false);
+  const errorCallbackURL = buildLoginRedirectPath(callbackURL);
 
   const redirectToProvider = (url: string) => {
     setIsRedirecting(true);
@@ -84,6 +86,7 @@ export function SocialLoginButtons({
       const result = await signIn.social({
         provider,
         callbackURL,
+        errorCallbackURL,
         disableRedirect: true,
       });
 

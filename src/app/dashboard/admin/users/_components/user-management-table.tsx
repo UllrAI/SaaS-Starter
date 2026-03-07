@@ -28,7 +28,11 @@ import { userRoleEnum } from "@/database/schema";
 import type { UserRole } from "@/lib/config/roles";
 import { useAdminTable } from "@/hooks/use-admin-table";
 import type { UserWithSubscription } from "@/types/billing";
-import { getUsers, updateUserAction } from "@/lib/actions/admin";
+import {
+  getUsers,
+  setUserDisabledAction,
+  updateUserAction,
+} from "@/lib/actions/admin";
 import { useIntlLocale } from "@/hooks/use-intl-locale";
 import { defineCopyCatalog } from "@/lib/i18n/copy-catalog";
 
@@ -73,6 +77,10 @@ function RoleLabel({ role }: { role: UserRole }) {
 
 function EmailStatusLabel({ verified }: { verified: boolean | null }) {
   return verified ? <>Verified</> : <>Unverified</>;
+}
+
+function AccessStatusLabel({ banned }: { banned: boolean }) {
+  return banned ? <>Disabled</> : <>Active</>;
 }
 
 export function UserManagementTable({
@@ -143,6 +151,31 @@ export function UserManagementTable({
     });
   };
 
+  const handleSetUserDisabled = async (disabled: boolean) => {
+    if (!editingUser) return;
+
+    startTransition(async () => {
+      const result = await setUserDisabledAction({
+        id: editingUser.id,
+        disabled,
+      });
+
+      if (result.data) {
+        toast.success(
+          result.data.disabled ? (
+            <>User disabled and signed out successfully.</>
+          ) : (
+            <>User re-enabled successfully.</>
+          ),
+        );
+        setEditingUser(null);
+        refresh();
+      } else if (result.serverError || result.validationErrors) {
+        toast.error(result.serverError || <>Validation failed.</>);
+      }
+    });
+  };
+
   const formatDate = (dateString: Date) => {
     return new Date(dateString).toLocaleDateString(intlLocale, {
       year: "numeric",
@@ -184,11 +217,20 @@ export function UserManagementTable({
       ),
     },
     {
-      key: "status",
+      key: "emailStatus",
       label: <>Email Status</>,
       render: (user) => (
         <Badge variant={user.emailVerified ? "outline" : "default"}>
           <EmailStatusLabel verified={user.emailVerified} />
+        </Badge>
+      ),
+    },
+    {
+      key: "access",
+      label: <>Access</>,
+      render: (user) => (
+        <Badge variant={user.banned ? "destructive" : "outline"}>
+          <AccessStatusLabel banned={user.banned} />
         </Badge>
       ),
     },
@@ -241,7 +283,9 @@ export function UserManagementTable({
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Edit User</DialogTitle>
-            <DialogDescription>Modify user details and role.</DialogDescription>
+            <DialogDescription>
+              Modify user details, role, and access status.
+            </DialogDescription>
           </DialogHeader>
           {editingUser && (
             <div className="grid gap-4 py-4">
@@ -280,9 +324,32 @@ export function UserManagementTable({
                   </SelectContent>
                 </Select>
               </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label className="text-right">Access</Label>
+                <div className="col-span-3 flex items-center gap-3">
+                  <Badge variant={editingUser.banned ? "destructive" : "outline"}>
+                    <AccessStatusLabel banned={editingUser.banned} />
+                  </Badge>
+                  {editingUser.banned && editingUser.banReason && (
+                    <span className="text-muted-foreground text-sm">
+                      {editingUser.banReason}
+                    </span>
+                  )}
+                </div>
+              </div>
             </div>
           )}
           <DialogFooter>
+            {editingUser && (
+              <Button
+                variant={editingUser.banned ? "outline" : "destructive"}
+                onClick={() => handleSetUserDisabled(!editingUser.banned)}
+                disabled={isPending}
+              >
+                {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {editingUser.banned ? "Enable User" : "Disable User"}
+              </Button>
+            )}
             <Button
               variant="outline"
               onClick={() => setEditingUser(null)}

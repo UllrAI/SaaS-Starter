@@ -12,7 +12,12 @@ import {
 export async function POST(request: NextRequest) {
   try {
     // 1. 认证检查
-    const session = await auth.api.getSession({ headers: request.headers });
+    const session = await auth.api.getSession({
+      headers: request.headers,
+      query: {
+        disableCookieCache: true,
+      },
+    });
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

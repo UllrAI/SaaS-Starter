@@ -1,11 +1,12 @@
 import { betterAuth } from "better-auth";
-import { magicLink } from "better-auth/plugins";
+import { admin, magicLink } from "better-auth/plugins";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import * as tables from "@/database/tables";
 import env from "@/env";
 import { db } from "@/database";
 import { sendMagicLink } from "@/emails/magic-link";
 import { APP_NAME } from "@/lib/config/constants";
+import { AUTH_BANNED_MESSAGE } from "./feedback";
 import { providerConfigs } from "./providers";
 
 // Dynamically build social providers based on environment variables
@@ -32,6 +33,9 @@ export const auth = betterAuth({
   baseURL: env.NEXT_PUBLIC_APP_URL,
   secret: env.BETTER_AUTH_SECRET,
   trustedOrigins: [env.NEXT_PUBLIC_APP_URL],
+  onAPIError: {
+    errorURL: `${env.NEXT_PUBLIC_APP_URL}/login`,
+  },
   logger: {
     disabled: process.env.NODE_ENV === "production",
     level: "debug",
@@ -76,6 +80,9 @@ export const auth = betterAuth({
         const request = context?.request as Request | undefined;
         await sendMagicLink(email, url, request);
       },
+    }),
+    admin({
+      bannedUserMessage: AUTH_BANNED_MESSAGE,
     }),
   ],
 });

@@ -6,6 +6,7 @@ import {
   subscriptions,
   payments,
   uploads,
+  sessions,
   userRoleEnum,
 } from "@/database/schema";
 import {
@@ -96,6 +97,9 @@ export async function getUsers({
       emailVerified: users.emailVerified,
       image: users.image,
       role: users.role,
+      banned: users.banned,
+      banReason: users.banReason,
+      banExpires: users.banExpires,
       createdAt: users.createdAt,
       updatedAt: users.updatedAt,
       subscriptionStatus: subscriptions.status,
@@ -133,6 +137,9 @@ export async function getUsers({
         emailVerified: user.emailVerified,
         image: user.image,
         role: user.role,
+        banned: user.banned,
+        banReason: user.banReason,
+        banExpires: user.banExpires,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
         subscriptions: userSubscriptions,
@@ -497,6 +504,55 @@ export const updateUserAction = adminAction
     await db.update(users).set(input).where(eq(users.id, input.id));
     revalidatePath("/dashboard/admin/users");
     return { success: true, message: "User updated successfully." };
+  });
+
+const setUserDisabledSchema = z.object({
+  id: z.string(),
+  disabled: z.boolean(),
+});
+
+export const setUserDisabledAction = adminAction
+  .schema(setUserDisabledSchema)
+  .action(async ({ parsedInput: input, ctx }) => {
+    const [targetUser] = await db
+      .select({ role: users.role })
+      .from(users)
+      .where(eq(users.id, input.id))
+      .limit(1);
+
+    if (!targetUser) {
+      throw new Error("User not found");
+    }
+
+    if (targetUser.role === "super_admin" && ctx.user.role !== "super_admin") {
+      throw new Error("Insufficient permissions to modify super_admin");
+    }
+
+    if (input.disabled && input.id === ctx.user.id) {
+      throw new Error("Cannot disable your own account");
+    }
+
+    const nextBanned = input.disabled;
+
+    await db
+      .update(users)
+      .set({
+        banned: nextBanned,
+        banReason: null,
+        banExpires: null,
+      })
+      .where(eq(users.id, input.id));
+
+    if (nextBanned) {
+      await db.delete(sessions).where(eq(sessions.userId, input.id));
+    }
+
+    revalidatePath("/dashboard/admin/users");
+
+    return {
+      success: true,
+      disabled: nextBanned,
+    };
   });
 
 const cancelSubscriptionSchema = z.object({

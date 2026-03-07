@@ -13,7 +13,12 @@ import { useRouter } from "next/navigation";
 import { getAvailableSocialProviders } from "@/lib/auth/providers";
 import { AuthFormBase } from "@/components/auth/auth-form-base";
 import {
+  type ResolvedAuthFeedback,
+} from "@/lib/auth/feedback";
+import { createAuthFeedback } from "@/lib/auth/feedback-copy";
+import {
   DEFAULT_CALLBACK_URL,
+  buildLoginRedirectPath,
   normalizeCallbackUrl,
 } from "@/lib/auth/callback-url";
 
@@ -24,16 +29,22 @@ interface AuthFormProps {
   mode: AuthMode;
   availableProviders?: ReturnType<typeof getAvailableSocialProviders>;
   callbackURL?: string;
+  initialFeedback?: ResolvedAuthFeedback | null;
 }
 
 export function AuthForm({
   mode,
   availableProviders,
   callbackURL = DEFAULT_CALLBACK_URL,
+  initialFeedback = null,
 }: AuthFormProps) {
   const [pendingAction, setPendingAction] = useState<AuthPendingAction>(null);
+  const [feedback, setFeedback] = useState<ResolvedAuthFeedback | null>(
+    initialFeedback,
+  );
   const router = useRouter();
   const resolvedCallbackURL = normalizeCallbackUrl(callbackURL);
+  const errorCallbackURL = buildLoginRedirectPath(resolvedCallbackURL);
   const callbackQuery =
     resolvedCallbackURL === DEFAULT_CALLBACK_URL
       ? ""
@@ -55,9 +66,27 @@ export function AuthForm({
   });
 
   const onSubmit = async (data: z.infer<typeof authSchema>) => {
+    setFeedback(null);
+    form.clearErrors("email");
+
+    const statusResponse = await fetch(
+      `/api/auth/account-status?email=${encodeURIComponent(data.email)}`,
+    );
+    const statusPayload = (await statusResponse.json()) as {
+      status: "active" | "banned";
+      feedback?: ResolvedAuthFeedback | null;
+    };
+
+    if (statusPayload.status === "banned") {
+      setFeedback(statusPayload.feedback ?? { key: "banned" });
+      setPendingAction(null);
+      return;
+    }
+
     const result = await signIn.magicLink({
       email: data.email,
       callbackURL: resolvedCallbackURL,
+      errorCallbackURL,
     });
 
     if (result.error) {
@@ -107,6 +136,8 @@ export function AuthForm({
     },
   ];
 
+  const renderedFeedback = createAuthFeedback(feedback);
+
   return (
     <AuthFormBase
       form={form}
@@ -116,6 +147,7 @@ export function AuthForm({
       config={config}
       fields={fields}
       availableProviders={availableProviders}
+      feedback={renderedFeedback}
     />
   );
 }

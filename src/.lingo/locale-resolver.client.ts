@@ -5,7 +5,9 @@ import {
   isMarketingPath,
   normalizeLocaleCandidate,
   resolvePreferredLocale,
-} from "../src/lib/config/i18n-routing";
+} from "@/lib/config/i18n-routing";
+
+const LOCALE_COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
 
 function getLocaleCookie(): string | null {
   const cookiePair = document.cookie
@@ -31,12 +33,11 @@ function getLocaleCookie(): string | null {
 
 function persistLocaleCookie(locale: string): void {
   const encoded = encodeURIComponent(locale);
-  document.cookie = `${LOCALE_COOKIE_NAME}=${encoded}; path=/; max-age=${60 * 60 * 24 * 365}; samesite=lax`;
+  document.cookie = `${LOCALE_COOKIE_NAME}=${encoded}; path=/; max-age=${LOCALE_COOKIE_MAX_AGE}; SameSite=Lax`;
 }
 
 export function getClientLocale(): string {
-  const currentPath = window.location.pathname;
-  const pathLocale = extractLocaleFromPath(currentPath);
+  const pathLocale = extractLocaleFromPath(window.location.pathname);
 
   if (pathLocale.locale && isMarketingPath(pathLocale.strippedPathname)) {
     return pathLocale.locale;

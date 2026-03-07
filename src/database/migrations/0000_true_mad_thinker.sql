@@ -42,6 +42,7 @@ CREATE TABLE "sessions" (
 	"os" text,
 	"browser" text,
 	"deviceType" text,
+	"impersonatedBy" text,
 	"userId" text NOT NULL,
 	CONSTRAINT "sessions_token_unique" UNIQUE("token")
 );
@@ -79,6 +80,9 @@ CREATE TABLE "users" (
 	"emailVerified" boolean NOT NULL,
 	"image" text,
 	"role" "user_role" DEFAULT 'user' NOT NULL,
+	"banned" boolean DEFAULT false NOT NULL,
+	"banReason" text,
+	"banExpires" timestamp,
 	"paymentProviderCustomerId" text,
 	"createdAt" timestamp NOT NULL,
 	"updatedAt" timestamp NOT NULL,

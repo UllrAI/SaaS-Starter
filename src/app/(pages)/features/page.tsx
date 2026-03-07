@@ -28,23 +28,22 @@ export async function generateMetadata() {
   };
 }
 
-const includedItems = [
-  <>Next.js App Router structure with page/layout conventions</>,
-  <>Better Auth login, signup, session, and permission guards</>,
-  <>Creem checkout, portal redirect, subscription records, and webhooks</>,
-  <>Admin pages for users, payments, subscriptions, and uploads</>,
-  <>Cloudflare R2 upload flows for browser and server uploads</>,
-  <>Markdown blog content, typed collections, and marketing pages</>,
-];
-
-const customizationItems = [
-  <>Your own product logic, domain-specific data model, and integrations</>,
-  <>Production infrastructure, deployment, secrets, and observability</>,
-  <>Brand assets, copy, and plan definitions that match your business</>,
-  <>Provider credentials for auth, billing, email, storage, and analytics</>,
-];
-
 export default function FeaturesPage() {
+  const includedItems = [
+    <>Next.js App Router structure with page/layout conventions</>,
+    <>Better Auth login, signup, session, and permission guards</>,
+    <>Creem checkout, portal redirect, subscription records, and webhooks</>,
+    <>Admin pages for users, payments, subscriptions, and uploads</>,
+    <>Cloudflare R2 upload flows for browser and server uploads</>,
+    <>Markdown blog content, typed collections, and marketing pages</>,
+  ];
+
+  const customizationItems = [
+    <>Your own product logic, domain-specific data model, and integrations</>,
+    <>Production infrastructure, deployment, secrets, and observability</>,
+    <>Brand assets, copy, and plan definitions that match your business</>,
+    <>Provider credentials for auth, billing, email, storage, and analytics</>,
+  ];
   return (
     <>
       <section className="bg-background border-border border-b py-20">

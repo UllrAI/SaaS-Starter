@@ -64,8 +64,11 @@ This directory contains Docker configuration for running the UllrAI Starter appl
 1. **Database Migrations**
 
    ```bash
-   # Run migrations inside the container
-   docker-compose exec app pnpm run db:migrate:dev
+   # Apply committed migrations inside the container
+   docker-compose exec app pnpm db:migrate
+
+   # For disposable local iteration only
+   docker-compose exec app pnpm db:push
    ```
 
 2. **Logs**

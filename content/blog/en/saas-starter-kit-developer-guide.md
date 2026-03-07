@@ -153,8 +153,7 @@ SaaS-Starter-main/
 │   │   └── ui/           # Generic UI components (based on shadcn/ui)
 │   ├── database/         # Drizzle ORM related
 │   │   ├── migrations/   # Database migration files
-│   │   ├── config.ts     # Development migration config
-│   │   ├── config.prod.ts # Production migration config
+│   │   ├── config.ts     # Shared migration config
 │   │   ├── index.ts      # Drizzle client initialization
 │   │   └── schema.ts     # Database table structure definitions
 │   ├── emails/           # React Email templates
@@ -245,10 +244,7 @@ The project uses Next.js App Router and leverages Route Groups for logical page 
    - Register and obtain API keys for Creem, Resend, Cloudflare R2, and fill them in the `.env` file.
 1. **Database Setup**:
    - **Development**: `pnpm db:push` synchronizes changes from `database/schema.ts` directly to the database, suitable for rapid iteration.
-   - **Production**: **Must** use migration files. Process:
-     1. `pnpm db:generate:prod`: Generate production migration SQL files.
-     1. Deploy code and migration files to production.
-     1. Run `pnpm db:migrate:prod` in production to apply migrations.
+   - **Shared environments**: generate and commit SQL migrations with `pnpm db:generate`, deploy the code, then run `pnpm db:migrate` once against the target `DATABASE_URL`.
 
 ### 3.2. Development Workflow
 
@@ -321,10 +317,10 @@ This starter kit uses the `better-auth` library to provide a complete authentica
 - **Schema Definition**: `database/schema.ts` is the single source of truth for all database tables, defining table structures, relationships, and constraints using Drizzle ORM syntax.
 - **Client Initialization**: `database/index.ts` initializes the Drizzle client and applies different connection pool configurations based on environment (Serverless or traditional server) (`src/lib/database/connection.ts`).
 - **Migration Management**:
-  - The project maintains two separate migration histories for development and production environments, located in `database/migrations/development` and `database/migrations/production` respectively.
-  - `pnpm db:generate` & `pnpm db:generate:prod`: Generate SQL migration files based on changes in `schema.ts`.
+  - The project maintains a single committed migration history in `src/database/migrations`.
+  - `pnpm db:generate`: Generate SQL migration files based on changes in `schema.ts`.
   - `pnpm db:push`: Development only, directly syncs schema to database, loses history.
-  - `pnpm db:migrate:dev` & `pnpm db:migrate:prod`: Apply migration files to database.
+  - `pnpm db:migrate`: Apply committed migration files to the database selected by `DATABASE_URL`.
 
 ### 4.3. Payment & Subscriptions (Creem)
 
@@ -516,14 +512,11 @@ Provides a powerful, extensible data management system.
 | `pnpm lint`             | Run ESLint checks                          |
 | `pnpm test`             | Run Jest unit tests                        |
 | `pnpm prettier:format`  | Format all code                            |
-| `pnpm db:generate`      | Generate migration files for development   |
-| `pnpm db:generate:prod` | Generate migration files for production    |
-| `pnpm db:migrate:dev`   | Apply development migrations               |
-| `pnpm db:migrate:prod`  | Apply production migrations                |
+| `pnpm db:generate`      | Generate committed migration files         |
+| `pnpm db:migrate`       | Apply migrations to the current database   |
 | `pnpm db:push`          | (Development only) Push schema to database |
 | `pnpm analyze`          | Build and analyze bundle size              |
-| `pnpm set:admin`        | (Local) Promote user to super admin        |
-| `pnpm set:admin:prod`   | (Production) Promote user to super admin   |
+| `pnpm set:admin`        | Promote user to super admin                |
 
 ### 8.2. Configuration Options
 
@@ -574,7 +567,7 @@ All required and optional environment variables are detailed in the environment 
 1. Import the Git repository in Vercel.
 1. Vercel will automatically detect Next.js project and configure build settings.
 1. In Vercel project's `Settings > Environment Variables`, add all environment variables defined in your `.env` file.
-1. Configure production database migration process in your CI/CD pipeline, ensuring `pnpm db:migrate:prod` runs after each successful deployment.
+1. Configure database migration as a dedicated CI/CD release step, ensuring `pnpm db:migrate` runs once against the production `DATABASE_URL` instead of on every app startup.
 1. Each push to main branch will automatically build and deploy your application on Vercel.
 
 ---
@@ -622,7 +615,7 @@ A: This is the most common file upload issue. Make sure you have correctly confi
 A: The system doesn't automatically set up admins. You need to:
 
 1. First register an account normally in the app with the email you want to make admin.
-1. Run `pnpm set:admin --email=your-email@example.com` (local) or `pnpm set:admin:prod --email=your-email@example.com` (production) in your project root directory.
+1. Run `pnpm set:admin --email=your-email@example.com` in your project root directory. The command loads `.env` when present and otherwise uses the current process environment.
 
 **Q: Social login doesn't work, what to do?**
 

@@ -20,7 +20,7 @@ This starter kit provides a comprehensive set of powerful features to help you q
 
 - **Authentication (Better-Auth + Resend):** Integrated with [Better-Auth](https://better-auth.com/), providing secure magic link login and third-party OAuth functionality. Uses [Resend](https://resend.com/) for reliable email delivery with Mailchecker integration to avoid temporary emails.
 - **Modern Web Framework (Next.js 16 + TypeScript):** Built on the latest [Next.js 16](https://nextjs.org/) with App Router and Server Components. The entire project uses strict TypeScript type checking.
-- **Internationalization (Lingo.dev Compiler):** Built-in localization workflow powered by `@lingo.dev/compiler` for App Router. See `docs/i18n-lingo.md`.
+- **Internationalization (Lingo.dev Compiler):** Built-in localization workflow powered by `@lingo.dev/compiler` for App Router. See `docs/i18n-lingo-migration.md`.
 - **Database & ORM (Drizzle + PostgreSQL):** Uses [Drizzle ORM](https://orm.drizzle.team/) for type-safe database operations with deep PostgreSQL integration. Supports schema migrations and optimized queries.
 - **Payments & Subscriptions (Creem):** Integrated with [Creem](https://creem.io/) as the payment provider for easy subscription and one-time payment handling.
 - **UI Component Library (shadcn/ui + Tailwind CSS):** Built with [shadcn/ui](https://ui.shadcn.com/), an accessible, composable component library based on Radix UI and Tailwind CSS with built-in theme support.
@@ -117,49 +117,44 @@ Then edit the `.env` file and fill in all required values.
 
 ### 4. Database Setup
 
-This project uses Drizzle ORM for database migrations. To ensure isolation between development and production environments, the project is configured with two separate database configuration files:
+This project uses a single Drizzle config file, `src/database/config.ts`, and a single committed migration history in `src/database/migrations/`. The target database is selected only by `DATABASE_URL`.
 
-- `src/database/config.ts` - Development environment configuration, migration files output to `src/database/migrations/development/`
-- `src/database/config.prod.ts` - Production environment configuration, migration files output to `src/database/migrations/production/`
+#### Local development
 
-#### Development Environment
-
-For local development, we recommend using the `push` command to directly sync `schema.ts` changes to the database:
+For fast local iteration against your own database:
 
 ```bash
-# Ensure local PostgreSQL database is running
 pnpm db:push
 ```
 
-Alternatively, you can use the traditional migration file approach:
+If the schema change should be reviewed, committed, or shared with other environments, create and apply a real migration instead:
 
 ```bash
-pnpm db:generate  # Generate migration files based on schema changes
-pnpm db:migrate:dev # Apply migration files to development database
+pnpm db:generate
+pnpm db:migrate
 ```
 
-#### Production Environment
+#### Staging and production
 
-**Important:** Production environments **must** use SQL migration file-based approach to ensure traceability and security of database changes.
+Shared environments should use committed SQL migrations only:
 
 ```bash
-# 1. In development environment, generate migration files based on schema changes
+# 1. Generate and commit the migration from your schema change
 pnpm db:generate
 
-# 2. Generate migration files for production environment (using separate production config)
-pnpm db:generate:prod
+# 2. Deploy the code that includes the new migration files
 
-# 3. Deploy code (including newly generated migration files) to production environment
-
-# 4. In production environment (usually through CI/CD pipeline), apply migrations
-pnpm db:migrate:prod
+# 3. Run migrations once against the target DATABASE_URL
+pnpm db:migrate
 ```
 
-> **Security Tips:**
+> **Recommended release practice**
 >
-> - **Never** use `pnpm db:push` in production environment.
-> - Production environment migrations should be automated through CI/CD pipelines.
-> - Always backup production database before applying migrations.
+> - **Never** use `pnpm db:push` in staging or production.
+> - Keep one migration history for all environments. Do not split migrations into dev/prod trees.
+> - Run `pnpm db:migrate` as a dedicated one-shot release step in CI/CD or your deploy platform.
+> - Do **not** run migrations on every application process startup.
+> - Make schema changes backward-compatible when possible, so app rollout and migration timing stay safe.
 
 ### 5. Content Management (Content Collections)
 
@@ -179,32 +174,20 @@ Now your application should be running at [http://localhost:3000](http://localho
 
 ### 7. Admin Account Setup
 
-For security reasons, the system no longer automatically sets the first registered user as super admin. You need to manually specify the super admin through a secure script.
+For security reasons, the first registered user is not promoted automatically. Use the admin script after the user has signed up normally:
 
-**Setup Process:**
+```bash
+pnpm set:admin --email=your-email@example.com
+```
 
-1. First, ensure the user you want to promote to admin has already registered an account in the system through normal registration.
-2. In your server (using environment variables) or local development environment (using .env file as environment variables), run the following command.
-   Available in server environment:
+The command loads `.env` if it exists and otherwise uses the current process environment, so the same command works locally and on a server.
 
-   ```bash
-   pnpm set:admin:prod --email=your-email@example.com
-   ```
+After successful execution, the user receives `super_admin` privileges and can access `/dashboard/admin`.
 
-   Available in local development environment:
+**Security tips**
 
-   ```bash
-   pnpm set:admin --email=your-email@example.com
-   ```
-
-   Replace `your-email@example.com` with the registered email of the user you want to promote.
-
-3. After successful script execution, the user will have super admin (`super_admin`) privileges and can access all management functions under the `/dashboard/admin` path.
-
-**Security Tips:**
-
-- Please ensure this privilege is only granted to trusted users.
-- This command should be executed in a secure environment to avoid exposing sensitive information.
+- Grant this role only to trusted users.
+- Run the command in a secure environment with the correct `DATABASE_URL`.
 
 ## 📜 Available Scripts
 
@@ -216,6 +199,7 @@ For security reasons, the system no longer automatically sets the first register
 | `pnpm build`           | Build application for production.            |
 | `pnpm start`           | Start production server.                     |
 | `pnpm lint`            | Check code for linting errors.               |
+| `pnpm type-check`      | Run TypeScript type checking.                |
 | `pnpm test`            | Run unit tests and generate coverage report. |
 | `pnpm prettier:format` | Format all code using Prettier.              |
 | `pnpm set:admin`       | Promote specified email user to super admin. |
@@ -229,13 +213,11 @@ For security reasons, the system no longer automatically sets the first register
 
 #### Database Scripts
 
-| Script                  | Description                                                       | Environment |
-| :---------------------- | :---------------------------------------------------------------- | :---------- |
-| `pnpm db:generate`      | Generate SQL migration files based on schema changes.             | Development |
-| `pnpm db:generate:prod` | Generate SQL migration files for production.                      | Production  |
-| `pnpm db:push`          | **Development only.** Push schema changes directly to database.   | Development |
-| `pnpm db:migrate:dev`   | Apply migration files to development database.                    | Development |
-| `pnpm db:migrate:prod`  | **Production use.** Apply migration files to production database. | Production  |
+| Script             | Description                                                                 |
+| :----------------- | :-------------------------------------------------------------------------- |
+| `pnpm db:generate` | Generate SQL migration files from schema changes.                           |
+| `pnpm db:migrate`  | Apply committed migrations to the database selected by `DATABASE_URL`.      |
+| `pnpm db:push`     | **Local development only.** Sync schema directly without creating migration |
 
 ## 📁 File Upload Feature
 
@@ -339,8 +321,8 @@ We recommend using [Vercel](https://vercel.com) for deployment as it seamlessly 
 3. **Configure Environment Variables:**
    - In your Vercel project's "Settings" -> "Environment Variables", add all the environment variables you defined in your `.env` file. **Do not commit the `.env` file to your Git repository**.
 
-4. **Configure Production Database Migration:**
-   After successful deployment, execute database migration separately: `pnpm db:migrate:prod`
+4. **Configure Database Migration as a Release Step:**
+   Run `pnpm db:migrate` once in a dedicated CI/CD or platform release step using the production `DATABASE_URL`. Avoid running migrations from web process startup hooks.
 
 5. **Deploy!**
    After completing the above steps, Vercel will automatically build and deploy your application every time you push to the main branch.

@@ -20,7 +20,7 @@
 
 - **身份验证 (Better-Auth + Resend):** 集成了 [Better-Auth](https://better-auth.com/)，提供安全的魔法链接登录和第三方 OAuth 功能。使用 [Resend](https://resend.com/) 提供可靠的邮件发送服务，并集成 Mailchecker 避免临时邮箱。
 - **现代 Web 框架 (Next.js 16 + TypeScript):** 基于最新的 [Next.js 16](https://nextjs.org/)，使用 App Router 和服务器组件。整个项目采用严格的 TypeScript 类型检查。
-- **国际化 (Lingo.dev Compiler):** 基于 `@lingo.dev/compiler` 的本地化工作流，适配 App Router。详见 `docs/i18n-lingo.md`。
+- **国际化 (Lingo.dev Compiler):** 基于 `@lingo.dev/compiler` 的本地化工作流，适配 App Router。详见 `docs/i18n-lingo-migration.md`。
 - **数据库与 ORM (Drizzle + PostgreSQL):** 使用 [Drizzle ORM](https://orm.drizzle.team/) 进行类型安全的数据库操作，并与 PostgreSQL 深度集成。支持模式迁移和优化的查询。
 - **支付与订阅 (Creem):** 集成了 [Creem](https://creem.io/) 作为支付提供商，轻松处理订阅和一次性支付。
 - **UI 组件库 (shadcn/ui + Tailwind CSS):** 使用 [shadcn/ui](https://ui.shadcn.com/) 构建，它是一个基于 Radix UI 和 Tailwind CSS 的可访问、可组合的组件库，内置主题支持。
@@ -117,49 +117,44 @@ cp .env.example .env
 
 ### 4. 数据库设置
 
-本项目使用 Drizzle ORM 进行数据库迁移。为了确保开发和生产环境的隔离，项目配置了两个独立的数据库配置文件：
+本项目使用单一 Drizzle 配置文件 `src/database/config.ts`，并维护一套提交到仓库的迁移历史 `src/database/migrations/`。目标数据库仅由 `DATABASE_URL` 决定。
 
-- `src/database/config.ts` - 开发环境配置，迁移文件输出到 `src/database/migrations/development/`
-- `src/database/config.prod.ts` - 生产环境配置，迁移文件输出到 `src/database/migrations/production/`
+#### 本地开发
 
-#### 开发环境
-
-对于本地开发，推荐使用 `push` 命令直接将 `schema.ts` 的变更同步到数据库：
+如果只是对自己的本地数据库做快速迭代：
 
 ```bash
-# 确保本地 PostgreSQL 数据库正在运行
 pnpm db:push
 ```
 
-或者，您也可以使用传统的迁移文件方式：
+如果这次 schema 变更需要评审、提交或同步到其他环境，请生成正式迁移：
 
 ```bash
-pnpm db:generate  # 基于 schema 变更生成迁移文件
-pnpm db:migrate:dev # 将迁移文件应用到开发数据库
+pnpm db:generate
+pnpm db:migrate
 ```
 
-#### 生产环境
+#### Staging / Production
 
-**重要：** 生产环境**必须**使用基于 SQL 迁移文件的方式，以确保数据库变更的可追溯性和安全性。
+共享环境只应使用已提交的 SQL 迁移：
 
 ```bash
-# 1. 在开发环境中，基于 schema 变更生成迁移文件
+# 1. 根据 schema 变更生成并提交迁移文件
 pnpm db:generate
 
-# 2. 为生产环境生成迁移文件（使用独立的生产配置）
-pnpm db:generate:prod
+# 2. 部署包含新迁移文件的代码
 
-# 3. 将代码（包含新生成的迁移文件）部署到生产环境
-
-# 4. 在生产环境中（通常通过 CI/CD 流程），应用迁移
-pnpm db:migrate:prod
+# 3. 在目标 DATABASE_URL 上执行一次迁移
+pnpm db:migrate
 ```
 
-> **安全提示：**
+> **推荐发布实践**
 >
-> - **切勿**在生产环境中使用 `pnpm db:push`。
-> - 生产环境迁移应通过 CI/CD 流程自动化执行。
-> - 在应用迁移前，务必备份生产数据库。
+> - **不要**在 staging 或 production 使用 `pnpm db:push`。
+> - 所有环境共用一套迁移历史，不要再维护 dev/prod 两棵 SQL 目录。
+> - 在 CI/CD 或部署平台中，把 `pnpm db:migrate` 作为单次执行的发布步骤。
+> - **不要**把迁移挂在每个应用实例启动时自动执行。
+> - 尽量保持 schema 变更向后兼容，降低迁移和应用切换的发布风险。
 
 ### 5. 内容管理 (Content Collections)
 
@@ -177,34 +172,22 @@ pnpm dev
 
 现在，您的应用应该已经在 [http://localhost:3000](http://localhost:3000) 上运行了！
 
-### 6. 管理员账户设置
+### 7. 管理员账户设置
 
-为了安全起见，系统不再自动将第一个注册的用户设置为超级管理员。您需要通过一个安全脚本来手动指定超级管理员。
+为了安全起见，系统不会自动把第一个注册用户提升为超级管理员。请在目标用户正常注册后执行：
 
-**设置流程：**
+```bash
+pnpm set:admin --email=your-email@example.com
+```
 
-1.  首先，确保您想要提升为管理员的用户已经通过常规方式在系统中注册了一个账户。
-2.  在您的服务器（使用环境变量）或本地开发环境中（使用.env文件作为环境变量），运行以下命令。
-    服务器环境中可用：
+该命令会在存在时自动加载 `.env`，否则直接使用当前进程环境变量，因此本地和服务器都使用同一个命令。
 
-    ```bash
-    pnpm set:admin:prod --email=your-email@example.com
-    ```
+执行成功后，该用户将获得 `super_admin` 权限，并可访问 `/dashboard/admin`。
 
-    本地开发环境中可用：
+**安全提示**
 
-    ```bash
-    pnpm set:admin --email=your-email@example.com
-    ```
-
-    将 `your-email@example.com` 替换为您要提升的用户的注册邮箱。
-
-3.  脚本执行成功后，该用户将拥有超级管理员 (`super_admin`) 权限，可以访问 `/dashboard/admin` 路径下的所有管理功能。
-
-**安全提示：**
-
-- 请确保只将此权限授予受信任的用户。
-- 此命令应在安全的环境中执行，避免暴露敏感信息。
+- 只将该权限授予可信用户。
+- 请在确认 `DATABASE_URL` 正确的安全环境中执行此命令。
 
 ## 📜 可用脚本
 
@@ -216,6 +199,7 @@ pnpm dev
 | `pnpm build`           | 为生产环境构建应用。               |
 | `pnpm start`           | 启动生产服务器。                   |
 | `pnpm lint`            | 检查代码中的 linting 错误。        |
+| `pnpm type-check`      | 运行 TypeScript 类型检查。         |
 | `pnpm test`            | 运行单元测试并生成覆盖率报告。     |
 | `pnpm prettier:format` | 使用 Prettier 格式化所有代码。     |
 | `pnpm set:admin`       | 将指定邮箱的用户提升为超级管理员。 |
@@ -229,13 +213,11 @@ pnpm dev
 
 #### 数据库脚本
 
-| 脚本                    | 描述                                        | 环境 |
-| :---------------------- | :------------------------------------------ | :--- |
-| `pnpm db:generate`      | 基于模式变更生成 SQL 迁移文件。             | 开发 |
-| `pnpm db:generate:prod` | 为生产环境生成 SQL 迁移文件。               | 生产 |
-| `pnpm db:push`          | **仅用于开发。** 直接推送模式变更到数据库。 | 开发 |
-| `pnpm db:migrate:dev`   | 将迁移文件应用到开发数据库。                | 开发 |
-| `pnpm db:migrate:prod`  | **用于生产。** 将迁移文件应用到生产数据库。 | 生产 |
+| 脚本               | 描述                                                         |
+| :----------------- | :----------------------------------------------------------- |
+| `pnpm db:generate` | 基于 schema 变更生成 SQL 迁移文件。                          |
+| `pnpm db:migrate`  | 对 `DATABASE_URL` 指向的数据库应用已提交的迁移。             |
+| `pnpm db:push`     | **仅限本地开发。** 不生成迁移文件，直接把 schema 推到数据库。 |
 
 ## 📁 文件上传功能
 
@@ -339,8 +321,8 @@ pnpm analyze:dev
 3.  **配置环境变量:**
     - 在 Vercel 项目的 "Settings" -> "Environment Variables" 中，添加您在 `.env` 文件中定义的所有环境变量。**请勿将 `.env` 文件提交到 Git 仓库中**。
 
-4.  **配置生产数据库迁移:**
-    在部署成功后，单独执行数据库迁移：`pnpm db:migrate:prod`
+4.  **把数据库迁移配置为发布步骤:**
+    在 CI/CD 或部署平台中，使用生产环境的 `DATABASE_URL` 单独执行一次 `pnpm db:migrate`。不要把迁移挂在 Web 进程启动钩子上。
 
 5.  **部署!**
     完成上述步骤后，Vercel 会在您每次推送到主分支时自动构建和部署您的应用。

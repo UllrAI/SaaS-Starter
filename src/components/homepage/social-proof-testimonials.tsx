@@ -126,7 +126,7 @@ export function SocialProofUnified() {
 
                 return (
                   <Card key={item.id} className="border-border bg-card">
-                    <CardHeader className="pb-3">
+                    <CardHeader>
                       <CardTitle className="flex items-center gap-3 text-lg">
                         <span className="bg-secondary text-primary flex h-10 w-10 items-center justify-center border">
                           <Icon className="h-5 w-5" />
@@ -134,7 +134,7 @@ export function SocialProofUnified() {
                         <Title />
                       </CardTitle>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="-mt-3">
                       <p className="text-muted-foreground text-sm leading-relaxed">
                         <Description />
                       </p>

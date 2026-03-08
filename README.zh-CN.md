@@ -4,8 +4,6 @@
 
 🚧 注意：此项目当前仍然在密集完善及修改中
 
-⚠️ 暂不建议在生产环境使用
-
 ---
 
 <!-- [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/ullrai/saas-starter) -->

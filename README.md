@@ -27,7 +27,7 @@ This starter kit provides a comprehensive set of powerful features to help you q
 - **Form Handling (Zod + React Hook Form):** Powerful, type-safe form validation through [Zod](https://zod.dev/) and [React Hook Form](https://react-hook-form.com/).
 - **File Upload (Cloudflare R2):** Secure file upload system based on Cloudflare R2, supporting client-side direct upload with various file type and size restrictions.
 - **Blog System (Content Collections):** Uses [Content Collections](https://www.content-collections.dev/) with plain Markdown files for type-safe blog content, metadata generation, and sitemap output.
-- **Code Quality:** Built-in ESLint and Prettier to ensure consistent code style and quality.
+- **Code Quality & Verification:** Built-in ESLint, Prettier, Jest, and Playwright smoke tests to keep critical flows from regressing.
 
 ---
 
@@ -201,8 +201,26 @@ After successful execution, the user receives `super_admin` privileges and can a
 | `pnpm lint`            | Check code for linting errors.               |
 | `pnpm type-check`      | Run TypeScript type checking.                |
 | `pnpm test`            | Run unit tests and generate coverage report. |
+| `pnpm test:e2e`        | Build and run Playwright E2E smoke tests.    |
 | `pnpm prettier:format` | Format all code using Prettier.              |
 | `pnpm set:admin`       | Promote specified email user to super admin. |
+
+## 🧪 E2E Testing
+
+This repository includes a Playwright smoke test suite in `e2e/` for the most important browser-level flows:
+
+- unauthenticated dashboard redirect
+- authenticated dashboard access
+- admin permission gating
+- locale canonicalization for marketing routes
+
+Run the suite with:
+
+```bash
+pnpm test:e2e
+```
+
+The Playwright runner starts the production server through `pnpm start` and enables a test-only session route with `E2E_TEST_MODE=true`. That route is guarded by `E2E_TEST_SECRET` and should only be enabled from the Playwright runner or CI.
 
 #### Bundle Analysis Scripts
 

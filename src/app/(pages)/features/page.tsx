@@ -16,18 +16,18 @@ export async function generateMetadata() {
     ...metadata,
     title: "Features",
     description:
-      "Review the actual modules included in the SaaS Starter: auth, billing, admin tooling, uploads, localization, and content infrastructure.",
+      "Review the actual modules included in the SaaS Starter: auth, billing, admin tooling, uploads, localization, content infrastructure, and E2E smoke coverage.",
     openGraph: {
       ...metadata.openGraph,
       title: "Features",
       description:
-        "Review the actual modules included in the SaaS Starter: auth, billing, admin tooling, uploads, localization, and content infrastructure.",
+        "Review the actual modules included in the SaaS Starter: auth, billing, admin tooling, uploads, localization, content infrastructure, and E2E smoke coverage.",
     },
     twitter: {
       ...metadata.twitter,
       title: "Features",
       description:
-        "Review the actual modules included in the SaaS Starter: auth, billing, admin tooling, uploads, localization, and content infrastructure.",
+        "Review the actual modules included in the SaaS Starter: auth, billing, admin tooling, uploads, localization, content infrastructure, and E2E smoke coverage.",
     },
   };
 }
@@ -40,6 +40,7 @@ export default function FeaturesPage() {
     <>Admin pages for users, payments, subscriptions, and uploads</>,
     <>Cloudflare R2 upload flows for browser and server uploads</>,
     <>Markdown blog content, typed collections, and marketing pages</>,
+    <>Playwright smoke coverage for auth, admin access, and locale routing</>,
   ];
 
   const customizationItems = [

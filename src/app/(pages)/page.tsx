@@ -16,18 +16,18 @@ export async function generateMetadata() {
     ...metadata,
     title: "Micro SaaS Starter",
     description:
-      "Authentication, billing, uploads, and admin tooling for shipping a SaaS product faster.",
+      "Authentication, billing, uploads, admin tooling, and Playwright-backed smoke coverage for shipping a SaaS product faster.",
     openGraph: {
       ...metadata.openGraph,
       title: "Micro SaaS Starter",
       description:
-        "Authentication, billing, uploads, and admin tooling for shipping a SaaS product faster.",
+        "Authentication, billing, uploads, admin tooling, and Playwright-backed smoke coverage for shipping a SaaS product faster.",
     },
     twitter: {
       ...metadata.twitter,
       title: "Micro SaaS Starter",
       description:
-        "Authentication, billing, uploads, and admin tooling for shipping a SaaS product faster.",
+        "Authentication, billing, uploads, admin tooling, and Playwright-backed smoke coverage for shipping a SaaS product faster.",
     },
   };
 }

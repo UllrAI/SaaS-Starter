@@ -20,18 +20,18 @@ export async function generateMetadata() {
     ...metadata,
     title: "Blog",
     description:
-      "Read our latest blog posts and insights about technology, development, and industry trends.",
+      "Read our latest blog posts and insights about shipping, testing, and operating modern SaaS products.",
     openGraph: {
       ...metadata.openGraph,
       title: "Blog",
       description:
-        "Read our latest blog posts and insights about technology, development, and industry trends.",
+        "Read our latest blog posts and insights about shipping, testing, and operating modern SaaS products.",
     },
     twitter: {
       ...metadata.twitter,
       title: "Blog",
       description:
-        "Read our latest blog posts and insights about technology, development, and industry trends.",
+        "Read our latest blog posts and insights about shipping, testing, and operating modern SaaS products.",
     },
   };
 }
@@ -86,15 +86,16 @@ export default async function BlogPage() {
             <div className="border-border bg-background/50 mb-4 inline-flex items-center rounded-full border px-3 py-1 text-sm backdrop-blur-sm sm:mb-6">
               <Sparkles className="text-primary mr-2 h-3 w-3" />
               <span className="text-muted-foreground">
-                Latest insights and updates
+                Latest guides, testing notes, and updates
               </span>
             </div>
             <h1 className="text-foreground mb-4 text-3xl font-bold tracking-tight sm:mb-6 sm:text-4xl lg:text-5xl xl:text-6xl">
               Our Blog
             </h1>
             <p className="text-muted-foreground mx-auto max-w-3xl text-lg leading-relaxed sm:text-xl">
-              Discover insights, tutorials, and updates from our team. Stay
-              informed about the latest trends in technology and development.
+              Discover implementation notes, tutorials, and release updates
+              from our team. Stay current on how we build, test, and operate
+              this starter in practice.
             </p>
           </div>
         </div>

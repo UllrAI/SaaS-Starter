@@ -18,7 +18,11 @@ const customJestConfig = {
     // 处理模块别名 (这部分很快会被 next/jest 自动配置)
     "^@/(.*)$": "<rootDir>/src/$1",
   },
-  testPathIgnorePatterns: ["<rootDir>/node_modules/", "<rootDir>/.next/"],
+  testPathIgnorePatterns: [
+    "<rootDir>/node_modules/",
+    "<rootDir>/.next/",
+    "<rootDir>/e2e/",
+  ],
   // 如果你有名为 "email.test.tsx.disabled" 的文件，添加这一行来忽略它
   modulePathIgnorePatterns: ["<rootDir>/src/lib/email.test.tsx.disabled"],
 };

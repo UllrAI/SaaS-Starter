@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { getSessionCookie } from "better-auth/cookies";
 import { buildLoginRedirectPath } from "@/lib/auth/callback-url";
+import { hasAuthenticatedSession } from "@/lib/auth/session";
 import {
   LOCALE_COOKIE_NAME,
   LOCALE_HEADER_NAME,
@@ -66,8 +66,7 @@ export default async function authMiddleware(request: NextRequest) {
     const requestHeaders = createLocalizedRequestHeaders(request, preferredLocale);
 
     // Use better-auth helper to check the session cookie.
-    const sessionCookie = getSessionCookie(request);
-    const hasSession = !!sessionCookie;
+    const hasSession = await hasAuthenticatedSession(request);
 
     // Redirect unauthenticated users to login with callbackUrl.
     if (!hasSession) {

@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth/server";
 import { createPresignedUrl } from "@/lib/r2";
 import {
   isFileTypeAllowed,
@@ -8,16 +7,12 @@ import {
   formatFileSize,
   presignedUrlRequestSchema, // 导入 Zod schema
 } from "@/lib/config/upload";
+import { getAuthSessionFromHeaders } from "@/lib/auth/session";
 
 export async function POST(request: NextRequest) {
   try {
     // 1. 认证检查
-    const session = await auth.api.getSession({
-      headers: request.headers,
-      query: {
-        disableCookieCache: true,
-      },
-    });
+    const session = await getAuthSessionFromHeaders(request.headers);
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

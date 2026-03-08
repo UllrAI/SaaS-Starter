@@ -10,6 +10,7 @@ import {
   LayoutDashboard,
   LockKeyhole,
   Package2,
+  ShieldCheck,
 } from "lucide-react";
 
 interface Feature {
@@ -167,6 +168,24 @@ const features: Feature[] = [
       return <>i18n</>;
     },
   },
+  {
+    id: "testing",
+    Title: function FeatureTitleTesting() {
+      return <>Testing and regression coverage</>;
+    },
+    Description: function FeatureDescriptionTesting() {
+      return (
+        <>
+          Jest covers units and routes, while Playwright smoke tests exercise
+          auth redirects, admin gating, and locale routing in a real browser.
+        </>
+      );
+    },
+    icon: ShieldCheck,
+    Category: function FeatureCategoryTesting() {
+      return <>Quality</>;
+    },
+  },
 ];
 
 const featureStats = [
@@ -175,7 +194,7 @@ const featureStats = [
     Label: function FeatureStatLabelModules() {
       return <>Core modules</>;
     },
-    value: <span data-lingo-skip>8</span>,
+    value: <span data-lingo-skip>9</span>,
   },
   {
     id: "locales",

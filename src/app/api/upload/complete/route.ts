@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth/server";
 import { db } from "@/database";
 import { uploads } from "@/database/schema";
 import env from "@/env";
@@ -12,15 +11,11 @@ import {
   uploadCompleteRequestSchema,
 } from "@/lib/config/upload";
 import { fileExists } from "@/lib/r2";
+import { getAuthSessionFromHeaders } from "@/lib/auth/session";
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth.api.getSession({
-      headers: request.headers,
-      query: {
-        disableCookieCache: true,
-      },
-    });
+    const session = await getAuthSessionFromHeaders(request.headers);
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

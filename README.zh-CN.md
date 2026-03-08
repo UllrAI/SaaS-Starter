@@ -27,7 +27,7 @@
 - **表单处理 (Zod + React Hook Form):** 通过 [Zod](https://zod.dev/) 和 [React Hook Form](https://react-hook-form.com/) 实现强大的、类型安全的表单验证。
 - **文件上传 (Cloudflare R2):** 基于 Cloudflare R2 的安全文件上传系统，支持客户端直传和多种文件类型与大小限制。
 - **博客系统 (Content Collections):** 使用 [Content Collections](https://www.content-collections.dev/) 配合原生 Markdown 文件，提供类型安全的博客内容、元数据生成和站点地图输出。
-- **代码质量:** 内置 ESLint 和 Prettier，确保代码风格统一和质量。
+- **代码质量与验证:** 内置 ESLint、Prettier、Jest 和 Playwright 冒烟测试，用于守住关键链路不回退。
 
 ---
 
@@ -201,8 +201,26 @@ pnpm set:admin --email=your-email@example.com
 | `pnpm lint`            | 检查代码中的 linting 错误。        |
 | `pnpm type-check`      | 运行 TypeScript 类型检查。         |
 | `pnpm test`            | 运行单元测试并生成覆盖率报告。     |
+| `pnpm test:e2e`        | 构建并运行 Playwright E2E 冒烟测试。 |
 | `pnpm prettier:format` | 使用 Prettier 格式化所有代码。     |
 | `pnpm set:admin`       | 将指定邮箱的用户提升为超级管理员。 |
+
+## 🧪 E2E 测试
+
+仓库现在包含基于 Playwright 的 `e2e/` 冒烟测试，当前主要覆盖这些真实浏览器链路：
+
+- 未登录访问 dashboard 的重定向
+- 已登录用户访问 dashboard
+- admin 权限拦截与后台访问
+- marketing 路由的 locale 规范化
+
+运行方式：
+
+```bash
+pnpm test:e2e
+```
+
+Playwright 会通过 `pnpm start` 启动生产服务，并在测试期间启用仅供测试使用的会话入口：`E2E_TEST_MODE=true`。该入口受 `E2E_TEST_SECRET` 保护，只应在 Playwright 或 CI 环境下启用。
 
 #### 包体积分析脚本
 

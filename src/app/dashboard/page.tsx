@@ -29,57 +29,11 @@ import {
 } from "lucide-react";
 
 export async function generateMetadata() {
-  const metadata = createMetadata({});
-
-  return {
-    ...metadata,
+  return createMetadata({
     title: "Dashboard",
     description: "Account overview, billing status, and starter setup progress.",
-    openGraph: {
-      ...metadata.openGraph,
-      title: "Dashboard",
-      description: "Account overview, billing status, and starter setup progress.",
-    },
-    twitter: {
-      ...metadata.twitter,
-      title: "Dashboard",
-      description: "Account overview, billing status, and starter setup progress.",
-    },
-  };
+  });
 }
-
-const checklistLinks = [
-  {
-    id: "billing",
-    Title: function DashboardChecklistTitleBilling() {
-      return <>Review billing flow</>;
-    },
-    Description: function DashboardChecklistDescriptionBilling() {
-      return <>Check plan selection, checkout, and portal access.</>;
-    },
-    href: "/dashboard/billing",
-  },
-  {
-    id: "upload",
-    Title: function DashboardChecklistTitleUpload() {
-      return <>Verify uploads</>;
-    },
-    Description: function DashboardChecklistDescriptionUpload() {
-      return <>Test client and server uploads against your storage config.</>;
-    },
-    href: "/dashboard/upload",
-  },
-  {
-    id: "settings",
-    Title: function DashboardChecklistTitleSettings() {
-      return <>Finish account setup</>;
-    },
-    Description: function DashboardChecklistDescriptionSettings() {
-      return <>Update your profile and validate theme and locale preferences.</>;
-    },
-    href: "/dashboard/settings",
-  },
-];
 
 export default async function HomeRoute() {
   const user = await requireAuth();
@@ -102,6 +56,28 @@ export default async function HomeRoute() {
   const subscriptionLabel = subscription
     ? `${subscription.tierId.charAt(0).toUpperCase()}${subscription.tierId.slice(1)}`
     : "Free";
+  const checklistLinks = [
+    {
+      id: "billing",
+      title: <>Review billing flow</>,
+      description: <>Check plan selection, checkout, and portal access.</>,
+      href: "/dashboard/billing",
+    },
+    {
+      id: "upload",
+      title: <>Verify uploads</>,
+      description: <>Test client and server uploads against your storage config.</>,
+      href: "/dashboard/upload",
+    },
+    {
+      id: "settings",
+      title: <>Finish account setup</>,
+      description: (
+        <>Update your profile and validate theme and locale preferences.</>
+      ),
+      href: "/dashboard/settings",
+    },
+  ];
 
   return (
     <DashboardPageWrapper
@@ -194,31 +170,24 @@ export default async function HomeRoute() {
             </CardDescription>
           </CardHeader>
           <CardContent className="grid gap-3">
-            {checklistLinks.map((item) => {
-              const Title = item.Title;
-              const Description = item.Description;
-
-              return (
-                <div key={item.id} className="border-border border p-4">
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <p className="font-medium">
-                        <Title />
-                      </p>
-                      <p className="text-muted-foreground mt-1 text-sm">
-                        <Description />
-                      </p>
-                    </div>
-                    <Button asChild size="sm" variant="outline">
-                      <Link href={item.href}>
-                        <>Open</>
-                        <ArrowRight className="ml-2 h-4 w-4" />
-                      </Link>
-                    </Button>
+            {checklistLinks.map((item) => (
+              <div key={item.id} className="border-border border p-4">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="font-medium">{item.title}</p>
+                    <p className="text-muted-foreground mt-1 text-sm">
+                      {item.description}
+                    </p>
                   </div>
+                  <Button asChild size="sm" variant="outline">
+                    <Link href={item.href}>
+                      <>Open</>
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Link>
+                  </Button>
                 </div>
-              );
-            })}
+              </div>
+            ))}
           </CardContent>
         </Card>
 

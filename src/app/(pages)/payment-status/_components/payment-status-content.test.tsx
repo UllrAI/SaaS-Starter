@@ -149,7 +149,7 @@ describe("PaymentStatusContent", () => {
       ).toBeInTheDocument();
     });
 
-    expect(screen.getByText("Failed to check payment status")).toBeInTheDocument();
+    expect(screen.getByText("Failed to check payment status.")).toBeInTheDocument();
     expect(
       screen.getByRole("link", { name: /View Plans/i }),
     ).toHaveAttribute("href", "/pricing");

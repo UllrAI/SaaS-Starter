@@ -23,7 +23,6 @@ import {
 } from "@/lib/actions/admin";
 import { SubscriptionStatus } from "@/types/billing";
 import { useIntlLocale } from "@/hooks/use-intl-locale";
-import { defineCopyCatalog } from "@/lib/i18n/copy-catalog";
 
 interface SubscriptionManagementTableProps {
   initialData: SubscriptionWithUser[];
@@ -35,64 +34,23 @@ interface SubscriptionManagementTableProps {
   };
 }
 
-const SUBSCRIPTION_STATUS_COPY = defineCopyCatalog([
-  {
-    id: "active",
-    Label: function SubscriptionStatusActiveLabel() {
+function SubscriptionStatusLabel({ status }: { status: string }) {
+  switch (status) {
+    case "active":
       return <>Active</>;
-    },
-  },
-  {
-    id: "trialing",
-    Label: function SubscriptionStatusTrialingLabel() {
+    case "trialing":
       return <>Trialing</>;
-    },
-  },
-  {
-    id: "canceled",
-    Label: function SubscriptionStatusCanceledLabel() {
+    case "canceled":
       return <>Canceled</>;
-    },
-  },
-  {
-    id: "past_due",
-    Label: function SubscriptionStatusPastDueLabel() {
+    case "past_due":
       return <>Past Due</>;
-    },
-  },
-  {
-    id: "incomplete",
-    Label: function SubscriptionStatusIncompleteLabel() {
+    case "incomplete":
       return <>Incomplete</>;
-    },
-  },
-  {
-    id: "unpaid",
-    Label: function SubscriptionStatusUnpaidLabel() {
+    case "unpaid":
       return <>Unpaid</>;
-    },
-  },
-  {
-    id: "unknown",
-    Label: function SubscriptionStatusUnknownLabel() {
+    default:
       return <>Unknown</>;
-    },
-  },
-] satisfies ReadonlyArray<{
-  id: string;
-  Label: React.ComponentType;
-}>);
-
-function NoSubscriptionsFoundMessage() {
-  return <>No subscriptions found</>;
-}
-
-function SearchSubscriptionsPlaceholder() {
-  return <>Search by user name, email, or subscription ID...</>;
-}
-
-function FilterBySubscriptionStatusPlaceholder() {
-  return <>Filter by status</>;
+  }
 }
 
 export function SubscriptionManagementTable({
@@ -209,24 +167,13 @@ export function SubscriptionManagementTable({
       render: (sub) => <div className="font-medium">{sub.planName}</div>,
     },
     {
-    key: "status",
-    label: <>Status</>,
-    render: (sub) => {
-        const SubscriptionStatusLabel = (
-          SUBSCRIPTION_STATUS_COPY.entries.find(
-            (entry) => entry.id === sub.status,
-          ) ?? SUBSCRIPTION_STATUS_COPY.get("unknown")
-        ).Label;
-
-        return (
-          <Badge
-            variant={getStatusBadgeVariant(sub.status)}
-            className="capitalize"
-          >
-            <SubscriptionStatusLabel />
-          </Badge>
-        );
-      },
+      key: "status",
+      label: <>Status</>,
+      render: (sub) => (
+        <Badge variant={getStatusBadgeVariant(sub.status)} className="capitalize">
+          <SubscriptionStatusLabel status={sub.status} />
+        </Badge>
+      ),
     },
     {
       key: "period",
@@ -275,14 +222,14 @@ export function SubscriptionManagementTable({
         error={error}
         searchTerm={searchTerm}
         onSearchChange={handleSearch}
-        searchPlaceholder={<SearchSubscriptionsPlaceholder />}
+        searchPlaceholder={<>Search by user name, email, or subscription ID...</>}
         filterValue={statusFilter}
         onFilterChange={handleStatusFilter}
         filterOptions={statusFilterOptions}
-        filterPlaceholder={<FilterBySubscriptionStatusPlaceholder />}
+        filterPlaceholder={<>Filter by status</>}
         pagination={pagination}
         onPageChange={handlePageChange}
-        emptyMessage={<NoSubscriptionsFoundMessage />}
+        emptyMessage={<>No subscriptions found</>}
       />
       <Dialog
         open={!!cancellingSubscription}

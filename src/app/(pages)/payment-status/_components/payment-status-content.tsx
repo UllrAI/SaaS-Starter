@@ -20,9 +20,10 @@ import {
   Sparkles,
 } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { type ReactNode, useEffect, useRef, useState } from "react";
 
 type PaymentStatus = "success" | "failed" | "pending" | "cancelled";
+type PaymentStatusErrorCode = "missing_reference" | "status_check_failed";
 
 const DIRECT_STATUS_MAP: Record<
   Exclude<PaymentStatus, "success">,
@@ -34,155 +35,143 @@ const DIRECT_STATUS_MAP: Record<
 };
 
 interface StatusConfig {
-  icon: React.ReactNode;
-  Title: React.ComponentType;
-  Description: React.ComponentType;
+  badgeText: ReactNode;
   badgeVariant: "default" | "destructive" | "secondary" | "outline";
-  BadgeText: React.ComponentType;
+  description: ReactNode;
+  icon: ReactNode;
   primaryAction: {
-    Text: React.ComponentType;
     href: string;
+    text: ReactNode;
     variant: "default" | "destructive" | "outline" | "secondary";
   };
   secondaryAction?: {
-    Text: React.ComponentType;
     href: string;
+    text: ReactNode;
   };
+  title: ReactNode;
 }
 
-const statusConfigs: Record<PaymentStatus, StatusConfig> = {
-  success: {
-    icon: <CheckCircle className="h-20 w-20 text-emerald-500" />,
-    Title: function PaymentStatusTitleSuccess() {
-      return <>Payment Successful!</>;
-    },
-    Description: function PaymentStatusDescriptionSuccess() {
+function getStatusConfig(status: PaymentStatus): StatusConfig {
+  switch (status) {
+    case "success":
+      return {
+        badgeText: <>Payment Completed</>,
+        badgeVariant: "default",
+        description: (
+          <>
+            Thank you for your purchase! Your subscription has been activated
+            and you now have access to all premium features.
+          </>
+        ),
+        icon: <CheckCircle className="h-20 w-20 text-emerald-500" />,
+        primaryAction: {
+          href: "/dashboard",
+          text: <>Access Dashboard</>,
+          variant: "default",
+        },
+        secondaryAction: {
+          href: "/dashboard/billing",
+          text: <>Manage Billing</>,
+        },
+        title: <>Payment Successful!</>,
+      };
+    case "failed":
+      return {
+        badgeText: <>Payment Failed</>,
+        badgeVariant: "destructive",
+        description: (
+          <>
+            We couldn&apos;t process your payment. Please check your payment
+            method and try again, or contact our support team for assistance.
+          </>
+        ),
+        icon: <XCircle className="h-20 w-20 text-red-500" />,
+        primaryAction: {
+          href: "/pricing",
+          text: <>Try Again</>,
+          variant: "default",
+        },
+        secondaryAction: {
+          href: "/contact",
+          text: <>Contact Support</>,
+        },
+        title: <>Payment Failed</>,
+      };
+    case "pending":
+      return {
+        badgeText: <>Processing</>,
+        badgeVariant: "secondary",
+        description: (
+          <>
+            Your payment is being processed. This may take a few minutes. The
+            page will automatically refresh to show the latest status.
+          </>
+        ),
+        icon: <Clock className="h-20 w-20 text-amber-500" />,
+        primaryAction: {
+          href: "/dashboard",
+          text: <>Go to Dashboard</>,
+          variant: "outline",
+        },
+        secondaryAction: {
+          href: "/dashboard/billing",
+          text: <>Check Status</>,
+        },
+        title: <>Payment Processing</>,
+      };
+    case "cancelled":
+      return {
+        badgeText: <>Cancelled</>,
+        badgeVariant: "outline",
+        description: (
+          <>
+            You cancelled the payment process. No charges have been made to
+            your account. You can try again anytime.
+          </>
+        ),
+        icon: <AlertCircle className="h-20 w-20 text-slate-500" />,
+        primaryAction: {
+          href: "/pricing",
+          text: <>View Plans</>,
+          variant: "default",
+        },
+        secondaryAction: {
+          href: "/dashboard",
+          text: <>Go to Dashboard</>,
+        },
+        title: <>Payment Cancelled</>,
+      };
+  }
+}
+
+function PaymentStatusErrorMessage({
+  code,
+}: {
+  code: PaymentStatusErrorCode;
+}) {
+  switch (code) {
+    case "missing_reference":
       return (
         <>
-          Thank you for your purchase! Your subscription has been activated and
-          you now have access to all premium features.
+          We are still verifying this payment because the checkout reference is
+          missing.
         </>
       );
-    },
-    badgeVariant: "default",
-    BadgeText: function PaymentStatusBadgeSuccess() {
-      return <>Payment Completed</>;
-    },
-    primaryAction: {
-      Text: function PaymentStatusPrimarySuccess() {
-        return <>Access Dashboard</>;
-      },
-      href: "/dashboard",
-      variant: "default",
-    },
-    secondaryAction: {
-      Text: function PaymentStatusSecondarySuccess() {
-        return <>Manage Billing</>;
-      },
-      href: "/dashboard/billing",
-    },
-  },
-  failed: {
-    icon: <XCircle className="h-20 w-20 text-red-500" />,
-    Title: function PaymentStatusTitleFailed() {
-      return <>Payment Failed</>;
-    },
-    Description: function PaymentStatusDescriptionFailed() {
-      return (
-        <>
-          We couldn&apos;t process your payment. Please check your payment
-          method and try again, or contact our support team for assistance.
-        </>
-      );
-    },
-    badgeVariant: "destructive",
-    BadgeText: function PaymentStatusBadgeFailed() {
-      return <>Payment Failed</>;
-    },
-    primaryAction: {
-      Text: function PaymentStatusPrimaryFailed() {
-        return <>Try Again</>;
-      },
-      href: "/pricing",
-      variant: "default",
-    },
-    secondaryAction: {
-      Text: function PaymentStatusSecondaryFailed() {
-        return <>Contact Support</>;
-      },
-      href: "/contact",
-    },
-  },
-  pending: {
-    icon: <Clock className="h-20 w-20 text-amber-500" />,
-    Title: function PaymentStatusTitlePending() {
-      return <>Payment Processing</>;
-    },
-    Description: function PaymentStatusDescriptionPending() {
-      return (
-        <>
-          Your payment is being processed. This may take a few minutes. The page
-          will automatically refresh to show the latest status.
-        </>
-      );
-    },
-    badgeVariant: "secondary",
-    BadgeText: function PaymentStatusBadgePending() {
-      return <>Processing</>;
-    },
-    primaryAction: {
-      Text: function PaymentStatusPrimaryPending() {
-        return <>Go to Dashboard</>;
-      },
-      href: "/dashboard",
-      variant: "outline",
-    },
-    secondaryAction: {
-      Text: function PaymentStatusSecondaryPending() {
-        return <>Check Status</>;
-      },
-      href: "/dashboard/billing",
-    },
-  },
-  cancelled: {
-    icon: <AlertCircle className="h-20 w-20 text-slate-500" />,
-    Title: function PaymentStatusTitleCancelled() {
-      return <>Payment Cancelled</>;
-    },
-    Description: function PaymentStatusDescriptionCancelled() {
-      return (
-        <>
-          You cancelled the payment process. No charges have been made to your
-          account. You can try again anytime.
-        </>
-      );
-    },
-    badgeVariant: "outline",
-    BadgeText: function PaymentStatusBadgeCancelled() {
-      return <>Cancelled</>;
-    },
-    primaryAction: {
-      Text: function PaymentStatusPrimaryCancelled() {
-        return <>View Plans</>;
-      },
-      href: "/pricing",
-      variant: "default",
-    },
-    secondaryAction: {
-      Text: function PaymentStatusSecondaryCancelled() {
-        return <>Go to Dashboard</>;
-      },
-      href: "/dashboard",
-    },
-  },
-};
+    case "status_check_failed":
+      return <>Failed to check payment status.</>;
+    default:
+      return null;
+  }
+}
 
 export function PaymentStatusContent() {
   const searchParams = useSearchParams();
   const [status, setStatus] = useState<PaymentStatus | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [errorCode, setErrorCode] = useState<PaymentStatusErrorCode | null>(
+    null,
+  );
   const pollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -215,7 +204,7 @@ export function PaymentStatusContent() {
             if (!isActive) return;
 
             setStatus(data.status as PaymentStatus);
-            setError(null);
+            setErrorCode(null);
 
             if (data.status === "pending") {
               clearPollTimeout();
@@ -231,28 +220,26 @@ export function PaymentStatusContent() {
           setStatus(
             DIRECT_STATUS_MAP[statusParam as keyof typeof DIRECT_STATUS_MAP],
           );
-          setError(null);
+          setErrorCode(null);
           setIsLoading(false);
           return;
         }
 
         if (statusParam === "success") {
           setStatus("pending");
-          setError(
-            "We are still verifying this payment because the checkout reference is missing.",
-          );
+          setErrorCode("missing_reference");
           setIsLoading(false);
           return;
         }
 
         setStatus("pending");
-        setError(null);
+        setErrorCode(null);
       } catch (err) {
         if (!isActive) return;
         if (err instanceof DOMException && err.name === "AbortError") return;
 
         console.error("Error checking payment status:", err);
-        setError("Failed to check payment status");
+        setErrorCode("status_check_failed");
         const statusParam = searchParams.get("status") as PaymentStatus;
         setStatus(
           statusParam && statusParam in DIRECT_STATUS_MAP
@@ -296,16 +283,16 @@ export function PaymentStatusContent() {
               <div className="mb-4 flex justify-center">
                 <Badge variant="secondary" className="gap-2">
                   <Clock className="h-3 w-3" />
-                  Verifying Payment
+                  <>Verifying Payment</>
                 </Badge>
               </div>
 
               <h1 className="mb-3 text-xl font-semibold">
-                Checking Payment Status
+                <>Checking Payment Status</>
               </h1>
 
               <p className="text-muted-foreground text-sm leading-relaxed">
-                Please wait while we confirm your payment...
+                <>Please wait while we confirm your payment...</>
               </p>
             </CardContent>
           </Card>
@@ -314,12 +301,7 @@ export function PaymentStatusContent() {
     );
   }
 
-  const config = statusConfigs[status];
-  const Title = config.Title;
-  const Description = config.Description;
-  const BadgeText = config.BadgeText;
-  const PrimaryActionText = config.primaryAction.Text;
-  const SecondaryActionText = config.secondaryAction?.Text;
+  const config = getStatusConfig(status);
 
   return (
     <section className="bg-background relative flex min-h-screen items-center justify-center overflow-hidden">
@@ -337,7 +319,7 @@ export function PaymentStatusContent() {
             {status === "failed" && <AlertCircle className="h-3 w-3" />}
             {status === "pending" && <Clock className="h-3 w-3" />}
             {status === "cancelled" && <XCircle className="h-3 w-3" />}
-            <BadgeText />
+            {config.badgeText}
           </Badge>
         </div>
 
@@ -356,12 +338,12 @@ export function PaymentStatusContent() {
 
             {/* Title */}
             <h1 className="text-foreground mb-4 text-3xl font-bold tracking-tight sm:text-4xl">
-              <Title />
+              {config.title}
             </h1>
 
             {/* Description */}
             <p className="text-muted-foreground mb-8 text-lg leading-relaxed">
-              <Description />
+              {config.description}
             </p>
 
             {/* Session ID */}
@@ -380,10 +362,12 @@ export function PaymentStatusContent() {
             )}
 
             {/* Error Message */}
-            {error && (
+            {errorCode && (
               <Alert variant="destructive" className="mb-8">
                 <AlertCircle className="h-4 w-4" />
-                <AlertDescription>{error}</AlertDescription>
+                <AlertDescription>
+                  <PaymentStatusErrorMessage code={errorCode} />
+                </AlertDescription>
               </Alert>
             )}
 
@@ -403,7 +387,7 @@ export function PaymentStatusContent() {
                   {status === "failed" && <ArrowRight className="h-4 w-4" />}
                   {status === "pending" && <Home className="h-4 w-4" />}
                   {status === "cancelled" && <ArrowRight className="h-4 w-4" />}
-                  <PrimaryActionText />
+                  {config.primaryAction.text}
                 </Link>
               </Button>
 
@@ -422,7 +406,7 @@ export function PaymentStatusContent() {
                     {status === "failed" && <Mail className="h-4 w-4" />}
                     {status === "pending" && <CreditCard className="h-4 w-4" />}
                     {status === "cancelled" && <Home className="h-4 w-4" />}
-                    {SecondaryActionText ? <SecondaryActionText /> : null}
+                    {config.secondaryAction.text}
                   </Link>
                 </Button>
               )}

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import {
   Card,
   CardContent,
@@ -15,222 +15,124 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import {
-  Check,
-  Zap,
   Calendar,
+  Check,
   CreditCard,
   Loader2,
   LogIn,
   Terminal,
+  Zap,
 } from "lucide-react";
 import { PRODUCT_TIERS, type PricingTier } from "@/lib/config/products";
 import { useSession } from "@/lib/auth/client";
 import { useRouter } from "nextjs-toploader/app";
-import type { PaymentMode, BillingCycle } from "@/types/billing";
+import type { BillingCycle, PaymentMode } from "@/types/billing";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "./ui/skeleton";
 import { useIntlLocale } from "@/hooks/use-intl-locale";
 import { getSafeBillingRedirectUrl } from "@/lib/billing/url";
-import { defineCopyCatalog } from "@/lib/i18n/copy-catalog";
 
-// Helper: Format Price
-const formatPrice = (
-  price: number,
-  locale: string,
-  currency: string = "USD",
-) => {
+type CheckoutMessageCode =
+  | "checkout_failed"
+  | "initializing_checkout"
+  | "invalid_request"
+  | "login_required"
+  | "subscription_active"
+  | "unexpected_checkout_error"
+  | "unsafe_checkout_url";
+
+type CheckoutResponse = {
+  checkoutUrl?: string;
+  code?: string;
+  managementUrl?: string;
+};
+
+function formatPrice(price: number, locale: string, currency = "USD") {
   return new Intl.NumberFormat(locale, {
     style: "currency",
     currency,
   }).format(price);
-};
+}
 
-const PAYMENT_MODE_COPY = defineCopyCatalog([
-  {
-    id: "subscription",
-    Label: function PricingModeSubscriptionLabel() {
-      return <>Subscription</>;
-    },
-  },
-  {
-    id: "one_time",
-    Label: function PricingModeOneTimeLabel() {
-      return <>One-Time</>;
-    },
-  },
-] satisfies ReadonlyArray<{
-  id: PaymentMode;
-  Label: React.ComponentType;
-}>);
+function PaymentModeLabel({ mode }: { mode: PaymentMode }) {
+  return mode === "subscription" ? <>Subscription</> : <>One-Time</>;
+}
 
-const BILLING_CYCLE_COPY = defineCopyCatalog([
-  {
-    id: "monthly",
-    Label: function BillingCycleMonthlyLabel() {
-      return <>Monthly</>;
-    },
-  },
-  {
-    id: "yearly",
-    Label: function BillingCycleYearlyLabel() {
-      return <>Yearly</>;
-    },
-  },
-] satisfies ReadonlyArray<{
-  id: BillingCycle;
-  Label: React.ComponentType;
-}>);
+function BillingCycleLabel({ cycle }: { cycle: BillingCycle }) {
+  return cycle === "monthly" ? <>Monthly</> : <>Yearly</>;
+}
 
-const TIER_UI_COPY = defineCopyCatalog([
-  {
-    id: "discount",
-    Label: function BillingCycleDiscountLabel() {
-      return <>Save 17%</>;
-    },
-  },
-  {
-    id: "recommended",
-    Label: function TierBadgeRecommendedLabel() {
-      return <>RECOMMENDED</>;
-    },
-  },
-  {
-    id: "oneTime",
-    Label: function TierBillingOneTimeLabel() {
-      return <>One-time purchase, no automatic renewal</>;
-    },
-  },
-  {
-    id: "annually",
-    Label: function TierBillingAnnualLabel() {
-      return <>Billed annually</>;
-    },
-  },
-  {
-    id: "monthly",
-    Label: function TierBillingMonthlyLabel() {
-      return <>Billed monthly</>;
-    },
-  },
-  {
-    id: "processing",
-    Label: function TierActionProcessingLabel() {
-      return <>PROCESSING</>;
-    },
-  },
-  {
-    id: "loginToBuy",
-    Label: function TierActionLoginToBuyLabel() {
-      return <>LOGIN TO BUY</>;
-    },
-  },
-  {
-    id: "loginAction",
-    Label: function TierToastLoginActionLabel() {
-      return <>Login</>;
-    },
-  },
-  {
-    id: "managePlanAction",
-    Label: function TierToastManagePlanActionLabel() {
-      return <>Manage Plan</>;
-    },
-  },
-] as const satisfies ReadonlyArray<{
-  id:
-    | "discount"
-    | "recommended"
-    | "oneTime"
-    | "annually"
-    | "monthly"
-    | "processing"
-    | "loginToBuy"
-    | "loginAction"
-    | "managePlanAction";
-  Label: React.ComponentType;
-}>);
+function TierBillingLabel({
+  billingCycle,
+  paymentMode,
+}: {
+  billingCycle: BillingCycle;
+  paymentMode: PaymentMode;
+}) {
+  if (paymentMode === "one_time") {
+    return <>One-time purchase, no automatic renewal</>;
+  }
 
-const PRICING_TIER_COPY = defineCopyCatalog([
-  {
-    id: "plus",
-    Description: function TierDescriptionPlus() {
-      return <>Core starter package for solo builders shipping the basics</>;
-    },
-  },
-  {
-    id: "pro",
-    Description: function TierDescriptionPro() {
-      return <>Full-featured starter package for teams shipping a real MVP</>;
-    },
-  },
-  {
-    id: "team",
-    Description: function TierDescriptionTeam() {
-      return <>Everything in Professional plus rollout support for teams</>;
-    },
-  },
-] satisfies ReadonlyArray<{
-  id: PricingTier["id"];
-  Description: React.ComponentType;
-}>);
+  return billingCycle === "yearly" ? <>Billed annually</> : <>Billed monthly</>;
+}
 
-const PRICING_FEATURE_COPY = defineCopyCatalog([
-  {
-    id: "marketing-foundation",
-    Label: function TierFeatureMarketingFoundation() {
-      return <>Marketing pages and blog foundation</>;
-    },
-  },
-  {
-    id: "auth-dashboard",
-    Label: function TierFeatureAuthDashboard() {
-      return <>Authentication and protected dashboard</>;
-    },
-  },
-  {
-    id: "billing-flow",
-    Label: function TierFeatureBillingFlow() {
-      return <>Creem checkout and billing portal flow</>;
-    },
-  },
-  {
-    id: "admin-operations",
-    Label: function TierFeatureAdminOperations() {
-      return <>Admin operations screens</>;
-    },
-  },
-  {
-    id: "r2-uploads",
-    Label: function TierFeatureR2Uploads() {
-      return <>Cloudflare R2 upload workflows</>;
-    },
-  },
-  {
-    id: "localization-setup",
-    Label: function TierFeatureLocalizationSetup() {
-      return <>Localization setup</>;
-    },
-  },
-  {
-    id: "implementation-guidance",
-    Label: function TierFeatureImplementationGuidance() {
-      return <>Implementation guidance</>;
-    },
-  },
-] satisfies ReadonlyArray<{
-  id:
-    | "marketing-foundation"
-    | "auth-dashboard"
-    | "billing-flow"
-    | "admin-operations"
-    | "r2-uploads"
-    | "localization-setup"
-    | "implementation-guidance";
-  Label: React.ComponentType;
-}>);
+function CheckoutMessage({ code }: { code: CheckoutMessageCode }) {
+  switch (code) {
+    case "checkout_failed":
+      return <>Failed to create checkout session. Please try again later.</>;
+    case "initializing_checkout":
+      return <>Initializing secure checkout sequence...</>;
+    case "invalid_request":
+      return <>Unable to start checkout with the current selection.</>;
+    case "login_required":
+      return <>Please log in to continue purchase.</>;
+    case "subscription_active":
+      return <>Subscription already active.</>;
+    case "unsafe_checkout_url":
+      return <>The checkout link was blocked because it looked unsafe.</>;
+    case "unexpected_checkout_error":
+      return <>An unexpected error occurred.</>;
+    default:
+      return null;
+  }
+}
 
 function TierActionGetLabel({ tierName }: { tierName: string }) {
   return <>GET {tierName.toUpperCase()}</>;
+}
+
+function isCheckoutMessageCode(
+  value: string | undefined,
+): value is CheckoutMessageCode {
+  return (
+    value === "checkout_failed" ||
+    value === "initializing_checkout" ||
+    value === "invalid_request" ||
+    value === "login_required" ||
+    value === "subscription_active" ||
+    value === "unexpected_checkout_error" ||
+    value === "unsafe_checkout_url"
+  );
+}
+
+function resolveCheckoutMessageCode(
+  status: number,
+  code: string | undefined,
+): CheckoutMessageCode {
+  if (isCheckoutMessageCode(code)) {
+    return code;
+  }
+
+  switch (status) {
+    case 400:
+      return "invalid_request";
+    case 401:
+      return "login_required";
+    case 409:
+      return "subscription_active";
+    default:
+      return "checkout_failed";
+  }
 }
 
 export function PricingSection({ className }: { className?: string }) {
@@ -238,31 +140,90 @@ export function PricingSection({ className }: { className?: string }) {
   const [paymentMode, setPaymentMode] = useState<PaymentMode>("subscription");
   const [billingCycle, setBillingCycle] = useState<BillingCycle>("yearly");
   const [loadingState, setLoadingState] = useState<{
-    tierId: string;
-    mode: PaymentMode;
     cycle?: BillingCycle;
+    mode: PaymentMode;
+    tierId: string;
   } | null>(null);
+  const [mounted, setMounted] = useState(false);
 
   const { data: session, isPending: isSessionLoading } = useSession();
   const router = useRouter();
-  const SubscriptionLabel = PAYMENT_MODE_COPY.get("subscription").Label;
-  const OneTimeLabel = PAYMENT_MODE_COPY.get("one_time").Label;
-  const MonthlyLabel = BILLING_CYCLE_COPY.get("monthly").Label;
-  const YearlyLabel = BILLING_CYCLE_COPY.get("yearly").Label;
-  const DiscountLabel = TIER_UI_COPY.get("discount").Label;
-  const RecommendedLabel = TIER_UI_COPY.get("recommended").Label;
-  const OneTimeBillingLabel = TIER_UI_COPY.get("oneTime").Label;
-  const AnnualBillingLabel = TIER_UI_COPY.get("annually").Label;
-  const MonthlyBillingLabel = TIER_UI_COPY.get("monthly").Label;
-  const ProcessingLabel = TIER_UI_COPY.get("processing").Label;
-  const LoginToBuyLabel = TIER_UI_COPY.get("loginToBuy").Label;
-  const LoginActionLabel = TIER_UI_COPY.get("loginAction").Label;
-  const ManagePlanActionLabel = TIER_UI_COPY.get("managePlanAction").Label;
+  const featureDefinitions = [
+    {
+      id: "marketing-foundation",
+      label: <>Marketing pages and blog foundation</>,
+    },
+    {
+      id: "auth-dashboard",
+      label: <>Authentication and protected dashboard</>,
+    },
+    {
+      id: "billing-flow",
+      label: <>Creem checkout and billing portal flow</>,
+    },
+    {
+      id: "admin-operations",
+      label: <>Admin operations screens</>,
+    },
+    {
+      id: "r2-uploads",
+      label: <>Cloudflare R2 upload workflows</>,
+    },
+    {
+      id: "localization-setup",
+      label: <>Localization setup</>,
+    },
+    {
+      id: "implementation-guidance",
+      label: <>Implementation guidance</>,
+    },
+  ] as const satisfies ReadonlyArray<{
+    id: string;
+    label: ReactNode;
+  }>;
+  type FeatureId = (typeof featureDefinitions)[number]["id"];
+  const allFeatureIds = featureDefinitions.map((feature) => feature.id) as Array<
+    FeatureId
+  >;
+  const tierCopyById: Record<
+    string,
+    {
+      description: ReactNode;
+      includedFeatureIds: readonly FeatureId[];
+    }
+  > = {
+    plus: {
+      description: <>Core starter package for solo builders shipping the basics</>,
+      includedFeatureIds: [
+        "marketing-foundation",
+        "auth-dashboard",
+        "billing-flow",
+      ],
+    },
+    pro: {
+      description: <>Full-featured starter package for teams shipping a real MVP</>,
+      includedFeatureIds: [
+        "marketing-foundation",
+        "auth-dashboard",
+        "billing-flow",
+        "admin-operations",
+        "r2-uploads",
+        "localization-setup",
+      ],
+    },
+    team: {
+      description: <>Everything in Professional plus rollout support for teams</>,
+      includedFeatureIds: allFeatureIds,
+    },
+  };
 
-  const [mounted, setMounted] = useState(false);
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  const redirectToLogin = () => {
+    router.push("/login?redirect=/pricing");
+  };
 
   const handleCheckout = async (
     tier: PricingTier,
@@ -270,18 +231,18 @@ export function PricingSection({ className }: { className?: string }) {
     cycle?: BillingCycle,
   ) => {
     if (!session?.user) {
-      toast.error(<>Please log in to continue purchase.</>, {
+      toast.error(<CheckoutMessage code="login_required" />, {
         action: {
-          label: <LoginActionLabel />,
-          onClick: () => router.push("/login?redirect=/pricing"),
+          label: <>Login</>,
+          onClick: redirectToLogin,
         },
       });
-      router.push("/login?redirect=/pricing");
+      redirectToLogin();
       return;
     }
 
     setLoadingState({ tierId: tier.id, mode, cycle });
-    toast.info(<>Initializing secure checkout sequence...</>);
+    toast.info(<CheckoutMessage code="initializing_checkout" />);
 
     let isRedirecting = false;
 
@@ -296,29 +257,48 @@ export function PricingSection({ className }: { className?: string }) {
         }),
       });
 
-      const data = await response.json();
+      const data = (await response.json()) as CheckoutResponse;
 
       if (response.status === 409) {
         const safeManagementUrl = getSafeBillingRedirectUrl(
           data.managementUrl,
           window.location,
         );
-        toast.error(data.error || "Subscription already active.", {
-          description: undefined,
-          ...(safeManagementUrl
-            ? {
-                action: {
-                  label: <ManagePlanActionLabel />,
-                  onClick: () => {
-                    window.location.href = safeManagementUrl;
+
+        toast.error(
+          <CheckoutMessage
+            code={resolveCheckoutMessageCode(response.status, data.code)}
+          />,
+          {
+            description: undefined,
+            ...(safeManagementUrl
+              ? {
+                  action: {
+                    label: <>Manage Plan</>,
+                    onClick: () => {
+                      window.location.href = safeManagementUrl;
+                    },
                   },
-                },
-              }
-            : {}),
-        });
+                }
+              : {}),
+          },
+        );
+
         if (data.managementUrl && !safeManagementUrl) {
           console.warn("Blocked unsafe managementUrl redirect.");
         }
+
+        return;
+      }
+
+      if (response.status === 401) {
+        toast.error(<CheckoutMessage code="login_required" />, {
+          action: {
+            label: <>Login</>,
+            onClick: redirectToLogin,
+          },
+        });
+        redirectToLogin();
         return;
       }
 
@@ -326,22 +306,27 @@ export function PricingSection({ className }: { className?: string }) {
         data.checkoutUrl,
         window.location,
       );
+
       if (response.ok && safeCheckoutUrl) {
         isRedirecting = true;
         window.location.href = safeCheckoutUrl;
-      } else {
-        if (response.ok && data.checkoutUrl && !safeCheckoutUrl) {
-          throw new Error("Received an unsafe checkout URL.");
-        }
-        throw new Error(data.error || "Failed to create checkout session.");
+        return;
       }
+
+      if (response.ok && data.checkoutUrl && !safeCheckoutUrl) {
+        throw new Error("unsafe_checkout_url");
+      }
+
+      throw new Error(resolveCheckoutMessageCode(response.status, data.code));
     } catch (error) {
       console.error("Checkout Error:", error);
-      toast.error(
-        error instanceof Error
+
+      const code =
+        error instanceof Error && isCheckoutMessageCode(error.message)
           ? error.message
-          : "An unexpected error occurred.",
-      );
+          : "unexpected_checkout_error";
+
+      toast.error(<CheckoutMessage code={code} />);
     } finally {
       if (!isRedirecting) {
         setLoadingState(null);
@@ -351,11 +336,10 @@ export function PricingSection({ className }: { className?: string }) {
 
   return (
     <div className={cn("w-full", className)}>
-      {/* Payment Mode Selection */}
       <div className="mb-8 text-center">
         <Tabs
           value={paymentMode}
-          onValueChange={(v) => setPaymentMode(v as PaymentMode)}
+          onValueChange={(value) => setPaymentMode(value as PaymentMode)}
           className="mx-auto w-full max-w-sm"
         >
           <TabsList className="bg-muted/50 grid h-11 w-full grid-cols-2 p-1">
@@ -363,32 +347,33 @@ export function PricingSection({ className }: { className?: string }) {
               value="subscription"
               className="data-[state=active]:bg-background flex items-center gap-2 text-sm font-medium transition-all data-[state=active]:shadow-sm"
             >
-              <Calendar className="h-4 w-4" /> <SubscriptionLabel />
+              <Calendar className="h-4 w-4" />
+              <PaymentModeLabel mode="subscription" />
             </TabsTrigger>
             <TabsTrigger
               value="one_time"
               className="data-[state=active]:bg-background flex items-center gap-2 text-sm font-medium transition-all data-[state=active]:shadow-sm"
             >
-              <CreditCard className="h-4 w-4" /> <OneTimeLabel />
+              <CreditCard className="h-4 w-4" />
+              <PaymentModeLabel mode="one_time" />
             </TabsTrigger>
           </TabsList>
         </Tabs>
       </div>
 
-      {/* Billing Cycle Toggle */}
       {paymentMode === "subscription" && (
         <div className="mb-10 flex flex-col items-center gap-3">
-          <div className="bg-muted/30 flex items-center justify-center gap-3 rounded-full border p-1">
+          <div className="bg-muted/30 flex items-center justify-center gap-3 rounded-sm border p-1">
             <Label
               htmlFor="billing-toggle"
               className={cn(
-                "cursor-pointer rounded-full px-4 py-1.5 text-sm font-medium transition-all select-none",
+                "cursor-pointer rounded-sm px-4 py-1.5 text-sm font-medium transition-all select-none",
                 billingCycle === "monthly"
                   ? "bg-background text-foreground shadow-sm"
                   : "text-muted-foreground hover:text-foreground",
               )}
             >
-              <MonthlyLabel />
+              <BillingCycleLabel cycle="monthly" />
             </Label>
             <Switch
               id="billing-toggle"
@@ -401,13 +386,13 @@ export function PricingSection({ className }: { className?: string }) {
             <Label
               htmlFor="billing-toggle"
               className={cn(
-                "cursor-pointer rounded-full px-4 py-1.5 text-sm font-medium transition-all select-none",
+                "cursor-pointer rounded-sm px-4 py-1.5 text-sm font-medium transition-all select-none",
                 billingCycle === "yearly"
                   ? "bg-background text-foreground shadow-sm"
                   : "text-muted-foreground hover:text-foreground",
               )}
             >
-              <YearlyLabel />
+              <BillingCycleLabel cycle="yearly" />
             </Label>
           </div>
           <div className="flex h-7 items-center justify-center">
@@ -416,17 +401,17 @@ export function PricingSection({ className }: { className?: string }) {
                 variant="outline"
                 className="animate-in fade-in-0 border-emerald-500/30 bg-emerald-500/10 text-emerald-600 duration-300 dark:text-emerald-400"
               >
-                <Zap className="mr-1.5 h-3 w-3" /> <DiscountLabel />
+                <Zap className="mr-1.5 h-3 w-3" />
+                <>Save 17%</>
               </Badge>
             )}
           </div>
         </div>
       )}
 
-      {/* Pricing Cards */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3 lg:gap-8">
         {PRODUCT_TIERS.map((tier) => {
-          const TierDescription = PRICING_TIER_COPY.get(tier.id).Description;
+          const tierCopy = tierCopyById[tier.id as keyof typeof tierCopyById];
           const price =
             paymentMode === "one_time"
               ? tier.prices.oneTime
@@ -454,7 +439,7 @@ export function PricingSection({ className }: { className?: string }) {
               {tier.isPopular && (
                 <div className="absolute -top-3 left-1/2 z-10 -translate-x-1/2">
                   <Badge className="bg-primary text-primary-foreground hover:bg-primary px-3 py-1 text-xs font-bold shadow-sm">
-                    <RecommendedLabel />
+                    <>RECOMMENDED</>
                   </Badge>
                 </div>
               )}
@@ -464,7 +449,7 @@ export function PricingSection({ className }: { className?: string }) {
                   {tier.name}
                 </CardTitle>
                 <CardDescription className="text-muted-foreground mx-auto max-w-[200px] text-sm leading-relaxed">
-                  <TierDescription />
+                  {tierCopy.description}
                 </CardDescription>
                 <div className="mt-6 space-y-2">
                   <div className="flex items-baseline justify-center gap-1">
@@ -487,13 +472,10 @@ export function PricingSection({ className }: { className?: string }) {
                   </div>
                   <div className="flex h-5 items-center justify-center">
                     <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
-                      {paymentMode === "one_time" ? (
-                        <OneTimeBillingLabel />
-                      ) : billingCycle === "yearly" ? (
-                        <AnnualBillingLabel />
-                      ) : (
-                        <MonthlyBillingLabel />
-                      )}
+                      <TierBillingLabel
+                        billingCycle={billingCycle}
+                        paymentMode={paymentMode}
+                      />
                     </p>
                   </div>
                 </div>
@@ -502,10 +484,10 @@ export function PricingSection({ className }: { className?: string }) {
               <CardContent className="flex flex-1 flex-col px-6 pt-0 pb-8">
                 <div className="bg-muted/30 mb-6 h-px w-full" />
                 <div className="mb-8 flex-1 space-y-4">
-                  {tier.features.map((feature, index) => {
-                    const TierFeatureLabel = PRICING_FEATURE_COPY.get(
+                  {featureDefinitions.map((feature, index) => {
+                    const included = tierCopy.includedFeatureIds.includes(
                       feature.id,
-                    ).Label;
+                    );
 
                     return (
                       <div
@@ -515,7 +497,7 @@ export function PricingSection({ className }: { className?: string }) {
                         <div
                           className={cn(
                             "mt-0.5 flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-sm border transition-colors",
-                            feature.included
+                            included
                               ? "border-primary/50 bg-primary/10 text-primary"
                               : "border-muted bg-muted/50 text-muted-foreground",
                           )}
@@ -525,12 +507,12 @@ export function PricingSection({ className }: { className?: string }) {
                         <span
                           className={cn(
                             "text-sm leading-tight transition-colors",
-                            feature.included
+                            included
                               ? "text-foreground"
                               : "text-muted-foreground line-through opacity-70",
                           )}
                         >
-                          <TierFeatureLabel />
+                          {feature.label}
                         </span>
                       </div>
                     );
@@ -556,12 +538,12 @@ export function PricingSection({ className }: { className?: string }) {
                     {isLoading ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        <ProcessingLabel />
+                        <>PROCESSING</>
                       </>
                     ) : !session?.user ? (
                       <>
                         <LogIn className="mr-2 h-4 w-4" />
-                        <LoginToBuyLabel />
+                        <>LOGIN TO BUY</>
                       </>
                     ) : (
                       <>

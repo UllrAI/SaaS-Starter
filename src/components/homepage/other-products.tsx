@@ -13,90 +13,69 @@ import {
   Zap,
 } from "lucide-react";
 
-interface Product {
-  id: string;
-  name: string;
-  Description: React.ComponentType;
-  url: string;
-  icon: React.ComponentType<{ className?: string }>;
-  BadgeLabel?: React.ComponentType;
-}
-
-const products: Product[] = [
-  {
-    id: "pixmiller",
-    name: "PixMiller",
-    Description: function ProductDescriptionPixMiller() {
-      return <>Remove backgrounds in seconds with AI-assisted image cleanup.</>;
+export function OtherProducts() {
+  const products = [
+    {
+      id: "pixmiller",
+      name: "PixMiller",
+      description: (
+        <>Remove backgrounds in seconds with AI-assisted image cleanup.</>
+      ),
+      url: "https://pixmiller.com/",
+      icon: Image,
     },
-    url: "https://pixmiller.com/",
-    icon: Image,
-  },
-  {
-    id: "headshots-fun",
-    name: "HeadShots.fun",
-    Description: function ProductDescriptionHeadshots() {
-      return (
+    {
+      id: "headshots-fun",
+      name: "HeadShots.fun",
+      description: (
         <>
           Generate polished headshots for team profiles, resumes, and listings.
         </>
-      );
+      ),
+      url: "https://headshots.fun/",
+      icon: Sparkles,
+      badgeLabel: <>Open Source</>,
     },
-    url: "https://headshots.fun/",
-    icon: Sparkles,
-    BadgeLabel: function ProductBadgeOpenSource() {
-      return <>Open Source</>;
-    },
-  },
-  {
-    id: "to-markdown",
-    name: "To Markdown",
-    Description: function ProductDescriptionToMarkdown() {
-      return (
+    {
+      id: "to-markdown",
+      name: "To Markdown",
+      description: (
         <>Convert docs and web pages into Markdown you can actually edit.</>
-      );
+      ),
+      url: "https://to-markdown.com/",
+      icon: FileText,
     },
-    url: "https://to-markdown.com/",
-    icon: FileText,
-  },
-  {
-    id: "trend-x-day",
-    name: "Trend X Day",
-    Description: function ProductDescriptionTrendXDay() {
-      return (
+    {
+      id: "trend-x-day",
+      name: "Trend X Day",
+      description: (
         <>
           Track daily product and creator trends with a simpler research loop.
         </>
-      );
+      ),
+      url: "https://trendxday.com/",
+      icon: TrendingUp,
     },
-    url: "https://trendxday.com/",
-    icon: TrendingUp,
-  },
-  {
-    id: "ogimage-site",
-    name: "OGimage.site",
-    Description: function ProductDescriptionOgImage() {
-      return (
+    {
+      id: "ogimage-site",
+      name: "OGimage.site",
+      description: (
         <>Generate open graph images for social cards and link previews.</>
-      );
+      ),
+      url: "https://ogimage.site/",
+      icon: Square,
     },
-    url: "https://ogimage.site/",
-    icon: Square,
-  },
-  {
-    id: "hipng",
-    name: "HiPNG.com",
-    Description: function ProductDescriptionHiPNG() {
-      return (
+    {
+      id: "hipng",
+      name: "HiPNG.com",
+      description: (
         <>Browse transparent PNG assets for quick mockups and landing pages.</>
-      );
+      ),
+      url: "https://hipng.com/",
+      icon: Zap,
     },
-    url: "https://hipng.com/",
-    icon: Zap,
-  },
-];
+  ];
 
-export function OtherProducts() {
   return (
     <section className="bg-background border-border relative border-b py-24">
       <SectionContainer className="relative">
@@ -119,8 +98,7 @@ export function OtherProducts() {
         <div className="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-6 sm:mt-20 md:grid-cols-2 lg:mx-0 lg:max-w-none lg:grid-cols-3">
           {products.map((product) => {
             const IconComponent = product.icon;
-            const Description = product.Description;
-            const BadgeLabel = product.BadgeLabel;
+
             return (
               <Card
                 key={product.id}
@@ -136,9 +114,9 @@ export function OtherProducts() {
                         <h3 className="text-foreground font-bold">
                           {product.name}
                         </h3>
-                        {BadgeLabel && (
+                        {product.badgeLabel && (
                           <Badge variant="secondary" className="mt-1 text-xs">
-                            <BadgeLabel />
+                            {product.badgeLabel}
                           </Badge>
                         )}
                       </div>
@@ -147,7 +125,7 @@ export function OtherProducts() {
                   </div>
 
                   <p className="text-muted-foreground mt-4 text-sm leading-relaxed">
-                    <Description />
+                    {product.description}
                   </p>
 
                   <a

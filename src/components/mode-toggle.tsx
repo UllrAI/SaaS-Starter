@@ -5,7 +5,6 @@ import { Moon, Sun, Monitor } from "lucide-react";
 import { useTheme } from "next-themes";
 
 import { Button } from "@/components/ui/button";
-import { defineCopyCatalog } from "@/lib/i18n/copy-catalog";
 
 interface ModeToggleProps {
   className?: string;
@@ -17,36 +16,34 @@ interface ModeToggleProps {
 const THEME_ORDER = ["light", "dark", "system"] as const;
 type ThemeKey = (typeof THEME_ORDER)[number];
 
-const THEME_COPY = defineCopyCatalog([
-  {
-    id: "light",
-    Label: function ThemeLabelLight() {
-      return <>Light</>;
-    },
-    Icon: Sun,
-  },
-  {
-    id: "dark",
-    Label: function ThemeLabelDark() {
-      return <>Dark</>;
-    },
-    Icon: Moon,
-  },
-  {
-    id: "system",
-    Label: function ThemeLabelSystem() {
-      return <>System</>;
-    },
-    Icon: Monitor,
-  },
-] satisfies ReadonlyArray<{
-  id: ThemeKey;
-  Label: React.ComponentType;
-  Icon: React.ComponentType<{ className?: string }>;
-}>);
-
 function resolveTheme(theme: string | undefined): ThemeKey {
   return theme === "light" || theme === "dark" ? theme : "system";
+}
+
+function ThemeLabel({ theme }: { theme: ThemeKey }) {
+  switch (theme) {
+    case "light":
+      return <>Light</>;
+    case "dark":
+      return <>Dark</>;
+    case "system":
+      return <>System</>;
+    default:
+      return null;
+  }
+}
+
+function ThemeIcon({ theme }: { theme: ThemeKey }) {
+  switch (theme) {
+    case "light":
+      return <Sun className="h-[1.2rem] w-[1.2rem] transition-all" />;
+    case "dark":
+      return <Moon className="h-[1.2rem] w-[1.2rem] transition-all" />;
+    case "system":
+      return <Monitor className="h-[1.2rem] w-[1.2rem] transition-all" />;
+    default:
+      return null;
+  }
 }
 
 export function ModeToggle({
@@ -70,9 +67,6 @@ export function ModeToggle({
   };
 
   const activeTheme = resolveTheme(theme);
-  const ActiveThemeLabel = THEME_COPY.get(activeTheme).Label;
-  const ActiveThemeIcon = THEME_COPY.get(activeTheme).Icon;
-  const FallbackThemeLabel = THEME_COPY.get("light").Label;
 
   if (!mounted) {
     return (
@@ -80,7 +74,7 @@ export function ModeToggle({
         <Sun className="h-[1.2rem] w-[1.2rem]" />
         {showLabel && (
           <span className="ml-2">
-            <FallbackThemeLabel />
+            <ThemeLabel theme="light" />
           </span>
         )}
       </Button>
@@ -94,10 +88,10 @@ export function ModeToggle({
       className={className}
       onClick={cycleTheme}
     >
-      <ActiveThemeIcon className="h-[1.2rem] w-[1.2rem] transition-all" />
+      <ThemeIcon theme={activeTheme} />
       {showLabel && (
         <span className="ml-2">
-          <ActiveThemeLabel />
+          <ThemeLabel theme={activeTheme} />
         </span>
       )}
       <span className="sr-only">Toggle theme</span>

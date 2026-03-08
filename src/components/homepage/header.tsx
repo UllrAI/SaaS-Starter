@@ -19,47 +19,9 @@ import { useHydrated } from "@/hooks/use-hydrated";
 
 interface NavItem {
   id: string;
-  Title: React.ComponentType;
   href: string;
+  title: React.ReactNode;
 }
-
-const navigationItems: NavItem[] = [
-  {
-    id: "nav-features",
-    Title: function NavTitleFeatures() {
-      return <>Features</>;
-    },
-    href: "/features",
-  },
-  {
-    id: "nav-pricing",
-    Title: function NavTitlePricing() {
-      return <>Pricing</>;
-    },
-    href: "/pricing",
-  },
-  {
-    id: "nav-about",
-    Title: function NavTitleAbout() {
-      return <>About</>;
-    },
-    href: "/about",
-  },
-  {
-    id: "nav-blog",
-    Title: function NavTitleBlog() {
-      return <>Blog</>;
-    },
-    href: "/blog",
-  },
-  {
-    id: "nav-contact",
-    Title: function NavTitleContact() {
-      return <>Contact</>;
-    },
-    href: "/contact",
-  },
-];
 
 function AuthButtons({
   session,
@@ -178,20 +140,16 @@ function MobileNavigation({
 
         <div className="flex flex-col p-6">
           <nav className="space-y-4">
-            {items.map((item) => {
-              const Title = item.Title;
-
-              return (
-                <Link
-                  key={item.id}
-                  href={item.href}
-                  className="text-foreground hover:text-primary block py-2 text-sm font-medium transition-colors"
-                  onClick={onClose}
-                >
-                  <Title />
-                </Link>
-              );
-            })}
+            {items.map((item) => (
+              <Link
+                key={item.id}
+                href={item.href}
+                className="text-foreground hover:text-primary block py-2 text-sm font-medium transition-colors"
+                onClick={onClose}
+              >
+                {item.title}
+              </Link>
+            ))}
           </nav>
 
           <MobileAuthButtons session={session} isPending={isPending} />
@@ -206,6 +164,13 @@ export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
   const { data: session, isPending } = useSession();
+  const navigationItems: NavItem[] = [
+    { id: "nav-features", href: "/features", title: <>Features</> },
+    { id: "nav-pricing", href: "/pricing", title: <>Pricing</> },
+    { id: "nav-about", href: "/about", title: <>About</> },
+    { id: "nav-blog", href: "/blog", title: <>Blog</> },
+    { id: "nav-contact", href: "/contact", title: <>Contact</> },
+  ];
 
   useEffect(() => {
     const handleScroll = () => {
@@ -242,28 +207,24 @@ export function Header() {
             </Link>
 
             <nav className="hidden items-center gap-1 md:flex">
-              {navigationItems.map((item) => {
-                const Title = item.Title;
-
-                return (
-                  <Button
-                    key={item.id}
-                    asChild
-                    variant="ghost"
-                    className="h-9 px-3 text-sm font-medium"
+              {navigationItems.map((item) => (
+                <Button
+                  key={item.id}
+                  asChild
+                  variant="ghost"
+                  className="h-9 px-3 text-sm font-medium"
+                >
+                  <Link
+                    href={item.href}
+                    className={cn(
+                      "text-muted-foreground transition-colors",
+                      isActive(item.href) && "text-foreground",
+                    )}
                   >
-                    <Link
-                      href={item.href}
-                      className={cn(
-                        "text-muted-foreground transition-colors",
-                        isActive(item.href) && "text-foreground",
-                      )}
-                    >
-                      <Title />
-                    </Link>
-                  </Button>
-                );
-              })}
+                    {item.title}
+                  </Link>
+                </Button>
+              ))}
             </nav>
 
             <div className="flex items-center gap-3">

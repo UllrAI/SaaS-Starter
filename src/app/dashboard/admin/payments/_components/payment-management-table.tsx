@@ -10,7 +10,6 @@ import { useAdminTable } from "@/hooks/use-admin-table";
 import { Button } from "@/components/ui/button";
 import { getPayments } from "@/lib/actions/admin";
 import { useIntlLocale } from "@/hooks/use-intl-locale";
-import { defineCopyCatalog } from "@/lib/i18n/copy-catalog";
 
 interface PaymentManagementTableProps {
   initialData: PaymentWithUser[];
@@ -34,84 +33,6 @@ const getStatusBadgeVariant = (status: string) => {
   return STATUS_BADGE_VARIANT_MAP[status] ?? "secondary";
 };
 
-const PAYMENT_STATUS_COPY = defineCopyCatalog([
-  {
-    id: "succeeded",
-    Label: function PaymentStatusSucceededLabel() {
-      return <>Succeeded</>;
-    },
-  },
-  {
-    id: "pending",
-    Label: function PaymentStatusPendingLabel() {
-      return <>Pending</>;
-    },
-  },
-  {
-    id: "failed",
-    Label: function PaymentStatusFailedLabel() {
-      return <>Failed</>;
-    },
-  },
-  {
-    id: "canceled",
-    Label: function PaymentStatusCanceledLabel() {
-      return <>Canceled</>;
-    },
-  },
-  {
-    id: "unknown",
-    Label: function PaymentStatusUnknownLabel() {
-      return <>Unknown</>;
-    },
-  },
-] satisfies ReadonlyArray<{
-  id: string;
-  Label: React.ComponentType;
-}>);
-
-const PAYMENT_METHOD_COPY = defineCopyCatalog([
-  {
-    id: "subscription",
-    Label: function PaymentMethodSubscriptionLabel() {
-      return <>Subscription</>;
-    },
-  },
-  {
-    id: "one_time",
-    Label: function PaymentMethodOneTimeLabel() {
-      return <>One-time Payment</>;
-    },
-  },
-  {
-    id: "card",
-    Label: function PaymentMethodCardLabel() {
-      return <>Credit Card</>;
-    },
-  },
-  {
-    id: "bank_transfer",
-    Label: function PaymentMethodBankTransferLabel() {
-      return <>Bank Transfer</>;
-    },
-  },
-  {
-    id: "paypal",
-    Label: function PaymentMethodPayPalLabel() {
-      return <>PayPal</>;
-    },
-  },
-  {
-    id: "unknown",
-    Label: function PaymentMethodUnknownLabel() {
-      return <>Unknown</>;
-    },
-  },
-] satisfies ReadonlyArray<{
-  id: string;
-  Label: React.ComponentType;
-}>);
-
 const formatCurrency = (amount: number, currency: string, locale: string) => {
   return new Intl.NumberFormat(locale, {
     style: "currency",
@@ -132,6 +53,38 @@ const formatDate = (dateString: string | Date, locale: string) => {
 const openProviderPayment = (paymentId: string) => {
   window.open(`https://www.creem.io/dashboard/payments/${paymentId}`, "_blank");
 };
+
+function PaymentStatusLabel({ status }: { status: string }) {
+  switch (status) {
+    case "succeeded":
+      return <>Succeeded</>;
+    case "pending":
+      return <>Pending</>;
+    case "failed":
+      return <>Failed</>;
+    case "canceled":
+      return <>Canceled</>;
+    default:
+      return <>Unknown</>;
+  }
+}
+
+function PaymentMethodLabel({ paymentType }: { paymentType: string }) {
+  switch (paymentType) {
+    case "subscription":
+      return <>Subscription</>;
+    case "one_time":
+      return <>One-time Payment</>;
+    case "card":
+      return <>Credit Card</>;
+    case "bank_transfer":
+      return <>Bank Transfer</>;
+    case "paypal":
+      return <>PayPal</>;
+    default:
+      return <>Unknown</>;
+  }
+}
 
 const createColumns = (
   locale: string,
@@ -163,38 +116,20 @@ const createColumns = (
   {
     key: "status",
     label: <>Status</>,
-    render: (payment) => {
-      const PaymentStatusLabel = (
-        PAYMENT_STATUS_COPY.entries.find((entry) => entry.id === payment.status) ??
-        PAYMENT_STATUS_COPY.get("unknown")
-      ).Label;
-
-      return (
-        <Badge
-          variant={getStatusBadgeVariant(payment.status)}
-          className="capitalize"
-        >
-          <PaymentStatusLabel />
-        </Badge>
-      );
-    },
+    render: (payment) => (
+      <Badge variant={getStatusBadgeVariant(payment.status)} className="capitalize">
+        <PaymentStatusLabel status={payment.status} />
+      </Badge>
+    ),
   },
   {
     key: "method",
     label: <>Method</>,
-    render: (payment) => {
-      const PaymentMethodLabel = (
-        PAYMENT_METHOD_COPY.entries.find(
-          (entry) => entry.id === payment.paymentType,
-        ) ?? PAYMENT_METHOD_COPY.get("unknown")
-      ).Label;
-
-      return (
-        <div className="text-sm">
-          <PaymentMethodLabel />
-        </div>
-      );
-    },
+    render: (payment) => (
+      <div className="text-sm">
+        <PaymentMethodLabel paymentType={payment.paymentType} />
+      </div>
+    ),
   },
   {
     key: "created",

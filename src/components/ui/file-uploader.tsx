@@ -1,626 +1,540 @@
-// components/ui/file-uploader.tsx
-
 "use client";
 
-import React, {
-  useCallback,
-  useState,
-  useRef,
-  useMemo,
-  useEffect,
-} from "react";
+import type { ReactNode } from "react";
 import {
-  Upload,
-  X,
-  FileIcon,
-  ImageIcon,
-  Loader2,
-  FileText,
   FileArchive,
   FileAudio,
+  FileIcon,
+  FileText,
   FileVideo,
+  ImageIcon,
+  Loader2,
+  RefreshCcw,
+  Upload,
+  X,
 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { cn } from "@/lib/utils";
-import { Button } from "./button";
-import { Progress } from "./progress";
-import { Alert, AlertDescription } from "./alert";
+import { formatFileSize, UPLOAD_CONFIG } from "@/lib/config/upload";
 import {
-  UPLOAD_CONFIG,
-  formatFileSize,
-  isFileTypeAllowed,
-  isFileSizeAllowed,
-} from "@/lib/config/upload";
+  useFileUpload,
+  type UseFileUploadOptions,
+  type UseFileUploadResult,
+} from "./file-upload/use-file-upload";
+import type { FileUploadIssue, FileUploadItem } from "./file-upload/types";
 
-// --- Helper Functions and Components ---
+function getFileTypeIcon(contentType: string) {
+  if (contentType.startsWith("image/")) {
+    return <ImageIcon className="h-5 w-5" />;
+  }
 
-const getFileTypeIcon = (contentType: string): React.ReactNode => {
-  if (contentType.startsWith("image/"))
-    return <ImageIcon className="h-8 w-8 text-gray-500" />;
-  if (contentType.startsWith("video/"))
-    return <FileVideo className="h-8 w-8 text-gray-500" />;
-  if (contentType.startsWith("audio/"))
-    return <FileAudio className="h-8 w-8 text-gray-500" />;
+  if (contentType.startsWith("video/")) {
+    return <FileVideo className="h-5 w-5" />;
+  }
+
+  if (contentType.startsWith("audio/")) {
+    return <FileAudio className="h-5 w-5" />;
+  }
+
   if (
     contentType.startsWith("application/zip") ||
     contentType.includes("compressed")
-  )
-    return <FileArchive className="h-8 w-8 text-gray-500" />;
-  if (contentType === "application/pdf" || contentType.startsWith("text/"))
-    return <FileText className="h-8 w-8 text-gray-500" />;
-  return <FileIcon className="h-8 w-8 text-gray-500" />;
-};
-
-const isAllowedUploadUrl = (url: string): boolean => {
-  try {
-    const parsedUrl = new URL(url);
-    const hostname = parsedUrl.hostname.toLowerCase();
-
-    if (!UPLOAD_CONFIG.ALLOWED_UPLOAD_URL_PROTOCOLS.includes(parsedUrl.protocol))
-      return false;
-
-    if (UPLOAD_CONFIG.ALLOWED_UPLOAD_HOSTS.includes(hostname)) return true;
-
-    return UPLOAD_CONFIG.ALLOWED_UPLOAD_HOST_SUFFIXES.some((suffix) =>
-      hostname.endsWith(suffix),
-    );
-  } catch {
-    return false;
+  ) {
+    return <FileArchive className="h-5 w-5" />;
   }
-};
 
-interface FileWithPreview extends File {
-  preview?: string;
+  if (contentType === "application/pdf" || contentType.startsWith("text/")) {
+    return <FileText className="h-5 w-5" />;
+  }
+
+  return <FileIcon className="h-5 w-5" />;
 }
 
-interface UploadedFile {
-  url: string;
-  key: string;
-  size: number;
-  contentType: string;
-  fileName: string;
+function IssueMessage({ issue }: { issue: FileUploadIssue }) {
+  switch (issue.code) {
+    case "too-many-files":
+      return <>You can upload up to {issue.maxFiles} file(s) at a time.</>;
+    case "file-type-not-accepted":
+      return (
+        <>
+          {issue.fileName} does not match the allowed upload preset for this
+          section.
+        </>
+      );
+    case "file-type-not-supported":
+      return <>This app does not support {issue.contentType} uploads.</>;
+    case "file-too-large":
+      return (
+        <>
+          {issue.fileName} is {formatFileSize(issue.fileSize ?? 0)}. The preset
+          limit is {formatFileSize(issue.maxFileSize ?? 0)}.
+        </>
+      );
+    case "file-too-large-for-app":
+      return (
+        <>
+          {issue.fileName} exceeds the app-wide limit of{" "}
+          {formatFileSize(issue.maxFileSize ?? 0)}.
+        </>
+      );
+    case "unsafe-upload-url":
+      return (
+        <>The upload destination was rejected by the client safety checks.</>
+      );
+    case "request-failed":
+      return <>The upload request could not be completed. Please try again.</>;
+    case "network-error":
+      return <>The network connection dropped during upload.</>;
+    case "upload-aborted":
+      return <>The upload was canceled before it finished.</>;
+    case "upload-preparation-failed":
+      return <>The file could not be prepared for upload.</>;
+    case "upload-failed":
+      return <>The file upload failed before completion.</>;
+  }
 }
 
-interface PresignedUploadPayload {
-  presignedUrl: string;
-  publicUrl: string;
-  key: string;
-}
+function QueueStatusBadge({ item }: { item: FileUploadItem }) {
+  if (item.status === "success") {
+    return <Badge variant="secondary">Uploaded</Badge>;
+  }
 
-const FilePreview = ({ file }: { file: FileWithPreview }) => {
-  const [hasError, setHasError] = useState(false);
-
-  if (!file.preview || hasError) {
+  if (item.status === "uploading") {
     return (
-      <div className="text-muted-foreground flex h-12 w-12 items-center justify-center rounded bg-gray-100 dark:bg-gray-800">
-        {getFileTypeIcon(file.type)}
+      <Badge variant="outline" className="gap-1">
+        <Loader2 className="h-3 w-3 animate-spin" />
+        Uploading
+      </Badge>
+    );
+  }
+
+  if (item.status === "error") {
+    return <Badge variant="destructive">Needs attention</Badge>;
+  }
+
+  if (item.status === "canceled") {
+    return <Badge variant="outline">Canceled</Badge>;
+  }
+
+  return <Badge variant="outline">Queued</Badge>;
+}
+
+function QueueStatusText({ item }: { item: FileUploadItem }) {
+  if (item.status === "success") {
+    return <>Uploaded</>;
+  }
+
+  if (item.status === "uploading") {
+    return <>{item.progress}%</>;
+  }
+
+  if (item.status === "error") {
+    return <>Needs attention</>;
+  }
+
+  if (item.status === "canceled") {
+    return <>Canceled</>;
+  }
+
+  return <>Queued</>;
+}
+
+function FilePreview({ item }: { item: FileUploadItem }) {
+  if (!item.previewUrl) {
+    return (
+      <div className="bg-muted text-muted-foreground flex h-14 w-14 items-center justify-center rounded-2xl">
+        {getFileTypeIcon(item.file.type)}
       </div>
     );
   }
 
   return (
-    // Local blob/data previews are intentionally rendered with native img.
     // eslint-disable-next-line @next/next/no-img-element
     <img
-      src={file.preview}
-      alt={file.name}
-      className="h-12 w-12 rounded object-contain"
-      onError={() => setHasError(true)}
+      src={item.previewUrl}
+      alt={item.file.name}
+      className="h-14 w-14 rounded-2xl border object-cover"
     />
   );
-};
-
-// --- Main Component ---
-
-interface FileUploaderProps {
-  acceptedFileTypes?: readonly string[];
-  maxFileSize?: number;
-  maxFiles?: number;
-  onUploadComplete?: (files: UploadedFile[]) => void;
-  className?: string;
-  disabled?: boolean;
-  enableImageCompression?: boolean;
-  imageCompressionQuality?: number;
-  imageCompressionMaxWidth?: number;
-  imageCompressionMaxHeight?: number;
 }
 
-interface FileUploadState {
-  file: FileWithPreview;
-  progress: number;
-  status: "pending" | "uploading" | "completed" | "error";
-  error?: string;
-  uploadedFile?: UploadedFile;
-}
-
-function AddFilesButtonLabel({ hasFiles }: { hasFiles: boolean }) {
-  return hasFiles ? <>Add More Files</> : <>Add Files</>;
-}
-
-export function FileUploader({
-  acceptedFileTypes = UPLOAD_CONFIG.ALLOWED_FILE_TYPES,
-  maxFileSize = UPLOAD_CONFIG.MAX_FILE_SIZE,
-  maxFiles = 1,
-  onUploadComplete,
-  className,
-  disabled = false,
-  enableImageCompression = false,
-  imageCompressionQuality = 0.8,
-  imageCompressionMaxWidth = 1920,
-  imageCompressionMaxHeight = 1080,
-}: FileUploaderProps) {
-  const [files, setFiles] = useState<FileUploadState[]>([]);
-  const [isDragOver, setIsDragOver] = useState(false);
-  const [globalError, setGlobalError] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const filesRef = useRef<FileUploadState[]>([]);
-
-  useEffect(() => {
-    filesRef.current = files;
-  }, [files]);
-
-  useEffect(() => {
-    return () => {
-      filesRef.current.forEach((f) => {
-        if (f.file.preview?.startsWith("blob:")) {
-          URL.revokeObjectURL(f.file.preview);
-        }
-      });
-    };
-  }, []);
-
-  const validateFile = useCallback(
-    (file: File): string | null => {
-      if (acceptedFileTypes && !acceptedFileTypes.includes(file.type)) {
-        return `File type ${file.type} is not allowed.`;
-      }
-      if (!isFileTypeAllowed(file.type)) {
-        return `File type ${file.type} is not supported.`;
-      }
-      if (file.size > maxFileSize) {
-        return `File size ${formatFileSize(file.size)} exceeds limit of ${formatFileSize(maxFileSize)}.`;
-      }
-      // ** FIX: Restore the check for the global file size limit **
-      if (!isFileSizeAllowed(file.size)) {
-        return `File size exceeds the application's maximum limit of ${formatFileSize(UPLOAD_CONFIG.MAX_FILE_SIZE)}.`;
-      }
-      return null;
-    },
-    [acceptedFileTypes, maxFileSize],
-  );
-
-  const createPreview = useCallback(
-    (file: File): Promise<string | undefined> => {
-      return new Promise((resolve) => {
-        if (!file.type.startsWith("image/")) return resolve(undefined);
-        if (file.type === "image/svg+xml") {
-          const reader = new FileReader();
-          reader.onloadend = () => resolve(reader.result as string);
-          reader.onerror = () => resolve(undefined);
-          reader.readAsDataURL(file);
-        } else {
-          resolve(URL.createObjectURL(file));
-        }
-      });
-    },
-    [],
-  );
-
-  const compressImage = useCallback(
-    (file: File): Promise<File> => {
-      return new Promise((resolve) => {
-        if (
-          !enableImageCompression ||
-          !file.type.startsWith("image/") ||
-          file.type === "image/svg+xml"
-        )
-          return resolve(file);
-
-        const inputObjectUrl = URL.createObjectURL(file);
-        const img = new window.Image();
-        img.onload = () => {
-          const canvas = document.createElement("canvas");
-          let { width, height } = img;
-          if (width > imageCompressionMaxWidth) {
-            height = (height * imageCompressionMaxWidth) / width;
-            width = imageCompressionMaxWidth;
-          }
-          if (height > imageCompressionMaxHeight) {
-            width = (width * imageCompressionMaxHeight) / height;
-            height = imageCompressionMaxHeight;
-          }
-          canvas.width = width;
-          canvas.height = height;
-          const ctx = canvas.getContext("2d");
-          ctx?.drawImage(img, 0, 0, width, height);
-          canvas.toBlob(
-            (blob) => {
-              URL.revokeObjectURL(inputObjectUrl);
-              resolve(
-                blob
-                  ? new File([blob], file.name, {
-                      type: file.type,
-                      lastModified: Date.now(),
-                    })
-                  : file,
-              );
-            },
-            file.type,
-            imageCompressionQuality,
-          );
-        };
-        img.onerror = () => {
-          URL.revokeObjectURL(inputObjectUrl);
-          resolve(file);
-        };
-        img.src = inputObjectUrl;
-      });
-    },
-    [
-      enableImageCompression,
-      imageCompressionQuality,
-      imageCompressionMaxWidth,
-      imageCompressionMaxHeight,
-    ],
-  );
-
-  const uploadToPresignedUrl = useCallback(
-    (
-      presignedUrl: string,
-      file: File,
-      onProgress: (progress: number) => void,
-    ): Promise<void> =>
-      new Promise((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-
-        xhr.open("PUT", presignedUrl);
-        xhr.setRequestHeader("Content-Type", file.type);
-
-        xhr.upload.onprogress = (event) => {
-          if (!event.lengthComputable) {
-            return;
-          }
-
-          onProgress(Math.round((event.loaded / event.total) * 100));
-        };
-
-        xhr.onerror = () => reject(new Error("Network error during upload."));
-        xhr.onabort = () => reject(new Error("Upload was aborted."));
-        xhr.onload = () => {
-          if (xhr.status >= 200 && xhr.status < 300) {
-            onProgress(100);
-            resolve();
-            return;
-          }
-
-          reject(new Error(`Upload failed with status ${xhr.status}.`));
-        };
-
-        xhr.send(file);
-      }),
-    [],
-  );
-
-  const completeUpload = useCallback(
-    async ({
-      key,
-      url,
-      file,
-    }: {
-      key: string;
-      url: string;
-      file: File;
-    }): Promise<UploadedFile> => {
-      const response = await fetch("/api/upload/complete", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          fileName: file.name,
-          contentType: file.type,
-          size: file.size,
-          key,
-          url,
-        }),
-      });
-
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to finalize upload");
-      }
-
-      return data.file as UploadedFile;
-    },
-    [],
-  );
-
-  const handleFiles = useCallback(
-    async (newFiles: FileList | File[]) => {
-      setGlobalError(null);
-      const fileArray = Array.from(newFiles);
-
-      if (files.length + fileArray.length > maxFiles) {
-        setGlobalError(`Maximum ${maxFiles} file(s) allowed`);
-        return;
-      }
-
-      const firstValidationError = fileArray
-        .map((file) => validateFile(file))
-        .find((error): error is string => Boolean(error));
-
-      if (firstValidationError) {
-        setGlobalError(firstValidationError);
-        return;
-      }
-
-      const preparedFiles = await Promise.all(
-        fileArray.map(async (file) => {
-          const processedFile = await compressImage(file);
-          const preview = await createPreview(processedFile);
-          const fileWithPreview: FileWithPreview = Object.assign(
-            processedFile,
-            {
-              preview,
-            },
-          );
-
-          return {
-            file: fileWithPreview,
-            progress: 0,
-            status: "pending" as const,
-          };
-        }),
-      );
-
-      setFiles((prev) => [...prev, ...preparedFiles]);
-    },
-    [files.length, maxFiles, validateFile, compressImage, createPreview],
-  );
-
-  useEffect(() => {
-    const uploadFile = async (fileIndex: number) => {
-      const fileState = files[fileIndex];
-      if (!fileState || fileState.status !== "pending") return null;
-
-      try {
-        setFiles((prev) =>
-          prev.map((f, i) =>
-            i === fileIndex ? { ...f, status: "uploading" } : f,
-          ),
-        );
-
-        const { file } = fileState;
-        const response = await fetch("/api/upload/presigned-url", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            fileName: file.name,
-            contentType: file.type,
-            size: file.size,
-          }),
-        });
-
-        if (!response.ok)
-          throw new Error(
-            (await response.json()).error || "Failed to get upload URL",
-          );
-
-        const { presignedUrl, publicUrl, key }: PresignedUploadPayload =
-          await response.json();
-
-        if (!presignedUrl || !isAllowedUploadUrl(presignedUrl)) {
-          throw new Error("Unsafe upload URL received.");
-        }
-
-        await uploadToPresignedUrl(presignedUrl, file, (progress) => {
-          setFiles((prev) =>
-            prev.map((f, i) => (i === fileIndex ? { ...f, progress } : f)),
-          );
-        });
-
-        const uploadedFile = await completeUpload({
-          key,
-          url: publicUrl,
-          file,
-        });
-
-        setFiles((prev) =>
-          prev.map((f, i) =>
-            i === fileIndex
-              ? {
-                  ...f,
-                  progress: 100,
-                  status: "completed",
-                  uploadedFile,
-                }
-              : f,
-          ),
-        );
-
-        return uploadedFile;
-      } catch (error) {
-        setFiles((prev) =>
-          prev.map((f, i) =>
-            i === fileIndex
-              ? { ...f, status: "error", error: (error as Error).message }
-              : f,
-          ),
-        );
-        return null;
-      }
-    };
-
-    const pendingFiles = files
-      .map((file, index) => ({ file, index }))
-      .filter((f) => f.file.status === "pending");
-    if (pendingFiles.length > 0) {
-      Promise.all(pendingFiles.map((f) => uploadFile(f.index))).then(
-        (results) => {
-          const successfulUploads = results.filter(
-            (r): r is UploadedFile => !!r,
-          );
-          if (onUploadComplete && successfulUploads.length > 0) {
-            onUploadComplete(successfulUploads);
-          }
-        },
-      );
-    }
-  }, [completeUpload, files, onUploadComplete, uploadToPresignedUrl]);
-
-  const removeFile = useCallback((index: number) => {
-    setFiles((prev) => {
-      const newFiles = [...prev];
-      const [removedFile] = newFiles.splice(index, 1);
-      if (removedFile?.file.preview?.startsWith("blob:")) {
-        URL.revokeObjectURL(removedFile.file.preview);
-      }
-      return newFiles;
-    });
-  }, []);
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(true);
-  };
-  const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(false);
-  };
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(false);
-    if (disabled || !e.dataTransfer.files) return;
-    handleFiles(e.dataTransfer.files);
-  };
-  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) handleFiles(e.target.files);
-    e.target.value = "";
-  };
-  const openFileDialog = () => {
-    if (!disabled) fileInputRef.current?.click();
-  };
-
-  const acceptAttribute = useMemo(
-    () =>
-      Array.isArray(acceptedFileTypes)
-        ? acceptedFileTypes.join(",")
-        : undefined,
-    [acceptedFileTypes],
-  );
-
+function ImageQueueTile({
+  item,
+  onCancel,
+  onRemove,
+  onRetry,
+}: {
+  item: FileUploadItem;
+  onCancel: () => void;
+  onRemove: () => void;
+  onRetry: () => void;
+}) {
   return (
-    <div className={cn("w-full", className)}>
-      <input
-        ref={fileInputRef}
-        type="file"
-        multiple={maxFiles > 1}
-        accept={acceptAttribute}
-        onChange={handleFileInputChange}
-        className="hidden"
-        disabled={disabled}
-      />
-      <div
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onDrop={handleDrop}
-        onClick={openFileDialog}
-        className={cn(
-          "relative cursor-pointer rounded-lg border-2 border-dashed p-6 transition-colors",
-          "hover:border-primary/50 hover:bg-muted/50",
-          isDragOver && "border-primary bg-primary/5",
-          disabled && "cursor-not-allowed opacity-50",
-          files.length === 0 &&
-            "flex min-h-[200px] items-center justify-center",
-        )}
-      >
-        {files.length === 0 ? (
-          <div className="text-center">
-            <Upload className="text-muted-foreground mx-auto mb-4 h-12 w-12" />
-            <p className="mb-2 text-lg font-medium">
-              Drop files here or click to upload
-            </p>
-            <p className="text-muted-foreground text-sm">
-              {maxFiles > 1 ? `Up to ${maxFiles} files, ` : ""}
-              max {formatFileSize(maxFileSize)}.
+    <div className="bg-muted relative aspect-square overflow-hidden rounded-xl border">
+      {item.previewUrl ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={item.previewUrl}
+          alt={item.file.name}
+          className="h-full w-full object-cover"
+        />
+      ) : null}
+
+      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/65 via-black/15 to-transparent p-3 text-white">
+        <div className="flex items-end justify-between gap-2">
+          <div className="min-w-0">
+            <p className="truncate text-xs font-medium">{item.file.name}</p>
+            <p className="text-[11px] text-white/80">
+              <QueueStatusText item={item} />
             </p>
           </div>
-        ) : (
-          <div className="space-y-4">
-            {files.map((fileState, index) => (
-              <div
-                key={index}
-                className="bg-background flex items-center space-x-4 rounded-lg border p-4"
-              >
-                <FilePreview
-                  key={`${fileState.file.name}-${fileState.file.size}-${fileState.file.lastModified}`}
-                  file={fileState.file}
-                />
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium">
-                    {fileState.file.name}
-                  </p>
-                  <p className="text-muted-foreground text-xs">
-                    {formatFileSize(fileState.file.size)} •{" "}
-                    {fileState.file.type}
-                  </p>
-                  {fileState.status === "uploading" && (
-                    <div className="mt-2">
-                      <Progress value={fileState.progress} className="h-2" />
-                    </div>
-                  )}
-                  <div className="mt-1 flex items-center space-x-2">
-                    {fileState.status === "uploading" && (
-                      <>
-                        <Loader2 className="h-3 w-3 animate-spin" />
-                        <span className="text-muted-foreground text-xs">
-                          Uploading...
-                        </span>
-                      </>
-                    )}
-                    {fileState.status === "completed" && (
-                      <span className="text-xs text-green-600">✓ Uploaded</span>
-                    )}
-                    {fileState.status === "error" && (
-                      <span className="text-xs text-red-600">
-                        ✗ {fileState.error}
-                      </span>
-                    )}
-                  </div>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    removeFile(index);
-                  }}
-                  disabled={fileState.status === "uploading"}
-                  className="flex-shrink-0"
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-            ))}
-            {files.length < maxFiles && (
-              <Button
-                variant="outline"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  openFileDialog();
-                }}
-                disabled={disabled}
-                className="w-full"
-              >
-                <Upload className="mr-2 h-4 w-4" />
-                <AddFilesButtonLabel hasFiles={files.length > 0} />
-              </Button>
-            )}
-          </div>
-        )}
+
+          {item.status === "success" ? (
+            <Badge variant="secondary">Done</Badge>
+          ) : null}
+        </div>
+
+        {item.status === "uploading" ? (
+          <Progress value={item.progress} className="mt-2 h-1.5 bg-white/20" />
+        ) : null}
       </div>
-      {globalError && (
-        <Alert variant="destructive" className="mt-4">
-          <AlertDescription>{globalError}</AlertDescription>
-        </Alert>
-      )}
+
+      <div className="absolute top-2 right-2 flex items-center gap-1">
+        {item.status === "uploading" ? (
+          <Button
+            variant="secondary"
+            size="icon"
+            className="h-8 w-8 rounded-full"
+            onClick={onCancel}
+            aria-label="Cancel upload"
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        ) : null}
+
+        {(item.status === "error" || item.status === "canceled") && (
+          <Button
+            variant="secondary"
+            size="icon"
+            className="h-8 w-8 rounded-full"
+            onClick={onRetry}
+            aria-label="Retry upload"
+          >
+            <RefreshCcw className="h-4 w-4" />
+          </Button>
+        )}
+
+        <Button
+          variant="secondary"
+          size="icon"
+          className="h-8 w-8 rounded-full"
+          onClick={onRemove}
+          aria-label="Remove file"
+        >
+          <X className="h-4 w-4" />
+        </Button>
+      </div>
+
+      {item.issue ? (
+        <div className="bg-background/90 absolute inset-x-2 bottom-2 rounded-md p-2 text-[11px] text-red-600">
+          <IssueMessage issue={item.issue} />
+        </div>
+      ) : null}
     </div>
   );
 }
+
+function FileQueueItem({
+  item,
+  onCancel,
+  onRemove,
+  onRetry,
+}: {
+  item: FileUploadItem;
+  onCancel: () => void;
+  onRemove: () => void;
+  onRetry: () => void;
+}) {
+  return (
+    <div className="bg-background flex items-start gap-3 rounded-lg border p-3">
+      <FilePreview item={item} />
+
+      <div className="min-w-0 flex-1 space-y-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <p className="min-w-0 flex-1 truncate text-sm font-medium">
+            {item.file.name}
+          </p>
+          <QueueStatusBadge item={item} />
+        </div>
+
+        <div className="text-muted-foreground flex flex-wrap items-center gap-2 text-xs">
+          <span>{formatFileSize(item.file.size)}</span>
+          <span>•</span>
+          <span className="truncate">{item.file.type}</span>
+        </div>
+
+        {item.status === "uploading" && (
+          <div className="space-y-1">
+            <Progress value={item.progress} className="h-2" />
+            <div className="text-muted-foreground flex justify-between text-xs">
+              <span>Uploading now</span>
+              <span>{item.progress}%</span>
+            </div>
+          </div>
+        )}
+
+        {item.issue && (
+          <p className="text-xs text-red-600">
+            <IssueMessage issue={item.issue} />
+          </p>
+        )}
+      </div>
+
+      <div className="flex shrink-0 items-center gap-1">
+        {item.status === "uploading" ? (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onCancel}
+            aria-label="Cancel upload"
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        ) : null}
+
+        {(item.status === "error" || item.status === "canceled") && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onRetry}
+            aria-label="Retry upload"
+          >
+            <RefreshCcw className="h-4 w-4" />
+          </Button>
+        )}
+
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={onRemove}
+          aria-label="Remove file"
+        >
+          <X className="h-4 w-4" />
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+export interface FileUploaderProps extends UseFileUploadOptions {
+  children?: (uploader: UseFileUploadResult) => ReactNode;
+  className?: string;
+}
+
+export function FileUploader({
+  children,
+  className,
+  ...options
+}: FileUploaderProps) {
+  const uploader = useFileUpload(options);
+
+  if (children) {
+    return <>{children(uploader)}</>;
+  }
+
+  const allFormatsEnabled =
+    (options.acceptedFileTypes ?? UPLOAD_CONFIG.ALLOWED_FILE_TYPES).length ===
+    UPLOAD_CONFIG.ALLOWED_FILE_TYPES.length;
+  const completedCount = uploader.items.filter(
+    (item) => item.status === "success",
+  ).length;
+  const showImageGrid =
+    uploader.items.length > 0 &&
+    uploader.items.every((item) => Boolean(item.previewUrl));
+
+  return (
+    <div className={cn("space-y-4", className)}>
+      <input {...uploader.getInputProps({ className: "hidden" })} />
+
+      {!showImageGrid ? (
+        <div
+          {...uploader.getRootProps({
+            className: cn(
+              "rounded-xl border border-dashed p-4 transition-colors",
+              "hover:border-primary/50",
+              uploader.isDragActive && "border-primary bg-muted/50",
+            ),
+          })}
+        >
+          <div className="space-y-4">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2 text-sm font-medium">
+                  <Upload className="h-4 w-4" />
+                  <span>Drop files here or click to browse</span>
+                </div>
+                <p className="text-muted-foreground text-xs">
+                  Up to {options.maxFiles ?? 1} file(s), max{" "}
+                  {formatFileSize(
+                    options.maxFileSize ?? UPLOAD_CONFIG.MAX_FILE_SIZE,
+                  )}
+                  .{" "}
+                  {allFormatsEnabled ? (
+                    <>All supported formats.</>
+                  ) : (
+                    <>Preset formats only.</>
+                  )}
+                </p>
+              </div>
+
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  type="button"
+                  size="sm"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    uploader.openFileDialog();
+                  }}
+                  disabled={!uploader.canAddMore}
+                >
+                  <Upload className="h-4 w-4" />
+                  {uploader.items.length > 0 ? (
+                    <>Add files</>
+                  ) : (
+                    <>Select files</>
+                  )}
+                </Button>
+
+                {!uploader.autoUpload && uploader.items.length > 0 ? (
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      void uploader.uploadAll();
+                    }}
+                  >
+                    Start upload
+                  </Button>
+                ) : null}
+
+                {completedCount > 0 ? (
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="ghost"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      uploader.clearCompleted();
+                    }}
+                  >
+                    Clear completed
+                  </Button>
+                ) : null}
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4">
+            {uploader.items.map((item) => (
+              <ImageQueueTile
+                key={item.id}
+                item={item}
+                onCancel={() => uploader.cancelFile(item.id)}
+                onRemove={() => uploader.removeFile(item.id)}
+                onRetry={() => {
+                  void uploader.retryFile(item.id);
+                }}
+              />
+            ))}
+
+            {uploader.canAddMore ? (
+              <div
+                {...uploader.getRootProps({
+                  className: cn(
+                    "text-muted-foreground hover:border-primary/50 hover:text-foreground flex aspect-square flex-col items-center justify-center rounded-xl border border-dashed text-center transition-colors",
+                    uploader.isDragActive && "border-primary bg-muted/50",
+                  ),
+                })}
+              >
+                <Upload className="mb-2 h-5 w-5" />
+                <p className="text-sm font-medium">Upload</p>
+                <p className="mt-1 text-xs">
+                  {uploader.items.length + 1}-
+                  {Math.max(options.maxFiles ?? 1, uploader.items.length + 1)}
+                </p>
+              </div>
+            ) : null}
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            {!uploader.autoUpload && uploader.items.length > 0 ? (
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  void uploader.uploadAll();
+                }}
+              >
+                Start upload
+              </Button>
+            ) : null}
+
+            {completedCount > 0 ? (
+              <Button
+                type="button"
+                size="sm"
+                variant="ghost"
+                onClick={() => {
+                  uploader.clearCompleted();
+                }}
+              >
+                Clear completed
+              </Button>
+            ) : null}
+          </div>
+        </div>
+      )}
+
+      {uploader.issue ? (
+        <Alert variant="destructive">
+          <AlertDescription>
+            <IssueMessage issue={uploader.issue} />
+          </AlertDescription>
+        </Alert>
+      ) : null}
+
+      {uploader.items.length > 0 && !showImageGrid ? (
+        <div className="space-y-3">
+          {uploader.items.map((item) => (
+            <FileQueueItem
+              key={item.id}
+              item={item}
+              onCancel={() => uploader.cancelFile(item.id)}
+              onRemove={() => uploader.removeFile(item.id)}
+              onRetry={() => {
+                void uploader.retryFile(item.id);
+              }}
+            />
+          ))}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+export { useFileUpload };
+export type {
+  FileUploadIssue,
+  FileUploadItem,
+  FileUploadItemStatus,
+  UploadedFile,
+  UploadTransport,
+} from "./file-upload/types";

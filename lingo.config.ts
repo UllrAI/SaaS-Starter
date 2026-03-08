@@ -2,7 +2,7 @@ import { SOURCE_LOCALE, TARGET_LOCALES } from "./src/lib/config/i18n";
 
 // export const LINGO_DEFAULT_MODEL = "openrouter:google/gemini-3-flash-preview";
 // export const LINGO_DEFAULT_MODEL = "openrouter:stepfun/step-3.5-flash";
-export const LINGO_DEFAULT_MODEL = "openai:LongCat-Flash-Lite";
+export const LINGO_DEFAULT_MODEL = "openai:LongCat-Flash-Chat";
 
 export const LINGO_MODEL_MAP: Record<string, string> = {
   "*:*": LINGO_DEFAULT_MODEL,

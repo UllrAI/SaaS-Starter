@@ -214,6 +214,14 @@ This repository includes a Playwright smoke test suite in `e2e/` for the most im
 - admin permission gating
 - locale canonicalization for marketing routes
 
+## Layout Widths
+
+- Use `ShellContainer` for the marketing header, footer, and other truly wide layouts.
+- Use `SectionContainer` for standard marketing sections and non-dashboard page bodies.
+- Use `ReadingContainer` for blog articles, legal pages, and other long-form reading surfaces.
+- Use `CompactContainer` for auth, payment status, and other narrow single-card flows.
+- Keep full-bleed backgrounds separate from content width. Backgrounds can span the viewport while content stays inside one semantic container.
+
 Run the suite with:
 
 ```bash

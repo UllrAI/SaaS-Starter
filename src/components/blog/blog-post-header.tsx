@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { BackgroundPattern } from "@/components/ui/background-pattern";
 import { Badge } from "@/components/ui/badge";
+import { ReadingContainer } from "@/components/layout/page-container";
 import { BlogPostMeta } from "./blog-post-meta";
 import { ArrowLeft } from "lucide-react";
 import Image from "next/image";
@@ -99,21 +100,19 @@ export function BlogPostHeader({
         {/* Tags section for hero image layout */}
         {tags.length > 0 && (
           <section className="bg-background/50 py-6 sm:py-8">
-            <div className="container mx-auto px-4 sm:px-6">
-              <div className="mx-auto max-w-4xl">
-                <div className="flex flex-wrap justify-center gap-2">
-                  {tags.map((tag, index) => (
-                    <Badge
-                      key={index}
-                      variant="outline"
-                      className="hover:bg-primary/10 text-xs transition-colors"
-                    >
-                      {tag}
-                    </Badge>
-                  ))}
-                </div>
+            <ReadingContainer>
+              <div className="flex flex-wrap justify-center gap-2">
+                {tags.map((tag, index) => (
+                  <Badge
+                    key={index}
+                    variant="outline"
+                    className="hover:bg-primary/10 text-xs transition-colors"
+                  >
+                    {tag}
+                  </Badge>
+                ))}
               </div>
-            </div>
+            </ReadingContainer>
           </section>
         )}
       </>
@@ -126,64 +125,62 @@ export function BlogPostHeader({
       <BackgroundPattern />
 
       <div className="py-6 md:py-12">
-        <div className="container mx-auto px-4 sm:px-6">
-          <div className="mx-auto max-w-4xl">
-            {/* Back button */}
-            <div className="mb-6 sm:mb-8">
-              <Button
-                variant="ghost"
-                asChild
-                className="hover:bg-background/80 pl-0 transition-colors"
-              >
-                <Link href={backHref}>
-                  <ArrowLeft className="mr-2 h-4 w-4" />
-                  <span className="hidden sm:inline">{backText}</span>
-                  <span className="sm:hidden">Back</span>
-                </Link>
-              </Button>
-            </div>
-
-            {/* Article header */}
-            <header className="text-center">
-              <BlogPostMeta
-                publishedDate={publishedDate}
-                featured={featured}
-                className="mb-6 justify-center sm:mb-8"
-                showBadge={true}
-                author={author}
-                readTime={calculateReadingTime(content)}
-                locale={locale}
-              />
-
-              <h1 className="text-foreground mb-6 text-3xl font-bold tracking-tight sm:mb-8 sm:text-4xl lg:text-5xl xl:text-6xl">
-                {title}
-              </h1>
-
-              {excerpt && (
-                <p className="text-muted-foreground mx-auto mb-6 max-w-3xl text-lg leading-relaxed sm:mb-8 sm:text-xl">
-                  {excerpt}
-                </p>
-              )}
-
-              {/* Tags section */}
-              {tags.length > 0 && (
-                <div className="mt-6 sm:mt-8">
-                  <div className="flex flex-wrap justify-center gap-2">
-                    {tags.map((tag, index) => (
-                      <Badge
-                        key={index}
-                        variant="outline"
-                        className="hover:bg-primary/10 text-xs transition-colors"
-                      >
-                        {tag}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </header>
+        <ReadingContainer>
+          {/* Back button */}
+          <div className="mb-6 sm:mb-8">
+            <Button
+              variant="ghost"
+              asChild
+              className="hover:bg-background/80 pl-0 transition-colors"
+            >
+              <Link href={backHref}>
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                <span className="hidden sm:inline">{backText}</span>
+                <span className="sm:hidden">Back</span>
+              </Link>
+            </Button>
           </div>
-        </div>
+
+          {/* Article header */}
+          <header className="text-center">
+            <BlogPostMeta
+              publishedDate={publishedDate}
+              featured={featured}
+              className="mb-6 justify-center sm:mb-8"
+              showBadge={true}
+              author={author}
+              readTime={calculateReadingTime(content)}
+              locale={locale}
+            />
+
+            <h1 className="text-foreground mb-6 text-3xl font-bold tracking-tight sm:mb-8 sm:text-4xl lg:text-5xl xl:text-6xl">
+              {title}
+            </h1>
+
+            {excerpt && (
+              <p className="text-muted-foreground mx-auto mb-6 max-w-3xl text-lg leading-relaxed sm:mb-8 sm:text-xl">
+                {excerpt}
+              </p>
+            )}
+
+            {/* Tags section */}
+            {tags.length > 0 && (
+              <div className="mt-6 sm:mt-8">
+                <div className="flex flex-wrap justify-center gap-2">
+                  {tags.map((tag, index) => (
+                    <Badge
+                      key={index}
+                      variant="outline"
+                      className="hover:bg-primary/10 text-xs transition-colors"
+                    >
+                      {tag}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+          </header>
+        </ReadingContainer>
       </div>
     </section>
   );

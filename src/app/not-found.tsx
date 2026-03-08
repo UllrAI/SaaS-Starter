@@ -8,7 +8,7 @@ export default function NotFound() {
     <main className="bg-background relative flex min-h-screen flex-col items-center justify-center overflow-hidden">
       <BackgroundPattern />
 
-      <div className="relative mx-auto max-w-2xl px-6 text-center">
+      <div className="relative mx-auto w-full max-w-2xl px-6 text-center">
         {/* Status Badge */}
         <div className="border-border bg-background/50 mb-8 inline-flex items-center rounded-full border px-3 py-1 text-sm backdrop-blur-sm">
           <Sparkles className="text-primary mr-2 h-3 w-3" />

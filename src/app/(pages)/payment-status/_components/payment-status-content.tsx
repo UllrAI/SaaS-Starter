@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { CompactContainer } from "@/components/layout/page-container";
 import {
   ArrowRight,
   CheckCircle,
@@ -282,8 +283,8 @@ export function PaymentStatusContent() {
           <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--border))_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border))_1px,transparent_1px)] bg-[size:4rem_4rem] opacity-20" />
         </div>
 
-        <div className="relative mx-auto max-w-md px-6">
-          <Card className="text-center">
+        <CompactContainer className="relative">
+          <Card className="w-full text-center">
             <CardContent className="pt-6">
               <div className="mb-6 flex justify-center">
                 <div className="relative">
@@ -308,7 +309,7 @@ export function PaymentStatusContent() {
               </p>
             </CardContent>
           </Card>
-        </div>
+        </CompactContainer>
       </section>
     );
   }
@@ -328,7 +329,7 @@ export function PaymentStatusContent() {
         <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--border))_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border))_1px,transparent_1px)] bg-[size:4rem_4rem] opacity-20" />
       </div>
 
-      <div className="relative mx-auto max-w-2xl px-6">
+      <CompactContainer className="relative">
         {/* Status Badge */}
         <div className="mb-8 text-center">
           <Badge variant={config.badgeVariant} className="">
@@ -341,7 +342,7 @@ export function PaymentStatusContent() {
         </div>
 
         {/* Main Content Card */}
-        <Card className="text-center">
+        <Card className="w-full text-center">
           <CardContent className="pt-8">
             {/* Icon with animation */}
             <div className="mb-8 flex justify-center">
@@ -359,7 +360,7 @@ export function PaymentStatusContent() {
             </h1>
 
             {/* Description */}
-            <p className="text-muted-foreground mx-auto mb-8 max-w-lg text-lg leading-relaxed">
+            <p className="text-muted-foreground mb-8 text-lg leading-relaxed">
               <Description />
             </p>
 
@@ -428,7 +429,7 @@ export function PaymentStatusContent() {
             </div>
           </CardContent>
         </Card>
-      </div>
+      </CompactContainer>
     </section>
   );
 }

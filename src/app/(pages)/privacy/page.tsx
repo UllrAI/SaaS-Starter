@@ -9,6 +9,7 @@ import {
 import { createMetadata } from "@/lib/metadata";
 import { createLocalizedAlternates } from "@/lib/metadata";
 import { getRequestLocale } from "@/lib/i18n/server-locale";
+import { ReadingContainer } from "@/components/layout/page-container";
 
 export async function generateMetadata() {
   const locale = await getRequestLocale();
@@ -181,88 +182,86 @@ const privacySections = [
 export default function PrivacyPage() {
   return (
     <div className="py-16">
-      <div className="container mx-auto px-6">
-        <div className="mx-auto max-w-4xl">
-          <h1 className="text-foreground mb-12 text-center text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
-            Privacy Policy
-          </h1>
+      <ReadingContainer>
+        <h1 className="text-foreground mb-12 text-center text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
+          Privacy Policy
+        </h1>
 
-          <p className="text-muted-foreground mb-10 text-center text-xl leading-relaxed">
-            We are committed to protecting your privacy and ensuring the
-            security of your personal information. This policy explains how we
-            collect, use, and safeguard your data.
+        <p className="text-muted-foreground mb-10 text-center text-xl leading-relaxed">
+          We are committed to protecting your privacy and ensuring the security
+          of your personal information. This policy explains how we collect,
+          use, and safeguard your data.
+        </p>
+
+        <div className="text-muted-foreground mb-12 text-center text-sm">
+          <p>Last updated: December 2024</p>
+          <p>Effective: December 1, 2024</p>
+        </div>
+
+        <div className="space-y-8">
+          {privacySections.map((section) => {
+            const Title = section.Title;
+
+            return (
+              <div key={section.id} id={section.id}>
+                <h2 className="mb-4 text-2xl font-semibold">
+                  <Title />
+                </h2>
+                <ul className="space-y-2 pl-5">
+                  {section.Items.map((Item, itemIndex) => (
+                    <li
+                      key={itemIndex}
+                      className="text-muted-foreground list-disc"
+                    >
+                      <Item />
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="mt-12">
+          <h2 className="mb-4 text-2xl font-semibold">
+            Questions About This Policy?
+          </h2>
+          <p className="text-muted-foreground mb-4">
+            If you have any questions about this Privacy Policy or our data
+            practices, please don&apos;t hesitate to contact us.
           </p>
-
-          <div className="text-muted-foreground mb-12 text-center text-sm">
-            <p>Last updated: December 2024</p>
-            <p>Effective: December 1, 2024</p>
-          </div>
-
-          <div className="space-y-8">
-            {privacySections.map((section) => {
-              const Title = section.Title;
-
-              return (
-                <div key={section.id} id={section.id}>
-                  <h2 className="mb-4 text-2xl font-semibold">
-                    <Title />
-                  </h2>
-                  <ul className="space-y-2 pl-5">
-                    {section.Items.map((Item, itemIndex) => (
-                      <li
-                        key={itemIndex}
-                        className="text-muted-foreground list-disc"
-                      >
-                        <Item />
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              );
-            })}
-          </div>
-
-          <div className="mt-12">
-            <h2 className="mb-4 text-2xl font-semibold">
-              Questions About This Policy?
-            </h2>
-            <p className="text-muted-foreground mb-4">
-              If you have any questions about this Privacy Policy or our data
-              practices, please don&apos;t hesitate to contact us.
-            </p>
-            <div className="text-muted-foreground space-y-2 text-sm">
-              <p>
-                <strong>Email:</strong> {PRIVACY_EMAIL}
-              </p>
-              <p>
-                <strong>Support:</strong>{" "}
-                <Link href="/contact" className="underline underline-offset-4">
-                  Contact page
-                </Link>
-              </p>
-              <p>
-                <strong>Community:</strong>{" "}
-                <a
-                  href={GITHUB_DISCUSSIONS_URL}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="underline underline-offset-4"
-                >
-                  GitHub Discussions
-                </a>
-              </p>
-            </div>
-          </div>
-
-          <div className="text-muted-foreground mt-12 border-t pt-8 text-center text-sm">
+          <div className="text-muted-foreground space-y-2 text-sm">
             <p>
-              This Privacy Policy is governed by the laws of the United States.
-              We reserve the right to update this policy at any time. Material
-              changes will be communicated via email or through our service.
+              <strong>Email:</strong> {PRIVACY_EMAIL}
+            </p>
+            <p>
+              <strong>Support:</strong>{" "}
+              <Link href="/contact" className="underline underline-offset-4">
+                Contact page
+              </Link>
+            </p>
+            <p>
+              <strong>Community:</strong>{" "}
+              <a
+                href={GITHUB_DISCUSSIONS_URL}
+                target="_blank"
+                rel="noreferrer"
+                className="underline underline-offset-4"
+              >
+                GitHub Discussions
+              </a>
             </p>
           </div>
         </div>
-      </div>
+
+        <div className="text-muted-foreground mt-12 border-t pt-8 text-center text-sm">
+          <p>
+            This Privacy Policy is governed by the laws of the United States. We
+            reserve the right to update this policy at any time. Material
+            changes will be communicated via email or through our service.
+          </p>
+        </div>
+      </ReadingContainer>
     </div>
   );
 }

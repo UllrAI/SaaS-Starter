@@ -2,6 +2,7 @@ import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Features } from "@/components/homepage/features";
+import { SectionContainer } from "@/components/layout/page-container";
 import { CheckCircle2, Package2, Wrench } from "lucide-react";
 import { createLocalizedAlternates, createMetadata } from "@/lib/metadata";
 import { getRequestLocale } from "@/lib/i18n/server-locale";
@@ -52,14 +53,19 @@ export default function FeaturesPage() {
   return (
     <>
       <section className="bg-background border-border border-b py-20">
-        <div className="mx-auto max-w-6xl px-6 lg:px-8">
+        <SectionContainer>
           <div className="mx-auto max-w-3xl text-center">
-            <Badge variant="outline" className="border-primary text-primary mb-4">
+            <Badge
+              variant="outline"
+              className="border-primary text-primary mb-4"
+            >
               <Package2 className="mr-2 h-3 w-3" />
               <>Starter scope</>
             </Badge>
             <h1 className="text-foreground text-4xl font-bold tracking-tight sm:text-5xl">
-              <>Everything included is here because it already exists in code.</>
+              <>
+                Everything included is here because it already exists in code.
+              </>
             </h1>
             <p className="text-muted-foreground mt-6 text-lg leading-8">
               <>
@@ -105,7 +111,7 @@ export default function FeaturesPage() {
               </CardContent>
             </Card>
           </div>
-        </div>
+        </SectionContainer>
       </section>
 
       <Features />

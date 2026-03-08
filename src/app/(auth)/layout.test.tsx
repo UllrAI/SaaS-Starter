@@ -111,7 +111,9 @@ describe("AuthLayout", () => {
     expect(childContent).toBeInTheDocument();
 
     // Check if children are in the correct wrapper
-    const wrapper = childContent.closest(".relative.w-full.max-w-md.px-6");
+    const wrapper = childContent.closest(
+      ".relative.mx-auto.w-full.max-w-md.px-4.sm\\:px-6.lg\\:px-8",
+    );
     expect(wrapper).toBeInTheDocument();
   });
 });

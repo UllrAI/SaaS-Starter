@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { X } from "lucide-react";
 import { useHydrated } from "@/hooks/use-hydrated";
+import { ShellContainer } from "@/components/layout/page-container";
 
 const COOKIE_CONSENT_KEY = "cookieConsent";
 
@@ -30,7 +31,7 @@ export function CookieConsent() {
 
   return (
     <div className="bg-background border-border fixed right-0 bottom-0 left-0 z-50 border-t p-4 shadow-lg">
-      <div className="container mx-auto flex max-w-7xl flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+      <ShellContainer className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <div className="flex-1">
           <h3 className="mb-1 text-base font-medium">We value your privacy</h3>
           <p className="text-muted-foreground text-sm">
@@ -60,7 +61,7 @@ export function CookieConsent() {
             <X className="h-4 w-4" />
           </button>
         </div>
-      </div>
+      </ShellContainer>
     </div>
   );
 }

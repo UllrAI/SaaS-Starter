@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth/server";
 import { S3Client } from "@aws-sdk/client-s3";
 import { Upload } from "@aws-sdk/lib-storage";
 import { db } from "@/database";
@@ -12,6 +11,7 @@ import {
   isFileSizeAllowed,
   getFileExtension,
 } from "@/lib/config/upload";
+import { getAuthSessionFromHeaders } from "@/lib/auth/session";
 
 // Initialize S3 client for Cloudflare R2
 const r2Client = new S3Client({
@@ -26,12 +26,7 @@ const r2Client = new S3Client({
 export async function POST(request: NextRequest) {
   try {
     // Check authentication
-    const session = await auth.api.getSession({
-      headers: request.headers,
-      query: {
-        disableCookieCache: true,
-      },
-    });
+    const session = await getAuthSessionFromHeaders(request.headers);
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

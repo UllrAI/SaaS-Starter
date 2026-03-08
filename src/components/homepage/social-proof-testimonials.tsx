@@ -110,7 +110,8 @@ export function SocialProofUnified() {
               <>
                 The project already includes the modules most teams end up
                 rebuilding: auth, billing, uploads, admin screens, content
-                pages, and localization plumbing.
+                pages, localization plumbing, and a Playwright smoke suite for
+                core browser flows.
               </>
             </p>
 
@@ -184,7 +185,8 @@ export function SocialProofUnified() {
                   <>
                     The value is the integration work already done for you:
                     consistent UI, typed data boundaries, and working flows
-                    between auth, billing, storage, and admin tooling.
+                    between auth, billing, storage, admin tooling, and core
+                    regression checks.
                   </>
                 </p>
               </CardContent>

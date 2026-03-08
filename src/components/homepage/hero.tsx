@@ -59,8 +59,8 @@ export function Hero() {
             >
               <>
                 Complete UllrAI SaaS starter with authentication, payments,
-                database, and deployment. Everything you need to go from idea to
-                revenue.
+                database, admin tooling, and Playwright-backed smoke tests.
+                Everything you need to go from idea to revenue.
               </>
             </p>
 
@@ -70,7 +70,7 @@ export function Hero() {
             >
               <Button
                 size="lg"
-                className="bg-primary text-primary-foreground hover:bg-primary/90 h-14 px-10 text-base font-bold shadow-xl transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-lg active:translate-x-[8px] active:translate-y-[8px] lg:h-16 lg:px-12 lg:text-lg"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 h-14 px-10 text-base font-bold shadow-md transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-lg active:translate-x-[8px] active:translate-y-[8px] lg:h-16 lg:px-12 lg:text-lg"
                 asChild
               >
                 <Link href="/signup">
@@ -239,6 +239,12 @@ export function Hero() {
                           ✓
                         </span>
                         <span><>i18n Ready</></span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-primary" data-lingo-skip>
+                          ✓
+                        </span>
+                        <span><>E2E Smoke Tests</></span>
                       </div>
                     </div>
                   </div>

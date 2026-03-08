@@ -4,8 +4,8 @@ import {
 } from "next-safe-action";
 import { headers } from "next/headers";
 import { z } from "zod";
-import { auth } from "./auth/server";
 import { APP_NAME } from "@/lib/config/constants";
+import { getAuthSessionFromHeaders } from "./auth/session";
 
 const actionClient = createSafeActionClient({
   handleServerError(e) {
@@ -30,12 +30,7 @@ const actionClient = createSafeActionClient({
 
 export const authActionClient = actionClient
   .use(async ({ next }) => {
-    const res = await auth.api.getSession({
-      headers: await headers(),
-      query: {
-        disableCookieCache: true,
-      },
-    });
+    const res = await getAuthSessionFromHeaders(await headers());
 
     if (!res || !res.session || !res.user) {
       throw new Error("You are not authorized to perform this action");

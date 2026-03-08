@@ -85,7 +85,7 @@ The application will run at `http://localhost:3000`.
 - **Content Management**: Content Collections (Markdown blog system)
 - **Email Service**: Resend + React Email (Transactional email templates)
 - **Form Handling**: React Hook Form + Zod (Type-safe form validation)
-- **Code Quality**: ESLint, Prettier
+- **Code Quality**: ESLint, Prettier, Jest, Playwright smoke tests
 - **Admin Dashboard**: Generic data management dashboard, easily extensible to manage any database table
 - **Deployment**: One-click Vercel deployment
 
@@ -468,10 +468,19 @@ Provides a powerful, extensible data management system.
 
 ### 6.1. Testing Strategy
 
-- **Framework**: Uses `Jest` and `React Testing Library`.
-- **Configuration Files**: `jest.config.ts`, `jest.setup.ts`.
-- **Examples**: Project includes unit test examples for UI components (`logo.test.tsx`), layouts (`layout.test.tsx`), schemas (`auth.schema.test.ts`), and core logic (`database/index.test.ts`).
-- **Run Tests**: `pnpm test`
+- **Frameworks**: Uses `Jest`, `React Testing Library`, and `Playwright`.
+- **Configuration Files**: `jest.config.js`, `jest.setup.ts`, `playwright.config.ts`.
+- **Unit and integration coverage**: Jest covers UI components, route handlers, hooks, auth helpers, billing helpers, upload logic, and dashboard pages.
+- **Browser smoke coverage**: Playwright currently exercises dashboard auth redirects, authenticated dashboard access, admin gating, and locale canonicalization in a real browser.
+- **Examples**:
+  - Unit/component: `src/components/forms/auth-form.test.tsx`
+  - Page: `src/app/dashboard/page.test.tsx`
+  - Route handler: `src/app/api/billing/checkout/route.test.ts`
+  - Browser E2E: `e2e/auth.spec.ts`, `e2e/admin.spec.ts`, `e2e/locale.spec.ts`
+- **Run Tests**:
+  - `pnpm test`
+  - `pnpm test:e2e`
+- **Test-only session route**: Playwright enables `/api/test/session` only when `E2E_TEST_MODE=true` and the correct `E2E_TEST_SECRET` is present.
 
 ### 6.2. Code Quality Assurance
 
@@ -511,6 +520,7 @@ Provides a powerful, extensible data management system.
 | `pnpm start`            | Start production server                    |
 | `pnpm lint`             | Run ESLint checks                          |
 | `pnpm test`             | Run Jest unit tests                        |
+| `pnpm test:e2e`         | Run Playwright E2E smoke tests             |
 | `pnpm prettier:format`  | Format all code                            |
 | `pnpm db:generate`      | Generate committed migration files         |
 | `pnpm db:migrate`       | Apply migrations to the current database   |

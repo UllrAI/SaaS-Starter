@@ -86,7 +86,7 @@ pnpm dev
 - **内容管理**: Content Collections (Markdown 博客系统)
 - **邮件服务**: Resend + React Email (事务性邮件模板)
 - **表单处理**: React Hook Form + Zod (类型安全的表单验证)
-- **代码质量**: ESLint, Prettier
+- **代码质量**: ESLint、Prettier、Jest、Playwright 冒烟测试
 - **管理后台**: 通用的数据管理后台，可轻松扩展以管理任何数据库表
 - **部署**: Vercel 一键部署
 
@@ -469,10 +469,19 @@ sequenceDiagram
 
 ### 6.1. 测试策略
 
-- **框架**: 使用 `Jest` 和 `React Testing Library`。
-- **配置文件**: `jest.config.ts`, `jest.setup.ts`。
-- **示例**: 项目中包含了对 UI 组件 (`logo.test.tsx`)、布局 (`layout.test.tsx`)、Schema (`auth.schema.test.ts`) 和核心逻辑 (`src/database/index.test.ts`) 的单元测试示例。
-- **运行测试**: `pnpm test`
+- **框架**: 使用 `Jest`、`React Testing Library` 和 `Playwright`。
+- **配置文件**: `jest.config.js`、`jest.setup.ts`、`playwright.config.ts`。
+- **单元与集成覆盖**: Jest 覆盖 UI 组件、路由处理器、hooks、认证辅助函数、计费逻辑、上传逻辑和 dashboard 页面。
+- **浏览器冒烟覆盖**: Playwright 当前覆盖 dashboard 登录重定向、已登录 dashboard 访问、admin 权限拦截，以及 locale 路由规范化。
+- **示例**:
+  - 单元/组件: `src/components/forms/auth-form.test.tsx`
+  - 页面: `src/app/dashboard/page.test.tsx`
+  - 路由处理器: `src/app/api/billing/checkout/route.test.ts`
+  - 浏览器 E2E: `e2e/auth.spec.ts`、`e2e/admin.spec.ts`、`e2e/locale.spec.ts`
+- **运行测试**:
+  - `pnpm test`
+  - `pnpm test:e2e`
+- **测试专用会话路由**: Playwright 仅在 `E2E_TEST_MODE=true` 且提供正确 `E2E_TEST_SECRET` 时启用 `/api/test/session`。
 
 ### 6.2. 代码质量保障
 
@@ -512,6 +521,7 @@ sequenceDiagram
 | `pnpm start`            | 启动生产服务器                    |
 | `pnpm lint`             | 运行 ESLint 检查                  |
 | `pnpm test`             | 运行 Jest 单元测试                |
+| `pnpm test:e2e`         | 运行 Playwright E2E 冒烟测试      |
 | `pnpm prettier:format`  | 格式化所有代码                    |
 | `pnpm db:generate`      | 生成可提交的迁移文件              |
 | `pnpm db:migrate`       | 对当前数据库应用迁移              |

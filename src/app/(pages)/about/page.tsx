@@ -29,18 +29,18 @@ export async function generateMetadata() {
     ...metadata,
     title: "About Us",
     description:
-      "Learn about our mission to help developers build and launch SaaS products faster than ever before.",
+      "Learn about our mission to help developers build and launch SaaS products faster with real, tested foundations.",
     openGraph: {
       ...metadata.openGraph,
       title: "About Us",
       description:
-        "Learn about our mission to help developers build and launch SaaS products faster than ever before.",
+        "Learn about our mission to help developers build and launch SaaS products faster with real, tested foundations.",
     },
     twitter: {
       ...metadata.twitter,
       title: "About Us",
       description:
-        "Learn about our mission to help developers build and launch SaaS products faster than ever before.",
+        "Learn about our mission to help developers build and launch SaaS products faster with real, tested foundations.",
     },
   };
 }
@@ -65,8 +65,10 @@ export default function AboutPage() {
                 Building the future of SaaS
               </h1>
               <p className="text-muted-foreground mx-auto max-w-3xl text-xl leading-relaxed">
-                We are a team of developers, designers, and creators building the
-                tools we wish we had. Open source at heart, enterprise in scale.
+                We are a team of developers, designers, and creators building
+                the tools we wish we had. Open source at heart, practical in
+                execution, and serious about documented, regression-tested
+                product foundations.
               </p>
             </div>
 

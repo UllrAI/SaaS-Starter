@@ -1,17 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth/server";
 import { billing } from "@/lib/billing";
 import { getUserSubscription } from "@/lib/database/subscription";
 import { assertTrustedBillingUrl } from "@/lib/billing/url";
+import { getAuthSessionFromHeaders } from "@/lib/auth/session";
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await auth.api.getSession({
-      headers: request.headers,
-      query: {
-        disableCookieCache: true,
-      },
-    });
+    const session = await getAuthSessionFromHeaders(request.headers);
     if (!session?.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth/server";
 import { billing } from "@/lib/billing";
-import { Session } from "@/types/auth";
 import { z } from "zod";
 import { getUserSubscription } from "@/lib/database/subscription";
 import { assertTrustedBillingUrl } from "@/lib/billing/url";
+import { getAuthSessionFromHeaders } from "@/lib/auth/session";
 
 const checkoutSchema = z.object({
   tierId: z.string(),
@@ -13,14 +12,9 @@ const checkoutSchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
-  let session: Session | null = null;
+  let session = null;
   try {
-    session = await auth.api.getSession({
-      headers: request.headers,
-      query: {
-        disableCookieCache: true,
-      },
-    });
+    session = await getAuthSessionFromHeaders(request.headers);
     if (!session?.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

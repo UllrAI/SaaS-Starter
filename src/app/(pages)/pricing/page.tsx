@@ -33,7 +33,7 @@ export async function generateMetadata() {
     ...metadata,
     title: "Pricing",
     description:
-      "Pricing for the SaaS Starter codebase. Review the current package structure, payment flow, and what is included before checkout.",
+      "Pricing for the SaaS Starter codebase. Review the current package structure, verification stack, and what is included before checkout.",
     keywords: [
       "pricing",
       "starter kit",
@@ -45,13 +45,13 @@ export async function generateMetadata() {
       ...metadata.openGraph,
       title: "Pricing",
       description:
-        "Pricing for the SaaS Starter codebase. Review the current package structure, payment flow, and what is included before checkout.",
+        "Pricing for the SaaS Starter codebase. Review the current package structure, verification stack, and what is included before checkout.",
     },
     twitter: {
       ...metadata.twitter,
       title: "Pricing",
       description:
-        "Pricing for the SaaS Starter codebase. Review the current package structure, payment flow, and what is included before checkout.",
+        "Pricing for the SaaS Starter codebase. Review the current package structure, verification stack, and what is included before checkout.",
     },
   };
 }
@@ -141,6 +141,15 @@ const notes = [
       <>
         Plan definitions, feature entitlements, and lifecycle messaging should
         be updated to reflect your real commercial offer before launch.
+      </>
+    );
+  },
+  function PricingNoteVerification() {
+    return (
+      <>
+        The current verification stack includes Jest coverage plus Playwright
+        smoke tests for auth, admin access, and locale routing. Extend browser
+        coverage before relying on custom billing or upload flows in production.
       </>
     );
   },

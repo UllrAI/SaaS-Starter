@@ -1,6 +1,5 @@
 import React from "react";
 import { headers } from "next/headers";
-import { auth } from "@/lib/auth/server";
 import { DashboardPageWrapper } from "../_components/dashboard-page-wrapper";
 import {
   getUserPayments,
@@ -8,6 +7,7 @@ import {
 } from "@/lib/database/subscription";
 import { BillingOverview } from "./_components/billing-overview";
 import { createMetadata } from "@/lib/metadata";
+import { getAuthSessionFromHeaders } from "@/lib/auth/session";
 
 export async function generateMetadata() {
   const metadata = createMetadata({});
@@ -31,12 +31,7 @@ export async function generateMetadata() {
 
 export default async function DashboardBillingPage() {
   const requestHeaders = await headers();
-  const session = await auth.api.getSession({
-    headers: requestHeaders,
-    query: {
-      disableCookieCache: true,
-    },
-  });
+  const session = await getAuthSessionFromHeaders(requestHeaders);
 
   const [subscription, payments] = await Promise.all([
     session?.user?.id

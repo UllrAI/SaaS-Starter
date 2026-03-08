@@ -50,7 +50,7 @@ export function AdminStatsCards({ stats, locale }: AdminStatsCardsProps) {
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       <Card className="relative overflow-hidden">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0">
           <CardTitle className="text-sm font-medium">Total Users</CardTitle>
           <Users className="text-muted-foreground h-4 w-4" />
         </CardHeader>
@@ -70,7 +70,7 @@ export function AdminStatsCards({ stats, locale }: AdminStatsCardsProps) {
       </Card>
 
       <Card className="relative overflow-hidden">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0">
           <CardTitle className="text-sm font-medium">
             Active Subscriptions
           </CardTitle>
@@ -89,7 +89,7 @@ export function AdminStatsCards({ stats, locale }: AdminStatsCardsProps) {
       </Card>
 
       <Card className="relative overflow-hidden">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0">
           <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
           <CreditCard className="text-muted-foreground h-4 w-4" />
         </CardHeader>
@@ -105,7 +105,7 @@ export function AdminStatsCards({ stats, locale }: AdminStatsCardsProps) {
       </Card>
 
       <Card className="relative overflow-hidden">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0">
           <CardTitle className="text-sm font-medium">File Uploads</CardTitle>
           <Upload className="text-muted-foreground h-4 w-4" />
         </CardHeader>

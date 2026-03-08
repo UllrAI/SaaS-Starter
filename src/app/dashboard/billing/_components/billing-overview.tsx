@@ -106,7 +106,7 @@ export function BillingOverview({ subscription, payments }: BillingOverviewProps
     <div className="space-y-6">
       <section className="grid gap-3 sm:grid-cols-3">
         <Card>
-          <CardHeader className="pb-2">
+          <CardHeader>
             <CardDescription>Current Plan</CardDescription>
             <CardTitle className="text-base">
               {subscription
@@ -136,7 +136,7 @@ export function BillingOverview({ subscription, payments }: BillingOverviewProps
         </Card>
 
         <Card>
-          <CardHeader className="pb-2">
+          <CardHeader>
             <CardDescription>Next Billing Date</CardDescription>
             <CardTitle className="text-base">
               {nextBillingDate || <NotScheduledLabel />}
@@ -151,7 +151,7 @@ export function BillingOverview({ subscription, payments }: BillingOverviewProps
         </Card>
 
         <Card>
-          <CardHeader className="pb-2">
+          <CardHeader>
             <CardDescription>Successful Payments</CardDescription>
             <CardTitle className="text-base">{paymentSummary.count}</CardTitle>
           </CardHeader>

@@ -2,9 +2,6 @@ import { describe, expect, it } from "@jest/globals";
 import {
   DEFAULT_INTL_LOCALE,
   INTL_LOCALE_BY_SUPPORTED_LOCALE,
-  LINGO_DEFAULT_MODEL,
-  LINGO_MODEL_MAP,
-  LINGO_PLURALIZATION_MODEL,
   SOURCE_LOCALE,
   SUPPORTED_LOCALES,
   TARGET_LOCALES,
@@ -48,11 +45,5 @@ describe("i18n config", () => {
     expect(getLocaleDisplayInfo("not_a_locale")).toEqual({
       nativeName: "NOT-A-LOCALE",
     });
-  });
-
-  it("keeps lingo model configuration aligned", () => {
-    expect(LINGO_DEFAULT_MODEL).toBeTruthy();
-    expect(LINGO_MODEL_MAP["*:*"]).toBe(LINGO_DEFAULT_MODEL);
-    expect(LINGO_PLURALIZATION_MODEL).toBe(LINGO_DEFAULT_MODEL);
   });
 });

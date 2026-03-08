@@ -3,7 +3,7 @@ import { PaymentStatusContent } from "./_components/payment-status-content";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
-import { CompactContainer } from "@/components/layout/page-container";
+import { SectionContainer } from "@/components/layout/page-container";
 import { Clock } from "lucide-react";
 import { createMetadata } from "@/lib/metadata";
 
@@ -39,15 +39,16 @@ function PaymentStatusSkeleton() {
         <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--border))_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border))_1px,transparent_1px)] bg-[size:4rem_4rem] opacity-20" />
       </div>
 
-      <CompactContainer className="relative">
+      <SectionContainer className="relative">
         {/* Status Badge Skeleton */}
         <div className="mb-8 text-center">
-          <div className="border-border bg-background/50 inline-flex items-center rounded-full border px-4 py-2 backdrop-blur-sm">
-            <Badge variant="secondary" className="gap-2">
-              <Clock className="h-3 w-3" />
-              Loading...
-            </Badge>
-          </div>
+          <Badge
+            variant="outline"
+            className="border-border bg-background/50 inline-flex items-center border px-3 py-1 text-sm backdrop-blur-sm font-mono text-muted-foreground"
+          >
+            <Clock className="mr-2 h-3 w-3" />
+            LOADING_STATUS
+          </Badge>
         </div>
 
         <Card className="w-full text-center">
@@ -59,7 +60,7 @@ function PaymentStatusSkeleton() {
             <Skeleton className="mx-auto h-10 w-40" />
           </CardContent>
         </Card>
-      </CompactContainer>
+      </SectionContainer>
     </section>
   );
 }

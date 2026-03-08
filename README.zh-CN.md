@@ -219,7 +219,8 @@ pnpm set:admin --email=your-email@example.com
 - `ShellContainer` 用于 marketing 的 header、footer 以及真正需要大画布的宽布局。
 - `SectionContainer` 用于常规 marketing section 和大多数非 dashboard 页面主体。
 - `ReadingContainer` 用于博客正文、法律条款等长文本阅读场景。
-- `CompactContainer` 用于登录、支付状态这类窄单卡片流程。
+- `CompactContainer` 用于登录这种窄单卡片流程。
+- `FocusContainer` 用于支付状态这类需要更多展示空间的单卡片流程。
 - 全宽背景与内容宽度要分开处理。背景可以铺满视口，内容仍应落在一个语义化容器内。
 
 运行方式：

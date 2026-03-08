@@ -103,7 +103,8 @@ pnpm set:admin
 - Use `ShellContainer` for global chrome and genuinely wide split layouts such as the marketing header, footer, and homepage hero.
 - Use `SectionContainer` for standard marketing sections and most non-dashboard page bodies.
 - Use `ReadingContainer` for article content, legal copy, and other long-form reading surfaces.
-- Use `CompactContainer` for narrow auth, status, and single-card flows.
+- Use `CompactContainer` for narrow auth flows.
+- Use `FocusContainer` for status pages and single-card flows that need more space.
 - Treat full-bleed backgrounds and content width as separate concerns: a section may span the viewport, but its content should still sit inside one semantic container.
 - Do not add new ad hoc width systems or scatter `max-w-*` utilities through page modules unless a one-off component truly cannot be expressed with the existing containers.
 

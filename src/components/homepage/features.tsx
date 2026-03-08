@@ -14,211 +14,17 @@ import {
   ShieldCheck,
 } from "lucide-react";
 
-interface Feature {
-  id: string;
-  Title: React.ComponentType;
-  Description: React.ComponentType;
+function FeatureCard({
+  category,
+  description,
+  icon: Icon,
+  title,
+}: {
+  category: React.ReactNode;
+  description: React.ReactNode;
   icon: React.ComponentType<{ className?: string }>;
-  Category: React.ComponentType;
-}
-
-const features: Feature[] = [
-  {
-    id: "app-router",
-    Title: function FeatureTitleAppRouter() {
-      return <>Next.js App Router foundation</>;
-    },
-    Description: function FeatureDescriptionAppRouter() {
-      return (
-        <>
-          Route groups, metadata helpers, loading states, error boundaries, and
-          page conventions are already wired in the codebase.
-        </>
-      );
-    },
-    icon: Package2,
-    Category: function FeatureCategoryArchitecture() {
-      return <>Architecture</>;
-    },
-  },
-  {
-    id: "auth",
-    Title: function FeatureTitleAuth() {
-      return <>Authentication and permissions</>;
-    },
-    Description: function FeatureDescriptionAuth() {
-      return (
-        <>
-          Better Auth sessions, guarded dashboard routes, role checks, and auth
-          flows for login, signup, and magic-link style access.
-        </>
-      );
-    },
-    icon: LockKeyhole,
-    Category: function FeatureCategoryAuth() {
-      return <>Auth</>;
-    },
-  },
-  {
-    id: "billing",
-    Title: function FeatureTitleBilling() {
-      return <>Billing workflow</>;
-    },
-    Description: function FeatureDescriptionBilling() {
-      return (
-        <>
-          Creem checkout, customer portal handoff, webhook handling, and
-          subscription records are connected end to end.
-        </>
-      );
-    },
-    icon: CreditCard,
-    Category: function FeatureCategoryMonetization() {
-      return <>Monetization</>;
-    },
-  },
-  {
-    id: "admin",
-    Title: function FeatureTitleAdmin() {
-      return <>Admin operations</>;
-    },
-    Description: function FeatureDescriptionAdmin() {
-      return (
-        <>
-          User, payment, subscription, and upload management screens give you a
-          working back office instead of an empty shell.
-        </>
-      );
-    },
-    icon: LayoutDashboard,
-    Category: function FeatureCategoryOperations() {
-      return <>Operations</>;
-    },
-  },
-  {
-    id: "data",
-    Title: function FeatureTitleData() {
-      return <>Typed database layer</>;
-    },
-    Description: function FeatureDescriptionData() {
-      return (
-        <>
-          Drizzle models, query helpers, and server-side data access keep the
-          app consistent without hand-written SQL scattered around the UI.
-        </>
-      );
-    },
-    icon: Database,
-    Category: function FeatureCategoryData() {
-      return <>Data</>;
-    },
-  },
-  {
-    id: "uploads",
-    Title: function FeatureTitleUploads() {
-      return <>Direct and server uploads</>;
-    },
-    Description: function FeatureDescriptionUploads() {
-      return (
-        <>
-          Cloudflare R2 upload flows support browser uploads, server uploads,
-          and administrative cleanup without leaking storage details into the
-          UI.
-        </>
-      );
-    },
-    icon: BadgeCheck,
-    Category: function FeatureCategoryStorage() {
-      return <>Storage</>;
-    },
-  },
-  {
-    id: "content",
-    Title: function FeatureTitleContent() {
-      return <>Content and SEO primitives</>;
-    },
-    Description: function FeatureDescriptionContent() {
-      return (
-        <>
-          Markdown blog content, Content Collections indexing, metadata
-          generation, sitemap output, and structured page shells are included
-          for marketing content.
-        </>
-      );
-    },
-    icon: FileText,
-    Category: function FeatureCategoryContent() {
-      return <>Content</>;
-    },
-  },
-  {
-    id: "i18n",
-    Title: function FeatureTitleI18n() {
-      return <>Localization-ready routing</>;
-    },
-    Description: function FeatureDescriptionI18n() {
-      return (
-        <>
-          Locale persistence, marketing URL handling, and translated UI strings
-          are in place for Multilingual.
-        </>
-      );
-    },
-    icon: Globe,
-    Category: function FeatureCategoryI18n() {
-      return <>i18n</>;
-    },
-  },
-  {
-    id: "testing",
-    Title: function FeatureTitleTesting() {
-      return <>Testing and regression coverage</>;
-    },
-    Description: function FeatureDescriptionTesting() {
-      return (
-        <>
-          Jest covers units and routes, while Playwright smoke tests exercise
-          auth redirects, admin gating, and locale routing in a real browser.
-        </>
-      );
-    },
-    icon: ShieldCheck,
-    Category: function FeatureCategoryTesting() {
-      return <>Quality</>;
-    },
-  },
-];
-
-const featureStats = [
-  {
-    id: "modules",
-    Label: function FeatureStatLabelModules() {
-      return <>Core modules</>;
-    },
-    value: <span data-lingo-skip>9</span>,
-  },
-  {
-    id: "locales",
-    Label: function FeatureStatLabelLocales() {
-      return <>Locales shipped</>;
-    },
-    value: <span data-lingo-skip>2</span>,
-  },
-  {
-    id: "billing-options",
-    Label: function FeatureStatLabelCheckoutModes() {
-      return <>Checkout modes</>;
-    },
-    value: <span data-lingo-skip>3</span>,
-  },
-];
-
-function FeatureCard({ feature }: { feature: Feature }) {
-  const Icon = feature.icon;
-  const Title = feature.Title;
-  const Description = feature.Description;
-  const Category = feature.Category;
-
+  title: React.ReactNode;
+}) {
   return (
     <Card className="group border-border bg-card hover:border-primary h-full border p-6 transition-all">
       <div className="space-y-4">
@@ -227,16 +33,14 @@ function FeatureCard({ feature }: { feature: Feature }) {
             <Icon className="h-6 w-6" />
           </div>
           <Badge variant="outline" className="border-border font-mono text-xs">
-            <Category />
+            {category}
           </Badge>
         </div>
 
         <div className="space-y-2">
-          <h3 className="text-foreground text-lg font-bold">
-            <Title />
-          </h3>
+          <h3 className="text-foreground text-lg font-bold">{title}</h3>
           <p className="text-muted-foreground text-sm leading-relaxed">
-            <Description />
+            {description}
           </p>
         </div>
       </div>
@@ -245,6 +49,137 @@ function FeatureCard({ feature }: { feature: Feature }) {
 }
 
 export function Features() {
+  const features = [
+    {
+      id: "app-router",
+      title: <>Next.js App Router foundation</>,
+      description: (
+        <>
+          Route groups, metadata helpers, loading states, error boundaries, and
+          page conventions are already wired in the codebase.
+        </>
+      ),
+      icon: Package2,
+      category: <>Architecture</>,
+    },
+    {
+      id: "auth",
+      title: <>Authentication and permissions</>,
+      description: (
+        <>
+          Better Auth sessions, guarded dashboard routes, role checks, and auth
+          flows for login, signup, and magic-link style access.
+        </>
+      ),
+      icon: LockKeyhole,
+      category: <>Auth</>,
+    },
+    {
+      id: "billing",
+      title: <>Billing workflow</>,
+      description: (
+        <>
+          Creem checkout, customer portal handoff, webhook handling, and
+          subscription records are connected end to end.
+        </>
+      ),
+      icon: CreditCard,
+      category: <>Monetization</>,
+    },
+    {
+      id: "admin",
+      title: <>Admin operations</>,
+      description: (
+        <>
+          User, payment, subscription, and upload management screens give you a
+          working back office instead of an empty shell.
+        </>
+      ),
+      icon: LayoutDashboard,
+      category: <>Operations</>,
+    },
+    {
+      id: "data",
+      title: <>Typed database layer</>,
+      description: (
+        <>
+          Drizzle models, query helpers, and server-side data access keep the
+          app consistent without hand-written SQL scattered around the UI.
+        </>
+      ),
+      icon: Database,
+      category: <>Data</>,
+    },
+    {
+      id: "uploads",
+      title: <>Direct and server uploads</>,
+      description: (
+        <>
+          Cloudflare R2 upload flows support browser uploads, server uploads,
+          and administrative cleanup without leaking storage details into the
+          UI.
+        </>
+      ),
+      icon: BadgeCheck,
+      category: <>Storage</>,
+    },
+    {
+      id: "content",
+      title: <>Content and SEO primitives</>,
+      description: (
+        <>
+          Markdown blog content, Content Collections indexing, metadata
+          generation, sitemap output, and structured page shells are included
+          for marketing content.
+        </>
+      ),
+      icon: FileText,
+      category: <>Content</>,
+    },
+    {
+      id: "i18n",
+      title: <>Localization-ready routing</>,
+      description: (
+        <>
+          Locale persistence, marketing URL handling, and translated UI strings
+          are in place for Multilingual.
+        </>
+      ),
+      icon: Globe,
+      category: <>i18n</>,
+    },
+    {
+      id: "testing",
+      title: <>Testing and regression coverage</>,
+      description: (
+        <>
+          Jest covers units and routes, while Playwright smoke tests exercise
+          auth redirects, admin gating, and locale routing in a real browser.
+        </>
+      ),
+      icon: ShieldCheck,
+      category: <>Quality</>,
+    },
+  ];
+
+  const featureStats = [
+    {
+      id: "modules",
+      label: <>Core modules</>,
+      value: <span data-lingo-skip>9</span>,
+    },
+    {
+      id: "locales",
+      label: <>Locales shipped</>,
+      value: <span data-lingo-skip>2</span>,
+    },
+    {
+      id: "billing-options",
+      label: <>Checkout modes</>,
+      value: <span data-lingo-skip>3</span>,
+    },
+  ];
+
   return (
     <section
       id="features"
@@ -252,9 +187,11 @@ export function Features() {
     >
       <SectionContainer>
         <div className="mx-auto mb-16 max-w-2xl text-center">
-          <Badge variant="outline" className="border-primary text-primary mb-4">
-            <Package2 className="mr-2 h-3 w-3" />
-            <>Included modules</>
+          <Badge className="border-border bg-background/50 mb-4 inline-flex items-center border px-3 py-1 text-sm backdrop-blur-sm">
+            <Package2 className="text-muted-foreground mr-2 h-3 w-3" />
+            <span className="text-muted-foreground font-mono">
+              INCLUDED_MODULES
+            </span>
           </Badge>
 
           <h2 className="text-foreground text-3xl font-bold tracking-tight sm:text-4xl">
@@ -275,28 +212,24 @@ export function Features() {
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {features.map((feature) => (
-            <FeatureCard key={feature.id} feature={feature} />
+            <FeatureCard key={feature.id} {...feature} />
           ))}
         </div>
 
         <div className="bg-border border-border mt-16 grid gap-px border sm:grid-cols-3">
-          {featureStats.map((stat) => {
-            const Label = stat.Label;
-
-            return (
-              <div
-                key={stat.id}
-                className="bg-card hover:bg-secondary/50 p-8 text-center transition-colors"
-              >
-                <div className="text-foreground text-4xl font-bold tracking-tighter">
-                  {stat.value}
-                </div>
-                <div className="text-muted-foreground mt-2 text-sm tracking-widest uppercase">
-                  <Label />
-                </div>
+          {featureStats.map((stat) => (
+            <div
+              key={stat.id}
+              className="bg-card hover:bg-secondary/50 p-8 text-center transition-colors"
+            >
+              <div className="text-foreground text-4xl font-bold tracking-tighter">
+                {stat.value}
               </div>
-            );
-          })}
+              <div className="text-muted-foreground mt-2 text-sm tracking-widest uppercase">
+                {stat.label}
+              </div>
+            </div>
+          ))}
         </div>
       </SectionContainer>
     </section>

@@ -1,8 +1,12 @@
-import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Features } from "@/components/homepage/features";
 import { SectionContainer } from "@/components/layout/page-container";
+import {
+  PageIntro,
+  PageIntroDescription,
+  PageIntroHeading,
+} from "@/components/layout/page-intro";
 import { CheckCircle2, Package2, Wrench } from "lucide-react";
 import { createLocalizedAlternates, createMetadata } from "@/lib/metadata";
 import { getRequestLocale } from "@/lib/i18n/server-locale";
@@ -37,11 +41,11 @@ export default function FeaturesPage() {
   const includedItems = [
     <>Next.js App Router structure with page/layout conventions</>,
     <>Better Auth login, signup, session, and permission guards</>,
-    <>Creem checkout, portal redirect, subscription records, and webhooks</>,
+    <>Creem checkout, portal, subscription records, and webhooks</>,
     <>Admin pages for users, payments, subscriptions, and uploads</>,
     <>Cloudflare R2 upload flows for browser and server uploads</>,
     <>Markdown blog content, typed collections, and marketing pages</>,
-    <>Playwright smoke coverage for auth, admin access, and locale routing</>,
+    <>Playwright smoke coverage for auth, admin, and locale routing</>,
   ];
 
   const customizationItems = [
@@ -54,27 +58,24 @@ export default function FeaturesPage() {
     <>
       <section className="bg-background border-border border-b py-20">
         <SectionContainer>
-          <div className="mx-auto max-w-3xl text-center">
-            <Badge
-              variant="outline"
-              className="border-primary text-primary mb-4"
-            >
-              <Package2 className="mr-2 h-3 w-3" />
-              <>Starter scope</>
-            </Badge>
-            <h1 className="text-foreground text-4xl font-bold tracking-tight sm:text-5xl">
-              <>
-                Everything included is here because it already exists in code.
-              </>
-            </h1>
-            <p className="text-muted-foreground mt-6 text-lg leading-8">
-              <>
-                This page describes the current implementation, not a roadmap or
-                marketing wish list. It is the fastest way to see what you can
-                reuse immediately and what still belongs to your product team.
-              </>
-            </p>
-          </div>
+          <PageIntro
+            badge={
+              <Badge className="border-border bg-background/50 inline-flex items-center border px-3 py-1 text-sm backdrop-blur-sm">
+                <Package2 className="text-muted-foreground mr-2 h-3 w-3" />
+                <span className="text-muted-foreground font-mono">
+                  STARTER_SCOPE
+                </span>
+              </Badge>
+            }
+          >
+            <PageIntroHeading className="text-4xl sm:text-5xl lg:text-6xl">
+              Shipped and ready to scale
+            </PageIntroHeading>
+            <PageIntroDescription className="mt-6 text-lg leading-8">
+              Every feature listed here exists in the codebase today. No roadmaps
+              or placeholders—just tested foundations you can reuse immediately.
+            </PageIntroDescription>
+          </PageIntro>
 
           <div className="mt-12 grid gap-6 lg:grid-cols-2">
             <Card className="border-border bg-card">

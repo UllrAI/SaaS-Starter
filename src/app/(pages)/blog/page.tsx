@@ -1,4 +1,5 @@
 import { Sparkles, BookOpen } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { BackgroundPattern } from "@/components/ui/background-pattern";
 import { BlogPostCard } from "@/components/blog/blog-post-card";
 import {
@@ -87,12 +88,12 @@ export default async function BlogPage() {
 
         <ReadingContainer>
           <div className="text-center">
-            <div className="border-border bg-background/50 mb-4 inline-flex items-center rounded-full border px-3 py-1 text-sm backdrop-blur-sm sm:mb-6">
-              <Sparkles className="text-primary mr-2 h-3 w-3" />
-              <span className="text-muted-foreground">
-                Latest guides, testing notes, and updates
+            <Badge className="border-border bg-background/50 mb-4 inline-flex items-center border px-3 py-1 text-sm backdrop-blur-sm sm:mb-6">
+              <Sparkles className="text-muted-foreground mr-2 h-3 w-3" />
+              <span className="text-muted-foreground font-mono">
+                BLOG_INDEX
               </span>
-            </div>
+            </Badge>
             <h1 className="text-foreground mb-4 text-3xl font-bold tracking-tight sm:mb-6 sm:text-4xl lg:text-5xl xl:text-6xl">
               Our Blog
             </h1>

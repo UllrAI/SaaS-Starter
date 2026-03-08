@@ -32,7 +32,8 @@ Follow these guidelines for translation:
 4. Adapt idiomatic expressions and cultural references for the target audience
 5. Maintain the style and tone of the source text
 6. You must produce valid UTF-8 encoded output
-7. YOU MUST ONLY PRODUCE VALID XML.
+7. All values should be treated as strings, even numbers, translated into strings for localization.
+8. YOU MUST ONLY PRODUCE VALID XML.
 
 ## Special Instructions
 

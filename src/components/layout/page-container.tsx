@@ -6,7 +6,8 @@ type ContainerProps = ComponentPropsWithoutRef<"div">;
 const containerWidthClasses = {
   shell: "max-w-7xl",
   section: "max-w-6xl",
-  reading: "max-w-[72ch]",
+  reading: "max-w-5xl",
+  focus: "max-w-3xl",
   compact: "max-w-md",
 } as const;
 
@@ -47,6 +48,10 @@ export function ReadingContainer(props: ContainerProps) {
 
 export function CompactContainer(props: ContainerProps) {
   return <BaseContainer width="compact" {...props} />;
+}
+
+export function FocusContainer(props: ContainerProps) {
+  return <BaseContainer width="focus" {...props} />;
 }
 
 // Temporary alias for older imports. Prefer semantic container names in new code.

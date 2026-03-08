@@ -1,6 +1,7 @@
 import { Home, ArrowLeft, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { BackgroundPattern } from "@/components/ui/background-pattern";
 import { ReadingContainer } from "@/components/layout/page-container";
 
@@ -11,10 +12,10 @@ export default function PagesNotFound() {
 
       <ReadingContainer className="relative text-center">
         {/* Status Badge */}
-        <div className="border-border bg-background/50 mb-8 inline-flex items-center rounded-full border px-3 py-1 text-sm backdrop-blur-sm">
-          <Sparkles className="text-primary mr-2 h-3 w-3" />
-          <span className="text-muted-foreground">Error 404</span>
-        </div>
+        <Badge className="border-border bg-background/50 mb-8 inline-flex items-center border px-3 py-1 text-sm backdrop-blur-sm">
+          <Sparkles className="text-muted-foreground mr-2 h-3 w-3" />
+          <span className="text-muted-foreground font-mono">ERROR_404</span>
+        </Badge>
 
         {/* Large 404 Display */}
         <div className="mb-6">

@@ -71,7 +71,7 @@ export function BlogPostHeader({
 
             {/* Article header overlay */}
             <div className="absolute right-0 bottom-0 left-0 p-4 sm:p-6 lg:p-12">
-              <div className="mx-auto max-w-4xl text-center">
+              <div className="mx-auto max-w-5xl text-center">
                 <BlogPostMeta
                   publishedDate={publishedDate}
                   featured={featured}

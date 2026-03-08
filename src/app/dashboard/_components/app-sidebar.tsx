@@ -169,14 +169,14 @@ export function AppSidebar() {
     },
     {
       id: "payments",
-      label: <>Payments</>,
+      label: <>Payments Management</>,
       url: "/dashboard/admin/payments",
       icon: CreditCard,
       matchMode: "exact",
     },
     {
       id: "subscriptions",
-      label: <>Subscriptions</>,
+      label: <>Subscriptions Management</>,
       url: "/dashboard/admin/subscriptions",
       icon: Shield,
       matchMode: "exact",

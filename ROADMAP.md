@@ -1,125 +1,142 @@
 # Roadmap | 路线图
 
-> **Language Select / 语言选择**: [English](#english) | [中文](#中文) > **Documentation / 文档**: [README (EN)](./README.md) | [README (中文)](./README.zh-CN.md)
+> **Language Select / 语言选择**: [English](#english) | [中文](#中文)
 
----
 
 ## English
 
-### ✅ **Shipped: Production-Ready Foundation**
+### ✅ Shipped Foundation
 
-Core infrastructure battle-tested and deployed.
+These parts already exist in the repository today:
 
-- ✅ Authentication (Magic Links + OAuth: Google, GitHub, LinkedIn)
-- ✅ Complete billing system with subscription management
-- ✅ Admin dashboard with dynamic table configuration
-- ✅ Secure file uploads with Cloudflare R2
-- ✅ Multi-language support (EN, ZH-CN) with Lingo.dev
-- ✅ SEO-optimized marketing pages
-- ✅ Role-based access control (user, admin, super_admin)
-- ✅ Type-safe codebase with zero `any` types
+- Authentication with magic link, OAuth, and role-based access control
+- Billing flow with Creem checkout, portal handoff, and webhook processing
+- Dashboard and admin pages for users, payments, subscriptions, and uploads
+- Cloudflare R2 upload flows for browser and server-side uploads
+- Localization foundation with Lingo multiple language support
+- Marketing pages, blog content, sitemap, and baseline SEO support
+- Jest coverage and Playwright smoke tests for critical browser flows
 
-### 🎯 **Code-First Admin Backend**
+### 🔭 Possible Evolution Directions
 
-Transform any database into an admin interface through configuration files.
+#### 1. Multi-tenant and team workflows
 
-- ✅ Dynamic table management with JSON configuration
-- ✅ Auto-generate CRUD from database schema
+- Workspaces or organizations as a first-class data model
+- Member invitation and role management inside a workspace
+- Workspace-scoped billing, settings, and resource isolation
+- Team-aware auditability for admin and operational actions
 
-### 📈 **Multi-Tenant Architecture**
+#### 2. Stronger product operations layer
 
-Team collaboration and workspace isolation.
+- More complete admin workflows for moderation, cleanup, and support tasks
+- Bulk operations and safer destructive actions in back-office tools
+- Better status surfaces for uploads, subscriptions, and payment incidents
+- Export-friendly views for operational and finance teams
 
-- ⏳ Workspace/organization data model
-- ⏳ Workspace-level billing and subscriptions
-- ⏳ Team member invitation and management
-- ⏳ Workspace roles (owner, admin, member)
-- ⏳ Resource isolation between workspaces
+#### 3. Billing and monetization depth
 
-### 🚀 **User Growth & Retention**
+- Cleaner plan configuration for multiple product tiers
+- Support for add-ons, credits, or usage-based extensions where needed
+- Better invoicing, payment history, and customer-facing billing visibility
+- Expanded regional billing options only when real demand justifies them
 
-Built-in tools for acquisition and engagement.
+#### 4. Developer platform and integrations
 
-- ⏳ User onboarding flow with progress tracking
-- ⏳ Email marketing campaigns with React Email
-- ⏳ User analytics dashboard (usage metrics)
-- ⏳ Basic A/B testing framework for pricing pages
+- Public API surface for customer or internal integrations
+- API key management and scoped access controls
+- More webhook events beyond payment lifecycle callbacks
+- Documentation and SDK generation once the API surface becomes stable
 
-### 🔌 **Developer API & Integrations**
+#### 5. Product onboarding and lifecycle
 
-Open platform for third-party extensibility.
+- Guided onboarding for new accounts and first-run setup
+- Better empty states and setup checklists across dashboard surfaces
+- Lifecycle messaging tied to account state, billing state, or activation state
+- Usage summaries that help teams understand product adoption
 
-- ⏳ OpenAPI 3.0 specification for all endpoints
-- ⏳ API key management for users
-- ⏳ Webhook system beyond payment events
-- ⏳ Zapier integration for workflow automation
+#### 6. Content, localization, and distribution
 
-### 💱 **Multi-Currency Billing**
+- More polished localization workflow for content-heavy pages
+- Expanded language coverage when translation quality and maintenance costs make sense
+- Better content templates for docs, changelog, and product education
+- Stronger SEO primitives for teams building content-led acquisition
 
-Global payment support.
+#### 7. Reliability and delivery
 
-- ⏳ Automatic currency selection by locale
-- ⏳ Currency preference in user settings
+- Stronger CI checks and broader E2E coverage
+- Seed/demo environments for safer product previews
+- Better observability around auth, billing, uploads, and background failures
+- Deployment workflows that make shared-environment releases more predictable
 
-**Note**: Focus is on solid, predictable functionality that solves real business problems.
+### ❌ Intentionally Not Assumed
+
+These are not treated as default roadmap items unless a real use case appears:
+
+- Generic “enterprise” features with no product context
+- Large integration catalogs just for checklist value
+- Deep feature decomposition before the underlying direction is validated
 
 ---
 
 ## 中文
 
-### ✅ **已上线: 生产级基础架构**
+### ✅ 已完成基础能力
 
-核心基础设施经过实战测试并部署。
+这些能力今天已经真实存在于仓库中：
 
-- ✅ 认证系统（Magic Links + OAuth: Google, GitHub, LinkedIn）
-- ✅ 完整的订阅计费和支付系统
-- ✅ 支持动态配置的管理后台
-- ✅ Cloudflare R2 安全文件上传
-- ✅ 多语言支持（英文、简体中文）
-- ✅ SEO 优化的营销页面
-- ✅ 基于角色的访问控制（用户、管理员、超级管理员）
-- ✅ 全栈类型安全，零 `any` 类型
+- 支持 magic link、OAuth 和基于角色权限控制的认证体系
+- 基于 Creem 的计费流程，包括 checkout、portal 跳转和 webhook 处理
+- 用户、支付、订阅、上传等 Dashboard 与后台管理页面
+- 面向浏览器直传和服务端上传的 Cloudflare R2 上传链路
+- 基于 Lingo 的多语言本地化基础设施
+- 营销页、博客内容、sitemap 和基础 SEO 支持
+- 覆盖关键浏览器链路的 Jest 与 Playwright 冒烟测试
 
-### 🎯 **模块化后台**
+### 🔭 可能的演进方向
 
-聚焦业务域的独立后台页面与统一权限治理。
+#### 1. 多租户与团队协作
 
-- ✅ 用户管理、支付、订阅、上传等独立管理页面
-- ✅ 基于角色的后台权限控制与审计友好型操作链路
+- 把 workspace / organization 作为一等数据模型引入
+- 支持工作区内的成员邀请与角色管理
+- 工作区级别的计费、设置和资源隔离
+- 面向团队协作的操作审计能力
 
-### 📈 **多租户架构**
+#### 2. 更强的后台运营层
 
-团队协作和工作空间隔离。
+- 更好的上传、订阅、支付异常状态可视化
+- 面向运营和财务场景的导出与检索能力
 
-- ⏳ 工作区/组织数据模型
-- ⏳ 工作区级别的计费和订阅
-- ⏳ 团队成员邀请和管理
-- ⏳ 工作区角色（所有者、管理员、成员）
-- ⏳ 工作区之间的资源隔离
+#### 3. 更完整的计费与商业化
 
-### 🚀 **用户增长与留存**
+- 更清晰的多套餐与产品层级配置方式
+- 在有真实需求时支持 add-on、credits 或 usage-based 扩展
+- 更完善的发票、支付历史和用户侧账单可见性
+- 只有在真实业务驱动下才扩展更多地区化计费能力
 
-内置的用户获取和参与工具。
+#### 4. 开发者平台与集成能力
 
-- ⏳ 用户引导流程和进度跟踪
-- ⏳ React Email 邮件营销活动
-- ⏳ 用户分析仪表板（使用指标）
-- ⏳ 定价页面的基础 A/B 测试框架
+- 面向客户或内部系统的公开 API
+- API Key 管理与细粒度访问控制
+- 除支付生命周期之外的更多 webhook 事件
+- 在 API 稳定后补充文档与 SDK 生成
 
-### 🔌 **开发者 API 与集成**
+#### 5. 产品 onboarding 与生命周期能力
 
-第三方可扩展的开放平台。
+- 面向新账户的引导流程与首次配置体验
+- 更完整的空状态、初始化清单和 setup checklist
+- 与账户状态、计费状态、激活状态联动的生命周期消息
+- 帮助团队理解采用情况的使用概览与汇总
 
-- ⏳ 所有端点的 OpenAPI 3.0 规范
-- ⏳ 用户 API 密钥管理
-- ⏳ 支付之外的 Webhook 系统
-- ⏳ Zapier 集成实现工作流自动化
+#### 6. 内容、本地化与分发
 
-### 💱 **多货币计费**
+- 面向内容型页面的更成熟本地化工作流
+- 在翻译质量和维护成本可控时扩展更多语言
+- 面向文档、更新日志、产品教育内容的模板能力
+- 对内容驱动增长更友好的 SEO 基础设施
 
-全球支付支持。
+#### 7. 可靠性与交付能力
 
-- ⏳ 根据地区自动选择货币
-- ⏳ 用户设置中的货币偏好
-
-**注意**: 重点是解决实际业务问题的稳定、可预测功能。
+- 更强的 CI 检查和更广的 E2E 覆盖
+- 更适合演示和预览的 seed / demo 环境
+- 围绕认证、计费、上传、后台失败的可观测性增强
+- 让共享环境发布更稳定的部署工作流

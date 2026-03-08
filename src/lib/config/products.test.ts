@@ -4,7 +4,6 @@ import {
   getProductTierById,
   getProductTierByProductId,
   type PricingTier,
-  type ProductFeature,
 } from "./products";
 
 describe("Product Configuration", () => {
@@ -20,7 +19,6 @@ describe("Product Configuration", () => {
         expect(tier).toHaveProperty("id");
         expect(tier).toHaveProperty("name");
         expect(tier).toHaveProperty("isPopular");
-        expect(tier).toHaveProperty("features");
         expect(tier).toHaveProperty("pricing");
         expect(tier).toHaveProperty("prices");
         expect(tier).toHaveProperty("currency");
@@ -28,7 +26,6 @@ describe("Product Configuration", () => {
         expect(typeof tier.id).toBe("string");
         expect(typeof tier.name).toBe("string");
         expect(typeof tier.isPopular).toBe("boolean");
-        expect(Array.isArray(tier.features)).toBe(true);
         expect(typeof tier.pricing).toBe("object");
         expect(typeof tier.prices).toBe("object");
         expect(["USD", "EUR"]).toContain(tier.currency);
@@ -67,20 +64,6 @@ describe("Product Configuration", () => {
         expect(tier.prices.oneTime).toBeGreaterThan(0);
         expect(tier.prices.monthly).toBeGreaterThan(0);
         expect(tier.prices.yearly).toBeGreaterThan(0);
-      });
-    });
-
-    it("should have valid features structure", () => {
-      PRODUCT_TIERS.forEach((tier) => {
-        expect(tier.features.length).toBeGreaterThan(0);
-
-        tier.features.forEach((feature: ProductFeature) => {
-          expect(feature).toHaveProperty("id");
-          expect(feature).toHaveProperty("included");
-          expect(typeof feature.id).toBe("string");
-          expect(typeof feature.included).toBe("boolean");
-          expect(feature.id.length).toBeGreaterThan(0);
-        });
       });
     });
 
@@ -150,7 +133,6 @@ describe("Product Configuration", () => {
         expect(tier).toHaveProperty("id", "pro");
         expect(tier).toHaveProperty("name", "Professional");
         expect(tier).toHaveProperty("isPopular", true);
-        expect(tier).toHaveProperty("features");
         expect(tier).toHaveProperty("pricing");
         expect(tier).toHaveProperty("prices");
         expect(tier).toHaveProperty("currency", "USD");
@@ -235,7 +217,6 @@ describe("Product Configuration", () => {
         expect(tier).toHaveProperty("id");
         expect(tier).toHaveProperty("name");
         expect(tier).toHaveProperty("isPopular");
-        expect(tier).toHaveProperty("features");
         expect(tier).toHaveProperty("pricing");
         expect(tier).toHaveProperty("prices");
         expect(tier).toHaveProperty("currency");
@@ -246,16 +227,10 @@ describe("Product Configuration", () => {
   describe("Type definitions", () => {
     it("should export correct TypeScript interfaces", () => {
       // This tests that the types are exportable and structured correctly
-      const mockFeature: ProductFeature = {
-        id: "marketing-foundation",
-        included: true,
-      };
-
       const mockTier: PricingTier = {
         id: "test",
         name: "Test Tier",
         isPopular: false,
-        features: [mockFeature],
         pricing: {
           creem: {
             oneTime: "test_one_time",
@@ -271,20 +246,11 @@ describe("Product Configuration", () => {
         currency: "USD",
       };
 
-      expect(mockFeature.id).toBe("marketing-foundation");
       expect(mockTier.id).toBe("test");
     });
   });
 
   describe("Data integrity", () => {
-    it("should have valid feature ids", () => {
-      const allFeatures = PRODUCT_TIERS.flatMap((tier) => tier.features);
-      allFeatures.forEach((feature) => {
-        expect(feature.id.trim()).toBe(feature.id);
-        expect(feature.id).not.toBe("");
-      });
-    });
-
     it("should have reasonable price ranges", () => {
       PRODUCT_TIERS.forEach((tier) => {
         // Prices should be reasonable (between $1 and $10000)

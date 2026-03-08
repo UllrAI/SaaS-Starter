@@ -30,12 +30,8 @@ import {
 
 export async function generateMetadata() {
   const locale = await getRequestLocale();
-  const metadata = createMetadata({
+  return createMetadata({
     alternates: createLocalizedAlternates("/pricing", locale),
-  });
-
-  return {
-    ...metadata,
     title: "Pricing",
     description:
       "Pricing for the SaaS Starter codebase. Review the current package structure, verification stack, and what is included before checkout.",
@@ -46,19 +42,7 @@ export async function generateMetadata() {
       "saas starter",
       "billing",
     ],
-    openGraph: {
-      ...metadata.openGraph,
-      title: "Pricing",
-      description:
-        "Pricing for the SaaS Starter codebase. Review the current package structure, verification stack, and what is included before checkout.",
-    },
-    twitter: {
-      ...metadata.twitter,
-      title: "Pricing",
-      description:
-        "Pricing for the SaaS Starter codebase. Review the current package structure, verification stack, and what is included before checkout.",
-    },
-  };
+  });
 }
 
 export default function PricingPage() {
@@ -124,8 +108,8 @@ export default function PricingPage() {
     </>,
     <>
       The current verification stack includes Jest coverage plus Playwright
-      smoke tests for auth, admin, and locale routing. Extend browser
-      coverage before relying on custom billing or upload flows in production.
+      smoke tests for auth, admin, and locale routing. Extend browser coverage
+      before relying on custom billing or upload flows in production.
     </>,
   ];
 
@@ -143,12 +127,10 @@ export default function PricingPage() {
         }
       >
         <PageIntroHeading>
-          Pricing for the codebase, not for a hosted platform
+          Simple, transparent pricing
         </PageIntroHeading>
         <PageIntroDescription className="mx-auto max-w-3xl">
-          Choose the package that matches how much of the starter you want to
-          adopt today, then customize the product and infrastructure for your
-          own launch.
+          Choose the plan that fits you. No hidden fees, no surprises.
         </PageIntroDescription>
       </PageIntro>
 

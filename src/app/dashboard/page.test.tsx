@@ -164,11 +164,12 @@ describe("Dashboard Home Page", () => {
   it("generates metadata from the dashboard copy", async () => {
     const { generateMetadata } = loadPageModule();
 
-    await expect(generateMetadata()).resolves.toMatchObject({
+    await generateMetadata();
+
+    expect(mockCreateMetadata).toHaveBeenCalledWith({
       title: "Dashboard",
       description: "Account overview, billing status, and starter setup progress.",
     });
-    expect(mockCreateMetadata).toHaveBeenCalledWith({});
   });
 
   it("renders the authenticated dashboard overview with subscription, uploads, and payments", async () => {

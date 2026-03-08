@@ -33,7 +33,7 @@ describe("page containers", () => {
 
     expect(shell.firstChild).toHaveClass("max-w-7xl");
     expect(section.firstChild).toHaveClass("max-w-6xl");
-    expect(reading.firstChild).toHaveClass("max-w-[72ch]");
+    expect(reading.firstChild).toHaveClass("max-w-5xl");
     expect(compact.firstChild).toHaveClass("max-w-md");
   });
 });

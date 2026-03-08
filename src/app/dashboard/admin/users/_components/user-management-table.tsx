@@ -34,7 +34,6 @@ import {
   updateUserAction,
 } from "@/lib/actions/admin";
 import { useIntlLocale } from "@/hooks/use-intl-locale";
-import { defineCopyCatalog } from "@/lib/i18n/copy-catalog";
 
 interface UserManagementTableProps {
   initialData: UserWithSubscription[];
@@ -46,33 +45,17 @@ interface UserManagementTableProps {
   };
 }
 
-const ROLE_COPY = defineCopyCatalog([
-  {
-    id: "user",
-    Label: function RoleUserLabel() {
-      return <>User</>;
-    },
-  },
-  {
-    id: "admin",
-    Label: function RoleAdminLabel() {
-      return <>Admin</>;
-    },
-  },
-  {
-    id: "super_admin",
-    Label: function RoleSuperAdminLabel() {
-      return <>Super Admin</>;
-    },
-  },
-] satisfies ReadonlyArray<{
-  id: UserRole;
-  Label: React.ComponentType;
-}>);
-
 function RoleLabel({ role }: { role: UserRole }) {
-  const LabelComponent = ROLE_COPY.get(role).Label;
-  return <LabelComponent />;
+  switch (role) {
+    case "user":
+      return <>User</>;
+    case "admin":
+      return <>Admin</>;
+    case "super_admin":
+      return <>Super Admin</>;
+    default:
+      return null;
+  }
 }
 
 function EmailStatusLabel({ verified }: { verified: boolean | null }) {

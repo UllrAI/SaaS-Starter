@@ -1,22 +1,7 @@
-export type ProductFeatureId =
-  | "marketing-foundation"
-  | "auth-dashboard"
-  | "billing-flow"
-  | "admin-operations"
-  | "r2-uploads"
-  | "localization-setup"
-  | "implementation-guidance";
-
-export interface ProductFeature {
-  id: ProductFeatureId;
-  included: boolean;
-}
-
 export interface PricingTier {
   id: string;
   name: string;
   isPopular: boolean;
-  features: ProductFeature[];
   pricing: {
     creem: {
       oneTime: string;
@@ -37,15 +22,6 @@ export const PRODUCT_TIERS: PricingTier[] = [
     id: "plus",
     name: "Plus",
     isPopular: false,
-    features: [
-      { id: "marketing-foundation", included: true },
-      { id: "auth-dashboard", included: true },
-      { id: "billing-flow", included: true },
-      { id: "admin-operations", included: false },
-      { id: "r2-uploads", included: false },
-      { id: "localization-setup", included: false },
-      { id: "implementation-guidance", included: false },
-    ],
     pricing: {
       creem: {
         oneTime: "prod_1HVwfBIaKkJh9CgS7zD37h",
@@ -64,15 +40,6 @@ export const PRODUCT_TIERS: PricingTier[] = [
     id: "pro",
     name: "Professional",
     isPopular: true,
-    features: [
-      { id: "marketing-foundation", included: true },
-      { id: "auth-dashboard", included: true },
-      { id: "billing-flow", included: true },
-      { id: "admin-operations", included: true },
-      { id: "r2-uploads", included: true },
-      { id: "localization-setup", included: true },
-      { id: "implementation-guidance", included: false },
-    ],
     pricing: {
       creem: {
         oneTime: "prod_6uhcfBUcRxprqDvep0U5Jw",
@@ -91,15 +58,6 @@ export const PRODUCT_TIERS: PricingTier[] = [
     id: "team",
     name: "Team",
     isPopular: false,
-    features: [
-      { id: "marketing-foundation", included: true },
-      { id: "auth-dashboard", included: true },
-      { id: "billing-flow", included: true },
-      { id: "admin-operations", included: true },
-      { id: "r2-uploads", included: true },
-      { id: "localization-setup", included: true },
-      { id: "implementation-guidance", included: true },
-    ],
     pricing: {
       creem: {
         oneTime: "prod_6uhcfBUcRxprqDvep0U5Jw",

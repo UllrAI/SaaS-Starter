@@ -16,7 +16,10 @@ export async function POST(request: NextRequest) {
   try {
     session = await getAuthSessionFromHeaders(request.headers);
     if (!session?.user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json(
+        { code: "login_required", error: "Unauthorized" },
+        { status: 401 },
+      );
     }
 
     const body = await request.json();
@@ -24,25 +27,25 @@ export async function POST(request: NextRequest) {
 
     if (!parsedBody.success) {
       return NextResponse.json(
-        { error: "Invalid request body", details: parsedBody.error.flatten() },
+        {
+          code: "invalid_request",
+          error: "Invalid request body",
+          details: parsedBody.error.flatten(),
+        },
         { status: 400 },
       );
     }
 
     const { tierId, paymentMode, billingCycle } = parsedBody.data;
 
-    // 仅在用户尝试购买新订阅时检查
     if (paymentMode === "subscription") {
       const existingSubscription = await getUserSubscription(session.user.id);
 
-      // --- 修正点: 移除了 `&& existingSubscription.tierId !== tierId` ---
-      // 只要存在任何有效的订阅，就阻止创建新的订阅。
       if (
         existingSubscription &&
         (existingSubscription.status === "active" ||
           existingSubscription.status === "trialing")
       ) {
-        // 创建客户门户URL，以便前端可以引导用户去管理订阅
         const { portalUrl } = await billing.createCustomerPortalUrl(
           existingSubscription.customerId,
         );
@@ -51,9 +54,9 @@ export async function POST(request: NextRequest) {
           "management URL",
         );
 
-        // 返回 409 Conflict 状态码，并附带管理链接
         return NextResponse.json(
           {
+            code: "subscription_active",
             error:
               "You already have an active subscription. Please manage your plan from the billing portal.",
             managementUrl: safePortalUrl,
@@ -63,7 +66,6 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // 使用 URL 对象构建各种状态的 URL，更安全健壮
     const appUrl = process.env.NEXT_PUBLIC_APP_URL;
     if (!appUrl) {
       throw new Error(
@@ -80,7 +82,6 @@ export async function POST(request: NextRequest) {
     const failureUrl = new URL("/payment-status", appUrl);
     failureUrl.searchParams.set("status", "failed");
 
-    // 构建传递给 billing provider 的选项
     const checkoutOptions = {
       userId: session.user.id,
       userEmail: session.user.email,
@@ -111,7 +112,10 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json(
-      { error: "Failed to create checkout session. Please try again later." },
+      {
+        code: "checkout_failed",
+        error: "Failed to create checkout session. Please try again later.",
+      },
       { status: 500 },
     );
   }

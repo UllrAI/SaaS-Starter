@@ -11,6 +11,7 @@ import {
 import { Clock, HelpCircle, ExternalLink, Send } from "lucide-react";
 import Link from "next/link";
 import { BackgroundPattern } from "@/components/ui/background-pattern";
+import { SectionContainer } from "@/components/layout/page-container";
 import {
   COMPANY_NAME,
   CONTACT_EMAIL,
@@ -52,10 +53,10 @@ export default function ContactPage() {
       <div className="bg-background relative grow overflow-hidden">
         <BackgroundPattern />
 
-        <div className="relative px-4 py-16">
-          <div className="mx-auto max-w-6xl">
+        <div className="relative py-16">
+          <SectionContainer>
             {/* Header */}
-            <div className="mb-20 text-center">
+            <div className="mx-auto mb-20 max-w-3xl text-center">
               <Badge className="border-border bg-background/50 mb-6 inline-flex items-center border px-3 py-1 text-sm backdrop-blur-sm">
                 <span className="text-muted-foreground font-mono">
                   CONTACT.md
@@ -64,7 +65,7 @@ export default function ContactPage() {
               <h1 className="text-foreground mb-6 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
                 Get in Touch
               </h1>
-              <p className="text-muted-foreground mx-auto max-w-3xl text-xl leading-relaxed">
+              <p className="text-muted-foreground text-xl leading-relaxed">
                 Have questions? Need support? Want to collaborate? We&apos;re
                 here to help. Choose your preferred channel below.
               </p>
@@ -301,13 +302,13 @@ export default function ContactPage() {
                 </Card>
               </div>
             </div>
-          </div>
+          </SectionContainer>
         </div>
       </div>
 
       {/* CTA Section */}
       <section className="py-24">
-        <div className="container mx-auto px-6">
+        <SectionContainer>
           <div className="mx-auto max-w-3xl text-center">
             <h2 className="mb-4 text-3xl font-bold tracking-tight">
               Ready to Get Started?
@@ -325,7 +326,7 @@ export default function ContactPage() {
               </Button>
             </div>
           </div>
-        </div>
+        </SectionContainer>
       </section>
     </section>
   );

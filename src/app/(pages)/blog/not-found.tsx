@@ -2,13 +2,14 @@ import { Home, ArrowLeft, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { BackgroundPattern } from "@/components/ui/background-pattern";
+import { ReadingContainer } from "@/components/layout/page-container";
 
 export default function PagesNotFound() {
   return (
     <div className="bg-background relative flex min-h-[60vh] flex-col items-center justify-center overflow-hidden py-16">
       <BackgroundPattern />
 
-      <div className="relative mx-auto max-w-2xl px-6 text-center">
+      <ReadingContainer className="relative text-center">
         {/* Status Badge */}
         <div className="border-border bg-background/50 mb-8 inline-flex items-center rounded-full border px-3 py-1 text-sm backdrop-blur-sm">
           <Sparkles className="text-primary mr-2 h-3 w-3" />
@@ -30,7 +31,7 @@ export default function PagesNotFound() {
           <h2 className="text-foreground text-2xl font-bold tracking-tight sm:text-3xl">
             Page Not Found
           </h2>
-          <p className="text-muted-foreground mx-auto max-w-lg text-base leading-relaxed">
+          <p className="text-muted-foreground text-base leading-relaxed">
             The page you&apos;re looking for doesn&apos;t exist or has been
             moved. Let&apos;s get you back on track.
           </p>
@@ -62,7 +63,7 @@ export default function PagesNotFound() {
             </Link>
           </p>
         </div>
-      </div>
+      </ReadingContainer>
     </div>
   );
 }

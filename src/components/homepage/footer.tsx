@@ -4,6 +4,7 @@ import { Separator } from "@/components/ui/separator";
 import { ModeToggle } from "@/components/mode-toggle";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { Logo } from "@/components/logo";
+import { ShellContainer } from "@/components/layout/page-container";
 import {
   APP_NAME,
   COMPANY_NAME,
@@ -125,7 +126,12 @@ const footerSections: FooterSection[] = [
     id: "foot-project",
     Title: FooterSectionTitleProject,
     links: [
-      { id: "foot-about", kind: "i18n", Label: FooterLabelAbout, href: "/about" },
+      {
+        id: "foot-about",
+        kind: "i18n",
+        Label: FooterLabelAbout,
+        href: "/about",
+      },
       {
         id: "foot-contact",
         kind: "i18n",
@@ -171,7 +177,12 @@ const footerSections: FooterSection[] = [
         Label: FooterLabelPrivacy,
         href: "/privacy",
       },
-      { id: "foot-terms", kind: "i18n", Label: FooterLabelTerms, href: "/terms" },
+      {
+        id: "foot-terms",
+        kind: "i18n",
+        Label: FooterLabelTerms,
+        href: "/terms",
+      },
     ],
   },
 ];
@@ -198,9 +209,7 @@ function FooterLinkComponent({ link }: { link: FooterLink }) {
   const linkClasses =
     "text-sm text-muted-foreground transition-colors hover:text-foreground";
   const label =
-    link.kind === "i18n"
-      ? React.createElement(link.Label)
-      : link.labelText;
+    link.kind === "i18n" ? React.createElement(link.Label) : link.labelText;
 
   if (link.external) {
     return (
@@ -243,7 +252,7 @@ export function Footer() {
 
   return (
     <footer className="border-border bg-background border-t">
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
+      <ShellContainer>
         <div className="py-16">
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-6">
             <div className="lg:col-span-2">
@@ -315,7 +324,7 @@ export function Footer() {
             </div>
           </div>
         </div>
-      </div>
+      </ShellContainer>
     </footer>
   );
 }

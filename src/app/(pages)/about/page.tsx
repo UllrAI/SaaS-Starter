@@ -7,15 +7,10 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import {
-  Terminal,
-  Zap,
-  Shield,
-  Users,
-  GitBranch,
-} from "lucide-react";
+import { Terminal, Zap, Shield, Users, GitBranch } from "lucide-react";
 import Link from "next/link";
 import { BackgroundPattern } from "@/components/ui/background-pattern";
+import { SectionContainer } from "@/components/layout/page-container";
 import { createLocalizedAlternates, createMetadata } from "@/lib/metadata";
 import { getRequestLocale } from "@/lib/i18n/server-locale";
 
@@ -52,10 +47,10 @@ export default function AboutPage() {
       <div className="bg-background relative grow overflow-hidden">
         <BackgroundPattern />
 
-        <div className="relative px-4 py-16">
-          <div className="mx-auto max-w-6xl">
+        <div className="relative py-16">
+          <SectionContainer>
             {/* Header */}
-            <div className="mb-20 text-center">
+            <div className="mx-auto mb-20 max-w-3xl text-center">
               <Badge className="border-border bg-background/50 mb-6 inline-flex items-center border px-3 py-1 text-sm backdrop-blur-sm">
                 <span className="text-muted-foreground font-mono">
                   README.md
@@ -64,7 +59,7 @@ export default function AboutPage() {
               <h1 className="text-foreground mb-6 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
                 Building the future of SaaS
               </h1>
-              <p className="text-muted-foreground mx-auto max-w-3xl text-xl leading-relaxed">
+              <p className="text-muted-foreground text-xl leading-relaxed">
                 We are a team of developers, designers, and creators building
                 the tools we wish we had. Open source at heart, practical in
                 execution, and serious about documented, regression-tested
@@ -82,33 +77,33 @@ export default function AboutPage() {
               <div className="grid gap-6 md:grid-cols-3">
                 <Card className="shadow-sm">
                   <CardHeader>
-                    <div className="bg-primary/10 text-primary mb-4 flex h-12 w-12 items-center justify-center border border-primary/20">
+                    <div className="bg-primary/10 text-primary border-primary/20 mb-4 flex h-12 w-12 items-center justify-center border">
                       <Zap className="h-6 w-6" />
                     </div>
                     <CardTitle>Speed as a Feature</CardTitle>
                     <CardDescription>
-                      We optimize for milliseconds. Performance isn&apos;t just a
-                      metric, it&apos;s a user experience requirement.
+                      We optimize for milliseconds. Performance isn&apos;t just
+                      a metric, it&apos;s a user experience requirement.
                     </CardDescription>
                   </CardHeader>
                 </Card>
 
                 <Card className="shadow-sm">
                   <CardHeader>
-                    <div className="bg-primary/10 text-primary mb-4 flex h-12 w-12 items-center justify-center border border-primary/20">
+                    <div className="bg-primary/10 text-primary border-primary/20 mb-4 flex h-12 w-12 items-center justify-center border">
                       <Shield className="h-6 w-6" />
                     </div>
                     <CardTitle>Security First</CardTitle>
                     <CardDescription>
-                      We don&apos;t treat security as an afterthought. It&apos;s baked into
-                      our architecture from line one.
+                      We don&apos;t treat security as an afterthought. It&apos;s
+                      baked into our architecture from line one.
                     </CardDescription>
                   </CardHeader>
                 </Card>
 
                 <Card className="shadow-sm">
                   <CardHeader>
-                    <div className="bg-primary/10 text-primary mb-4 flex h-12 w-12 items-center justify-center border border-primary/20">
+                    <div className="bg-primary/10 text-primary border-primary/20 mb-4 flex h-12 w-12 items-center justify-center border">
                       <Users className="h-6 w-6" />
                     </div>
                     <CardTitle>Community Driven</CardTitle>
@@ -133,16 +128,14 @@ export default function AboutPage() {
                   <Card key={i} className="overflow-hidden p-0 shadow-sm">
                     {/* Image Section - Full Bleed (no padding) */}
                     <div className="bg-muted aspect-square w-full">
-                      <div className="flex h-full w-full items-center justify-center text-muted-foreground/20">
+                      <div className="text-muted-foreground/20 flex h-full w-full items-center justify-center">
                         <Users className="h-24 w-24" />
                       </div>
                     </div>
 
                     {/* Content Section - With Padding */}
                     <div className="p-6">
-                      <CardTitle className="text-lg mb-1.5">
-                        Dev Member {i}
-                      </CardTitle>
+                      <CardTitle className="text-lg">Dev Member {i}</CardTitle>
                       <CardDescription className="font-mono text-xs">
                         Senior Engineer
                       </CardDescription>
@@ -159,9 +152,9 @@ export default function AboutPage() {
                 <h2 className="text-2xl font-bold">Changelog</h2>
               </div>
 
-              <div className="border-l-2 border-muted ml-4 space-y-12 pl-8">
+              <div className="border-muted ml-4 space-y-12 border-l-2 pl-8">
                 <div className="relative">
-                  <div className="bg-primary absolute -left-[41px] top-1 h-5 w-5 rounded-full border-4 border-background" />
+                  <div className="bg-primary border-background absolute top-1 -left-[41px] h-5 w-5 rounded-full border-4" />
                   <div className="mb-2 flex items-center gap-2">
                     <Badge variant="outline" className="font-mono">
                       v2.0.0
@@ -177,7 +170,7 @@ export default function AboutPage() {
                 </div>
 
                 <div className="relative">
-                  <div className="bg-muted-foreground absolute -left-[41px] top-1 h-5 w-5 rounded-full border-4 border-background" />
+                  <div className="bg-muted-foreground border-background absolute top-1 -left-[41px] h-5 w-5 rounded-full border-4" />
                   <div className="mb-2 flex items-center gap-2">
                     <Badge variant="outline" className="font-mono">
                       v1.0.0
@@ -193,7 +186,7 @@ export default function AboutPage() {
                 </div>
 
                 <div className="relative">
-                  <div className="bg-muted-foreground absolute -left-[41px] top-1 h-5 w-5 rounded-full border-4 border-background" />
+                  <div className="bg-muted-foreground border-background absolute top-1 -left-[41px] h-5 w-5 rounded-full border-4" />
                   <div className="mb-2 flex items-center gap-2">
                     <Badge variant="outline" className="font-mono">
                       v0.1.0
@@ -209,13 +202,13 @@ export default function AboutPage() {
                 </div>
               </div>
             </div>
-          </div>
+          </SectionContainer>
         </div>
       </div>
 
       {/* CTA Section */}
       <section className="py-24">
-        <div className="container mx-auto px-6">
+        <SectionContainer>
           <div className="mx-auto max-w-3xl text-center">
             <h2 className="mb-4 text-3xl font-bold tracking-tight">
               Ready to Build Something Amazing?
@@ -233,7 +226,7 @@ export default function AboutPage() {
               </Button>
             </div>
           </div>
-        </div>
+        </SectionContainer>
       </section>
     </section>
   );

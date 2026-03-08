@@ -7,6 +7,7 @@ import { Github, Terminal, Copy, Check } from "lucide-react";
 import { GITHUB_URL } from "@/lib/config/constants";
 import Link from "next/link";
 import { useHydrated } from "@/hooks/use-hydrated";
+import { ShellContainer } from "@/components/layout/page-container";
 
 const UI_STACK_LABEL = "Next.js 16 + shadcn/ui";
 
@@ -23,7 +24,7 @@ export function Hero() {
 
   return (
     <section className="bg-background border-border relative overflow-hidden border-b pt-24 pb-32 lg:pt-32 lg:pb-48">
-      <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8">
+      <ShellContainer className="relative z-10">
         <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-16">
           {/* Left Side: Content */}
           <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
@@ -146,43 +147,68 @@ export function Hero() {
                   <div data-lingo-skip className="space-y-2 text-xs sm:text-xs">
                     {/* Quick Start */}
                     <div className="text-muted-foreground/65">
-                      <span data-lingo-skip className="text-green-500">➜</span> git clone https://github.com/UllrAI/SaaS-Starter.git
+                      <span data-lingo-skip className="text-green-500">
+                        ➜
+                      </span>{" "}
+                      git clone https://github.com/UllrAI/SaaS-Starter.git
                     </div>
                     <div className="text-muted-foreground/65">
-                      <span data-lingo-skip className="text-green-500">➜</span> cd saas-starter
+                      <span data-lingo-skip className="text-green-500">
+                        ➜
+                      </span>{" "}
+                      cd saas-starter
                     </div>
 
                     <div className="h-4" />
 
                     <div className="text-muted-foreground/65">
-                      <span data-lingo-skip className="text-green-500">➜</span> cp .env.example .env
+                      <span data-lingo-skip className="text-green-500">
+                        ➜
+                      </span>{" "}
+                      cp .env.example .env
                     </div>
                     <div className="text-muted-foreground/65">
-                      <span data-lingo-skip className="text-green-500">➜</span> pnpm install
+                      <span data-lingo-skip className="text-green-500">
+                        ➜
+                      </span>{" "}
+                      pnpm install
                     </div>
 
                     <div className="h-4" />
 
                     <div className="text-foreground font-bold">
-                      <span data-lingo-skip className="text-primary">➜</span> pnpm dev
+                      <span data-lingo-skip className="text-primary">
+                        ➜
+                      </span>{" "}
+                      pnpm dev
                     </div>
 
                     <div className="h-4" />
 
                     {/* Output */}
                     <div className="text-muted-foreground/65 space-y-1 pl-2">
-                      <div data-lingo-skip className="text-green-500">✓ Ready in 1.2s</div>
+                      <div data-lingo-skip className="text-green-500">
+                        ✓ Ready in 1.2s
+                      </div>
                       <div data-lingo-skip>
                         ○ Local:{" "}
-                        <span data-lingo-skip className="text-primary underline">
+                        <span
+                          data-lingo-skip
+                          className="text-primary underline"
+                        >
                           http://localhost:3000
                         </span>
                       </div>
                     </div>
 
                     <div className="text-primary mt-6 flex animate-pulse items-center gap-2">
-                      <span data-lingo-skip className="bg-primary block h-4 w-2" />
-                      <span><>Running...</></span>
+                      <span
+                        data-lingo-skip
+                        className="bg-primary block h-4 w-2"
+                      />
+                      <span>
+                        <>Running...</>
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -203,48 +229,62 @@ export function Hero() {
 
                   {/* Features Grid */}
                   <div className="flex-1 space-y-4">
-                    <div className="text-muted-foreground grid grid-cols-1 gap-3 text-sm pb-4">
+                    <div className="text-muted-foreground grid grid-cols-1 gap-3 pb-4 text-sm">
                       <div className="flex items-center gap-2">
                         <span className="text-primary" data-lingo-skip>
                           ✓
                         </span>
-                        <span><>Authentication</></span>
+                        <span>
+                          <>Authentication</>
+                        </span>
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="text-primary" data-lingo-skip>
                           ✓
                         </span>
-                        <span><>Database</></span>
+                        <span>
+                          <>Database</>
+                        </span>
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="text-primary" data-lingo-skip>
                           ✓
                         </span>
-                        <span><>Payments</></span>
+                        <span>
+                          <>Payments</>
+                        </span>
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="text-primary" data-lingo-skip>
                           ✓
                         </span>
-                        <span><>File Upload</></span>
+                        <span>
+                          <>File Upload</>
+                        </span>
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="text-primary" data-lingo-skip>
                           ✓
                         </span>
-                        <span><>Admin Panel</></span>
+                        <span>
+                          <>Admin Panel</>
+                        </span>
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="text-primary" data-lingo-skip>
                           ✓
                         </span>
-                        <span><>i18n Ready</></span>
+                        <span>
+                          <>i18n Ready</>
+                        </span>
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="text-primary" data-lingo-skip>
                           ✓
                         </span>
-                        <span><>E2E Smoke Tests</></span>
+                        <span>
+                          <>E2E Smoke Tests</>
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -265,7 +305,7 @@ export function Hero() {
             </div>
           </div>
         </div>
-      </div>
+      </ShellContainer>
     </section>
   );
 }

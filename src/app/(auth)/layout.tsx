@@ -4,6 +4,7 @@ import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { APP_NAME } from "@/lib/config/constants";
 import { BackgroundPattern } from "@/components/ui/background-pattern";
+import { CompactContainer } from "@/components/layout/page-container";
 import { createMetadata } from "@/lib/metadata";
 
 export const metadata = createMetadata({
@@ -44,7 +45,7 @@ export default function AuthLayout({
         </Link>
       </div>
 
-      <div className="relative w-full max-w-md px-6">{children}</div>
+      <CompactContainer className="relative">{children}</CompactContainer>
     </main>
   );
 }

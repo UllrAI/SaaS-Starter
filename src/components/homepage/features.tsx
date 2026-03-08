@@ -1,6 +1,7 @@
 import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { SectionContainer } from "@/components/layout/page-container";
 import {
   BadgeCheck,
   CreditCard,
@@ -245,8 +246,11 @@ function FeatureCard({ feature }: { feature: Feature }) {
 
 export function Features() {
   return (
-    <section id="features" className="bg-background border-border border-b py-24">
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
+    <section
+      id="features"
+      className="bg-background border-border border-b py-24"
+    >
+      <SectionContainer>
         <div className="mx-auto mb-16 max-w-2xl text-center">
           <Badge variant="outline" className="border-primary text-primary mb-4">
             <Package2 className="mr-2 h-3 w-3" />
@@ -269,7 +273,7 @@ export function Features() {
           </p>
         </div>
 
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {features.map((feature) => (
             <FeatureCard key={feature.id} feature={feature} />
           ))}
@@ -294,7 +298,7 @@ export function Features() {
             );
           })}
         </div>
-      </div>
+      </SectionContainer>
     </section>
   );
 }

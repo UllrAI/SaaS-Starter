@@ -97,6 +97,16 @@ pnpm set:admin
 - Use real implementations. Do not ship fake data, fake success states, or dead-end UI.
 - Add page metadata where appropriate.
 
+### Layout and page width
+
+- Use the semantic containers from `src/components/layout/page-container.tsx` instead of page-local `max-w-*` wrappers when working outside the dashboard.
+- Use `ShellContainer` for global chrome and genuinely wide split layouts such as the marketing header, footer, and homepage hero.
+- Use `SectionContainer` for standard marketing sections and most non-dashboard page bodies.
+- Use `ReadingContainer` for article content, legal copy, and other long-form reading surfaces.
+- Use `CompactContainer` for narrow auth, status, and single-card flows.
+- Treat full-bleed backgrounds and content width as separate concerns: a section may span the viewport, but its content should still sit inside one semantic container.
+- Do not add new ad hoc width systems or scatter `max-w-*` utilities through page modules unless a one-off component truly cannot be expressed with the existing containers.
+
 ### Forms and validation
 
 - Use React Hook Form with Zod for form validation.

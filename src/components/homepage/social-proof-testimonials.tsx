@@ -1,6 +1,7 @@
 import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { SectionContainer } from "@/components/layout/page-container";
 import {
   Blocks,
   Code2,
@@ -22,8 +23,7 @@ const stackHighlights = [
       return (
         <>
           Layouts, route handlers, metadata, and server components are organized
-          around modern Next.js conventions instead of legacy Pages Router
-          code.
+          around modern Next.js conventions instead of legacy Pages Router code.
         </>
       );
     },
@@ -94,10 +94,13 @@ const starterModules = [
 export function SocialProofUnified() {
   return (
     <section className="bg-muted/30 border-border border-b py-24">
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
+      <SectionContainer>
         <div className="grid gap-12 lg:grid-cols-[1.1fr_0.9fr]">
           <div>
-            <Badge variant="outline" className="border-primary text-primary mb-4">
+            <Badge
+              variant="outline"
+              className="border-primary text-primary mb-4"
+            >
               <ShieldCheck className="mr-2 h-3 w-3" />
               <>What is actually here</>
             </Badge>
@@ -193,7 +196,7 @@ export function SocialProofUnified() {
             </Card>
           </div>
         </div>
-      </div>
+      </SectionContainer>
     </section>
   );
 }

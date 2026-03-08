@@ -10,6 +10,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { BackgroundPattern } from "@/components/ui/background-pattern";
+import { SectionContainer } from "@/components/layout/page-container";
 import { PricingSection } from "@/components/payment-options";
 import { PAYMENT_PROVIDER } from "@/lib/config/constants";
 import { createLocalizedAlternates, createMetadata } from "@/lib/metadata";
@@ -161,9 +162,9 @@ export default function PricingPage() {
       <div className="bg-background relative grow overflow-hidden">
         <BackgroundPattern />
 
-        <div className="relative px-4 py-16">
-          <div className="mx-auto max-w-6xl">
-            <div className="mb-20 text-center">
+        <div className="relative py-16">
+          <SectionContainer>
+            <div className="mb-20 text-center max-w-4xl mx-auto">
               <Badge className="border-border bg-background/50 mb-6 inline-flex items-center border px-3 py-1 text-sm backdrop-blur-sm">
                 <Boxes className="text-muted-foreground mr-2 h-3 w-3" />
                 <span className="text-muted-foreground font-mono">
@@ -187,7 +188,9 @@ export default function PricingPage() {
             <div className="mb-24">
               <div className="mb-10 flex items-center gap-2 border-b pb-4">
                 <Boxes className="text-primary h-6 w-6" />
-                <h2 className="text-2xl font-bold">What the starter already includes</h2>
+                <h2 className="text-2xl font-bold">
+                  What the starter already includes
+                </h2>
               </div>
 
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
@@ -199,7 +202,7 @@ export default function PricingPage() {
                   return (
                     <Card key={item.id} className="shadow-sm">
                       <CardHeader>
-                        <div className="bg-primary/10 text-primary mb-4 flex h-12 w-12 items-center justify-center border border-primary/20">
+                        <div className="bg-primary/10 text-primary border-primary/20 mb-4 flex h-12 w-12 items-center justify-center border">
                           <Icon className="h-6 w-6" />
                         </div>
                         <CardTitle>
@@ -267,7 +270,7 @@ export default function PricingPage() {
                 </CardContent>
               </Card>
             </div>
-          </div>
+          </SectionContainer>
         </div>
       </div>
     </section>

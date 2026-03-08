@@ -23,10 +23,7 @@ import {
   LogIn,
   Terminal,
 } from "lucide-react";
-import {
-  PRODUCT_TIERS,
-  type PricingTier,
-} from "@/lib/config/products";
+import { PRODUCT_TIERS, type PricingTier } from "@/lib/config/products";
 import { useSession } from "@/lib/auth/client";
 import { useRouter } from "nextjs-toploader/app";
 import type { PaymentMode, BillingCycle } from "@/types/billing";
@@ -353,7 +350,7 @@ export function PricingSection({ className }: { className?: string }) {
   };
 
   return (
-    <div className={cn("mx-auto w-full max-w-7xl px-4", className)}>
+    <div className={cn("w-full", className)}>
       {/* Payment Mode Selection */}
       <div className="mb-8 text-center">
         <Tabs
@@ -450,7 +447,7 @@ export function PricingSection({ className }: { className?: string }) {
               className={cn(
                 "relative flex flex-col transition-all duration-300",
                 tier.isPopular
-                  ? "border-primary shadow-lg ring-1 ring-primary/20"
+                  ? "border-primary ring-primary/20 shadow-lg ring-1"
                   : "hover:border-primary/50 shadow-sm hover:shadow-md",
               )}
             >
@@ -489,7 +486,7 @@ export function PricingSection({ className }: { className?: string }) {
                     )}
                   </div>
                   <div className="flex h-5 items-center justify-center">
-                    <p className="text-muted-foreground text-xs font-medium uppercase tracking-wide">
+                    <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
                       {paymentMode === "one_time" ? (
                         <OneTimeBillingLabel />
                       ) : billingCycle === "yearly" ? (
@@ -506,8 +503,9 @@ export function PricingSection({ className }: { className?: string }) {
                 <div className="bg-muted/30 mb-6 h-px w-full" />
                 <div className="mb-8 flex-1 space-y-4">
                   {tier.features.map((feature, index) => {
-                    const TierFeatureLabel =
-                      PRICING_FEATURE_COPY.get(feature.id).Label;
+                    const TierFeatureLabel = PRICING_FEATURE_COPY.get(
+                      feature.id,
+                    ).Label;
 
                     return (
                       <div

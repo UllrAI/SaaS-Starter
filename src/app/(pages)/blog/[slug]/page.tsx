@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import env from "@/env";
 import { createMetadata } from "@/lib/metadata";
 import { BlogPostHeader } from "@/components/blog/blog-post-header";
+import { ReadingContainer } from "@/components/layout/page-container";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -179,40 +180,36 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
       {post.isFallback && (
         <section className="bg-background pt-8 sm:pt-10">
-          <div className="container mx-auto px-4 sm:px-6">
-            <div className="mx-auto max-w-4xl">
-              <Alert className="border-amber-300/60 bg-amber-50/80 text-amber-950">
-                <Languages className="text-amber-700" />
-                <AlertTitle>
-                  This article is currently only available in English
-                </AlertTitle>
-                <AlertDescription>
-                  You are viewing the English version because a localized
-                  version is not available yet.
-                </AlertDescription>
-              </Alert>
-            </div>
-          </div>
+          <ReadingContainer>
+            <Alert className="border-amber-300/60 bg-amber-50/80 text-amber-950">
+              <Languages className="text-amber-700" />
+              <AlertTitle>
+                This article is currently only available in English
+              </AlertTitle>
+              <AlertDescription>
+                You are viewing the English version because a localized version
+                is not available yet.
+              </AlertDescription>
+            </Alert>
+          </ReadingContainer>
         </section>
       )}
 
       {/* Article Content */}
       <section className="bg-background py-12 sm:py-16">
-        <div className="container mx-auto px-4 sm:px-6">
-          <div className="mx-auto max-w-4xl">
-            <article className="prose prose-base prose-slate dark:prose-invert sm:prose-lg markdown-content mx-auto max-w-none">
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                {post.content}
-              </ReactMarkdown>
-            </article>
-          </div>
-        </div>
+        <ReadingContainer>
+          <article className="prose prose-base prose-slate dark:prose-invert markdown-content mx-auto max-w-none sm:prose-lg [&_pre]:max-w-full [&_pre]:overflow-x-auto">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {post.content}
+            </ReactMarkdown>
+          </article>
+        </ReadingContainer>
       </section>
 
       {/* Footer */}
       <section className="bg-muted/40 py-12 sm:py-16">
-        <div className="container mx-auto px-4 sm:px-6">
-          <div className="mx-auto max-w-4xl text-center">
+        <ReadingContainer>
+          <div className="text-center">
             <h2 className="text-foreground mb-4 text-xl font-bold sm:text-2xl">
               Thanks for reading!
             </h2>
@@ -229,7 +226,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
               </Button>
             </Link>
           </div>
-        </div>
+        </ReadingContainer>
       </section>
     </>
   );

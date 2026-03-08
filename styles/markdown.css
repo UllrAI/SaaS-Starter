@@ -54,6 +54,8 @@
 
 .markdown-content code {
   @apply bg-muted rounded px-1.5 py-0.5 font-mono text-sm;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .markdown-content pre {
@@ -62,6 +64,9 @@
 
 .markdown-content pre code {
   @apply bg-transparent p-0 text-sm;
+  overflow-wrap: normal;
+  white-space: pre;
+  word-break: normal;
 }
 
 .markdown-content a {

@@ -214,6 +214,14 @@ pnpm set:admin --email=your-email@example.com
 - admin 权限拦截与后台访问
 - marketing 路由的 locale 规范化
 
+## 页面宽度约定
+
+- `ShellContainer` 用于 marketing 的 header、footer 以及真正需要大画布的宽布局。
+- `SectionContainer` 用于常规 marketing section 和大多数非 dashboard 页面主体。
+- `ReadingContainer` 用于博客正文、法律条款等长文本阅读场景。
+- `CompactContainer` 用于登录、支付状态这类窄单卡片流程。
+- 全宽背景与内容宽度要分开处理。背景可以铺满视口，内容仍应落在一个语义化容器内。
+
 运行方式：
 
 ```bash

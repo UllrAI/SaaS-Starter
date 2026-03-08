@@ -1,6 +1,7 @@
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { SectionContainer } from "@/components/layout/page-container";
 import {
   ExternalLink,
   FileText,
@@ -36,7 +37,9 @@ const products: Product[] = [
     name: "HeadShots.fun",
     Description: function ProductDescriptionHeadshots() {
       return (
-        <>Generate polished headshots for team profiles, resumes, and listings.</>
+        <>
+          Generate polished headshots for team profiles, resumes, and listings.
+        </>
       );
     },
     url: "https://headshots.fun/",
@@ -49,7 +52,9 @@ const products: Product[] = [
     id: "to-markdown",
     name: "To Markdown",
     Description: function ProductDescriptionToMarkdown() {
-      return <>Convert docs and web pages into Markdown you can actually edit.</>;
+      return (
+        <>Convert docs and web pages into Markdown you can actually edit.</>
+      );
     },
     url: "https://to-markdown.com/",
     icon: FileText,
@@ -58,7 +63,11 @@ const products: Product[] = [
     id: "trend-x-day",
     name: "Trend X Day",
     Description: function ProductDescriptionTrendXDay() {
-      return <>Track daily product and creator trends with a simpler research loop.</>;
+      return (
+        <>
+          Track daily product and creator trends with a simpler research loop.
+        </>
+      );
     },
     url: "https://trendxday.com/",
     icon: TrendingUp,
@@ -67,7 +76,9 @@ const products: Product[] = [
     id: "ogimage-site",
     name: "OGimage.site",
     Description: function ProductDescriptionOgImage() {
-      return <>Generate open graph images for social cards and link previews.</>;
+      return (
+        <>Generate open graph images for social cards and link previews.</>
+      );
     },
     url: "https://ogimage.site/",
     icon: Square,
@@ -76,7 +87,9 @@ const products: Product[] = [
     id: "hipng",
     name: "HiPNG.com",
     Description: function ProductDescriptionHiPNG() {
-      return <>Browse transparent PNG assets for quick mockups and landing pages.</>;
+      return (
+        <>Browse transparent PNG assets for quick mockups and landing pages.</>
+      );
     },
     url: "https://hipng.com/",
     icon: Zap,
@@ -86,7 +99,7 @@ const products: Product[] = [
 export function OtherProducts() {
   return (
     <section className="bg-background border-border relative border-b py-24">
-      <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
+      <SectionContainer className="relative">
         <div className="mx-auto max-w-3xl text-center">
           <Badge variant="outline" className="border-primary text-primary mb-4">
             <FlaskConical className="mr-2 h-3 w-3" />
@@ -159,7 +172,7 @@ export function OtherProducts() {
             <>Let us know</>
           </a>
         </p>
-      </div>
+      </SectionContainer>
     </section>
   );
 }

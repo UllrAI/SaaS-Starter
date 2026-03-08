@@ -1,6 +1,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/logo";
+import { SectionContainer } from "@/components/layout/page-container";
 import { ArrowRight, CheckCircle } from "lucide-react";
 import Link from "next/link";
 
@@ -13,7 +14,7 @@ export function CallToAction() {
 
   return (
     <section className="border-border bg-background border-t">
-      <div className="mx-auto max-w-5xl px-6 py-24 sm:py-32">
+      <SectionContainer className="py-24 sm:py-32">
         <div className="text-center">
           <div className="border-primary bg-primary/5 mx-auto flex h-16 w-16 items-center justify-center border">
             <Logo className="text-primary h-10 w-10" variant="icon-only" />
@@ -75,7 +76,7 @@ export function CallToAction() {
             </>
           </p>
         </div>
-      </div>
+      </SectionContainer>
     </section>
   );
 }

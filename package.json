@@ -23,7 +23,8 @@
     "prettier:format": "prettier --write --ignore-path .gitignore .",
     "analyze": "pnpm content:build && ANALYZE=true next build",
     "analyze:dev": "pnpm content:build && ANALYZE=true next dev",
-    "set:admin": "node --env-file-if-exists=.env --import tsx scripts/set-admin.ts"
+    "set:admin": "node --env-file-if-exists=.env --import tsx scripts/set-admin.ts",
+    "creem:sync-products": "node --env-file-if-exists=.env --import tsx scripts/sync-creem-products.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1004.0",

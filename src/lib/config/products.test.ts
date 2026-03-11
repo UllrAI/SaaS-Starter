@@ -142,21 +142,23 @@ describe("Product Configuration", () => {
 
   describe("getProductTierByProductId", () => {
     it("should return correct tier for valid Creem product IDs", () => {
-      // Test with known product IDs from the configuration
+      const plusTierConfig = getProductTierById("plus");
+      expect(plusTierConfig).toBeDefined();
+
       const plusTierOneTime = getProductTierByProductId(
-        "prod_1HVwfBIaKkJh9CgS7zD37h",
+        plusTierConfig!.pricing.creem.oneTime,
       );
       expect(plusTierOneTime).toBeDefined();
       expect(plusTierOneTime?.id).toBe("plus");
 
       const plusTierMonthly = getProductTierByProductId(
-        "prod_6uhcfBUcRxprqDvep0U5Jw",
+        plusTierConfig!.pricing.creem.monthly,
       );
       expect(plusTierMonthly).toBeDefined();
-      // Note: This product ID is used by multiple tiers due to example data
+      expect(plusTierMonthly?.id).toBe("plus");
 
       const plusTierYearly = getProductTierByProductId(
-        "prod_7LJkGVgv4LOBuucrxANo2b",
+        plusTierConfig!.pricing.creem.yearly,
       );
       expect(plusTierYearly).toBeDefined();
       expect(plusTierYearly?.id).toBe("plus");
@@ -175,14 +177,14 @@ describe("Product Configuration", () => {
       expect(getProductTierByProductId("undefined")).toBeUndefined();
     });
 
-    it("should return the first matching tier for duplicate product IDs", () => {
-      // Since multiple tiers use the same example product ID, test that it returns consistently
-      const result1 = getProductTierByProductId("prod_6uhcfBUcRxprqDvep0U5Jw");
-      const result2 = getProductTierByProductId("prod_6uhcfBUcRxprqDvep0U5Jw");
+    it("should return the same tier for repeated lookups of the same product ID", () => {
+      const productId = PRODUCT_TIERS[1]!.pricing.creem.monthly;
+      const result1 = getProductTierByProductId(productId);
+      const result2 = getProductTierByProductId(productId);
 
       expect(result1).toBeDefined();
       expect(result2).toBeDefined();
-      expect(result1?.id).toBe(result2?.id); // Should be consistent
+      expect(result1?.id).toBe(result2?.id);
     });
 
     it("should find tiers by all billing cycle product IDs", () => {
@@ -198,20 +200,18 @@ describe("Product Configuration", () => {
           tier.pricing.creem.yearly,
         );
 
-        // Each product ID should find a tier (though might not be the original due to duplicates in test data)
         expect(foundByOneTime).toBeDefined();
         expect(foundByMonthly).toBeDefined();
         expect(foundByYearly).toBeDefined();
 
-        // At least verify we get back valid tier objects
-        if (foundByOneTime) expect(foundByOneTime.id).toBeTruthy();
-        if (foundByMonthly) expect(foundByMonthly.id).toBeTruthy();
-        if (foundByYearly) expect(foundByYearly.id).toBeTruthy();
+        expect(foundByOneTime?.id).toBe(tier.id);
+        expect(foundByMonthly?.id).toBe(tier.id);
+        expect(foundByYearly?.id).toBe(tier.id);
       });
     });
 
     it("should return the full tier object with all properties", () => {
-      const tier = getProductTierByProductId("prod_1HVwfBIaKkJh9CgS7zD37h");
+      const tier = getProductTierByProductId(PRODUCT_TIERS[0]!.pricing.creem.oneTime);
       expect(tier).toBeDefined();
       if (tier) {
         expect(tier).toHaveProperty("id");

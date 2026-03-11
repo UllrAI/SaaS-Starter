@@ -24,9 +24,9 @@ export const PRODUCT_TIERS: PricingTier[] = [
     isPopular: false,
     pricing: {
       creem: {
-        oneTime: "prod_1HVwfBIaKkJh9CgS7zD37h",
-        monthly: "prod_6uhcfBUcRxprqDvep0U5Jw",
-        yearly: "prod_7LJkGVgv4LOBuucrxANo2b",
+        oneTime: "prod_1xvCrHVxDLPdoptwdH8Ake",
+        monthly: "prod_1szT3Q4qCWKYeIVk56FD0v",
+        yearly: "prod_2DyqDup95VCqxUv7rB6zWD",
       },
     },
     prices: {
@@ -42,9 +42,9 @@ export const PRODUCT_TIERS: PricingTier[] = [
     isPopular: true,
     pricing: {
       creem: {
-        oneTime: "prod_6uhcfBUcRxprqDvep0U5Jw",
-        monthly: "prod_6uhcfBUcRxprqDvep0U5Jw",
-        yearly: "prod_6uhcfBUcRxprqDvep0U5Jw",
+        oneTime: "prod_707V6jfaKsrUb9HckzuWpA",
+        monthly: "prod_6E1zx5skxroRjjbPGcHMGs",
+        yearly: "prod_3vq08mIOjo04eWmDlM5LKB",
       },
     },
     prices: {
@@ -60,9 +60,9 @@ export const PRODUCT_TIERS: PricingTier[] = [
     isPopular: false,
     pricing: {
       creem: {
-        oneTime: "prod_6uhcfBUcRxprqDvep0U5Jw",
-        monthly: "prod_6uhcfBUcRxprqDvep0U5Jw",
-        yearly: "prod_6uhcfBUcRxprqDvep0U5Jw",
+        oneTime: "prod_2msXlwJ3tbbUUp7hVIKJWk",
+        monthly: "prod_2ZXku6CgdRY38k7VQff0me",
+        yearly: "prod_2l5IMno8y3iv7KPg5QBuWM",
       },
     },
     prices: {

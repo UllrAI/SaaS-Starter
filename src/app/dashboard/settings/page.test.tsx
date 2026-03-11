@@ -21,6 +21,12 @@ jest.mock("./_components/appearance-page", () => ({
   AppearancePage: () => <div data-testid="appearance-page">Appearance</div>,
 }));
 
+jest.mock("./_components/developer-access-section", () => ({
+  DeveloperAccessSection: () => (
+    <div data-testid="developer-access-section">Developer Access</div>
+  ),
+}));
+
 jest.mock("@/lib/metadata", () => ({
   createMetadata: (config: unknown) => config,
 }));
@@ -42,7 +48,7 @@ describe("Dashboard Settings Page", () => {
     });
   });
 
-  it("renders account and appearance sections by default", async () => {
+  it("renders account, appearance, and developer access sections by default", async () => {
     const element = await SettingsPage({
       searchParams: Promise.resolve({}),
     });
@@ -51,6 +57,7 @@ describe("Dashboard Settings Page", () => {
     expect(screen.getByTestId("settings-wrapper")).toBeInTheDocument();
     expect(screen.getByTestId("account-page")).toBeInTheDocument();
     expect(screen.getByTestId("appearance-page")).toBeInTheDocument();
+    expect(screen.getByTestId("developer-access-section")).toBeInTheDocument();
     expect(mockRedirect).not.toHaveBeenCalled();
   });
 

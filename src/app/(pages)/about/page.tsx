@@ -36,18 +36,18 @@ export async function generateMetadata() {
     ...metadata,
     title: "About Us",
     description:
-      "Learn about our mission to help developers build and launch SaaS products faster with real, tested foundations.",
+      "Learn about our mission to help developers build and launch SaaS products faster with real, tested, and agent-friendly foundations.",
     openGraph: {
       ...metadata.openGraph,
       title: "About Us",
       description:
-        "Learn about our mission to help developers build and launch SaaS products faster with real, tested foundations.",
+        "Learn about our mission to help developers build and launch SaaS products faster with real, tested, and agent-friendly foundations.",
     },
     twitter: {
       ...metadata.twitter,
       title: "About Us",
       description:
-        "Learn about our mission to help developers build and launch SaaS products faster with real, tested foundations.",
+        "Learn about our mission to help developers build and launch SaaS products faster with real, tested, and agent-friendly foundations.",
     },
   };
 }
@@ -69,7 +69,9 @@ export default function AboutPage() {
           <PageIntroDescription>
             We are a team of developers, designers, and creators building the
             tools we wish we had. Open source at heart, practical in execution,
-            and serious about documented, regression-tested product foundations.
+            and serious about documented, regression-tested foundations for
+            both human users and agent (OpenClaw, Codex, Claude Code, etc.)
+            workflows.
           </PageIntroDescription>
         </PageIntro>
 
@@ -86,10 +88,11 @@ export default function AboutPage() {
                 <div className="bg-primary/10 text-primary border-primary/20 mb-4 flex h-12 w-12 items-center justify-center border">
                   <Zap className="h-6 w-6" />
                 </div>
-                <CardTitle>Speed as a Feature</CardTitle>
+                <CardTitle>Human and Agent Workflow Speed</CardTitle>
                 <CardDescription>
-                  We optimize for milliseconds. Performance isn&apos;t just a
-                  metric, it&apos;s a user experience requirement.
+                  We want the starter to feel fast for browser users, scripts,
+                  and agent-driven automation alike. Setup time matters just as
+                  much as runtime performance.
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -183,7 +186,7 @@ export default function AboutPage() {
               </div>
               <h3 className="text-xl font-bold">Initial Release</h3>
               <p className="text-muted-foreground mt-2">
-                Public beta launch with core features.
+                Public beta launch with core SaaS foundations.
               </p>
             </div>
 
@@ -197,7 +200,7 @@ export default function AboutPage() {
               </div>
               <h3 className="text-xl font-bold">First Commit</h3>
               <p className="text-muted-foreground mt-2">
-                Development started on the core engine.
+                Development started on the reusable starter foundation.
               </p>
             </div>
           </div>
@@ -211,8 +214,8 @@ export default function AboutPage() {
               Ready to Build Something Amazing?
             </PageIntroHeading>
             <PageIntroDescription className="mb-8 text-lg">
-              Join thousands of developers who are already building the next
-              generation of SaaS products.
+              Build a SaaS product that works well for end users, internal
+              tooling, and agent-friendly automation from day one.
             </PageIntroDescription>
             <div className="flex flex-wrap justify-center gap-4">
               <Button asChild size="lg">

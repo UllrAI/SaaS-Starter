@@ -9,6 +9,9 @@ excerpt: >-
 tags:
   - Next.js
   - SaaS Starter
+  - Agent-Friendly SaaS
+  - API Key
+  - CLI Auth
   - TypeScript
   - Tailwind CSS
   - shadcn/ui
@@ -31,6 +34,7 @@ heroImage: https://images.unsplash.com/photo-1561886362-a2b38ce83470?q=80&w=1674
 **UllrAI SaaS Starter Kit** 是一个免费、开源、生产就绪的全栈 SaaS 入门套件。它集成了现代 Web 开发中备受推崇的技术和实践，旨在帮助开发者以前所未有的速度启动下一个 SaaS 项目，让您专注于业务逻辑而非基础架构的搭建。
 
 - **核心功能**：提供身份验证、支付订阅、数据库管理、文件上传、内容管理等 SaaS 应用的核心功能。
+- **Agent 友好定位**：同一套代码同时服务浏览器用户、API、终端自动化，以及 agent（OpenClaw、Codex、Claude Code 等）工作流。
 - **技术栈**：基于 Next.js 16 App Router、TypeScript、PostgreSQL、Drizzle ORM，并集成了 Creem 支付、Resend 邮件服务和 Cloudflare R2 文件存储。
 - **适用场景**：
   - 快速搭建需要用户登录和付费订阅功能的全栈 SaaS 应用。
@@ -80,6 +84,7 @@ pnpm dev
 - **现代框架**: Next.js 16 (App Router, RSC), React 19, TypeScript
 - **UI**: Tailwind CSS v4, shadcn/ui, Lucide Icons, Dark/Light Mode
 - **认证**: Better-Auth (魔法链接, OAuth - Google/GitHub/LinkedIn)
+- **机器认证**: API Key、浏览器批准的 CLI 设备登录、CLI 会话查看、版本化 `/api/v1/*` 接口
 - **数据库**: PostgreSQL + Drizzle ORM (类型安全查询, 迁移管理)
 - **支付订阅**: Creem 集成 (一次性支付, 订阅, 客户门户, Webhooks)
 - **文件上传**: Cloudflare R2 集成 (客户端预签名直传, 服务端代理上传, 图片压缩)
@@ -88,6 +93,7 @@ pnpm dev
 - **表单处理**: React Hook Form + Zod (类型安全的表单验证)
 - **代码质量**: ESLint、Prettier、Jest、Playwright 冒烟测试
 - **管理后台**: 通用的数据管理后台，可轻松扩展以管理任何数据库表
+- **Agent 友好工作流**: 内置一等公民 `saas-cli`、API 校验与已授权设备管理能力
 - **部署**: Vercel 一键部署
 
 ### 1.4. 技术架构图
@@ -204,15 +210,24 @@ SaaS-Starter-main/
 - **用户角色 (`src/lib/config/roles.ts`)**: 定义了用户角色及其层级关系（`user`, `admin`, `super_admin`）。`hasRole` 等辅助函数提供了统一的权限检查逻辑。
 - **文件上传 (`src/lib/config/upload.ts`)**: 集中管理文件上传的所有规则，包括最大文件大小、允许的文件类型等。所有上传路径（客户端和服务器端）都共享此配置，确保规则一致性。
 
-#### 2.2.3. 路由架构
+#### 2.2.3. 机器认证与 Agent 工作流
+
+- **Web 用户**：继续使用 Better Auth session 和 dashboard 路由保护。
+- **机器客户端**：通过版本化 `/api/v1/*` bearer token 接口访问，而不是复用浏览器 cookie。
+- **API Key**：可在 dashboard settings 中创建与撤销，适合脚本、集成和 agent 调用。
+- **CLI 设备登录**：`saas-cli` 通过浏览器批准的 device flow 登录，本地工具无需复制浏览器 session token。
+- **会话管理**：已授权 CLI 会话可以在 dashboard settings 中查看和撤销。
+
+#### 2.2.4. 路由架构
 
 项目采用 Next.js App Router，并利用路由组 (Route Groups) 对页面进行逻辑隔离。
 
 - `(pages)`: 存放所有对公众可见的页面，如首页、关于、博客、定价等。使用 `src/app/(pages)/layout.tsx` 提供统一的页头和页脚。
 - `(auth)`: 存放认证流程中的页面，如登录、注册。使用 `src/app/(auth)/layout.tsx` 提供一个居中、简洁的布局。
 - `(dashboard)`: 存放所有需要用户登录才能访问的页面。其布局 `src/app/dashboard/layout.tsx` 通过 `SessionGuard` 实现了路由保护。
+- `api/v1`: 存放面向机器客户端的版本化认证接口，包括 API 校验、设备批准、token 换取与刷新。
 
-#### 2.2.4. 构建和打包流程
+#### 2.2.5. 构建和打包流程
 
 - **`next.config.ts`**: Next.js 的核心配置文件。
   - 配置了 `images.remotePatterns`，允许从 Unsplash 和 Cloudflare R2 加载图片。
@@ -250,6 +265,10 @@ SaaS-Starter-main/
 ### 3.2. 开发流程
 
 1. **启动开发服务器**: `pnpm dev`
+1. **本地测试 Agent 友好鉴权链路**:
+   - `pnpm saas-cli -- auth login --base-url http://localhost:3000`
+   - `pnpm saas-cli -- auth status --base-url http://localhost:3000`
+   - 或导出 `SAAS_CLI_API_KEY=ssk_...` 给脚本和 agent 调用
 1. **修改数据库**:
    - 编辑 `src/database/schema.ts`。
    - 运行 `pnpm db:push` 同步变更。

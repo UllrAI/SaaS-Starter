@@ -40,7 +40,7 @@ export function Hero() {
                   <span className="bg-primary absolute inline-flex h-full w-full animate-ping rounded-full opacity-75"></span>
                   <span className="bg-primary relative inline-flex h-2 w-2 rounded-full"></span>
                 </span>
-                <>OpenSource READY</>
+                <>Open source and agent ready</>
               </Badge>
             </div>
 
@@ -60,7 +60,8 @@ export function Hero() {
             >
               <>
                 Complete UllrAI SaaS starter with authentication, payments,
-                database, admin tooling, and Playwright-backed smoke tests.
+                database, admin tooling, agent-ready APIs, and CLI device auth
+                for agent (OpenClaw, Codex, Claude Code, etc.) workflows.
                 Everything you need to go from idea to revenue.
               </>
             </p>
@@ -236,6 +237,22 @@ export function Hero() {
                         </span>
                         <span>
                           <>Authentication</>
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-primary" data-lingo-skip>
+                          ✓
+                        </span>
+                        <span>
+                          <>Agent-ready APIs</>
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-primary" data-lingo-skip>
+                          ✓
+                        </span>
+                        <span>
+                          <>CLI Device Auth</>
                         </span>
                       </div>
                       <div className="flex items-center gap-2">

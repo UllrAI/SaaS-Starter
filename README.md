@@ -10,6 +10,8 @@
 
 This is a free, open-source, production-ready full-stack SaaS starter kit designed to help you launch your next project at unprecedented speed. It integrates modern web development tools and practices to provide you with a solid foundation.
 
+It is also an agent-friendly SaaS template: humans use browser sessions, scripts and coding agents use API keys, and local tools can sign in through a browser-approved CLI device flow.
+
 ![UllrAI SaaS Starter Kit](./public/og.png)
 
 ## ✨ Features
@@ -17,6 +19,7 @@ This is a free, open-source, production-ready full-stack SaaS starter kit design
 This starter kit provides a comprehensive set of powerful features to help you quickly build full-featured SaaS applications:
 
 - **Authentication (Better-Auth + Resend):** Integrated with [Better-Auth](https://better-auth.com/), providing secure magic link login and third-party OAuth functionality. Uses [Resend](https://resend.com/) for reliable email delivery with Mailchecker integration to avoid temporary emails.
+- **Machine Auth for APIs and Agents:** Includes per-user API keys, CLI access tokens, refresh-token rotation, and a versioned `/api/v1/*` surface for machine clients.
 - **Modern Web Framework (Next.js 16 + TypeScript):** Built on the latest [Next.js 16](https://nextjs.org/) with App Router and Server Components. The entire project uses strict TypeScript type checking.
 - **Internationalization (Lingo.dev Compiler):** Built-in localization workflow powered by `@lingo.dev/compiler` for App Router. See `docs/i18n-lingo-migration.md`.
 - **Database & ORM (Drizzle + PostgreSQL):** Uses [Drizzle ORM](https://orm.drizzle.team/) for type-safe database operations with deep PostgreSQL integration. Supports schema migrations and optimized queries.
@@ -25,6 +28,7 @@ This starter kit provides a comprehensive set of powerful features to help you q
 - **Form Handling (Zod + React Hook Form):** Powerful, type-safe form validation through [Zod](https://zod.dev/) and [React Hook Form](https://react-hook-form.com/).
 - **File Upload (Cloudflare R2):** Secure file upload system based on Cloudflare R2, supporting client-side direct upload with various file type and size restrictions.
 - **Blog System (Content Collections):** Uses [Content Collections](https://www.content-collections.dev/) with plain Markdown files for type-safe blog content, metadata generation, and sitemap output.
+- **Agent-Friendly Developer Workflow:** Ships with a first-party `saas-cli`, browser-approved device login, API key management, and dashboard surfaces for reviewing authorized CLI sessions.
 - **Code Quality & Verification:** Built-in ESLint, Prettier, Jest, and Playwright smoke tests to keep critical flows from regressing.
 
 ---
@@ -112,6 +116,8 @@ Then edit the `.env` file and fill in all required values.
 
 > **Tip:** You can generate a secure key using the following command:
 > `openssl rand -base64 32`
+>
+> **Optional local CLI auth:** for scripts, local agents, or quick terminal access, you can export `SAAS_CLI_API_KEY=ssk_...` instead of storing credentials in the CLI config.
 
 ### 4. Database Setup
 
@@ -162,7 +168,37 @@ The project uses Content Collections plus plain Markdown files for blog content.
 - **Generated content data:** Run `pnpm content:build` to refresh the generated collections manually. The command is already wired into the build, test, and type-check scripts.
 - **Production behavior:** There is no CMS admin route or runtime content API. All blog content is built from the repository content files.
 
-### 6. Start Development Server
+### 6. Agent-Friendly API and CLI Auth
+
+This starter distinguishes clearly between human auth and machine auth:
+
+- **Browser users:** Better Auth session cookies for the web app
+- **Server-to-server and agent access:** user-managed API keys
+- **Local developer tools:** browser-approved device login via `saas-cli`
+
+What ships today:
+
+- versioned machine endpoints under `/api/v1/*`
+- API key creation and revocation in Dashboard Settings
+- CLI session review and revocation in Dashboard Settings
+- a terminal workflow for signing in from local tools without reusing browser session tokens
+
+Quick examples:
+
+```bash
+# Sign in a local CLI through the browser
+pnpm saas-cli -- auth login --base-url http://localhost:3000
+
+# Check current CLI auth state
+pnpm saas-cli -- auth status --base-url http://localhost:3000
+
+# Use an API key for scripts or coding agents
+SAAS_CLI_API_KEY=ssk_your_key_here pnpm saas-cli -- auth status --base-url http://localhost:3000
+```
+
+The web app exposes management surfaces at `/dashboard/settings` for both API keys and authorized CLI sessions.
+
+### 7. Start Development Server
 
 ```bash
 pnpm dev
@@ -170,7 +206,7 @@ pnpm dev
 
 Now your application should be running at [http://localhost:3000](http://localhost:3000)!
 
-### 7. Admin Account Setup
+### 8. Admin Account Setup
 
 For security reasons, the first registered user is not promoted automatically. Use the admin script after the user has signed up normally:
 
@@ -191,17 +227,18 @@ After successful execution, the user receives `super_admin` privileges and can a
 
 #### Application Scripts
 
-| Script                 | Description                                  |
-| :--------------------- | :------------------------------------------- |
-| `pnpm dev`             | Start development server.                    |
-| `pnpm build`           | Build application for production.            |
-| `pnpm start`           | Start production server.                     |
-| `pnpm lint`            | Check code for linting errors.               |
-| `pnpm type-check`      | Run TypeScript type checking.                |
-| `pnpm test`            | Run unit tests and generate coverage report. |
-| `pnpm test:e2e`        | Build and run Playwright E2E smoke tests.    |
-| `pnpm prettier:format` | Format all code using Prettier.              |
-| `pnpm set:admin`       | Promote specified email user to super admin. |
+| Script                 | Description                                                    |
+| :--------------------- | :------------------------------------------------------------- |
+| `pnpm dev`             | Start development server.                                      |
+| `pnpm build`           | Build application for production.                              |
+| `pnpm start`           | Start production server.                                       |
+| `pnpm saas-cli`        | Run the first-party CLI for device login and API verification. |
+| `pnpm lint`            | Check code for linting errors.                                 |
+| `pnpm type-check`      | Run TypeScript type checking.                                  |
+| `pnpm test`            | Run unit tests and generate coverage report.                   |
+| `pnpm test:e2e`        | Build and run Playwright E2E smoke tests.                      |
+| `pnpm prettier:format` | Format all code using Prettier.                                |
+| `pnpm set:admin`       | Promote specified email user to super admin.                   |
 
 ## 🧪 E2E Testing
 
@@ -211,6 +248,8 @@ This repository includes a Playwright smoke test suite in `e2e/` for the most im
 - authenticated dashboard access
 - admin permission gating
 - locale canonicalization for marketing routes
+- API key creation and machine-auth verification
+- browser-approved device auth for CLI sign-in
 
 ## Layout Widths
 

@@ -8,6 +8,9 @@ excerpt: >-
 tags:
   - Next.js
   - SaaS Starter
+  - Agent-Friendly SaaS
+  - API Key
+  - CLI Auth
   - TypeScript
   - Tailwind CSS
   - shadcn/ui
@@ -30,6 +33,7 @@ This documentation provides a comprehensive and in-depth technical reference for
 **UllrAI SaaS Starter Kit** is a free, open-source, production-ready full-stack SaaS starter kit. It integrates the most respected technologies and practices in modern web development, designed to help developers launch their next SaaS project at unprecedented speed, allowing you to focus on business logic rather than infrastructure setup.
 
 - **Core Features**: Provides authentication, payment subscriptions, database management, file uploads, content management, and other core SaaS application features.
+- **Agent-Friendly Positioning**: Built for browser users, APIs, local automation, and agent (OpenClaw, Codex, Claude Code, etc.) workflows from the same codebase.
 - **Technology Stack**: Based on Next.js 16 App Router, TypeScript, PostgreSQL, Drizzle ORM, and integrates Creem payments, Resend email service, and Cloudflare R2 file storage.
 - **Use Cases**:
   - Quickly build full-stack SaaS applications requiring user login and paid subscription features.
@@ -79,6 +83,7 @@ The application will run at `http://localhost:3000`.
 - **Modern Framework**: Next.js 16 (App Router, RSC), React 19, TypeScript
 - **UI**: Tailwind CSS v4, shadcn/ui, Lucide Icons, Dark/Light Mode
 - **Authentication**: Better-Auth (Magic Link, OAuth - Google/GitHub/LinkedIn)
+- **Machine Auth**: API keys, browser-approved CLI device login, CLI session review, versioned `/api/v1/*` endpoints
 - **Database**: PostgreSQL + Drizzle ORM (Type-safe queries, Migration management)
 - **Payment Subscriptions**: Creem integration (One-time payments, Subscriptions, Customer portal, Webhooks)
 - **File Upload**: Cloudflare R2 integration (Client-side presigned direct upload, Server-side proxy upload, Image compression)
@@ -87,6 +92,7 @@ The application will run at `http://localhost:3000`.
 - **Form Handling**: React Hook Form + Zod (Type-safe form validation)
 - **Code Quality**: ESLint, Prettier, Jest, Playwright smoke tests
 - **Admin Dashboard**: Generic data management dashboard, easily extensible to manage any database table
+- **Agent-Friendly Workflow**: First-party `saas-cli`, API verification, and management surfaces for authorized devices
 - **Deployment**: One-click Vercel deployment
 
 ### 1.4. Technical Architecture Diagram
@@ -203,15 +209,24 @@ The project's configuration is highly centralized for easy maintenance and exten
 - **User Roles (`src/lib/config/roles.ts`)**: Defines user roles and their hierarchical relationships (`user`, `admin`, `super_admin`). Helper functions like `hasRole` provide unified permission checking logic.
 - **File Upload (`src/lib/config/upload.ts`)**: Centrally manages all file upload rules, including maximum file size, allowed file types, etc. All upload paths (client and server-side) share this configuration, ensuring rule consistency.
 
-#### 2.2.3. Routing Architecture
+#### 2.2.3. Machine Auth and Agent Workflow
+
+- **Web users**: Continue to use Better Auth sessions and dashboard route protection.
+- **Machine clients**: Use versioned `/api/v1/*` endpoints and bearer tokens instead of browser cookies.
+- **API keys**: Created and revoked inside dashboard settings for scripts, integrations, and agents.
+- **CLI device auth**: `saas-cli` starts a browser-approved device flow so local tools can sign in without copying browser session tokens.
+- **Session review**: Authorized CLI sessions can be reviewed and revoked from dashboard settings.
+
+#### 2.2.4. Routing Architecture
 
 The project uses Next.js App Router and leverages Route Groups for logical page separation.
 
 - `(pages)`: Contains all public pages like home, about, blog, pricing, etc. Uses `src/app/(pages)/layout.tsx` to provide unified header and footer.
 - `(auth)`: Contains authentication flow pages like login, signup. Uses `src/app/(auth)/layout.tsx` to provide a centered, clean layout.
 - `(dashboard)`: Contains all pages requiring user login. Its layout `src/app/dashboard/layout.tsx` implements route protection through `SessionGuard`.
+- `api/v1`: Contains versioned machine-facing auth endpoints for API verification, device approval, token exchange, and refresh.
 
-#### 2.2.4. Build and Packaging Process
+#### 2.2.5. Build and Packaging Process
 
 - **`next.config.ts`**: Next.js core configuration file.
   - Configures `images.remotePatterns` to allow loading images from Unsplash and Cloudflare R2.
@@ -249,6 +264,10 @@ The project uses Next.js App Router and leverages Route Groups for logical page 
 ### 3.2. Development Workflow
 
 1. **Start Development Server**: `pnpm dev`
+1. **Test agent-friendly auth locally**:
+   - `pnpm saas-cli -- auth login --base-url http://localhost:3000`
+   - `pnpm saas-cli -- auth status --base-url http://localhost:3000`
+   - Or export `SAAS_CLI_API_KEY=ssk_...` for scripts and agent calls
 1. **Modify Database**:
    - Edit `database/schema.ts`.
    - Run `pnpm db:push` to sync changes.

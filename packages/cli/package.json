@@ -1,0 +1,22 @@
+{
+  "name": "saas-cli",
+  "version": "0.1.0",
+  "private": true,
+  "description": "First-party CLI for the UllrAI SaaS Starter machine auth flows.",
+  "license": "MIT",
+  "homepage": "https://github.com/UllrAI/SaaS-Starter",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/UllrAI/SaaS-Starter.git"
+  },
+  "keywords": [
+    "saas",
+    "cli",
+    "api-key",
+    "device-auth",
+    "agent-friendly"
+  ],
+  "bin": {
+    "saas-cli": "./src/index.ts"
+  }
+}

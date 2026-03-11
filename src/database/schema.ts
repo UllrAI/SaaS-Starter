@@ -75,6 +75,92 @@ export const accounts = pgTable(
   },
 );
 
+export const apiKeys = pgTable(
+  "api_keys",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    keyPrefix: text("keyPrefix").notNull(),
+    keyHash: text("keyHash").notNull(),
+    lastFourChars: text("lastFourChars").notNull(),
+    rateLimit: integer("rateLimit").notNull().default(60),
+    isActive: boolean("isActive").notNull().default(true),
+    lastUsedAt: timestamp("lastUsedAt"),
+    expiresAt: timestamp("expiresAt"),
+    requestCountInWindow: integer("requestCountInWindow")
+      .notNull()
+      .default(0),
+    windowStartedAt: timestamp("windowStartedAt"),
+    createdAt: timestamp("createdAt").notNull().defaultNow(),
+    updatedAt: timestamp("updatedAt").notNull().defaultNow(),
+  },
+  (table) => {
+    return {
+      userIdx: index("api_keys_userId_idx").on(table.userId),
+      keyHashIdx: index("api_keys_keyHash_idx").on(table.keyHash),
+    };
+  },
+);
+
+export const deviceCodes = pgTable(
+  "device_codes",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    deviceCode: text("deviceCode").notNull().unique(),
+    userCode: text("userCode").notNull().unique(),
+    userId: text("userId").references(() => users.id, { onDelete: "cascade" }),
+    status: text("status").notNull().default("pending"),
+    interval: integer("interval").notNull().default(5),
+    lastPolledAt: timestamp("lastPolledAt"),
+    attempts: integer("attempts").notNull().default(0),
+    clientName: text("clientName"),
+    clientVersion: text("clientVersion"),
+    deviceOs: text("deviceOs"),
+    deviceHostname: text("deviceHostname"),
+    expiresAt: timestamp("expiresAt").notNull(),
+    createdAt: timestamp("createdAt").notNull().defaultNow(),
+  },
+  (table) => {
+    return {
+      expiresAtIdx: index("device_codes_expiresAt_idx").on(table.expiresAt),
+    };
+  },
+);
+
+export const cliTokens = pgTable(
+  "cli_tokens",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    tokenHash: text("tokenHash").notNull().unique(),
+    tokenPrefix: text("tokenPrefix").notNull(),
+    lastFourChars: text("lastFourChars").notNull(),
+    refreshTokenHash: text("refreshTokenHash").notNull().unique(),
+    previousRefreshTokenHash: text("previousRefreshTokenHash"),
+    refreshRotatedAt: timestamp("refreshRotatedAt"),
+    isActive: boolean("isActive").notNull().default(true),
+    expiresAt: timestamp("expiresAt").notNull(),
+    refreshExpiresAt: timestamp("refreshExpiresAt").notNull(),
+    lastUsedAt: timestamp("lastUsedAt"),
+    deviceOs: text("deviceOs"),
+    deviceHostname: text("deviceHostname"),
+    cliVersion: text("cliVersion"),
+    createdAt: timestamp("createdAt").notNull().defaultNow(),
+    updatedAt: timestamp("updatedAt").notNull().defaultNow(),
+  },
+  (table) => {
+    return {
+      userIdx: index("cli_tokens_userId_idx").on(table.userId),
+    };
+  },
+);
+
 export const verifications = pgTable("verifications", {
   id: text("id").primaryKey(),
   identifier: text("identifier").notNull(),

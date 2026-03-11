@@ -21,18 +21,18 @@ export async function generateMetadata() {
     ...metadata,
     title: "Features",
     description:
-      "Review the actual modules included in the SaaS Starter: auth, billing, admin tooling, uploads, localization, content infrastructure, and E2E smoke coverage.",
+      "Review the actual modules included in the SaaS Starter: auth, agent-ready APIs, CLI device auth, billing, admin tooling, uploads, localization, content infrastructure, and E2E smoke coverage.",
     openGraph: {
       ...metadata.openGraph,
       title: "Features",
       description:
-        "Review the actual modules included in the SaaS Starter: auth, billing, admin tooling, uploads, localization, content infrastructure, and E2E smoke coverage.",
+        "Review the actual modules included in the SaaS Starter: auth, agent-ready APIs, CLI device auth, billing, admin tooling, uploads, localization, content infrastructure, and E2E smoke coverage.",
     },
     twitter: {
       ...metadata.twitter,
       title: "Features",
       description:
-        "Review the actual modules included in the SaaS Starter: auth, billing, admin tooling, uploads, localization, content infrastructure, and E2E smoke coverage.",
+        "Review the actual modules included in the SaaS Starter: auth, agent-ready APIs, CLI device auth, billing, admin tooling, uploads, localization, content infrastructure, and E2E smoke coverage.",
     },
   };
 }
@@ -41,11 +41,12 @@ export default function FeaturesPage() {
   const includedItems = [
     <>Next.js App Router structure with page/layout conventions</>,
     <>Better Auth login, signup, session, and permission guards</>,
+    <>API keys, CLI device login, and versioned `/api/v1/*` machine auth routes</>,
     <>Creem checkout, portal, subscription records, and webhooks</>,
     <>Admin pages for users, payments, subscriptions, and uploads</>,
     <>Cloudflare R2 upload flows for browser and server uploads</>,
     <>Markdown blog content, typed collections, and marketing pages</>,
-    <>Playwright smoke coverage for auth, admin, and locale routing</>,
+    <>Playwright smoke coverage for auth, API key flows, CLI auth, admin, and locale routing</>,
   ];
 
   const customizationItems = [
@@ -73,7 +74,8 @@ export default function FeaturesPage() {
             </PageIntroHeading>
             <PageIntroDescription className="mt-6 text-lg leading-8">
               Every feature listed here exists in the codebase today. No roadmaps
-              or placeholders—just tested foundations you can reuse immediately.
+              or placeholders. Just tested foundations for human users, APIs,
+              and agent workflows you can reuse immediately.
             </PageIntroDescription>
           </PageIntro>
 

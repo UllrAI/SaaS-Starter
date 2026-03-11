@@ -7,6 +7,7 @@
     "dev": "pnpm content:build && next dev",
     "build": "pnpm content:build && next build",
     "start": "next start",
+    "saas-cli": "node --import tsx packages/cli/src/index.ts",
     "lint": "eslint .",
     "type-check": "pnpm content:build && node scripts/clean-next-types.mjs && tsc --noEmit",
     "test": "pnpm content:build && jest",

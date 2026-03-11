@@ -16,18 +16,18 @@ export async function generateMetadata() {
     ...metadata,
     title: "Micro SaaS Starter",
     description:
-      "Authentication, billing, uploads, admin tooling, and Playwright-backed smoke coverage for shipping a SaaS product faster.",
+      "Authentication, billing, agent-ready APIs, CLI device auth, uploads, admin tooling, and Playwright-backed smoke coverage for shipping a SaaS product faster.",
     openGraph: {
       ...metadata.openGraph,
       title: "Micro SaaS Starter",
       description:
-        "Authentication, billing, uploads, admin tooling, and Playwright-backed smoke coverage for shipping a SaaS product faster.",
+        "Authentication, billing, agent-ready APIs, CLI device auth, uploads, admin tooling, and Playwright-backed smoke coverage for shipping a SaaS product faster.",
     },
     twitter: {
       ...metadata.twitter,
       title: "Micro SaaS Starter",
       description:
-        "Authentication, billing, uploads, admin tooling, and Playwright-backed smoke coverage for shipping a SaaS product faster.",
+        "Authentication, billing, agent-ready APIs, CLI device auth, uploads, admin tooling, and Playwright-backed smoke coverage for shipping a SaaS product faster.",
     },
   };
 }

@@ -11,6 +11,9 @@ import {
   payments,
   webhookEvents,
   uploads,
+  apiKeys,
+  deviceCodes,
+  cliTokens,
 } from "./schema";
 import { Table } from "drizzle-orm/table";
 
@@ -61,6 +64,9 @@ describe("Database Schema", () => {
       expect(payments).toBeDefined();
       expect(webhookEvents).toBeDefined();
       expect(uploads).toBeDefined();
+      expect(apiKeys).toBeDefined();
+      expect(deviceCodes).toBeDefined();
+      expect(cliTokens).toBeDefined();
     });
 
     it("should have table objects with proper structure", () => {
@@ -73,6 +79,9 @@ describe("Database Schema", () => {
         payments,
         webhookEvents,
         uploads,
+        apiKeys,
+        deviceCodes,
+        cliTokens,
       ];
 
       tables.forEach((table) => {
@@ -242,6 +251,91 @@ describe("Database Schema", () => {
       expect(payments.currency.default).toBe("usd");
       expect(payments.status.notNull).toBe(true);
       expect(payments.paymentType.notNull).toBe(true);
+    });
+  });
+
+  describe("apiKeys table", () => {
+    it("should have all required columns as properties", () => {
+      expect(apiKeys).toHaveProperty("id");
+      expect(apiKeys).toHaveProperty("userId");
+      expect(apiKeys).toHaveProperty("name");
+      expect(apiKeys).toHaveProperty("keyPrefix");
+      expect(apiKeys).toHaveProperty("keyHash");
+      expect(apiKeys).toHaveProperty("lastFourChars");
+      expect(apiKeys).toHaveProperty("rateLimit");
+      expect(apiKeys).toHaveProperty("isActive");
+      expect(apiKeys).toHaveProperty("lastUsedAt");
+      expect(apiKeys).toHaveProperty("expiresAt");
+      expect(apiKeys).toHaveProperty("requestCountInWindow");
+      expect(apiKeys).toHaveProperty("windowStartedAt");
+      expect(apiKeys).toHaveProperty("createdAt");
+      expect(apiKeys).toHaveProperty("updatedAt");
+    });
+
+    it("should have proper column constraints", () => {
+      expect(apiKeys.id.primary).toBe(true);
+      expect(apiKeys.userId.notNull).toBe(true);
+      expect(apiKeys.keyHash.notNull).toBe(true);
+      expect(apiKeys.isActive.default).toBe(true);
+      expect(apiKeys.rateLimit.default).toBe(60);
+    });
+  });
+
+  describe("deviceCodes table", () => {
+    it("should have all required columns as properties", () => {
+      expect(deviceCodes).toHaveProperty("id");
+      expect(deviceCodes).toHaveProperty("deviceCode");
+      expect(deviceCodes).toHaveProperty("userCode");
+      expect(deviceCodes).toHaveProperty("userId");
+      expect(deviceCodes).toHaveProperty("status");
+      expect(deviceCodes).toHaveProperty("interval");
+      expect(deviceCodes).toHaveProperty("lastPolledAt");
+      expect(deviceCodes).toHaveProperty("attempts");
+      expect(deviceCodes).toHaveProperty("clientName");
+      expect(deviceCodes).toHaveProperty("clientVersion");
+      expect(deviceCodes).toHaveProperty("deviceOs");
+      expect(deviceCodes).toHaveProperty("deviceHostname");
+      expect(deviceCodes).toHaveProperty("expiresAt");
+      expect(deviceCodes).toHaveProperty("createdAt");
+    });
+
+    it("should have proper column constraints", () => {
+      expect(deviceCodes.id.primary).toBe(true);
+      expect(deviceCodes.deviceCode.notNull).toBe(true);
+      expect(deviceCodes.userCode.notNull).toBe(true);
+      expect(deviceCodes.interval.default).toBe(5);
+      expect(deviceCodes.attempts.default).toBe(0);
+    });
+  });
+
+  describe("cliTokens table", () => {
+    it("should have all required columns as properties", () => {
+      expect(cliTokens).toHaveProperty("id");
+      expect(cliTokens).toHaveProperty("userId");
+      expect(cliTokens).toHaveProperty("name");
+      expect(cliTokens).toHaveProperty("tokenHash");
+      expect(cliTokens).toHaveProperty("tokenPrefix");
+      expect(cliTokens).toHaveProperty("lastFourChars");
+      expect(cliTokens).toHaveProperty("refreshTokenHash");
+      expect(cliTokens).toHaveProperty("previousRefreshTokenHash");
+      expect(cliTokens).toHaveProperty("refreshRotatedAt");
+      expect(cliTokens).toHaveProperty("isActive");
+      expect(cliTokens).toHaveProperty("expiresAt");
+      expect(cliTokens).toHaveProperty("refreshExpiresAt");
+      expect(cliTokens).toHaveProperty("lastUsedAt");
+      expect(cliTokens).toHaveProperty("deviceOs");
+      expect(cliTokens).toHaveProperty("deviceHostname");
+      expect(cliTokens).toHaveProperty("cliVersion");
+      expect(cliTokens).toHaveProperty("createdAt");
+      expect(cliTokens).toHaveProperty("updatedAt");
+    });
+
+    it("should have proper column constraints", () => {
+      expect(cliTokens.id.primary).toBe(true);
+      expect(cliTokens.userId.notNull).toBe(true);
+      expect(cliTokens.tokenHash.notNull).toBe(true);
+      expect(cliTokens.refreshTokenHash.notNull).toBe(true);
+      expect(cliTokens.isActive.default).toBe(true);
     });
   });
 

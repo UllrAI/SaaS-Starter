@@ -2,7 +2,6 @@
 
 > **Language Select / 语言选择**: [English](#english) | [中文](#中文)
 
-
 ## English
 
 ### ✅ Shipped Foundation
@@ -10,12 +9,14 @@
 These parts already exist in the repository today:
 
 - Authentication with magic link, OAuth, and role-based access control
+- Machine auth with API keys, CLI device login, CLI session review, and `/api/v1/*` endpoints
 - Billing flow with Creem checkout, portal handoff, and webhook processing
 - Dashboard and admin pages for users, payments, subscriptions, and uploads
 - Cloudflare R2 upload flows for browser and server-side uploads
 - Localization foundation with Lingo multiple language support
 - Marketing pages, blog content, sitemap, and baseline SEO support
 - Jest coverage and Playwright smoke tests for critical browser flows
+- An agent-friendly developer workflow for scripts, coding agents, and local automation
 
 ### 🔭 Possible Evolution Directions
 
@@ -42,10 +43,10 @@ These parts already exist in the repository today:
 
 #### 4. Developer platform and integrations
 
-- Public API surface for customer or internal integrations
-- API key management and scoped access controls
+- A more stable external API contract for customer or internal integrations
+- Scoped API permissions, quotas, and better usage governance
 - More webhook events beyond payment lifecycle callbacks
-- Documentation and SDK generation once the API surface becomes stable
+- CLI packaging, SDK generation, and deeper docs once the API surface becomes stable
 
 #### 5. Product onboarding and lifecycle
 
@@ -85,12 +86,14 @@ These are not treated as default roadmap items unless a real use case appears:
 这些能力今天已经真实存在于仓库中：
 
 - 支持 magic link、OAuth 和基于角色权限控制的认证体系
+- 支持 API Key、CLI 设备登录、CLI 会话查看，以及位于 `/api/v1/*` 下的机器认证接口
 - 基于 Creem 的计费流程，包括 checkout、portal 跳转和 webhook 处理
 - 用户、支付、订阅、上传等 Dashboard 与后台管理页面
 - 面向浏览器直传和服务端上传的 Cloudflare R2 上传链路
 - 基于 Lingo 的多语言本地化基础设施
 - 营销页、博客内容、sitemap 和基础 SEO 支持
 - 覆盖关键浏览器链路的 Jest 与 Playwright 冒烟测试
+- 面向脚本、Coding Agent 和本地自动化工具的 Agent 友好工作流
 
 ### 🔭 可能的演进方向
 
@@ -115,10 +118,10 @@ These are not treated as default roadmap items unless a real use case appears:
 
 #### 4. 开发者平台与集成能力
 
-- 面向客户或内部系统的公开 API
-- API Key 管理与细粒度访问控制
+- 更稳定的外部 API 契约，便于客户或内部系统集成
+- Scoped API 权限、额度治理和更清晰的使用边界
 - 除支付生命周期之外的更多 webhook 事件
-- 在 API 稳定后补充文档与 SDK 生成
+- 在 API 稳定后补充 CLI 打包、SDK 生成和更完整文档
 
 #### 5. 产品 onboarding 与生命周期能力
 

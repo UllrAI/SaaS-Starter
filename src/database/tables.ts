@@ -8,6 +8,9 @@ import {
   webhookEvents,
   uploads,
   userRoleEnum,
+  apiKeys,
+  deviceCodes,
+  cliTokens,
 } from "./schema";
 
 export {
@@ -20,4 +23,7 @@ export {
   webhookEvents,
   uploads,
   userRoleEnum,
+  apiKeys,
+  deviceCodes,
+  cliTokens,
 };

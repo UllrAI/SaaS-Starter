@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { DashboardPageWrapper } from "../_components/dashboard-page-wrapper";
 import { AccountPage } from "./_components/account-page";
 import { AppearancePage } from "./_components/appearance-page";
+import { DeveloperAccessSection } from "./_components/developer-access-section";
 import { createMetadata } from "@/lib/metadata";
 
 export async function generateMetadata() {
@@ -52,6 +53,7 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
       <section className="space-y-8">
         <AccountPage />
         <AppearancePage />
+        <DeveloperAccessSection />
       </section>
     </DashboardPageWrapper>
   );

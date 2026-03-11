@@ -8,6 +8,7 @@ import {
   Database,
   FileText,
   Globe,
+  KeyRound,
   LayoutDashboard,
   LockKeyhole,
   Package2,
@@ -73,6 +74,19 @@ export function Features() {
       ),
       icon: LockKeyhole,
       category: <>Auth</>,
+    },
+    {
+      id: "agents",
+      title: <>Agent-ready API and CLI auth</>,
+      description: (
+        <>
+          API keys, CLI device login, refresh rotation, and versioned machine
+          endpoints give scripts and agent (OpenClaw, Codex, Claude Code, etc.)
+          access without reusing browser session cookies.
+        </>
+      ),
+      icon: KeyRound,
+      category: <>Agents</>,
     },
     {
       id: "billing",
@@ -154,7 +168,8 @@ export function Features() {
       description: (
         <>
           Jest covers units and routes, while Playwright smoke tests exercise
-          auth redirects, admin gating, and locale routing in a real browser.
+          auth redirects, API key flows, CLI device auth, admin gating, and
+          locale routing in a real browser.
         </>
       ),
       icon: ShieldCheck,
@@ -166,7 +181,7 @@ export function Features() {
     {
       id: "modules",
       label: <>Core modules</>,
-      value: <span data-lingo-skip>9</span>,
+      value: <span data-lingo-skip>10</span>,
     },
     {
       id: "locales",

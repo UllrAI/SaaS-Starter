@@ -25,18 +25,18 @@ export async function generateMetadata() {
     ...metadata,
     title: "Blog",
     description:
-      "Read our latest blog posts and insights about shipping, testing, and operating modern SaaS products.",
+      "Read implementation notes, tutorials, and insights about shipping agent-friendly SaaS products with strong auth, APIs, CLI tooling, and testing.",
     openGraph: {
       ...metadata.openGraph,
       title: "Blog",
       description:
-        "Read our latest blog posts and insights about shipping, testing, and operating modern SaaS products.",
+        "Read implementation notes, tutorials, and insights about shipping agent-friendly SaaS products with strong auth, APIs, CLI tooling, and testing.",
     },
     twitter: {
       ...metadata.twitter,
       title: "Blog",
       description:
-        "Read our latest blog posts and insights about shipping, testing, and operating modern SaaS products.",
+        "Read implementation notes, tutorials, and insights about shipping agent-friendly SaaS products with strong auth, APIs, CLI tooling, and testing.",
     },
   };
 }
@@ -98,9 +98,9 @@ export default async function BlogPage() {
               Our Blog
             </h1>
             <p className="text-muted-foreground text-lg leading-relaxed sm:text-xl">
-              Discover implementation notes, tutorials, and release updates from
-              our team. Stay current on how we build, test, and operate this
-              starter in practice.
+              Discover implementation notes, tutorials, and release updates on
+              how we build, test, and market an agent-friendly SaaS starter in
+              practice.
             </p>
           </div>
         </ReadingContainer>
@@ -131,7 +131,8 @@ export default async function BlogPage() {
                       Featured Posts
                     </h2>
                     <p className="text-muted-foreground text-sm sm:text-base">
-                      Our most popular and insightful articles
+                      Our most popular and insightful articles about SaaS
+                      foundations, agent workflows, and product delivery
                     </p>
                   </div>
                   <div className="grid gap-6 sm:gap-8 lg:gap-12">

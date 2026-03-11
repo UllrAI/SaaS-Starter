@@ -32,9 +32,10 @@ describe("blog content localization helpers", () => {
   it("returns a locale-aware list without duplicating translated slugs", () => {
     const posts = getAllPosts("zh-Hans");
 
-    expect(posts).toHaveLength(4);
-    expect(posts[0]?.slug).toBe("saas-starter-kit-developer-guide");
+    expect(posts).toHaveLength(5);
+    expect(posts[0]?.slug).toBe("agent-friendly-saas-template");
     expect(getAllPostSlugs()).toEqual([
+      "agent-friendly-saas-template",
       "modern-css-techniques",
       "nextjs-15-features",
       "saas-starter-kit-developer-guide",
@@ -43,9 +44,14 @@ describe("blog content localization helpers", () => {
   });
 
   it("exposes all localized source records for sitemap and metadata", () => {
-    expect(getAllLocalizedPosts()).toHaveLength(5);
+    expect(getAllLocalizedPosts()).toHaveLength(7);
     expect(
       getPostLocalizations("saas-starter-kit-developer-guide").map(
+        (post) => post.locale,
+      ),
+    ).toEqual(["en", "zh-Hans"]);
+    expect(
+      getPostLocalizations("agent-friendly-saas-template").map(
         (post) => post.locale,
       ),
     ).toEqual(["en", "zh-Hans"]);

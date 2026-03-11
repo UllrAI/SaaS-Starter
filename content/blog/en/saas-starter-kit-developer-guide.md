@@ -213,9 +213,9 @@ The project's configuration is highly centralized for easy maintenance and exten
 
 - **Web users**: Continue to use Better Auth sessions and dashboard route protection.
 - **Machine clients**: Use versioned `/api/v1/*` endpoints and bearer tokens instead of browser cookies.
-- **API keys**: Created and revoked inside dashboard settings for scripts, integrations, and agents.
+- **API keys**: Created and revoked inside the dedicated Developer Access page for scripts, integrations, and agents.
 - **CLI device auth**: `saas-cli` starts a browser-approved device flow so local tools can sign in without copying browser session tokens.
-- **Session review**: Authorized CLI sessions can be reviewed and revoked from dashboard settings.
+- **Session review**: Authorized CLI sessions can be reviewed and revoked from the dedicated Developer Access page.
 
 #### 2.2.4. Routing Architecture
 

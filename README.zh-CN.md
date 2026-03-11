@@ -28,7 +28,7 @@
 - **表单处理 (Zod + React Hook Form):** 通过 [Zod](https://zod.dev/) 和 [React Hook Form](https://react-hook-form.com/) 实现强大的、类型安全的表单验证。
 - **文件上传 (Cloudflare R2):** 基于 Cloudflare R2 的安全文件上传系统，支持客户端直传和多种文件类型与大小限制。
 - **博客系统 (Content Collections):** 使用 [Content Collections](https://www.content-collections.dev/) 配合原生 Markdown 文件，提供类型安全的博客内容、元数据生成和站点地图输出。
-- **Agent 友好的开发工作流:** 自带一等公民 `saas-cli`、浏览器批准的设备登录、API Key 管理，以及在 Dashboard 中查看和撤销已授权 CLI 会话的能力。
+- **Agent 友好的开发工作流:** 自带一等公民 `saas-cli`、浏览器批准的设备登录、API Key 管理，以及在独立的 Developer Access 工作区中查看和撤销已授权 CLI 会话的能力。
 - **代码质量与验证:** 内置 ESLint、Prettier、Jest 和 Playwright 冒烟测试，用于守住关键链路不回退。
 
 ---
@@ -196,7 +196,7 @@ pnpm saas-cli -- auth status --base-url http://localhost:3000
 SAAS_CLI_API_KEY=ssk_your_key_here pnpm saas-cli -- auth status --base-url http://localhost:3000
 ```
 
-Web 端对应的管理入口位于 `/dashboard/settings`，可以同时管理 API Key 和已授权 CLI 会话。
+Web 端对应的管理入口位于 `/dashboard/developer`，可以同时管理 API Key 和已授权 CLI 会话。
 
 ### 7. 启动开发服务器
 

@@ -5,7 +5,7 @@ import { getAuthSessionFromHeaders } from "@/lib/auth/session";
 import { listApiKeys } from "@/lib/api-keys/key-service";
 import { listCliTokens } from "@/lib/device-auth/token-service";
 
-export async function DeveloperAccessSection() {
+export async function DeveloperAccessSections() {
   const requestHeaders = await headers();
   const session = await getAuthSessionFromHeaders(requestHeaders);
   const userId = session?.user?.id;
@@ -16,10 +16,13 @@ export async function DeveloperAccessSection() {
   ]);
 
   return (
-    <>
-      <ApiKeysSection initialKeys={initialKeys} />
-      <CliTokensSection initialTokens={initialTokens} />
-    </>
+    <div className="space-y-6">
+      <section id="api-keys" className="scroll-mt-20">
+        <ApiKeysSection initialKeys={initialKeys} />
+      </section>
+      <section id="cli-sessions" className="scroll-mt-20">
+        <CliTokensSection initialTokens={initialTokens} />
+      </section>
+    </div>
   );
 }
-

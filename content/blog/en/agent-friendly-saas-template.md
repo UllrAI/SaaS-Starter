@@ -65,7 +65,7 @@ The starter now highlights several capabilities as first-class features:
 - per-user API key management
 - versioned `/api/v1/*` machine endpoints
 - CLI device auth through `saas-cli`
-- dashboard review for active CLI sessions
+- a dedicated Developer Access workspace for active CLI sessions
 - smoke coverage for API key and device auth flows
 
 That makes the starter more useful for teams building products that need both user-facing UI and programmable access.

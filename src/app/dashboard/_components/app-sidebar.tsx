@@ -4,6 +4,7 @@ import {
   BarChart3,
   CreditCard,
   Home,
+  KeyRound,
   LucideIcon,
   Settings,
   Shield,
@@ -62,7 +63,9 @@ function SidebarMenuLink({ item, pathname, allItems }: MenuItemProps) {
       : pathname.startsWith(otherItem.url);
   });
 
-  const maxMatchLength = Math.max(...matchingItems.map((navItem) => navItem.url.length));
+  const maxMatchLength = Math.max(
+    ...matchingItems.map((navItem) => navItem.url.length),
+  );
   const isActive = isMatch && item.url.length === maxMatchLength;
 
   return (
@@ -141,6 +144,13 @@ export function AppSidebar() {
       label: <>Billing</>,
       url: "/dashboard/billing",
       icon: Wallet,
+      matchMode: "exact",
+    },
+    {
+      id: "developer-access",
+      label: <>Developer Access</>,
+      url: "/dashboard/developer",
+      icon: KeyRound,
       matchMode: "exact",
     },
     {

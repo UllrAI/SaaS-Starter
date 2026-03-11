@@ -1,9 +1,8 @@
 import React from "react";
-import { redirect } from "next/navigation";
 import { DashboardPageWrapper } from "../_components/dashboard-page-wrapper";
 import { AccountPage } from "./_components/account-page";
 import { AppearancePage } from "./_components/appearance-page";
-import { DeveloperAccessSection } from "./_components/developer-access-section";
+import { DeveloperAccessCard } from "./_components/developer-access-card";
 import { createMetadata } from "@/lib/metadata";
 
 export async function generateMetadata() {
@@ -26,25 +25,7 @@ export async function generateMetadata() {
   };
 }
 
-interface SettingsPageProps {
-  searchParams: Promise<{ page?: string }>;
-}
-
-const legacySettingsRouteMap: Record<string, string> = {
-  account: "/dashboard/settings",
-  appearance: "/dashboard/settings",
-  notifications: "/dashboard/settings",
-  billing: "/dashboard/billing",
-};
-
-export default async function SettingsPage({ searchParams }: SettingsPageProps) {
-  const { page } = await searchParams;
-  const legacyTarget = page ? legacySettingsRouteMap[page] : undefined;
-
-  if (legacyTarget) {
-    redirect(legacyTarget);
-  }
-
+export default function SettingsPage() {
   return (
     <DashboardPageWrapper
       title={<>Settings</>}
@@ -53,7 +34,7 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
       <section className="space-y-8">
         <AccountPage />
         <AppearancePage />
-        <DeveloperAccessSection />
+        <DeveloperAccessCard />
       </section>
     </DashboardPageWrapper>
   );

@@ -34,7 +34,8 @@ Follow these guidelines for translation:
 5. Maintain the style and tone of the source text
 6. You must produce valid UTF-8 encoded output
 7. All values should be treated as strings, even numbers, translated into strings for localization.
-8. YOU MUST ONLY PRODUCE VALID XML.
+8. Keep established technical terms, protocols, acronyms, and domain-specific proper nouns unchanged across locales unless an explicit repository-wide canonical translation is defined.
+9. YOU MUST ONLY PRODUCE VALID XML.
 
 ## Special Instructions
 

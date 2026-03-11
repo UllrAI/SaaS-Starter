@@ -268,7 +268,7 @@ function CreateApiKeyDialog({ onCreated }: { onCreated: () => void }) {
                 {isCreating ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : null}
-                Create
+                Create Key
               </Button>
             </DialogFooter>
           </>
@@ -277,4 +277,3 @@ function CreateApiKeyDialog({ onCreated }: { onCreated: () => void }) {
     </Dialog>
   );
 }
-

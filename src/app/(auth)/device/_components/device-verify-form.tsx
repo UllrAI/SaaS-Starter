@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import { Loader2, Monitor, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -106,6 +107,11 @@ export function DeviceVerifyForm({
               You can close this tab and return to your terminal.
             </p>
           </div>
+          <Button asChild variant="outline" size="sm">
+            <Link href="/dashboard/developer#cli-sessions">
+              Review authorized devices
+            </Link>
+          </Button>
         </CardContent>
       </Card>
     );

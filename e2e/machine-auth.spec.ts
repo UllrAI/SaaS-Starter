@@ -1,11 +1,11 @@
 import { expect, test } from "@playwright/test";
 import { loginAs } from "./helpers/auth";
 
-test("creates an API key from settings and uses it against the v1 auth endpoint", async ({
+test("creates an API key from developer access and uses it against the v1 auth endpoint", async ({
   page,
 }) => {
   await loginAs(page, "user");
-  await page.goto("/dashboard/settings");
+  await page.goto("/dashboard/developer");
 
   await expect(page.getByText("API Keys", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Create Key" }).click();

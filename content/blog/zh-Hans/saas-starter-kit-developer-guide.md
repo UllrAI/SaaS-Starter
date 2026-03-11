@@ -214,9 +214,9 @@ SaaS-Starter-main/
 
 - **Web 用户**：继续使用 Better Auth session 和 dashboard 路由保护。
 - **机器客户端**：通过版本化 `/api/v1/*` bearer token 接口访问，而不是复用浏览器 cookie。
-- **API Key**：可在 dashboard settings 中创建与撤销，适合脚本、集成和 agent 调用。
+- **API Key**：可在独立的 Developer Access 页面中创建与撤销，适合脚本、集成和 agent 调用。
 - **CLI 设备登录**：`saas-cli` 通过浏览器批准的 device flow 登录，本地工具无需复制浏览器 session token。
-- **会话管理**：已授权 CLI 会话可以在 dashboard settings 中查看和撤销。
+- **会话管理**：已授权 CLI 会话可以在独立的 Developer Access 页面中查看和撤销。
 
 #### 2.2.4. 路由架构
 

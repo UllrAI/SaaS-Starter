@@ -28,7 +28,7 @@ This starter kit provides a comprehensive set of powerful features to help you q
 - **Form Handling (Zod + React Hook Form):** Powerful, type-safe form validation through [Zod](https://zod.dev/) and [React Hook Form](https://react-hook-form.com/).
 - **File Upload (Cloudflare R2):** Secure file upload system based on Cloudflare R2, supporting client-side direct upload with various file type and size restrictions.
 - **Blog System (Content Collections):** Uses [Content Collections](https://www.content-collections.dev/) with plain Markdown files for type-safe blog content, metadata generation, and sitemap output.
-- **Agent-Friendly Developer Workflow:** Ships with a first-party `saas-cli`, browser-approved device login, API key management, and dashboard surfaces for reviewing authorized CLI sessions.
+- **Agent-Friendly Developer Workflow:** Ships with a first-party `saas-cli`, browser-approved device login, API key management, and a dedicated Developer Access workspace for reviewing authorized CLI sessions.
 - **Code Quality & Verification:** Built-in ESLint, Prettier, Jest, and Playwright smoke tests to keep critical flows from regressing.
 
 ---
@@ -196,7 +196,7 @@ pnpm saas-cli -- auth status --base-url http://localhost:3000
 SAAS_CLI_API_KEY=ssk_your_key_here pnpm saas-cli -- auth status --base-url http://localhost:3000
 ```
 
-The web app exposes management surfaces at `/dashboard/settings` for both API keys and authorized CLI sessions.
+The web app exposes management surfaces at `/dashboard/developer` for both API keys and authorized CLI sessions.
 
 ### 7. Start Development Server
 

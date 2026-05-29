@@ -1,4 +1,5 @@
 import type { NextRequest } from "next/server";
+import { FixedWindowRateLimiter } from "@/lib/fixed-window-rate-limit";
 import type { RateLimitInfo } from "@/lib/machine-auth/types";
 
 export type RateLimitResult =
@@ -18,12 +19,7 @@ type CheckRateLimitParams = {
   windowMs: number;
 };
 
-type RateLimitBucket = {
-  count: number;
-  resetAt: number;
-};
-
-const buckets = new Map<string, RateLimitBucket>();
+const rateLimiter = new FixedWindowRateLimiter();
 
 function getBucketKey(scope: string, key: string): string {
   return `${scope}:${key}`;
@@ -35,43 +31,18 @@ export function checkRateLimit({
   scope,
   windowMs,
 }: CheckRateLimitParams): Promise<RateLimitResult> {
-  const now = Date.now();
-  const bucketKey = getBucketKey(scope, key);
-  const existing = buckets.get(bucketKey);
-
-  if (!existing || existing.resetAt <= now) {
-    const resetAt = now + windowMs;
-    buckets.set(bucketKey, { count: 1, resetAt });
-
-    return Promise.resolve({
-      allowed: true,
-      info: {
-        limit,
-        remaining: Math.max(limit - 1, 0),
-        resetAt: Math.ceil(resetAt / 1000),
-      },
-    });
-  }
-
-  if (existing.count >= limit) {
-    return Promise.resolve({
-      allowed: false,
-      info: {
-        limit,
-        remaining: 0,
-        resetAt: Math.ceil(existing.resetAt / 1000),
-      },
-    });
-  }
-
-  existing.count += 1;
+  const result = rateLimiter.check({
+    key: getBucketKey(scope, key),
+    limit,
+    windowMs,
+  });
 
   return Promise.resolve({
-    allowed: true,
+    allowed: result.allowed,
     info: {
-      limit,
-      remaining: Math.max(limit - existing.count, 0),
-      resetAt: Math.ceil(existing.resetAt / 1000),
+      limit: result.limit,
+      remaining: result.remaining,
+      resetAt: Math.ceil(result.resetAt / 1000),
     },
   });
 }
@@ -89,5 +60,5 @@ export function getClientRateLimitKey(request: NextRequest): string {
 }
 
 export function clearRateLimitForTests(): void {
-  buckets.clear();
+  rateLimiter.clear();
 }

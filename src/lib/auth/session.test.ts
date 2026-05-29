@@ -14,6 +14,7 @@ const VALID_SECRET =
 const originalEnv = {
   E2E_TEST_MODE: process.env.E2E_TEST_MODE,
   E2E_TEST_SECRET: process.env.E2E_TEST_SECRET,
+  PLAYWRIGHT: process.env.PLAYWRIGHT,
   NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
   NODE_ENV: process.env.NODE_ENV,
   VERCEL_ENV: process.env.VERCEL_ENV,
@@ -55,6 +56,7 @@ describe("E2E auth session helpers", () => {
   beforeEach(() => {
     process.env.E2E_TEST_MODE = "true";
     process.env.E2E_TEST_SECRET = VALID_SECRET;
+    process.env.PLAYWRIGHT = "true";
     process.env.NEXT_PUBLIC_APP_URL = "http://127.0.0.1:3100";
     delete process.env.VERCEL_ENV;
     setNodeEnv("test");
@@ -63,6 +65,7 @@ describe("E2E auth session helpers", () => {
   afterEach(() => {
     restoreEnvValue("E2E_TEST_MODE");
     restoreEnvValue("E2E_TEST_SECRET");
+    restoreEnvValue("PLAYWRIGHT");
     restoreEnvValue("NEXT_PUBLIC_APP_URL");
     restoreEnvValue("VERCEL_ENV");
     if (originalEnv.NODE_ENV === undefined) {
@@ -89,6 +92,12 @@ describe("E2E auth session helpers", () => {
   it("rejects E2E access for non-local production deployments", () => {
     setNodeEnv("production");
     process.env.NEXT_PUBLIC_APP_URL = "https://app.example.com";
+
+    expect(shouldAllowE2ETestAccess(VALID_SECRET)).toBe(false);
+  });
+
+  it("rejects E2E access outside Playwright", () => {
+    delete process.env.PLAYWRIGHT;
 
     expect(shouldAllowE2ETestAccess(VALID_SECRET)).toBe(false);
   });

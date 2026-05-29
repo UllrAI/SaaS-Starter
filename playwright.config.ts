@@ -22,7 +22,7 @@ export default defineConfig({
     video: "retain-on-failure",
   },
   webServer: {
-    command: `PORT=${port} NEXT_PUBLIC_APP_URL=${baseURL} E2E_TEST_MODE=true E2E_TEST_SECRET=${e2eTestSecret} pnpm start`,
+    command: `PORT=${port} NEXT_PUBLIC_APP_URL=${baseURL} E2E_TEST_MODE=true PLAYWRIGHT=true E2E_TEST_SECRET=${e2eTestSecret} pnpm start`,
     url: baseURL,
     reuseExistingServer: false,
     timeout: 120 * 1000,

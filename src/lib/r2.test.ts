@@ -105,6 +105,14 @@ describe("R2 Storage Functions", () => {
   });
 
   describe("createPresignedUrl", () => {
+    it("should normalize public URLs", async () => {
+      const { buildR2PublicUrl } = await import("./r2");
+
+      expect(
+        buildR2PublicUrl("/uploads/user-123/file.jpg", "https://cdn.test/"),
+      ).toBe("https://cdn.test/uploads/user-123/file.jpg");
+    });
+
     it("should create presigned URL with valid parameters", async () => {
       const { createPresignedUrl } = await import("./r2");
 

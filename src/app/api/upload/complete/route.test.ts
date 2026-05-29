@@ -32,6 +32,7 @@ jest.mock("@/lib/auth/server", () => ({
 
 const mockGetObjectMetadata = jest.fn() as any;
 jest.mock("@/lib/r2", () => ({
+  buildR2PublicUrl: (key: string) => `https://cdn.example.com/${key}`,
   getObjectMetadata: mockGetObjectMetadata,
 }));
 

@@ -11,8 +11,8 @@ import {
 } from "@/lib/auth/session";
 
 const e2eUserSchema = z.object({
-  id: z.string().min(1),
-  email: z.string().email(),
+  id: z.string().regex(/^e2e-[a-z0-9_-]+$/),
+  email: z.string().email().endsWith("@e2e.local"),
   name: z.string().min(1),
   role: z.enum(["user", "admin", "super_admin"]),
   image: z.string().nullable().optional(),
@@ -24,26 +24,15 @@ function notFoundResponse(): NextResponse {
 
 async function upsertUser(user: E2ETestUser) {
   const now = new Date();
-  const existingUser = await db
-    .select({
-      id: users.id,
-    })
-    .from(users)
-    .where(eq(users.email, user.email))
-    .limit(1);
-  const persistedUser = {
-    ...user,
-    id: existingUser[0]?.id ?? user.id,
-  };
 
   await db
     .insert(users)
     .values({
-      id: persistedUser.id,
-      email: persistedUser.email,
-      name: persistedUser.name,
-      image: persistedUser.image ?? null,
-      role: persistedUser.role,
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      image: user.image ?? null,
+      role: user.role,
       emailVerified: true,
       banned: false,
       banReason: null,
@@ -55,10 +44,10 @@ async function upsertUser(user: E2ETestUser) {
     .onConflictDoUpdate({
       target: users.id,
       set: {
-        email: persistedUser.email,
-        name: persistedUser.name,
-        image: persistedUser.image ?? null,
-        role: persistedUser.role,
+        email: user.email,
+        name: user.name,
+        image: user.image ?? null,
+        role: user.role,
         emailVerified: true,
         banned: false,
         banReason: null,
@@ -67,7 +56,7 @@ async function upsertUser(user: E2ETestUser) {
       },
     });
 
-  return persistedUser;
+  return user;
 }
 
 export async function POST(request: NextRequest) {
@@ -113,7 +102,7 @@ export async function DELETE(request: NextRequest) {
   }
 
   const userId = request.nextUrl.searchParams.get("userId");
-  if (userId) {
+  if (userId?.startsWith("e2e-")) {
     await db.delete(users).where(eq(users.id, userId));
   }
 

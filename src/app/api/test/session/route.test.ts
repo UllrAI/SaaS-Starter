@@ -84,6 +84,7 @@ jest.mock("drizzle-orm", () => ({
 const originalEnv = {
   E2E_TEST_MODE: process.env.E2E_TEST_MODE,
   E2E_TEST_SECRET: process.env.E2E_TEST_SECRET,
+  PLAYWRIGHT: process.env.PLAYWRIGHT,
   NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
   NODE_ENV: process.env.NODE_ENV,
   VERCEL_ENV: process.env.VERCEL_ENV,
@@ -131,6 +132,7 @@ describe("POST /api/test/session", () => {
     jest.clearAllMocks();
     process.env.E2E_TEST_MODE = "true";
     process.env.E2E_TEST_SECRET = VALID_SECRET;
+    process.env.PLAYWRIGHT = "true";
     process.env.NEXT_PUBLIC_APP_URL = "http://127.0.0.1:3100";
     delete process.env.VERCEL_ENV;
     setNodeEnv("test");
@@ -141,6 +143,7 @@ describe("POST /api/test/session", () => {
   afterEach(() => {
     restoreEnvValue("E2E_TEST_MODE");
     restoreEnvValue("E2E_TEST_SECRET");
+    restoreEnvValue("PLAYWRIGHT");
     restoreEnvValue("NEXT_PUBLIC_APP_URL");
     restoreEnvValue("VERCEL_ENV");
     if (originalEnv.NODE_ENV === undefined) {
@@ -171,6 +174,34 @@ describe("POST /api/test/session", () => {
 
     expect(response.status).toBe(404);
     expect(mockSelect).not.toHaveBeenCalled();
+    expect(mockCookieSet).not.toHaveBeenCalled();
+  });
+
+  it("returns 404 outside Playwright", async () => {
+    delete process.env.PLAYWRIGHT;
+
+    const { POST } = await import("./route");
+    const response = await POST(createPostRequest(VALID_SECRET));
+
+    expect(response.status).toBe(404);
+    expect(mockInsert).not.toHaveBeenCalled();
+    expect(mockCookieSet).not.toHaveBeenCalled();
+  });
+
+  it("rejects non-E2E identities", async () => {
+    const request = createPostRequest(VALID_SECRET);
+    request.json = jest.fn().mockResolvedValue({
+      ...TEST_USER,
+      id: "real-user",
+      email: "admin@example.com",
+      role: "super_admin",
+    });
+
+    const { POST } = await import("./route");
+    const response = await POST(request);
+
+    expect(response.status).toBe(400);
+    expect(mockInsert).not.toHaveBeenCalled();
     expect(mockCookieSet).not.toHaveBeenCalled();
   });
 

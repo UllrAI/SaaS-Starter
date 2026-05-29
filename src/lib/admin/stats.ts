@@ -2,7 +2,7 @@
 import type { AdminStats } from "@/app/dashboard/admin/_components/admin-stats-cards";
 import { db } from "@/database";
 import { users, subscriptions, payments, uploads } from "@/database/schema";
-import { count, sum, desc, eq, inArray, gte } from "drizzle-orm";
+import { count, sum, desc, eq, inArray, gte, sql } from "drizzle-orm";
 import { formatFileSize } from "@/lib/config/upload";
 
 // Extended interface for chart data
@@ -130,54 +130,37 @@ export async function getAdminStatsWithCharts(): Promise<AdminStatsWithCharts> {
 
   const twelveMonthsAgo = new Date();
   twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);
+  const userCreatedDate = sql<string>`to_char(${users.createdAt}, 'YYYY-MM-DD')`;
+  const paymentCreatedMonth = sql<string>`to_char(${payments.createdAt}, 'YYYY-MM')`;
 
-  const [basicStats, recentUsersRaw, monthlyRevenueRaw] = await Promise.all([
+  const [basicStats, recentUsersData, monthlyRevenueRaw] = await Promise.all([
     getAdminStats(),
     db
-      .select({ createdAt: users.createdAt })
+      .select({
+        date: userCreatedDate,
+        count: count(),
+      })
       .from(users)
       .where(gte(users.createdAt, thirtyDaysAgo))
-      .orderBy(desc(users.createdAt)),
+      .groupBy(userCreatedDate)
+      .orderBy(desc(userCreatedDate)),
     db
-      .select({ createdAt: payments.createdAt, amount: payments.amount })
+      .select({
+        month: paymentCreatedMonth,
+        revenue: sum(payments.amount),
+        count: count(),
+      })
       .from(payments)
       .where(gte(payments.createdAt, twelveMonthsAgo))
-      .orderBy(desc(payments.createdAt)),
+      .groupBy(paymentCreatedMonth)
+      .orderBy(desc(paymentCreatedMonth)),
   ]);
 
-  const userCountsByDate = recentUsersRaw.reduce(
-    (acc, user) => {
-      const date = user.createdAt.toISOString().split("T")[0];
-      acc[date] = (acc[date] || 0) + 1;
-      return acc;
-    },
-    {} as Record<string, number>,
-  );
-
-  const recentUsersData = Object.entries(userCountsByDate)
-    .map(([date, count]) => ({ date, count }))
-    .toSorted((a, b) => b.date.localeCompare(a.date));
-
-  const revenueByMonth = monthlyRevenueRaw.reduce(
-    (acc, payment) => {
-      const month = payment.createdAt.toISOString().substring(0, 7);
-      if (!acc[month]) {
-        acc[month] = { revenue: 0, count: 0 };
-      }
-      acc[month].revenue += Number(payment.amount);
-      acc[month].count += 1;
-      return acc;
-    },
-    {} as Record<string, { revenue: number; count: number }>,
-  );
-
-  const monthlyRevenueData = Object.entries(revenueByMonth)
-    .map(([month, data]) => ({
-      month,
-      revenue: data.revenue,
-      count: data.count,
-    }))
-    .toSorted((a, b) => b.month.localeCompare(a.month));
+  const monthlyRevenueData = monthlyRevenueRaw.map((data) => ({
+    month: data.month,
+    revenue: Number(data.revenue) || 0,
+    count: data.count,
+  }));
 
   return {
     ...basicStats,

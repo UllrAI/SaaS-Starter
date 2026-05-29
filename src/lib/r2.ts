@@ -91,7 +91,7 @@ export async function createPresignedUrl({
     });
 
     // Generate public URL
-    const publicUrl = `${env.R2_PUBLIC_URL}/${key}`;
+    const publicUrl = buildR2PublicUrl(key);
 
     return {
       success: true,
@@ -118,6 +118,13 @@ interface UploadResult {
 export interface R2ObjectMetadata {
   contentLength: number;
   contentType: string;
+}
+
+export function buildR2PublicUrl(
+  key: string,
+  baseUrl = env.R2_PUBLIC_URL,
+): string {
+  return `${baseUrl.replace(/\/+$/, "")}/${key.replace(/^\/+/, "")}`;
 }
 
 const BLOCKED_URL_ERROR = "Blocked URL host";
@@ -295,7 +302,7 @@ export async function uploadBuffer(
 
     await r2Client.send(command);
 
-    const publicUrl = `${env.R2_PUBLIC_URL}/${key}`;
+    const publicUrl = buildR2PublicUrl(key);
 
     return {
       success: true,

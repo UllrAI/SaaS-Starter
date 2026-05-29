@@ -15,6 +15,7 @@ import {
 } from "@/lib/config/upload";
 import { getAuthSessionFromHeaders } from "@/lib/auth/session";
 import { checkUploadRateLimit } from "@/lib/upload-rate-limit";
+import { buildR2PublicUrl } from "@/lib/r2";
 
 // Initialize S3 client for Cloudflare R2
 const r2Client = new S3Client({
@@ -184,7 +185,7 @@ export async function POST(request: NextRequest) {
         await upload.done();
 
         // Generate public URL
-        const publicUrl = `${env.R2_PUBLIC_URL}/${key}`;
+        const publicUrl = buildR2PublicUrl(key);
 
         // Store upload record in database
         await db.insert(uploads).values({

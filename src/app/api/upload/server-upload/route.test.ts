@@ -45,6 +45,11 @@ jest.mock("@/lib/auth/server", () => ({
   },
 }));
 
+const mockCheckUploadRateLimit = jest.fn() as any;
+jest.mock("@/lib/upload-rate-limit", () => ({
+  checkUploadRateLimit: mockCheckUploadRateLimit,
+}));
+
 // Mock AWS SDK
 const mockUpload = {
   done: jest.fn() as any,
@@ -77,26 +82,35 @@ jest.mock("crypto", () => ({
 
 // Mock env
 jest.mock("@/env", () => ({
-  R2_ENDPOINT: "https://r2.example.com",
-  R2_ACCESS_KEY_ID: "test-key",
-  R2_SECRET_ACCESS_KEY: "test-secret",
-  R2_BUCKET_NAME: "test-bucket",
-  R2_PUBLIC_URL: "https://cdn.example.com",
-  NEXT_PUBLIC_APP_URL: "https://app.example.com",
+  __esModule: true,
+  default: {
+    R2_ENDPOINT: "https://r2.example.com",
+    R2_ACCESS_KEY_ID: "test-key",
+    R2_SECRET_ACCESS_KEY: "test-secret",
+    R2_BUCKET_NAME: "test-bucket",
+    R2_PUBLIC_URL: "https://cdn.example.com",
+    NEXT_PUBLIC_APP_URL: "https://app.example.com",
+  },
 }));
 
 // Mock upload config
 const mockIsFileTypeAllowed = jest.fn() as any;
 const mockIsFileSizeAllowed = jest.fn() as any;
 const mockGetFileExtension = jest.fn() as any;
+const mockFormatFileSize = jest.fn() as any;
 
 jest.mock("@/lib/config/upload", () => ({
   UPLOAD_CONFIG: {
     MAX_FILE_SIZE: 10485760, // 10MB
+    MAX_SERVER_UPLOAD_FILES: 5,
+    MAX_SERVER_UPLOAD_TOTAL_SIZE: 20 * 1024 * 1024,
+    SERVER_UPLOAD_CONCURRENCY: 2,
   },
   isFileTypeAllowed: mockIsFileTypeAllowed,
   isFileSizeAllowed: mockIsFileSizeAllowed,
   getFileExtension: mockGetFileExtension,
+  formatFileSize: mockFormatFileSize,
+  normalizeContentType: jest.fn((contentType: string) => contentType),
 }));
 
 describe("Upload Server Upload API", () => {
@@ -104,6 +118,14 @@ describe("Upload Server Upload API", () => {
     jest.clearAllMocks();
     // Set default Date.now for consistent timestamps
     jest.spyOn(Date, "now").mockReturnValue(1640995200000); // 2022-01-01
+    mockCheckUploadRateLimit.mockReturnValue({
+      allowed: true,
+      limit: 30,
+      remaining: 29,
+      resetAt: Date.now() + 60_000,
+      retryAfter: 0,
+    });
+    mockFormatFileSize.mockImplementation((size: number) => `${size} bytes`);
   });
 
   afterEach(() => {
@@ -200,6 +222,59 @@ describe("Upload Server Upload API", () => {
 
       expect(response.status).toBe(400);
       expect(data.error).toBe("No files provided");
+    });
+
+    it("should reject requests with too many files", async () => {
+      mockGetSession.mockResolvedValue(mockSession);
+
+      const files = Array.from({ length: 6 }, (_, index) =>
+        createMockFile(`test-${index}.jpg`, "image/jpeg", 1024),
+      );
+      const mockFormData = {
+        getAll: jest.fn(() => files),
+      };
+
+      const { POST } = await import("./route");
+      const request = createMockRequest(
+        "multipart/form-data",
+        mockFormData as unknown as FormData,
+      );
+
+      const response = await POST(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(400);
+      expect(data.error).toBe(
+        "Too many files. Maximum 5 files are allowed per request.",
+      );
+      expect(mockUpload.done).not.toHaveBeenCalled();
+    });
+
+    it("should reject requests that exceed total upload size", async () => {
+      mockGetSession.mockResolvedValue(mockSession);
+
+      const files = [
+        createMockFile("large-1.jpg", "image/jpeg", 15 * 1024 * 1024),
+        createMockFile("large-2.jpg", "image/jpeg", 10 * 1024 * 1024),
+      ];
+      const mockFormData = {
+        getAll: jest.fn(() => files),
+      };
+
+      const { POST } = await import("./route");
+      const request = createMockRequest(
+        "multipart/form-data",
+        mockFormData as unknown as FormData,
+      );
+
+      const response = await POST(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(400);
+      expect(data.error).toBe(
+        "Total upload size of 26214400 bytes exceeds the per-request limit of 20971520 bytes.",
+      );
+      expect(mockUpload.done).not.toHaveBeenCalled();
     });
 
     it("should successfully upload single file", async () => {

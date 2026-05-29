@@ -7,17 +7,35 @@ import {
   formatFileSize,
   isFileSizeAllowed,
   isFileTypeAllowed,
+  normalizeContentType,
   UPLOAD_CONFIG,
   uploadCompleteRequestSchema,
 } from "@/lib/config/upload";
-import { fileExists } from "@/lib/r2";
+import { getObjectMetadata } from "@/lib/r2";
 import { getAuthSessionFromHeaders } from "@/lib/auth/session";
+import { checkUploadRateLimit } from "@/lib/upload-rate-limit";
 
 export async function POST(request: NextRequest) {
   try {
     const session = await getAuthSessionFromHeaders(request.headers);
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const rateLimit = checkUploadRateLimit(session.user.id);
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { error: "Too many upload requests. Please try again later." },
+        {
+          status: 429,
+          headers: {
+            "Retry-After": String(rateLimit.retryAfter),
+            "X-RateLimit-Limit": String(rateLimit.limit),
+            "X-RateLimit-Remaining": String(rateLimit.remaining),
+            "X-RateLimit-Reset": String(Math.ceil(rateLimit.resetAt / 1000)),
+          },
+        },
+      );
     }
 
     const body = await request.json();
@@ -33,9 +51,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { contentType, fileName, key, size, url } = validation.data;
+    const { fileName, key, size, url } = validation.data;
+    const contentType = normalizeContentType(validation.data.contentType);
     const keyPrefix = `uploads/${session.user.id}/`;
-    const expectedUrlPrefix = `${env.R2_PUBLIC_URL}/`;
+    const expectedUrl = `${env.R2_PUBLIC_URL}/${key}`;
 
     if (!key.startsWith(keyPrefix)) {
       return NextResponse.json(
@@ -44,7 +63,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!url.startsWith(expectedUrlPrefix) || !url.endsWith(key)) {
+    if (url !== expectedUrl) {
       return NextResponse.json(
         { error: "Upload URL does not match the stored object key." },
         { status: 400 },
@@ -67,11 +86,44 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const exists = await fileExists(key);
-    if (!exists) {
+    const metadata = await getObjectMetadata(key);
+    if (!metadata) {
       return NextResponse.json(
         { error: "Uploaded object could not be verified." },
         { status: 409 },
+      );
+    }
+
+    if (metadata.contentLength !== size) {
+      return NextResponse.json(
+        { error: "Uploaded object size does not match the declared size." },
+        { status: 400 },
+      );
+    }
+
+    if (metadata.contentType !== contentType) {
+      return NextResponse.json(
+        {
+          error:
+            "Uploaded object content type does not match the declared content type.",
+        },
+        { status: 400 },
+      );
+    }
+
+    if (!isFileTypeAllowed(metadata.contentType)) {
+      return NextResponse.json(
+        { error: `File type '${metadata.contentType}' is not allowed.` },
+        { status: 400 },
+      );
+    }
+
+    if (!isFileSizeAllowed(metadata.contentLength)) {
+      return NextResponse.json(
+        {
+          error: `File size of ${formatFileSize(metadata.contentLength)} exceeds the limit of ${formatFileSize(UPLOAD_CONFIG.MAX_FILE_SIZE)}.`,
+        },
+        { status: 400 },
       );
     }
 
@@ -96,19 +148,19 @@ export async function POST(request: NextRequest) {
     await db.insert(uploads).values({
       userId: session.user.id,
       fileKey: key,
-      url,
+      url: expectedUrl,
       fileName,
-      fileSize: size,
-      contentType,
+      fileSize: metadata.contentLength,
+      contentType: metadata.contentType,
     });
 
     return NextResponse.json({
       file: {
         key,
-        url,
+        url: expectedUrl,
         fileName,
-        size,
-        contentType,
+        size: metadata.contentLength,
+        contentType: metadata.contentType,
       },
     });
   } catch (error) {

@@ -10,8 +10,11 @@ import {
   isFileTypeAllowed,
   isFileSizeAllowed,
   getFileExtension,
+  formatFileSize,
+  normalizeContentType,
 } from "@/lib/config/upload";
 import { getAuthSessionFromHeaders } from "@/lib/auth/session";
+import { checkUploadRateLimit } from "@/lib/upload-rate-limit";
 
 // Initialize S3 client for Cloudflare R2
 const r2Client = new S3Client({
@@ -23,12 +26,69 @@ const r2Client = new S3Client({
   },
 });
 
+type ServerUploadResult =
+  | {
+      fileName: string;
+      url: string;
+      key: string;
+      size: number;
+      contentType: string;
+      success: true;
+    }
+  | {
+      fileName: string;
+      success: false;
+      error: string;
+    };
+
+function isUploadFile(entry: FormDataEntryValue): entry is File {
+  return (
+    typeof entry === "object" &&
+    entry !== null &&
+    "name" in entry &&
+    "type" in entry &&
+    "size" in entry &&
+    "stream" in entry
+  );
+}
+
+async function processInBatches<T, R>(
+  items: T[],
+  batchSize: number,
+  task: (item: T) => Promise<R>,
+): Promise<R[]> {
+  const results: R[] = [];
+
+  for (let index = 0; index < items.length; index += batchSize) {
+    const batch = items.slice(index, index + batchSize);
+    results.push(...(await Promise.all(batch.map(task))));
+  }
+
+  return results;
+}
+
 export async function POST(request: NextRequest) {
   try {
     // Check authentication
     const session = await getAuthSessionFromHeaders(request.headers);
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const rateLimit = checkUploadRateLimit(session.user.id);
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { error: "Too many upload requests. Please try again later." },
+        {
+          status: 429,
+          headers: {
+            "Retry-After": String(rateLimit.retryAfter),
+            "X-RateLimit-Limit": String(rateLimit.limit),
+            "X-RateLimit-Remaining": String(rateLimit.remaining),
+            "X-RateLimit-Reset": String(Math.ceil(rateLimit.resetAt / 1000)),
+          },
+        },
+      );
     }
 
     // Check if request is multipart/form-data
@@ -45,18 +105,50 @@ export async function POST(request: NextRequest) {
 
     // Parse multipart/form-data
     const formData = await request.formData();
-    const files = formData.getAll("files") as File[];
+    const fileEntries = formData.getAll("files");
+    const files = fileEntries.filter(isUploadFile);
 
-    if (!files || files.length === 0) {
+    if (fileEntries.length !== files.length) {
+      return NextResponse.json(
+        { error: "Invalid file entry in upload payload" },
+        { status: 400 },
+      );
+    }
+
+    if (files.length === 0) {
       return NextResponse.json({ error: "No files provided" }, { status: 400 });
     }
 
+    if (files.length > UPLOAD_CONFIG.MAX_SERVER_UPLOAD_FILES) {
+      return NextResponse.json(
+        {
+          error: `Too many files. Maximum ${UPLOAD_CONFIG.MAX_SERVER_UPLOAD_FILES} files are allowed per request.`,
+        },
+        { status: 400 },
+      );
+    }
+
+    const totalSize = files.reduce((sum, file) => sum + file.size, 0);
+    if (
+      !Number.isFinite(totalSize) ||
+      totalSize > UPLOAD_CONFIG.MAX_SERVER_UPLOAD_TOTAL_SIZE
+    ) {
+      return NextResponse.json(
+        {
+          error: `Total upload size of ${formatFileSize(totalSize)} exceeds the per-request limit of ${formatFileSize(UPLOAD_CONFIG.MAX_SERVER_UPLOAD_TOTAL_SIZE)}.`,
+        },
+        { status: 400 },
+      );
+    }
+
     // Function to process a single file
-    const processFile = async (file: File) => {
+    const processFile = async (file: File): Promise<ServerUploadResult> => {
       try {
+        const normalizedContentType = normalizeContentType(file.type);
+
         // Validate file type
-        if (!isFileTypeAllowed(file.type)) {
-          throw new Error(`File type ${file.type} is not allowed`);
+        if (!isFileTypeAllowed(normalizedContentType)) {
+          throw new Error(`File type ${normalizedContentType} is not allowed`);
         }
 
         // Validate file size
@@ -67,7 +159,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Generate unique key for the file
-        const fileExtension = getFileExtension(file.type);
+        const fileExtension = getFileExtension(normalizedContentType);
         const timestamp = Date.now();
         const uuid = randomUUID();
         const key = `uploads/${session.user!.id}/${timestamp}-${uuid}.${fileExtension}`;
@@ -82,9 +174,10 @@ export async function POST(request: NextRequest) {
             Bucket: env.R2_BUCKET_NAME,
             Key: key,
             Body: fileStream,
-            ContentType: file.type,
+            ContentType: normalizedContentType,
             ContentLength: file.size,
           },
+          queueSize: 1,
         });
 
         // Execute the upload
@@ -100,7 +193,7 @@ export async function POST(request: NextRequest) {
           url: publicUrl,
           fileName: file.name,
           fileSize: file.size,
-          contentType: file.type,
+          contentType: normalizedContentType,
         });
 
         return {
@@ -108,7 +201,7 @@ export async function POST(request: NextRequest) {
           url: publicUrl,
           key: key,
           size: file.size,
-          contentType: file.type,
+          contentType: normalizedContentType,
           success: true,
         };
       } catch (error) {
@@ -121,9 +214,11 @@ export async function POST(request: NextRequest) {
       }
     };
 
-    // Process all files in parallel
-    const uploadPromises = files.map(processFile);
-    const uploadResults = await Promise.all(uploadPromises);
+    const uploadResults = await processInBatches(
+      files,
+      UPLOAD_CONFIG.SERVER_UPLOAD_CONCURRENCY,
+      processFile,
+    );
 
     const successCount = uploadResults.filter((r) => r.success).length;
     const failureCount = uploadResults.length - successCount;

@@ -107,6 +107,34 @@ const mockDeleteFilesFromR2 = jest.fn();
 
 const mockRevalidatePath = jest.fn();
 
+const mockAdminUser = {
+  id: "admin1",
+  name: "Admin User",
+  email: "admin@example.com",
+  role: "admin",
+};
+
+function mockPaginatedQuery(data: unknown[] = []) {
+  const dataQuery = {
+    from: jest.fn().mockReturnThis(),
+    leftJoin: jest.fn().mockReturnThis(),
+    innerJoin: jest.fn().mockReturnThis(),
+    where: jest.fn().mockReturnThis(),
+    orderBy: jest.fn().mockReturnThis(),
+    limit: jest.fn().mockReturnThis(),
+    offset: jest.fn().mockResolvedValue(data),
+  };
+
+  const totalQuery = {
+    from: jest.fn().mockReturnThis(),
+    leftJoin: jest.fn().mockReturnThis(),
+    innerJoin: jest.fn().mockReturnThis(),
+    where: jest.fn().mockResolvedValue([{ total: data.length }]),
+  };
+
+  mockDb.select.mockReturnValueOnce(dataQuery).mockReturnValueOnce(totalQuery);
+}
+
 // Mock all imports
 jest.mock("@/database", () => ({
   db: mockDb,
@@ -177,6 +205,7 @@ jest.mock("../r2", () => ({
 describe("Admin Actions", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockRequireAdmin.mockResolvedValue(mockAdminUser);
 
     // Setup default mock implementations
     mockDb.select.mockReturnValue({
@@ -218,6 +247,75 @@ describe("Admin Actions", () => {
 
   afterEach(() => {
     jest.resetAllMocks();
+  });
+
+  describe("admin query authorization", () => {
+    const adminQueryCases = [
+      {
+        name: "getUsers",
+        call: async () => {
+          const { getUsers } = await import("./admin");
+          return getUsers({});
+        },
+      },
+      {
+        name: "getPayments",
+        call: async () => {
+          const { getPayments } = await import("./admin");
+          return getPayments({});
+        },
+      },
+      {
+        name: "getSubscriptions",
+        call: async () => {
+          const { getSubscriptions } = await import("./admin");
+          return getSubscriptions({});
+        },
+      },
+      {
+        name: "getUploads",
+        call: async () => {
+          const { getUploads } = await import("./admin");
+          return getUploads({});
+        },
+      },
+    ];
+
+    it.each(adminQueryCases)(
+      "should reject unauthenticated callers for $name",
+      async ({ call }) => {
+        mockRequireAdmin.mockRejectedValueOnce(
+          new Error("NEXT_REDIRECT_LOGIN"),
+        );
+
+        await expect(call()).rejects.toThrow("NEXT_REDIRECT_LOGIN");
+        expect(mockDb.select).not.toHaveBeenCalled();
+      },
+    );
+
+    it.each(adminQueryCases)(
+      "should reject non-admin callers for $name",
+      async ({ call }) => {
+        mockRequireAdmin.mockRejectedValueOnce(
+          new Error("NEXT_REDIRECT_DASHBOARD"),
+        );
+
+        await expect(call()).rejects.toThrow("NEXT_REDIRECT_DASHBOARD");
+        expect(mockDb.select).not.toHaveBeenCalled();
+      },
+    );
+
+    it.each(adminQueryCases)(
+      "should allow admin callers for $name",
+      async ({ call }) => {
+        mockPaginatedQuery();
+
+        await call();
+
+        expect(mockRequireAdmin).toHaveBeenCalledTimes(1);
+        expect(mockDb.select).toHaveBeenCalled();
+      },
+    );
   });
 
   describe("getUsers", () => {

@@ -21,6 +21,24 @@ function buildRateLimitHeaders(
   };
 }
 
+function buildErrorHeaders(
+  status: number,
+  rateLimitInfo?: RateLimitInfo,
+): Record<string, string> | undefined {
+  const headers = buildRateLimitHeaders(rateLimitInfo);
+
+  if (status !== 429 || !rateLimitInfo) {
+    return headers;
+  }
+
+  return {
+    ...headers,
+    "Retry-After": String(
+      Math.max(rateLimitInfo.resetAt - Math.ceil(Date.now() / 1000), 1),
+    ),
+  };
+}
+
 export function apiSuccess<T>(
   data: T,
   status = 200,
@@ -70,7 +88,7 @@ export function handleApiError(error: unknown, rateLimitInfo?: RateLimitInfo) {
     },
     {
       status: normalizedError.status,
-      headers: buildRateLimitHeaders(rateLimitInfo),
+      headers: buildErrorHeaders(normalizedError.status, rateLimitInfo),
     },
   );
 }

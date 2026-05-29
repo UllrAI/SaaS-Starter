@@ -19,9 +19,11 @@ export async function DELETE(
   });
 
   if (!revoked) {
-    return NextResponse.json({ error: "CLI session not found." }, { status: 404 });
+    return NextResponse.json(
+      { error: "CLI session not found." },
+      { status: 404 },
+    );
   }
 
   return NextResponse.json({ success: true });
 }
-

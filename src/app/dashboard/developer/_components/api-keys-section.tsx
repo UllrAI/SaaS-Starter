@@ -71,7 +71,11 @@ export function ApiKeysSection({
           </div>
         ) : (
           keys.map((apiKey) => (
-            <ApiKeyRow key={apiKey.id} apiKey={apiKey} onRevoked={refreshKeys} />
+            <ApiKeyRow
+              key={apiKey.id}
+              apiKey={apiKey}
+              onRevoked={refreshKeys}
+            />
           ))
         )}
       </CardContent>
@@ -200,8 +204,11 @@ function CreateApiKeyDialog({ onCreated }: { onCreated: () => void }) {
                 Copy this key now. It will not be shown again.
               </DialogDescription>
             </DialogHeader>
-            <div className="flex items-center gap-2 rounded-lg border bg-muted p-3">
-              <code className="min-w-0 flex-1 break-all text-sm" data-lingo-skip>
+            <div className="bg-muted flex items-center gap-2 rounded-lg border p-3">
+              <code
+                className="min-w-0 flex-1 text-sm break-all"
+                data-lingo-skip
+              >
                 {createdKey}
               </code>
               <CopyButton textToCopy={createdKey} />

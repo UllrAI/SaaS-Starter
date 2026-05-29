@@ -1,11 +1,37 @@
 import { APP_NAME, OGIMAGE, TWITTERACCOUNT } from "@/lib/config/constants";
-import { SOURCE_LOCALE, SUPPORTED_LOCALES, type SupportedLocale } from "@/lib/config/i18n";
+import {
+  SOURCE_LOCALE,
+  SUPPORTED_LOCALES,
+  type SupportedLocale,
+} from "@/lib/config/i18n";
 import { withLocalePrefix } from "@/lib/config/i18n-routing";
 import env from "@/env";
 import type { Metadata } from "next";
 
-function resolveCanonicalUrl(override: Metadata): string | URL | undefined {
-  const canonical = override.alternates?.canonical;
+type WithoutLocalizableMetadata<T> = T extends unknown
+  ? Omit<T, "title" | "description">
+  : never;
+
+type SharedOpenGraphMetadata = WithoutLocalizableMetadata<
+  NonNullable<Metadata["openGraph"]>
+>;
+
+type SharedTwitterMetadata = WithoutLocalizableMetadata<
+  NonNullable<Metadata["twitter"]>
+>;
+
+type MetadataDefaultsOptions = Pick<
+  Metadata,
+  "alternates" | "metadataBase" | "robots"
+> & {
+  openGraph?: SharedOpenGraphMetadata;
+  twitter?: SharedTwitterMetadata;
+};
+
+function resolveCanonicalUrl(
+  alternates: Metadata["alternates"],
+): string | URL | undefined {
+  const canonical = alternates?.canonical;
 
   if (canonical instanceof URL || typeof canonical === "string") {
     return canonical;
@@ -14,44 +40,28 @@ function resolveCanonicalUrl(override: Metadata): string | URL | undefined {
   return undefined;
 }
 
-export function createMetadata(override: Metadata): Metadata {
-  let title = APP_NAME;
-
-  if (override.title) {
-    if (typeof override.title === "string") {
-      title = override.title;
-    } else if (typeof override.title === "object" && override.title !== null) {
-      const titleObj = override.title as Record<
-        string,
-        string | null | undefined
-      >;
-      title = titleObj.absolute || titleObj.default || APP_NAME;
-    }
-  }
-
-  const description = override.description || "";
-  const canonicalUrl = resolveCanonicalUrl(override);
+export function createMetadataDefaults(
+  options: MetadataDefaultsOptions = {},
+): Metadata {
+  const canonicalUrl = resolveCanonicalUrl(options.alternates);
 
   return {
-    ...override,
+    alternates: options.alternates,
+    robots: options.robots,
     openGraph: {
-      title: override.openGraph?.title ?? title,
-      description: override.openGraph?.description ?? description,
-      url: override.openGraph?.url ?? canonicalUrl,
-      images: override.openGraph?.images ?? OGIMAGE,
+      url: options.openGraph?.url ?? canonicalUrl,
+      images: options.openGraph?.images ?? OGIMAGE,
       siteName: APP_NAME,
       type: "website",
-      ...override.openGraph,
+      ...options.openGraph,
     },
     twitter: {
       card: "summary_large_image",
       creator: TWITTERACCOUNT,
-      title: override.twitter?.title ?? title,
-      description: override.twitter?.description ?? description,
-      images: override.twitter?.images ?? OGIMAGE,
-      ...override.twitter,
+      images: options.twitter?.images ?? OGIMAGE,
+      ...options.twitter,
     },
-    metadataBase: override.metadataBase ?? new URL(env.NEXT_PUBLIC_APP_URL),
+    metadataBase: options.metadataBase ?? new URL(env.NEXT_PUBLIC_APP_URL),
   };
 }
 

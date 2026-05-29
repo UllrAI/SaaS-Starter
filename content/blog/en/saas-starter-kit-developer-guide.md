@@ -313,6 +313,7 @@ This starter kit uses the `better-auth` library to provide a complete authentica
   - Provides methods for interacting with the authentication system in client components, like `signIn`, `signOut`, `useSession`, etc.
 - **Authentication Flow (Magic Link)**:
   [![Magic Link](https://mermaid.ink/img/pako:eNp1k-1r00Acx_-V415NaNN2fVh74ETqA4KysYc30je35NaGJrl6SUQtBVeUVXHasQ1ZrYjCQBxL3ZvOWde_ppe0_4WXnh1ldiGQu-P7uXy_97tfFapUIxBBmzxxiaWSOzouMmwWLDB-Kpg5uqpXsOWAdZuwWet5Qyfig23AvW9-4yw47oC5265TukeZeWMWsUrYU8JCwm_v8Ldf-eF3QSw_mCleITaxtFA8qnuDXlcioXKiDo1FFxelDwSG_T3--kiIA--Un3eD-jnf7gWHPX5xMCGkVDDSCQLLS6trIIYregwL4zETF3U1auhWeUJI4RQR7H_xG02__cb_2PUPGkHrFVijZWL9B0j_wlbnzD-t8w-7o5dbMgmY481jSYH1lYeX6SURFWyYDIF_zMm-3-6M9vr--yPJX8kvxTKuFAx-nQhfErk2-v2708lVbBgbWC3fckJbNxVFufYERj_eDTtb0n8E8MYn3vs9-NMadj5fQaZr4_WDC0-qQJ7Ssk6AqNFoe4d7Ld7c5Y2fIKZhu7RBMdNgBBaZrkHkMJdEoEmYicMprI7LD50SMUkBIjHUyCZ2DacAC1ZNYOLmPKbUnJCMusUSRJvYsMXMrWjYmdz0y1UmzpywPHUtB6L5xHgPiKrwGUTJRFxJL8TjafFmc6nkfDoCn0OUziqpXC6XyWUzyVQmk0nUIvDF-K9xJbsgNETTHcoeyQ4bN1rtLzk3Xew)](https://mermaid.live/edit#pako:eNp1k-1r00Acx_-V415NaNN2fVh74ETqA4KysYc30je35NaGJrl6SUQtBVeUVXHasQ1ZrYjCQBxL3ZvOWde_ppe0_4WXnh1ldiGQu-P7uXy_97tfFapUIxBBmzxxiaWSOzouMmwWLDB-Kpg5uqpXsOWAdZuwWet5Qyfig23AvW9-4yw47oC5265TukeZeWMWsUrYU8JCwm_v8Ldf-eF3QSw_mCleITaxtFA8qnuDXlcioXKiDo1FFxelDwSG_T3--kiIA--Un3eD-jnf7gWHPX5xMCGkVDDSCQLLS6trIIYregwL4zETF3U1auhWeUJI4RQR7H_xG02__cb_2PUPGkHrFVijZWL9B0j_wlbnzD-t8w-7o5dbMgmY481jSYH1lYeX6SURFWyYDIF_zMm-3-6M9vr--yPJX8kvxTKuFAx-nQhfErk2-v2708lVbBgbWC3fckJbNxVFufYERj_eDTtb0n8E8MYn3vs9-NMadj5fQaZr4_WDC0-qQJ7Ssk6AqNFoe4d7Ld7c5Y2fIKZhu7RBMdNgBBaZrkHkMJdEoEmYicMprI7LD50SMUkBIjHUyCZ2DacAC1ZNYOLmPKbUnJCMusUSRJvYsMXMrWjYmdz0y1UmzpywPHUtB6L5xHgPiKrwGUTJRFxJL8TjafFmc6nkfDoCn0OUziqpXC6XyWUzyVQmk0nUIvDF-K9xJbsgNETTHcoeyQ4bN1rtLzk3Xew)
+
   ```mermaid
   sequenceDiagram
       participant User
@@ -355,6 +356,7 @@ This starter kit uses the `better-auth` library to provide a complete authentica
   - **Transactional**: All database operations are completed in one transaction, ensuring data consistency.
 - **Payment Flow**:
   [![Payment Flow](https://mermaid.ink/img/pako:eNp1U11rE0EU_SvDPCWQJqn5aDIPfTAFn8RAWwTJy3T3Nlm6u7POzoo1BKwgDbWBCLG0VoT2qSgmedCKBvXPZDbJv3B2txtqTZaF3Zl7zj1n7tzbxBrTARPswlMPbA02DFrn1KrZKHwcyoWhGQ61Bdp2gS_ar5gGqA91kexf-u3vk88DlKhyFbbrqErrkFzE2gT-DHjA8j905NGFPLtamJwDhG7iYOBiZX09EiVo8uqHPByhGn4AAlVNatdwjIwgChtJEVR9tLmFMtQxMjuGaSp3Ga0B2h7zREyJkEH6QJYE6lQAqtzAVNx1DWbPFQLUyi2FON82N--kvGV5-qcnzz8uws4dB4ckaHbYkf33svtWtoeRFvJ7g_HodHbx7W45Ir-yf-y3uxFoqcnHsNNgbA8lYgdpjVmOCQL05H-FiEmzT8fTwcHky2_Z7aTQtD-Uv96Nf74Zj66XUhIb99EWp7ZLNaGKlkT--Vf_ZDjpXakmmfYvZ6evJ0fX_suDJVf7z_EzDt23guK4ggrPxSlc54aOieAepLAF3KLBEjfDXsGiARbUMFG_OuxSzxRBX7QUTXXVE8asmMmZV29gsktNV608R1f3fTMD810Otg68wjxbYHKvEObApImfY5JbzaYLa9lsQb2lcj4XRPcxKZTS-XK5XCyXirl8sVhcbaXwi1A1my6tKQzohmD8YTR74Qi2_gLtEE8s)](https://mermaid.live/edit#pako:eNp1U11rE0EU_SvDPCWQJqn5aDIPfTAFn8RAWwTJy3T3Nlm6u7POzoo1BKwgDbWBCLG0VoT2qSgmedCKBvXPZDbJv3B2txtqTZaF3Zl7zj1n7tzbxBrTARPswlMPbA02DFrn1KrZKHwcyoWhGQ61Bdp2gS_ar5gGqA91kexf-u3vk88DlKhyFbbrqErrkFzE2gT-DHjA8j905NGFPLtamJwDhG7iYOBiZX09EiVo8uqHPByhGn4AAlVNatdwjIwgChtJEVR9tLmFMtQxMjuGaSp3Ga0B2h7zREyJkEH6QJYE6lQAqtzAVNx1DWbPFQLUyi2FON82N--kvGV5-qcnzz8uws4dB4ckaHbYkf33svtWtoeRFvJ7g_HodHbx7W45Ir-yf-y3uxFoqcnHsNNgbA8lYgdpjVmOCQL05H-FiEmzT8fTwcHky2_Z7aTQtD-Uv96Nf74Zj66XUhIb99EWp7ZLNaGKlkT--Vf_ZDjpXakmmfYvZ6evJ0fX_suDJVf7z_EzDt23guK4ggrPxSlc54aOieAepLAF3KLBEjfDXsGiARbUMFG_OuxSzxRBX7QUTXXVE8asmMmZV29gsktNV608R1f3fTMD810Otg68wjxbYHKvEObApImfY5JbzaYLa9lsQb2lcj4XRPcxKZTS-XK5XCyXirl8sVhcbaXwi1A1my6tKQzohmD8YTR74Qi2_gLtEE8s)
+
   ```mermaid
   sequenceDiagram
       participant User
@@ -531,21 +533,21 @@ Provides a powerful, extensible data management system.
 
 ### 8.1. CLI Commands
 
-| Script                  | Description                                |
-| ----------------------- | ------------------------------------------ |
-| `pnpm dev`              | Start development server (Turbo mode)      |
-| `pnpm content:build`    | Generate Content Collections output        |
-| `pnpm build`            | Build production application               |
-| `pnpm start`            | Start production server                    |
-| `pnpm lint`             | Run ESLint checks                          |
-| `pnpm test`             | Run Jest unit tests                        |
-| `pnpm test:e2e`         | Run Playwright E2E smoke tests             |
-| `pnpm prettier:format`  | Format all code                            |
-| `pnpm db:generate`      | Generate committed migration files         |
-| `pnpm db:migrate`       | Apply migrations to the current database   |
-| `pnpm db:push`          | (Development only) Push schema to database |
-| `pnpm analyze`          | Build and analyze bundle size              |
-| `pnpm set:admin`        | Promote user to super admin                |
+| Script                 | Description                                |
+| ---------------------- | ------------------------------------------ |
+| `pnpm dev`             | Start development server (Turbo mode)      |
+| `pnpm content:build`   | Generate Content Collections output        |
+| `pnpm build`           | Build production application               |
+| `pnpm start`           | Start production server                    |
+| `pnpm lint`            | Run ESLint checks                          |
+| `pnpm test`            | Run Jest unit tests                        |
+| `pnpm test:e2e`        | Run Playwright E2E smoke tests             |
+| `pnpm prettier:format` | Format all code                            |
+| `pnpm db:generate`     | Generate committed migration files         |
+| `pnpm db:migrate`      | Apply migrations to the current database   |
+| `pnpm db:push`         | (Development only) Push schema to database |
+| `pnpm analyze`         | Build and analyze bundle size              |
+| `pnpm set:admin`       | Promote user to super admin                |
 
 ### 8.2. Configuration Options
 

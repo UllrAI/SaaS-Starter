@@ -71,4 +71,3 @@ export type AuthVerifyResponse = {
     rateLimit: number | null;
   };
 };
-

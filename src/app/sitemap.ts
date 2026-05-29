@@ -63,7 +63,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       SUPPORTED_LOCALES.map((locale) => ({
         url: `${baseUrl}${withLocalePrefix(pathname, locale)}`,
         changeFrequency,
-        priority: locale === SOURCE_LOCALE ? priority : Math.max(priority - 0.1, 0.1),
+        priority:
+          locale === SOURCE_LOCALE ? priority : Math.max(priority - 0.1, 0.1),
         alternates: {
           languages: buildLocaleAlternates(pathname),
         },
@@ -96,6 +97,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [...staticPages, ...blogPostEntries];
 }
 
-function getLocalizedPostPath(slug: string, locale: (typeof SUPPORTED_LOCALES)[number]) {
+function getLocalizedPostPath(
+  slug: string,
+  locale: (typeof SUPPORTED_LOCALES)[number],
+) {
   return withLocalePrefix(`/blog/${slug}`, locale);
 }

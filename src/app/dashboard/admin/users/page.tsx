@@ -12,10 +12,10 @@ import { UserManagementTable } from "./_components/user-management-table";
 import { UserStatsCards } from "./_components/user-stats-cards";
 import { StatsCardsSkeleton } from "../_components/stats-cards-skeleton";
 import { getUsers } from "@/lib/actions/admin";
-import { createMetadata } from "@/lib/metadata";
+import { createMetadataDefaults } from "@/lib/metadata";
 
 export async function generateMetadata() {
-  const metadata = createMetadata({});
+  const metadata = createMetadataDefaults();
 
   return {
     ...metadata,

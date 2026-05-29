@@ -3,13 +3,14 @@ import { AppSidebar } from "./_components/app-sidebar";
 import { cookies } from "next/headers";
 import { Suspense } from "react";
 import { requireAuth } from "@/lib/auth/permissions";
-import { createMetadata } from "@/lib/metadata";
+import { createMetadataDefaults } from "@/lib/metadata";
+import { RequestLingoProvider } from "@/lib/i18n/request-lingo-provider";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
 }
 
-export const metadata = createMetadata({
+export const metadata = createMetadataDefaults({
   robots: {
     index: false,
     follow: false,
@@ -29,11 +30,13 @@ export default async function AppLayout({ children }: DashboardLayoutProps) {
     sidebarCookie === undefined ? true : sidebarCookie === "true";
 
   return (
-    <SidebarProvider defaultOpen={defaultSidebarOpen}>
-      <Suspense fallback={<div className="bg-sidebar w-14" />}>
-        <AppSidebar />
-      </Suspense>
-      <SidebarInset className="flex flex-col">{children}</SidebarInset>
-    </SidebarProvider>
+    <RequestLingoProvider>
+      <SidebarProvider defaultOpen={defaultSidebarOpen}>
+        <Suspense fallback={<div className="bg-sidebar w-14" />}>
+          <AppSidebar />
+        </Suspense>
+        <SidebarInset className="flex flex-col">{children}</SidebarInset>
+      </SidebarProvider>
+    </RequestLingoProvider>
   );
 }

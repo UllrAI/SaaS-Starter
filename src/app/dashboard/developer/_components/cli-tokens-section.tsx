@@ -50,7 +50,7 @@ export function CliTokensSection({
             <Terminal className="text-muted-foreground h-8 w-8" />
             <p className="text-muted-foreground text-sm">
               No CLI sessions yet. Run{" "}
-              <code className="rounded bg-muted px-1 py-0.5" data-lingo-skip>
+              <code className="bg-muted rounded px-1 py-0.5" data-lingo-skip>
                 pnpm saas-cli -- auth login
               </code>{" "}
               to authorize a device.
@@ -109,19 +109,31 @@ function CliTokenRow({
           <p className="truncate text-sm font-medium" data-lingo-skip>
             {token.name}
           </p>
-          <Badge variant={!token.isActive || isExpired ? "outline" : "secondary"}>
-            {!token.isActive ? <>Revoked</> : isExpired ? <>Expired</> : <>Active</>}
+          <Badge
+            variant={!token.isActive || isExpired ? "outline" : "secondary"}
+          >
+            {!token.isActive ? (
+              <>Revoked</>
+            ) : isExpired ? (
+              <>Expired</>
+            ) : (
+              <>Active</>
+            )}
           </Badge>
         </div>
         <p className="text-muted-foreground font-mono text-xs" data-lingo-skip>
           {token.tokenPrefix}...{token.lastFourChars}
         </p>
         <div className="text-muted-foreground flex flex-wrap gap-3 text-xs">
-          {token.deviceOs ? <span data-lingo-skip>{token.deviceOs}</span> : null}
+          {token.deviceOs ? (
+            <span data-lingo-skip>{token.deviceOs}</span>
+          ) : null}
           {token.deviceHostname ? (
             <span data-lingo-skip>{token.deviceHostname}</span>
           ) : null}
-          {token.cliVersion ? <span data-lingo-skip>{token.cliVersion}</span> : null}
+          {token.cliVersion ? (
+            <span data-lingo-skip>{token.cliVersion}</span>
+          ) : null}
           <span>
             Created{" "}
             <span data-lingo-skip>

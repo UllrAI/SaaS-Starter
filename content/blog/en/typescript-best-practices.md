@@ -70,7 +70,7 @@ interface User {
 }
 
 interface UserPreferences {
-  theme: 'light' | 'dark';
+  theme: "light" | "dark";
   notifications: boolean;
   language: string;
 }
@@ -80,11 +80,11 @@ interface UserPreferences {
 
 ```typescript
 // ✅ Good: Descriptive union types
-type Status = 'pending' | 'approved' | 'rejected';
-type Theme = 'light' | 'dark' | 'auto';
+type Status = "pending" | "approved" | "rejected";
+type Theme = "light" | "dark" | "auto";
 
 // ✅ Good: Discriminated unions
-type ApiResponse<T> = 
+type ApiResponse<T> =
   | { success: true; data: T }
   | { success: false; error: string };
 ```
@@ -95,7 +95,7 @@ type ApiResponse<T> =
 // ✅ Good: Reusable generic interface
 interface ApiClient<T> {
   get(id: string): Promise<T>;
-  create(data: Omit<T, 'id'>): Promise<T>;
+  create(data: Omit<T, "id">): Promise<T>;
   update(id: string, data: Partial<T>): Promise<T>;
   delete(id: string): Promise<void>;
 }
@@ -111,9 +111,9 @@ const postClient: ApiClient<Post> = new PostApiClient();
 
 ```typescript
 // ✅ Good: Using utility types
-type CreateUserRequest = Omit<User, 'id' | 'createdAt'>;
-type UpdateUserRequest = Partial<Pick<User, 'name' | 'email'>>;
-type UserSummary = Pick<User, 'id' | 'name' | 'email'>;
+type CreateUserRequest = Omit<User, "id" | "createdAt">;
+type UpdateUserRequest = Partial<Pick<User, "name" | "email">>;
+type UserSummary = Pick<User, "id" | "name" | "email">;
 ```
 
 ### 2. Conditional Types for Complex Logic
@@ -121,13 +121,13 @@ type UserSummary = Pick<User, 'id' | 'name' | 'email'>;
 ```typescript
 // ✅ Good: Conditional types for API responses
 type ApiEndpoint<T extends string> = T extends `${infer Method} ${infer Path}`
-  ? Method extends 'GET'
-    ? { method: 'GET'; path: Path; body?: never }
+  ? Method extends "GET"
+    ? { method: "GET"; path: Path; body?: never }
     : { method: Method; path: Path; body: unknown }
   : never;
 
-type GetUsers = ApiEndpoint<'GET /users'>; // { method: 'GET'; path: '/users'; body?: never }
-type CreateUser = ApiEndpoint<'POST /users'>; // { method: 'POST'; path: '/users'; body: unknown }
+type GetUsers = ApiEndpoint<"GET /users">; // { method: 'GET'; path: '/users'; body?: never }
+type CreateUser = ApiEndpoint<"POST /users">; // { method: 'POST'; path: '/users'; body: unknown }
 ```
 
 ### 3. Mapped Types for Consistency
@@ -150,20 +150,22 @@ type UserFormState = FormState<CreateUserRequest>;
 ### 1. Result Pattern for Error Handling
 
 ```typescript
-type Result<T, E = Error> = 
+type Result<T, E = Error> =
   | { success: true; data: T }
   | { success: false; error: E };
 
 class UserService {
-  async getUser(id: string): Promise<Result<User, 'NOT_FOUND' | 'NETWORK_ERROR'>> {
+  async getUser(
+    id: string,
+  ): Promise<Result<User, "NOT_FOUND" | "NETWORK_ERROR">> {
     try {
       const user = await this.apiClient.get(id);
       return { success: true, data: user };
     } catch (error) {
       if (error.status === 404) {
-        return { success: false, error: 'NOT_FOUND' };
+        return { success: false, error: "NOT_FOUND" };
       }
-      return { success: false, error: 'NETWORK_ERROR' };
+      return { success: false, error: "NETWORK_ERROR" };
     }
   }
 }
@@ -178,18 +180,21 @@ abstract class AppError extends Error {
 }
 
 class ValidationError extends AppError {
-  readonly code = 'VALIDATION_ERROR';
+  readonly code = "VALIDATION_ERROR";
   readonly statusCode = 400;
-  
-  constructor(public field: string, message: string) {
+
+  constructor(
+    public field: string,
+    message: string,
+  ) {
     super(`Validation failed for ${field}: ${message}`);
   }
 }
 
 class NotFoundError extends AppError {
-  readonly code = 'NOT_FOUND';
+  readonly code = "NOT_FOUND";
   readonly statusCode = 404;
-  
+
   constructor(resource: string, id: string) {
     super(`${resource} with id ${id} not found`);
   }
@@ -202,22 +207,24 @@ class NotFoundError extends AppError {
 
 ```typescript
 // ✅ Good: Type-only imports
-import type { User, UserPreferences } from './types';
-import { validateUser } from './validators';
+import type { User, UserPreferences } from "./types";
+import { validateUser } from "./validators";
 
 // ✅ Good: Mixed imports
-import { type ApiResponse, fetchData } from './api';
+import { type ApiResponse, fetchData } from "./api";
 ```
 
 ### 2. Lazy Type Loading
 
 ```typescript
 // ✅ Good: Lazy loading for large types
-type LazyUserDetails = () => Promise<import('./user-details').UserDetails>;
+type LazyUserDetails = () => Promise<import("./user-details").UserDetails>;
 
 class UserManager {
-  async getUserDetails(id: string): Promise<Awaited<ReturnType<LazyUserDetails>>> {
-    const { UserDetails } = await import('./user-details');
+  async getUserDetails(
+    id: string,
+  ): Promise<Awaited<ReturnType<LazyUserDetails>>> {
+    const { UserDetails } = await import("./user-details");
     return new UserDetails(id);
   }
 }
@@ -231,9 +238,9 @@ class UserManager {
 // ✅ Good: Type-safe test helpers
 function createMockUser(overrides: Partial<User> = {}): User {
   return {
-    id: 'test-id',
-    name: 'Test User',
-    email: 'test@example.com',
+    id: "test-id",
+    name: "Test User",
+    email: "test@example.com",
     createdAt: new Date(),
     ...overrides,
   };
@@ -265,16 +272,18 @@ function processData(data: any): any {
 }
 
 // ✅ Good: Use generics or unknown
-function processData<T>(data: T): T extends { someProperty: infer P } ? P : never {
+function processData<T>(
+  data: T,
+): T extends { someProperty: infer P } ? P : never {
   return (data as any).someProperty; // Type assertion when necessary
 }
 
 // ✅ Better: Use unknown for truly unknown data
 function processUnknownData(data: unknown): string {
-  if (typeof data === 'object' && data !== null && 'someProperty' in data) {
+  if (typeof data === "object" && data !== null && "someProperty" in data) {
     return String((data as { someProperty: unknown }).someProperty);
   }
-  throw new Error('Invalid data structure');
+  throw new Error("Invalid data structure");
 }
 ```
 
@@ -315,6 +324,7 @@ interface FlattenedStructure {
 Following these TypeScript best practices will help you build more maintainable, scalable, and robust applications. Remember that TypeScript is not just about adding types—it's about creating a better development experience and catching errors before they reach production.
 
 Key takeaways:
+
 - **Start with strict configuration** to catch issues early
 - **Use descriptive types** that communicate intent
 - **Leverage utility types** for code reuse
@@ -326,4 +336,4 @@ By incorporating these practices into your development workflow, you'll write Ty
 
 ---
 
-*Want to learn some about Next.js? Check out our [Exploring Next.js 15](/blog/nextjs-15-features) for tips.*    
+_Want to learn some about Next.js? Check out our [Exploring Next.js 15](/blog/nextjs-15-features) for tips._

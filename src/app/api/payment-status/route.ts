@@ -1,6 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
+import {
+  checkPersistentRateLimit,
+  getClientRateLimitKey,
+} from "@/lib/rate-limit";
 
 type ResolvedPaymentStatus = "success" | "failed" | "pending" | "cancelled";
+
+const PAYMENT_STATUS_RATE_LIMIT_WINDOW_MS = 60 * 1000;
+const PAYMENT_STATUS_RATE_LIMIT_MAX_REQUESTS = 30;
 
 const CHECKOUT_STATUS_MAP = {
   completed: {
@@ -80,6 +87,33 @@ function getCheckoutReference(searchParams: URLSearchParams): string | null {
 
 export async function GET(request: NextRequest) {
   try {
+    const rateLimit = await checkPersistentRateLimit({
+      scope: "payment_status",
+      key: getClientRateLimitKey(request),
+      limit: PAYMENT_STATUS_RATE_LIMIT_MAX_REQUESTS,
+      windowMs: PAYMENT_STATUS_RATE_LIMIT_WINDOW_MS,
+    });
+
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { error: "Too many status checks. Please try again later." },
+        {
+          status: 429,
+          headers: {
+            "Retry-After": String(
+              Math.max(
+                rateLimit.info.resetAt - Math.ceil(Date.now() / 1000),
+                1,
+              ),
+            ),
+            "X-RateLimit-Limit": String(rateLimit.info.limit),
+            "X-RateLimit-Remaining": String(rateLimit.info.remaining),
+            "X-RateLimit-Reset": String(rateLimit.info.resetAt),
+          },
+        },
+      );
+    }
+
     const { searchParams } = new URL(request.url);
     const checkoutId = getCheckoutReference(searchParams);
     const statusParam = searchParams.get("status");

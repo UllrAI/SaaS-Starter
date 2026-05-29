@@ -87,10 +87,10 @@ export async function checkRateLimit(
     details: {
       limit: maxPerMinute,
       resetAt: Math.ceil(
-        ((row.windowStartedAt?.getTime() ?? now.getTime()) + RATE_LIMIT_WINDOW_MS)
-          / 1000,
+        ((row.windowStartedAt?.getTime() ?? now.getTime()) +
+          RATE_LIMIT_WINDOW_MS) /
+          1000,
       ),
     },
   });
 }
-

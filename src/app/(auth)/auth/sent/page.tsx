@@ -14,7 +14,7 @@ export default async function MagicLinkSent({
   const description = (
     <div className="space-y-3">
       <p>We&apos;ve sent a secure magic-link to</p>
-      <p className="text-foreground break-all font-bold">
+      <p className="text-foreground font-bold break-all">
         {email || <>your email address</>}
       </p>
       <p>Click the link in the email to sign in.</p>

@@ -12,10 +12,10 @@ import { SubscriptionStatsCards } from "./_components/subscription-stats-cards";
 import { SubscriptionManagementTable } from "./_components/subscription-management-table";
 import { StatsCardsSkeleton } from "../_components/stats-cards-skeleton";
 import { getSubscriptions } from "@/lib/actions/admin";
-import { createMetadata } from "@/lib/metadata";
+import { createMetadataDefaults } from "@/lib/metadata";
 
 export async function generateMetadata() {
-  const metadata = createMetadata({});
+  const metadata = createMetadataDefaults();
 
   return {
     ...metadata,

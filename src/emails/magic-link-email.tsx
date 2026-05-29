@@ -215,19 +215,11 @@ const styles = {
   },
 } as const;
 
-export async function MagicLinkEmailSubject({
-  appName,
-}: {
-  appName: string;
-}) {
+export async function MagicLinkEmailSubject({ appName }: { appName: string }) {
   return <>Your secure sign-in link for {appName}</>;
 }
 
-export async function MagicLinkEmailPreview({
-  appName,
-}: {
-  appName: string;
-}) {
+export async function MagicLinkEmailPreview({ appName }: { appName: string }) {
   return (
     <>
       Click the secure button below to complete your sign-in process. Your
@@ -268,8 +260,8 @@ export async function MagicLinkEmailCta() {
 export async function MagicLinkEmailSecurityReminder() {
   return (
     <>
-      Security reminder: This link expires in 15 minutes. If you did not
-      request it, you can safely ignore this message.
+      Security reminder: This link expires in 15 minutes. If you did not request
+      it, you can safely ignore this message.
     </>
   );
 }
@@ -317,7 +309,11 @@ export async function MagicLinkEmailDeviceLine({
   browser: string;
   os: string;
 }) {
-  return <>Device: {browser} on {os}</>;
+  return (
+    <>
+      Device: {browser} on {os}
+    </>
+  );
 }
 
 export async function MagicLinkEmailLocationLine({

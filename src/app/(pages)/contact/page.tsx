@@ -24,14 +24,16 @@ import {
   GITHUB_DISCUSSIONS_URL,
   GITHUB_RELEASES_URL,
 } from "@/lib/config/constants";
-import { createLocalizedAlternates, createMetadata } from "@/lib/metadata";
-import { getRequestLocale } from "@/lib/i18n/server-locale";
+import {
+  createLocalizedAlternates,
+  createMetadataDefaults,
+} from "@/lib/metadata";
+import { SOURCE_LOCALE } from "@/lib/config/i18n";
 import { ContactMethods } from "./contact-methods";
 
 export async function generateMetadata() {
-  const locale = await getRequestLocale();
-  const metadata = createMetadata({
-    alternates: createLocalizedAlternates("/contact", locale),
+  const metadata = createMetadataDefaults({
+    alternates: createLocalizedAlternates("/contact", SOURCE_LOCALE),
   });
 
   return {

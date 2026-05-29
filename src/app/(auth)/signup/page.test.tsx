@@ -32,9 +32,9 @@ jest.mock("@/lib/auth/providers", () => ({
   getAvailableSocialProviders: () => mockGetAvailableSocialProviders(),
 }));
 
-const mockCreateMetadata = jest.fn(() => ({}));
+const mockCreateMetadataDefaults = jest.fn(() => ({}));
 jest.mock("@/lib/metadata", () => ({
-  createMetadata: (config: unknown) => mockCreateMetadata(config),
+  createMetadataDefaults: () => mockCreateMetadataDefaults(),
 }));
 
 describe("SignUpPage", () => {
@@ -50,7 +50,7 @@ describe("SignUpPage", () => {
       title: "Sign Up",
       description: "Create your account with magic link",
     });
-    expect(mockCreateMetadata).toHaveBeenCalledWith({});
+    expect(mockCreateMetadataDefaults).toHaveBeenCalledWith();
   });
 
   it("renders AuthForm in signup mode with providers", async () => {

@@ -9,7 +9,9 @@ test("redirects a regular user away from admin pages", async ({ page }) => {
   await expect(page).toHaveURL(/\/dashboard$/);
 });
 
-test("allows an admin session to open the admin dashboard", async ({ page }) => {
+test("allows an admin session to open the admin dashboard", async ({
+  page,
+}) => {
   await loginAs(page, "admin");
 
   await page.goto("/dashboard/admin");

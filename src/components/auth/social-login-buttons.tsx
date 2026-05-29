@@ -133,7 +133,10 @@ export function SocialLoginButtons({
         const buttonLabel = isLoading ? (
           <SocialLoginPendingLabel provider={config} />
         ) : (
-          <SocialLoginDefaultLabel provider={config} IconComponent={IconComponent} />
+          <SocialLoginDefaultLabel
+            provider={config}
+            IconComponent={IconComponent}
+          />
         );
 
         return (

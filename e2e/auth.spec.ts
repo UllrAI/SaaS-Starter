@@ -1,7 +1,9 @@
 import { expect, test } from "@playwright/test";
 import { loginAs } from "./helpers/auth";
 
-test("redirects unauthenticated dashboard requests to login", async ({ page }) => {
+test("redirects unauthenticated dashboard requests to login", async ({
+  page,
+}) => {
   await page.goto("/dashboard/settings");
 
   await expect(page).toHaveURL(

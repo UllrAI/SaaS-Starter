@@ -3,10 +3,10 @@ import { DashboardPageWrapper } from "../_components/dashboard-page-wrapper";
 import { AccountPage } from "./_components/account-page";
 import { AppearancePage } from "./_components/appearance-page";
 import { DeveloperAccessCard } from "./_components/developer-access-card";
-import { createMetadata } from "@/lib/metadata";
+import { createMetadataDefaults } from "@/lib/metadata";
 
 export async function generateMetadata() {
-  const metadata = createMetadata({});
+  const metadata = createMetadataDefaults();
 
   return {
     ...metadata,

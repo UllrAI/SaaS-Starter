@@ -31,15 +31,16 @@ describe("MagicLinkEmailTemplate", () => {
     expect(
       screen.getByRole("heading", { name: "Access your account securely" }),
     ).toBeInTheDocument();
-    expect(screen.getByText("Use the link below to finish signing in.")).toBeInTheDocument();
+    expect(
+      screen.getByText("Use the link below to finish signing in."),
+    ).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Sign in" })).toHaveAttribute(
       "href",
       "https://example.com/magic-link",
     );
-    expect(screen.getByRole("link", { name: "user@example.com" })).toHaveAttribute(
-      "href",
-      "mailto:user@example.com",
-    );
+    expect(
+      screen.getByRole("link", { name: "user@example.com" }),
+    ).toHaveAttribute("href", "mailto:user@example.com");
   });
 
   it("renders device details only when present", () => {
@@ -79,7 +80,9 @@ describe("MagicLinkEmailTemplate", () => {
     expect(
       screen.queryByText("Sign-in request details"),
     ).not.toBeInTheDocument();
-    expect(screen.queryByText("Device: Safari on macOS")).not.toBeInTheDocument();
+    expect(
+      screen.queryByText("Device: Safari on macOS"),
+    ).not.toBeInTheDocument();
     expect(
       screen.queryByText("Location: Shanghai, CN (approximate)"),
     ).not.toBeInTheDocument();

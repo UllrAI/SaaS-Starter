@@ -123,7 +123,10 @@ export async function refreshCliToken(rawRefreshToken: string): Promise<{
   });
 
   if (row) {
-    if (row.refreshExpiresAt < now || !(await isMachineAuthUserActive(row.userId))) {
+    if (
+      row.refreshExpiresAt < now ||
+      !(await isMachineAuthUserActive(row.userId))
+    ) {
       return null;
     }
 
@@ -165,7 +168,8 @@ export async function refreshCliToken(rawRefreshToken: string): Promise<{
 
   if (
     !graceRow.refreshRotatedAt ||
-    now.getTime() - graceRow.refreshRotatedAt.getTime() > CLI_REFRESH_GRACE_PERIOD_MS
+    now.getTime() - graceRow.refreshRotatedAt.getTime() >
+      CLI_REFRESH_GRACE_PERIOD_MS
   ) {
     await db
       .update(cliTokens)
@@ -230,7 +234,10 @@ export async function revokeCliToken(params: {
       updatedAt: new Date(),
     })
     .where(
-      and(eq(cliTokens.id, params.tokenId), eq(cliTokens.userId, params.userId)),
+      and(
+        eq(cliTokens.id, params.tokenId),
+        eq(cliTokens.userId, params.userId),
+      ),
     )
     .returning({ id: cliTokens.id });
 
@@ -246,4 +253,3 @@ export async function updateCliTokenLastUsed(tokenId: string): Promise<void> {
     })
     .where(eq(cliTokens.id, tokenId));
 }
-

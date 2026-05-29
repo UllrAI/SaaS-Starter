@@ -313,9 +313,8 @@ describe("Creem Client", () => {
       mockEnv.CREEM_WEBHOOK_SECRET = "live_webhook_secret_456";
 
       jest.resetModules();
-      const { creemClient, creemApiKey, creemWebhookSecret } = await import(
-        "./client"
-      );
+      const { creemClient, creemApiKey, creemWebhookSecret } =
+        await import("./client");
 
       expect(mockCreemConstructor).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -333,9 +332,8 @@ describe("Creem Client", () => {
       mockEnv.CREEM_WEBHOOK_SECRET = "test_webhook_secret_012";
 
       jest.resetModules();
-      const { creemClient, creemApiKey, creemWebhookSecret } = await import(
-        "./client"
-      );
+      const { creemClient, creemApiKey, creemWebhookSecret } =
+        await import("./client");
 
       expect(mockCreemConstructor).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -353,9 +351,8 @@ describe("Creem Client", () => {
       delete (mockEnv as any).CREEM_WEBHOOK_SECRET;
 
       jest.resetModules();
-      const { creemClient, creemApiKey, creemWebhookSecret } = await import(
-        "./client"
-      );
+      const { creemClient, creemApiKey, creemWebhookSecret } =
+        await import("./client");
 
       expect(mockCreemConstructor).toHaveBeenCalledWith(
         expect.objectContaining({

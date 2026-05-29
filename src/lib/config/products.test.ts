@@ -211,7 +211,9 @@ describe("Product Configuration", () => {
     });
 
     it("should return the full tier object with all properties", () => {
-      const tier = getProductTierByProductId(PRODUCT_TIERS[0]!.pricing.creem.oneTime);
+      const tier = getProductTierByProductId(
+        PRODUCT_TIERS[0]!.pricing.creem.oneTime,
+      );
       expect(tier).toBeDefined();
       if (tier) {
         expect(tier).toHaveProperty("id");

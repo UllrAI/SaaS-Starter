@@ -19,7 +19,9 @@ export function resolveLocaleSwitchUrl({
   locale,
 }: ResolveLocaleSwitchUrlInput): string | null {
   const pathLocale = extractLocaleFromPath(pathname);
-  const basePathname = pathLocale.locale ? pathLocale.strippedPathname : pathname;
+  const basePathname = pathLocale.locale
+    ? pathLocale.strippedPathname
+    : pathname;
 
   if (!isMarketingPath(basePathname)) {
     return null;

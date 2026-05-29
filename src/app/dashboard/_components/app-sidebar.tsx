@@ -69,7 +69,11 @@ function SidebarMenuLink({ item, pathname, allItems }: MenuItemProps) {
   const isActive = isMatch && item.url.length === maxMatchLength;
 
   return (
-    <SidebarMenuButton asChild isActive={isActive} tooltip={{ children: label }}>
+    <SidebarMenuButton
+      asChild
+      isActive={isActive}
+      tooltip={{ children: label }}
+    >
       <Link href={item.url}>
         <item.icon className="size-4" />
         <span>{label}</span>
@@ -96,7 +100,11 @@ function SidebarSection({ title, items, pathname }: MenuSectionProps) {
         <SidebarMenu>
           {items.map((item) => (
             <SidebarMenuItem key={item.id}>
-              <SidebarMenuLink item={item} pathname={pathname} allItems={items} />
+              <SidebarMenuLink
+                item={item}
+                pathname={pathname}
+                allItems={items}
+              />
             </SidebarMenuItem>
           ))}
         </SidebarMenu>
@@ -214,7 +222,11 @@ export function AppSidebar() {
         </Link>
       </SidebarHeader>
       <SidebarContent>
-        <SidebarSection title={undefined} items={navigation} pathname={pathname} />
+        <SidebarSection
+          title={undefined}
+          items={navigation}
+          pathname={pathname}
+        />
 
         {showAdminSections && (
           <SidebarSection

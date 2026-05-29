@@ -71,4 +71,3 @@ describe("GET /api/v1/auth/verify", () => {
     });
   });
 });
-

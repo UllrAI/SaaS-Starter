@@ -2,12 +2,7 @@ import {
   CLI_REFRESH_PREFIX,
   CLI_TOKEN_PREFIX,
 } from "../../../src/lib/machine-auth/constants";
-import {
-  getBaseUrl,
-  loadConfig,
-  requireAuthToken,
-  saveConfig,
-} from "./config";
+import { getBaseUrl, loadConfig, requireAuthToken, saveConfig } from "./config";
 
 type ApiEnvelope<T> =
   | {
@@ -118,4 +113,3 @@ export async function request<T>(
 export async function verifyAuth(): Promise<AuthVerifyResponse> {
   return request<AuthVerifyResponse>("GET", "/api/v1/auth/verify");
 }
-

@@ -54,14 +54,14 @@ describe("proxy", () => {
     );
   });
 
-  it("rewrites localized marketing path to existing route and keeps locale context", async () => {
+  it("keeps localized marketing path on its static route", async () => {
     const request = new NextRequest("http://localhost/zh-Hans/pricing");
 
     const response = await proxy(request);
 
-    expect(response.headers.get("x-middleware-rewrite")).toBe(
-      "http://localhost/pricing",
-    );
+    expect(response.headers.get("x-middleware-next")).toBe("1");
+    expect(response.headers.get("x-middleware-rewrite")).toBeNull();
+    expect(response.headers.get("location")).toBeNull();
   });
 
   it("canonicalizes aliased locale segment to configured locale segment", async () => {

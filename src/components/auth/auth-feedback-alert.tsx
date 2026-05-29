@@ -16,7 +16,8 @@ export function AuthFeedbackAlert({
     case "banned":
       description = feedback.banReason ? (
         <>
-          This account is disabled. Contact support. Reason: {feedback.banReason}
+          This account is disabled. Contact support. Reason:{" "}
+          {feedback.banReason}
         </>
       ) : (
         <>This account is disabled. Contact support.</>

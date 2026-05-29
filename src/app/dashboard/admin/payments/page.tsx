@@ -12,10 +12,10 @@ import { PaymentStatsCards } from "./_components/payment-stats-cards";
 import { PaymentManagementTable } from "./_components/payment-management-table";
 import { StatsCardsSkeleton } from "../_components/stats-cards-skeleton";
 import { getPayments } from "@/lib/actions/admin";
-import { createMetadata } from "@/lib/metadata";
+import { createMetadataDefaults } from "@/lib/metadata";
 
 export async function generateMetadata() {
-  const metadata = createMetadata({});
+  const metadata = createMetadataDefaults();
 
   return {
     ...metadata,

@@ -5,8 +5,9 @@ import { withLingo } from "@lingo.dev/compiler/next";
 import { createLingoConfig } from "./lingo.config";
 import { getRemotePatterns } from "./next-images.config";
 
-(globalThis as typeof globalThis & { AI_SDK_LOG_WARNINGS?: false })
-  .AI_SDK_LOG_WARNINGS = false;
+(
+  globalThis as typeof globalThis & { AI_SDK_LOG_WARNINGS?: false }
+).AI_SDK_LOG_WARNINGS = false;
 process.env.DOTENV_CONFIG_QUIET = "true";
 
 const nextConfig: NextConfig = {

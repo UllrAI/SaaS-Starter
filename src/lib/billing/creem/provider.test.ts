@@ -461,7 +461,9 @@ describe("Creem Provider Implementation", () => {
       };
 
       mockGetProductTierById.mockReturnValue(mockTier);
-      mockCreemClient.checkouts.create.mockRejectedValue(new Error("API Error"));
+      mockCreemClient.checkouts.create.mockRejectedValue(
+        new Error("API Error"),
+      );
 
       await expect(
         creemProvider.createCheckoutSession(mockCheckoutOptions),
@@ -482,11 +484,11 @@ describe("Creem Provider Implementation", () => {
       const result =
         await creemProvider.createCustomerPortalUrl("customer-123");
 
-      expect(mockCreemClient.customers.generateBillingLinks).toHaveBeenCalledWith(
-        {
-          customerId: "customer-123",
-        },
-      );
+      expect(
+        mockCreemClient.customers.generateBillingLinks,
+      ).toHaveBeenCalledWith({
+        customerId: "customer-123",
+      });
       expect(result).toEqual({
         portalUrl: "https://portal.creem.io/customer-123",
       });

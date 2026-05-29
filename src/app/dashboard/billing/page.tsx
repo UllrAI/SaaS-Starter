@@ -6,11 +6,11 @@ import {
   getUserSubscription,
 } from "@/lib/database/subscription";
 import { BillingOverview } from "./_components/billing-overview";
-import { createMetadata } from "@/lib/metadata";
+import { createMetadataDefaults } from "@/lib/metadata";
 import { getAuthSessionFromHeaders } from "@/lib/auth/session";
 
 export async function generateMetadata() {
-  const metadata = createMetadata({});
+  const metadata = createMetadataDefaults();
 
   return {
     ...metadata,

@@ -17,7 +17,10 @@ export const assertTrustedBillingUrl = (url: string, label: string): string => {
     throw new Error(`Invalid ${label}.`);
   }
 
-  if (parsedUrl.protocol !== "https:" || !isTrustedBillingHost(parsedUrl.hostname)) {
+  if (
+    parsedUrl.protocol !== "https:" ||
+    !isTrustedBillingHost(parsedUrl.hostname)
+  ) {
     throw new Error(`Invalid ${label}.`);
   }
 
@@ -42,7 +45,9 @@ export const getSafeBillingRedirectUrl = (
     }
 
     if (parsedUrl.protocol !== "https:") return null;
-    return isTrustedBillingHost(parsedUrl.hostname) ? parsedUrl.toString() : null;
+    return isTrustedBillingHost(parsedUrl.hostname)
+      ? parsedUrl.toString()
+      : null;
   } catch {
     return null;
   }

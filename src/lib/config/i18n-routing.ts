@@ -65,7 +65,9 @@ function stripFirstPathSegment(pathname: string): string {
   return stripped || "/";
 }
 
-function parseAcceptLanguageEntry(entry: string): { tag: string; q: number } | null {
+function parseAcceptLanguageEntry(
+  entry: string,
+): { tag: string; q: number } | null {
   const trimmed = entry.trim();
   if (!trimmed) {
     return null;
@@ -168,8 +170,7 @@ export function isMarketingPath(pathname: string): boolean {
   }
 
   return MARKETING_ROUTE_PREFIXES.some(
-    (prefix) =>
-      normalized === prefix || normalized.startsWith(`${prefix}/`),
+    (prefix) => normalized === prefix || normalized.startsWith(`${prefix}/`),
   );
 }
 

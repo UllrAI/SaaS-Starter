@@ -1,14 +1,14 @@
 import { notFound } from "next/navigation";
+import Script from "next/script";
 import env from "@/env";
-import { createMetadata } from "@/lib/metadata";
+import { createMetadataDefaults } from "@/lib/metadata";
 import { BlogPostHeader } from "@/components/blog/blog-post-header";
 import { ReadingContainer } from "@/components/layout/page-container";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { getRequestLocale } from "@/lib/i18n/server-locale";
-import { SOURCE_LOCALE } from "@/lib/config/i18n";
+import { SOURCE_LOCALE, type SupportedLocale } from "@/lib/config/i18n";
 import { COMPANY_NAME } from "@/lib/config/constants";
 import { Languages } from "lucide-react";
 import ReactMarkdown from "react-markdown";
@@ -28,20 +28,25 @@ interface BlogPostPageProps {
   }>;
 }
 
+export const dynamicParams = false;
+
 export async function generateStaticParams() {
   return getAllPostSlugs().map((slug) => ({
     slug,
   }));
 }
 
-export async function generateMetadata({
-  params,
-}: BlogPostPageProps): Promise<Metadata> {
-  const [{ slug }, locale] = await Promise.all([params, getRequestLocale()]);
+export function generateBlogPostMetadata({
+  slug,
+  locale,
+}: {
+  slug: string;
+  locale: SupportedLocale;
+}): Metadata {
   const post = getPostBySlug(slug, locale);
 
   if (!post) {
-    const metadata = createMetadata({});
+    const metadata = createMetadataDefaults();
 
     return {
       ...metadata,
@@ -78,12 +83,8 @@ export async function generateMetadata({
     : undefined;
   const modifiedTime = publishedTime;
 
-  return createMetadata({
-    title: post.title,
-    description,
+  const metadata = createMetadataDefaults({
     openGraph: {
-      title: post.title,
-      description,
       type: "article",
       publishedTime,
       modifiedTime,
@@ -100,8 +101,6 @@ export async function generateMetadata({
     },
     twitter: {
       card: "summary_large_image",
-      title: post.title,
-      description,
       images: post.heroImage ? [post.heroImage] : undefined,
     },
     alternates: {
@@ -115,10 +114,39 @@ export async function generateMetadata({
       },
     },
   });
+
+  return {
+    ...metadata,
+    title: post.title,
+    description,
+    openGraph: {
+      ...metadata.openGraph,
+      title: post.title,
+      description,
+    },
+    twitter: {
+      ...metadata.twitter,
+      title: post.title,
+      description,
+    },
+  };
 }
 
-export default async function BlogPostPage({ params }: BlogPostPageProps) {
-  const [{ slug }, locale] = await Promise.all([params, getRequestLocale()]);
+export async function generateMetadata({
+  params,
+}: BlogPostPageProps): Promise<Metadata> {
+  const { slug } = await params;
+
+  return generateBlogPostMetadata({ slug, locale: SOURCE_LOCALE });
+}
+
+export async function BlogPostPageContent({
+  locale,
+  params,
+}: BlogPostPageProps & {
+  locale: SupportedLocale;
+}) {
+  const { slug } = await params;
   const post = getPostBySlug(slug, locale);
 
   if (!post) {
@@ -158,8 +186,10 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
   return (
     <>
-      <script
+      <Script
+        id={`article-structured-data-${slug}`}
         type="application/ld+json"
+        strategy="beforeInteractive"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(articleStructuredData),
         }}
@@ -198,7 +228,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       {/* Article Content */}
       <section className="bg-background py-12 sm:py-16">
         <ReadingContainer>
-          <article className="prose prose-base prose-slate dark:prose-invert markdown-content mx-auto max-w-none sm:prose-lg [&_pre]:max-w-full [&_pre]:overflow-x-auto">
+          <article className="prose prose-base prose-slate dark:prose-invert markdown-content sm:prose-lg mx-auto max-w-none [&_pre]:max-w-full [&_pre]:overflow-x-auto">
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
               {post.content}
             </ReactMarkdown>
@@ -230,4 +260,8 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       </section>
     </>
   );
+}
+
+export default async function BlogPostPage({ params }: BlogPostPageProps) {
+  return <BlogPostPageContent locale={SOURCE_LOCALE} params={params} />;
 }

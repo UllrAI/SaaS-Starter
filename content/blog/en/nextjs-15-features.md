@@ -34,7 +34,7 @@ Server Components have been refined to provide even better performance and devel
 // Example of an optimized Server Component
 export default async function BlogPost({ params }) {
   const post = await fetchPost(params.slug);
-  
+
   return (
     <article>
       <h1>{post.title}</h1>
@@ -56,11 +56,11 @@ Next.js 15 introduces sophisticated caching mechanisms that automatically optimi
 
 Our testing shows remarkable improvements across key metrics:
 
-| Metric | Next.js 14 | Next.js 15 | Improvement |
-|--------|------------|------------|-------------|
-| First Contentful Paint | 1.2s | 0.8s | 33% faster |
-| Time to Interactive | 2.1s | 1.4s | 33% faster |
-| Bundle Size | 250KB | 180KB | 28% smaller |
+| Metric                 | Next.js 14 | Next.js 15 | Improvement |
+| ---------------------- | ---------- | ---------- | ----------- |
+| First Contentful Paint | 1.2s       | 0.8s       | 33% faster  |
+| Time to Interactive    | 2.1s       | 1.4s       | 33% faster  |
+| Bundle Size            | 250KB      | 180KB      | 28% smaller |
 
 ## Getting Started with Next.js 15
 
@@ -108,4 +108,4 @@ Start exploring Next.js 15 today and experience the future of web development fi
 
 ---
 
-*Ready to upgrade? Check out our [migration guide](/blog/nextjs-15-migration) for step-by-step instructions on moving your existing Next.js application to version 15.*
+_Ready to upgrade? Check out our [migration guide](/blog/nextjs-15-migration) for step-by-step instructions on moving your existing Next.js application to version 15._

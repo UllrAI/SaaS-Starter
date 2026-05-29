@@ -2,7 +2,7 @@ import React from "react";
 import { beforeEach, describe, expect, it, jest } from "@jest/globals";
 import { render, screen } from "@testing-library/react";
 
-const mockCreateMetadata = jest.fn();
+const mockCreateMetadataDefaults = jest.fn();
 const mockRequireAuth = jest.fn();
 const mockGetUserSubscription = jest.fn();
 const mockGetUserPayments = jest.fn();
@@ -19,7 +19,7 @@ describe("Dashboard Home Page", () => {
     jest.resetModules();
     jest.clearAllMocks();
 
-    mockCreateMetadata.mockReturnValue({});
+    mockCreateMetadataDefaults.mockReturnValue({});
     mockRequireAuth.mockResolvedValue({
       id: "user-123",
       name: "Test User",
@@ -59,7 +59,7 @@ describe("Dashboard Home Page", () => {
 
   function loadPageModule() {
     jest.doMock("@/lib/metadata", () => ({
-      createMetadata: (config: unknown) => mockCreateMetadata(config),
+      createMetadataDefaults: () => mockCreateMetadataDefaults(),
     }));
     jest.doMock("@/lib/auth/permissions", () => ({
       requireAuth: mockRequireAuth,
@@ -121,11 +121,15 @@ describe("Dashboard Home Page", () => {
       ),
     }));
     jest.doMock("@/components/ui/card", () => ({
-      Card: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+      Card: ({ children }: { children: React.ReactNode }) => (
+        <div>{children}</div>
+      ),
       CardHeader: ({ children }: { children: React.ReactNode }) => (
         <div>{children}</div>
       ),
-      CardTitle: ({ children }: { children: React.ReactNode }) => <h2>{children}</h2>,
+      CardTitle: ({ children }: { children: React.ReactNode }) => (
+        <h2>{children}</h2>
+      ),
       CardDescription: ({ children }: { children: React.ReactNode }) => (
         <p>{children}</p>
       ),
@@ -143,7 +147,9 @@ describe("Dashboard Home Page", () => {
       }) => <span data-variant={variant}>{children}</span>,
     }));
     jest.doMock("@/components/ui/button", () => ({
-      Button: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+      Button: ({ children }: { children: React.ReactNode }) => (
+        <div>{children}</div>
+      ),
     }));
     jest.doMock("lucide-react", () => {
       const Icon = () => null;
@@ -164,12 +170,12 @@ describe("Dashboard Home Page", () => {
   it("generates metadata from the dashboard copy", async () => {
     const { generateMetadata } = loadPageModule();
 
-    await generateMetadata();
-
-    expect(mockCreateMetadata).toHaveBeenCalledWith({
+    await expect(generateMetadata()).resolves.toMatchObject({
       title: "Dashboard",
-      description: "Account overview, billing status, and starter setup progress.",
+      description:
+        "Account overview, billing status, and starter setup progress.",
     });
+    expect(mockCreateMetadataDefaults).toHaveBeenCalledWith();
   });
 
   it("renders the authenticated dashboard overview with subscription, uploads, and payments", async () => {
@@ -177,7 +183,9 @@ describe("Dashboard Home Page", () => {
 
     render(await HomeRoute());
 
-    expect(screen.getByRole("heading", { name: "Dashboard" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Dashboard" }),
+    ).toBeInTheDocument();
     expect(
       screen.getByText(
         "Account overview, billing status, and starter setup progress.",

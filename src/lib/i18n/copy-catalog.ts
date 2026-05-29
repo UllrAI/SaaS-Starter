@@ -1,8 +1,6 @@
 export function defineCopyCatalog<
   const Entries extends readonly { id: string }[],
->(
-  entries: Entries,
-) {
+>(entries: Entries) {
   const entryMap = new Map(entries.map((entry) => [entry.id, entry]));
 
   return {

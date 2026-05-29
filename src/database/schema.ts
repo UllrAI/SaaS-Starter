@@ -6,10 +6,10 @@ import {
   boolean,
   uuid,
   index,
+  uniqueIndex,
   pgEnum,
 } from "drizzle-orm/pg-core";
 
-// 定义用户角色枚举
 export const userRoleEnum = pgEnum("user_role", [
   "user",
   "admin",
@@ -90,9 +90,7 @@ export const apiKeys = pgTable(
     isActive: boolean("isActive").notNull().default(true),
     lastUsedAt: timestamp("lastUsedAt"),
     expiresAt: timestamp("expiresAt"),
-    requestCountInWindow: integer("requestCountInWindow")
-      .notNull()
-      .default(0),
+    requestCountInWindow: integer("requestCountInWindow").notNull().default(0),
     windowStartedAt: timestamp("windowStartedAt"),
     createdAt: timestamp("createdAt").notNull().defaultNow(),
     updatedAt: timestamp("updatedAt").notNull().defaultNow(),
@@ -262,6 +260,29 @@ export const uploads = pgTable(
     return {
       userIdx: index("uploads_userId_idx").on(table.userId),
       fileKeyIdx: index("uploads_fileKey_idx").on(table.fileKey),
+    };
+  },
+);
+
+export const rateLimitBuckets = pgTable(
+  "rate_limit_buckets",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    scope: text("scope").notNull(),
+    key: text("key").notNull(),
+    count: integer("count").notNull().default(0),
+    windowStartedAt: timestamp("windowStartedAt").notNull(),
+    updatedAt: timestamp("updatedAt").notNull().defaultNow(),
+  },
+  (table) => {
+    return {
+      scopeKeyIdx: uniqueIndex("rate_limit_buckets_scope_key_idx").on(
+        table.scope,
+        table.key,
+      ),
+      windowStartedAtIdx: index("rate_limit_buckets_windowStartedAt_idx").on(
+        table.windowStartedAt,
+      ),
     };
   },
 );

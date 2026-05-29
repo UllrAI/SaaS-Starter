@@ -58,12 +58,17 @@ export default async function authMiddleware(request: NextRequest) {
   });
 
   const pathLocale = extractLocaleFromPath(pathname);
-  const basePathname = pathLocale.locale ? pathLocale.strippedPathname : pathname;
+  const basePathname = pathLocale.locale
+    ? pathLocale.strippedPathname
+    : pathname;
 
   // Keep dashboard auth checks fast and deterministic.
   const isDashboardPage = pathname.startsWith("/dashboard");
   if (isDashboardPage) {
-    const requestHeaders = createLocalizedRequestHeaders(request, preferredLocale);
+    const requestHeaders = createLocalizedRequestHeaders(
+      request,
+      preferredLocale,
+    );
 
     // Use better-auth helper to check the session cookie.
     const hasSession = await hasAuthenticatedSession(request);
@@ -71,7 +76,10 @@ export default async function authMiddleware(request: NextRequest) {
     // Redirect unauthenticated users to login with callbackUrl.
     if (!hasSession) {
       const callbackUrl = `${pathname}${search}`;
-      const loginUrl = new URL(buildLoginRedirectPath(callbackUrl), request.url);
+      const loginUrl = new URL(
+        buildLoginRedirectPath(callbackUrl),
+        request.url,
+      );
       return NextResponse.redirect(loginUrl);
     }
 
@@ -84,7 +92,10 @@ export default async function authMiddleware(request: NextRequest) {
 
   const isMarketingRequest = isMarketingPath(basePathname);
   if (!isMarketingRequest) {
-    const requestHeaders = createLocalizedRequestHeaders(request, preferredLocale);
+    const requestHeaders = createLocalizedRequestHeaders(
+      request,
+      preferredLocale,
+    );
     return NextResponse.next({
       request: {
         headers: requestHeaders,
@@ -109,7 +120,10 @@ export default async function authMiddleware(request: NextRequest) {
     );
 
     // Canonicalize locale aliases such as /zh/... to /zh-Hans/...
-    if (!pathLocale.isCanonicalLocaleSegment || pathname !== canonicalLocalizedPath) {
+    if (
+      !pathLocale.isCanonicalLocaleSegment ||
+      pathname !== canonicalLocalizedPath
+    ) {
       const redirectUrl = new URL(request.url);
       redirectUrl.pathname = canonicalLocalizedPath;
       const response = NextResponse.redirect(redirectUrl);
@@ -117,16 +131,7 @@ export default async function authMiddleware(request: NextRequest) {
       return response;
     }
 
-    // Rewrite localized marketing URL to existing route tree.
-    const rewriteUrl = new URL(request.url);
-    rewriteUrl.pathname = pathLocale.strippedPathname;
-
-    const requestHeaders = createLocalizedRequestHeaders(request, pathLocale.locale);
-    const response = NextResponse.rewrite(rewriteUrl, {
-      request: {
-        headers: requestHeaders,
-      },
-    });
+    const response = NextResponse.next();
     setLocaleCookie(response, pathLocale.locale);
     return response;
   }

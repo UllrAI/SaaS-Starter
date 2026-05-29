@@ -140,7 +140,10 @@ function getTierBlock(source: string, tierId: string) {
     throw new Error(`Unable to find tier "${tierId}" in products config.`);
   }
 
-  const nextTierStart = source.indexOf('\n  {\n    id: "', start + tierMarker.length);
+  const nextTierStart = source.indexOf(
+    '\n  {\n    id: "',
+    start + tierMarker.length,
+  );
   const arrayEnd = source.indexOf("\n];", start);
   const end =
     nextTierStart === -1 ? arrayEnd : Math.min(nextTierStart, arrayEnd);

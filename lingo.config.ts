@@ -1,8 +1,7 @@
 import { SOURCE_LOCALE, TARGET_LOCALES } from "./src/lib/config/i18n";
 
-// export const LINGO_DEFAULT_MODEL = "openrouter:google/gemini-3-flash-preview";
+export const LINGO_DEFAULT_MODEL = "openrouter:google/gemini-3-flash-preview";
 // export const LINGO_DEFAULT_MODEL = "openrouter:stepfun/step-3.5-flash";
-export const LINGO_DEFAULT_MODEL = "openai:LongCat-Flash-Chat";
 
 export const LINGO_MODEL_MAP: Record<string, string> = {
   "*:*": LINGO_DEFAULT_MODEL,
@@ -50,7 +49,9 @@ Your goal is to perform state-of-the-art localization for software products and 
 `.trim();
 
 function resolveLingoBuildMode(): "cache-only" | "translate" {
-  return process.env.LINGO_BUILD_MODE === "cache-only" ? "cache-only" : "translate";
+  return process.env.LINGO_BUILD_MODE === "cache-only"
+    ? "cache-only"
+    : "translate";
 }
 
 function shouldUseLingoPseudotranslator(): boolean {

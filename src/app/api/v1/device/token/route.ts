@@ -5,9 +5,7 @@ import { apiSuccess, handleApiError } from "@/lib/machine-auth/api-response";
 import { MachineAuthError } from "@/lib/machine-auth/error";
 
 const deviceTokenSchema = z.object({
-  deviceCode: z
-    .string()
-    .regex(/^[0-9a-f]{40}$/, "Invalid device code format."),
+  deviceCode: z.string().regex(/^[0-9a-f]{40}$/, "Invalid device code format."),
 });
 
 export async function POST(request: NextRequest) {
@@ -37,4 +35,3 @@ export async function POST(request: NextRequest) {
     return handleApiError(error);
   }
 }
-

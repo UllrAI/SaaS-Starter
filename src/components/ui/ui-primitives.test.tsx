@@ -1,9 +1,6 @@
 import { render, screen } from "@testing-library/react";
-import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-} from "@/components/ui/alert";
+import Link from "next/link";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -32,7 +29,7 @@ describe("UI primitives", () => {
 
     rerender(
       <Button asChild variant="link">
-        <a href="/pricing">Pricing</a>
+        <Link href="/pricing">Pricing</Link>
       </Button>,
     );
 
@@ -51,7 +48,7 @@ describe("UI primitives", () => {
 
     rerender(
       <Badge asChild variant="outline">
-        <a href="/plans">Plans</a>
+        <Link href="/plans">Plans</Link>
       </Badge>,
     );
 
@@ -102,7 +99,10 @@ describe("UI primitives", () => {
       "data-slot",
       "card-description",
     );
-    expect(screen.getByText("Edit")).toHaveAttribute("data-slot", "card-action");
+    expect(screen.getByText("Edit")).toHaveAttribute(
+      "data-slot",
+      "card-action",
+    );
     expect(screen.getByText("Usage summary")).toHaveAttribute(
       "data-slot",
       "card-content",

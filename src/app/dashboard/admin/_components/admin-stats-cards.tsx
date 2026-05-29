@@ -2,13 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatFileSize } from "@/lib/config/upload";
 import { resolveIntlLocale } from "@/lib/locale";
-import {
-  CreditCard,
-  Shield,
-  TrendingUp,
-  Upload,
-  Users,
-} from "lucide-react";
+import { CreditCard, Shield, TrendingUp, Upload, Users } from "lucide-react";
 
 export interface AdminStats {
   users: {

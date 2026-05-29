@@ -35,7 +35,8 @@ export async function GET(request: NextRequest) {
     let apiKeyName: string | null = null;
     if (context.authMethod === "api_key" && context.apiKeyId) {
       const keys = await listApiKeys(context.userId);
-      apiKeyName = keys.find((key) => key.id === context.apiKeyId)?.name ?? null;
+      apiKeyName =
+        keys.find((key) => key.id === context.apiKeyId)?.name ?? null;
     }
 
     const response: AuthVerifyResponse = {

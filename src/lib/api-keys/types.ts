@@ -14,4 +14,3 @@ export type ApiKeyAuthResult = {
   apiKeyId: string;
   rateLimit: number;
 };
-

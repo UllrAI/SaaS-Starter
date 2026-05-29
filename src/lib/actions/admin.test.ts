@@ -1041,7 +1041,9 @@ describe("Admin Actions", () => {
       mockDb.select.mockReturnValue({
         from: jest.fn().mockReturnValue({
           where: jest.fn().mockReturnValue({
-            limit: jest.fn().mockResolvedValue([{ role: "user", banned: false }]),
+            limit: jest
+              .fn()
+              .mockResolvedValue([{ role: "user", banned: false }]),
           }),
         }),
       });
@@ -1071,7 +1073,9 @@ describe("Admin Actions", () => {
       mockDb.select.mockReturnValue({
         from: jest.fn().mockReturnValue({
           where: jest.fn().mockReturnValue({
-            limit: jest.fn().mockResolvedValue([{ role: "admin", banned: false }]),
+            limit: jest
+              .fn()
+              .mockResolvedValue([{ role: "admin", banned: false }]),
           }),
         }),
       });
@@ -1090,9 +1094,9 @@ describe("Admin Actions", () => {
       mockDb.select.mockReturnValue({
         from: jest.fn().mockReturnValue({
           where: jest.fn().mockReturnValue({
-            limit: jest.fn().mockResolvedValue([
-              { role: "super_admin", banned: false },
-            ]),
+            limit: jest
+              .fn()
+              .mockResolvedValue([{ role: "super_admin", banned: false }]),
           }),
         }),
       });

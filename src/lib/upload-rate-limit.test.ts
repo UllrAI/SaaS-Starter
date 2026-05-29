@@ -1,13 +1,15 @@
 import { beforeEach, describe, expect, it, jest } from "@jest/globals";
 import { UPLOAD_CONFIG } from "@/lib/config/upload";
-import {
-  checkUploadRateLimit,
-  clearUploadRateLimitForTests,
-} from "./upload-rate-limit";
+
+const mockCheckPersistentRateLimit = jest.fn();
+
+jest.mock("@/lib/rate-limit", () => ({
+  checkPersistentRateLimit: mockCheckPersistentRateLimit,
+}));
 
 describe("upload rate limit", () => {
   beforeEach(() => {
-    clearUploadRateLimitForTests();
+    jest.clearAllMocks();
     jest.spyOn(Date, "now").mockReturnValue(1_000);
   });
 
@@ -15,37 +17,46 @@ describe("upload rate limit", () => {
     jest.restoreAllMocks();
   });
 
-  it("allows requests until the per-user window is exhausted", () => {
+  it("delegates to the persistent rate limiter", async () => {
     const limit = UPLOAD_CONFIG.USER_UPLOAD_RATE_LIMIT_MAX_REQUESTS;
+    mockCheckPersistentRateLimit.mockResolvedValue({
+      allowed: true,
+      info: {
+        limit,
+        remaining: limit - 1,
+        resetAt: 61,
+      },
+    });
+    const { checkUploadRateLimit } = await import("./upload-rate-limit");
 
-    expect(checkUploadRateLimit("user-1")).toMatchObject({
+    await expect(checkUploadRateLimit("user-1")).resolves.toMatchObject({
       allowed: true,
       remaining: limit - 1,
     });
 
-    for (let count = 1; count < limit; count += 1) {
-      expect(checkUploadRateLimit("user-1").allowed).toBe(true);
-    }
-
-    expect(checkUploadRateLimit("user-1")).toMatchObject({
-      allowed: false,
-      remaining: 0,
-      retryAfter: 60,
+    expect(mockCheckPersistentRateLimit).toHaveBeenCalledWith({
+      scope: "upload",
+      key: "user-1",
+      limit,
+      windowMs: UPLOAD_CONFIG.USER_UPLOAD_RATE_LIMIT_WINDOW_MS,
     });
   });
 
-  it("tracks users independently", () => {
-    for (
-      let count = 0;
-      count < UPLOAD_CONFIG.USER_UPLOAD_RATE_LIMIT_MAX_REQUESTS;
-      count += 1
-    ) {
-      checkUploadRateLimit("user-1");
-    }
+  it("returns retry metadata for blocked requests", async () => {
+    mockCheckPersistentRateLimit.mockResolvedValue({
+      allowed: false,
+      info: {
+        limit: UPLOAD_CONFIG.USER_UPLOAD_RATE_LIMIT_MAX_REQUESTS,
+        remaining: 0,
+        resetAt: 61,
+      },
+    });
+    const { checkUploadRateLimit } = await import("./upload-rate-limit");
 
-    expect(checkUploadRateLimit("user-2")).toMatchObject({
-      allowed: true,
-      remaining: UPLOAD_CONFIG.USER_UPLOAD_RATE_LIMIT_MAX_REQUESTS - 1,
+    await expect(checkUploadRateLimit("user-1")).resolves.toMatchObject({
+      allowed: false,
+      remaining: 0,
+      retryAfter: 60,
     });
   });
 });

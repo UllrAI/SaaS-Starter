@@ -138,7 +138,9 @@ export async function authorizeDeviceCode(
   return { success: true };
 }
 
-export async function pollDeviceCode(deviceCode: string): Promise<
+export async function pollDeviceCode(
+  deviceCode: string,
+): Promise<
   | { type: "token"; data: DeviceTokenResponse }
   | { type: "pending"; data: DeviceTokenPendingResponse }
 > {
@@ -147,7 +149,12 @@ export async function pollDeviceCode(deviceCode: string): Promise<
     where: eq(deviceCodes.deviceCode, deviceCode),
   });
 
-  if (!row || row.expiresAt < now || row.status === "expired" || row.status === "used") {
+  if (
+    !row ||
+    row.expiresAt < now ||
+    row.status === "expired" ||
+    row.status === "used"
+  ) {
     return {
       type: "pending",
       data: {
@@ -223,7 +230,9 @@ export async function pollDeviceCode(deviceCode: string): Promise<
     };
   }
 
-  const tokenName = [row.deviceHostname, row.clientName].filter(Boolean).join(" - ");
+  const tokenName = [row.deviceHostname, row.clientName]
+    .filter(Boolean)
+    .join(" - ");
   const token = await createCliToken({
     userId: row.userId,
     name: tokenName || "CLI Device",

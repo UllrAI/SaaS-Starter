@@ -230,9 +230,8 @@ describe("Database Connection Configuration", () => {
       jest.clearAllMocks();
       jest.resetModules();
 
-      const { validateDatabaseConfig, resetConfigValidation } = await import(
-        "./connection"
-      );
+      const { validateDatabaseConfig, resetConfigValidation } =
+        await import("./connection");
       resetConfigValidation();
 
       validateDatabaseConfig();
@@ -442,9 +441,8 @@ describe("Database Connection Configuration", () => {
     });
 
     it("should return consistent results across multiple calls", async () => {
-      const { getConnectionConfig, getEnvironmentType } = await import(
-        "./connection"
-      );
+      const { getConnectionConfig, getEnvironmentType } =
+        await import("./connection");
 
       const config1 = getConnectionConfig();
       const config2 = getConnectionConfig();

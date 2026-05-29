@@ -42,7 +42,7 @@ Container queries represent one of the most significant additions to CSS, allowi
     gap: 1rem;
     padding: 2rem;
   }
-  
+
   .card__image {
     aspect-ratio: 1;
     object-fit: cover;
@@ -54,7 +54,7 @@ Container queries represent one of the most significant additions to CSS, allowi
     grid-template-columns: 1fr 3fr;
     padding: 3rem;
   }
-  
+
   .card__title {
     font-size: 2rem;
   }
@@ -87,7 +87,7 @@ Container queries represent one of the most significant additions to CSS, allowi
     transform: translateY(-100%);
     transition: transform 0.3s ease;
   }
-  
+
   .navigation[data-open="true"] .nav-list {
     transform: translateY(0);
   }
@@ -149,11 +149,15 @@ Subgrid allows nested grids to participate in their parent's grid, creating perf
   --hue: 220;
   --saturation: 70%;
   --lightness: 50%;
-  
+
   --primary: hsl(var(--hue) var(--saturation) var(--lightness));
-  --primary-light: hsl(var(--hue) var(--saturation) calc(var(--lightness) + 20%));
-  --primary-dark: hsl(var(--hue) var(--saturation) calc(var(--lightness) - 20%));
-  
+  --primary-light: hsl(
+    var(--hue) var(--saturation) calc(var(--lightness) + 20%)
+  );
+  --primary-dark: hsl(
+    var(--hue) var(--saturation) calc(var(--lightness) - 20%)
+  );
+
   --surface: hsl(var(--hue) 10% 98%);
   --surface-variant: hsl(var(--hue) 10% 95%);
 }
@@ -204,7 +208,7 @@ Subgrid allows nested grids to participate in their parent's grid, creating perf
   --space-m: clamp(1.5rem, 1.37rem + 0.65vw, 1.88rem);
   --space-l: clamp(2rem, 1.83rem + 0.87vw, 2.5rem);
   --space-xl: clamp(3rem, 2.74rem + 1.3vw, 3.75rem);
-  
+
   /* Fluid typography */
   --text-xs: clamp(0.75rem, 0.71rem + 0.2vw, 0.88rem);
   --text-sm: clamp(0.88rem, 0.83rem + 0.24vw, 1rem);
@@ -246,11 +250,21 @@ Subgrid allows nested grids to participate in their parent's grid, creating perf
   gap: 1rem;
 }
 
-.header { grid-area: header; }
-.nav { grid-area: nav; }
-.main { grid-area: main; }
-.aside { grid-area: aside; }
-.footer { grid-area: footer; }
+.header {
+  grid-area: header;
+}
+.nav {
+  grid-area: nav;
+}
+.main {
+  grid-area: main;
+}
+.aside {
+  grid-area: aside;
+}
+.footer {
+  grid-area: footer;
+}
 
 @media (max-width: 768px) {
   .holy-grail {
@@ -326,8 +340,12 @@ Subgrid allows nested grids to participate in their parent's grid, creating perf
 }
 
 @keyframes progress {
-  from { transform: scaleX(0); }
-  to { transform: scaleX(1); }
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
 }
 ```
 
@@ -348,7 +366,7 @@ Subgrid allows nested grids to participate in their parent's grid, creating perf
 }
 
 .button::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 50%;
   left: 50%;
@@ -357,7 +375,9 @@ Subgrid allows nested grids to participate in their parent's grid, creating perf
   background: rgba(255, 255, 255, 0.2);
   border-radius: 50%;
   transform: translate(-50%, -50%);
-  transition: width 0.6s ease, height 0.6s ease;
+  transition:
+    width 0.6s ease,
+    height 0.6s ease;
 }
 
 .button:hover::before {
@@ -376,7 +396,7 @@ Subgrid allows nested grids to participate in their parent's grid, creating perf
 }
 
 .button[data-loading="true"]::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 50%;
   left: 50%;
@@ -390,7 +410,9 @@ Subgrid allows nested grids to participate in their parent's grid, creating perf
 }
 
 @keyframes spin {
-  to { transform: translate(-50%, -50%) rotate(360deg); }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
 }
 ```
 
@@ -428,7 +450,11 @@ Subgrid allows nested grids to participate in their parent's grid, creating perf
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--primary) 0%,
+    var(--primary-dark) 100%
+  );
 }
 
 /* Defer non-critical animations */
@@ -471,7 +497,7 @@ Subgrid allows nested grids to participate in their parent's grid, creating perf
   .responsive-component {
     container-type: inline-size;
   }
-  
+
   @container (min-width: 400px) {
     .component-content {
       display: grid;
@@ -506,4 +532,4 @@ By mastering these modern CSS techniques, you'll be equipped to build the next g
 
 ---
 
-*Ready to dive deeper? Explore our [CSS Grid masterclass](/blog/css-grid-masterclass) and learn advanced layout techniques.*
+_Ready to dive deeper? Explore our [CSS Grid masterclass](/blog/css-grid-masterclass) and learn advanced layout techniques._

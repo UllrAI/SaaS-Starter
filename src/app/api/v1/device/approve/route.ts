@@ -12,29 +12,18 @@ const approveDeviceSchema = z.object({
     .regex(/^[A-Z0-9]{4}-[A-Z0-9]{4}$/, "Invalid device code format."),
 });
 
-function resolveAllowedOrigins(request: NextRequest): Set<string> {
-  const allowedOrigins = new Set<string>([
-    new URL(env.NEXT_PUBLIC_APP_URL).origin,
-    request.nextUrl.origin,
-  ]);
-  const host =
-    request.headers.get("x-forwarded-host") ?? request.headers.get("host");
-  const protocol =
-    request.headers.get("x-forwarded-proto") ??
-    request.nextUrl.protocol.replace(/:$/, "");
-
-  if (host && protocol) {
-    allowedOrigins.add(`${protocol}://${host}`);
+function isAllowedOrigin(origin: string | null): boolean {
+  if (!origin) {
+    return false;
   }
 
-  return allowedOrigins;
+  return origin === new URL(env.NEXT_PUBLIC_APP_URL).origin;
 }
 
 export async function POST(request: NextRequest) {
   try {
     const origin = request.headers.get("origin");
-    const allowedOrigins = resolveAllowedOrigins(request);
-    if (!origin || !allowedOrigins.has(origin)) {
+    if (!isAllowedOrigin(origin)) {
       throw new MachineAuthError({
         code: "CSRF_REJECTED",
         message: "Invalid request origin.",
@@ -70,7 +59,10 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const result = await authorizeDeviceCode(parsed.data.userCode, session.user.id);
+    const result = await authorizeDeviceCode(
+      parsed.data.userCode,
+      session.user.id,
+    );
     if (!result.success) {
       throw new MachineAuthError({
         code: "DEVICE_AUTH_FAILED",

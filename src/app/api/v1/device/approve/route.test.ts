@@ -16,7 +16,11 @@ describe("POST /api/v1/device/approve", () => {
     jest.clearAllMocks();
   });
 
-  function createRequest(origin: string | null, body: unknown) {
+  function createRequest(
+    origin: string | null,
+    body: unknown,
+    host = "127.0.0.1:3000",
+  ) {
     return {
       headers: {
         get: (name: string) => {
@@ -25,7 +29,7 @@ describe("POST /api/v1/device/approve", () => {
           }
 
           if (name === "host") {
-            return "127.0.0.1:3000";
+            return host;
           }
 
           return null;
@@ -51,10 +55,13 @@ describe("POST /api/v1/device/approve", () => {
 
   it("requires a signed-in user", async () => {
     mockGetAuthSessionFromHeaders.mockResolvedValue(null);
+    const allowedOrigin = new URL(
+      process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000",
+    ).origin;
 
     const { POST } = await import("./route");
     const response = await POST(
-      createRequest("http://127.0.0.1:3000", { userCode: "ABCD-EFGH" }),
+      createRequest(allowedOrigin, { userCode: "ABCD-EFGH" }),
     );
     const payload = await response.json();
 
@@ -63,6 +70,9 @@ describe("POST /api/v1/device/approve", () => {
   });
 
   it("authorizes a device code", async () => {
+    const allowedOrigin = new URL(
+      process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000",
+    ).origin;
     mockGetAuthSessionFromHeaders.mockResolvedValue({
       user: {
         id: "user-1",
@@ -72,12 +82,29 @@ describe("POST /api/v1/device/approve", () => {
 
     const { POST } = await import("./route");
     const response = await POST(
-      createRequest("http://127.0.0.1:3000", { userCode: "ABCD-EFGH" }),
+      createRequest(allowedOrigin, { userCode: "ABCD-EFGH" }),
     );
     const payload = await response.json();
 
     expect(response.status).toBe(200);
     expect(payload.success).toBe(true);
     expect(mockAuthorizeDeviceCode).toHaveBeenCalledWith("ABCD-EFGH", "user-1");
+  });
+
+  it("rejects origins that only match the request host", async () => {
+    const { POST } = await import("./route");
+    const response = await POST(
+      createRequest(
+        "http://attacker.example",
+        { userCode: "ABCD-EFGH" },
+        "attacker.example",
+      ),
+    );
+    const payload = await response.json();
+
+    expect(response.status).toBe(403);
+    expect(payload.success).toBe(false);
+    expect(payload.error.code).toBe("CSRF_REJECTED");
+    expect(mockGetAuthSessionFromHeaders).not.toHaveBeenCalled();
   });
 });

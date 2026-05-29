@@ -3,6 +3,8 @@ import type { SpyInstance } from "@/../jest.setup";
 type CheckoutFunction = (checkoutId: string) => Promise<{ status?: string }>;
 
 const mockRetrieveCheckout = jest.fn() as jest.MockedFunction<CheckoutFunction>;
+const mockCheckPersistentRateLimit = jest.fn();
+const mockGetClientRateLimitKey = jest.fn();
 
 beforeAll(() => {
   jest.resetModules();
@@ -14,6 +16,11 @@ beforeAll(() => {
         retrieve: mockRetrieveCheckout,
       },
     },
+  }));
+
+  jest.doMock("@/lib/rate-limit", () => ({
+    checkPersistentRateLimit: mockCheckPersistentRateLimit,
+    getClientRateLimitKey: mockGetClientRateLimitKey,
   }));
 });
 
@@ -41,6 +48,15 @@ describe("Payment Status API", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    mockGetClientRateLimitKey.mockReturnValue("127.0.0.1:test");
+    mockCheckPersistentRateLimit.mockResolvedValue({
+      allowed: true,
+      info: {
+        limit: 30,
+        remaining: 29,
+        resetAt: 1_800_000_000,
+      },
+    });
     consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
   });
 
@@ -58,6 +74,31 @@ describe("Payment Status API", () => {
     expect(data).toEqual({
       error: "Checkout ID or status is required",
     });
+  });
+
+  it("rate limits payment status checks", async () => {
+    mockCheckPersistentRateLimit.mockResolvedValue({
+      allowed: false,
+      info: {
+        limit: 30,
+        remaining: 0,
+        resetAt: Math.ceil(Date.now() / 1000) + 60,
+      },
+    });
+
+    const response = await GET(
+      createMockRequest(
+        "http://localhost:3000/api/payment-status?checkout_id=checkout-123",
+      ),
+    );
+    const data = await response.json();
+
+    expect(response.status).toBe(429);
+    expect(response.headers.get("Retry-After")).toBeTruthy();
+    expect(data).toEqual({
+      error: "Too many status checks. Please try again later.",
+    });
+    expect(mockRetrieveCheckout).not.toHaveBeenCalled();
   });
 
   it("maps direct failed status without trusting success URLs", async () => {

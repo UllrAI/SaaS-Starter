@@ -11,9 +11,9 @@ describe("callback-url utils", () => {
   });
 
   it("keeps valid internal paths including query and hash", () => {
-    expect(normalizeCallbackUrl("/dashboard/billing?tab=history#invoices")).toBe(
-      "/dashboard/billing?tab=history#invoices",
-    );
+    expect(
+      normalizeCallbackUrl("/dashboard/billing?tab=history#invoices"),
+    ).toBe("/dashboard/billing?tab=history#invoices");
   });
 
   it("normalizes encoded callback values", () => {

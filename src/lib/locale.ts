@@ -8,5 +8,9 @@ export function resolveIntlLocale(locale?: string | null): string {
     return DEFAULT_INTL_LOCALE;
   }
 
-  return INTL_LOCALE_BY_SUPPORTED_LOCALE[locale as keyof typeof INTL_LOCALE_BY_SUPPORTED_LOCALE] ?? locale;
+  return (
+    INTL_LOCALE_BY_SUPPORTED_LOCALE[
+      locale as keyof typeof INTL_LOCALE_BY_SUPPORTED_LOCALE
+    ] ?? locale
+  );
 }

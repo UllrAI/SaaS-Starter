@@ -6,8 +6,11 @@ import {
   ReadingContainer,
   SectionContainer,
 } from "@/components/layout/page-container";
-import { createLocalizedAlternates, createMetadata } from "@/lib/metadata";
-import { getRequestLocale } from "@/lib/i18n/server-locale";
+import {
+  createLocalizedAlternates,
+  createMetadataDefaults,
+} from "@/lib/metadata";
+import { SOURCE_LOCALE, type SupportedLocale } from "@/lib/config/i18n";
 import { calculateReadingTime } from "@/lib/utils";
 import {
   getAllPosts,
@@ -16,9 +19,8 @@ import {
 } from "@/lib/content/blog";
 
 export async function generateMetadata() {
-  const locale = await getRequestLocale();
-  const metadata = createMetadata({
-    alternates: createLocalizedAlternates("/blog", locale),
+  const metadata = createMetadataDefaults({
+    alternates: createLocalizedAlternates("/blog", SOURCE_LOCALE),
   });
 
   return {
@@ -41,8 +43,7 @@ export async function generateMetadata() {
   };
 }
 
-export default async function BlogPage() {
-  const locale = await getRequestLocale();
+export function BlogPageContent({ locale }: { locale: SupportedLocale }) {
   const sortedPosts = getAllPosts(locale);
 
   const featuredPosts = sortedPosts.filter((post) => post.featured);
@@ -165,4 +166,8 @@ export default async function BlogPage() {
       </section>
     </>
   );
+}
+
+export default function BlogPage() {
+  return <BlogPageContent locale={SOURCE_LOCALE} />;
 }

@@ -10,7 +10,9 @@ export function SocialProofUnified() {
       id: "founder",
       quote: (
         <>
-          “We replaced two weeks of setup work with one focused weekend.The starter provided a solid foundation rather than another disposable prototype.”
+          “We replaced two weeks of setup work with one focused weekend.The
+          starter provided a solid foundation rather than another disposable
+          prototype.”
         </>
       ),
       author: <>Avery Chen</>,
@@ -21,8 +23,8 @@ export function SocialProofUnified() {
       id: "agency",
       quote: (
         <>
-          “Since auth and billing were already integrated, 
-          the team could focus on developing the product.”
+          “Since auth and billing were already integrated, the team could focus
+          on developing the product.”
         </>
       ),
       author: <>Jordan Patel</>,
@@ -33,8 +35,8 @@ export function SocialProofUnified() {
       id: "product",
       quote: (
         <>
-          “We retained the foundation, replaced the product logic, 
-          and progressed much faster than starting from scratch.”
+          “We retained the foundation, replaced the product logic, and
+          progressed much faster than starting from scratch.”
         </>
       ),
       author: <>Morgan Rivera</>,
@@ -96,7 +98,7 @@ export function SocialProofUnified() {
           {testimonials.map((testimonial, index) => (
             <Card
               key={testimonial.id}
-              className={`border-border bg-card h-full border transition-colors hover:border-primary/50 ${
+              className={`border-border bg-card hover:border-primary/50 h-full border transition-colors ${
                 index === 0 ? "lg:-translate-y-2" : ""
               }`}
             >

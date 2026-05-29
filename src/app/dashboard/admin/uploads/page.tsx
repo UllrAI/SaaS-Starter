@@ -12,10 +12,10 @@ import { UploadManagementTable } from "./_components/upload-management-table";
 import { UploadStatsCards } from "./_components/upload-stats-cards";
 import { StatsCardsSkeleton } from "../_components/stats-cards-skeleton";
 import { getUploads } from "@/lib/actions/admin";
-import { createMetadata } from "@/lib/metadata";
+import { createMetadataDefaults } from "@/lib/metadata";
 
 export async function generateMetadata() {
-  const metadata = createMetadata({});
+  const metadata = createMetadataDefaults();
 
   return {
     ...metadata,
@@ -29,8 +29,7 @@ export async function generateMetadata() {
     twitter: {
       ...metadata.twitter,
       title: "Upload Management",
-      description:
-        "Manage user uploads, file storage, and content moderation",
+      description: "Manage user uploads, file storage, and content moderation",
     },
   };
 }

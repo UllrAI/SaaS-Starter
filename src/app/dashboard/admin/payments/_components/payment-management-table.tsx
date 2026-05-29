@@ -117,7 +117,10 @@ const createColumns = (
     key: "status",
     label: <>Status</>,
     render: (payment) => (
-      <Badge variant={getStatusBadgeVariant(payment.status)} className="capitalize">
+      <Badge
+        variant={getStatusBadgeVariant(payment.status)}
+        className="capitalize"
+      >
         <PaymentStatusLabel status={payment.status} />
       </Badge>
     ),

@@ -17,14 +17,13 @@ import {
 } from "@/components/layout/page-intro";
 import { PageSectionHeading } from "@/components/layout/page-section-heading";
 import { createLocalizedAlternates } from "@/lib/metadata";
-import { getRequestLocale } from "@/lib/i18n/server-locale";
+import { SOURCE_LOCALE } from "@/lib/config/i18n";
 import { APP_NAME, OGIMAGE, TWITTERACCOUNT } from "@/lib/config/constants";
 import env from "@/env";
 import type { Metadata } from "next";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const locale = await getRequestLocale();
-  const alternates = createLocalizedAlternates("/about", locale);
+  const alternates = createLocalizedAlternates("/about", SOURCE_LOCALE);
   const canonical = alternates.canonical;
   const canonicalUrl =
     typeof canonical === "string" || canonical instanceof URL

@@ -2,6 +2,8 @@ import { Header } from "@/components/homepage/header";
 import { Footer } from "@/components/homepage/footer";
 import { Suspense } from "react";
 
+export const dynamic = "force-static";
+
 export default function PagesLayout({
   children,
 }: {

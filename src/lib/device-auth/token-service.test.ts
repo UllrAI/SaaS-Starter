@@ -100,4 +100,3 @@ describe("token-service", () => {
     expect(mockUpdate).toHaveBeenCalled();
   });
 });
-

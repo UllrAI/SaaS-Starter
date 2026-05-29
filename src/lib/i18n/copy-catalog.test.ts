@@ -17,7 +17,9 @@ describe("defineCopyCatalog", () => {
   });
 
   it("throws a descriptive error for missing entries", () => {
-    const catalog = defineCopyCatalog([{ id: "hero", copy: "Hero copy" }] as const);
+    const catalog = defineCopyCatalog([
+      { id: "hero", copy: "Hero copy" },
+    ] as const);
 
     expect(() => catalog.get("missing")).toThrow(
       'Missing copy catalog entry for "missing"',

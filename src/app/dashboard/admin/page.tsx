@@ -1,6 +1,6 @@
 import { requireAdmin } from "@/lib/auth/permissions";
 import { DashboardPageWrapper } from "../_components/dashboard-page-wrapper";
-import { createMetadata } from "@/lib/metadata";
+import { createMetadataDefaults } from "@/lib/metadata";
 import { AdminStatsCards } from "./_components/admin-stats-cards";
 import { AdminDashboardCharts } from "./_components/admin-dashboard-charts";
 import {
@@ -10,7 +10,7 @@ import {
 import { getRequestLocale } from "@/lib/i18n/server-locale";
 
 export async function generateMetadata() {
-  const metadata = createMetadata({});
+  const metadata = createMetadataDefaults();
 
   return {
     ...metadata,

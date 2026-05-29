@@ -51,7 +51,10 @@ function NoPaymentRecordsLabel() {
   return <>No records yet</>;
 }
 
-export function BillingOverview({ subscription, payments }: BillingOverviewProps) {
+export function BillingOverview({
+  subscription,
+  payments,
+}: BillingOverviewProps) {
   const intlLocale = useIntlLocale();
   const router = useRouter();
   const [isPortalLoading, setIsPortalLoading] = useState(false);
@@ -109,9 +112,11 @@ export function BillingOverview({ subscription, payments }: BillingOverviewProps
           <CardHeader>
             <CardDescription>Current Plan</CardDescription>
             <CardTitle className="text-base">
-              {subscription
-                ? `${subscription.tierId.charAt(0).toUpperCase()}${subscription.tierId.slice(1)}`
-                : <>Free</>}
+              {subscription ? (
+                `${subscription.tierId.charAt(0).toUpperCase()}${subscription.tierId.slice(1)}`
+              ) : (
+                <>Free</>
+              )}
             </CardTitle>
           </CardHeader>
           <CardContent className="flex items-center gap-2 text-sm">
@@ -144,9 +149,11 @@ export function BillingOverview({ subscription, payments }: BillingOverviewProps
           </CardHeader>
           <CardContent className="text-muted-foreground flex items-center gap-2 text-sm">
             <CalendarClock className="h-4 w-4" />
-            {subscription?.canceledAt
-              ? <>Subscription ends at period close</>
-              : <>Based on your current billing cycle</>}
+            {subscription?.canceledAt ? (
+              <>Subscription ends at period close</>
+            ) : (
+              <>Based on your current billing cycle</>
+            )}
           </CardContent>
         </Card>
 
@@ -157,15 +164,15 @@ export function BillingOverview({ subscription, payments }: BillingOverviewProps
           </CardHeader>
           <CardContent className="text-muted-foreground flex items-center gap-2 text-sm">
             <ReceiptText className="h-4 w-4" />
-            {paymentSummary.latestDate
-              ? (
-                  <LatestPaymentDateLabel
-                    date={new Date(paymentSummary.latestDate).toLocaleDateString(
-                      intlLocale,
-                    )}
-                  />
-                )
-              : <NoPaymentRecordsLabel />}
+            {paymentSummary.latestDate ? (
+              <LatestPaymentDateLabel
+                date={new Date(paymentSummary.latestDate).toLocaleDateString(
+                  intlLocale,
+                )}
+              />
+            ) : (
+              <NoPaymentRecordsLabel />
+            )}
           </CardContent>
         </Card>
       </section>
@@ -180,8 +187,13 @@ export function BillingOverview({ subscription, payments }: BillingOverviewProps
         </CardHeader>
         <CardContent className="flex flex-wrap items-center gap-3">
           {subscription ? (
-            <Button onClick={handleManageSubscription} disabled={isPortalLoading}>
-              {isPortalLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            <Button
+              onClick={handleManageSubscription}
+              disabled={isPortalLoading}
+            >
+              {isPortalLoading && (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              )}
               Manage Subscription
             </Button>
           ) : (
@@ -213,9 +225,13 @@ export function BillingOverview({ subscription, payments }: BillingOverviewProps
                 {payments.map((payment) => (
                   <TableRow key={payment.id}>
                     <TableCell className="text-sm">
-                      {new Date(payment.createdAt).toLocaleDateString(intlLocale)}
+                      {new Date(payment.createdAt).toLocaleDateString(
+                        intlLocale,
+                      )}
                     </TableCell>
-                    <TableCell className="font-medium">{payment.tierName}</TableCell>
+                    <TableCell className="font-medium">
+                      {payment.tierName}
+                    </TableCell>
                     <TableCell>
                       <Badge
                         variant={
@@ -230,7 +246,11 @@ export function BillingOverview({ subscription, payments }: BillingOverviewProps
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      {formatCurrency(payment.amount, payment.currency, intlLocale)}
+                      {formatCurrency(
+                        payment.amount,
+                        payment.currency,
+                        intlLocale,
+                      )}
                     </TableCell>
                     <TableCell>
                       <Badge
@@ -249,7 +269,9 @@ export function BillingOverview({ subscription, payments }: BillingOverviewProps
               </TableBody>
             </Table>
           ) : (
-            <p className="text-muted-foreground text-sm">No payment history found.</p>
+            <p className="text-muted-foreground text-sm">
+              No payment history found.
+            </p>
           )}
         </CardContent>
       </Card>

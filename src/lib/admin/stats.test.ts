@@ -76,6 +76,19 @@ jest.mock("drizzle-orm", () => ({
 }));
 
 describe("Admin Stats", () => {
+  async function expectRejectsWithMessage(
+    task: () => Promise<unknown>,
+    message: string,
+  ) {
+    try {
+      await task();
+      throw new Error("Expected task to reject");
+    } catch (error) {
+      expect(error).toBeInstanceOf(Error);
+      expect((error as Error).message).toBe(message);
+    }
+  }
+
   beforeEach(() => {
     jest.clearAllMocks();
 
@@ -114,7 +127,7 @@ describe("Admin Stats", () => {
   });
 
   afterEach(() => {
-    jest.resetAllMocks();
+    jest.restoreAllMocks();
   });
 
   describe("getUserStats", () => {
@@ -158,33 +171,25 @@ describe("Admin Stats", () => {
       ]);
     });
 
-    it("should handle database errors gracefully", async () => {
+    it("should surface database errors", async () => {
       mockDb.select.mockImplementation(() => {
         throw new Error("Database error");
       });
 
       const { getUserStats } = await import("./stats");
 
-      const result = await getUserStats();
-
-      expect(result).toEqual({
-        total: 0,
-        verified: 0,
-        admins: 0,
-      });
-
-      expect(mockConsoleError).toHaveBeenCalledWith(
-        "Error fetching user stats:",
-        expect.any(Error),
-      );
+      await expectRejectsWithMessage(getUserStats, "Database error");
+      expect(mockConsoleError).not.toHaveBeenCalled();
     });
 
     it("should handle null/undefined database responses", async () => {
-      const mockEmptyResponse = { from: jest.fn().mockResolvedValue([]) };
-
       mockDb.select
-        .mockReturnValueOnce(mockEmptyResponse)
-        .mockReturnValueOnce(mockEmptyResponse)
+        .mockReturnValueOnce({ from: jest.fn().mockResolvedValue([]) })
+        .mockReturnValueOnce({
+          from: jest.fn().mockReturnValue({
+            where: jest.fn().mockResolvedValue([]),
+          }),
+        })
         .mockReturnValueOnce({
           from: jest.fn().mockReturnValue({
             where: jest.fn().mockResolvedValue([]),
@@ -238,25 +243,18 @@ describe("Admin Stats", () => {
       expect(mockEq).toHaveBeenCalledWith(mockSubscriptions.status, "canceled");
     });
 
-    it("should handle database errors gracefully", async () => {
+    it("should surface database errors", async () => {
       mockDb.select.mockImplementation(() => {
         throw new Error("Subscription query error");
       });
 
       const { getSubscriptionStats } = await import("./stats");
 
-      const result = await getSubscriptionStats();
-
-      expect(result).toEqual({
-        total: 0,
-        active: 0,
-        canceled: 0,
-      });
-
-      expect(mockConsoleError).toHaveBeenCalledWith(
-        "Error fetching subscription stats:",
-        expect.any(Error),
+      await expectRejectsWithMessage(
+        getSubscriptionStats,
+        "Subscription query error",
       );
+      expect(mockConsoleError).not.toHaveBeenCalled();
     });
   });
 
@@ -322,25 +320,15 @@ describe("Admin Stats", () => {
       });
     });
 
-    it("should handle database errors gracefully", async () => {
+    it("should surface database errors", async () => {
       mockDb.select.mockImplementation(() => {
         throw new Error("Payment query error");
       });
 
       const { getPaymentStats } = await import("./stats");
 
-      const result = await getPaymentStats();
-
-      expect(result).toEqual({
-        total: 0,
-        totalRevenue: 0,
-        successful: 0,
-      });
-
-      expect(mockConsoleError).toHaveBeenCalledWith(
-        "Error fetching payment stats:",
-        expect.any(Error),
-      );
+      await expectRejectsWithMessage(getPaymentStats, "Payment query error");
+      expect(mockConsoleError).not.toHaveBeenCalled();
     });
   });
 
@@ -391,24 +379,15 @@ describe("Admin Stats", () => {
       });
     });
 
-    it("should handle database errors gracefully", async () => {
+    it("should surface database errors", async () => {
       mockDb.select.mockImplementation(() => {
         throw new Error("Upload query error");
       });
 
       const { getUploadStats } = await import("./stats");
 
-      const result = await getUploadStats();
-
-      expect(result).toEqual({
-        total: 0,
-        totalSize: 0,
-      });
-
-      expect(mockConsoleError).toHaveBeenCalledWith(
-        "Error fetching upload stats:",
-        expect.any(Error),
-      );
+      await expectRejectsWithMessage(getUploadStats, "Upload query error");
+      expect(mockConsoleError).not.toHaveBeenCalled();
     });
   });
 
@@ -469,26 +448,15 @@ describe("Admin Stats", () => {
       });
     });
 
-    it("should handle errors and return default structure", async () => {
+    it("should surface query errors", async () => {
       mockDb.select.mockImplementation(() => {
         throw new Error("Combined stats error");
       });
 
       const { getAdminStats } = await import("./stats");
 
-      const result = await getAdminStats();
-
-      expect(result).toEqual({
-        users: { total: 0, verified: 0, admins: 0 },
-        subscriptions: { total: 0, active: 0, canceled: 0 },
-        payments: { total: 0, totalRevenue: 0, successful: 0 },
-        uploads: { total: 0, totalSize: 0 },
-      });
-
-      expect(mockConsoleError).toHaveBeenCalledWith(
-        "Error fetching user stats:",
-        expect.any(Error),
-      );
+      await expectRejectsWithMessage(getAdminStats, "Combined stats error");
+      expect(mockConsoleError).not.toHaveBeenCalled();
     });
   });
 
@@ -585,25 +553,60 @@ describe("Admin Stats", () => {
       expect(Array.isArray(result.charts.monthlyRevenue)).toBe(true);
     });
 
-    it("should handle chart data errors gracefully", async () => {
-      // Simplify by just throwing error immediately
-      mockDb.select.mockImplementation(() => {
-        throw new Error("Chart error");
-      });
+    it("should surface chart data errors", async () => {
+      const mockBasicStatsQueries = [
+        { from: jest.fn().mockResolvedValue([{ value: 100 }]) },
+        {
+          from: jest.fn().mockReturnValue({
+            where: jest.fn().mockResolvedValue([{ value: 80 }]),
+          }),
+        },
+        {
+          from: jest.fn().mockReturnValue({
+            where: jest.fn().mockResolvedValue([{ value: 5 }]),
+          }),
+        },
+        { from: jest.fn().mockResolvedValue([{ value: 50 }]) },
+        {
+          from: jest.fn().mockReturnValue({
+            where: jest.fn().mockResolvedValue([{ value: 40 }]),
+          }),
+        },
+        {
+          from: jest.fn().mockReturnValue({
+            where: jest.fn().mockResolvedValue([{ value: 10 }]),
+          }),
+        },
+        { from: jest.fn().mockResolvedValue([{ value: 200 }]) },
+        { from: jest.fn().mockResolvedValue([{ value: "50000" }]) },
+        {
+          from: jest.fn().mockReturnValue({
+            where: jest.fn().mockResolvedValue([{ value: 180 }]),
+          }),
+        },
+        { from: jest.fn().mockResolvedValue([{ value: 300 }]) },
+        { from: jest.fn().mockResolvedValue([{ value: "2000000000" }]) },
+        {
+          from: jest.fn().mockReturnValue({
+            where: jest.fn().mockReturnValue({
+              orderBy: jest.fn().mockRejectedValue(new Error("Chart error")),
+            }),
+          }),
+        },
+        {
+          from: jest.fn().mockReturnValue({
+            where: jest.fn().mockReturnValue({
+              orderBy: jest.fn().mockResolvedValue([]),
+            }),
+          }),
+        },
+      ];
+      mockDb.select.mockImplementation(() => mockBasicStatsQueries.shift());
 
       const { getAdminStatsWithCharts } = await import("./stats");
 
-      const result = await getAdminStatsWithCharts();
-
-      expect(result.charts).toEqual({
-        recentUsers: [],
-        monthlyRevenue: [],
-      });
-
-      expect(mockConsoleError).toHaveBeenCalledWith(
-        "Error fetching admin stats with charts:",
-        expect.any(Error),
-      );
+      await expectRejectsWithMessage(getAdminStatsWithCharts, "Chart error");
+      expect(mockConsoleError).not.toHaveBeenCalled();
     });
   });
 
@@ -718,29 +721,18 @@ describe("Admin Stats", () => {
       });
     });
 
-    it("should handle database errors gracefully", async () => {
+    it("should surface database errors", async () => {
       mockDb.select.mockImplementation(() => {
         throw new Error("Upload details error");
       });
 
       const { getUploadStatsDetails } = await import("./stats");
 
-      const result = await getUploadStatsDetails();
-
-      expect(result).toEqual({
-        total: 0,
-        totalSize: 0,
-        totalSizeFormatted: "0 B",
-        averageSize: 0,
-        averageSizeFormatted: "0 B",
-        topFileTypes: [],
-        recentUploads: 0,
-      });
-
-      expect(mockConsoleError).toHaveBeenCalledWith(
-        "Error fetching upload stats details:",
-        expect.any(Error),
+      await expectRejectsWithMessage(
+        getUploadStatsDetails,
+        "Upload details error",
       );
+      expect(mockConsoleError).not.toHaveBeenCalled();
     });
 
     it("should categorize file types correctly", async () => {

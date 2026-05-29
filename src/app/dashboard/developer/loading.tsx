@@ -6,7 +6,11 @@ function DeveloperAccessPageTitle() {
 }
 
 function DeveloperAccessPageDescription() {
-  return <>Manage API keys, CLI sessions, and agent-friendly access from one place.</>;
+  return (
+    <>
+      Manage API keys, CLI sessions, and agent-friendly access from one place.
+    </>
+  );
 }
 
 export default function DashboardDeveloperAccessLoading() {

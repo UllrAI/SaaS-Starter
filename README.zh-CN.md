@@ -121,7 +121,7 @@ cp .env.example .env
 
 #### 统计脚本
 
-根布局中包含 UllrAI 自建统计脚本。它没有设计成可复用的 `.env` 配置项，因为内置 website ID 只适用于 UllrAI 自己的统计服务。如果您 fork 此项目或把它作为模板使用，请在 `src/app/layout.tsx` 中替换成自己的统计方案，或直接删除该脚本。
+统计脚本默认关闭。若要启用脚本型统计服务，请在 `.env` 中设置 `ANALYTICS_ENABLED=true`、`ANALYTICS_SCRIPT_URL` 和 `ANALYTICS_WEBSITE_ID`。不要把生产 website ID 提交进 starter。
 
 ### 4. 数据库设置
 

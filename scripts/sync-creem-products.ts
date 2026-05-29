@@ -28,7 +28,8 @@ async function main() {
   });
 
   const prefix =
-    getArgumentValue("--prefix") ?? humanizePackageName(await readPackageName());
+    getArgumentValue("--prefix") ??
+    humanizePackageName(await readPackageName());
   const client = new Creem({
     serverIdx: env.CREEM_ENVIRONMENT === "live_mode" ? 0 : 1,
     apiKey: env.CREEM_API_KEY,
@@ -144,7 +145,10 @@ async function createProduct(
 async function writeResolvedProducts(
   resolvedProducts: ResolvedCreemProduct[],
 ): Promise<void> {
-  const productsConfigPath = resolve(process.cwd(), "src/lib/config/products.ts");
+  const productsConfigPath = resolve(
+    process.cwd(),
+    "src/lib/config/products.ts",
+  );
   const source = await readFile(productsConfigPath, "utf8");
   const nextSource = updateProductsConfigSource(source, resolvedProducts);
 

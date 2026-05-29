@@ -170,7 +170,10 @@ export function SubscriptionManagementTable({
       key: "status",
       label: <>Status</>,
       render: (sub) => (
-        <Badge variant={getStatusBadgeVariant(sub.status)} className="capitalize">
+        <Badge
+          variant={getStatusBadgeVariant(sub.status)}
+          className="capitalize"
+        >
           <SubscriptionStatusLabel status={sub.status} />
         </Badge>
       ),
@@ -222,7 +225,9 @@ export function SubscriptionManagementTable({
         error={error}
         searchTerm={searchTerm}
         onSearchChange={handleSearch}
-        searchPlaceholder={<>Search by user name, email, or subscription ID...</>}
+        searchPlaceholder={
+          <>Search by user name, email, or subscription ID...</>
+        }
         filterValue={statusFilter}
         onFilterChange={handleStatusFilter}
         filterOptions={statusFilterOptions}

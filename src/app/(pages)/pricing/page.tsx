@@ -17,8 +17,11 @@ import {
 import { PageSectionHeading } from "@/components/layout/page-section-heading";
 import { PricingSection } from "@/components/payment-options";
 import { PAYMENT_PROVIDER } from "@/lib/config/constants";
-import { createLocalizedAlternates, createMetadata } from "@/lib/metadata";
-import { getRequestLocale } from "@/lib/i18n/server-locale";
+import {
+  createLocalizedAlternates,
+  createMetadataDefaults,
+} from "@/lib/metadata";
+import { SOURCE_LOCALE } from "@/lib/config/i18n";
 import {
   Boxes,
   CreditCard,
@@ -29,9 +32,12 @@ import {
 } from "lucide-react";
 
 export async function generateMetadata() {
-  const locale = await getRequestLocale();
-  return createMetadata({
-    alternates: createLocalizedAlternates("/pricing", locale),
+  const metadata = createMetadataDefaults({
+    alternates: createLocalizedAlternates("/pricing", SOURCE_LOCALE),
+  });
+
+  return {
+    ...metadata,
     title: "Pricing",
     description:
       "Pricing for the SaaS Starter codebase. Review the current package structure, verification stack, and what is included before checkout.",
@@ -42,7 +48,19 @@ export async function generateMetadata() {
       "saas starter",
       "billing",
     ],
-  });
+    openGraph: {
+      ...metadata.openGraph,
+      title: "Pricing",
+      description:
+        "Pricing for the SaaS Starter codebase. Review the current package structure, verification stack, and what is included before checkout.",
+    },
+    twitter: {
+      ...metadata.twitter,
+      title: "Pricing",
+      description:
+        "Pricing for the SaaS Starter codebase. Review the current package structure, verification stack, and what is included before checkout.",
+    },
+  };
 }
 
 export default function PricingPage() {
@@ -126,9 +144,7 @@ export default function PricingPage() {
           </Badge>
         }
       >
-        <PageIntroHeading>
-          Simple, transparent pricing
-        </PageIntroHeading>
+        <PageIntroHeading>Simple, transparent pricing</PageIntroHeading>
         <PageIntroDescription className="mx-auto max-w-3xl">
           Choose the plan that fits you. No hidden fees, no surprises.
         </PageIntroDescription>

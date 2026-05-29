@@ -6,11 +6,11 @@ import env from "@/env";
 function isServerlessEnvironment(): boolean {
   return Boolean(
     process.env.VERCEL ||
-      process.env.AWS_LAMBDA_FUNCTION_NAME ||
-      process.env.NETLIFY ||
-      process.env.RAILWAY_ENVIRONMENT ||
-      process.env.FUNCTIONS_EMULATOR || // Google Cloud Functions
-      process.env.AZURE_FUNCTIONS_ENVIRONMENT, // Azure Functions
+    process.env.AWS_LAMBDA_FUNCTION_NAME ||
+    process.env.NETLIFY ||
+    process.env.RAILWAY_ENVIRONMENT ||
+    process.env.FUNCTIONS_EMULATOR || // Google Cloud Functions
+    process.env.AZURE_FUNCTIONS_ENVIRONMENT, // Azure Functions
   );
 }
 

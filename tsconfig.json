@@ -1,15 +1,8 @@
 {
   "compilerOptions": {
     "target": "ESNext",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
-    "types": [
-      "node",
-      "jest"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "types": ["node", "jest"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -27,21 +20,11 @@
       }
     ],
     "paths": {
-      "@/*": [
-        "./src/*"
-      ],
-      "@/env": [
-        "./env.js"
-      ],
-      "content-collections": [
-        "./.content-collections/generated"
-      ],
-      "@/styles/*": [
-        "./styles/*"
-      ],
-      "env": [
-        "./env.js"
-      ]
+      "@/*": ["./src/*"],
+      "@/env": ["./env.js"],
+      "content-collections": ["./.content-collections/generated"],
+      "@/styles/*": ["./styles/*"],
+      "env": ["./env.js"]
     }
   },
   "include": [
@@ -52,9 +35,5 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"
   ],
-  "exclude": [
-    "node_modules",
-    "**/*.test.ts",
-    "**/*.test.tsx"
-  ]
+  "exclude": ["node_modules", "**/*.test.ts", "**/*.test.tsx"]
 }

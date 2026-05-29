@@ -26,11 +26,7 @@ const RevenueChart = dynamic(
   },
 );
 
-function ChartLoadingMessage({
-  heightClassName,
-}: {
-  heightClassName: string;
-}) {
+function ChartLoadingMessage({ heightClassName }: { heightClassName: string }) {
   return (
     <div
       className={`text-muted-foreground flex items-center justify-center text-sm ${heightClassName}`}

@@ -45,7 +45,6 @@ import {
 } from "../r2";
 import type { UserRole } from "../config/roles";
 
-// --- 安全的 Action Client ---
 const actionClient = createSafeActionClient();
 
 const adminAction = actionClient.use(async ({ next }) => {
@@ -53,8 +52,6 @@ const adminAction = actionClient.use(async ({ next }) => {
   return next({ ctx: { user } });
 });
 
-// --- 数据查询函数 ---
-// (此部分代码保持不变，为简洁起见省略)
 interface GetUsersParams {
   page?: number;
   limit?: number;
@@ -632,11 +629,9 @@ export const batchDeleteUploadsAction = adminAction
     const deleteResult = await deleteFilesFromR2(fileKeysToDelete);
 
     if (!deleteResult.success) {
-      // 如果批量删除失败，可以抛出错误或返回部分成功的消息
       throw new Error(deleteResult.error || "Failed to delete files from R2.");
     }
 
-    // 只有在 R2 删除成功后，才从数据库中删除记录
     await db.delete(uploads).where(inArray(uploads.id, uploadIds));
 
     revalidatePath("/dashboard/admin/uploads");

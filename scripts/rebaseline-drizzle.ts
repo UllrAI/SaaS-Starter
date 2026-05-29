@@ -68,7 +68,9 @@ async function assertDatabaseMatchesBaseline(sql: postgres.Sql) {
   `;
 
   const existingTables = new Set(tables.map((table) => table.table_name));
-  const missingTables = requiredTables.filter((table) => !existingTables.has(table));
+  const missingTables = requiredTables.filter(
+    (table) => !existingTables.has(table),
+  );
 
   if (missingTables.length > 0) {
     throw new Error(
@@ -84,7 +86,9 @@ async function assertDatabaseMatchesBaseline(sql: postgres.Sql) {
     `;
 
     const existingColumns = new Set(result.map((column) => column.column_name));
-    const missingColumns = columns.filter((column) => !existingColumns.has(column));
+    const missingColumns = columns.filter(
+      (column) => !existingColumns.has(column),
+    );
 
     if (missingColumns.length > 0) {
       throw new Error(

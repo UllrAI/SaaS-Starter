@@ -12,9 +12,7 @@ import { Mail } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { getAvailableSocialProviders } from "@/lib/auth/providers";
 import { AuthFormBase } from "@/components/auth/auth-form-base";
-import {
-  type ResolvedAuthFeedback,
-} from "@/lib/auth/feedback";
+import { type ResolvedAuthFeedback } from "@/lib/auth/feedback";
 import {
   DEFAULT_CALLBACK_URL,
   buildLoginRedirectPath,
@@ -103,16 +101,23 @@ export function AuthForm({
 
   const config = {
     title: isLogin ? <>Welcome back</> : <>Get started today</>,
-    description: isLogin
-      ? <>Enter your email to receive a secure magic link and access your dashboard</>
-      : <>Create your account in seconds with just your email address</>,
+    description: isLogin ? (
+      <>
+        Enter your email to receive a secure magic link and access your
+        dashboard
+      </>
+    ) : (
+      <>Create your account in seconds with just your email address</>
+    ),
     badgeText: isLogin ? <>Welcome back</> : <>Get started</>,
     submitButtonText: isLogin ? <>Send Magic Link</> : <>Create Account</>,
     magicLinkLoadingText: <>Sending magic link...</>,
     submitIcon: Mail,
-    alternativeActionText: isLogin
-      ? <>New to our platform?</>
-      : <>Already have an account?</>,
+    alternativeActionText: isLogin ? (
+      <>New to our platform?</>
+    ) : (
+      <>Already have an account?</>
+    ),
     alternativeActionLink: (
       <Link
         href={isLogin ? `/signup${callbackQuery}` : `/login${callbackQuery}`}

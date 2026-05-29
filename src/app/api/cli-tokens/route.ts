@@ -12,4 +12,3 @@ export async function GET(request: NextRequest) {
   const tokens = await listCliTokens(session.user.id);
   return NextResponse.json({ tokens });
 }
-

@@ -38,9 +38,9 @@ jest.mock("@/lib/auth/providers", () => ({
   getAvailableSocialProviders: () => mockGetAvailableSocialProviders(),
 }));
 
-const mockCreateMetadata = jest.fn(() => ({}));
+const mockCreateMetadataDefaults = jest.fn(() => ({}));
 jest.mock("@/lib/metadata", () => ({
-  createMetadata: (config: unknown) => mockCreateMetadata(config),
+  createMetadataDefaults: () => mockCreateMetadataDefaults(),
 }));
 
 const mockGetRequestLocale = jest.fn(async () => "en");
@@ -68,7 +68,7 @@ describe("LoginPage", () => {
       title: "Sign In",
       description: "Sign in to your account with magic link",
     });
-    expect(mockCreateMetadata).toHaveBeenCalledWith({});
+    expect(mockCreateMetadataDefaults).toHaveBeenCalledWith();
   });
 
   it("renders the AuthForm with login mode and available providers", async () => {

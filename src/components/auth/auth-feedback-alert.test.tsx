@@ -38,9 +38,7 @@ describe("AuthFeedbackAlert", () => {
     ],
     ["sign_in_failed", "Unable to sign in. Try again."],
   ] as const)("renders %s copy", (key, text) => {
-    render(
-      <AuthFeedbackAlert feedback={{ key } as ResolvedAuthFeedback} />,
-    );
+    render(<AuthFeedbackAlert feedback={{ key } as ResolvedAuthFeedback} />);
 
     expect(screen.getByText(text)).toBeInTheDocument();
   });

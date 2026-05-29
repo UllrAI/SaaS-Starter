@@ -1,7 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Features } from "@/components/homepage/features";
-import { SectionContainer } from "@/components/layout/page-container";
+import { MarketingPageShell } from "@/components/layout/marketing-page-shell";
 import {
   PageIntro,
   PageIntroDescription,
@@ -64,65 +64,62 @@ export default function FeaturesPage() {
   ];
   return (
     <>
-      <section className="bg-background border-border border-b py-20">
-        <SectionContainer>
-          <PageIntro
-            badge={
-              <Badge className="border-border bg-background/50 inline-flex items-center border px-3 py-1 text-sm backdrop-blur-sm">
-                <Package2 className="text-muted-foreground mr-2 h-3 w-3" />
-                <span className="text-muted-foreground font-mono">
-                  STARTER_SCOPE
-                </span>
-              </Badge>
-            }
-          >
-            <PageIntroHeading className="text-4xl sm:text-5xl lg:text-6xl">
-              Shipped and ready to scale
-            </PageIntroHeading>
-            <PageIntroDescription className="mt-6 text-lg leading-8">
-              Every feature listed here exists in the codebase today. No
-              roadmaps or placeholders. Just tested foundations for human users,
-              APIs, and agent workflows you can reuse immediately.
-            </PageIntroDescription>
-          </PageIntro>
+      <MarketingPageShell>
+        <PageIntro
+          className="mb-20"
+          badge={
+            <Badge className="border-border bg-background/50 inline-flex items-center border px-3 py-1 text-sm backdrop-blur-sm">
+              <Package2 className="text-muted-foreground mr-2 h-3 w-3" />
+              <span className="text-muted-foreground font-mono">
+                STARTER_SCOPE
+              </span>
+            </Badge>
+          }
+        >
+          <PageIntroHeading>Shipped and ready to scale</PageIntroHeading>
+          <PageIntroDescription>
+            Every feature listed here exists in the codebase today. No roadmaps
+            or placeholders. Just tested foundations for human users, APIs, and
+            agent workflows you can reuse immediately.
+          </PageIntroDescription>
+        </PageIntro>
 
-          <div className="mt-12 grid gap-6 lg:grid-cols-2">
-            <Card className="border-border bg-card">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <CheckCircle2 className="text-primary h-5 w-5" />
-                  Included today
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3 text-sm leading-relaxed">
-                {includedItems.map((item, index) => (
-                  <div key={index} className="flex items-start gap-3">
-                    <CheckCircle2 className="text-primary mt-0.5 h-4 w-4 shrink-0" />
-                    <span>{item}</span>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
+        <div className="grid gap-6 lg:grid-cols-2">
+          <Card className="border-border bg-card">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <CheckCircle2 className="text-primary h-5 w-5" />
+                Included today
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3 text-sm leading-relaxed">
+              {includedItems.map((item, index) => (
+                <div key={index} className="flex items-start gap-3">
+                  <CheckCircle2 className="text-primary mt-0.5 h-4 w-4 shrink-0" />
+                  <span>{item}</span>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
 
-            <Card className="border-border bg-card">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Wrench className="text-primary h-5 w-5" />
-                  You still configure
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3 text-sm leading-relaxed">
-                {customizationItems.map((item, index) => (
-                  <div key={index} className="flex items-start gap-3">
-                    <Wrench className="text-primary mt-0.5 h-4 w-4 shrink-0" />
-                    <span>{item}</span>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-          </div>
-        </SectionContainer>
-      </section>
+          <Card className="border-border bg-card">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Wrench className="text-primary h-5 w-5" />
+                You still configure
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3 text-sm leading-relaxed">
+              {customizationItems.map((item, index) => (
+                <div key={index} className="flex items-start gap-3">
+                  <Wrench className="text-primary mt-0.5 h-4 w-4 shrink-0" />
+                  <span>{item}</span>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </div>
+      </MarketingPageShell>
 
       <Features />
     </>

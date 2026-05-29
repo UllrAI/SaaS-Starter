@@ -40,6 +40,11 @@ const env = createEnv({
     // E2E testing
     E2E_TEST_MODE: z.enum(["true", "false"]).optional(),
     E2E_TEST_SECRET: z.string().optional(),
+
+    // Optional third-party analytics. Disabled unless explicitly enabled.
+    ANALYTICS_ENABLED: z.enum(["true", "false"]).default("false"),
+    ANALYTICS_SCRIPT_URL: z.string().url().optional(),
+    ANALYTICS_WEBSITE_ID: z.string().optional(),
   },
 
   // Client-side public environment variables
@@ -88,6 +93,11 @@ const env = createEnv({
     // E2E testing
     E2E_TEST_MODE: process.env.E2E_TEST_MODE,
     E2E_TEST_SECRET: process.env.E2E_TEST_SECRET,
+
+    // Optional third-party analytics
+    ANALYTICS_ENABLED: process.env.ANALYTICS_ENABLED,
+    ANALYTICS_SCRIPT_URL: process.env.ANALYTICS_SCRIPT_URL,
+    ANALYTICS_WEBSITE_ID: process.env.ANALYTICS_WEBSITE_ID,
   },
 });
 

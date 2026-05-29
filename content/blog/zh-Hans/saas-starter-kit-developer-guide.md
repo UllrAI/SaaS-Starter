@@ -500,7 +500,7 @@ sequenceDiagram
 - **运行测试**:
   - `pnpm test`
   - `pnpm test:e2e`
-- **测试专用会话路由**: Playwright 仅在 `E2E_TEST_MODE=true` 且提供正确 `E2E_TEST_SECRET` 时启用 `/api/test/session`。
+- **测试专用会话路由**: Playwright 仅在 `E2E_TEST_MODE=true` 且提供至少 32 个字符的显式 `E2E_TEST_SECRET` 时启用 `/api/test/session`。非本机生产部署会禁用该入口，测试 cookie 会使用该密钥签名。
 
 ### 6.2. 代码质量保障
 

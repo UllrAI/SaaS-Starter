@@ -266,7 +266,7 @@ pnpm set:admin --email=your-email@example.com
 pnpm test:e2e
 ```
 
-Playwright 会通过 `pnpm start` 启动生产服务，并在测试期间启用仅供测试使用的会话入口：`E2E_TEST_MODE=true`。该入口受 `E2E_TEST_SECRET` 保护，只应在 Playwright 或 CI 环境下启用。
+Playwright 会通过 `pnpm start` 启动生产服务，并在测试期间启用仅供测试使用的会话入口：`E2E_TEST_MODE=true`。该入口要求显式配置至少 32 个字符的 `E2E_TEST_SECRET`，测试 cookie 会用该密钥签名，且非本机生产部署会禁用该入口。CI 未提供密钥时，Playwright 会为每次运行生成临时密钥。
 
 #### 包体积分析脚本
 

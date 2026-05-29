@@ -1,10 +1,6 @@
 import Link from "next/link";
 
-import {
-  COMPANY_NAME,
-  GITHUB_DISCUSSIONS_URL,
-  PRIVACY_EMAIL,
-} from "@/lib/config/constants";
+import { GITHUB_DISCUSSIONS_URL, PRIVACY_EMAIL } from "@/lib/config/constants";
 import { Shield } from "lucide-react";
 import {
   createLocalizedAlternates,
@@ -27,16 +23,19 @@ export async function generateMetadata() {
   return {
     ...metadata,
     title: "Privacy Policy",
-    description: `Learn how ${COMPANY_NAME} collects, uses, and protects your personal information.`,
+    description:
+      "Learn how we collect, use, and protect your personal information.",
     openGraph: {
       ...metadata.openGraph,
       title: "Privacy Policy",
-      description: `Learn how ${COMPANY_NAME} collects, uses, and protects your personal information.`,
+      description:
+        "Learn how we collect, use, and protect your personal information.",
     },
     twitter: {
       ...metadata.twitter,
       title: "Privacy Policy",
-      description: `Learn how ${COMPANY_NAME} collects, uses, and protects your personal information.`,
+      description:
+        "Learn how we collect, use, and protect your personal information.",
     },
   };
 }

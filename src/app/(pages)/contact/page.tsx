@@ -39,16 +39,19 @@ export async function generateMetadata() {
   return {
     ...metadata,
     title: "Contact Us",
-    description: `Get in touch with our team. We are here to help with any questions about ${COMPANY_NAME}.`,
+    description:
+      "Get in touch with our team. We are here to help with any product or integration questions.",
     openGraph: {
       ...metadata.openGraph,
       title: "Contact Us",
-      description: `Get in touch with our team. We are here to help with any questions about ${COMPANY_NAME}.`,
+      description:
+        "Get in touch with our team. We are here to help with any product or integration questions.",
     },
     twitter: {
       ...metadata.twitter,
       title: "Contact Us",
-      description: `Get in touch with our team. We are here to help with any questions about ${COMPANY_NAME}.`,
+      description:
+        "Get in touch with our team. We are here to help with any product or integration questions.",
     },
   };
 }

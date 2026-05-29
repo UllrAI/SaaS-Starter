@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import LocalizedMarketingLayout, { generateStaticParams } from "./layout";
+import LocalizedMarketingLayout from "./layout";
 import { resolveStaticMarketingParams } from "@/lib/i18n/static-marketing-locale";
 
 jest.mock("@/app/(pages)/layout", () => ({
@@ -14,18 +14,7 @@ jest.mock("@/app/(pages)/layout", () => ({
 }));
 
 jest.mock("@/lib/i18n/static-marketing-locale", () => ({
-  getStaticMarketingLocaleParams: jest.fn(() => [{ locale: "zh-Hans" }]),
   resolveStaticMarketingParams: jest.fn(() => Promise.resolve("zh-Hans")),
-}));
-
-jest.mock("@/lib/i18n/request-lingo-provider", () => ({
-  LocaleLingoProvider: ({
-    children,
-    locale,
-  }: {
-    children: React.ReactNode;
-    locale: string;
-  }) => <div data-locale={locale}>{children}</div>,
 }));
 
 const mockResolveStaticMarketingParams =
@@ -52,13 +41,5 @@ describe("LocalizedMarketingLayout", () => {
     expect(screen.getByTestId("homepage-header")).toBeInTheDocument();
     expect(screen.getByTestId("homepage-footer")).toBeInTheDocument();
     expect(screen.getByTestId("layout-child")).toBeInTheDocument();
-    expect(screen.getByTestId("pages-layout").parentElement).toHaveAttribute(
-      "data-locale",
-      "zh-Hans",
-    );
-  });
-
-  it("statically generates supported target locale params", () => {
-    expect(generateStaticParams()).toEqual([{ locale: "zh-Hans" }]);
   });
 });

@@ -27,16 +27,19 @@ export async function generateMetadata() {
   return {
     ...metadata,
     title: "Terms of Service",
-    description: `Read our terms of service to understand your rights and responsibilities when using ${COMPANY_NAME}.`,
+    description:
+      "Read our terms of service to understand your rights and responsibilities when using the product.",
     openGraph: {
       ...metadata.openGraph,
       title: "Terms of Service",
-      description: `Read our terms of service to understand your rights and responsibilities when using ${COMPANY_NAME}.`,
+      description:
+        "Read our terms of service to understand your rights and responsibilities when using the product.",
     },
     twitter: {
       ...metadata.twitter,
       title: "Terms of Service",
-      description: `Read our terms of service to understand your rights and responsibilities when using ${COMPANY_NAME}.`,
+      description:
+        "Read our terms of service to understand your rights and responsibilities when using the product.",
     },
   };
 }

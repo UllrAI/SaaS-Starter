@@ -47,7 +47,7 @@ export interface CreateCheckoutOptions {
   failureUrl?: string;
 }
 
-// --- Creem Webhook 事件对象详细类型定义 ---
+// --- Detailed Creem webhook object types ---
 
 export type CreemMetadata = {
   userId?: string;

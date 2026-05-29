@@ -3,7 +3,7 @@ import { UserRole, hasRole as checkRole } from "@/lib/config/roles";
 import { buildLoginRedirectPath } from "./callback-url";
 import { getAuthSessionFromHeaders } from "./session";
 
-// 重新导出 UserRole 类型以保持向后兼容性
+// Re-export UserRole for backward compatibility.
 export type { UserRole };
 
 export interface AuthUser {

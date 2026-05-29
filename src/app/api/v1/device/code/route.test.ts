@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, jest } from "@jest/globals";
 
 const mockCreateDeviceCode = jest.fn();
-const mockCheckPersistentRateLimit = jest.fn();
+const mockCheckRateLimit = jest.fn();
 const mockGetClientRateLimitKey = jest.fn();
 
 jest.mock("@/lib/device-auth/device-service", () => ({
@@ -9,7 +9,7 @@ jest.mock("@/lib/device-auth/device-service", () => ({
 }));
 
 jest.mock("@/lib/rate-limit", () => ({
-  checkPersistentRateLimit: mockCheckPersistentRateLimit,
+  checkRateLimit: mockCheckRateLimit,
   getClientRateLimitKey: mockGetClientRateLimitKey,
 }));
 
@@ -17,7 +17,7 @@ describe("POST /api/v1/device/code", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockGetClientRateLimitKey.mockReturnValue("203.0.113.10:SaaS CLI test");
-    mockCheckPersistentRateLimit.mockResolvedValue({
+    mockCheckRateLimit.mockResolvedValue({
       allowed: true,
       info: {
         limit: 20,
@@ -78,7 +78,7 @@ describe("POST /api/v1/device/code", () => {
   });
 
   it("rate limits repeated device code requests", async () => {
-    mockCheckPersistentRateLimit.mockResolvedValue({
+    mockCheckRateLimit.mockResolvedValue({
       allowed: false,
       info: {
         limit: 20,

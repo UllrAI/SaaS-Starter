@@ -2,10 +2,7 @@ import { NextRequest } from "next/server";
 import { z } from "zod";
 import env from "@/env";
 import { createDeviceCode } from "@/lib/device-auth/device-service";
-import {
-  checkPersistentRateLimit,
-  getClientRateLimitKey,
-} from "@/lib/rate-limit";
+import { checkRateLimit, getClientRateLimitKey } from "@/lib/rate-limit";
 import { apiSuccess, handleApiError } from "@/lib/machine-auth/api-response";
 import { MachineAuthError } from "@/lib/machine-auth/error";
 
@@ -20,7 +17,7 @@ const deviceCodeSchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
-  const rateLimit = await checkPersistentRateLimit({
+  const rateLimit = await checkRateLimit({
     scope: "device_code",
     key: getClientRateLimitKey(request),
     limit: DEVICE_CODE_RATE_LIMIT_MAX_REQUESTS,

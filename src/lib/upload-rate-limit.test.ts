@@ -1,15 +1,13 @@
 import { beforeEach, describe, expect, it, jest } from "@jest/globals";
 import { UPLOAD_CONFIG } from "@/lib/config/upload";
-
-const mockCheckPersistentRateLimit = jest.fn();
-
-jest.mock("@/lib/rate-limit", () => ({
-  checkPersistentRateLimit: mockCheckPersistentRateLimit,
-}));
+import {
+  checkUploadRateLimit,
+  clearUploadRateLimitForTests,
+} from "./upload-rate-limit";
 
 describe("upload rate limit", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    clearUploadRateLimitForTests();
     jest.spyOn(Date, "now").mockReturnValue(1_000);
   });
 
@@ -17,46 +15,37 @@ describe("upload rate limit", () => {
     jest.restoreAllMocks();
   });
 
-  it("delegates to the persistent rate limiter", async () => {
+  it("allows requests until the per-user window is exhausted", () => {
     const limit = UPLOAD_CONFIG.USER_UPLOAD_RATE_LIMIT_MAX_REQUESTS;
-    mockCheckPersistentRateLimit.mockResolvedValue({
-      allowed: true,
-      info: {
-        limit,
-        remaining: limit - 1,
-        resetAt: 61,
-      },
-    });
-    const { checkUploadRateLimit } = await import("./upload-rate-limit");
 
-    await expect(checkUploadRateLimit("user-1")).resolves.toMatchObject({
+    expect(checkUploadRateLimit("user-1")).toMatchObject({
       allowed: true,
       remaining: limit - 1,
     });
 
-    expect(mockCheckPersistentRateLimit).toHaveBeenCalledWith({
-      scope: "upload",
-      key: "user-1",
-      limit,
-      windowMs: UPLOAD_CONFIG.USER_UPLOAD_RATE_LIMIT_WINDOW_MS,
-    });
-  });
+    for (let count = 1; count < limit; count += 1) {
+      expect(checkUploadRateLimit("user-1").allowed).toBe(true);
+    }
 
-  it("returns retry metadata for blocked requests", async () => {
-    mockCheckPersistentRateLimit.mockResolvedValue({
-      allowed: false,
-      info: {
-        limit: UPLOAD_CONFIG.USER_UPLOAD_RATE_LIMIT_MAX_REQUESTS,
-        remaining: 0,
-        resetAt: 61,
-      },
-    });
-    const { checkUploadRateLimit } = await import("./upload-rate-limit");
-
-    await expect(checkUploadRateLimit("user-1")).resolves.toMatchObject({
+    expect(checkUploadRateLimit("user-1")).toMatchObject({
       allowed: false,
       remaining: 0,
       retryAfter: 60,
+    });
+  });
+
+  it("tracks users independently", () => {
+    for (
+      let count = 0;
+      count < UPLOAD_CONFIG.USER_UPLOAD_RATE_LIMIT_MAX_REQUESTS;
+      count += 1
+    ) {
+      checkUploadRateLimit("user-1");
+    }
+
+    expect(checkUploadRateLimit("user-2")).toMatchObject({
+      allowed: true,
+      remaining: UPLOAD_CONFIG.USER_UPLOAD_RATE_LIMIT_MAX_REQUESTS - 1,
     });
   });
 });

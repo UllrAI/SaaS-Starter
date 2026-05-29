@@ -21,7 +21,7 @@ This starter kit provides a comprehensive set of powerful features to help you q
 - **Authentication (Better-Auth + Resend):** Integrated with [Better-Auth](https://better-auth.com/), providing secure magic link login and third-party OAuth functionality. Uses [Resend](https://resend.com/) for reliable email delivery with Mailchecker integration to avoid temporary emails.
 - **Machine Auth for APIs and Agents:** Includes per-user API keys, CLI access tokens, refresh-token rotation, and a versioned `/api/v1/*` surface for machine clients.
 - **Modern Web Framework (Next.js 16 + TypeScript):** Built on the latest [Next.js 16](https://nextjs.org/) with App Router and Server Components. The entire project uses strict TypeScript type checking.
-- **Internationalization (Lingo.dev Compiler):** Built-in localization workflow powered by `@lingo.dev/compiler` for App Router. See `docs/i18n-lingo-migration.md`.
+- **Internationalization (Lingo.dev Compiler):** Built-in localization workflow powered by `@lingo.dev/compiler` for App Router. See [docs/i18n-lingo.md](docs/i18n-lingo.md).
 - **Database & ORM (Drizzle + PostgreSQL):** Uses [Drizzle ORM](https://orm.drizzle.team/) for type-safe database operations with deep PostgreSQL integration. Supports schema migrations and optimized queries.
 - **Payments & Subscriptions (Creem):** Integrated with [Creem](https://creem.io/) as the payment provider for easy subscription and one-time payment handling.
 - **UI Component Library (shadcn/ui + Tailwind CSS):** Built with [shadcn/ui](https://ui.shadcn.com/), an accessible, composable component library based on Radix UI and Tailwind CSS with built-in theme support.

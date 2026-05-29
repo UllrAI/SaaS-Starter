@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/database";
 import { uploads } from "@/database/schema";
-import env from "@/env";
 import { and, eq } from "drizzle-orm";
 import {
   formatFileSize,
@@ -11,7 +10,7 @@ import {
   UPLOAD_CONFIG,
   uploadCompleteRequestSchema,
 } from "@/lib/config/upload";
-import { getObjectMetadata } from "@/lib/r2";
+import { buildR2PublicUrl, getObjectMetadata } from "@/lib/r2";
 import { getAuthSessionFromHeaders } from "@/lib/auth/session";
 import { checkUploadRateLimit } from "@/lib/upload-rate-limit";
 
@@ -54,7 +53,7 @@ export async function POST(request: NextRequest) {
     const { fileName, key, size, url } = validation.data;
     const contentType = normalizeContentType(validation.data.contentType);
     const keyPrefix = `uploads/${session.user.id}/`;
-    const expectedUrl = `${env.R2_PUBLIC_URL}/${key}`;
+    const expectedUrl = buildR2PublicUrl(key);
 
     if (!key.startsWith(keyPrefix)) {
       return NextResponse.json(

@@ -83,6 +83,7 @@ export function getE2ETestSecret(): string | null {
 function isE2ETestModeEnabled(): boolean {
   return (
     process.env.E2E_TEST_MODE === "true" &&
+    process.env.PLAYWRIGHT === "true" &&
     !isProductionDeployment() &&
     getE2ETestSecret() !== null
   );

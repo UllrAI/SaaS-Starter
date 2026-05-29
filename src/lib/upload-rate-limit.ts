@@ -1,9 +1,5 @@
 import { UPLOAD_CONFIG } from "@/lib/config/upload";
-
-interface UploadRateLimitBucket {
-  count: number;
-  resetAt: number;
-}
+import { FixedWindowRateLimiter } from "@/lib/fixed-window-rate-limit";
 
 interface UploadRateLimitResult {
   allowed: boolean;
@@ -13,48 +9,16 @@ interface UploadRateLimitResult {
   retryAfter: number;
 }
 
-const buckets = new Map<string, UploadRateLimitBucket>();
+const uploadRateLimiter = new FixedWindowRateLimiter();
 
 export function checkUploadRateLimit(userId: string): UploadRateLimitResult {
-  const now = Date.now();
-  const windowMs = UPLOAD_CONFIG.USER_UPLOAD_RATE_LIMIT_WINDOW_MS;
-  const limit = UPLOAD_CONFIG.USER_UPLOAD_RATE_LIMIT_MAX_REQUESTS;
-  const existing = buckets.get(userId);
-
-  if (!existing || existing.resetAt <= now) {
-    const resetAt = now + windowMs;
-    buckets.set(userId, { count: 1, resetAt });
-
-    return {
-      allowed: true,
-      limit,
-      remaining: limit - 1,
-      resetAt,
-      retryAfter: 0,
-    };
-  }
-
-  if (existing.count >= limit) {
-    return {
-      allowed: false,
-      limit,
-      remaining: 0,
-      resetAt: existing.resetAt,
-      retryAfter: Math.ceil((existing.resetAt - now) / 1000),
-    };
-  }
-
-  existing.count += 1;
-
-  return {
-    allowed: true,
-    limit,
-    remaining: limit - existing.count,
-    resetAt: existing.resetAt,
-    retryAfter: 0,
-  };
+  return uploadRateLimiter.check({
+    key: userId,
+    limit: UPLOAD_CONFIG.USER_UPLOAD_RATE_LIMIT_MAX_REQUESTS,
+    windowMs: UPLOAD_CONFIG.USER_UPLOAD_RATE_LIMIT_WINDOW_MS,
+  });
 }
 
 export function clearUploadRateLimitForTests(): void {
-  buckets.clear();
+  uploadRateLimiter.clear();
 }

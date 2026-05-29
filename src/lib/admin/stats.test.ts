@@ -22,6 +22,7 @@ const mockDesc = jest.fn();
 const mockEq = jest.fn();
 const mockInArray = jest.fn();
 const mockGte = jest.fn();
+const mockSql = jest.fn();
 
 // Mock database tables
 const mockUsers = {
@@ -73,6 +74,7 @@ jest.mock("drizzle-orm", () => ({
   eq: mockEq,
   inArray: mockInArray,
   gte: mockGte,
+  sql: mockSql,
 }));
 
 describe("Admin Stats", () => {
@@ -102,6 +104,7 @@ describe("Admin Stats", () => {
     mockEq.mockReturnValue("column = value");
     mockInArray.mockReturnValue("column IN (values)");
     mockGte.mockReturnValue("column >= value");
+    mockSql.mockReturnValue("formatted_date");
     mockFormatFileSize.mockImplementation((size) => `${size} B`);
 
     // Mock default database responses
@@ -462,26 +465,14 @@ describe("Admin Stats", () => {
 
   describe("getAdminStatsWithCharts", () => {
     it("should fetch stats with chart data successfully", async () => {
-      const now = new Date();
       const mockUsers = [
-        { createdAt: new Date(now.getTime() - 1000 * 60 * 60 * 24) }, // 1 day ago
-        { createdAt: new Date(now.getTime() - 1000 * 60 * 60 * 24 * 2) }, // 2 days ago
-        { createdAt: new Date(now.getTime() - 1000 * 60 * 60 * 24) }, // 1 day ago (duplicate date)
+        { date: "2026-05-28", count: 2 },
+        { date: "2026-05-27", count: 1 },
       ];
 
       const mockPayments = [
-        {
-          createdAt: new Date(now.getTime() - 1000 * 60 * 60 * 24 * 30),
-          amount: 1000,
-        }, // 1 month ago
-        {
-          createdAt: new Date(now.getTime() - 1000 * 60 * 60 * 24 * 60),
-          amount: 2000,
-        }, // 2 months ago
-        {
-          createdAt: new Date(now.getTime() - 1000 * 60 * 60 * 24 * 30),
-          amount: 1500,
-        }, // 1 month ago (same month)
+        { month: "2026-04", revenue: "2500", count: 2 },
+        { month: "2026-03", revenue: "2000", count: 1 },
       ];
 
       // Mock basic stats calls (first 11 calls)
@@ -521,14 +512,18 @@ describe("Admin Stats", () => {
         {
           from: jest.fn().mockReturnValue({
             where: jest.fn().mockReturnValue({
-              orderBy: jest.fn().mockResolvedValue(mockUsers),
+              groupBy: jest.fn().mockReturnValue({
+                orderBy: jest.fn().mockResolvedValue(mockUsers),
+              }),
             }),
           }),
         },
         {
           from: jest.fn().mockReturnValue({
             where: jest.fn().mockReturnValue({
-              orderBy: jest.fn().mockResolvedValue(mockPayments),
+              groupBy: jest.fn().mockReturnValue({
+                orderBy: jest.fn().mockResolvedValue(mockPayments),
+              }),
             }),
           }),
         },
@@ -548,9 +543,11 @@ describe("Admin Stats", () => {
       expect(result.charts).toHaveProperty("recentUsers");
       expect(result.charts).toHaveProperty("monthlyRevenue");
 
-      // Test that chart data is processed correctly
-      expect(Array.isArray(result.charts.recentUsers)).toBe(true);
-      expect(Array.isArray(result.charts.monthlyRevenue)).toBe(true);
+      expect(result.charts.recentUsers).toEqual(mockUsers);
+      expect(result.charts.monthlyRevenue).toEqual([
+        { month: "2026-04", revenue: 2500, count: 2 },
+        { month: "2026-03", revenue: 2000, count: 1 },
+      ]);
     });
 
     it("should surface chart data errors", async () => {
@@ -589,14 +586,18 @@ describe("Admin Stats", () => {
         {
           from: jest.fn().mockReturnValue({
             where: jest.fn().mockReturnValue({
-              orderBy: jest.fn().mockRejectedValue(new Error("Chart error")),
+              groupBy: jest.fn().mockReturnValue({
+                orderBy: jest.fn().mockRejectedValue(new Error("Chart error")),
+              }),
             }),
           }),
         },
         {
           from: jest.fn().mockReturnValue({
             where: jest.fn().mockReturnValue({
-              orderBy: jest.fn().mockResolvedValue([]),
+              groupBy: jest.fn().mockReturnValue({
+                orderBy: jest.fn().mockResolvedValue([]),
+              }),
             }),
           }),
         },

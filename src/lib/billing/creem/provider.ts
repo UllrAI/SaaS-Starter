@@ -111,7 +111,7 @@ const creemProvider: PaymentProvider = {
   ): Promise<{ received: boolean; message?: string }> {
     if (!creemWebhookSecret) {
       console.error("Creem webhook secret is not configured.");
-      return { received: false, message: "Webhook secret not configured." };
+      throw new Error("Webhook secret not configured.");
     }
 
     try {
@@ -120,7 +120,10 @@ const creemProvider: PaymentProvider = {
       const message =
         error instanceof Error ? error.message : "Webhook handling failed";
       console.error(`[Creem Webhook Provider Error]: ${message}`);
-      return { received: false, message };
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error(message);
     }
   },
 };

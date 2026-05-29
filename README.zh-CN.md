@@ -119,6 +119,10 @@ cp .env.example .env
 >
 > **可选的本地 CLI 鉴权方式：** 对于脚本、本地 Agent 或临时终端调用，您可以直接导出 `SAAS_CLI_API_KEY=ssk_...`，而不必把凭证写入 CLI 配置文件。
 
+#### 统计脚本
+
+根布局中包含 UllrAI 自建统计脚本。它没有设计成可复用的 `.env` 配置项，因为内置 website ID 只适用于 UllrAI 自己的统计服务。如果您 fork 此项目或把它作为模板使用，请在 `src/app/layout.tsx` 中替换成自己的统计方案，或直接删除该脚本。
+
 ### 4. 数据库设置
 
 本项目使用单一 Drizzle 配置文件 `src/database/config.ts`，并维护一套提交到仓库的迁移历史 `src/database/migrations/`。目标数据库仅由 `DATABASE_URL` 决定。

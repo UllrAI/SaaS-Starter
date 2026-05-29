@@ -119,6 +119,10 @@ Then edit the `.env` file and fill in all required values.
 >
 > **Optional local CLI auth:** for scripts, local agents, or quick terminal access, you can export `SAAS_CLI_API_KEY=ssk_...` instead of storing credentials in the CLI config.
 
+#### Analytics Script
+
+The root layout includes UllrAI's self-hosted analytics script. It is intentionally not exposed as a reusable `.env` setting because the bundled website ID only works with UllrAI's own analytics service. If you fork this starter or use it as a template, replace that script in `src/app/layout.tsx` with your own analytics provider, or remove it entirely.
+
 ### 4. Database Setup
 
 This project uses a single Drizzle config file, `src/database/config.ts`, and a single committed migration history in `src/database/migrations/`. The target database is selected only by `DATABASE_URL`.

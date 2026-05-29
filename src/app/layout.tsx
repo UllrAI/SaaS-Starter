@@ -97,16 +97,6 @@ export default async function RootLayout({
       },
     ],
   };
-  const analyticsScript =
-    env.ANALYTICS_ENABLED === "true" &&
-    env.ANALYTICS_SCRIPT_URL &&
-    env.ANALYTICS_WEBSITE_ID
-      ? {
-          src: env.ANALYTICS_SCRIPT_URL,
-          websiteId: env.ANALYTICS_WEBSITE_ID,
-        }
-      : null;
-
   return (
     <html
       lang={locale}
@@ -125,13 +115,11 @@ export default async function RootLayout({
         >
           {JSON.stringify(structuredData)}
         </Script>
-        {analyticsScript && (
-          <Script
-            src={analyticsScript.src}
-            data-website-id={analyticsScript.websiteId}
-            strategy="lazyOnload"
-          />
-        )}
+        <Script
+          src="https://track.pixmiller.com/script.js"
+          data-website-id="9315890d-80ba-455a-b624-ab2ab48595f4"
+          strategy="lazyOnload"
+        />
       </body>
     </html>
   );

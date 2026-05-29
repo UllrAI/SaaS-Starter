@@ -54,6 +54,9 @@ describe("i18n routing helpers", () => {
 
     expect(withLocalePrefix("/about", "zh-Hans")).toBe("/zh-Hans/about");
     expect(withLocalePrefix("/about", "en")).toBe("/about");
+    expect(
+      withLocalePrefix("/about", "en", { includeSourceLocale: true }),
+    ).toBe("/en/about");
     expect(withLocalePrefix("/", "zh-Hans")).toBe("/zh-Hans");
   });
 

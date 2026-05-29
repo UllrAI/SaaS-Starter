@@ -208,9 +208,10 @@ export function extractLocaleFromPath(pathname: string): {
 export function withLocalePrefix(
   pathname: string,
   locale: SupportedLocale,
+  options: { includeSourceLocale?: boolean } = {},
 ): string {
   const normalized = normalizePathname(pathname);
-  if (locale === DEFAULT_LOCALE) {
+  if (locale === DEFAULT_LOCALE && !options.includeSourceLocale) {
     return normalized;
   }
 

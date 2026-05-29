@@ -60,7 +60,7 @@ pnpm set:admin
 ## 4. Important Paths
 
 - App routes: `src/app`
-- Public marketing pages: `src/app/(pages)`
+- Public marketing pages: `src/app/[locale]`
 - Auth routes: `src/app/(auth)`
 - Protected app: `src/app/dashboard`
 - API routes: `src/app/api`

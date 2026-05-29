@@ -146,7 +146,7 @@ SaaS-Starter-main/
 │   ├── app/              # Next.js App Router core directory
 │   │   ├── (auth)/       # Authentication-related pages (login, signup)
 │   │   ├── (dashboard)/  # Protected dashboard pages
-│   │   ├── (pages)/      # Public pages (home, about, blog, etc.)
+│   │   ├── [locale]/     # Localized public pages (home, about, blog, etc.)
 │   │   ├── api/          # API routes
 │   │   ├── layout.tsx    # Root layout
 │   │   └── not-found.tsx # Global 404 page
@@ -219,9 +219,9 @@ The project's configuration is highly centralized for easy maintenance and exten
 
 #### 2.2.4. Routing Architecture
 
-The project uses Next.js App Router and leverages Route Groups for logical page separation.
+The project uses Next.js App Router, localized public routes, and Route Groups for logical page separation.
 
-- `(pages)`: Contains all public pages like home, about, blog, pricing, etc. Uses `src/app/(pages)/layout.tsx` to provide unified header and footer.
+- `[locale]`: Contains all localized public pages like home, about, blog, pricing, etc. Uses `src/app/[locale]/layout.tsx` to provide unified header and footer.
 - `(auth)`: Contains authentication flow pages like login, signup. Uses `src/app/(auth)/layout.tsx` to provide a centered, clean layout.
 - `(dashboard)`: Contains all pages requiring user login. Its layout `src/app/dashboard/layout.tsx` implements route protection through `SessionGuard`.
 - `api/v1`: Contains versioned machine-facing auth endpoints for API verification, device approval, token exchange, and refresh.
@@ -272,7 +272,7 @@ The project uses Next.js App Router and leverages Route Groups for logical page 
    - Edit `database/schema.ts`.
    - Run `pnpm db:push` to sync changes.
 1. **Create New Pages**:
-   - Create new folders and `page.tsx` files in `app/(pages)` or `app/(dashboard)`.
+   - Create new folders and `page.tsx` files in `app/[locale]` or `app/(dashboard)`.
 1. **Create API Routes**:
    - Create new folders and `route.ts` files in the `app/api` directory.
 1. **Create Server Actions**:
@@ -436,8 +436,8 @@ sequenceDiagram
 - **Authoring Workflow**: Blog posts are edited directly in `content/blog/*.md`, while author data lives in `content/authors/*.json`.
 - **Content Reading**:
   - `content-collections.ts` defines the content schema and generated collections.
-  - `src/app/(pages)/blog/page.tsx`: Blog list page, reads all indexed articles.
-  - `src/app/(pages)/blog/[slug]/page.tsx`: Blog detail page, reads a single article and renders Markdown with `react-markdown`.
+  - `src/app/[locale]/blog/page.tsx`: Blog list page, reads all indexed articles.
+  - `src/app/[locale]/blog/[slug]/page.tsx`: Blog detail page, reads a single article and renders Markdown with `react-markdown`.
 
 ### 4.6. Admin Dashboard
 
@@ -453,7 +453,7 @@ Provides a powerful, extensible data management system.
 
 ### 5.1. Extension Point Identification
 
-- **Add New Pages**: Create new routes in `app/(pages)` or `app/(dashboard)`.
+- **Add New Pages**: Create new routes in `app/[locale]` or `app/(dashboard)`.
 - **Add New Admin Management Tables**:
   1. Define new table in `database/schema.ts`.
   1. Add corresponding query/mutation logic in `src/lib/actions/admin.ts`.

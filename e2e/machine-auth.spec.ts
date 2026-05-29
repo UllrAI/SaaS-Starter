@@ -7,7 +7,12 @@ test("creates an API key from developer access and uses it against the v1 auth e
   await loginAs(page, "user");
   await page.goto("/dashboard/developer");
 
-  await expect(page.getByText("API Keys", { exact: true })).toBeVisible();
+  await expect(
+    page
+      .locator('section#api-keys [data-slot="card-title"]')
+      .filter({ hasText: "API Keys" })
+      .first(),
+  ).toBeVisible();
   await page.getByRole("button", { name: "Create Key" }).click();
   await page.getByLabel("Name").fill("Playwright Key");
   await page.getByRole("button", { name: "Create" }).click();

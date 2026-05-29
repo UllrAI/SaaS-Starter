@@ -102,4 +102,5 @@ describe("RootLayout", () => {
     expect(lingoProvider?.props.initialLocale).toBe("zh-Hans");
     expect(lingoProvider?.props.initialTranslations).toEqual({ hello: "你好" });
   });
+
 });

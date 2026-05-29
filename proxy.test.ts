@@ -76,6 +76,22 @@ describe("proxy", () => {
     );
   });
 
+  it("does not let external locale headers bypass marketing canonicalization", async () => {
+    const request = new NextRequest("http://localhost/zh/contact", {
+      headers: {
+        "x-user-locale": "en",
+      },
+    });
+
+    const response = await proxy(request);
+
+    expect(response.status).toBeGreaterThanOrEqual(300);
+    expect(response.status).toBeLessThan(400);
+    expect(response.headers.get("location")).toBe(
+      "http://localhost/zh-Hans/contact",
+    );
+  });
+
   it("redirects /en-prefixed marketing paths to English canonical bare paths", async () => {
     const request = new NextRequest("http://localhost/en/blog");
 

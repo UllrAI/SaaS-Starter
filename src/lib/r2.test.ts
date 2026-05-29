@@ -63,6 +63,7 @@ jest.mock("./config/upload", () => ({
   isFileTypeAllowed: mockIsFileTypeAllowed,
   isFileSizeAllowed: mockIsFileSizeAllowed,
   getFileExtension: mockGetFileExtension,
+  normalizeContentType: jest.fn((contentType: string) => contentType),
 }));
 
 // Mock crypto
@@ -247,7 +248,10 @@ describe("R2 Storage Functions", () => {
     it("should reject unsupported protocols", async () => {
       const { uploadFromUrl } = await import("./r2");
 
-      const result = await uploadFromUrl("ftp://example.com/file.jpg", "test-key");
+      const result = await uploadFromUrl(
+        "ftp://example.com/file.jpg",
+        "test-key",
+      );
 
       expect(result.success).toBe(false);
       expect(result.error).toBe("Unsupported URL protocol");
@@ -423,7 +427,10 @@ describe("R2 Storage Functions", () => {
     it("should return true when the object exists", async () => {
       const { fileExists } = await import("./r2");
 
-      mockSend.mockResolvedValueOnce({});
+      mockSend.mockResolvedValueOnce({
+        ContentLength: 1024,
+        ContentType: "image/jpeg",
+      });
 
       await expect(fileExists("test-key")).resolves.toBe(true);
     });
@@ -449,11 +456,37 @@ describe("R2 Storage Functions", () => {
 
       await expect(fileExists("test-key")).resolves.toBe(false);
       expect(consoleSpy).toHaveBeenCalledWith(
-        "Error checking file existence:",
+        "Error reading object metadata:",
         expect.any(Error),
       );
 
       consoleSpy.mockRestore();
+    });
+  });
+
+  describe("getObjectMetadata", () => {
+    it("should return object metadata from HeadObject", async () => {
+      const { getObjectMetadata } = await import("./r2");
+
+      mockSend.mockResolvedValueOnce({
+        ContentLength: 2048,
+        ContentType: "image/png",
+      });
+
+      await expect(getObjectMetadata("test-key")).resolves.toEqual({
+        contentLength: 2048,
+        contentType: "image/png",
+      });
+    });
+
+    it("should return null when object metadata is incomplete", async () => {
+      const { getObjectMetadata } = await import("./r2");
+
+      mockSend.mockResolvedValueOnce({
+        ContentType: "image/png",
+      });
+
+      await expect(getObjectMetadata("test-key")).resolves.toBeNull();
     });
   });
 

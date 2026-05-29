@@ -63,9 +63,19 @@ describe("Upload Configuration", () => {
       expect(isFileTypeAllowed("")).toBe(false);
     });
 
-    it("should be case sensitive", () => {
-      expect(isFileTypeAllowed("image/JPEG")).toBe(false);
-      expect(isFileTypeAllowed("IMAGE/JPEG")).toBe(false);
+    it("should reject active content types by default", () => {
+      expect(isFileTypeAllowed("image/svg+xml")).toBe(false);
+      expect(isFileTypeAllowed("text/html")).toBe(false);
+      expect(isFileTypeAllowed("text/javascript")).toBe(false);
+      expect(isFileTypeAllowed("application/javascript")).toBe(false);
+      expect(isFileTypeAllowed("application/xml")).toBe(false);
+      expect(isFileTypeAllowed("text/css")).toBe(false);
+    });
+
+    it("should normalize MIME type casing and parameters", () => {
+      expect(isFileTypeAllowed("image/JPEG")).toBe(true);
+      expect(isFileTypeAllowed("IMAGE/JPEG")).toBe(true);
+      expect(isFileTypeAllowed("image/jpeg; charset=binary")).toBe(true);
     });
   });
 
@@ -83,9 +93,10 @@ describe("Upload Configuration", () => {
       expect(isFileSizeAllowed(1024 * 1024 * 1024)).toBe(false); // 1GB
     });
 
-    it("should handle edge cases", () => {
-      expect(isFileSizeAllowed(0)).toBe(true);
-      expect(isFileSizeAllowed(-1)).toBe(true); // Function doesn't validate negative, just checks <= MAX
+    it("should reject non-positive and invalid sizes", () => {
+      expect(isFileSizeAllowed(0)).toBe(false);
+      expect(isFileSizeAllowed(-1)).toBe(false);
+      expect(isFileSizeAllowed(Number.NaN)).toBe(false);
     });
   });
 
@@ -392,8 +403,8 @@ describe("Upload Configuration", () => {
     it("should handle null and undefined inputs gracefully", () => {
       expect(isFileTypeAllowed(null as unknown as string)).toBe(false);
       expect(isFileTypeAllowed(undefined as unknown as string)).toBe(false);
-      expect(isFileSizeAllowed(null as unknown as number)).toBe(true); // null <= MAX_FILE_SIZE is true
-      expect(isFileSizeAllowed(undefined as unknown as number)).toBe(false); // undefined <= MAX_FILE_SIZE is false
+      expect(isFileSizeAllowed(null as unknown as number)).toBe(false);
+      expect(isFileSizeAllowed(undefined as unknown as number)).toBe(false);
     });
 
     it("should handle very small files", () => {

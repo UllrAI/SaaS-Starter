@@ -30,9 +30,14 @@ jest.mock("@/lib/auth/server", () => ({
   },
 }));
 
-const mockFileExists = jest.fn() as any;
+const mockGetObjectMetadata = jest.fn() as any;
 jest.mock("@/lib/r2", () => ({
-  fileExists: mockFileExists,
+  getObjectMetadata: mockGetObjectMetadata,
+}));
+
+const mockCheckUploadRateLimit = jest.fn() as any;
+jest.mock("@/lib/upload-rate-limit", () => ({
+  checkUploadRateLimit: mockCheckUploadRateLimit,
 }));
 
 const mockSelectLimit = jest.fn().mockResolvedValue([]) as any;
@@ -82,6 +87,7 @@ jest.mock("@/lib/config/upload", () => ({
     MAX_FILE_SIZE: 10485760,
   },
   formatFileSize: mockFormatFileSize,
+  normalizeContentType: jest.fn((contentType: string) => contentType),
   uploadCompleteRequestSchema: mockUploadCompleteRequestSchema,
 }));
 
@@ -100,6 +106,13 @@ describe("Upload Complete API", () => {
     });
     mockDb.insert.mockReturnValue({
       values: mockInsertValues,
+    });
+    mockCheckUploadRateLimit.mockReturnValue({
+      allowed: true,
+      limit: 30,
+      remaining: 29,
+      resetAt: Date.now() + 60_000,
+      retryAfter: 0,
     });
   });
 
@@ -189,7 +202,7 @@ describe("Upload Complete API", () => {
     });
     mockIsFileTypeAllowed.mockReturnValue(true);
     mockIsFileSizeAllowed.mockReturnValue(true);
-    mockFileExists.mockResolvedValue(false);
+    mockGetObjectMetadata.mockResolvedValue(null);
 
     const { POST } = await import("./route");
     const response = await POST(createMockRequest(validRequestBody));
@@ -262,7 +275,10 @@ describe("Upload Complete API", () => {
     });
     mockIsFileTypeAllowed.mockReturnValue(true);
     mockIsFileSizeAllowed.mockReturnValue(true);
-    mockFileExists.mockResolvedValue(true);
+    mockGetObjectMetadata.mockResolvedValue({
+      contentLength: validRequestBody.size,
+      contentType: validRequestBody.contentType,
+    });
     const existingUpload = {
       fileKey: validRequestBody.key,
       url: validRequestBody.url,
@@ -306,7 +322,10 @@ describe("Upload Complete API", () => {
     });
     mockIsFileTypeAllowed.mockReturnValue(true);
     mockIsFileSizeAllowed.mockReturnValue(true);
-    mockFileExists.mockResolvedValue(true);
+    mockGetObjectMetadata.mockResolvedValue({
+      contentLength: validRequestBody.size,
+      contentType: validRequestBody.contentType,
+    });
 
     const { POST } = await import("./route");
     const response = await POST(createMockRequest(validRequestBody));
@@ -331,5 +350,53 @@ describe("Upload Complete API", () => {
       size: validRequestBody.size,
       contentType: validRequestBody.contentType,
     });
+  });
+
+  it("should reject when actual object size differs from the declared size", async () => {
+    mockGetSession.mockResolvedValue(mockSession);
+    mockUploadCompleteRequestSchema.safeParse.mockReturnValue({
+      success: true,
+      data: validRequestBody,
+    });
+    mockIsFileTypeAllowed.mockReturnValue(true);
+    mockIsFileSizeAllowed.mockReturnValue(true);
+    mockGetObjectMetadata.mockResolvedValue({
+      contentLength: validRequestBody.size + 1,
+      contentType: validRequestBody.contentType,
+    });
+
+    const { POST } = await import("./route");
+    const response = await POST(createMockRequest(validRequestBody));
+    const data = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(data.error).toBe(
+      "Uploaded object size does not match the declared size.",
+    );
+    expect(mockDb.insert).not.toHaveBeenCalled();
+  });
+
+  it("should reject when actual object content type differs from the declared type", async () => {
+    mockGetSession.mockResolvedValue(mockSession);
+    mockUploadCompleteRequestSchema.safeParse.mockReturnValue({
+      success: true,
+      data: validRequestBody,
+    });
+    mockIsFileTypeAllowed.mockReturnValue(true);
+    mockIsFileSizeAllowed.mockReturnValue(true);
+    mockGetObjectMetadata.mockResolvedValue({
+      contentLength: validRequestBody.size,
+      contentType: "image/png",
+    });
+
+    const { POST } = await import("./route");
+    const response = await POST(createMockRequest(validRequestBody));
+    const data = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(data.error).toBe(
+      "Uploaded object content type does not match the declared content type.",
+    );
+    expect(mockDb.insert).not.toHaveBeenCalled();
   });
 });

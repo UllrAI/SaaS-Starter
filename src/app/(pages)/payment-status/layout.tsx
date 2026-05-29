@@ -1,28 +1,32 @@
-import { createMetadata } from "@/lib/metadata";
+import { APP_NAME, OGIMAGE, TWITTERACCOUNT } from "@/lib/config/constants";
+import env from "@/env";
+import type { Metadata } from "next";
 
-export async function generateMetadata() {
-  const metadata = createMetadata({
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    metadataBase: new URL(env.NEXT_PUBLIC_APP_URL),
     robots: {
       index: false,
       follow: false,
     },
-  });
-
-  return {
-    ...metadata,
     title: "Payment Status",
-    description: "Check your payment status and next steps for your subscription.",
+    description:
+      "Check your payment status and next steps for your subscription.",
     openGraph: {
-      ...metadata.openGraph,
       title: "Payment Status",
       description:
         "Check your payment status and next steps for your subscription.",
+      images: OGIMAGE,
+      siteName: APP_NAME,
+      type: "website",
     },
     twitter: {
-      ...metadata.twitter,
+      card: "summary_large_image",
+      creator: TWITTERACCOUNT,
       title: "Payment Status",
       description:
         "Check your payment status and next steps for your subscription.",
+      images: OGIMAGE,
     },
   };
 }

@@ -1,12 +1,17 @@
 import "@/styles/globals.css";
 import Script from "next/script";
 import { Inter, JetBrains_Mono } from "next/font/google";
-import { APP_NAME, COMPANY_NAME } from "@/lib/config/constants";
+import {
+  APP_NAME,
+  COMPANY_NAME,
+  OGIMAGE,
+  TWITTERACCOUNT,
+} from "@/lib/config/constants";
 import env from "@/env";
+import type { Metadata } from "next";
 
 import { LingoProvider } from "@lingo.dev/compiler/react/next";
 import { AppProviders } from "@/components/app-providers";
-import { createMetadata } from "@/lib/metadata";
 import { getRequestLocale } from "@/lib/i18n/server-locale";
 
 const fontSans = Inter({
@@ -21,12 +26,19 @@ const fontMono = JetBrains_Mono({
   display: "swap",
 });
 
-export async function generateMetadata() {
-  const metadata = createMetadata({
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    metadataBase: new URL(env.NEXT_PUBLIC_APP_URL),
     applicationName: APP_NAME,
     authors: [{ name: COMPANY_NAME, url: env.NEXT_PUBLIC_APP_URL }],
     creator: COMPANY_NAME,
     publisher: COMPANY_NAME,
+    title: {
+      template: `%s | ${APP_NAME}`,
+      default: APP_NAME,
+    },
+    description:
+      "Complete Micro UllrAI SaaS starter with authentication, payments, database, and deployment.",
     robots: {
       index: true,
       follow: true,
@@ -38,27 +50,21 @@ export async function generateMetadata() {
         "max-snippet": -1,
       },
     },
-  });
-
-  return {
-    ...metadata,
-    title: {
-      template: `%s | ${APP_NAME}`,
-      default: APP_NAME,
-    },
-    description:
-      "Complete Micro UllrAI SaaS starter with authentication, payments, database, and deployment.",
     openGraph: {
-      ...metadata.openGraph,
       title: APP_NAME,
       description:
         "Complete Micro UllrAI SaaS starter with authentication, payments, database, and deployment.",
+      images: OGIMAGE,
+      siteName: APP_NAME,
+      type: "website",
     },
     twitter: {
-      ...metadata.twitter,
+      card: "summary_large_image",
+      creator: TWITTERACCOUNT,
       title: APP_NAME,
       description:
         "Complete Micro UllrAI SaaS starter with authentication, payments, database, and deployment.",
+      images: OGIMAGE,
     },
   };
 }
@@ -91,6 +97,15 @@ export default async function RootLayout({
       },
     ],
   };
+  const analyticsScript =
+    env.ANALYTICS_ENABLED === "true" &&
+    env.ANALYTICS_SCRIPT_URL &&
+    env.ANALYTICS_WEBSITE_ID
+      ? {
+          src: env.ANALYTICS_SCRIPT_URL,
+          websiteId: env.ANALYTICS_WEBSITE_ID,
+        }
+      : null;
 
   return (
     <html
@@ -110,11 +125,13 @@ export default async function RootLayout({
         >
           {JSON.stringify(structuredData)}
         </Script>
-        <Script
-          src="https://track.pixmiller.com/script.js"
-          data-website-id="9315890d-80ba-455a-b624-ab2ab48595f4"
-          strategy="lazyOnload"
-        />
+        {analyticsScript && (
+          <Script
+            src={analyticsScript.src}
+            data-website-id={analyticsScript.websiteId}
+            strategy="lazyOnload"
+          />
+        )}
       </body>
     </html>
   );

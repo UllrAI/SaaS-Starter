@@ -15,6 +15,11 @@ test("allows an E2E user session to access the dashboard", async ({ page }) => {
   await page.goto("/dashboard");
 
   await expect(page).toHaveURL(/\/dashboard$/);
-  await expect(page.getByText("Account overview", { exact: true })).toBeVisible();
+  await expect(
+    page
+      .locator('[data-slot="card-title"]')
+      .filter({ hasText: "Account overview" })
+      .first(),
+  ).toBeVisible();
   await expect(page.getByText(user.email)).toBeVisible();
 });

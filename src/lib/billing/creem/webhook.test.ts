@@ -207,11 +207,12 @@ describe("Creem Webhook Handler", () => {
         object: { id: "checkout_123" },
       });
 
-      const { handleCreemWebhook } = await import("./webhook");
+      const { handleCreemWebhook, CreemWebhookSignatureError } =
+        await import("./webhook");
 
       await expect(
         handleCreemWebhook(payload, "invalid-signature"),
-      ).rejects.toThrow("Invalid signature.");
+      ).rejects.toThrow(CreemWebhookSignatureError);
     });
 
     it("should handle duplicate webhook events", async () => {
@@ -401,11 +402,12 @@ describe("Creem Webhook Handler", () => {
         object: { id: "checkout_123" },
       });
 
-      const { handleCreemWebhook } = await import("./webhook");
+      const { handleCreemWebhook, CreemWebhookSignatureError } =
+        await import("./webhook");
 
       await expect(
         handleCreemWebhook(payload, "invalid-signature"),
-      ).rejects.toThrow("Invalid signature.");
+      ).rejects.toThrow(CreemWebhookSignatureError);
     });
 
     // Note: Testing webhook secret configuration is complex due to module mocking
@@ -421,10 +423,11 @@ describe("Creem Webhook Handler", () => {
         object: { id: "checkout_123" },
       });
 
-      const { handleCreemWebhook } = await import("./webhook");
+      const { handleCreemWebhook, CreemWebhookSignatureError } =
+        await import("./webhook");
 
       await expect(handleCreemWebhook(payload, "signature")).rejects.toThrow(
-        "Invalid signature.",
+        CreemWebhookSignatureError,
       );
     });
 

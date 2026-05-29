@@ -113,11 +113,11 @@ describe("Billing Webhooks Creem API", () => {
     it("should handle signature verification errors with 400 status", async () => {
       const mockSignature = "invalid-signature";
       const mockPayload = '{"event": "test"}';
+      const signatureError = new Error("Invalid signature.");
+      signatureError.name = "CreemWebhookSignatureError";
 
       mockHeadersList.get.mockReturnValue(mockSignature);
-      mockHandleWebhook.mockRejectedValue(
-        new Error("Invalid signature provided"),
-      );
+      mockHandleWebhook.mockRejectedValue(signatureError);
 
       const { POST } = await import("./route");
       const request = createMockRequest(mockPayload);
@@ -126,7 +126,7 @@ describe("Billing Webhooks Creem API", () => {
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data.error).toBe("Invalid signature provided");
+      expect(data.error).toBe("Invalid signature.");
     });
 
     it("should handle other webhook errors with 500 status", async () => {
@@ -273,15 +273,14 @@ describe("Billing Webhooks Creem API", () => {
       );
     });
 
-    it("should detect signature errors case-insensitively", async () => {
-      const mockSignature = "invalid-signature";
+    it("should return 500 when a non-signature error mentions signature", async () => {
+      const mockSignature = "valid-signature";
       const mockPayload = '{"event": "test"}';
 
       mockHeadersList.get.mockReturnValue(mockSignature);
 
-      // Test uppercase SIGNATURE in error message
       mockHandleWebhook.mockRejectedValue(
-        new Error("Invalid SIGNATURE provided"),
+        new Error("Database failed while saving signature metadata"),
       );
 
       const { POST } = await import("./route");
@@ -289,7 +288,7 @@ describe("Billing Webhooks Creem API", () => {
 
       const response = await POST(request);
 
-      expect(response.status).toBe(400);
+      expect(response.status).toBe(500);
     });
 
     it("should return 500 for non-signature related errors", async () => {

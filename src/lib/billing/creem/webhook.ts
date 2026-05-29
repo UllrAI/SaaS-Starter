@@ -21,6 +21,13 @@ import { getProductTierByProductId } from "@/lib/config/products";
 
 // --- Helper functions and type guards (no changes here) ---
 
+export class CreemWebhookSignatureError extends Error {
+  constructor(message = "Invalid signature.") {
+    super(message);
+    this.name = "CreemWebhookSignatureError";
+  }
+}
+
 function getCustomerId(
   customerField: string | { id: string } | undefined,
 ): string {
@@ -78,7 +85,7 @@ export async function handleCreemWebhook(payload: string, signature: string) {
   const isValid = verifyCreemSignature(payload, signature, creemWebhookSecret);
   if (!isValid) {
     console.warn("Invalid webhook signature received.");
-    throw new Error("Invalid signature.");
+    throw new CreemWebhookSignatureError();
   }
 
   const event: CreemWebhookPayload = JSON.parse(payload);

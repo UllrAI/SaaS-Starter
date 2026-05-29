@@ -1,7 +1,4 @@
-import { and, eq, lt, sql } from "drizzle-orm";
 import type { NextRequest } from "next/server";
-import { db } from "@/database";
-import { rateLimitBuckets } from "@/database/schema";
 import type { RateLimitInfo } from "@/lib/machine-auth/types";
 
 export type RateLimitResult =
@@ -21,118 +18,62 @@ type CheckRateLimitParams = {
   windowMs: number;
 };
 
-function toResetAt(windowStartedAt: Date, windowMs: number): number {
-  return Math.ceil((windowStartedAt.getTime() + windowMs) / 1000);
+type RateLimitBucket = {
+  count: number;
+  resetAt: number;
+};
+
+const buckets = new Map<string, RateLimitBucket>();
+
+function getBucketKey(scope: string, key: string): string {
+  return `${scope}:${key}`;
 }
 
-export async function checkPersistentRateLimit({
+export function checkRateLimit({
   key,
   limit,
   scope,
   windowMs,
 }: CheckRateLimitParams): Promise<RateLimitResult> {
-  const now = new Date();
-  const expiredBefore = new Date(now.getTime() - windowMs);
+  const now = Date.now();
+  const bucketKey = getBucketKey(scope, key);
+  const existing = buckets.get(bucketKey);
 
-  const [resetRow] = await db
-    .update(rateLimitBuckets)
-    .set({
-      count: 1,
-      windowStartedAt: now,
-      updatedAt: now,
-    })
-    .where(
-      and(
-        eq(rateLimitBuckets.scope, scope),
-        eq(rateLimitBuckets.key, key),
-        lt(rateLimitBuckets.windowStartedAt, expiredBefore),
-      ),
-    )
-    .returning({ windowStartedAt: rateLimitBuckets.windowStartedAt });
+  if (!existing || existing.resetAt <= now) {
+    const resetAt = now + windowMs;
+    buckets.set(bucketKey, { count: 1, resetAt });
 
-  if (resetRow) {
-    return {
+    return Promise.resolve({
       allowed: true,
       info: {
         limit,
         remaining: Math.max(limit - 1, 0),
-        resetAt: toResetAt(resetRow.windowStartedAt, windowMs),
+        resetAt: Math.ceil(resetAt / 1000),
       },
-    };
-  }
-
-  const [insertRow] = await db
-    .insert(rateLimitBuckets)
-    .values({
-      scope,
-      key,
-      count: 1,
-      windowStartedAt: now,
-      updatedAt: now,
-    })
-    .onConflictDoNothing({
-      target: [rateLimitBuckets.scope, rateLimitBuckets.key],
-    })
-    .returning({ windowStartedAt: rateLimitBuckets.windowStartedAt });
-
-  if (insertRow) {
-    return {
-      allowed: true,
-      info: {
-        limit,
-        remaining: Math.max(limit - 1, 0),
-        resetAt: toResetAt(insertRow.windowStartedAt, windowMs),
-      },
-    };
-  }
-
-  const [incrementRow] = await db
-    .update(rateLimitBuckets)
-    .set({
-      count: sql`${rateLimitBuckets.count} + 1`,
-      updatedAt: now,
-    })
-    .where(
-      and(
-        eq(rateLimitBuckets.scope, scope),
-        eq(rateLimitBuckets.key, key),
-        lt(rateLimitBuckets.count, limit),
-      ),
-    )
-    .returning({
-      count: rateLimitBuckets.count,
-      windowStartedAt: rateLimitBuckets.windowStartedAt,
     });
-
-  if (incrementRow) {
-    return {
-      allowed: true,
-      info: {
-        limit,
-        remaining: Math.max(limit - incrementRow.count, 0),
-        resetAt: toResetAt(incrementRow.windowStartedAt, windowMs),
-      },
-    };
   }
 
-  const row = await db.query.rateLimitBuckets.findFirst({
-    where: and(
-      eq(rateLimitBuckets.scope, scope),
-      eq(rateLimitBuckets.key, key),
-    ),
-    columns: {
-      windowStartedAt: true,
-    },
-  });
+  if (existing.count >= limit) {
+    return Promise.resolve({
+      allowed: false,
+      info: {
+        limit,
+        remaining: 0,
+        resetAt: Math.ceil(existing.resetAt / 1000),
+      },
+    });
+  }
 
-  return {
-    allowed: false,
+  existing.count += 1;
+
+  return Promise.resolve({
+    allowed: true,
     info: {
       limit,
-      remaining: 0,
-      resetAt: toResetAt(row?.windowStartedAt ?? now, windowMs),
+      remaining: Math.max(limit - existing.count, 0),
+      resetAt: Math.ceil(existing.resetAt / 1000),
     },
-  };
+  });
 }
 
 export function getClientRateLimitKey(request: NextRequest): string {
@@ -145,4 +86,8 @@ export function getClientRateLimitKey(request: NextRequest): string {
     request.headers.get("user-agent")?.trim() || "unknown-agent";
 
   return `${clientIp}:${userAgent}`;
+}
+
+export function clearRateLimitForTests(): void {
+  buckets.clear();
 }

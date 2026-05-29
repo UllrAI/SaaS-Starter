@@ -1,8 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import {
-  checkPersistentRateLimit,
-  getClientRateLimitKey,
-} from "@/lib/rate-limit";
+import { checkRateLimit, getClientRateLimitKey } from "@/lib/rate-limit";
 
 type ResolvedPaymentStatus = "success" | "failed" | "pending" | "cancelled";
 
@@ -87,7 +84,7 @@ function getCheckoutReference(searchParams: URLSearchParams): string | null {
 
 export async function GET(request: NextRequest) {
   try {
-    const rateLimit = await checkPersistentRateLimit({
+    const rateLimit = await checkRateLimit({
       scope: "payment_status",
       key: getClientRateLimitKey(request),
       limit: PAYMENT_STATUS_RATE_LIMIT_MAX_REQUESTS,

@@ -6,7 +6,6 @@ import {
   boolean,
   uuid,
   index,
-  uniqueIndex,
   pgEnum,
 } from "drizzle-orm/pg-core";
 
@@ -260,29 +259,6 @@ export const uploads = pgTable(
     return {
       userIdx: index("uploads_userId_idx").on(table.userId),
       fileKeyIdx: index("uploads_fileKey_idx").on(table.fileKey),
-    };
-  },
-);
-
-export const rateLimitBuckets = pgTable(
-  "rate_limit_buckets",
-  {
-    id: uuid("id").primaryKey().defaultRandom(),
-    scope: text("scope").notNull(),
-    key: text("key").notNull(),
-    count: integer("count").notNull().default(0),
-    windowStartedAt: timestamp("windowStartedAt").notNull(),
-    updatedAt: timestamp("updatedAt").notNull().defaultNow(),
-  },
-  (table) => {
-    return {
-      scopeKeyIdx: uniqueIndex("rate_limit_buckets_scope_key_idx").on(
-        table.scope,
-        table.key,
-      ),
-      windowStartedAtIdx: index("rate_limit_buckets_windowStartedAt_idx").on(
-        table.windowStartedAt,
-      ),
     };
   },
 );

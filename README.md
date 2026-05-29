@@ -121,7 +121,7 @@ Then edit the `.env` file and fill in all required values.
 
 #### Analytics Script
 
-Analytics are disabled by default. To enable a script-based analytics provider, set `ANALYTICS_ENABLED=true`, `ANALYTICS_SCRIPT_URL`, and `ANALYTICS_WEBSITE_ID` in `.env`. Do not commit a production website ID into the starter.
+The root layout includes UllrAI's self-hosted analytics script. It is intentionally not exposed as a reusable `.env` setting because the bundled website ID only works with UllrAI's own analytics service. If you fork this starter or use it as a template, replace that script in `src/app/layout.tsx` with your own analytics provider, or remove it entirely.
 
 ### 4. Database Setup
 

@@ -1,5 +1,9 @@
 import { UPLOAD_CONFIG } from "@/lib/config/upload";
-import { checkPersistentRateLimit } from "@/lib/rate-limit";
+
+interface UploadRateLimitBucket {
+  count: number;
+  resetAt: number;
+}
 
 interface UploadRateLimitResult {
   allowed: boolean;
@@ -9,22 +13,48 @@ interface UploadRateLimitResult {
   retryAfter: number;
 }
 
-export async function checkUploadRateLimit(
-  userId: string,
-): Promise<UploadRateLimitResult> {
-  const result = await checkPersistentRateLimit({
-    scope: "upload",
-    key: userId,
-    limit: UPLOAD_CONFIG.USER_UPLOAD_RATE_LIMIT_MAX_REQUESTS,
-    windowMs: UPLOAD_CONFIG.USER_UPLOAD_RATE_LIMIT_WINDOW_MS,
-  });
-  const now = Math.ceil(Date.now() / 1000);
+const buckets = new Map<string, UploadRateLimitBucket>();
+
+export function checkUploadRateLimit(userId: string): UploadRateLimitResult {
+  const now = Date.now();
+  const windowMs = UPLOAD_CONFIG.USER_UPLOAD_RATE_LIMIT_WINDOW_MS;
+  const limit = UPLOAD_CONFIG.USER_UPLOAD_RATE_LIMIT_MAX_REQUESTS;
+  const existing = buckets.get(userId);
+
+  if (!existing || existing.resetAt <= now) {
+    const resetAt = now + windowMs;
+    buckets.set(userId, { count: 1, resetAt });
+
+    return {
+      allowed: true,
+      limit,
+      remaining: limit - 1,
+      resetAt,
+      retryAfter: 0,
+    };
+  }
+
+  if (existing.count >= limit) {
+    return {
+      allowed: false,
+      limit,
+      remaining: 0,
+      resetAt: existing.resetAt,
+      retryAfter: Math.ceil((existing.resetAt - now) / 1000),
+    };
+  }
+
+  existing.count += 1;
 
   return {
-    allowed: result.allowed,
-    limit: result.info.limit,
-    remaining: result.info.remaining,
-    resetAt: result.info.resetAt * 1000,
-    retryAfter: result.allowed ? 0 : Math.max(result.info.resetAt - now, 1),
+    allowed: true,
+    limit,
+    remaining: limit - existing.count,
+    resetAt: existing.resetAt,
+    retryAfter: 0,
   };
+}
+
+export function clearUploadRateLimitForTests(): void {
+  buckets.clear();
 }

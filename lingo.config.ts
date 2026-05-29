@@ -1,7 +1,6 @@
 import { SOURCE_LOCALE, TARGET_LOCALES } from "./src/lib/config/i18n";
 
-export const LINGO_DEFAULT_MODEL = "openrouter:google/gemini-3-flash-preview";
-// export const LINGO_DEFAULT_MODEL = "openrouter:stepfun/step-3.5-flash";
+export const LINGO_DEFAULT_MODEL = "openrouter:deepseek/deepseek-v4-flash";
 
 export const LINGO_MODEL_MAP: Record<string, string> = {
   "*:*": LINGO_DEFAULT_MODEL,

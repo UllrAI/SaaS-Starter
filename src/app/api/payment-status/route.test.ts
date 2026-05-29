@@ -3,7 +3,7 @@ import type { SpyInstance } from "@/../jest.setup";
 type CheckoutFunction = (checkoutId: string) => Promise<{ status?: string }>;
 
 const mockRetrieveCheckout = jest.fn() as jest.MockedFunction<CheckoutFunction>;
-const mockCheckPersistentRateLimit = jest.fn();
+const mockCheckRateLimit = jest.fn();
 const mockGetClientRateLimitKey = jest.fn();
 
 beforeAll(() => {
@@ -19,7 +19,7 @@ beforeAll(() => {
   }));
 
   jest.doMock("@/lib/rate-limit", () => ({
-    checkPersistentRateLimit: mockCheckPersistentRateLimit,
+    checkRateLimit: mockCheckRateLimit,
     getClientRateLimitKey: mockGetClientRateLimitKey,
   }));
 });
@@ -49,7 +49,7 @@ describe("Payment Status API", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockGetClientRateLimitKey.mockReturnValue("127.0.0.1:test");
-    mockCheckPersistentRateLimit.mockResolvedValue({
+    mockCheckRateLimit.mockResolvedValue({
       allowed: true,
       info: {
         limit: 30,
@@ -77,7 +77,7 @@ describe("Payment Status API", () => {
   });
 
   it("rate limits payment status checks", async () => {
-    mockCheckPersistentRateLimit.mockResolvedValue({
+    mockCheckRateLimit.mockResolvedValue({
       allowed: false,
       info: {
         limit: 30,

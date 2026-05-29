@@ -14,7 +14,6 @@ import {
   apiKeys,
   deviceCodes,
   cliTokens,
-  rateLimitBuckets,
 } from "./schema";
 import { Table } from "drizzle-orm/table";
 
@@ -68,7 +67,6 @@ describe("Database Schema", () => {
       expect(apiKeys).toBeDefined();
       expect(deviceCodes).toBeDefined();
       expect(cliTokens).toBeDefined();
-      expect(rateLimitBuckets).toBeDefined();
     });
 
     it("should have table objects with proper structure", () => {
@@ -84,7 +82,6 @@ describe("Database Schema", () => {
         apiKeys,
         deviceCodes,
         cliTokens,
-        rateLimitBuckets,
       ];
 
       tables.forEach((table) => {

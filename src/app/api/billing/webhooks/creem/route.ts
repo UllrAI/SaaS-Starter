@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { headers } from "next/headers";
 import { billing } from "@/lib/billing";
 
+function isCreemSignatureError(error: unknown) {
+  return error instanceof Error && error.name === "CreemWebhookSignatureError";
+}
+
 export async function POST(request: NextRequest) {
   try {
     const payload = await request.text();
@@ -26,11 +30,7 @@ export async function POST(request: NextRequest) {
       error instanceof Error ? error.message : "Webhook processing failed";
     console.error(`[Creem Webhook Error]: ${message}`);
 
-    const status =
-      error instanceof Error &&
-      error.message.toLowerCase().includes("signature")
-        ? 400
-        : 500;
+    const status = isCreemSignatureError(error) ? 400 : 500;
 
     return NextResponse.json({ error: message }, { status });
   }

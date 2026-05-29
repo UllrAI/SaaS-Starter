@@ -542,12 +542,9 @@ describe("Creem Provider Implementation", () => {
         new Error("Webhook processing failed"),
       );
 
-      const result = await creemProvider.handleWebhook("payload", "signature");
-
-      expect(result).toEqual({
-        received: false,
-        message: "Webhook processing failed",
-      });
+      await expect(
+        creemProvider.handleWebhook("payload", "signature"),
+      ).rejects.toThrow("Webhook processing failed");
     });
 
     it("should handle webhook with no secret configured", async () => {
@@ -563,15 +560,9 @@ describe("Creem Provider Implementation", () => {
       jest.resetModules();
       const { default: providerWithoutSecret } = await import("./provider");
 
-      const result = await providerWithoutSecret.handleWebhook(
-        "payload",
-        "signature",
-      );
-
-      expect(result).toEqual({
-        received: false,
-        message: "Webhook secret not configured.",
-      });
+      await expect(
+        providerWithoutSecret.handleWebhook("payload", "signature"),
+      ).rejects.toThrow("Webhook secret not configured.");
     });
 
     it("should handle unknown webhook errors", async () => {
@@ -588,15 +579,9 @@ describe("Creem Provider Implementation", () => {
 
       mockHandleCreemWebhook.mockRejectedValue("String error");
 
-      const result = await providerWithSecret.handleWebhook(
-        "payload",
-        "signature",
-      );
-
-      expect(result).toEqual({
-        received: false,
-        message: "Webhook handling failed",
-      });
+      await expect(
+        providerWithSecret.handleWebhook("payload", "signature"),
+      ).rejects.toThrow("Webhook handling failed");
     });
   });
 });

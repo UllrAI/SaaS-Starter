@@ -48,9 +48,9 @@ Your goal is to perform state-of-the-art localization for software products and 
 `.trim();
 
 function resolveLingoBuildMode(): "cache-only" | "translate" {
-  return process.env.LINGO_BUILD_MODE === "cache-only"
-    ? "cache-only"
-    : "translate";
+  return process.env.LINGO_BUILD_MODE === "translate"
+    ? "translate"
+    : "cache-only";
 }
 
 function shouldUseLingoPseudotranslator(): boolean {

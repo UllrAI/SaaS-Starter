@@ -85,7 +85,7 @@ describe("next.config.ts", () => {
     expect(nextConfig).not.toHaveProperty("analyzed");
   });
 
-  it("uses translate mode by default", async () => {
+  it("uses cache-only mode by default", async () => {
     delete process.env.LINGO_BUILD_MODE;
     jest.doMock("@/env", () => ({
       __esModule: true,
@@ -98,14 +98,14 @@ describe("next.config.ts", () => {
     await getConfig();
 
     expect(getLingoOptions()).toMatchObject({
-      buildMode: "translate",
+      buildMode: "cache-only",
       dev: {
         usePseudotranslator: true,
       },
     });
   });
 
-  it("uses cache-only mode when LINGO_BUILD_MODE requests it", async () => {
+  it("keeps cache-only mode when LINGO_BUILD_MODE requests it", async () => {
     process.env.LINGO_BUILD_MODE = "cache-only";
     jest.doMock("@/env", () => ({
       __esModule: true,

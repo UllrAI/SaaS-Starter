@@ -55,11 +55,25 @@ function formatPrice(price: number, locale: string, currency = "USD") {
 }
 
 function PaymentModeLabel({ mode }: { mode: PaymentMode }) {
-  return mode === "subscription" ? <>Subscription</> : <>One-Time</>;
+  switch (mode) {
+    case "subscription":
+      return <>Subscription</>;
+    case "one_time":
+      return <>One-Time</>;
+    default:
+      return null;
+  }
 }
 
 function BillingCycleLabel({ cycle }: { cycle: BillingCycle }) {
-  return cycle === "monthly" ? <>Monthly</> : <>Yearly</>;
+  switch (cycle) {
+    case "monthly":
+      return <>Monthly</>;
+    case "yearly":
+      return <>Yearly</>;
+    default:
+      return null;
+  }
 }
 
 function TierBillingLabel({
@@ -99,6 +113,30 @@ function CheckoutMessage({ code }: { code: CheckoutMessageCode }) {
 
 function TierActionGetLabel({ tierName }: { tierName: string }) {
   return <>GET {tierName.toUpperCase()}</>;
+}
+
+function TierBadgeLabel({ badge }: { badge: "recommended" }) {
+  switch (badge) {
+    case "recommended":
+      return <>Recommended</>;
+    default:
+      return null;
+  }
+}
+
+function CheckoutButtonStatusLabel({
+  status,
+}: {
+  status: "processing" | "login_required";
+}) {
+  switch (status) {
+    case "processing":
+      return <>Processing</>;
+    case "login_required":
+      return <>Login to buy</>;
+    default:
+      return null;
+  }
 }
 
 function isCheckoutMessageCode(
@@ -444,8 +482,8 @@ export function PricingSection({ className }: { className?: string }) {
             >
               {tier.isPopular && (
                 <div className="absolute -top-3 left-1/2 z-10 -translate-x-1/2">
-                  <Badge className="bg-primary text-primary-foreground hover:bg-primary px-3 py-1 text-xs font-bold shadow-sm">
-                    <>RECOMMENDED</>
+                  <Badge className="bg-primary text-primary-foreground hover:bg-primary px-3 py-1 text-xs font-bold uppercase shadow-sm">
+                    <TierBadgeLabel badge="recommended" />
                   </Badge>
                 </div>
               )}
@@ -544,12 +582,16 @@ export function PricingSection({ className }: { className?: string }) {
                     {isLoading ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        <>PROCESSING</>
+                        <span className="uppercase">
+                          <CheckoutButtonStatusLabel status="processing" />
+                        </span>
                       </>
                     ) : !session?.user ? (
                       <>
                         <LogIn className="mr-2 h-4 w-4" />
-                        <>LOGIN TO BUY</>
+                        <span className="uppercase">
+                          <CheckoutButtonStatusLabel status="login_required" />
+                        </span>
                       </>
                     ) : (
                       <>

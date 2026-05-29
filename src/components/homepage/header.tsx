@@ -16,11 +16,27 @@ import { ShellContainer } from "@/components/layout/page-container";
 import { Menu, UserCircle } from "lucide-react";
 import { APP_NAME } from "@/lib/config/constants";
 import { useHydrated } from "@/hooks/use-hydrated";
+import {
+  extractLocaleFromPath,
+  isMarketingPath,
+  withLocalePrefix,
+} from "@/lib/config/i18n-routing";
 
 interface NavItem {
   id: string;
   href: string;
+  baseHref: string;
   title: React.ReactNode;
+}
+
+function getLocalizedMarketingHref(pathname: string, href: string): string {
+  const pathLocale = extractLocaleFromPath(pathname);
+
+  if (!pathLocale.locale || !isMarketingPath(href)) {
+    return href;
+  }
+
+  return withLocalePrefix(href, pathLocale.locale);
 }
 
 function AuthButtons({
@@ -164,12 +180,42 @@ export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
   const { data: session, isPending } = useSession();
+  const pathLocale = extractLocaleFromPath(pathname);
+  const activePathname = pathLocale.locale
+    ? pathLocale.strippedPathname
+    : pathname;
+  const homeHref = getLocalizedMarketingHref(pathname, "/");
   const navigationItems: NavItem[] = [
-    { id: "nav-features", href: "/features", title: <>Features</> },
-    { id: "nav-pricing", href: "/pricing", title: <>Pricing</> },
-    { id: "nav-about", href: "/about", title: <>About</> },
-    { id: "nav-blog", href: "/blog", title: <>Blog</> },
-    { id: "nav-contact", href: "/contact", title: <>Contact</> },
+    {
+      id: "nav-features",
+      href: getLocalizedMarketingHref(pathname, "/features"),
+      baseHref: "/features",
+      title: <>Features</>,
+    },
+    {
+      id: "nav-pricing",
+      href: getLocalizedMarketingHref(pathname, "/pricing"),
+      baseHref: "/pricing",
+      title: <>Pricing</>,
+    },
+    {
+      id: "nav-about",
+      href: getLocalizedMarketingHref(pathname, "/about"),
+      baseHref: "/about",
+      title: <>About</>,
+    },
+    {
+      id: "nav-blog",
+      href: getLocalizedMarketingHref(pathname, "/blog"),
+      baseHref: "/blog",
+      title: <>Blog</>,
+    },
+    {
+      id: "nav-contact",
+      href: getLocalizedMarketingHref(pathname, "/contact"),
+      baseHref: "/contact",
+      title: <>Contact</>,
+    },
   ];
 
   useEffect(() => {
@@ -183,10 +229,10 @@ export function Header() {
 
   const isActive = (href: string) => {
     if (href === "/") {
-      return pathname === href;
+      return activePathname === href;
     }
 
-    return pathname === href || pathname.startsWith(`${href}/`);
+    return activePathname === href || activePathname.startsWith(`${href}/`);
   };
 
   return (
@@ -199,7 +245,7 @@ export function Header() {
       >
         <ShellContainer>
           <div className="flex h-16 items-center justify-between">
-            <Link href="/" className="flex items-center gap-2">
+            <Link href={homeHref} className="flex items-center gap-2">
               <Logo className="text-primary h-6 w-6" variant="icon-only" />
               <span className="text-foreground text-xl font-bold">
                 {APP_NAME}
@@ -218,7 +264,7 @@ export function Header() {
                     href={item.href}
                     className={cn(
                       "text-muted-foreground transition-colors",
-                      isActive(item.href) && "text-foreground",
+                      isActive(item.baseHref) && "text-foreground",
                     )}
                   >
                     {item.title}

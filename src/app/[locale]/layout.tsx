@@ -1,14 +1,7 @@
-import {
-  getStaticMarketingLocaleParams,
-  resolveStaticMarketingParams,
-} from "@/lib/i18n/static-marketing-locale";
+import { resolveStaticMarketingParams } from "@/lib/i18n/static-marketing-locale";
+import PagesLayout from "@/app/(pages)/layout";
 
-export const dynamic = "force-static";
-export const dynamicParams = false;
-
-export function generateStaticParams() {
-  return getStaticMarketingLocaleParams();
-}
+export const dynamic = "force-dynamic";
 
 export default async function LocalizedMarketingLayout({
   children,
@@ -19,5 +12,5 @@ export default async function LocalizedMarketingLayout({
 }) {
   await resolveStaticMarketingParams(params);
 
-  return children;
+  return <PagesLayout>{children}</PagesLayout>;
 }

@@ -131,7 +131,15 @@ export default async function authMiddleware(request: NextRequest) {
       return response;
     }
 
-    const response = NextResponse.next();
+    const requestHeaders = createLocalizedRequestHeaders(
+      request,
+      pathLocale.locale,
+    );
+    const response = NextResponse.next({
+      request: {
+        headers: requestHeaders,
+      },
+    });
     setLocaleCookie(response, pathLocale.locale);
     return response;
   }

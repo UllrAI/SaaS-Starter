@@ -10,10 +10,10 @@ import {
 import env from "@/env";
 import type { Metadata } from "next";
 
-import { LingoProvider } from "@lingo.dev/compiler/react/next";
 import { AppProviders } from "@/components/app-providers";
-import { SOURCE_LOCALE } from "@/lib/config/i18n";
-import { normalizeLocaleCandidate } from "@/lib/config/i18n-routing";
+import { getRequestLocale } from "@/lib/i18n/server-locale";
+import { AppLingoProvider } from "@/lib/i18n/lingo-provider";
+import { loadLingoTranslations } from "@/lib/i18n/lingo-translations";
 
 const fontSans = Inter({
   subsets: ["latin"],
@@ -72,13 +72,11 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function RootLayout({
   children,
-  params,
 }: Readonly<{
   children: React.ReactNode;
-  params: Promise<{ locale?: string }>;
 }>) {
-  const { locale: localeParam } = await params;
-  const locale = normalizeLocaleCandidate(localeParam) ?? SOURCE_LOCALE;
+  const locale = await getRequestLocale();
+  const translations = await loadLingoTranslations(locale);
   const structuredData = {
     "@context": "https://schema.org",
     "@graph": [
@@ -109,9 +107,12 @@ export default async function RootLayout({
     >
       <head />
       <body>
-        <LingoProvider initialLocale={locale} devWidget={{ enabled: false }}>
+        <AppLingoProvider
+          initialLocale={locale}
+          initialTranslations={translations}
+        >
           <AppProviders>{children}</AppProviders>
-        </LingoProvider>
+        </AppLingoProvider>
         <Script
           id="website-structured-data"
           type="application/ld+json"

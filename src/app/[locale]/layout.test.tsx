@@ -1,45 +1,41 @@
 import { render, screen } from "@testing-library/react";
-import LocalizedMarketingLayout from "./layout";
-import { resolveStaticMarketingParams } from "@/lib/i18n/static-marketing-locale";
+import type React from "react";
+import MarketingLayout, { generateStaticParams } from "./layout";
 
-jest.mock("@/app/(pages)/layout", () => ({
-  __esModule: true,
-  default: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="pages-layout">
-      <header data-testid="homepage-header">Header</header>
-      <main>{children}</main>
-      <footer data-testid="homepage-footer">Footer</footer>
-    </div>
-  ),
+jest.mock("@/components/homepage/header", () => ({
+  Header: () => <header data-testid="homepage-header">Header</header>,
 }));
 
-jest.mock("@/lib/i18n/static-marketing-locale", () => ({
-  resolveStaticMarketingParams: jest.fn(() => Promise.resolve("zh-Hans")),
+jest.mock("@/components/homepage/footer", () => ({
+  Footer: () => <footer data-testid="homepage-footer">Footer</footer>,
 }));
 
-const mockResolveStaticMarketingParams =
-  resolveStaticMarketingParams as jest.MockedFunction<
-    typeof resolveStaticMarketingParams
-  >;
-
-describe("LocalizedMarketingLayout", () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
+describe("MarketingLayout", () => {
+  it("returns all locale params for the unified marketing route tree", () => {
+    expect(generateStaticParams()).toEqual([
+      { locale: "en" },
+      { locale: "zh-Hans" },
+    ]);
   });
 
-  it("validates the locale and reuses the marketing chrome", async () => {
-    const params = Promise.resolve({ locale: "zh-Hans" });
-    const layout = await LocalizedMarketingLayout({
-      children: <div data-testid="layout-child">Localized content</div>,
-      params,
+  it("renders the header, footer, and provided children", async () => {
+    const childContent = <div data-testid="layout-child">Child content</div>;
+    const ui = await MarketingLayout({
+      children: childContent,
+      params: Promise.resolve({ locale: "en" }),
     });
 
-    render(layout);
+    const { container } = render(ui);
 
-    expect(mockResolveStaticMarketingParams).toHaveBeenCalledWith(params);
-    expect(screen.getByTestId("pages-layout")).toBeInTheDocument();
     expect(screen.getByTestId("homepage-header")).toBeInTheDocument();
     expect(screen.getByTestId("homepage-footer")).toBeInTheDocument();
     expect(screen.getByTestId("layout-child")).toBeInTheDocument();
+
+    const root = container.firstElementChild as HTMLElement;
+    expect(root).toHaveClass("flex", "min-h-screen", "flex-col");
+
+    const main = screen.getByRole("main");
+    expect(main).toHaveClass("flex-1");
+    expect(main).toContainElement(screen.getByTestId("layout-child"));
   });
 });

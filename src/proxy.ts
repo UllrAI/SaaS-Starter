@@ -30,6 +30,22 @@ function createLocalizedRequestHeaders(
   return requestHeaders;
 }
 
+function createLocalizedRewrite(
+  request: NextRequest,
+  locale: string,
+  pathname: string,
+): NextResponse {
+  const rewriteUrl = new URL(request.url);
+  rewriteUrl.pathname = pathname;
+  const response = NextResponse.rewrite(rewriteUrl, {
+    request: {
+      headers: createLocalizedRequestHeaders(request, locale),
+    },
+  });
+  setLocaleCookie(response, locale);
+  return response;
+}
+
 export default async function authMiddleware(request: NextRequest) {
   const requestUrl = new URL(request.url);
   const { pathname, search } = requestUrl;
@@ -135,14 +151,11 @@ export default async function authMiddleware(request: NextRequest) {
     return response;
   }
 
-  const requestHeaders = createLocalizedRequestHeaders(request, SOURCE_LOCALE);
-  const response = NextResponse.next({
-    request: {
-      headers: requestHeaders,
-    },
-  });
-  setLocaleCookie(response, SOURCE_LOCALE);
-  return response;
+  return createLocalizedRewrite(
+    request,
+    SOURCE_LOCALE,
+    withLocalePrefix(pathname, SOURCE_LOCALE, { includeSourceLocale: true }),
+  );
 }
 
 export const config = {

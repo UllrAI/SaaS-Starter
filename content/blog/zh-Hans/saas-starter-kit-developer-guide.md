@@ -147,7 +147,7 @@ SaaS-Starter-main/
 │   ├── app/              # Next.js App Router 核心目录
 │   │   ├── (auth)/       # 认证相关页面 (登录、注册)
 │   │   ├── (dashboard)/  # 受保护的仪表盘页面
-│   │   ├── (pages)/      # 公开页面 (首页、关于、博客等)
+│   │   ├── [locale]/     # 本地化公开页面 (首页、关于、博客等)
 │   │   ├── api/          # API 路由
 │   │   ├── layout.tsx    # 根布局
 │   │   └── not-found.tsx # 全局 404 页面
@@ -220,9 +220,9 @@ SaaS-Starter-main/
 
 #### 2.2.4. 路由架构
 
-项目采用 Next.js App Router，并利用路由组 (Route Groups) 对页面进行逻辑隔离。
+项目采用 Next.js App Router、本地化公开路由，并利用路由组 (Route Groups) 对页面进行逻辑隔离。
 
-- `(pages)`: 存放所有对公众可见的页面，如首页、关于、博客、定价等。使用 `src/app/(pages)/layout.tsx` 提供统一的页头和页脚。
+- `[locale]`: 存放所有本地化公开页面，如首页、关于、博客、定价等。使用 `src/app/[locale]/layout.tsx` 提供统一的页头和页脚。
 - `(auth)`: 存放认证流程中的页面，如登录、注册。使用 `src/app/(auth)/layout.tsx` 提供一个居中、简洁的布局。
 - `(dashboard)`: 存放所有需要用户登录才能访问的页面。其布局 `src/app/dashboard/layout.tsx` 通过 `SessionGuard` 实现了路由保护。
 - `api/v1`: 存放面向机器客户端的版本化认证接口，包括 API 校验、设备批准、token 换取与刷新。
@@ -273,7 +273,7 @@ SaaS-Starter-main/
    - 编辑 `src/database/schema.ts`。
    - 运行 `pnpm db:push` 同步变更。
 1. **创建新页面**:
-   - 在 `src/app/(pages)` 或 `src/app/(dashboard)` 中创建新的文件夹和 `page.tsx` 文件。
+   - 在 `src/app/[locale]` 或 `src/app/(dashboard)` 中创建新的文件夹和 `page.tsx` 文件。
 1. **创建 API 路由**:
    - 在 `src/app/api` 目录下创建新的文件夹和 `route.ts` 文件。
 1. **创建 Server Action**:
@@ -437,8 +437,8 @@ sequenceDiagram
 - **编写方式**: 直接编辑 `content/blog/*.md` 博客文章，并在 `content/authors/*.json` 中维护作者信息。
 - **内容读取**:
   - `content-collections.ts` 定义内容 schema 和生成的集合。
-  - `src/app/(pages)/blog/page.tsx`: 博客列表页，读取所有索引后的文章。
-  - `src/app/(pages)/blog/[slug]/page.tsx`: 博客详情页，读取单篇文章，并使用 `react-markdown` 渲染 Markdown 内容。
+  - `src/app/[locale]/blog/page.tsx`: 博客列表页，读取所有索引后的文章。
+  - `src/app/[locale]/blog/[slug]/page.tsx`: 博客详情页，读取单篇文章，并使用 `react-markdown` 渲染 Markdown 内容。
 
 ### 4.6. 管理后台 (Admin Dashboard)
 
@@ -454,7 +454,7 @@ sequenceDiagram
 
 ### 5.1. 扩展点识别
 
-- **添加新页面**: 在 `src/app/(pages)` 或 `src/app/(dashboard)` 中创建新路由。
+- **添加新页面**: 在 `src/app/[locale]` 或 `src/app/(dashboard)` 中创建新路由。
 - **添加新后台管理表**:
   1. 在 `src/database/schema.ts` 中定义新表。
   1. 在 `src/lib/actions/admin.ts` 中添加对应查询/变更逻辑。

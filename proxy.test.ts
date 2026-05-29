@@ -102,7 +102,7 @@ describe("proxy", () => {
     expect(response.headers.get("location")).toBe("http://localhost/blog");
   });
 
-  it("keeps bare marketing path when preferred locale is unsupported", async () => {
+  it("rewrites bare marketing path to internal English route when preferred locale is unsupported", async () => {
     const request = new NextRequest("http://localhost/terms", {
       headers: {
         "accept-language": "fr-FR,fr;q=0.9",
@@ -111,7 +111,9 @@ describe("proxy", () => {
 
     const response = await proxy(request);
 
-    expect(response.headers.get("x-middleware-next")).toBe("1");
+    expect(response.headers.get("x-middleware-rewrite")).toBe(
+      "http://localhost/en/terms",
+    );
     expect(response.headers.get("location")).toBeNull();
   });
 

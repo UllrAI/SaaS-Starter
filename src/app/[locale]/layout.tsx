@@ -1,9 +1,19 @@
-import { resolveStaticMarketingParams } from "@/lib/i18n/static-marketing-locale";
-import PagesLayout from "@/app/(pages)/layout";
+import { Header } from "@/components/homepage/header";
+import { Footer } from "@/components/homepage/footer";
+import { Suspense } from "react";
+import {
+  getStaticMarketingLocaleParams,
+  resolveStaticMarketingParams,
+} from "@/lib/i18n/static-marketing-locale";
 
-export const dynamic = "force-dynamic";
+export const dynamic = "force-static";
+export const dynamicParams = false;
 
-export default async function LocalizedMarketingLayout({
+export function generateStaticParams() {
+  return getStaticMarketingLocaleParams();
+}
+
+export default async function MarketingLayout({
   children,
   params,
 }: {
@@ -12,5 +22,13 @@ export default async function LocalizedMarketingLayout({
 }) {
   await resolveStaticMarketingParams(params);
 
-  return <PagesLayout>{children}</PagesLayout>;
+  return (
+    <div className="flex min-h-screen flex-col">
+      <Suspense fallback={<div className="h-16 w-full" />}>
+        <Header />
+      </Suspense>
+      <main className="flex-1">{children}</main>
+      <Footer />
+    </div>
+  );
 }

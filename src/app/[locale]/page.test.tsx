@@ -64,7 +64,9 @@ describe("HomePage", () => {
   });
 
   it("builds localized metadata for the marketing homepage", async () => {
-    await expect(generateMetadata()).resolves.toMatchObject({
+    await expect(
+      generateMetadata({ params: Promise.resolve({ locale: "en" }) }),
+    ).resolves.toMatchObject({
       title: "Micro SaaS Starter",
       description:
         "Authentication, billing, agent-ready APIs, CLI device auth, uploads, admin tooling, and Playwright-backed smoke coverage for shipping a SaaS product faster.",

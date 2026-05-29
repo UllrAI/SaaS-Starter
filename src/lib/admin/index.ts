@@ -1,4 +1,4 @@
-// 统一导出 admin 相关能力
+// Re-export admin capabilities from one module.
 export {
   getAdminStats,
   type AdminStatsWithCharts,

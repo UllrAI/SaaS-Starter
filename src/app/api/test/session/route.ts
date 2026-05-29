@@ -86,6 +86,10 @@ export async function POST(request: NextRequest) {
   }
 
   const persistedUser = await upsertUser(parsedUser.data);
+  const cookieValue = await createE2ESessionCookieValue(persistedUser);
+  if (!cookieValue) {
+    return notFoundResponse();
+  }
 
   const response = NextResponse.json({
     ok: true,
@@ -93,7 +97,7 @@ export async function POST(request: NextRequest) {
   });
   response.cookies.set({
     name: E2E_AUTH_COOKIE_NAME,
-    value: createE2ESessionCookieValue(persistedUser),
+    value: cookieValue,
     httpOnly: true,
     sameSite: "lax",
     path: "/",

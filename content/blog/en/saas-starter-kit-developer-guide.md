@@ -499,7 +499,7 @@ Provides a powerful, extensible data management system.
 - **Run Tests**:
   - `pnpm test`
   - `pnpm test:e2e`
-- **Test-only session route**: Playwright enables `/api/test/session` only when `E2E_TEST_MODE=true` and the correct `E2E_TEST_SECRET` is present.
+- **Test-only session route**: Playwright enables `/api/test/session` only when `E2E_TEST_MODE=true` and an explicit `E2E_TEST_SECRET` of at least 32 characters is present. The route is disabled for non-local production deployments and signs the test cookie with that secret.
 
 ### 6.2. Code Quality Assurance
 

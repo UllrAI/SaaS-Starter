@@ -266,7 +266,7 @@ Run the suite with:
 pnpm test:e2e
 ```
 
-The Playwright runner starts the production server through `pnpm start` and enables a test-only session route with `E2E_TEST_MODE=true`. That route is guarded by `E2E_TEST_SECRET` and should only be enabled from the Playwright runner or CI.
+The Playwright runner starts the production server through `pnpm start` and enables a test-only session route with `E2E_TEST_MODE=true`. That route requires an explicit `E2E_TEST_SECRET` of at least 32 characters, signs the test cookie with that secret, and is disabled for non-local production deployments. Playwright generates a per-run secret when one is not provided by CI.
 
 #### Bundle Analysis Scripts
 

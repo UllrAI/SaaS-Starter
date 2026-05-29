@@ -9,7 +9,14 @@ interface TestUser {
   role: TestRole;
 }
 
-const E2E_TEST_SECRET = process.env.E2E_TEST_SECRET || "local-e2e-secret";
+function getE2ETestSecret(): string {
+  const secret = process.env.E2E_TEST_SECRET;
+  if (!secret) {
+    throw new Error("E2E_TEST_SECRET must be configured for Playwright auth.");
+  }
+
+  return secret;
+}
 
 function getTestUser(role: TestRole): TestUser {
   return {
@@ -45,7 +52,7 @@ export async function loginAs(page: Page, role: TestRole): Promise<TestUser> {
       };
     },
     {
-      secret: E2E_TEST_SECRET,
+      secret: getE2ETestSecret(),
       userPayload: user,
     },
   );

@@ -55,7 +55,10 @@ function extractTextContent(node: ReactNode): string {
   return "";
 }
 
-function getCookieValue(cookieHeader: string | null, name: string): string | null {
+function getCookieValue(
+  cookieHeader: string | null,
+  name: string,
+): string | null {
   if (!cookieHeader) {
     return null;
   }

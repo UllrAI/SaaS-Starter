@@ -154,9 +154,7 @@ describe("AuthForm", () => {
     });
 
     it("preserves callback url when switching between login and signup", () => {
-      render(
-        <AuthForm mode="login" callbackURL="/dashboard/billing" />,
-      );
+      render(<AuthForm mode="login" callbackURL="/dashboard/billing" />);
 
       const signupLink = screen.getByText("Create an account");
       expect(signupLink.closest("a")).toHaveAttribute(
@@ -245,9 +243,7 @@ describe("AuthForm", () => {
     it("uses a custom callback url when provided", async () => {
       mockSignIn.magicLink = jest.fn().mockResolvedValue({ error: null });
 
-      render(
-        <AuthForm mode="login" callbackURL="/dashboard/billing" />,
-      );
+      render(<AuthForm mode="login" callbackURL="/dashboard/billing" />);
 
       fireEvent.change(screen.getByPlaceholderText("you@example.com"), {
         target: { value: "test@example.com" },

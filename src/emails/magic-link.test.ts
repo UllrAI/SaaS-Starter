@@ -1,6 +1,16 @@
-import { afterEach, beforeEach, describe, expect, it, jest } from "@jest/globals";
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  jest,
+} from "@jest/globals";
 
-import { LOCALE_COOKIE_NAME, LOCALE_HEADER_NAME } from "@/lib/config/i18n-routing";
+import {
+  LOCALE_COOKIE_NAME,
+  LOCALE_HEADER_NAME,
+} from "@/lib/config/i18n-routing";
 
 const mockSendEmail = jest.fn();
 const mockUserAgent = jest.fn();
@@ -26,11 +36,7 @@ describe("sendMagicLink", () => {
         locale: string;
       }) => ({
         html: `<html lang="${locale}">${copy.heading}</html>`,
-        text: [
-          copy.deviceDetailsTitle,
-          copy.deviceLine,
-          copy.locationLine,
-        ]
+        text: [copy.deviceDetailsTitle, copy.deviceLine, copy.locationLine]
           .filter(Boolean)
           .join("\n"),
       }),
@@ -127,7 +133,9 @@ describe("sendMagicLink", () => {
     expect(body.html).toContain('lang="zh-Hans"');
     expect(body.text).toContain("Sign-in request details");
     expect(body.text).toContain("Device: Safari on iOS");
-    expect(body.text).toContain("Location: San Francisco, CA, US (approximate)");
+    expect(body.text).toContain(
+      "Location: San Francisco, CA, US (approximate)",
+    );
   });
 
   it("falls back to Accept-Language when no explicit locale is present", async () => {

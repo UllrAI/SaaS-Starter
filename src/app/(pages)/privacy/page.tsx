@@ -6,9 +6,11 @@ import {
   PRIVACY_EMAIL,
 } from "@/lib/config/constants";
 import { Shield } from "lucide-react";
-import { createMetadata } from "@/lib/metadata";
-import { createLocalizedAlternates } from "@/lib/metadata";
-import { getRequestLocale } from "@/lib/i18n/server-locale";
+import {
+  createLocalizedAlternates,
+  createMetadataDefaults,
+} from "@/lib/metadata";
+import { SOURCE_LOCALE } from "@/lib/config/i18n";
 import { ReadingContainer } from "@/components/layout/page-container";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -18,9 +20,8 @@ import {
 } from "@/components/layout/page-intro";
 
 export async function generateMetadata() {
-  const locale = await getRequestLocale();
-  const metadata = createMetadata({
-    alternates: createLocalizedAlternates("/privacy", locale),
+  const metadata = createMetadataDefaults({
+    alternates: createLocalizedAlternates("/privacy", SOURCE_LOCALE),
   });
 
   return {

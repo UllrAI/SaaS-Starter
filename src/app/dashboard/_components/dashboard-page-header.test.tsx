@@ -84,7 +84,11 @@ jest.mock("@/components/mode-toggle", () => ({
 
 jest.mock("@/components/locale-switcher", () => ({
   LocaleSwitcher: ({ variant, size }: { variant?: string; size?: string }) => (
-    <button data-testid="locale-switcher" data-variant={variant} data-size={size}>
+    <button
+      data-testid="locale-switcher"
+      data-variant={variant}
+      data-size={size}
+    >
       Language
     </button>
   ),

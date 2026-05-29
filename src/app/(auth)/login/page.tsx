@@ -4,11 +4,11 @@ import {
   DEFAULT_CALLBACK_URL,
   normalizeCallbackUrl,
 } from "@/lib/auth/callback-url";
-import { createMetadata } from "@/lib/metadata";
+import { createMetadataDefaults } from "@/lib/metadata";
 import { resolveAuthFeedback } from "@/lib/auth/feedback";
 
 export async function generateMetadata() {
-  const metadata = createMetadata({});
+  const metadata = createMetadataDefaults();
 
   return {
     ...metadata,
@@ -38,8 +38,9 @@ interface LoginPageProps {
 
 export default async function LoginPage({ searchParams }: LoginPageProps) {
   const availableProviders = getAvailableSocialProviders();
-  const resolvedSearchParams: Awaited<NonNullable<LoginPageProps["searchParams"]>> =
-    searchParams ? await searchParams : {};
+  const resolvedSearchParams: Awaited<
+    NonNullable<LoginPageProps["searchParams"]>
+  > = searchParams ? await searchParams : {};
   const rawCallbackUrl = resolvedSearchParams.callbackUrl;
   const callbackUrl = normalizeCallbackUrl(
     Array.isArray(rawCallbackUrl) ? rawCallbackUrl[0] : rawCallbackUrl,

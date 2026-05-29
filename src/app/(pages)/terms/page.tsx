@@ -13,13 +13,15 @@ import {
   PageIntroDescription,
   PageIntroHeading,
 } from "@/components/layout/page-intro";
-import { createLocalizedAlternates, createMetadata } from "@/lib/metadata";
-import { getRequestLocale } from "@/lib/i18n/server-locale";
+import {
+  createLocalizedAlternates,
+  createMetadataDefaults,
+} from "@/lib/metadata";
+import { SOURCE_LOCALE } from "@/lib/config/i18n";
 
 export async function generateMetadata() {
-  const locale = await getRequestLocale();
-  const metadata = createMetadata({
-    alternates: createLocalizedAlternates("/terms", locale),
+  const metadata = createMetadataDefaults({
+    alternates: createLocalizedAlternates("/terms", SOURCE_LOCALE),
   });
 
   return {

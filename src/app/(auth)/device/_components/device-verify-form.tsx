@@ -18,7 +18,10 @@ import { useSession } from "@/lib/auth/client";
 type ViewState = "idle" | "error" | "success";
 
 function normalizeDeviceCode(value: string): string {
-  const stripped = value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 8);
+  const stripped = value
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, "")
+    .slice(0, 8);
   if (stripped.length <= 4) {
     return stripped;
   }
@@ -154,7 +157,7 @@ export function DeviceVerifyForm({
       </CardHeader>
       <CardContent className="space-y-4">
         {viewState === "error" ? (
-          <div className="rounded-lg border border-destructive/20 bg-destructive/5 px-3 py-2 text-sm text-destructive">
+          <div className="border-destructive/20 bg-destructive/5 text-destructive rounded-lg border px-3 py-2 text-sm">
             {errorMessage}
           </div>
         ) : null}
@@ -163,7 +166,9 @@ export function DeviceVerifyForm({
           <Input
             id="device-code"
             value={normalizedCode}
-            onChange={(event) => setCode(normalizeDeviceCode(event.target.value))}
+            onChange={(event) =>
+              setCode(normalizeDeviceCode(event.target.value))
+            }
             placeholder="ABCD-EFGH"
             className="text-center font-mono text-lg tracking-[0.2em]"
             maxLength={9}

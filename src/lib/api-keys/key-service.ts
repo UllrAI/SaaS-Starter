@@ -125,4 +125,3 @@ export async function updateLastUsedAt(apiKeyId: string): Promise<void> {
     })
     .where(eq(apiKeys.id, apiKeyId));
 }
-

@@ -12,7 +12,8 @@ import type { Metadata } from "next";
 
 import { LingoProvider } from "@lingo.dev/compiler/react/next";
 import { AppProviders } from "@/components/app-providers";
-import { getRequestLocale } from "@/lib/i18n/server-locale";
+import { SOURCE_LOCALE } from "@/lib/config/i18n";
+import { normalizeLocaleCandidate } from "@/lib/config/i18n-routing";
 
 const fontSans = Inter({
   subsets: ["latin"],
@@ -71,10 +72,13 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function RootLayout({
   children,
+  params,
 }: Readonly<{
   children: React.ReactNode;
+  params: Promise<{ locale?: string }>;
 }>) {
-  const locale = await getRequestLocale();
+  const { locale: localeParam } = await params;
+  const locale = normalizeLocaleCandidate(localeParam) ?? SOURCE_LOCALE;
   const structuredData = {
     "@context": "https://schema.org",
     "@graph": [
@@ -97,6 +101,16 @@ export default async function RootLayout({
       },
     ],
   };
+  const analyticsScript =
+    env.ANALYTICS_ENABLED === "true" &&
+    env.ANALYTICS_SCRIPT_URL &&
+    env.ANALYTICS_WEBSITE_ID
+      ? {
+          src: env.ANALYTICS_SCRIPT_URL,
+          websiteId: env.ANALYTICS_WEBSITE_ID,
+        }
+      : null;
+
   return (
     <html
       lang={locale}
@@ -115,11 +129,13 @@ export default async function RootLayout({
         >
           {JSON.stringify(structuredData)}
         </Script>
-        <Script
-          src="https://track.pixmiller.com/script.js"
-          data-website-id="9315890d-80ba-455a-b624-ab2ab48595f4"
-          strategy="lazyOnload"
-        />
+        {analyticsScript && (
+          <Script
+            src={analyticsScript.src}
+            data-website-id={analyticsScript.websiteId}
+            strategy="lazyOnload"
+          />
+        )}
       </body>
     </html>
   );

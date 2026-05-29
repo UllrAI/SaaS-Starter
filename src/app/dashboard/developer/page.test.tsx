@@ -26,7 +26,7 @@ jest.mock("./_components/developer-access-sections", () => ({
 }));
 
 jest.mock("@/lib/metadata", () => ({
-  createMetadata: (config: unknown) => config,
+  createMetadataDefaults: () => ({}),
 }));
 
 import DeveloperAccessPage, { generateMetadata } from "./page";
@@ -52,8 +52,6 @@ describe("Dashboard Developer Access Page", () => {
         "Manage API keys, CLI sessions, and agent-friendly access from one place.",
       ),
     ).toBeInTheDocument();
-    expect(
-      screen.getByTestId("developer-access-sections"),
-    ).toBeInTheDocument();
+    expect(screen.getByTestId("developer-access-sections")).toBeInTheDocument();
   });
 });

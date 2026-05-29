@@ -2,7 +2,9 @@ import { eq } from "drizzle-orm";
 import { db } from "@/database";
 import { users } from "@/database/schema";
 
-export async function isMachineAuthUserActive(userId: string): Promise<boolean> {
+export async function isMachineAuthUserActive(
+  userId: string,
+): Promise<boolean> {
   const user = await db.query.users.findFirst({
     where: eq(users.id, userId),
     columns: {
@@ -13,4 +15,3 @@ export async function isMachineAuthUserActive(userId: string): Promise<boolean> 
 
   return Boolean(user && !user.banned);
 }
-

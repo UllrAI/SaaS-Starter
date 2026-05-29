@@ -16,7 +16,7 @@ jest.mock("./_components/appearance-page", () => ({
 }));
 
 jest.mock("@/lib/metadata", () => ({
-  createMetadata: (config: unknown) => config,
+  createMetadataDefaults: () => ({}),
 }));
 
 import SettingsPage, { generateMetadata } from "./page";

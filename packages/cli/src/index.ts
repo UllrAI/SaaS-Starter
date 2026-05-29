@@ -171,9 +171,7 @@ async function runStatus(options: { baseUrl?: string }) {
   }
 
   console.log(
-    token.startsWith(CLI_TOKEN_PREFIX)
-      ? "Auth: CLI token"
-      : "Auth: API key",
+    token.startsWith(CLI_TOKEN_PREFIX) ? "Auth: CLI token" : "Auth: API key",
   );
 
   const verifiedUser = await verifyAuth();
@@ -188,7 +186,9 @@ async function runRefresh(options: { baseUrl?: string }) {
   const config = loadConfig();
 
   if (!config.refreshToken) {
-    throw new Error("No refresh token found. Run `pnpm saas-cli -- auth login`.");
+    throw new Error(
+      "No refresh token found. Run `pnpm saas-cli -- auth login`.",
+    );
   }
 
   const payload = await request<{

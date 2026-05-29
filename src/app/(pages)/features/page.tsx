@@ -8,13 +8,15 @@ import {
   PageIntroHeading,
 } from "@/components/layout/page-intro";
 import { CheckCircle2, Package2, Wrench } from "lucide-react";
-import { createLocalizedAlternates, createMetadata } from "@/lib/metadata";
-import { getRequestLocale } from "@/lib/i18n/server-locale";
+import {
+  createLocalizedAlternates,
+  createMetadataDefaults,
+} from "@/lib/metadata";
+import { SOURCE_LOCALE } from "@/lib/config/i18n";
 
 export async function generateMetadata() {
-  const locale = await getRequestLocale();
-  const metadata = createMetadata({
-    alternates: createLocalizedAlternates("/features", locale),
+  const metadata = createMetadataDefaults({
+    alternates: createLocalizedAlternates("/features", SOURCE_LOCALE),
   });
 
   return {
@@ -41,12 +43,17 @@ export default function FeaturesPage() {
   const includedItems = [
     <>Next.js App Router structure with page/layout conventions</>,
     <>Better Auth login, signup, session, and permission guards</>,
-    <>API keys, CLI device login, and versioned `/api/v1/*` machine auth routes</>,
+    <>
+      API keys, CLI device login, and versioned `/api/v1/*` machine auth routes
+    </>,
     <>Creem checkout, portal, subscription records, and webhooks</>,
     <>Admin pages for users, payments, subscriptions, and uploads</>,
     <>Cloudflare R2 upload flows for browser and server uploads</>,
     <>Markdown blog content, typed collections, and marketing pages</>,
-    <>Playwright smoke coverage for auth, API key flows, CLI auth, admin, and locale routing</>,
+    <>
+      Playwright smoke coverage for auth, API key flows, CLI auth, admin, and
+      locale routing
+    </>,
   ];
 
   const customizationItems = [
@@ -73,9 +80,9 @@ export default function FeaturesPage() {
               Shipped and ready to scale
             </PageIntroHeading>
             <PageIntroDescription className="mt-6 text-lg leading-8">
-              Every feature listed here exists in the codebase today. No roadmaps
-              or placeholders. Just tested foundations for human users, APIs,
-              and agent workflows you can reuse immediately.
+              Every feature listed here exists in the codebase today. No
+              roadmaps or placeholders. Just tested foundations for human users,
+              APIs, and agent workflows you can reuse immediately.
             </PageIntroDescription>
           </PageIntro>
 

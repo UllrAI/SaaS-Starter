@@ -109,12 +109,8 @@
           "name": "accounts_userId_users_id_fk",
           "tableFrom": "accounts",
           "tableTo": "users",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["userId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -257,12 +253,8 @@
           "name": "api_keys_userId_users_id_fk",
           "tableFrom": "api_keys",
           "tableTo": "users",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["userId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -412,12 +404,8 @@
           "name": "cli_tokens_userId_users_id_fk",
           "tableFrom": "cli_tokens",
           "tableTo": "users",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["userId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -427,16 +415,12 @@
         "cli_tokens_tokenHash_unique": {
           "name": "cli_tokens_tokenHash_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "tokenHash"
-          ]
+          "columns": ["tokenHash"]
         },
         "cli_tokens_refreshTokenHash_unique": {
           "name": "cli_tokens_refreshTokenHash_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "refreshTokenHash"
-          ]
+          "columns": ["refreshTokenHash"]
         }
       },
       "policies": {},
@@ -559,12 +543,8 @@
           "name": "device_codes_userId_users_id_fk",
           "tableFrom": "device_codes",
           "tableTo": "users",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["userId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -574,16 +554,12 @@
         "device_codes_deviceCode_unique": {
           "name": "device_codes_deviceCode_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "deviceCode"
-          ]
+          "columns": ["deviceCode"]
         },
         "device_codes_userCode_unique": {
           "name": "device_codes_userCode_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "userCode"
-          ]
+          "columns": ["userCode"]
         }
       },
       "policies": {},
@@ -693,12 +669,8 @@
           "name": "payments_userId_users_id_fk",
           "tableFrom": "payments",
           "tableTo": "users",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["userId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -708,9 +680,7 @@
         "payments_paymentId_unique": {
           "name": "payments_paymentId_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "paymentId"
-          ]
+          "columns": ["paymentId"]
         }
       },
       "policies": {},
@@ -800,12 +770,8 @@
           "name": "sessions_userId_users_id_fk",
           "tableFrom": "sessions",
           "tableTo": "users",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["userId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -815,9 +781,7 @@
         "sessions_token_unique": {
           "name": "sessions_token_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "token"
-          ]
+          "columns": ["token"]
         }
       },
       "policies": {},
@@ -935,12 +899,8 @@
           "name": "subscriptions_userId_users_id_fk",
           "tableFrom": "subscriptions",
           "tableTo": "users",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["userId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -950,9 +910,7 @@
         "subscriptions_subscriptionId_unique": {
           "name": "subscriptions_subscriptionId_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "subscriptionId"
-          ]
+          "columns": ["subscriptionId"]
         }
       },
       "policies": {},
@@ -1051,12 +1009,8 @@
           "name": "uploads_userId_users_id_fk",
           "tableFrom": "uploads",
           "tableTo": "users",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["userId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1154,16 +1108,12 @@
         "users_email_unique": {
           "name": "users_email_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
+          "columns": ["email"]
         },
         "users_paymentProviderCustomerId_unique": {
           "name": "users_paymentProviderCustomerId_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "paymentProviderCustomerId"
-          ]
+          "columns": ["paymentProviderCustomerId"]
         }
       },
       "policies": {},
@@ -1315,9 +1265,7 @@
         "webhook_events_eventId_unique": {
           "name": "webhook_events_eventId_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "eventId"
-          ]
+          "columns": ["eventId"]
         }
       },
       "policies": {},
@@ -1329,11 +1277,7 @@
     "public.user_role": {
       "name": "user_role",
       "schema": "public",
-      "values": [
-        "user",
-        "admin",
-        "super_admin"
-      ]
+      "values": ["user", "admin", "super_admin"]
     }
   },
   "schemas": {},

@@ -182,9 +182,9 @@ export function PricingSection({ className }: { className?: string }) {
     label: ReactNode;
   }>;
   type FeatureId = (typeof featureDefinitions)[number]["id"];
-  const allFeatureIds = featureDefinitions.map((feature) => feature.id) as Array<
-    FeatureId
-  >;
+  const allFeatureIds = featureDefinitions.map(
+    (feature) => feature.id,
+  ) as Array<FeatureId>;
   const tierCopyById: Record<
     string,
     {
@@ -193,7 +193,9 @@ export function PricingSection({ className }: { className?: string }) {
     }
   > = {
     plus: {
-      description: <>Core starter package for solo builders shipping the basics</>,
+      description: (
+        <>Core starter package for solo builders shipping the basics</>
+      ),
       includedFeatureIds: [
         "marketing-foundation",
         "auth-dashboard",
@@ -201,7 +203,9 @@ export function PricingSection({ className }: { className?: string }) {
       ],
     },
     pro: {
-      description: <>Full-featured starter package for teams shipping a real MVP</>,
+      description: (
+        <>Full-featured starter package for teams shipping a real MVP</>
+      ),
       includedFeatureIds: [
         "marketing-foundation",
         "auth-dashboard",
@@ -212,7 +216,9 @@ export function PricingSection({ className }: { className?: string }) {
       ],
     },
     team: {
-      description: <>Everything in Professional plus rollout support for teams</>,
+      description: (
+        <>Everything in Professional plus rollout support for teams</>
+      ),
       includedFeatureIds: allFeatureIds,
     },
   };

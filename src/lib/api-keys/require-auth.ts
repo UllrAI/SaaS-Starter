@@ -1,11 +1,11 @@
 import { NextRequest } from "next/server";
 import { validateApiKey, updateLastUsedAt } from "./key-service";
 import { checkRateLimit } from "./rate-limit";
-import { validateCliToken, updateCliTokenLastUsed } from "@/lib/device-auth/token-service";
 import {
-  API_KEY_PREFIX,
-  CLI_TOKEN_PREFIX,
-} from "@/lib/machine-auth/constants";
+  validateCliToken,
+  updateCliTokenLastUsed,
+} from "@/lib/device-auth/token-service";
+import { API_KEY_PREFIX, CLI_TOKEN_PREFIX } from "@/lib/machine-auth/constants";
 import { MachineAuthError } from "@/lib/machine-auth/error";
 import type { RateLimitInfo } from "./types";
 
@@ -44,7 +44,10 @@ export async function requireAuth(
       });
     }
 
-    const rateLimitInfo = await checkRateLimit(result.apiKeyId, result.rateLimit);
+    const rateLimitInfo = await checkRateLimit(
+      result.apiKeyId,
+      result.rateLimit,
+    );
     void Promise.resolve(updateLastUsedAt(result.apiKeyId)).catch(() => {});
 
     return {

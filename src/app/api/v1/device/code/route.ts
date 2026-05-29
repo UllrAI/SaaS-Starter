@@ -2,8 +2,15 @@ import { NextRequest } from "next/server";
 import { z } from "zod";
 import env from "@/env";
 import { createDeviceCode } from "@/lib/device-auth/device-service";
+import {
+  checkPersistentRateLimit,
+  getClientRateLimitKey,
+} from "@/lib/rate-limit";
 import { apiSuccess, handleApiError } from "@/lib/machine-auth/api-response";
 import { MachineAuthError } from "@/lib/machine-auth/error";
+
+const DEVICE_CODE_RATE_LIMIT_WINDOW_MS = 60 * 1000;
+const DEVICE_CODE_RATE_LIMIT_MAX_REQUESTS = 20;
 
 const deviceCodeSchema = z.object({
   clientName: z.string().max(100).optional(),
@@ -13,7 +20,25 @@ const deviceCodeSchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
+  const rateLimit = await checkPersistentRateLimit({
+    scope: "device_code",
+    key: getClientRateLimitKey(request),
+    limit: DEVICE_CODE_RATE_LIMIT_MAX_REQUESTS,
+    windowMs: DEVICE_CODE_RATE_LIMIT_WINDOW_MS,
+  });
+
   try {
+    if (!rateLimit.allowed) {
+      throw new MachineAuthError({
+        code: "RATE_LIMIT_EXCEEDED",
+        message: "Too many device code requests. Please try again later.",
+        status: 429,
+        details: {
+          resetAt: rateLimit.info.resetAt,
+        },
+      });
+    }
+
     const body = await request.json().catch(() => null);
     if (!body) {
       throw new MachineAuthError({
@@ -40,7 +65,6 @@ export async function POST(request: NextRequest) {
 
     return apiSuccess(result);
   } catch (error) {
-    return handleApiError(error);
+    return handleApiError(error, rateLimit.info);
   }
 }
-

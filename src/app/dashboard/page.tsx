@@ -12,12 +12,15 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { requireAuth } from "@/lib/auth/permissions";
-import { getUserPayments, getUserSubscription } from "@/lib/database/subscription";
+import {
+  getUserPayments,
+  getUserSubscription,
+} from "@/lib/database/subscription";
 import { db } from "@/database";
 import { uploads } from "@/database/schema";
 import { formatCurrency } from "@/lib/utils";
 import { formatFileSize } from "@/lib/config/upload";
-import { createMetadata } from "@/lib/metadata";
+import { createMetadataDefaults } from "@/lib/metadata";
 import { getRequestLocale } from "@/lib/i18n/server-locale";
 import {
   ArrowRight,
@@ -29,10 +32,26 @@ import {
 } from "lucide-react";
 
 export async function generateMetadata() {
-  return createMetadata({
+  const metadata = createMetadataDefaults();
+
+  return {
+    ...metadata,
     title: "Dashboard",
-    description: "Account overview, billing status, and starter setup progress.",
-  });
+    description:
+      "Account overview, billing status, and starter setup progress.",
+    openGraph: {
+      ...metadata.openGraph,
+      title: "Dashboard",
+      description:
+        "Account overview, billing status, and starter setup progress.",
+    },
+    twitter: {
+      ...metadata.twitter,
+      title: "Dashboard",
+      description:
+        "Account overview, billing status, and starter setup progress.",
+    },
+  };
 }
 
 export default async function HomeRoute() {
@@ -66,7 +85,9 @@ export default async function HomeRoute() {
     {
       id: "upload",
       title: <>Verify uploads</>,
-      description: <>Test client and server uploads against your storage config.</>,
+      description: (
+        <>Test client and server uploads against your storage config.</>
+      ),
       href: "/dashboard/upload",
     },
     {
@@ -82,7 +103,9 @@ export default async function HomeRoute() {
   return (
     <DashboardPageWrapper
       title={<>Dashboard</>}
-      description={<>Account overview, billing status, and starter setup progress.</>}
+      description={
+        <>Account overview, billing status, and starter setup progress.</>
+      }
     >
       <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
         <Card className="shadow-sm">
@@ -102,7 +125,8 @@ export default async function HomeRoute() {
               <Badge
                 className="capitalize"
                 variant={
-                  subscription && ["active", "trialing"].includes(subscription.status)
+                  subscription &&
+                  ["active", "trialing"].includes(subscription.status)
                     ? "default"
                     : "secondary"
                 }
@@ -118,16 +142,20 @@ export default async function HomeRoute() {
               </p>
             </div>
             <div className="border-border space-y-2 border p-4">
-              <p className="text-muted-foreground text-xs uppercase">Payments</p>
+              <p className="text-muted-foreground text-xs uppercase">
+                Payments
+              </p>
               <p className="text-lg font-semibold">{payments.length}</p>
               <p className="text-muted-foreground text-sm">
-                {latestPayment
-                  ? formatCurrency(
-                      latestPayment.amount,
-                      latestPayment.currency,
-                      locale,
-                    )
-                  : <>No payment records yet</>}
+                {latestPayment ? (
+                  formatCurrency(
+                    latestPayment.amount,
+                    latestPayment.currency,
+                    locale,
+                  )
+                ) : (
+                  <>No payment records yet</>
+                )}
               </p>
             </div>
           </CardContent>
@@ -151,7 +179,9 @@ export default async function HomeRoute() {
             </div>
             <div className="border-border border p-4">
               <p className="text-muted-foreground">Role</p>
-              <p className="font-medium capitalize">{user.role.replace("_", " ")}</p>
+              <p className="font-medium capitalize">
+                {user.role.replace("_", " ")}
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -212,12 +242,17 @@ export default async function HomeRoute() {
                     <div>
                       <p className="font-medium">{payment.tierName}</p>
                       <p className="text-muted-foreground text-sm capitalize">
-                        {payment.status} • {payment.paymentType.replace("_", " ")}
+                        {payment.status} •{" "}
+                        {payment.paymentType.replace("_", " ")}
                       </p>
                     </div>
                     <div className="text-right">
                       <p className="font-medium">
-                        {formatCurrency(payment.amount, payment.currency, locale)}
+                        {formatCurrency(
+                          payment.amount,
+                          payment.currency,
+                          locale,
+                        )}
                       </p>
                       <p className="text-muted-foreground text-sm">
                         {new Date(payment.createdAt).toLocaleDateString(locale)}

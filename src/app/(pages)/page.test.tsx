@@ -41,7 +41,7 @@ const mockCreateLocalizedAlternates = jest.fn(() => ({
     "zh-Hans": "/zh-Hans",
   },
 }));
-const mockCreateMetadata = jest.fn(() => ({
+const mockCreateMetadataDefaults = jest.fn(() => ({
   openGraph: {
     siteName: "UllrAI",
   },
@@ -52,12 +52,8 @@ const mockCreateMetadata = jest.fn(() => ({
 jest.mock("@/lib/metadata", () => ({
   createLocalizedAlternates: (...args: unknown[]) =>
     mockCreateLocalizedAlternates(...args),
-  createMetadata: (...args: unknown[]) => mockCreateMetadata(...args),
-}));
-
-const mockGetRequestLocale = jest.fn(async () => "zh-Hans");
-jest.mock("@/lib/i18n/server-locale", () => ({
-  getRequestLocale: () => mockGetRequestLocale(),
+  createMetadataDefaults: (...args: unknown[]) =>
+    mockCreateMetadataDefaults(...args),
 }));
 
 import HomePage, { generateMetadata } from "./page";
@@ -74,9 +70,8 @@ describe("HomePage", () => {
         "Authentication, billing, agent-ready APIs, CLI device auth, uploads, admin tooling, and Playwright-backed smoke coverage for shipping a SaaS product faster.",
     });
 
-    expect(mockGetRequestLocale).toHaveBeenCalledTimes(1);
-    expect(mockCreateLocalizedAlternates).toHaveBeenCalledWith("/", "zh-Hans");
-    expect(mockCreateMetadata).toHaveBeenCalledWith({
+    expect(mockCreateLocalizedAlternates).toHaveBeenCalledWith("/", "en");
+    expect(mockCreateMetadataDefaults).toHaveBeenCalledWith({
       alternates: {
         canonical: "/",
         languages: {

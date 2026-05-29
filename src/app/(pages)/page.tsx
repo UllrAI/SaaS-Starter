@@ -3,13 +3,15 @@ import { SocialProofUnified } from "@/components/homepage/social-proof-testimoni
 import { Features } from "@/components/homepage/features";
 import { OtherProducts } from "@/components/homepage/other-products";
 import { CallToAction } from "@/components/homepage/call-to-action";
-import { createLocalizedAlternates, createMetadata } from "@/lib/metadata";
-import { getRequestLocale } from "@/lib/i18n/server-locale";
+import {
+  createLocalizedAlternates,
+  createMetadataDefaults,
+} from "@/lib/metadata";
+import { SOURCE_LOCALE } from "@/lib/config/i18n";
 
 export async function generateMetadata() {
-  const locale = await getRequestLocale();
-  const metadata = createMetadata({
-    alternates: createLocalizedAlternates("/", locale),
+  const metadata = createMetadataDefaults({
+    alternates: createLocalizedAlternates("/", SOURCE_LOCALE),
   });
 
   return {

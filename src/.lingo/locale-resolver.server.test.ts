@@ -42,7 +42,9 @@ describe("lingo server locale resolver", () => {
   });
 
   it("falls back to cookie locale and then accept-language", async () => {
-    mockHeaders.mockResolvedValue(new Headers([["accept-language", "en-US,en;q=0.9"]]));
+    mockHeaders.mockResolvedValue(
+      new Headers([["accept-language", "en-US,en;q=0.9"]]),
+    );
     mockCookies.mockResolvedValue(createCookieStore({ value: "zh-Hans" }));
 
     const { getServerLocale } = await import("./locale-resolver.server");

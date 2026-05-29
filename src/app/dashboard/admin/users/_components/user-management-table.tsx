@@ -310,7 +310,9 @@ export function UserManagementTable({
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label className="text-right">Access</Label>
                 <div className="col-span-3 flex items-center gap-3">
-                  <Badge variant={editingUser.banned ? "destructive" : "outline"}>
+                  <Badge
+                    variant={editingUser.banned ? "destructive" : "outline"}
+                  >
                     <AccessStatusLabel banned={editingUser.banned} />
                   </Badge>
                   {editingUser.banned && editingUser.banReason && (

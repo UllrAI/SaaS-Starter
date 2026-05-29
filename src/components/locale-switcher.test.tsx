@@ -141,7 +141,9 @@ describe("LocaleSwitcher", () => {
 
     render(<LocaleSwitcher locales={[]} />);
 
-    expect(await screen.findByRole("button", { name: "English" })).toBeEnabled();
+    expect(
+      await screen.findByRole("button", { name: "English" }),
+    ).toBeEnabled();
     expect(screen.getByRole("button", { name: "简体中文" })).toBeDisabled();
   });
 });

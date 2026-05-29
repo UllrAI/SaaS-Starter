@@ -88,7 +88,7 @@ describe("Auth Client", () => {
     const clientModule = await import("./client");
 
     // Check that all expected exports exist
-      const expectedExports = [
+    const expectedExports = [
       "signIn",
       "signOut",
       "signUp",

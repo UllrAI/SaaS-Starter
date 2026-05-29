@@ -127,7 +127,9 @@ describe("SocialLoginButtons", () => {
   });
 
   it("returns nothing when there are no configured providers", () => {
-    const { container } = render(<SocialLoginButtons availableProviders={[]} />);
+    const { container } = render(
+      <SocialLoginButtons availableProviders={[]} />,
+    );
 
     expect(container).toBeEmptyDOMElement();
   });
@@ -155,10 +157,7 @@ describe("SocialLoginButtons", () => {
 
   it("disables actions while an external loading state is active", () => {
     render(
-      <SocialLoginButtons
-        availableProviders={["google", "github"]}
-        loading
-      />,
+      <SocialLoginButtons availableProviders={["google", "github"]} loading />,
     );
 
     expect(

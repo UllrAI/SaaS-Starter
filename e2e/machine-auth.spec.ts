@@ -51,7 +51,9 @@ test("authorizes a CLI device through the browser and exchanges it for a CLI tok
   expect(codeResponse.ok()).toBeTruthy();
   expect(codePayload.data.userCode).toMatch(/^[A-Z0-9]{4}-[A-Z0-9]{4}$/);
 
-  await page.goto(`/device?code=${encodeURIComponent(codePayload.data.userCode)}`);
+  await page.goto(
+    `/device?code=${encodeURIComponent(codePayload.data.userCode)}`,
+  );
   await page.getByRole("button", { name: "Authorize" }).click();
 
   await expect(page.getByText("Device authorized")).toBeVisible();

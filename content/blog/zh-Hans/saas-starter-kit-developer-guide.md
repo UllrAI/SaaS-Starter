@@ -314,6 +314,7 @@ SaaS-Starter-main/
   - 提供了在客户端组件中与认证系统交互的方法，如 `signIn`, `signOut`, `useSession` 等。
 - **认证流程 (Magic Link 魔法链接)**:
   [![魔法链接](https://mermaid.ink/img/pako:eNp1k-1r00Acx_-V415NaNN2fVh74ETqA4KysYc30je35NaGJrl6SUQtBVeUVXHasQ1ZrYjCQBxL3ZvOWde_ppe0_4WXnh1ldiGQu-P7uXy_97tfFapUIxBBmzxxiaWSOzouMmwWLDB-Kpg5uqpXsOWAdZuwWet5Qyfig23AvW9-4yw47oC5265TukeZeWMWsUrYU8JCwm_v8Ldf-eF3QSw_mCleITaxtFA8qnuDXlcioXKiDo1FFxelDwSG_T3--kiIA--Un3eD-jnf7gWHPX5xMCGkVDDSCQLLS6trIIYregwL4zETF3U1auhWeUJI4RQR7H_xG02__cb_2PUPGkHrFVijZWL9B0j_wlbnzD-t8w-7o5dbMgmY481jSYH1lYeX6SURFWyYDIF_zMm-3-6M9vr--yPJX8kvxTKuFAx-nQhfErk2-v2708lVbBgbWC3fckJbNxVFufYERj_eDTtb0n8E8MYn3vs9-NMadj5fQaZr4_WDC0-qQJ7Ssk6AqNFoe4d7Ld7c5Y2fIKZhu7RBMdNgBBaZrkHkMJdEoEmYicMprI7LD50SMUkBIjHUyCZ2DacAC1ZNYOLmPKbUnJCMusUSRJvYsMXMrWjYmdz0y1UmzpywPHUtB6L5xHgPiKrwGUTJRFxJL8TjafFmc6nkfDoCn0OUziqpXC6XyWUzyVQmk0nUIvDF-K9xJbsgNETTHcoeyQ4bN1rtLzk3Xew?type=png)](https://mermaid.live/edit#pako:eNp1k-1r00Acx_-V415NaNN2fVh74ETqA4KysYc30je35NaGJrl6SUQtBVeUVXHasQ1ZrYjCQBxL3ZvOWde_ppe0_4WXnh1ldiGQu-P7uXy_97tfFapUIxBBmzxxiaWSOzouMmwWLDB-Kpg5uqpXsOWAdZuwWet5Qyfig23AvW9-4yw47oC5265TukeZeWMWsUrYU8JCwm_v8Ldf-eF3QSw_mCleITaxtFA8qnuDXlcioXKiDo1FFxelDwSG_T3--kiIA--Un3eD-jnf7gWHPX5xMCGkVDDSCQLLS6trIIYregwL4zETF3U1auhWeUJI4RQR7H_xG02__cb_2PUPGkHrFVijZWL9B0j_wlbnzD-t8w-7o5dbMgmY481jSYH1lYeX6SURFWyYDIF_zMm-3-6M9vr--yPJX8kvxTKuFAx-nQhfErk2-v2708lVbBgbWC3fckJbNxVFufYERj_eDTtb0n8E8MYn3vs9-NMadj5fQaZr4_WDC0-qQJ7Ssk6AqNFoe4d7Ld7c5Y2fIKZhu7RBMdNgBBaZrkHkMJdEoEmYicMprI7LD50SMUkBIjHUyCZ2DacAC1ZNYOLmPKbUnJCMusUSRJvYsMXMrWjYmdz0y1UmzpywPHUtB6L5xHgPiKrwGUTJRFxJL8TjafFmc6nkfDoCn0OUziqpXC6XyWUzyVQmk0nUIvDF-K9xJbsgNETTHcoeyQ4bN1rtLzk3Xew)
+
   ```mermaid
   sequenceDiagram
       participant User
@@ -356,6 +357,7 @@ SaaS-Starter-main/
   - **事务性**: 所有数据库操作都在一个事务中完成，确保数据一致性。
 - **支付流程图**:
   [![支付流程图](https://mermaid.ink/img/pako:eNp1U11rE0EU_SvDPCWQJqn5aDIPfTAFn8RAWwTJy3T3Nlm6u7POzoo1BKwgDbWBCLG0VoT2qSgmedCKBvXPZDbJv3B2txtqTZaF3Zl7zj1n7tzbxBrTARPswlMPbA02DFrn1KrZKHwcyoWhGQ61Bdp2gS_ar5gGqA91kexf-u3vk88DlKhyFbbrqErrkFzE2gT-DHjA8j905NGFPLtamJwDhG7iYOBiZX09EiVo8uqHPByhGn4AAlVNatdwjIwgChtJEVR9tLmFMtQxMjuGaSp3Ga0B2h7zREyJkEH6QJYE6lQAqtzAVNx1DWbPFQLUyi2FON82N--kvGV5-qcnzz8uws4dB4ckaHbYkf33svtWtoeRFvJ7g_HodHbx7W45Ir-yf-y3uxFoqcnHsNNgbA8lYgdpjVmOCQL05H-FiEmzT8fTwcHky2_Z7aTQtD-Uv96Nf74Zj66XUhIb99EWp7ZLNaGKlkT--Vf_ZDjpXakmmfYvZ6evJ0fX_suDJVf7z_EzDt23guK4ggrPxSlc54aOieAepLAF3KLBEjfDXsGiARbUMFG_OuxSzxRBX7QUTXXVE8asmMmZV29gsktNV608R1f3fTMD810Otg68wjxbYHKvEObApImfY5JbzaYLa9lsQb2lcj4XRPcxKZTS-XK5XCyXirl8sVhcbaXwi1A1my6tKQzohmD8YTR74Qi2_gLtEE8s?type=png)](https://mermaid.live/edit#pako:eNp1U11rE0EU_SvDPCWQJqn5aDIPfTAFn8RAWwTJy3T3Nlm6u7POzoo1BKwgDbWBCLG0VoT2qSgmedCKBvXPZDbJv3B2txtqTZaF3Zl7zj1n7tzbxBrTARPswlMPbA02DFrn1KrZKHwcyoWhGQ61Bdp2gS_ar5gGqA91kexf-u3vk88DlKhyFbbrqErrkFzE2gT-DHjA8j905NGFPLtamJwDhG7iYOBiZX09EiVo8uqHPByhGn4AAlVNatdwjIwgChtJEVR9tLmFMtQxMjuGaSp3Ga0B2h7zREyJkEH6QJYE6lQAqtzAVNx1DWbPFQLUyi2FON82N--kvGV5-qcnzz8uws4dB4ckaHbYkf33svtWtoeRFvJ7g_HodHbx7W45Ir-yf-y3uxFoqcnHsNNgbA8lYgdpjVmOCQL05H-FiEmzT8fTwcHky2_Z7aTQtD-Uv96Nf74Zj66XUhIb99EWp7ZLNaGKlkT--Vf_ZDjpXakmmfYvZ6evJ0fX_suDJVf7z_EzDt23guK4ggrPxSlc54aOieAepLAF3KLBEjfDXsGiARbUMFG_OuxSzxRBX7QUTXXVE8asmMmZV29gsktNV608R1f3fTMD810Otg68wjxbYHKvEObApImfY5JbzaYLa9lsQb2lcj4XRPcxKZTS-XK5XCyXirl8sVhcbaXwi1A1my6tKQzohmD8YTR74Qi2_gLtEE8s)
+
   ```mermaid
   sequenceDiagram
       participant User
@@ -532,21 +534,21 @@ sequenceDiagram
 
 ### 8.1. CLI 命令
 
-| 脚本                    | 描述                              |
-| ----------------------- | --------------------------------- |
-| `pnpm dev`              | 启动开发服务器（Turbo 模式）      |
-| `pnpm content:build`    | 生成 Content Collections 内容输出 |
-| `pnpm build`            | 构建生产应用                      |
-| `pnpm start`            | 启动生产服务器                    |
-| `pnpm lint`             | 运行 ESLint 检查                  |
-| `pnpm test`             | 运行 Jest 单元测试                |
-| `pnpm test:e2e`         | 运行 Playwright E2E 冒烟测试      |
-| `pnpm prettier:format`  | 格式化所有代码                    |
-| `pnpm db:generate`      | 生成可提交的迁移文件              |
-| `pnpm db:migrate`       | 对当前数据库应用迁移              |
-| `pnpm db:push`          | (仅开发) 将 Schema 推送到数据库   |
-| `pnpm analyze`          | 构建并分析包体积                  |
-| `pnpm set:admin`        | 提升用户为超级管理员              |
+| 脚本                   | 描述                              |
+| ---------------------- | --------------------------------- |
+| `pnpm dev`             | 启动开发服务器（Turbo 模式）      |
+| `pnpm content:build`   | 生成 Content Collections 内容输出 |
+| `pnpm build`           | 构建生产应用                      |
+| `pnpm start`           | 启动生产服务器                    |
+| `pnpm lint`            | 运行 ESLint 检查                  |
+| `pnpm test`            | 运行 Jest 单元测试                |
+| `pnpm test:e2e`        | 运行 Playwright E2E 冒烟测试      |
+| `pnpm prettier:format` | 格式化所有代码                    |
+| `pnpm db:generate`     | 生成可提交的迁移文件              |
+| `pnpm db:migrate`      | 对当前数据库应用迁移              |
+| `pnpm db:push`         | (仅开发) 将 Schema 推送到数据库   |
+| `pnpm analyze`         | 构建并分析包体积                  |
+| `pnpm set:admin`       | 提升用户为超级管理员              |
 
 ### 8.2. 配置选项
 

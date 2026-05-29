@@ -1,10 +1,10 @@
 import React from "react";
 import { DashboardPageWrapper } from "../_components/dashboard-page-wrapper";
 import { DeveloperAccessSections } from "./_components/developer-access-sections";
-import { createMetadata } from "@/lib/metadata";
+import { createMetadataDefaults } from "@/lib/metadata";
 
 export async function generateMetadata() {
-  const metadata = createMetadata({});
+  const metadata = createMetadataDefaults();
 
   return {
     ...metadata,
@@ -31,7 +31,10 @@ export default function DeveloperAccessPage() {
     <DashboardPageWrapper
       title={<>Developer Access</>}
       description={
-        <>Manage API keys, CLI sessions, and agent-friendly access from one place.</>
+        <>
+          Manage API keys, CLI sessions, and agent-friendly access from one
+          place.
+        </>
       }
     >
       <DeveloperAccessSections />

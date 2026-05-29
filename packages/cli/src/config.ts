@@ -1,4 +1,10 @@
-import { chmodSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
+import {
+  chmodSync,
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  writeFileSync,
+} from "fs";
 import { homedir } from "os";
 import { join } from "path";
 import {
@@ -46,7 +52,9 @@ export function saveConfig(config: CliConfig): void {
 }
 
 export function getBaseUrl(): string {
-  return process.env[CLI_BASE_URL_ENV] ?? loadConfig().baseUrl ?? DEFAULT_BASE_URL;
+  return (
+    process.env[CLI_BASE_URL_ENV] ?? loadConfig().baseUrl ?? DEFAULT_BASE_URL
+  );
 }
 
 export function getAuthToken(): string | undefined {

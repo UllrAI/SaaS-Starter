@@ -21,6 +21,7 @@ import { normalizeLocaleCandidate } from "@/lib/config/i18n-routing";
 import { persistLocale } from "@/lib/i18n/locale-client";
 import { resolveLocaleSwitchUrl } from "@/lib/i18n/locale-switch";
 import { useLingoContext } from "@lingo.dev/compiler/react";
+import { useIsClient } from "@/hooks/use-is-client";
 
 type ButtonVariant = React.ComponentProps<typeof Button>["variant"];
 type ButtonSize = React.ComponentProps<typeof Button>["size"];
@@ -55,16 +56,12 @@ export function LocaleSwitcher({
   align = "end",
   showLabel = false,
 }: LocaleSwitcherProps) {
-  const [isMounted, setIsMounted] = React.useState(false);
+  const isClient = useIsClient();
   const [isPending, startTransition] = React.useTransition();
   const availableLocales = locales.length > 0 ? locales : SUPPORTED_LOCALES;
   const { locale: currentLocale, setLocale } = useLingoContext();
   const normalizedCurrentLocale = normalizeLocaleCandidate(currentLocale);
   const activeLocale = normalizedCurrentLocale ?? availableLocales[0];
-
-  React.useEffect(() => {
-    setIsMounted(true);
-  }, []);
 
   const handleLocaleSelect = (locale: SupportedLocale) => {
     if (normalizedCurrentLocale && locale === normalizedCurrentLocale) {
@@ -115,7 +112,7 @@ export function LocaleSwitcher({
         {availableLocales.map((locale) => {
           const details = getLocaleDisplayInfo(locale);
           const isSelected = locale === activeLocale;
-          const localeHref = isMounted ? getMarketingLocaleHref(locale) : null;
+          const localeHref = isClient ? getMarketingLocaleHref(locale) : null;
 
           if (localeHref && !isSelected) {
             return (

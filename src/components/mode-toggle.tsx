@@ -5,6 +5,7 @@ import { Moon, Sun, Monitor } from "lucide-react";
 import { useTheme } from "next-themes";
 
 import { Button } from "@/components/ui/button";
+import { useIsClient } from "@/hooks/use-is-client";
 
 interface ModeToggleProps {
   className?: string;
@@ -53,11 +54,7 @@ export function ModeToggle({
   showLabel = false,
 }: ModeToggleProps) {
   const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = React.useState(false);
-
-  React.useEffect(() => {
-    setMounted(true);
-  }, []);
+  const isClient = useIsClient();
 
   const cycleTheme = () => {
     const activeTheme = resolveTheme(theme);
@@ -68,7 +65,7 @@ export function ModeToggle({
 
   const activeTheme = resolveTheme(theme);
 
-  if (!mounted) {
+  if (!isClient) {
     return (
       <Button variant={variant} size={size} className={className} disabled>
         <Sun className="h-[1.2rem] w-[1.2rem]" />

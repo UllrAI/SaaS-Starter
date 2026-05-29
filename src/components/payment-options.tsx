@@ -1,6 +1,6 @@
 "use client";
 
-import { type ReactNode, useEffect, useState } from "react";
+import { type ReactNode, useState } from "react";
 import {
   Card,
   CardContent,
@@ -31,6 +31,7 @@ import { cn } from "@/lib/utils";
 import { Skeleton } from "./ui/skeleton";
 import { useIntlLocale } from "@/hooks/use-intl-locale";
 import { getSafeBillingRedirectUrl } from "@/lib/billing/url";
+import { useIsClient } from "@/hooks/use-is-client";
 
 type CheckoutMessageCode =
   | "checkout_failed"
@@ -182,7 +183,7 @@ export function PricingSection({ className }: { className?: string }) {
     mode: PaymentMode;
     tierId: string;
   } | null>(null);
-  const [mounted, setMounted] = useState(false);
+  const isClient = useIsClient();
 
   const { data: session, isPending: isSessionLoading } = useSession();
   const router = useRouter();
@@ -261,10 +262,6 @@ export function PricingSection({ className }: { className?: string }) {
     },
   };
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
   const redirectToLogin = () => {
     router.push("/login?redirect=/pricing");
   };
@@ -320,7 +317,7 @@ export function PricingSection({ className }: { className?: string }) {
                   action: {
                     label: <>Manage Plan</>,
                     onClick: () => {
-                      window.location.href = safeManagementUrl;
+                      window.location.assign(safeManagementUrl);
                     },
                   },
                 }
@@ -353,7 +350,7 @@ export function PricingSection({ className }: { className?: string }) {
 
       if (response.ok && safeCheckoutUrl) {
         isRedirecting = true;
-        window.location.href = safeCheckoutUrl;
+        window.location.assign(safeCheckoutUrl);
         return;
       }
 
@@ -468,7 +465,7 @@ export function PricingSection({ className }: { className?: string }) {
             loadingState.mode === paymentMode &&
             (paymentMode === "one_time" || loadingState.cycle === billingCycle);
 
-          const isDisabled = !mounted || isLoading || isSessionLoading;
+          const isDisabled = !isClient || isLoading || isSessionLoading;
 
           return (
             <Card
@@ -563,7 +560,7 @@ export function PricingSection({ className }: { className?: string }) {
                   })}
                 </div>
 
-                {!mounted || isSessionLoading ? (
+                {!isClient || isSessionLoading ? (
                   <Skeleton className="h-11 w-full" />
                 ) : (
                   <Button

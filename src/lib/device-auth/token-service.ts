@@ -13,13 +13,17 @@ import { hashToken } from "@/lib/machine-auth/hash";
 import { isMachineAuthUserActive } from "@/lib/machine-auth/user-access";
 import type { CliTokenPublic } from "@/lib/machine-auth/types";
 
-function toPublic(row: typeof cliTokens.$inferSelect): CliTokenPublic {
+function toPublic(
+  row: typeof cliTokens.$inferSelect,
+  now = new Date(),
+): CliTokenPublic {
   return {
     id: row.id,
     name: row.name,
     tokenPrefix: row.tokenPrefix,
     lastFourChars: row.lastFourChars,
     isActive: row.isActive,
+    isExpired: row.expiresAt < now,
     expiresAt: row.expiresAt.toISOString(),
     lastUsedAt: row.lastUsedAt?.toISOString() ?? null,
     deviceOs: row.deviceOs,
@@ -220,7 +224,8 @@ export async function listCliTokens(userId: string): Promise<CliTokenPublic[]> {
     orderBy: (table, { desc }) => [desc(table.createdAt)],
   });
 
-  return rows.map(toPublic);
+  const now = new Date();
+  return rows.map((row) => toPublic(row, now));
 }
 
 export async function revokeCliToken(params: {

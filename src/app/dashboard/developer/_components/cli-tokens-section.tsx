@@ -78,7 +78,6 @@ function CliTokenRow({
   onRevoked: () => void;
 }) {
   const [isRevoking, setIsRevoking] = useState(false);
-  const isExpired = new Date(token.expiresAt).getTime() < Date.now();
 
   async function handleRevoke() {
     setIsRevoking(true);
@@ -110,11 +109,13 @@ function CliTokenRow({
             {token.name}
           </p>
           <Badge
-            variant={!token.isActive || isExpired ? "outline" : "secondary"}
+            variant={
+              !token.isActive || token.isExpired ? "outline" : "secondary"
+            }
           >
             {!token.isActive ? (
               <>Revoked</>
-            ) : isExpired ? (
+            ) : token.isExpired ? (
               <>Expired</>
             ) : (
               <>Active</>

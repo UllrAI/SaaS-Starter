@@ -27,6 +27,7 @@ export type CliTokenPublic = {
   tokenPrefix: string;
   lastFourChars: string;
   isActive: boolean;
+  isExpired: boolean;
   expiresAt: string;
   lastUsedAt: string | null;
   deviceOs: string | null;

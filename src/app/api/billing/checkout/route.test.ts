@@ -240,7 +240,7 @@ describe("Billing Checkout API", () => {
         tierId: "tier-premium",
         paymentMode: "subscription",
         billingCycle: "yearly",
-        successUrl: "https://example.com/payment-status?status=success",
+        successUrl: "https://example.com/payment-status?status=pending",
         cancelUrl: "https://example.com/payment-status?status=cancelled",
         failureUrl: "https://example.com/payment-status?status=failed",
       });

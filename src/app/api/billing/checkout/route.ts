@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
     }
 
     const successUrl = new URL("/payment-status", appUrl);
-    successUrl.searchParams.set("status", "success");
+    successUrl.searchParams.set("status", "pending");
 
     const cancelUrl = new URL("/payment-status", appUrl);
     cancelUrl.searchParams.set("status", "cancelled");

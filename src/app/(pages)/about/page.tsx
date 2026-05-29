@@ -6,14 +6,7 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import {
-  Terminal,
-  Zap,
-  Shield,
-  Users,
-  GitBranch,
-  Info,
-} from "lucide-react";
+import { Terminal, Zap, Shield, Users, Info } from "lucide-react";
 import Link from "next/link";
 import { SectionContainer } from "@/components/layout/page-container";
 import { MarketingPageShell } from "@/components/layout/marketing-page-shell";
@@ -23,31 +16,43 @@ import {
   PageIntroHeading,
 } from "@/components/layout/page-intro";
 import { PageSectionHeading } from "@/components/layout/page-section-heading";
-import { createLocalizedAlternates, createMetadata } from "@/lib/metadata";
+import { createLocalizedAlternates } from "@/lib/metadata";
 import { getRequestLocale } from "@/lib/i18n/server-locale";
+import { APP_NAME, OGIMAGE, TWITTERACCOUNT } from "@/lib/config/constants";
+import env from "@/env";
+import type { Metadata } from "next";
 
-export async function generateMetadata() {
+export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
-  const metadata = createMetadata({
-    alternates: createLocalizedAlternates("/about", locale),
-  });
+  const alternates = createLocalizedAlternates("/about", locale);
+  const canonical = alternates.canonical;
+  const canonicalUrl =
+    typeof canonical === "string" || canonical instanceof URL
+      ? canonical
+      : undefined;
 
   return {
-    ...metadata,
+    metadataBase: new URL(env.NEXT_PUBLIC_APP_URL),
+    alternates,
     title: "About Us",
     description:
       "Learn about our mission to help developers build and launch SaaS products faster with real, tested, and agent-friendly foundations.",
     openGraph: {
-      ...metadata.openGraph,
       title: "About Us",
       description:
         "Learn about our mission to help developers build and launch SaaS products faster with real, tested, and agent-friendly foundations.",
+      url: canonicalUrl,
+      images: OGIMAGE,
+      siteName: APP_NAME,
+      type: "website",
     },
     twitter: {
-      ...metadata.twitter,
+      card: "summary_large_image",
+      creator: TWITTERACCOUNT,
       title: "About Us",
       description:
         "Learn about our mission to help developers build and launch SaaS products faster with real, tested, and agent-friendly foundations.",
+      images: OGIMAGE,
     },
   };
 }
@@ -67,11 +72,10 @@ export default function AboutPage() {
         >
           <PageIntroHeading>Building the future of SaaS</PageIntroHeading>
           <PageIntroDescription>
-            We are a team of developers, designers, and creators building the
-            tools we wish we had. Open source at heart, practical in execution,
-            and serious about documented, regression-tested foundations for
-            both human users and agent (OpenClaw, Codex, Claude Code, etc.)
-            workflows.
+            This starter focuses on real SaaS foundations: authentication,
+            billing, database access, uploads, localization, and operational
+            screens that can be inspected, tested, and extended without
+            replacing placeholder flows first.
           </PageIntroDescription>
         </PageIntro>
 
@@ -88,11 +92,11 @@ export default function AboutPage() {
                 <div className="bg-primary/10 text-primary border-primary/20 mb-4 flex h-12 w-12 items-center justify-center border">
                   <Zap className="h-6 w-6" />
                 </div>
-                <CardTitle>Human and Agent Workflow Speed</CardTitle>
+                <CardTitle>Practical Workflow Speed</CardTitle>
                 <CardDescription>
-                  We want the starter to feel fast for browser users, scripts,
-                  and agent-driven automation alike. Setup time matters just as
-                  much as runtime performance.
+                  The project is shaped for builders who need to move quickly
+                  without losing the ability to understand, test, and modify the
+                  code they ship.
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -102,10 +106,11 @@ export default function AboutPage() {
                 <div className="bg-primary/10 text-primary border-primary/20 mb-4 flex h-12 w-12 items-center justify-center border">
                   <Shield className="h-6 w-6" />
                 </div>
-                <CardTitle>Security First</CardTitle>
+                <CardTitle>Security Boundaries</CardTitle>
                 <CardDescription>
-                  We don&apos;t treat security as an afterthought. It&apos;s
-                  baked into our architecture from line one.
+                  Auth, billing, uploads, and environment configuration are kept
+                  behind explicit server-side checks instead of optimistic UI
+                  assumptions.
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -115,10 +120,11 @@ export default function AboutPage() {
                 <div className="bg-primary/10 text-primary border-primary/20 mb-4 flex h-12 w-12 items-center justify-center border">
                   <Users className="h-6 w-6" />
                 </div>
-                <CardTitle>Community Driven</CardTitle>
+                <CardTitle>Maintainable Defaults</CardTitle>
                 <CardDescription>
-                  We build in public and listen to our users. Your feedback
-                  shapes our roadmap directly.
+                  The code favors ordinary Next.js conventions, small modules,
+                  and reusable components over framework tricks or hidden
+                  generators.
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -127,82 +133,70 @@ export default function AboutPage() {
 
         <div className="mb-24">
           <PageSectionHeading icon={<Users className="text-primary h-6 w-6" />}>
-            Core Maintainers
+            What You Can Verify
           </PageSectionHeading>
 
-          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
-            {[1, 2, 3, 4].map((i) => (
-              <Card key={i} className="overflow-hidden p-0 shadow-sm">
-                <div className="bg-muted aspect-square w-full">
-                  <div className="text-muted-foreground/20 flex h-full w-full items-center justify-center">
-                    <Users className="h-24 w-24" />
-                  </div>
-                </div>
+          <div className="grid gap-6 md:grid-cols-3">
+            <Card className="shadow-sm">
+              <CardHeader>
+                <CardTitle>Real Checkout Flow</CardTitle>
+                <CardDescription>
+                  Pricing actions call the billing provider abstraction and
+                  return users through a verifiable payment status page.
+                </CardDescription>
+              </CardHeader>
+            </Card>
 
-                <div className="p-6">
-                  <CardTitle className="text-lg">Dev Member {i}</CardTitle>
-                  <CardDescription className="font-mono text-xs">
-                    Senior Engineer
-                  </CardDescription>
-                </div>
-              </Card>
-            ))}
+            <Card className="shadow-sm">
+              <CardHeader>
+                <CardTitle>Protected App Routes</CardTitle>
+                <CardDescription>
+                  Dashboard, settings, and admin areas use the same route
+                  protection and session boundaries as production features.
+                </CardDescription>
+              </CardHeader>
+            </Card>
+
+            <Card className="shadow-sm">
+              <CardHeader>
+                <CardTitle>Repository Content</CardTitle>
+                <CardDescription>
+                  Marketing pages, blog content, and legal pages live in the
+                  repository so changes can be reviewed with the code.
+                </CardDescription>
+              </CardHeader>
+            </Card>
           </div>
         </div>
 
         <div>
           <PageSectionHeading
-            icon={<GitBranch className="text-primary h-6 w-6" />}
+            icon={<Shield className="text-primary h-6 w-6" />}
           >
-            Changelog
+            Maintenance Model
           </PageSectionHeading>
 
-          <div className="border-muted ml-4 space-y-12 border-l-2 pl-8">
-            <div className="relative">
-              <div className="bg-primary border-background absolute top-1 -left-[41px] h-5 w-5 rounded-full border-4" />
-              <div className="mb-2 flex items-center gap-2">
-                <Badge variant="outline" className="font-mono">
-                  v2.0.0
-                </Badge>
-                <span className="text-muted-foreground text-sm">
-                  October 2023
-                </span>
-              </div>
-              <h3 className="text-xl font-bold">Global Scale</h3>
-              <p className="text-muted-foreground mt-2">
-                Launched multi-region support and edge caching.
-              </p>
-            </div>
+          <div className="grid gap-6 md:grid-cols-2">
+            <Card className="shadow-sm">
+              <CardHeader>
+                <CardTitle>Code Over Claims</CardTitle>
+                <CardDescription>
+                  Project capabilities are represented by implemented routes,
+                  configuration, tests, and documentation instead of invented
+                  release milestones.
+                </CardDescription>
+              </CardHeader>
+            </Card>
 
-            <div className="relative">
-              <div className="bg-muted-foreground border-background absolute top-1 -left-[41px] h-5 w-5 rounded-full border-4" />
-              <div className="mb-2 flex items-center gap-2">
-                <Badge variant="outline" className="font-mono">
-                  v1.0.0
-                </Badge>
-                <span className="text-muted-foreground text-sm">
-                  January 2023
-                </span>
-              </div>
-              <h3 className="text-xl font-bold">Initial Release</h3>
-              <p className="text-muted-foreground mt-2">
-                Public beta launch with core SaaS foundations.
-              </p>
-            </div>
-
-            <div className="relative">
-              <div className="bg-muted-foreground border-background absolute top-1 -left-[41px] h-5 w-5 rounded-full border-4" />
-              <div className="mb-2 flex items-center gap-2">
-                <Badge variant="outline" className="font-mono">
-                  v0.1.0
-                </Badge>
-                <span className="text-muted-foreground text-sm">June 2022</span>
-              </div>
-              <h3 className="text-xl font-bold">First Commit</h3>
-              <p className="text-muted-foreground mt-2">
-                Development started on the reusable starter foundation.
-              </p>
-            </div>
+            <Card className="shadow-sm">
+              <CardHeader>
+                <CardTitle>Small, Reviewable Changes</CardTitle>
+                <CardDescription>
+                  Improvements should stay scoped, keep migrations and generated
+                  assets aligned, and include the checks needed for confidence.
+                </CardDescription>
+              </CardHeader>
+            </Card>
           </div>
         </div>
       </MarketingPageShell>

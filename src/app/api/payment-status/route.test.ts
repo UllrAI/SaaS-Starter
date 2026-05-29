@@ -85,7 +85,7 @@ describe("Payment Status API", () => {
     expect(successData).toEqual({
       status: "pending",
       message:
-        "Payment completed, but we still need the checkout reference to verify it.",
+        "We received the checkout return, but still need the checkout reference to verify the payment.",
     });
   });
 
@@ -145,6 +145,25 @@ describe("Payment Status API", () => {
       status: "pending",
       message: "Payment is being processed. This may take a few minutes.",
       sessionId: "test-session-id",
+    });
+  });
+
+  it("accepts session_id as a checkout reference", async () => {
+    mockRetrieveCheckout.mockResolvedValue({ status: "succeeded" });
+
+    const response = await GET(
+      createMockRequest(
+        "http://localhost:3000/api/payment-status?session_id=checkout-from-creem",
+      ),
+    );
+    const data = await response.json();
+
+    expect(mockRetrieveCheckout).toHaveBeenCalledWith("checkout-from-creem");
+    expect(response.status).toBe(200);
+    expect(data).toEqual({
+      status: "success",
+      message: "Payment completed successfully",
+      sessionId: "checkout-from-creem",
     });
   });
 

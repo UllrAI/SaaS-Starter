@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
+type ResolvedPaymentStatus = "success" | "failed" | "pending" | "cancelled";
+
 const CHECKOUT_STATUS_MAP = {
   completed: {
     status: "success",
@@ -40,7 +42,7 @@ const CHECKOUT_STATUS_MAP = {
 } as const;
 
 function resolveCheckoutStatus(normalizedStatus: string): {
-  status: string;
+  status: ResolvedPaymentStatus;
   message: string;
 } {
   return (
@@ -68,11 +70,18 @@ const URL_STATUS_MAP = {
   },
 } as const;
 
+function getCheckoutReference(searchParams: URLSearchParams): string | null {
+  return (
+    searchParams.get("checkout_id") ||
+    searchParams.get("session_id") ||
+    searchParams.get("sessionId")
+  );
+}
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const checkoutId =
-      searchParams.get("checkout_id") || searchParams.get("sessionId");
+    const checkoutId = getCheckoutReference(searchParams);
     const statusParam = searchParams.get("status");
 
     if (checkoutId) {
@@ -124,7 +133,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({
         status: "pending",
         message:
-          "Payment completed, but we still need the checkout reference to verify it.",
+          "We received the checkout return, but still need the checkout reference to verify the payment.",
       });
     }
 

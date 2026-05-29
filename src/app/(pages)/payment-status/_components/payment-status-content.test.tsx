@@ -29,7 +29,7 @@ describe("PaymentStatusContent", () => {
     await waitFor(() => {
       expect(
         screen.getByText(
-          "We are still verifying this payment because the checkout reference is missing.",
+          "We received the checkout return, but the checkout reference is missing. Check your billing page in a few minutes or contact support if access does not update.",
         ),
       ).toBeInTheDocument();
     });
@@ -149,10 +149,13 @@ describe("PaymentStatusContent", () => {
       ).toBeInTheDocument();
     });
 
-    expect(screen.getByText("Failed to check payment status.")).toBeInTheDocument();
     expect(
-      screen.getByRole("link", { name: /View Plans/i }),
-    ).toHaveAttribute("href", "/pricing");
+      screen.getByText("Failed to check payment status."),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /View Plans/i })).toHaveAttribute(
+      "href",
+      "/pricing",
+    );
 
     consoleErrorSpy.mockRestore();
   });

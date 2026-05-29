@@ -5,30 +5,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { SectionContainer } from "@/components/layout/page-container";
 import { Clock } from "lucide-react";
-import { createMetadata } from "@/lib/metadata";
-
-export async function generateMetadata() {
-  const metadata = createMetadata({});
-
-  return {
-    ...metadata,
-    title: "Payment Status",
-    description:
-      "Review the latest billing result and next steps for your account.",
-    openGraph: {
-      ...metadata.openGraph,
-      title: "Payment Status",
-      description:
-        "Review the latest billing result and next steps for your account.",
-    },
-    twitter: {
-      ...metadata.twitter,
-      title: "Payment Status",
-      description:
-        "Review the latest billing result and next steps for your account.",
-    },
-  };
-}
 
 function PaymentStatusSkeleton() {
   return (
@@ -44,7 +20,7 @@ function PaymentStatusSkeleton() {
         <div className="mb-8 text-center">
           <Badge
             variant="outline"
-            className="border-border bg-background/50 inline-flex items-center border px-3 py-1 text-sm backdrop-blur-sm font-mono text-muted-foreground"
+            className="border-border bg-background/50 text-muted-foreground inline-flex items-center border px-3 py-1 font-mono text-sm backdrop-blur-sm"
           >
             <Clock className="mr-2 h-3 w-3" />
             LOADING_STATUS

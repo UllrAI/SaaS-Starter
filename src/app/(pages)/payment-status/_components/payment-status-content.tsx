@@ -125,8 +125,8 @@ function getStatusConfig(status: PaymentStatus): StatusConfig {
         badgeVariant: "outline",
         description: (
           <>
-            You cancelled the payment process. No charges have been made to
-            your account. You can try again anytime.
+            You cancelled the payment process. No charges have been made to your
+            account. You can try again anytime.
           </>
         ),
         icon: <AlertCircle className="h-20 w-20 text-slate-500" />,
@@ -144,17 +144,14 @@ function getStatusConfig(status: PaymentStatus): StatusConfig {
   }
 }
 
-function PaymentStatusErrorMessage({
-  code,
-}: {
-  code: PaymentStatusErrorCode;
-}) {
+function PaymentStatusErrorMessage({ code }: { code: PaymentStatusErrorCode }) {
   switch (code) {
     case "missing_reference":
       return (
         <>
-          We are still verifying this payment because the checkout reference is
-          missing.
+          We received the checkout return, but the checkout reference is
+          missing. Check your billing page in a few minutes or contact support
+          if access does not update.
         </>
       );
     case "status_check_failed":
@@ -189,14 +186,23 @@ export function PaymentStatusContent() {
       try {
         const statusParam = searchParams.get("status") as PaymentStatus;
         const checkoutIdParam =
-          searchParams.get("session_id") || searchParams.get("checkout_id");
+          searchParams.get("checkout_id") || searchParams.get("session_id");
 
         setSessionId(checkoutIdParam);
 
         if (checkoutIdParam) {
+          const paymentStatusParams = new URLSearchParams({
+            checkout_id: checkoutIdParam,
+          });
+          if (statusParam) {
+            paymentStatusParams.set("status", statusParam);
+          }
+
           const response = await fetch(
-            `/api/payment-status?checkout_id=${encodeURIComponent(checkoutIdParam)}`,
-            { signal: abortController.signal },
+            `/api/payment-status?${paymentStatusParams}`,
+            {
+              signal: abortController.signal,
+            },
           );
 
           if (response.ok) {

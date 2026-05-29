@@ -72,6 +72,8 @@ export async function getUsers({
   sortBy = "createdAt",
   sortOrder = "desc",
 }: GetUsersParams) {
+  await requireAdmin();
+
   const offset = (page - 1) * limit;
 
   const whereConditions = [];
@@ -191,6 +193,8 @@ export async function getPayments({
   dateFrom,
   dateTo,
 }: GetPaymentsParams) {
+  await requireAdmin();
+
   const offset = (page - 1) * limit;
   const whereConditions = [];
 
@@ -284,6 +288,8 @@ export async function getSubscriptions({
   sortBy = "createdAt",
   sortOrder = "desc",
 }: GetSubscriptionsParams) {
+  await requireAdmin();
+
   const offset = (page - 1) * limit;
   const whereConditions = [];
 
@@ -377,6 +383,8 @@ export async function getUploads({
   search = "",
   fileType = "all",
 }: GetUploadsParams) {
+  await requireAdmin();
+
   const offset = (page - 1) * limit;
   const conditions: (SQLWrapper | undefined)[] = [];
 

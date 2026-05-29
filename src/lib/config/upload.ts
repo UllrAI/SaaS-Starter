@@ -3,8 +3,8 @@
 import { z } from "zod";
 
 /**
- * 将 MIME 类型映射到文件扩展名。
- * 这是文件扩展名的主要来源。
+ * Maps MIME types to file extensions.
+ * This is the primary source for upload file extensions.
  */
 const MIME_TYPE_TO_EXTENSION = {
   // Images
@@ -54,89 +54,137 @@ const MIME_TYPE_TO_EXTENSION = {
   "text/html": "html",
   "text/css": "css",
   "text/javascript": "js",
+  "application/javascript": "js",
+  "application/ecmascript": "js",
+  "text/ecmascript": "js",
   "application/json": "json", // Note: text/json is obsolete
   "application/xml": "xml", // Note: text/xml is also used
   "text/xml": "xml",
+  "application/xhtml+xml": "xhtml",
   "text/calendar": "ics",
 
   // Archives
   "application/zip": "zip",
   "application/x-rar-compressed": "rar",
   "application/x-7z-compressed": "7z",
-} as const; // 使用 as const 确保类型安全
+} as const;
+
+export const BLOCKED_ACTIVE_CONTENT_TYPES = [
+  "image/svg+xml",
+  "text/html",
+  "text/css",
+  "text/javascript",
+  "application/javascript",
+  "application/ecmascript",
+  "text/ecmascript",
+  "application/xhtml+xml",
+  "application/xml",
+  "text/xml",
+] as const;
+
+const BLOCKED_ACTIVE_CONTENT_TYPE_SET = new Set<string>(
+  BLOCKED_ACTIVE_CONTENT_TYPES,
+);
 
 /**
- * 全局文件上传配置。
- * 这是整个应用中文件上传规则的单一事实来源。
+ * Global upload policy for the application.
  */
 export const UPLOAD_CONFIG = {
   /**
-   * 允许的最大文件大小（字节）。
+   * Maximum allowed single-file size in bytes.
    * @default 50MB
    */
   MAX_FILE_SIZE: 50 * 1024 * 1024,
 
   /**
-   * 允许的最大文件大小（MB），用于在UI中显示。
+   * Maximum allowed single-file size in MB for UI display.
    */
   MAX_FILE_SIZE_MB: 50,
 
   /**
-   * 预签名 URL 的过期时间（秒）。
+   * Maximum files accepted by server-upload in one request.
+   */
+  MAX_SERVER_UPLOAD_FILES: 5,
+
+  /**
+   * Maximum aggregate size accepted by server-upload in one request.
+   */
+  MAX_SERVER_UPLOAD_TOTAL_SIZE: 100 * 1024 * 1024,
+
+  /**
+   * Maximum concurrent R2 uploads performed by server-upload.
+   */
+  SERVER_UPLOAD_CONCURRENCY: 2,
+
+  /**
+   * Lightweight per-user rate limit window for upload endpoints.
+   */
+  USER_UPLOAD_RATE_LIMIT_WINDOW_MS: 60 * 1000,
+
+  /**
+   * Maximum upload endpoint requests allowed per user in one window.
+   */
+  USER_UPLOAD_RATE_LIMIT_MAX_REQUESTS: 30,
+
+  /**
+   * Presigned URL expiration in seconds.
    * @default 15 minutes
    */
   PRESIGNED_URL_EXPIRATION: 15 * 60,
 
   /**
-   * 允许上传的 MIME 类型数组。
-   * **自动从 MIME_TYPE_TO_EXTENSION 生成，确保一致性。**
+   * MIME types allowed for public uploads.
    */
-  ALLOWED_FILE_TYPES: Object.keys(
-    MIME_TYPE_TO_EXTENSION,
+  ALLOWED_FILE_TYPES: Object.keys(MIME_TYPE_TO_EXTENSION).filter(
+    (contentType) => !BLOCKED_ACTIVE_CONTENT_TYPE_SET.has(contentType),
   ) as (keyof typeof MIME_TYPE_TO_EXTENSION)[],
 
   /**
-   * 允许上传目标的协议列表。
-   * 默认仅允许 HTTPS。
+   * Allowed upload target protocols.
    */
   ALLOWED_UPLOAD_URL_PROTOCOLS: ["https:"] as string[],
 
   /**
-   * 允许上传目标的主机名（精确匹配）。
-   * 如使用自定义域名，请将其添加到此列表。
+   * Exact allowed upload target hostnames.
    */
   ALLOWED_UPLOAD_HOSTS: [] as string[],
 
   /**
-   * 允许上传目标的主机名后缀匹配（用于供应商域名）。
+   * Allowed upload target hostname suffixes for provider domains.
    */
   ALLOWED_UPLOAD_HOST_SUFFIXES: [".r2.cloudflarestorage.com"] as string[],
 } as const;
 
+export function normalizeContentType(contentType: string): string {
+  if (typeof contentType !== "string") {
+    return "";
+  }
+
+  return contentType.split(";")[0]?.trim().toLowerCase() || "";
+}
+
 /**
- * 检查文件类型是否在允许列表中。
- * @param contentType - 文件的 MIME 类型。
- * @returns 如果允许则为 `true`，否则为 `false`。
+ * Checks whether a MIME type is allowed for upload.
  */
 export function isFileTypeAllowed(contentType: string): boolean {
+  const normalizedContentType = normalizeContentType(contentType);
+
   return UPLOAD_CONFIG.ALLOWED_FILE_TYPES.includes(
-    contentType as (typeof UPLOAD_CONFIG.ALLOWED_FILE_TYPES)[number],
+    normalizedContentType as (typeof UPLOAD_CONFIG.ALLOWED_FILE_TYPES)[number],
   );
 }
 
 /**
- * 检查文件大小是否在限制范围内。
- * @param size - 文件的字节大小。
- * @returns 如果在限制内则为 `true`，否则为 `false`。
+ * Checks whether a file size is positive and within the limit.
  */
 export function isFileSizeAllowed(size: number): boolean {
-  return size <= UPLOAD_CONFIG.MAX_FILE_SIZE;
+  return (
+    Number.isFinite(size) && size > 0 && size <= UPLOAD_CONFIG.MAX_FILE_SIZE
+  );
 }
 
 /**
- * 格式化文件大小以便于阅读。
- * @param bytes - 文件的字节大小。
- * @returns 格式化后的字符串 (例如, "1.23 MB")。
+ * Formats a byte size for display.
  */
 export function formatFileSize(bytes: number): string {
   if (bytes === 0) return "0 Bytes";
@@ -149,19 +197,19 @@ export function formatFileSize(bytes: number): string {
 }
 
 /**
- * 从 MIME 类型获取文件扩展名。
- * @param contentType - 文件的 MIME 类型。
- * @returns 对应的文件扩展名，如果找不到则默认为 "bin"。
+ * Gets a file extension from a MIME type.
  */
 export function getFileExtension(contentType: string): string {
-  if (contentType in MIME_TYPE_TO_EXTENSION) {
+  const normalizedContentType = normalizeContentType(contentType);
+
+  if (normalizedContentType in MIME_TYPE_TO_EXTENSION) {
     return MIME_TYPE_TO_EXTENSION[
-      contentType as keyof typeof MIME_TYPE_TO_EXTENSION
+      normalizedContentType as keyof typeof MIME_TYPE_TO_EXTENSION
     ];
   }
 
   // Fallback for types like 'application/vnd.some-custom-format'
-  const parts = contentType.split("/");
+  const parts = normalizedContentType.split("/");
   const subtype = parts[1];
   if (subtype && !subtype.includes("*")) {
     const ext = subtype.split("+")[0];
@@ -171,7 +219,6 @@ export function getFileExtension(contentType: string): string {
   return "bin"; // Default fallback
 }
 
-// 用于验证预签名 URL 请求体的 Zod schema
 export const presignedUrlRequestSchema = z.object({
   fileName: z
     .string()

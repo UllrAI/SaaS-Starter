@@ -5,19 +5,35 @@ import {
   isFileSizeAllowed,
   UPLOAD_CONFIG,
   formatFileSize,
-  presignedUrlRequestSchema, // 导入 Zod schema
+  presignedUrlRequestSchema,
+  normalizeContentType,
 } from "@/lib/config/upload";
 import { getAuthSessionFromHeaders } from "@/lib/auth/session";
+import { checkUploadRateLimit } from "@/lib/upload-rate-limit";
 
 export async function POST(request: NextRequest) {
   try {
-    // 1. 认证检查
     const session = await getAuthSessionFromHeaders(request.headers);
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // 2. 解析和验证请求体
+    const rateLimit = checkUploadRateLimit(session.user.id);
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { error: "Too many upload requests. Please try again later." },
+        {
+          status: 429,
+          headers: {
+            "Retry-After": String(rateLimit.retryAfter),
+            "X-RateLimit-Limit": String(rateLimit.limit),
+            "X-RateLimit-Remaining": String(rateLimit.remaining),
+            "X-RateLimit-Reset": String(Math.ceil(rateLimit.resetAt / 1000)),
+          },
+        },
+      );
+    }
+
     const body = await request.json();
     const validation = presignedUrlRequestSchema.safeParse(body);
 
@@ -31,9 +47,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { fileName, contentType, size } = validation.data;
+    const { fileName, size } = validation.data;
+    const contentType = normalizeContentType(validation.data.contentType);
 
-    // 3. 服务器端文件规则验证 (关键安全修复)
     if (!isFileTypeAllowed(contentType)) {
       return NextResponse.json(
         { error: `File type '${contentType}' is not allowed.` },
@@ -50,7 +66,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 4. 创建预签名 URL
     const result = await createPresignedUrl({
       userId: session.user.id,
       fileName,
@@ -59,11 +74,9 @@ export async function POST(request: NextRequest) {
     });
 
     if (!result.success) {
-      // createPresignedUrl 内部已经包含了验证，但我们在这里再次捕获以防万一
       return NextResponse.json({ error: result.error }, { status: 400 });
     }
 
-    // 5. 返回预签名 URL 给客户端。上传完成后由单独的 complete 接口入库。
     return NextResponse.json({
       presignedUrl: result.presignedUrl,
       publicUrl: result.publicUrl,

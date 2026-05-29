@@ -15,6 +15,7 @@ import {
   isFileTypeAllowed,
   isFileSizeAllowed,
   getFileExtension,
+  normalizeContentType,
 } from "./config/upload";
 import { randomUUID } from "crypto";
 
@@ -112,6 +113,11 @@ interface UploadResult {
   url?: string;
   key?: string;
   error?: string;
+}
+
+export interface R2ObjectMetadata {
+  contentLength: number;
+  contentType: string;
 }
 
 const BLOCKED_URL_ERROR = "Blocked URL host";
@@ -305,15 +311,27 @@ export async function uploadBuffer(
   }
 }
 
-export async function fileExists(key: string): Promise<boolean> {
+export async function getObjectMetadata(
+  key: string,
+): Promise<R2ObjectMetadata | null> {
   try {
     const command = new HeadObjectCommand({
       Bucket: env.R2_BUCKET_NAME,
       Key: key,
     });
 
-    await r2Client.send(command);
-    return true;
+    const result = await r2Client.send(command);
+    const contentLength = result.ContentLength;
+    const contentType = normalizeContentType(result.ContentType || "");
+
+    if (typeof contentLength !== "number" || !contentType) {
+      return null;
+    }
+
+    return {
+      contentLength,
+      contentType,
+    };
   } catch (error) {
     if (
       error &&
@@ -325,13 +343,18 @@ export async function fileExists(key: string): Promise<boolean> {
       const maybeName = (error as { name?: string }).name;
 
       if (maybeStatus === 404 || maybeName === "NotFound") {
-        return false;
+        return null;
       }
     }
 
-    console.error("Error checking file existence:", error);
-    return false;
+    console.error("Error reading object metadata:", error);
+    return null;
   }
+}
+
+export async function fileExists(key: string): Promise<boolean> {
+  const metadata = await getObjectMetadata(key);
+  return metadata !== null;
 }
 
 /**
@@ -342,7 +365,6 @@ export async function deleteFile(
 ): Promise<{ success: boolean; error?: string }> {
   try {
     const command = new DeleteObjectCommand({
-      // 使用 DeleteObjectCommand
       Bucket: env.R2_BUCKET_NAME,
       Key: key,
     });
@@ -373,7 +395,7 @@ export async function deleteFiles(
       Bucket: env.R2_BUCKET_NAME,
       Delete: {
         Objects: keys.map((key) => ({ Key: key })),
-        Quiet: false, // 设置为 false 以在响应中获取已删除对象的信息
+        Quiet: false,
       },
     });
     await r2Client.send(command);

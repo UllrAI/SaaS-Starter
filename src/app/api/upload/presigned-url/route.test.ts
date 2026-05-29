@@ -26,6 +26,11 @@ jest.mock("@/lib/r2", () => ({
   createPresignedUrl: mockCreatePresignedUrl,
 }));
 
+const mockCheckUploadRateLimit = jest.fn() as any;
+jest.mock("@/lib/upload-rate-limit", () => ({
+  checkUploadRateLimit: mockCheckUploadRateLimit,
+}));
+
 const mockIsFileTypeAllowed = jest.fn() as any;
 const mockIsFileSizeAllowed = jest.fn() as any;
 const mockFormatFileSize = jest.fn() as any;
@@ -40,12 +45,20 @@ jest.mock("@/lib/config/upload", () => ({
     MAX_FILE_SIZE: 10485760,
   },
   formatFileSize: mockFormatFileSize,
+  normalizeContentType: jest.fn((contentType: string) => contentType),
   presignedUrlRequestSchema: mockPresignedUrlRequestSchema,
 }));
 
 describe("Upload Presigned URL API", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockCheckUploadRateLimit.mockReturnValue({
+      allowed: true,
+      limit: 30,
+      remaining: 29,
+      resetAt: Date.now() + 60_000,
+      retryAfter: 0,
+    });
   });
 
   const createMockRequest = (body: unknown): NextRequest =>

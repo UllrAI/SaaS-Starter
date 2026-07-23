@@ -355,7 +355,7 @@ export async function getObjectMetadata(
     }
 
     console.error("Error reading object metadata:", error);
-    return null;
+    throw error;
   }
 }
 

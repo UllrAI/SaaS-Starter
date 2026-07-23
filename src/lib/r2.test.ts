@@ -454,7 +454,7 @@ describe("R2 Storage Functions", () => {
       await expect(fileExists("missing-key")).resolves.toBe(false);
     });
 
-    it("should log unexpected errors and return false", async () => {
+    it("should surface unexpected metadata errors", async () => {
       const { fileExists } = await import("./r2");
 
       mockSend.mockRejectedValueOnce(new Error("Timeout"));
@@ -462,7 +462,7 @@ describe("R2 Storage Functions", () => {
         .spyOn(console, "error")
         .mockImplementation(() => {});
 
-      await expect(fileExists("test-key")).resolves.toBe(false);
+      await expect(fileExists("test-key")).rejects.toThrow("Timeout");
       expect(consoleSpy).toHaveBeenCalledWith(
         "Error reading object metadata:",
         expect.any(Error),

@@ -48,7 +48,13 @@ const mockSelectWhere = jest.fn().mockReturnValue({
 const mockSelectFrom = jest.fn().mockReturnValue({
   where: mockSelectWhere,
 }) as any;
-const mockInsertValues = jest.fn().mockResolvedValue(undefined) as any;
+const mockReturning = jest.fn() as any;
+const mockOnConflictDoNothing = jest.fn().mockReturnValue({
+  returning: mockReturning,
+}) as any;
+const mockInsertValues = jest.fn().mockReturnValue({
+  onConflictDoNothing: mockOnConflictDoNothing,
+}) as any;
 const mockDb = {
   select: jest.fn().mockReturnValue({
     from: mockSelectFrom,
@@ -108,6 +114,21 @@ describe("Upload Complete API", () => {
     mockDb.insert.mockReturnValue({
       values: mockInsertValues,
     });
+    mockInsertValues.mockReturnValue({
+      onConflictDoNothing: mockOnConflictDoNothing,
+    });
+    mockOnConflictDoNothing.mockReturnValue({
+      returning: mockReturning,
+    });
+    mockReturning.mockResolvedValue([
+      {
+        fileKey: validRequestBody.key,
+        url: validRequestBody.url,
+        fileName: validRequestBody.fileName,
+        fileSize: validRequestBody.size,
+        contentType: validRequestBody.contentType,
+      },
+    ]);
     mockCheckUploadRateLimit.mockReturnValue({
       allowed: true,
       limit: 30,
@@ -177,6 +198,25 @@ describe("Upload Complete API", () => {
     expect(data.error).toBe("Invalid request data");
   });
 
+  it("should return 400 for malformed JSON", async () => {
+    mockGetSession.mockResolvedValue(mockSession);
+    mockUploadCompleteRequestSchema.safeParse.mockReturnValue({
+      success: false,
+      error: {
+        flatten: () => ({ fieldErrors: {} }),
+      },
+    });
+    const request = createMockRequest(validRequestBody);
+    (request.json as jest.Mock).mockRejectedValue(new Error("Invalid JSON"));
+
+    const { POST } = await import("./route");
+    const response = await POST(request);
+    const data = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(data.error).toBe("Invalid request data");
+  });
+
   it("should reject upload keys that do not belong to the current user", async () => {
     mockGetSession.mockResolvedValue(mockSession);
     mockUploadCompleteRequestSchema.safeParse.mockReturnValue({
@@ -211,6 +251,25 @@ describe("Upload Complete API", () => {
 
     expect(response.status).toBe(409);
     expect(data.error).toBe("Uploaded object could not be verified.");
+    expect(mockDb.insert).not.toHaveBeenCalled();
+  });
+
+  it("should return 500 when object storage metadata lookup fails", async () => {
+    mockGetSession.mockResolvedValue(mockSession);
+    mockUploadCompleteRequestSchema.safeParse.mockReturnValue({
+      success: true,
+      data: validRequestBody,
+    });
+    mockIsFileTypeAllowed.mockReturnValue(true);
+    mockIsFileSizeAllowed.mockReturnValue(true);
+    mockGetObjectMetadata.mockRejectedValue(new Error("R2 unavailable"));
+
+    const { POST } = await import("./route");
+    const response = await POST(createMockRequest(validRequestBody));
+    const data = await response.json();
+
+    expect(response.status).toBe(500);
+    expect(data.error).toBe("Internal Server Error. Please try again later.");
     expect(mockDb.insert).not.toHaveBeenCalled();
   });
 
@@ -287,6 +346,7 @@ describe("Upload Complete API", () => {
       fileSize: validRequestBody.size,
       contentType: validRequestBody.contentType,
     };
+    mockReturning.mockResolvedValue([]);
     mockSelectLimit.mockResolvedValue([existingUpload]);
 
     const { POST } = await import("./route");
@@ -294,7 +354,10 @@ describe("Upload Complete API", () => {
     const data = await response.json();
 
     expect(response.status).toBe(200);
-    expect(mockDb.insert).not.toHaveBeenCalled();
+    expect(mockDb.insert).toHaveBeenCalled();
+    expect(mockOnConflictDoNothing).toHaveBeenCalledWith({
+      target: "fileKey",
+    });
     expect(data.file).toEqual({
       key: existingUpload.fileKey,
       url: existingUpload.url,

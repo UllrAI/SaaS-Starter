@@ -211,6 +211,12 @@ describe("Upload Presigned URL API", () => {
 
     it("should handle request.json() failure", async () => {
       mockGetSession.mockResolvedValue(mockSession);
+      mockPresignedUrlRequestSchema.safeParse.mockReturnValue({
+        success: false,
+        error: {
+          flatten: () => ({ fieldErrors: {} }),
+        },
+      });
 
       const request = {
         headers: {
@@ -229,8 +235,8 @@ describe("Upload Presigned URL API", () => {
       const response = await POST(request);
       const data = await response.json();
 
-      expect(response.status).toBe(500);
-      expect(data.error).toBe("Internal Server Error. Please try again later.");
+      expect(response.status).toBe(400);
+      expect(data.error).toBe("Invalid request data");
     });
   });
 });

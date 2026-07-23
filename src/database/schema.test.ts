@@ -1514,8 +1514,14 @@ describe("Database Schema", () => {
       const configs = getIndexConfigs(uploads);
       const indexNames = configs.map((cfg) => cfg.name);
       expect(indexNames).toEqual(
-        expect.arrayContaining(["uploads_userId_idx", "uploads_fileKey_idx"]),
+        expect.arrayContaining([
+          "uploads_userId_idx",
+          "uploads_fileKey_unique",
+        ]),
       );
+      expect(
+        configs.find((cfg) => cfg.name === "uploads_fileKey_unique")?.unique,
+      ).toBe(true);
     });
   });
 });

@@ -8,8 +8,7 @@ if (!env.CREEM_API_KEY) {
 export const creemApiKey = env.CREEM_API_KEY;
 
 export const creemClient = new Creem({
-  // Select the Creem server by environment: 0 is live_mode, 1 is test_mode.
-  serverIdx: env.CREEM_ENVIRONMENT === "live_mode" ? 0 : 1,
+  server: env.CREEM_ENVIRONMENT === "live_mode" ? "prod" : "test",
   apiKey: creemApiKey,
 });
 

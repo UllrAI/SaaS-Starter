@@ -15,6 +15,13 @@
       "when": 1773132563613,
       "tag": "0001_tense_bloodstorm",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1784825234413,
+      "tag": "0002_gorgeous_spot",
+      "breakpoints": true
     }
   ]
 }

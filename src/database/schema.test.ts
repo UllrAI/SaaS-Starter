@@ -354,7 +354,7 @@ describe("Database Schema", () => {
     it("should have proper column constraints", () => {
       expect(webhookEvents.id.primary).toBe(true);
       expect(webhookEvents.eventId.notNull).toBe(true);
-      expect(webhookEvents.eventId.isUnique).toBe(true);
+      expect(webhookEvents.eventId.isUnique).toBe(false);
       expect(webhookEvents.eventType.notNull).toBe(true);
       expect(webhookEvents.provider.notNull).toBe(true);
       expect(webhookEvents.provider.default).toBe("creem");
@@ -517,8 +517,8 @@ describe("Database Schema", () => {
       // Payments should have unique paymentId
       expect(payments.paymentId.isUnique).toBe(true);
 
-      // Webhook events should have unique eventId
-      expect(webhookEvents.eventId.isUnique).toBe(true);
+      // Webhook event IDs are unique within a provider via a composite index
+      expect(webhookEvents.eventId.isUnique).toBe(false);
 
       // Payment provider customer ID should be unique
       expect(users.paymentProviderCustomerId.isUnique).toBe(true);
@@ -1313,7 +1313,7 @@ describe("Database Schema", () => {
       expect(sessions.token.isUnique).toBe(true);
       expect(subscriptions.subscriptionId.isUnique).toBe(true);
       expect(payments.paymentId.isUnique).toBe(true);
-      expect(webhookEvents.eventId.isUnique).toBe(true);
+      expect(webhookEvents.eventId.isUnique).toBe(false);
 
       // Test default values
       expect(users.role.default).toBe("user");
@@ -1494,15 +1494,20 @@ describe("Database Schema", () => {
       expect(indexNames).toContain("payments_userId_idx");
     });
 
-    it("webhook events table keeps eventId/provider indexes for idempotency", () => {
+    it("webhook events table keeps provider-scoped idempotency indexes", () => {
       const configs = getIndexConfigs(webhookEvents);
       const indexNames = configs.map((cfg) => cfg.name);
       expect(indexNames).toEqual(
         expect.arrayContaining([
-          "webhook_events_eventId_idx",
+          "webhook_events_provider_eventId_unique",
           "webhook_events_provider_idx",
         ]),
       );
+      expect(
+        configs.find(
+          (cfg) => cfg.name === "webhook_events_provider_eventId_unique",
+        )?.unique,
+      ).toBe(true);
     });
 
     it("uploads table indexes file ownership and key", () => {

@@ -45,8 +45,22 @@ describe("Billing Webhooks Creem API", () => {
   });
 
   const createMockRequest = (payload: string): NextRequest => {
+    const encodedPayload = new TextEncoder().encode(payload);
+    let delivered = false;
+
     return {
-      text: jest.fn().mockResolvedValue(payload) as any,
+      body: {
+        getReader: () => ({
+          read: jest.fn(async () => {
+            if (delivered) {
+              return { done: true, value: undefined };
+            }
+            delivered = true;
+            return { done: false, value: encodedPayload };
+          }),
+          cancel: jest.fn(async () => undefined),
+        }),
+      },
       headers: {
         get: () => "",
         has: () => false,
@@ -129,6 +143,21 @@ describe("Billing Webhooks Creem API", () => {
       expect(data.error).toBe("Invalid signature.");
     });
 
+    it("should return 400 for a signed invalid webhook payload", async () => {
+      const payloadError = new Error("Invalid webhook payload.");
+      payloadError.name = "InvalidWebhookPayloadError";
+
+      mockHeadersList.get.mockReturnValue("valid-signature");
+      mockHandleWebhook.mockRejectedValue(payloadError);
+
+      const { POST } = await import("./route");
+      const response = await POST(createMockRequest("{invalid-json"));
+      const data = await response.json();
+
+      expect(response.status).toBe(400);
+      expect(data.error).toBe("Invalid webhook payload");
+    });
+
     it("should handle other webhook errors with 500 status", async () => {
       const mockSignature = "valid-signature";
       const mockPayload = '{"event": "test"}';
@@ -145,7 +174,7 @@ describe("Billing Webhooks Creem API", () => {
       const data = await response.json();
 
       expect(response.status).toBe(500);
-      expect(data.error).toBe("Database connection failed");
+      expect(data.error).toBe("Webhook processing failed");
     });
 
     it("should handle non-Error exceptions with 500 status", async () => {
@@ -165,13 +194,18 @@ describe("Billing Webhooks Creem API", () => {
       expect(data.error).toBe("Webhook processing failed");
     });
 
-    it("should handle request.text() failure", async () => {
+    it("should handle request body read failure", async () => {
       mockHeadersList.get.mockReturnValue("valid-signature");
 
       const request = {
-        text: jest
-          .fn()
-          .mockRejectedValue(new Error("Failed to read request body")) as any,
+        body: {
+          getReader: () => ({
+            read: jest
+              .fn()
+              .mockRejectedValue(new Error("Failed to read request body")),
+            cancel: jest.fn(),
+          }),
+        },
         headers: {
           get: () => "",
           has: () => false,
@@ -189,7 +223,7 @@ describe("Billing Webhooks Creem API", () => {
       const data = await response.json();
 
       expect(response.status).toBe(500);
-      expect(data.error).toBe("Failed to read request body");
+      expect(data.error).toBe("Webhook processing failed");
     });
 
     it("should handle headers() function failure", async () => {
@@ -203,7 +237,7 @@ describe("Billing Webhooks Creem API", () => {
       const data = await response.json();
 
       expect(response.status).toBe(500);
-      expect(data.error).toBe("Headers not available");
+      expect(data.error).toBe("Webhook processing failed");
 
       // Restore headers mock
       mockHeaders.mockResolvedValue(mockHeadersList);
@@ -271,6 +305,23 @@ describe("Billing Webhooks Creem API", () => {
         mockPayload,
         mockSignature,
       );
+    });
+
+    it("should reject a payload larger than one megabyte", async () => {
+      mockHeadersList.get.mockReturnValue("signature-123");
+
+      const request = createMockRequest("small");
+      request.headers.get = jest.fn((name: string) =>
+        name === "content-length" ? String(1024 * 1024 + 1) : "",
+      );
+
+      const { POST } = await import("./route");
+      const response = await POST(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(413);
+      expect(data.error).toBe("Webhook payload is too large");
+      expect(mockHandleWebhook).not.toHaveBeenCalled();
     });
 
     it("should return 500 when a non-signature error mentions signature", async () => {

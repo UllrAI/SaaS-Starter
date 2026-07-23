@@ -22,6 +22,7 @@ const mockSubscriptions = {
   currentPeriodStart: "subscriptions.currentPeriodStart",
   currentPeriodEnd: "subscriptions.currentPeriodEnd",
   canceledAt: "subscriptions.canceledAt",
+  lastWebhookCreatedAt: "subscriptions.lastWebhookCreatedAt",
   createdAt: "subscriptions.createdAt",
   updatedAt: "subscriptions.updatedAt",
 };
@@ -55,7 +56,12 @@ const mockWebhookEvents = {
 
 const mockEq = jest.fn();
 const mockDesc = jest.fn();
-const mockAnd = jest.fn();
+const mockSql = jest.fn(
+  (strings: TemplateStringsArray, ...values: unknown[]) => ({
+    strings,
+    values,
+  }),
+);
 
 const mockGetProductTierByProductId = jest.fn();
 const mockGetProductTierById = jest.fn();
@@ -75,7 +81,7 @@ jest.mock("@/database/tables", () => ({
 jest.mock("drizzle-orm", () => ({
   eq: mockEq,
   desc: mockDesc,
-  and: mockAnd,
+  sql: mockSql,
 }));
 
 jest.mock("@/lib/config/products", () => ({
@@ -86,6 +92,12 @@ jest.mock("@/lib/config/products", () => ({
 describe("Database Subscription Functions", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockSql.mockImplementation(
+      (strings: TemplateStringsArray, ...values: unknown[]) => ({
+        strings,
+        values,
+      }),
+    );
 
     // Setup default mock implementations
     mockDb.select.mockReturnValue({
@@ -108,7 +120,9 @@ describe("Database Subscription Functions", () => {
         onConflictDoUpdate: jest.fn().mockReturnValue({
           returning: jest.fn().mockResolvedValue([]),
         }),
-        onConflictDoNothing: jest.fn().mockResolvedValue([]),
+        onConflictDoNothing: jest.fn().mockReturnValue({
+          returning: jest.fn().mockResolvedValue([{ id: "event-row-id" }]),
+        }),
         returning: jest.fn().mockResolvedValue([]),
       }),
     });
@@ -139,6 +153,7 @@ describe("Database Subscription Functions", () => {
         currentPeriodStart: new Date("2024-01-01"),
         currentPeriodEnd: new Date("2024-02-01"),
         canceledAt: null,
+        lastWebhookCreatedAt: new Date("2024-01-01T00:00:00Z"),
       };
 
       const mockResult = [{ id: "subscription-id", ...subscriptionData }];
@@ -169,6 +184,7 @@ describe("Database Subscription Functions", () => {
         currentPeriodStart: new Date("2024-01-01"),
         currentPeriodEnd: new Date("2024-02-01"),
         canceledAt: new Date("2024-01-15"),
+        lastWebhookCreatedAt: new Date("2024-01-15T00:00:00Z"),
       };
 
       const mockUpdateResult = [{ id: "subscription-id", ...subscriptionData }];
@@ -194,8 +210,10 @@ describe("Database Subscription Functions", () => {
           status: "canceled",
           productId: "product-123",
           canceledAt: subscriptionData.canceledAt,
+          lastWebhookCreatedAt: subscriptionData.lastWebhookCreatedAt,
           updatedAt: expect.any(Date),
         }),
+        setWhere: expect.any(Object),
       });
     });
 
@@ -206,6 +224,7 @@ describe("Database Subscription Functions", () => {
         subscriptionId: "sub-123",
         productId: "product-123",
         status: "active" as const,
+        lastWebhookCreatedAt: new Date("2024-01-01T00:00:00Z"),
       };
 
       const mockTx = {
@@ -803,102 +822,26 @@ describe("Database Subscription Functions", () => {
     });
   });
 
-  describe("isWebhookEventProcessed", () => {
-    it("should return true when event already processed", async () => {
-      const mockEvent = {
-        eventId: "event-123",
-        provider: "creem",
-        processed: true,
-      };
-
-      mockDb.select.mockReturnValue({
-        from: jest.fn().mockReturnValue({
-          where: jest.fn().mockReturnValue({
-            limit: jest.fn().mockResolvedValue([mockEvent]),
-          }),
-        }),
-      });
-
-      const { isWebhookEventProcessed } = await import("./subscription");
-
-      const result = await isWebhookEventProcessed("event-123");
-
-      expect(result).toBe(true);
-      expect(mockEq).toHaveBeenCalledWith(
-        mockWebhookEvents.eventId,
-        "event-123",
-      );
-      expect(mockEq).toHaveBeenCalledWith(mockWebhookEvents.provider, "creem");
-    });
-
-    it("should return false when event not processed", async () => {
-      mockDb.select.mockReturnValue({
-        from: jest.fn().mockReturnValue({
-          where: jest.fn().mockReturnValue({
-            limit: jest.fn().mockResolvedValue([]),
-          }),
-        }),
-      });
-
-      const { isWebhookEventProcessed } = await import("./subscription");
-
-      const result = await isWebhookEventProcessed("event-123");
-
-      expect(result).toBe(false);
-    });
-
-    it("should use custom provider", async () => {
-      mockDb.select.mockReturnValue({
-        from: jest.fn().mockReturnValue({
-          where: jest.fn().mockReturnValue({
-            limit: jest.fn().mockResolvedValue([]),
-          }),
-        }),
-      });
-
-      const { isWebhookEventProcessed } = await import("./subscription");
-
-      await isWebhookEventProcessed("event-123", "stripe");
-
-      expect(mockEq).toHaveBeenCalledWith(mockWebhookEvents.provider, "stripe");
-    });
-
-    it("should work with transaction", async () => {
-      const mockTx = {
-        select: jest.fn().mockReturnValue({
-          from: jest.fn().mockReturnValue({
-            where: jest.fn().mockReturnValue({
-              limit: jest.fn().mockResolvedValue([]),
-            }),
-          }),
-        }),
-      };
-
-      const { isWebhookEventProcessed } = await import("./subscription");
-
-      await isWebhookEventProcessed("event-123", "creem", mockTx as any);
-
-      expect(mockTx.select).toHaveBeenCalled();
-    });
-  });
-
   describe("recordWebhookEvent", () => {
     it("should record webhook event with all parameters", async () => {
       mockDb.insert.mockReturnValue({
         values: jest.fn().mockReturnValue({
-          onConflictDoNothing: jest.fn().mockResolvedValue([]),
+          onConflictDoNothing: jest.fn().mockReturnValue({
+            returning: jest.fn().mockResolvedValue([{ id: "event-row-id" }]),
+          }),
         }),
       });
 
       const { recordWebhookEvent } = await import("./subscription");
 
-      await recordWebhookEvent(
+      const result = await recordWebhookEvent(
         "event-123",
         "payment.succeeded",
         "creem",
         '{"eventType":"payment.succeeded"}',
       );
 
+      expect(result).toBe(true);
       expect(mockDb.insert).toHaveBeenCalledWith(mockWebhookEvents);
     });
 
@@ -922,7 +865,9 @@ describe("Database Subscription Functions", () => {
       const mockTx = {
         insert: jest.fn().mockReturnValue({
           values: jest.fn().mockReturnValue({
-            onConflictDoNothing: jest.fn().mockResolvedValue([]),
+            onConflictDoNothing: jest.fn().mockReturnValue({
+              returning: jest.fn().mockResolvedValue([{ id: "event-row-id" }]),
+            }),
           }),
         }),
       };
@@ -941,7 +886,10 @@ describe("Database Subscription Functions", () => {
     });
 
     it("should ignore conflicts gracefully", async () => {
-      const mockOnConflictDoNothing = jest.fn().mockResolvedValue([]);
+      const mockReturning = jest.fn().mockResolvedValue([]);
+      const mockOnConflictDoNothing = jest.fn().mockReturnValue({
+        returning: mockReturning,
+      });
 
       mockDb.insert.mockReturnValue({
         values: jest.fn().mockReturnValue({
@@ -951,9 +899,13 @@ describe("Database Subscription Functions", () => {
 
       const { recordWebhookEvent } = await import("./subscription");
 
-      await recordWebhookEvent("event-123", "payment.succeeded");
+      const result = await recordWebhookEvent("event-123", "payment.succeeded");
 
-      expect(mockOnConflictDoNothing).toHaveBeenCalled();
+      expect(result).toBe(false);
+      expect(mockOnConflictDoNothing).toHaveBeenCalledWith({
+        target: [mockWebhookEvents.provider, mockWebhookEvents.eventId],
+      });
+      expect(mockReturning).toHaveBeenCalled();
     });
   });
 

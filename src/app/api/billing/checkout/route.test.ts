@@ -325,7 +325,7 @@ describe("Billing Checkout API", () => {
       expect(data.error).toContain("Failed to create checkout session");
     });
 
-    it("should handle request.json() failure", async () => {
+    it("should return 400 when request JSON is malformed", async () => {
       mockGetSession.mockResolvedValue(mockSession);
 
       const request = {
@@ -346,8 +346,8 @@ describe("Billing Checkout API", () => {
       const response = await POST(request);
       const data = await response.json();
 
-      expect(response.status).toBe(500);
-      expect(data.error).toContain("Failed to create checkout session");
+      expect(response.status).toBe(400);
+      expect(data.error).toBe("Invalid request body");
     });
 
     it("should validate checkoutSchema with all valid enum values", async () => {

@@ -20,6 +20,8 @@ export type SubscriptionStatus =
   | "canceled"
   | "past_due"
   | "unpaid"
+  | "paused"
+  | "scheduled_cancel"
   | "trialing"
   | "incomplete";
 
@@ -66,9 +68,9 @@ interface CreemBaseObject {
 export interface CreemSubscriptionObject extends CreemBaseObject {
   product: string | { id: string };
   status: SubscriptionStatus;
-  current_period_start_date: string;
-  current_period_end_date: string;
-  canceled_at: string | null;
+  current_period_start_date?: string;
+  current_period_end_date?: string;
+  canceled_at?: string | null;
 }
 
 export interface CreemPaymentObject extends CreemBaseObject {

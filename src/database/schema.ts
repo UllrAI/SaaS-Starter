@@ -6,6 +6,7 @@ import {
   boolean,
   uuid,
   index,
+  uniqueIndex,
   pgEnum,
 } from "drizzle-orm/pg-core";
 
@@ -182,6 +183,7 @@ export const subscriptions = pgTable(
     currentPeriodStart: timestamp("currentPeriodStart"),
     currentPeriodEnd: timestamp("currentPeriodEnd"),
     canceledAt: timestamp("canceledAt"),
+    lastWebhookCreatedAt: timestamp("lastWebhookCreatedAt"),
     createdAt: timestamp("createdAt").notNull().defaultNow(),
     updatedAt: timestamp("updatedAt").notNull().defaultNow(),
   },
@@ -224,7 +226,7 @@ export const webhookEvents = pgTable(
   "webhook_events",
   {
     id: uuid("id").primaryKey().defaultRandom(),
-    eventId: text("eventId").notNull().unique(), // Unique identifier from webhook provider
+    eventId: text("eventId").notNull(), // Unique identifier from webhook provider
     eventType: text("eventType").notNull(),
     provider: text("provider").notNull().default("creem"), // Support multiple providers
     processed: boolean("processed").notNull().default(true),
@@ -234,7 +236,9 @@ export const webhookEvents = pgTable(
   },
   (table) => {
     return {
-      eventIdIdx: index("webhook_events_eventId_idx").on(table.eventId),
+      providerEventIdUnique: uniqueIndex(
+        "webhook_events_provider_eventId_unique",
+      ).on(table.provider, table.eventId),
       providerIdx: index("webhook_events_provider_idx").on(table.provider),
     };
   },

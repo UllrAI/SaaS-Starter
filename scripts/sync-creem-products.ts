@@ -17,10 +17,6 @@ const envSchema = z.object({
   CREEM_ENVIRONMENT: z.enum(["test_mode", "live_mode"]).default("test_mode"),
 });
 
-const createProductResponseSchema = z.object({
-  id: z.string(),
-});
-
 async function main() {
   const env = envSchema.parse({
     CREEM_API_KEY: process.env.CREEM_API_KEY,
@@ -31,7 +27,7 @@ async function main() {
     getArgumentValue("--prefix") ??
     humanizePackageName(await readPackageName());
   const client = new Creem({
-    serverIdx: env.CREEM_ENVIRONMENT === "live_mode" ? 0 : 1,
+    server: env.CREEM_ENVIRONMENT === "live_mode" ? "prod" : "test",
     apiKey: env.CREEM_API_KEY,
   });
 
@@ -51,11 +47,7 @@ async function main() {
       continue;
     }
 
-    const createdProduct = await createProduct(
-      env.CREEM_API_KEY,
-      env.CREEM_ENVIRONMENT,
-      spec,
-    );
+    const createdProduct = await createProduct(client, spec);
 
     existingProducts.push(createdProduct);
     resolvedProducts.push({
@@ -71,75 +63,31 @@ async function main() {
 
 async function loadAllProducts(client: Creem): Promise<ProductEntity[]> {
   const products: ProductEntity[] = [];
-  let pageNumber = 1;
 
-  while (true) {
-    const response = await client.products.search(pageNumber, 100);
-    products.push(...response.items);
-
-    if (!response.pagination.nextPage) {
-      break;
-    }
-
-    pageNumber = response.pagination.nextPage;
+  const response = await client.products.search(1, 100);
+  for await (const page of response) {
+    products.push(...page.result.items);
   }
 
   return products;
 }
 
 async function createProduct(
-  apiKey: string,
-  environment: "test_mode" | "live_mode",
+  client: Creem,
   spec: CreemProductSpec,
 ): Promise<ProductEntity> {
-  const body = {
-    name: spec.name,
-    description: spec.description,
-    price: spec.price,
-    currency: spec.currency,
-    billing_type: spec.billingType,
-    tax_mode: "exclusive" as const,
-    tax_category: "saas" as const,
-    ...(spec.billingType === "recurring"
-      ? { billing_period: spec.billingPeriod }
-      : {}),
-  };
-
-  const response = await fetch("https://api.creem.io/v1/products", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-api-key": apiKey,
-    },
-    body: JSON.stringify(body),
-  });
-
-  if (!response.ok) {
-    const body = await response.text();
-    throw new Error(
-      `Creem create product failed: ${response.status} ${response.statusText} ${body}`,
-    );
-  }
-
-  const payload = createProductResponseSchema.parse(await response.json());
-  const mode = environment === "live_mode" ? "prod" : "test";
-
-  return {
-    id: payload.id,
-    mode,
-    object: "product",
+  return client.products.create({
     name: spec.name,
     description: spec.description,
     price: spec.price,
     currency: spec.currency,
     billingType: spec.billingType,
-    billingPeriod: spec.billingPeriod,
-    status: "active",
     taxMode: "exclusive",
     taxCategory: "saas",
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  };
+    ...(spec.billingType === "recurring"
+      ? { billingPeriod: spec.billingPeriod }
+      : {}),
+  });
 }
 
 async function writeResolvedProducts(

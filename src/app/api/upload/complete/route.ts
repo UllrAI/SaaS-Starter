@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const body = await request.json();
+    const body = await request.json().catch(() => null);
     const validation = uploadCompleteRequestSchema.safeParse(body);
 
     if (!validation.success) {
@@ -126,40 +126,42 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const existingUpload = await db
-      .select()
-      .from(uploads)
-      .where(and(eq(uploads.userId, session.user.id), eq(uploads.fileKey, key)))
-      .limit(1);
+    const inserted = await db
+      .insert(uploads)
+      .values({
+        userId: session.user.id,
+        fileKey: key,
+        url: expectedUrl,
+        fileName,
+        fileSize: metadata.contentLength,
+        contentType: metadata.contentType,
+      })
+      .onConflictDoNothing({ target: uploads.fileKey })
+      .returning();
 
-    if (existingUpload[0]) {
-      return NextResponse.json({
-        file: {
-          key: existingUpload[0].fileKey,
-          url: existingUpload[0].url,
-          fileName: existingUpload[0].fileName,
-          size: existingUpload[0].fileSize,
-          contentType: existingUpload[0].contentType,
-        },
-      });
+    const existing =
+      inserted[0] ??
+      (
+        await db
+          .select()
+          .from(uploads)
+          .where(
+            and(eq(uploads.userId, session.user.id), eq(uploads.fileKey, key)),
+          )
+          .limit(1)
+      )[0];
+
+    if (!existing) {
+      throw new Error("Upload record was not available after insert.");
     }
-
-    await db.insert(uploads).values({
-      userId: session.user.id,
-      fileKey: key,
-      url: expectedUrl,
-      fileName,
-      fileSize: metadata.contentLength,
-      contentType: metadata.contentType,
-    });
 
     return NextResponse.json({
       file: {
-        key,
-        url: expectedUrl,
-        fileName,
-        size: metadata.contentLength,
-        contentType: metadata.contentType,
+        key: existing.fileKey,
+        url: existing.url,
+        fileName: existing.fileName,
+        size: existing.fileSize,
+        contentType: existing.contentType,
       },
     });
   } catch (error) {

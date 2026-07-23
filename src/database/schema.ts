@@ -262,7 +262,7 @@ export const uploads = pgTable(
   (table) => {
     return {
       userIdx: index("uploads_userId_idx").on(table.userId),
-      fileKeyIdx: index("uploads_fileKey_idx").on(table.fileKey),
+      fileKeyUnique: uniqueIndex("uploads_fileKey_unique").on(table.fileKey),
     };
   },
 );

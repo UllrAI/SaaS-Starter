@@ -15,7 +15,9 @@ import {
 } from "@/lib/config/upload";
 import { getAuthSessionFromHeaders } from "@/lib/auth/session";
 import { checkUploadRateLimit } from "@/lib/upload-rate-limit";
-import { buildR2PublicUrl } from "@/lib/r2";
+import { buildR2PublicUrl, deleteFile } from "@/lib/r2";
+
+const MULTIPART_OVERHEAD_BYTES = 1024 * 1024;
 
 // Initialize S3 client for Cloudflare R2
 const r2Client = new S3Client({
@@ -41,6 +43,13 @@ type ServerUploadResult =
       success: false;
       error: string;
     };
+
+class UploadValidationError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "UploadValidationError";
+  }
+}
 
 function isUploadFile(entry: FormDataEntryValue): entry is File {
   return (
@@ -104,8 +113,49 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const contentLengthHeader = request.headers.get("content-length");
+    if (contentLengthHeader === null) {
+      return NextResponse.json(
+        { error: "Content-Length header is required." },
+        { status: 411 },
+      );
+    }
+
+    if (!/^\d+$/.test(contentLengthHeader)) {
+      return NextResponse.json(
+        { error: "Invalid Content-Length header." },
+        { status: 400 },
+      );
+    }
+
+    const declaredLength = Number(contentLengthHeader);
+    const maxRequestSize =
+      UPLOAD_CONFIG.MAX_SERVER_UPLOAD_TOTAL_SIZE + MULTIPART_OVERHEAD_BYTES;
+    if (!Number.isSafeInteger(declaredLength) || declaredLength <= 0) {
+      return NextResponse.json(
+        { error: "Invalid Content-Length header." },
+        { status: 400 },
+      );
+    }
+
+    if (declaredLength > maxRequestSize) {
+      return NextResponse.json(
+        { error: "Upload request is too large." },
+        { status: 413 },
+      );
+    }
+
     // Parse multipart/form-data
-    const formData = await request.formData();
+    let formData: FormData;
+    try {
+      formData = await request.formData();
+    } catch (error) {
+      console.warn("Invalid multipart upload payload:", error);
+      return NextResponse.json(
+        { error: "Invalid multipart upload payload." },
+        { status: 400 },
+      );
+    }
     const fileEntries = formData.getAll("files");
     const files = fileEntries.filter(isUploadFile);
 
@@ -144,17 +194,21 @@ export async function POST(request: NextRequest) {
 
     // Function to process a single file
     const processFile = async (file: File): Promise<ServerUploadResult> => {
+      let uploadedKey: string | null = null;
+
       try {
         const normalizedContentType = normalizeContentType(file.type);
 
         // Validate file type
         if (!isFileTypeAllowed(normalizedContentType)) {
-          throw new Error(`File type ${normalizedContentType} is not allowed`);
+          throw new UploadValidationError(
+            `File type ${normalizedContentType} is not allowed`,
+          );
         }
 
         // Validate file size
         if (!isFileSizeAllowed(file.size)) {
-          throw new Error(
+          throw new UploadValidationError(
             `File size ${file.size} bytes exceeds maximum allowed size of ${UPLOAD_CONFIG.MAX_FILE_SIZE} bytes`,
           );
         }
@@ -183,6 +237,7 @@ export async function POST(request: NextRequest) {
 
         // Execute the upload
         await upload.done();
+        uploadedKey = key;
 
         // Generate public URL
         const publicUrl = buildR2PublicUrl(key);
@@ -207,10 +262,23 @@ export async function POST(request: NextRequest) {
         };
       } catch (error) {
         console.error(`Error uploading file ${file.name}:`, error);
+
+        if (uploadedKey) {
+          const cleanup = await deleteFile(uploadedKey);
+          if (!cleanup.success) {
+            console.error(
+              `Failed to clean up R2 object ${uploadedKey} after upload metadata error.`,
+            );
+          }
+        }
+
         return {
           fileName: file.name,
           success: false,
-          error: error instanceof Error ? error.message : "Unknown error",
+          error:
+            error instanceof UploadValidationError
+              ? error.message
+              : "Upload failed. Please try again.",
         };
       }
     };

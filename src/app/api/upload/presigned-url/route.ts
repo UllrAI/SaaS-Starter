@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const body = await request.json();
+    const body = await request.json().catch(() => null);
     const validation = presignedUrlRequestSchema.safeParse(body);
 
     if (!validation.success) {

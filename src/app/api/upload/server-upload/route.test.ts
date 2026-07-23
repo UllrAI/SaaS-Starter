@@ -61,10 +61,17 @@ jest.mock("@aws-sdk/lib-storage", () => ({
   Upload: jest.fn(() => mockUpload),
 }));
 
+const mockDeleteFile = jest.fn() as any;
+jest.mock("@/lib/r2", () => ({
+  buildR2PublicUrl: (key: string) => `https://cdn.example.com/${key}`,
+  deleteFile: mockDeleteFile,
+}));
+
 // Mock database
+const mockInsertValues = jest.fn() as any;
 const mockDb = {
   insert: jest.fn().mockReturnValue({
-    values: jest.fn() as any,
+    values: mockInsertValues,
   }) as any,
 };
 jest.mock("@/database", () => ({
@@ -126,16 +133,29 @@ describe("Upload Server Upload API", () => {
       retryAfter: 0,
     });
     mockFormatFileSize.mockImplementation((size: number) => `${size} bytes`);
+    mockDeleteFile.mockResolvedValue({ success: true });
+    mockInsertValues.mockResolvedValue(undefined);
+    mockDb.insert.mockReturnValue({ values: mockInsertValues });
   });
 
   afterEach(() => {
     jest.restoreAllMocks();
   });
 
-  const createMockRequest = (contentType: string, formData?: FormData) => {
+  const createMockRequest = (
+    contentType: string,
+    formData?: FormData,
+    contentLength: number | string | null = 1024,
+  ) => {
     return {
       headers: {
-        get: jest.fn((key) => (key === "content-type" ? contentType : "")),
+        get: jest.fn((key) => {
+          if (key === "content-type") return contentType;
+          if (key === "content-length") {
+            return contentLength === null ? null : String(contentLength);
+          }
+          return "";
+        }),
         has: () => false,
         set: () => {},
         entries: () => [],
@@ -222,6 +242,56 @@ describe("Upload Server Upload API", () => {
 
       expect(response.status).toBe(400);
       expect(data.error).toBe("No files provided");
+    });
+
+    it("should reject oversized multipart requests before parsing", async () => {
+      mockGetSession.mockResolvedValue(mockSession);
+
+      const { POST } = await import("./route");
+      const request = createMockRequest(
+        "multipart/form-data",
+        undefined,
+        22 * 1024 * 1024,
+      );
+
+      const response = await POST(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(413);
+      expect(data.error).toBe("Upload request is too large.");
+      expect(request.formData).not.toHaveBeenCalled();
+    });
+
+    it("should require Content-Length before parsing multipart data", async () => {
+      mockGetSession.mockResolvedValue(mockSession);
+
+      const { POST } = await import("./route");
+      const request = createMockRequest("multipart/form-data", undefined, null);
+
+      const response = await POST(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(411);
+      expect(data.error).toBe("Content-Length header is required.");
+      expect(request.formData).not.toHaveBeenCalled();
+    });
+
+    it("should reject invalid Content-Length before parsing", async () => {
+      mockGetSession.mockResolvedValue(mockSession);
+
+      const { POST } = await import("./route");
+      const request = createMockRequest(
+        "multipart/form-data",
+        undefined,
+        "invalid",
+      );
+
+      const response = await POST(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(400);
+      expect(data.error).toBe("Invalid Content-Length header.");
+      expect(request.formData).not.toHaveBeenCalled();
     });
 
     it("should reject requests with too many files", async () => {
@@ -399,8 +469,9 @@ describe("Upload Server Upload API", () => {
       expect(data.results[0]).toEqual({
         fileName: "test.jpg",
         success: false,
-        error: "S3 upload failed",
+        error: "Upload failed. Please try again.",
       });
+      expect(mockDeleteFile).not.toHaveBeenCalled();
     });
 
     it("should handle database insert failure", async () => {
@@ -409,7 +480,7 @@ describe("Upload Server Upload API", () => {
       mockIsFileSizeAllowed.mockReturnValue(true);
       mockGetFileExtension.mockReturnValue("jpg");
       mockUpload.done.mockResolvedValue({});
-      mockDb.insert().values.mockRejectedValue(new Error("Database error"));
+      mockInsertValues.mockRejectedValue(new Error("Database error"));
 
       const file = createMockFile("test.jpg", "image/jpeg", 1024);
       const mockFormData = {
@@ -429,8 +500,11 @@ describe("Upload Server Upload API", () => {
       expect(data.results[0]).toEqual({
         fileName: "test.jpg",
         success: false,
-        error: "Database error",
+        error: "Upload failed. Please try again.",
       });
+      expect(mockDeleteFile).toHaveBeenCalledWith(
+        "uploads/user-123/1640995200000-test-uuid-123.jpg",
+      );
     });
 
     it("should handle multiple files with mixed results", async () => {
@@ -482,7 +556,9 @@ describe("Upload Server Upload API", () => {
 
       const request = {
         headers: {
-          get: jest.fn(() => "multipart/form-data"),
+          get: jest.fn((key) =>
+            key === "content-type" ? "multipart/form-data" : "1024",
+          ),
           has: () => false,
           set: () => {},
           entries: () => [],
@@ -498,8 +574,8 @@ describe("Upload Server Upload API", () => {
       const response = await POST(request);
       const data = await response.json();
 
-      expect(response.status).toBe(500);
-      expect(data.error).toBe("Internal server error");
+      expect(response.status).toBe(400);
+      expect(data.error).toBe("Invalid multipart upload payload.");
     });
 
     it("should handle non-Error exceptions in processFile", async () => {
@@ -526,7 +602,7 @@ describe("Upload Server Upload API", () => {
       expect(data.results[0]).toEqual({
         fileName: "test.jpg",
         success: false,
-        error: "Unknown error",
+        error: "Upload failed. Please try again.",
       });
     });
   });

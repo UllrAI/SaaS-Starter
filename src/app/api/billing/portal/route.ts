@@ -28,8 +28,9 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error("[Portal API Error]", error);
-    const message =
-      error instanceof Error ? error.message : "Internal Server Error";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json(
+      { error: "Unable to open the billing portal. Please try again later." },
+      { status: 500 },
+    );
   }
 }

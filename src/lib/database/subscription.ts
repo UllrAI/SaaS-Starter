@@ -6,7 +6,7 @@ import {
   users,
   webhookEvents,
 } from "@/database/tables";
-import { eq, desc, and } from "drizzle-orm"; // Added desc for descending order
+import { eq, desc, sql } from "drizzle-orm"; // Added desc for descending order
 import type { PgTransaction } from "drizzle-orm/pg-core";
 import type { PostgresJsQueryResultHKT } from "drizzle-orm/postgres-js";
 import type { Subscription, SubscriptionStatus } from "@/types/billing";
@@ -31,6 +31,7 @@ interface UpsertSubscriptionData {
   currentPeriodStart?: Date;
   currentPeriodEnd?: Date;
   canceledAt?: Date | null;
+  lastWebhookCreatedAt: Date;
 }
 
 interface UpsertPaymentData {
@@ -65,8 +66,10 @@ export async function upsertSubscription(
         currentPeriodStart: data.currentPeriodStart,
         currentPeriodEnd: data.currentPeriodEnd,
         canceledAt: data.canceledAt,
+        lastWebhookCreatedAt: data.lastWebhookCreatedAt,
         updatedAt: now,
       },
+      setWhere: sql`${subscriptions.lastWebhookCreatedAt} is null or ${subscriptions.lastWebhookCreatedAt} <= ${data.lastWebhookCreatedAt}`,
     })
     .returning();
 }
@@ -177,39 +180,13 @@ export async function getUserPayments(userId: string, limit: number = 10) {
 }
 
 /**
- * Check if a webhook event has already been processed
- * @param eventId - Unique identifier from the webhook provider
- * @param provider - Webhook provider name (default: 'creem')
- * @param tx - Optional transaction
- * @returns true if event was already processed, false otherwise
- */
-export async function isWebhookEventProcessed(
-  eventId: string,
-  provider: string = "creem",
-  tx?: Tx,
-): Promise<boolean> {
-  const dbase = getDb(tx);
-  const result = await dbase
-    .select()
-    .from(webhookEvents)
-    .where(
-      and(
-        eq(webhookEvents.eventId, eventId),
-        eq(webhookEvents.provider, provider),
-      ),
-    )
-    .limit(1);
-
-  return result.length > 0;
-}
-
-/**
  * Record a webhook event as processed to ensure idempotency
  * @param eventId - Unique identifier from the webhook provider
  * @param eventType - Type of the webhook event
  * @param provider - Webhook provider name (default: 'creem')
  * @param payload - Original webhook payload for debugging
  * @param tx - Optional transaction
+ * @returns true when this request claimed the event, false on conflict
  */
 export async function recordWebhookEvent(
   eventId: string,
@@ -217,9 +194,9 @@ export async function recordWebhookEvent(
   provider: string = "creem",
   payload?: string,
   tx?: Tx,
-): Promise<void> {
+): Promise<boolean> {
   const dbase = getDb(tx);
-  await dbase
+  const inserted = await dbase
     .insert(webhookEvents)
     .values({
       eventId,
@@ -229,5 +206,10 @@ export async function recordWebhookEvent(
       processed: true,
       processedAt: new Date(),
     })
-    .onConflictDoNothing(); // Ignore if already exists
+    .onConflictDoNothing({
+      target: [webhookEvents.provider, webhookEvents.eventId],
+    })
+    .returning({ id: webhookEvents.id });
+
+  return inserted.length > 0;
 }

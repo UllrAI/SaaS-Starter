@@ -5,6 +5,7 @@ import type {
   CreemCheckoutObject,
   CreemSubscriptionObject,
   CreemPaymentObject,
+  SubscriptionStatus,
 } from "@/types/billing";
 import { db } from "@/database";
 import { users } from "@/database/schema";
@@ -13,7 +14,6 @@ import {
   findUserByCustomerId,
   upsertSubscription,
   upsertPayment,
-  isWebhookEventProcessed,
   recordWebhookEvent,
 } from "@/lib/database/subscription";
 import type { Tx } from "@/lib/database/subscription";
@@ -28,29 +28,187 @@ export class CreemWebhookSignatureError extends Error {
   }
 }
 
+export class InvalidWebhookPayloadError extends Error {
+  constructor(message = "Invalid webhook payload.") {
+    super(message);
+    this.name = "InvalidWebhookPayloadError";
+  }
+}
+
 function getCustomerId(
   customerField: string | { id: string } | undefined,
 ): string {
-  if (!customerField) {
-    throw new Error("Customer field is missing in the webhook event object.");
+  if (
+    !customerField ||
+    (typeof customerField === "string" && customerField.trim().length === 0) ||
+    (typeof customerField === "object" &&
+      (typeof customerField.id !== "string" ||
+        customerField.id.trim().length === 0))
+  ) {
+    throw new InvalidWebhookPayloadError(
+      "Customer field is missing in the webhook event object.",
+    );
   }
   return typeof customerField === "string" ? customerField : customerField.id;
 }
 
 function isCheckoutObject(obj: unknown): obj is CreemCheckoutObject {
-  return typeof obj === "object" && obj !== null && "order" in obj;
-}
-function isSubscriptionObject(obj: unknown): obj is CreemSubscriptionObject {
+  if (typeof obj !== "object" || obj === null || !("order" in obj)) {
+    return false;
+  }
+
+  const order = (obj as { order?: unknown }).order;
+  const subscription = (obj as { subscription?: unknown }).subscription;
   return (
-    typeof obj === "object" && obj !== null && "current_period_end_date" in obj
+    typeof order === "object" &&
+    order !== null &&
+    typeof (order as { id?: unknown }).id === "string" &&
+    typeof (order as { transaction?: unknown }).transaction === "string" &&
+    typeof (order as { amount_due?: unknown }).amount_due === "number" &&
+    typeof (order as { currency?: unknown }).currency === "string" &&
+    (subscription == null || isCheckoutSubscriptionObject(subscription))
   );
 }
+
+const subscriptionStatuses = new Set<SubscriptionStatus>([
+  "active",
+  "canceled",
+  "past_due",
+  "unpaid",
+  "paused",
+  "scheduled_cancel",
+  "trialing",
+  "incomplete",
+]);
+
+function isIdReference(value: unknown): value is string | { id: string } {
+  return (
+    (typeof value === "string" && value.trim().length > 0) ||
+    (typeof value === "object" &&
+      value !== null &&
+      typeof (value as { id?: unknown }).id === "string" &&
+      (value as { id: string }).id.trim().length > 0)
+  );
+}
+
+function isSubscriptionObject(obj: unknown): obj is CreemSubscriptionObject {
+  return (
+    typeof obj === "object" &&
+    obj !== null &&
+    isIdReference((obj as { customer?: unknown }).customer) &&
+    isIdReference((obj as { product?: unknown }).product) &&
+    typeof (obj as { status?: unknown }).status === "string" &&
+    subscriptionStatuses.has((obj as { status: SubscriptionStatus }).status)
+  );
+}
+
+function isCheckoutSubscriptionObject(
+  obj: unknown,
+): obj is CreemSubscriptionObject {
+  return (
+    typeof obj === "object" &&
+    obj !== null &&
+    typeof (obj as { id?: unknown }).id === "string" &&
+    isIdReference((obj as { product?: unknown }).product) &&
+    typeof (obj as { status?: unknown }).status === "string" &&
+    subscriptionStatuses.has((obj as { status: SubscriptionStatus }).status)
+  );
+}
+
 function isPaymentObject(obj: unknown): obj is CreemPaymentObject {
   return (
     typeof obj === "object" &&
     obj !== null &&
-    ("amount" in obj || "amount_paid" in obj)
+    isIdReference((obj as { customer?: unknown }).customer) &&
+    (typeof (obj as { amount?: unknown }).amount === "number" ||
+      typeof (obj as { amount_paid?: unknown }).amount_paid === "number")
   );
+}
+
+function parseCreemWebhookPayload(payload: string): CreemWebhookPayload {
+  let event: unknown;
+  try {
+    event = JSON.parse(payload);
+  } catch {
+    throw new InvalidWebhookPayloadError();
+  }
+
+  if (!event || typeof event !== "object") {
+    throw new InvalidWebhookPayloadError();
+  }
+
+  const candidate = event as Partial<CreemWebhookPayload>;
+  if (
+    typeof candidate.id !== "string" ||
+    candidate.id.trim().length === 0 ||
+    typeof candidate.eventType !== "string" ||
+    typeof candidate.created_at !== "number" ||
+    !Number.isFinite(candidate.created_at) ||
+    !candidate.object ||
+    typeof candidate.object !== "object" ||
+    typeof candidate.object.id !== "string" ||
+    candidate.object.id.trim().length === 0
+  ) {
+    throw new InvalidWebhookPayloadError();
+  }
+
+  return candidate as CreemWebhookPayload;
+}
+
+function toWebhookCreatedAt(timestamp: number): Date {
+  // Creem sends Unix milliseconds; accept seconds for older integrations.
+  const milliseconds =
+    timestamp < 1_000_000_000_000 ? timestamp * 1000 : timestamp;
+  const createdAt = new Date(milliseconds);
+  if (Number.isNaN(createdAt.getTime())) {
+    throw new InvalidWebhookPayloadError();
+  }
+  return createdAt;
+}
+
+function invalidEventObject(eventType: string): never {
+  throw new InvalidWebhookPayloadError(
+    `Invalid object for Creem webhook event type ${eventType}.`,
+  );
+}
+
+function parseWebhookDate(value: unknown, fieldName: string): Date {
+  if (typeof value !== "string" || value.trim().length === 0) {
+    throw new InvalidWebhookPayloadError(
+      `Invalid ${fieldName} in Creem webhook payload.`,
+    );
+  }
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    throw new InvalidWebhookPayloadError(
+      `Invalid ${fieldName} in Creem webhook payload.`,
+    );
+  }
+  return date;
+}
+
+function parseOptionalWebhookDate(
+  value: unknown,
+  fieldName: string,
+): Date | undefined {
+  return value === undefined ? undefined : parseWebhookDate(value, fieldName);
+}
+
+function parseUnixSecondsDate(value: unknown, fieldName: string): Date {
+  if (typeof value !== "number" || !Number.isFinite(value) || value < 0) {
+    throw new InvalidWebhookPayloadError(
+      `Invalid ${fieldName} in Creem webhook payload.`,
+    );
+  }
+
+  const date = new Date(value * 1000);
+  if (Number.isNaN(date.getTime())) {
+    throw new InvalidWebhookPayloadError(
+      `Invalid ${fieldName} in Creem webhook payload.`,
+    );
+  }
+  return date;
 }
 
 function verifyCreemSignature(
@@ -88,58 +246,69 @@ export async function handleCreemWebhook(payload: string, signature: string) {
     throw new CreemWebhookSignatureError();
   }
 
-  const event: CreemWebhookPayload = JSON.parse(payload);
+  const event = parseCreemWebhookPayload(payload);
   console.log(`Received valid Creem webhook: ${event.eventType}`);
 
-  // Generate a unique event ID for idempotency
-  // Use event object ID + event type as the unique identifier
-  const eventId = `${event.object.id}_${event.eventType}`;
+  const eventId = event.id.trim();
+  const eventCreatedAt = toWebhookCreatedAt(event.created_at);
 
   await db.transaction(async (tx) => {
-    // Check if this event has already been processed
-    const alreadyProcessed = await isWebhookEventProcessed(
+    // Claim the event atomically. A conflicting insert means another request
+    // already owns or completed the same event.
+    const claimed = await recordWebhookEvent(
       eventId,
+      event.eventType,
       "creem",
+      payload,
       tx,
     );
-    if (alreadyProcessed) {
+    if (!claimed) {
       console.log(`Webhook event ${eventId} already processed, skipping.`);
       return;
     }
 
-    // Record the event as being processed (before actual processing to prevent race conditions)
-    await recordWebhookEvent(eventId, event.eventType, "creem", payload, tx);
-
     const eventObject = event.object;
     switch (event.eventType) {
       case "checkout.completed":
-        if (isCheckoutObject(eventObject))
-          await processCheckoutCompletedEvent(eventObject, tx);
+        if (!isCheckoutObject(eventObject)) {
+          invalidEventObject(event.eventType);
+        }
+        await processCheckoutCompletedEvent(eventObject, eventCreatedAt, tx);
         break;
       case "payment.succeeded":
-        if (
-          isPaymentObject(eventObject) &&
-          eventObject.billing_reason === "subscription_cycle"
-        ) {
-          await processSubscriptionRenewal(eventObject, tx);
-        } else if (isPaymentObject(eventObject)) {
+        if (!isPaymentObject(eventObject)) {
+          invalidEventObject(event.eventType);
+        }
+        if (eventObject.billing_reason === "subscription_cycle") {
+          await processSubscriptionRenewal(eventObject, eventCreatedAt, tx);
+        } else {
           await processPaymentSucceededEvent(eventObject, tx);
         }
         break;
 
       case "subscription.active":
-      case "subscription.updated":
+      case "subscription.trialing":
+      case "subscription.update":
       case "subscription.canceled":
+      case "subscription.scheduled_cancel":
       case "subscription.expired":
+      case "subscription.unpaid":
       case "subscription.past_due":
-        if (isSubscriptionObject(eventObject))
-          await processSubscriptionEvent(eventObject, tx);
+      case "subscription.paused":
+        if (!isSubscriptionObject(eventObject)) {
+          invalidEventObject(event.eventType);
+        }
+        await processSubscriptionEvent(eventObject, eventCreatedAt, tx);
         break;
 
       case "subscription.paid":
-        if (isSubscriptionObject(eventObject) || isPaymentObject(eventObject)) {
-          await processSubscriptionRenewal(eventObject, tx);
+        if (
+          !isSubscriptionObject(eventObject) &&
+          !isPaymentObject(eventObject)
+        ) {
+          invalidEventObject(event.eventType);
         }
+        await processSubscriptionRenewal(eventObject, eventCreatedAt, tx);
         break;
       default:
         console.log(
@@ -153,6 +322,7 @@ export async function handleCreemWebhook(payload: string, signature: string) {
 
 async function processCheckoutCompletedEvent(
   checkoutData: CreemCheckoutObject,
+  eventCreatedAt: Date,
   tx: Tx,
 ) {
   const {
@@ -162,13 +332,13 @@ async function processCheckoutCompletedEvent(
     order,
   } = checkoutData;
   if (!customerField || !order) {
-    throw new Error(
+    throw new InvalidWebhookPayloadError(
       "checkout.completed event is missing required data objects (customer or order).",
     );
   }
   const userId = metadata?.userId as string | undefined;
   if (!userId) {
-    throw new Error(
+    throw new InvalidWebhookPayloadError(
       `userId not found in metadata for checkout ${checkoutData.id}`,
     );
   }
@@ -196,11 +366,24 @@ async function processCheckoutCompletedEvent(
         subscriptionId: subscription.id,
         productId: tier?.id || productId,
         status: subscription.status,
-        currentPeriodStart: new Date(subscription.current_period_start_date),
-        currentPeriodEnd: new Date(subscription.current_period_end_date),
-        canceledAt: subscription.canceled_at
-          ? new Date(subscription.canceled_at)
-          : null,
+        currentPeriodStart: parseOptionalWebhookDate(
+          subscription.current_period_start_date,
+          "subscription.current_period_start_date",
+        ),
+        currentPeriodEnd: parseOptionalWebhookDate(
+          subscription.current_period_end_date,
+          "subscription.current_period_end_date",
+        ),
+        canceledAt:
+          subscription.canceled_at === undefined
+            ? undefined
+            : subscription.canceled_at
+              ? parseWebhookDate(
+                  subscription.canceled_at,
+                  "subscription.canceled_at",
+                )
+              : null,
+        lastWebhookCreatedAt: eventCreatedAt,
       },
       tx,
     );
@@ -242,7 +425,7 @@ async function processCheckoutCompletedEvent(
       tx,
     );
   } else {
-    throw new Error(
+    throw new InvalidWebhookPayloadError(
       `Unsupported payment mode: ${paymentMode} or missing subscription data for subscription mode`,
     );
   }
@@ -250,6 +433,7 @@ async function processCheckoutCompletedEvent(
 
 async function processSubscriptionEvent(
   subscriptionData: CreemSubscriptionObject,
+  eventCreatedAt: Date,
   tx: Tx,
 ) {
   const customerId = getCustomerId(subscriptionData.customer);
@@ -272,11 +456,24 @@ async function processSubscriptionEvent(
       subscriptionId: subscriptionData.id,
       productId: tier?.id || productId,
       status: subscriptionData.status,
-      currentPeriodStart: new Date(subscriptionData.current_period_start_date),
-      currentPeriodEnd: new Date(subscriptionData.current_period_end_date),
-      canceledAt: subscriptionData.canceled_at
-        ? new Date(subscriptionData.canceled_at)
-        : null,
+      currentPeriodStart: parseOptionalWebhookDate(
+        subscriptionData.current_period_start_date,
+        "subscription.current_period_start_date",
+      ),
+      currentPeriodEnd: parseOptionalWebhookDate(
+        subscriptionData.current_period_end_date,
+        "subscription.current_period_end_date",
+      ),
+      canceledAt:
+        subscriptionData.canceled_at === undefined
+          ? undefined
+          : subscriptionData.canceled_at
+            ? parseWebhookDate(
+                subscriptionData.canceled_at,
+                "subscription.canceled_at",
+              )
+            : null,
+      lastWebhookCreatedAt: eventCreatedAt,
     },
     tx,
   );
@@ -284,6 +481,7 @@ async function processSubscriptionEvent(
 
 async function processSubscriptionRenewal(
   renewalData: CreemPaymentObject | CreemSubscriptionObject,
+  eventCreatedAt: Date,
   tx: Tx,
 ) {
   const customerId = getCustomerId(renewalData.customer);
@@ -293,7 +491,9 @@ async function processSubscriptionRenewal(
       : renewalData.id;
 
   if (!subscriptionId)
-    throw new Error("Subscription ID missing in renewal event");
+    throw new InvalidWebhookPayloadError(
+      "Subscription ID missing in renewal event",
+    );
 
   const user = await findUserByCustomerId(customerId, tx);
   if (!user)
@@ -301,20 +501,37 @@ async function processSubscriptionRenewal(
       `User not found for customerId ${customerId} during subscription renewal.`,
     );
 
-  let periodStartDateStr: string, periodEndDateStr: string;
+  let currentPeriodStart: Date;
+  let currentPeriodEnd: Date;
 
   if (isPaymentObject(renewalData) && renewalData.lines?.data?.[0]?.period) {
-    periodStartDateStr = new Date(
-      renewalData.lines.data[0].period.start * 1000,
-    ).toISOString();
-    periodEndDateStr = new Date(
-      renewalData.lines.data[0].period.end * 1000,
-    ).toISOString();
+    currentPeriodStart = parseUnixSecondsDate(
+      renewalData.lines.data[0].period.start,
+      "payment.lines[0].period.start",
+    );
+    currentPeriodEnd = parseUnixSecondsDate(
+      renewalData.lines.data[0].period.end,
+      "payment.lines[0].period.end",
+    );
   } else if (isSubscriptionObject(renewalData)) {
-    periodStartDateStr = renewalData.current_period_start_date;
-    periodEndDateStr = renewalData.current_period_end_date;
+    if (
+      !renewalData.current_period_start_date ||
+      !renewalData.current_period_end_date
+    ) {
+      throw new InvalidWebhookPayloadError(
+        "Subscription renewal is missing its billing period.",
+      );
+    }
+    currentPeriodStart = parseWebhookDate(
+      renewalData.current_period_start_date,
+      "subscription.current_period_start_date",
+    );
+    currentPeriodEnd = parseWebhookDate(
+      renewalData.current_period_end_date,
+      "subscription.current_period_end_date",
+    );
   } else {
-    throw new Error(
+    throw new InvalidWebhookPayloadError(
       "Could not determine new period for subscription renewal from event object.",
     );
   }
@@ -331,7 +548,8 @@ async function processSubscriptionRenewal(
         ? renewalData.product
         : renewalData.product.id;
   }
-  if (!productId) throw new Error("Product ID missing in renewal event");
+  if (!productId)
+    throw new InvalidWebhookPayloadError("Product ID missing in renewal event");
 
   const tier = getProductTierByProductId(productId);
 
@@ -342,9 +560,10 @@ async function processSubscriptionRenewal(
       subscriptionId,
       productId: tier?.id || productId,
       status: "active",
-      currentPeriodStart: new Date(periodStartDateStr),
-      currentPeriodEnd: new Date(periodEndDateStr),
+      currentPeriodStart,
+      currentPeriodEnd,
       canceledAt: null,
+      lastWebhookCreatedAt: eventCreatedAt,
     },
     tx,
   );
@@ -367,7 +586,8 @@ async function processPaymentSucceededEvent(
 
   const productId =
     paymentData.product_id || paymentData.lines?.data?.[0]?.price?.product;
-  if (!productId) throw new Error("Product ID missing in payment event");
+  if (!productId)
+    throw new InvalidWebhookPayloadError("Product ID missing in payment event");
 
   const tier = getProductTierByProductId(productId);
 

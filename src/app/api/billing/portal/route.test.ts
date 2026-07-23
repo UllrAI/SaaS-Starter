@@ -181,7 +181,9 @@ describe("Billing Portal API", () => {
       const data = await response.json();
 
       expect(response.status).toBe(500);
-      expect(data.error).toBe("Auth service unavailable");
+      expect(data.error).toBe(
+        "Unable to open the billing portal. Please try again later.",
+      );
     });
 
     it("should handle getUserSubscription failure", async () => {
@@ -195,7 +197,9 @@ describe("Billing Portal API", () => {
       const data = await response.json();
 
       expect(response.status).toBe(500);
-      expect(data.error).toBe("Database error");
+      expect(data.error).toBe(
+        "Unable to open the billing portal. Please try again later.",
+      );
     });
 
     it("should handle billing.createCustomerPortalUrl failure", async () => {
@@ -215,7 +219,9 @@ describe("Billing Portal API", () => {
       const data = await response.json();
 
       expect(response.status).toBe(500);
-      expect(data.error).toBe("Billing service error");
+      expect(data.error).toBe(
+        "Unable to open the billing portal. Please try again later.",
+      );
     });
 
     it("should handle non-Error exceptions", async () => {
@@ -233,7 +239,9 @@ describe("Billing Portal API", () => {
       const data = await response.json();
 
       expect(response.status).toBe(500);
-      expect(data.error).toBe("Internal Server Error");
+      expect(data.error).toBe(
+        "Unable to open the billing portal. Please try again later.",
+      );
     });
 
     it("should call getUserSubscription with correct user ID", async () => {

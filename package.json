@@ -5,7 +5,7 @@
   "scripts": {
     "content:build": "node scripts/build-content-collections.mjs",
     "dev": "pnpm content:build && next dev",
-    "build": "pnpm content:build && next build",
+    "build": "pnpm content:build && next build --webpack",
     "start": "next start",
     "saas-cli": "node --import tsx packages/cli/src/index.ts",
     "lint": "eslint .",
@@ -21,8 +21,8 @@
     "db:rebaseline": "node --env-file-if-exists=.env --import tsx scripts/rebaseline-drizzle.ts",
     "prettier:check": "prettier --check --ignore-path .gitignore .",
     "prettier:format": "prettier --write --ignore-path .gitignore .",
-    "analyze": "pnpm content:build && ANALYZE=true next build",
-    "analyze:dev": "pnpm content:build && ANALYZE=true next dev",
+    "analyze": "pnpm content:build && ANALYZE=true next build --webpack",
+    "analyze:dev": "pnpm content:build && ANALYZE=true next dev --webpack",
     "set:admin": "node --env-file-if-exists=.env --import tsx scripts/set-admin.ts",
     "creem:sync-products": "node --env-file-if-exists=.env --import tsx scripts/sync-creem-products.ts"
   },

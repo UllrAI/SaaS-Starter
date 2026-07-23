@@ -7,6 +7,17 @@ import {
   afterEach,
 } from "@jest/globals";
 
+let webhookSequence = 0;
+
+function createWebhookPayload(event: Record<string, unknown>): string {
+  webhookSequence += 1;
+  return JSON.stringify({
+    id: `evt_test_${webhookSequence}`,
+    created_at: 1_700_000_000 + webhookSequence,
+    ...event,
+  });
+}
+
 // Mock all external dependencies
 const mockDb = {
   transaction: jest.fn(),
@@ -22,7 +33,6 @@ const mockCreemWebhookSecret = "test-webhook-secret";
 const mockFindUserByCustomerId = jest.fn();
 const mockUpsertSubscription = jest.fn();
 const mockUpsertPayment = jest.fn();
-const mockIsWebhookEventProcessed = jest.fn();
 const mockRecordWebhookEvent = jest.fn();
 
 const mockGetProductTierByProductId = jest.fn();
@@ -53,7 +63,6 @@ jest.mock("@/lib/database/subscription", () => ({
   findUserByCustomerId: mockFindUserByCustomerId,
   upsertSubscription: mockUpsertSubscription,
   upsertPayment: mockUpsertPayment,
-  isWebhookEventProcessed: mockIsWebhookEventProcessed,
   recordWebhookEvent: mockRecordWebhookEvent,
 }));
 
@@ -72,6 +81,7 @@ describe("Creem Webhook Handler", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    webhookSequence = 0;
 
     // Suppress console.log, console.warn, console.error in tests
     jest.spyOn(console, "log").mockImplementation(() => {});
@@ -98,8 +108,7 @@ describe("Creem Webhook Handler", () => {
       return callback(mockTx);
     });
 
-    mockIsWebhookEventProcessed.mockResolvedValue(false);
-    mockRecordWebhookEvent.mockResolvedValue(undefined);
+    mockRecordWebhookEvent.mockResolvedValue(true);
     mockFindUserByCustomerId.mockResolvedValue({
       id: "user1",
       email: "test@example.com",
@@ -118,7 +127,8 @@ describe("Creem Webhook Handler", () => {
 
   describe("handleCreemWebhook", () => {
     it("should handle valid webhook with checkout.completed event", async () => {
-      const payload = JSON.stringify({
+      const payload = createWebhookPayload({
+        id: "evt_checkout_123",
         eventType: "checkout.completed",
         object: {
           id: "checkout_123",
@@ -149,13 +159,8 @@ describe("Creem Webhook Handler", () => {
       const result = await handleCreemWebhook(payload, "test-signature");
 
       expect(result).toEqual({ received: true });
-      expect(mockIsWebhookEventProcessed).toHaveBeenCalledWith(
-        "checkout_123_checkout.completed",
-        "creem",
-        expect.any(Object),
-      );
       expect(mockRecordWebhookEvent).toHaveBeenCalledWith(
-        "checkout_123_checkout.completed",
+        "evt_checkout_123",
         "checkout.completed",
         "creem",
         payload,
@@ -166,7 +171,7 @@ describe("Creem Webhook Handler", () => {
     });
 
     it("should handle payment.succeeded event", async () => {
-      const payload = JSON.stringify({
+      const payload = createWebhookPayload({
         eventType: "payment.succeeded",
         object: {
           id: "payment_123",
@@ -202,7 +207,7 @@ describe("Creem Webhook Handler", () => {
     it("should reject invalid signature", async () => {
       mockTimingSafeEqual.mockReturnValue(false);
 
-      const payload = JSON.stringify({
+      const payload = createWebhookPayload({
         eventType: "checkout.completed",
         object: { id: "checkout_123" },
       });
@@ -215,10 +220,50 @@ describe("Creem Webhook Handler", () => {
       ).rejects.toThrow(CreemWebhookSignatureError);
     });
 
-    it("should handle duplicate webhook events", async () => {
-      mockIsWebhookEventProcessed.mockResolvedValue(true);
+    it("should reject malformed JSON after signature verification", async () => {
+      const { handleCreemWebhook, InvalidWebhookPayloadError } =
+        await import("./webhook");
 
+      await expect(
+        handleCreemWebhook("{invalid-json", "test-signature"),
+      ).rejects.toThrow(InvalidWebhookPayloadError);
+      expect(mockRecordWebhookEvent).not.toHaveBeenCalled();
+    });
+
+    it("should reject payloads without a provider event ID", async () => {
       const payload = JSON.stringify({
+        created_at: 1_700_000_000,
+        eventType: "subscription.update",
+        object: { id: "sub_123" },
+      });
+      const { handleCreemWebhook, InvalidWebhookPayloadError } =
+        await import("./webhook");
+
+      await expect(
+        handleCreemWebhook(payload, "test-signature"),
+      ).rejects.toThrow(InvalidWebhookPayloadError);
+      expect(mockRecordWebhookEvent).not.toHaveBeenCalled();
+    });
+
+    it("should reject recognized events with invalid object data", async () => {
+      const payload = createWebhookPayload({
+        eventType: "subscription.update",
+        object: { id: "sub_123" },
+      });
+      const { handleCreemWebhook, InvalidWebhookPayloadError } =
+        await import("./webhook");
+
+      await expect(
+        handleCreemWebhook(payload, "test-signature"),
+      ).rejects.toThrow(InvalidWebhookPayloadError);
+      expect(mockRecordWebhookEvent).toHaveBeenCalledTimes(1);
+      expect(mockUpsertSubscription).not.toHaveBeenCalled();
+    });
+
+    it("should handle duplicate webhook events", async () => {
+      mockRecordWebhookEvent.mockResolvedValue(false);
+
+      const payload = createWebhookPayload({
         eventType: "checkout.completed",
         object: { id: "checkout_123" },
       });
@@ -232,12 +277,54 @@ describe("Creem Webhook Handler", () => {
       expect(mockUpsertPayment).not.toHaveBeenCalled();
     });
 
+    it("should process distinct updates for the same subscription object", async () => {
+      const createPayload = (eventId: string, status: string) =>
+        createWebhookPayload({
+          id: eventId,
+          eventType: "subscription.update",
+          object: {
+            id: "sub_123",
+            customer: "cus_123",
+            product: "prod_123",
+            status,
+            current_period_start_date: "2024-01-01T00:00:00Z",
+            current_period_end_date: "2024-02-01T00:00:00Z",
+            canceled_at: null,
+          },
+        });
+
+      const { handleCreemWebhook } = await import("./webhook");
+      await handleCreemWebhook(createPayload("evt_update_1", "active"), "sig");
+      await handleCreemWebhook(
+        createPayload("evt_update_2", "past_due"),
+        "sig",
+      );
+
+      expect(mockRecordWebhookEvent).toHaveBeenNthCalledWith(
+        1,
+        "evt_update_1",
+        "subscription.update",
+        "creem",
+        expect.any(String),
+        expect.any(Object),
+      );
+      expect(mockRecordWebhookEvent).toHaveBeenNthCalledWith(
+        2,
+        "evt_update_2",
+        "subscription.update",
+        "creem",
+        expect.any(String),
+        expect.any(Object),
+      );
+      expect(mockUpsertSubscription).toHaveBeenCalledTimes(2);
+    });
+
     it("should handle error during signature verification", async () => {
       mockTimingSafeEqual.mockImplementation(() => {
         throw new Error("Buffer length mismatch");
       });
 
-      const payload = JSON.stringify({
+      const payload = createWebhookPayload({
         eventType: "checkout.completed",
         object: { id: "checkout_123" },
       });
@@ -249,8 +336,9 @@ describe("Creem Webhook Handler", () => {
       ).rejects.toThrow("Invalid signature.");
     });
 
-    it("should handle subscription.active event", async () => {
-      const payload = JSON.stringify({
+    it("should handle millisecond timestamps on subscription.active", async () => {
+      const payload = createWebhookPayload({
+        created_at: 1_700_000_000_123,
         eventType: "subscription.active",
         object: {
           id: "sub_123",
@@ -274,13 +362,14 @@ describe("Creem Webhook Handler", () => {
           customerId: "cus_123",
           subscriptionId: "sub_123",
           status: "active",
+          lastWebhookCreatedAt: new Date(1_700_000_000_123),
         }),
         expect.any(Object),
       );
     });
 
     it("should handle subscription renewal with payment object", async () => {
-      const payload = JSON.stringify({
+      const payload = createWebhookPayload({
         eventType: "payment.succeeded",
         object: {
           id: "payment_123",
@@ -321,8 +410,40 @@ describe("Creem Webhook Handler", () => {
       );
     });
 
+    it("should reject invalid renewal period timestamps", async () => {
+      const payload = createWebhookPayload({
+        eventType: "payment.succeeded",
+        object: {
+          id: "payment_123",
+          customer: "cus_123",
+          subscription_id: "sub_123",
+          product_id: "prod_123",
+          amount: 1000,
+          currency: "usd",
+          billing_reason: "subscription_cycle",
+          lines: {
+            data: [
+              {
+                period: {
+                  start: "invalid",
+                  end: "invalid",
+                },
+              },
+            ],
+          },
+        },
+      });
+      const { handleCreemWebhook, InvalidWebhookPayloadError } =
+        await import("./webhook");
+
+      await expect(
+        handleCreemWebhook(payload, "test-signature"),
+      ).rejects.toThrow(InvalidWebhookPayloadError);
+      expect(mockUpsertSubscription).not.toHaveBeenCalled();
+    });
+
     it("should handle one_time payment in checkout.completed", async () => {
-      const payload = JSON.stringify({
+      const payload = createWebhookPayload({
         eventType: "checkout.completed",
         object: {
           id: "checkout_123",
@@ -359,9 +480,9 @@ describe("Creem Webhook Handler", () => {
     });
 
     it("should skip already processed events", async () => {
-      mockIsWebhookEventProcessed.mockResolvedValue(true);
+      mockRecordWebhookEvent.mockResolvedValue(false);
 
-      const payload = JSON.stringify({
+      const payload = createWebhookPayload({
         eventType: "checkout.completed",
         object: {
           id: "checkout_123",
@@ -378,7 +499,7 @@ describe("Creem Webhook Handler", () => {
     });
 
     it("should ignore unhandled event types", async () => {
-      const payload = JSON.stringify({
+      const payload = createWebhookPayload({
         eventType: "unhandled.event",
         object: {
           id: "obj_123",
@@ -397,7 +518,7 @@ describe("Creem Webhook Handler", () => {
     it("should throw error for invalid signature", async () => {
       mockTimingSafeEqual.mockReturnValue(false);
 
-      const payload = JSON.stringify({
+      const payload = createWebhookPayload({
         eventType: "checkout.completed",
         object: { id: "checkout_123" },
       });
@@ -418,7 +539,7 @@ describe("Creem Webhook Handler", () => {
         throw new Error("Buffer length mismatch");
       });
 
-      const payload = JSON.stringify({
+      const payload = createWebhookPayload({
         eventType: "checkout.completed",
         object: { id: "checkout_123" },
       });
@@ -432,7 +553,7 @@ describe("Creem Webhook Handler", () => {
     });
 
     it("should handle missing customer field in checkout", async () => {
-      const payload = JSON.stringify({
+      const payload = createWebhookPayload({
         eventType: "checkout.completed",
         object: {
           id: "checkout_123",
@@ -460,7 +581,7 @@ describe("Creem Webhook Handler", () => {
     });
 
     it("should handle missing userId in metadata", async () => {
-      const payload = JSON.stringify({
+      const payload = createWebhookPayload({
         eventType: "checkout.completed",
         object: {
           id: "checkout_123",
@@ -487,7 +608,7 @@ describe("Creem Webhook Handler", () => {
     });
 
     it("should handle customer as object instead of string", async () => {
-      const payload = JSON.stringify({
+      const payload = createWebhookPayload({
         eventType: "subscription.active",
         object: {
           id: "sub_123",
@@ -511,7 +632,7 @@ describe("Creem Webhook Handler", () => {
     });
 
     it("should handle product as object in subscription events", async () => {
-      const payload = JSON.stringify({
+      const payload = createWebhookPayload({
         eventType: "subscription.active",
         object: {
           id: "sub_123",
@@ -534,7 +655,7 @@ describe("Creem Webhook Handler", () => {
     it("should handle user not found error in subscription events", async () => {
       mockFindUserByCustomerId.mockResolvedValue(null);
 
-      const payload = JSON.stringify({
+      const payload = createWebhookPayload({
         eventType: "subscription.active",
         object: {
           id: "sub_123",
@@ -558,7 +679,7 @@ describe("Creem Webhook Handler", () => {
     it("should handle missing subscription ID in renewal event", async () => {
       // This event should trigger subscription ID missing error
       // Create a payment object that will be identified as payment object but missing both subscription_id and id
-      const payload = JSON.stringify({
+      const payload = createWebhookPayload({
         eventType: "subscription.paid",
         object: {
           id: "", // Empty ID so that renewalData.id is falsy
@@ -570,15 +691,16 @@ describe("Creem Webhook Handler", () => {
         },
       });
 
-      const { handleCreemWebhook } = await import("./webhook");
+      const { handleCreemWebhook, InvalidWebhookPayloadError } =
+        await import("./webhook");
 
       await expect(
         handleCreemWebhook(payload, "test-signature"),
-      ).rejects.toThrow("Subscription ID missing in renewal event");
+      ).rejects.toThrow(InvalidWebhookPayloadError);
     });
 
     it("should handle missing product ID in payment event", async () => {
-      const payload = JSON.stringify({
+      const payload = createWebhookPayload({
         eventType: "payment.succeeded",
         object: {
           id: "payment_123",
@@ -597,7 +719,7 @@ describe("Creem Webhook Handler", () => {
     });
 
     it("should handle unsupported payment mode in checkout", async () => {
-      const payload = JSON.stringify({
+      const payload = createWebhookPayload({
         eventType: "checkout.completed",
         object: {
           id: "checkout_123",
@@ -623,7 +745,7 @@ describe("Creem Webhook Handler", () => {
     });
 
     it("should handle subscription.paid event with subscription object", async () => {
-      const payload = JSON.stringify({
+      const payload = createWebhookPayload({
         eventType: "subscription.paid",
         object: {
           id: "sub_123",
@@ -649,41 +771,25 @@ describe("Creem Webhook Handler", () => {
       );
     });
 
-    it("should use fallback values for missing payment data", async () => {
-      // When undefined values are JSON.stringify'd, they get removed from the object
-      // So we need to use null or just have the key present to pass isPaymentObject check
-      const payload = JSON.stringify({
+    it("should reject payment events without a numeric amount", async () => {
+      const payload = createWebhookPayload({
         eventType: "payment.succeeded",
         object: {
           id: "payment_123",
           customer: "cus_123",
-          product_id: "prod_123", // Need product_id to avoid error
-          // Include amount field but set to null to trigger fallback
-          amount: null, // This makes it a payment object but triggers fallback to 0
-          // Missing currency field to trigger fallback to "usd"
+          product_id: "prod_123",
+          amount: null,
           subscription_id: "sub_123",
-          // Explicitly not setting billing_reason so it goes to processPaymentSucceededEvent
-          // If billing_reason was "subscription_cycle", it would go to processSubscriptionRenewal instead
         },
       });
 
-      // Reset the mock calls count for this specific test
-      mockUpsertPayment.mockClear();
-      mockUpsertSubscription.mockClear();
+      const { handleCreemWebhook, InvalidWebhookPayloadError } =
+        await import("./webhook");
 
-      const { handleCreemWebhook } = await import("./webhook");
-
-      const result = await handleCreemWebhook(payload, "test-signature");
-
-      expect(result).toEqual({ received: true });
-
-      expect(mockUpsertPayment).toHaveBeenCalledWith(
-        expect.objectContaining({
-          amount: 0, // fallback value for missing amount (paymentData.amount ?? paymentData.amount_paid ?? 0)
-          currency: "usd", // fallback value for missing currency (paymentData.currency ?? "usd")
-        }),
-        expect.any(Object),
-      );
+      await expect(
+        handleCreemWebhook(payload, "test-signature"),
+      ).rejects.toThrow(InvalidWebhookPayloadError);
+      expect(mockUpsertPayment).not.toHaveBeenCalled();
     });
   });
 
@@ -691,7 +797,7 @@ describe("Creem Webhook Handler", () => {
     it("should correctly identify checkout objects", async () => {
       // We need to test the internal type guards, but they're not exported
       // So we test indirectly through webhook handling
-      const checkoutPayload = JSON.stringify({
+      const checkoutPayload = createWebhookPayload({
         eventType: "checkout.completed",
         object: {
           id: "checkout_123",
@@ -716,7 +822,7 @@ describe("Creem Webhook Handler", () => {
     });
 
     it("should correctly identify subscription objects", async () => {
-      const subscriptionPayload = JSON.stringify({
+      const subscriptionPayload = createWebhookPayload({
         eventType: "subscription.active",
         object: {
           id: "sub_123",
@@ -738,7 +844,7 @@ describe("Creem Webhook Handler", () => {
     });
 
     it("should correctly identify payment objects", async () => {
-      const paymentPayload = JSON.stringify({
+      const paymentPayload = createWebhookPayload({
         eventType: "payment.succeeded",
         object: {
           id: "payment_123",
@@ -782,8 +888,7 @@ describe("Creem Webhook Handler", () => {
         id: "user-123",
         paymentProviderCustomerId: "cus_123",
       });
-      mockIsWebhookEventProcessed.mockResolvedValue(false);
-      mockRecordWebhookEvent.mockResolvedValue(undefined);
+      mockRecordWebhookEvent.mockResolvedValue(true);
       mockGetProductTierByProductId.mockResolvedValue("pro");
       mockTimingSafeEqual.mockReturnValue(true);
       mockCreateHmacFunction.mockReturnValue({
@@ -799,7 +904,7 @@ describe("Creem Webhook Handler", () => {
     });
 
     it("should handle missing customer field error", async () => {
-      const payload = JSON.stringify({
+      const payload = createWebhookPayload({
         eventType: "payment.succeeded",
         object: {
           id: "payment_123",
@@ -809,13 +914,12 @@ describe("Creem Webhook Handler", () => {
         },
       });
 
-      const { handleCreemWebhook } = await import("./webhook");
+      const { handleCreemWebhook, InvalidWebhookPayloadError } =
+        await import("./webhook");
 
       await expect(
         handleCreemWebhook(payload, "test-signature"),
-      ).rejects.toThrow(
-        "Customer field is missing in the webhook event object.",
-      );
+      ).rejects.toThrow(InvalidWebhookPayloadError);
     });
 
     it("should handle missing webhook secret configuration", async () => {
@@ -828,7 +932,7 @@ describe("Creem Webhook Handler", () => {
       // Test that specifically covers line 293 in webhook.ts
       mockFindUserByCustomerId.mockResolvedValue(null);
 
-      const payload = JSON.stringify({
+      const payload = createWebhookPayload({
         eventType: "subscription.paid",
         object: {
           id: "payment_123",
@@ -863,7 +967,7 @@ describe("Creem Webhook Handler", () => {
     it("should handle user not found error in payment processing", async () => {
       mockFindUserByCustomerId.mockResolvedValue(null);
 
-      const payload = JSON.stringify({
+      const payload = createWebhookPayload({
         eventType: "payment.succeeded",
         object: {
           id: "payment_123",
@@ -883,7 +987,7 @@ describe("Creem Webhook Handler", () => {
     });
 
     it("should handle period determination error in subscription renewal", async () => {
-      const payload = JSON.stringify({
+      const payload = createWebhookPayload({
         eventType: "subscription.paid",
         object: {
           id: "payment_123",
@@ -905,7 +1009,7 @@ describe("Creem Webhook Handler", () => {
     });
 
     it("should handle missing customer field with undefined value", async () => {
-      const payload = JSON.stringify({
+      const payload = createWebhookPayload({
         eventType: "payment.succeeded",
         object: {
           id: "payment_123",
@@ -915,17 +1019,16 @@ describe("Creem Webhook Handler", () => {
         },
       });
 
-      const { handleCreemWebhook } = await import("./webhook");
+      const { handleCreemWebhook, InvalidWebhookPayloadError } =
+        await import("./webhook");
 
       await expect(
         handleCreemWebhook(payload, "test-signature"),
-      ).rejects.toThrow(
-        "Customer field is missing in the webhook event object.",
-      );
+      ).rejects.toThrow(InvalidWebhookPayloadError);
     });
 
     it("should handle object customer field as object", async () => {
-      const payload = JSON.stringify({
+      const payload = createWebhookPayload({
         eventType: "payment.succeeded",
         object: {
           id: "payment_123",
@@ -946,7 +1049,7 @@ describe("Creem Webhook Handler", () => {
     });
 
     it("should handle missing customer field with empty object", async () => {
-      const payload = JSON.stringify({
+      const payload = createWebhookPayload({
         eventType: "payment.succeeded",
         object: {
           id: "payment_123",
@@ -956,16 +1059,13 @@ describe("Creem Webhook Handler", () => {
         },
       });
 
-      const { handleCreemWebhook } = await import("./webhook");
+      const { handleCreemWebhook, InvalidWebhookPayloadError } =
+        await import("./webhook");
 
-      // The code handles this case gracefully - empty object results in undefined customer ID
-      // which gets passed through. The findUserByCustomerId will be called with undefined
-      const result = await handleCreemWebhook(payload, "test-signature");
-      expect(result).toEqual({ received: true });
-      expect(mockFindUserByCustomerId).toHaveBeenCalledWith(
-        undefined,
-        expect.any(Object),
-      );
+      await expect(
+        handleCreemWebhook(payload, "test-signature"),
+      ).rejects.toThrow(InvalidWebhookPayloadError);
+      expect(mockFindUserByCustomerId).not.toHaveBeenCalled();
     });
   });
 });

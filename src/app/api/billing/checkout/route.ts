@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const body = await request.json();
+    const body = await request.json().catch(() => null);
     const parsedBody = checkoutSchema.safeParse(body);
 
     if (!parsedBody.success) {

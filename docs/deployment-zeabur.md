@@ -63,6 +63,13 @@ until a later response reports a partial batch. Cancelled uploads release quota
 immediately, while their cleanup tombstones remain for a second object deletion
 24 hours later so late signed PUTs cannot leave an orphan.
 
+The repository includes an opt-in `.github/workflows/production-maintenance.yml`
+schedule for hosts without a native cron facility. To enable it, set the
+repository variable `PRODUCTION_MAINTENANCE_ENABLED=true`, set
+`PRODUCTION_APP_URL` to the public HTTPS origin, and add the same
+`UPLOAD_CLEANUP_SECRET` value as an Actions secret. Deployments that do not set
+the enable flag skip the job safely.
+
 ## Locale and SEO checks
 
 - An explicit `/zh-Hans/...` URL stays in Simplified Chinese.

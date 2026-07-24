@@ -1,0 +1,37 @@
+name: Production maintenance
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: production-maintenance
+  cancel-in-progress: false
+
+jobs:
+  upload-cleanup:
+    if: vars.PRODUCTION_MAINTENANCE_ENABLED == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    steps:
+      - name: Drain expired upload intents
+        env:
+          PRODUCTION_APP_URL: ${{ vars.PRODUCTION_APP_URL }}
+          UPLOAD_CLEANUP_SECRET: ${{ secrets.UPLOAD_CLEANUP_SECRET }}
+        run: |
+          set -euo pipefail
+          test -n "${PRODUCTION_APP_URL}"
+          test -n "${UPLOAD_CLEANUP_SECRET}"
+          curl \
+            --fail-with-body \
+            --silent \
+            --show-error \
+            --retry 2 \
+            --retry-all-errors \
+            --max-time 45 \
+            --request POST \
+            --header "Authorization: Bearer ${UPLOAD_CLEANUP_SECRET}" \
+            "${PRODUCTION_APP_URL%/}/api/internal/uploads/cleanup"

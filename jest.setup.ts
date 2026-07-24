@@ -395,12 +395,13 @@ class MockResponse {
   }
 
   static json(data: unknown, init?: ResponseInit) {
+    const headers = new MockHeaders(init?.headers);
+    if (!headers.has("content-type")) {
+      headers.set("content-type", "application/json");
+    }
     const response = new MockResponse(JSON.stringify(data), {
       ...init,
-      headers: {
-        "content-type": "application/json",
-        ...init?.headers,
-      },
+      headers: Object.fromEntries(headers.entries()),
     });
     return response;
   }
@@ -728,12 +729,29 @@ const mockAnd = jest.fn().mockImplementation(
     type: "and",
   }),
 );
+const mockGte = jest.fn().mockImplementation(
+  (field: unknown, value: unknown): DrizzleCondition => ({
+    field,
+    type: "gte",
+    value,
+  }),
+);
+const mockDrizzleSql = jest
+  .fn()
+  .mockImplementation(
+    (strings: TemplateStringsArray, ...values: unknown[]) => ({
+      strings,
+      values,
+    }),
+  );
 
 // Mock Drizzle ORM functions
 jest.mock("drizzle-orm", () => ({
   eq: mockEq,
   desc: mockDesc,
   and: mockAnd,
+  gte: mockGte,
+  sql: mockDrizzleSql,
 }));
 
 // Type-safe environment configuration mock
@@ -756,6 +774,7 @@ type MockEnvironment = {
   DB_IDLE_TIMEOUT: number;
   DB_MAX_LIFETIME: number;
   DB_CONNECT_TIMEOUT: number;
+  RATE_LIMIT_IP_HEADER: string;
 };
 
 const mockEnvConfig: MockEnvironment = {
@@ -777,6 +796,7 @@ const mockEnvConfig: MockEnvironment = {
   DB_IDLE_TIMEOUT: 300,
   DB_MAX_LIFETIME: 14400,
   DB_CONNECT_TIMEOUT: 30,
+  RATE_LIMIT_IP_HEADER: "x-forwarded-for",
 };
 
 const mockCreateEnv = jest.fn(() => mockEnvConfig);
@@ -789,12 +809,13 @@ jest.mock("@t3-oss/env-nextjs", () => ({
 // Mock Next.js server components with proper cookie support
 class MockNextResponse extends MockResponse {
   static json(data: unknown, init?: ResponseInit) {
+    const headers = new MockHeaders(init?.headers);
+    if (!headers.has("content-type")) {
+      headers.set("content-type", "application/json");
+    }
     const response = new MockNextResponse(JSON.stringify(data), {
       ...init,
-      headers: {
-        "content-type": "application/json",
-        ...init?.headers,
-      },
+      headers: Object.fromEntries(headers.entries()),
     });
     return response;
   }
@@ -951,5 +972,6 @@ jest.mock("./env.js", () => ({
     DB_IDLE_TIMEOUT: 300,
     DB_MAX_LIFETIME: 14400,
     DB_CONNECT_TIMEOUT: 30,
+    RATE_LIMIT_IP_HEADER: "x-forwarded-for",
   },
 }));

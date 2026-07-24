@@ -58,7 +58,7 @@ describe("PaymentStatusContent", () => {
     });
 
     expect(screen.getByText("Payment Completed")).toBeInTheDocument();
-    expect(screen.getByText(/Transaction ID:/)).toBeInTheDocument();
+    expect(screen.queryByText(/Transaction ID:/)).not.toBeInTheDocument();
     expect(
       screen.getByRole("link", { name: /Access Dashboard/i }),
     ).toHaveAttribute("href", "/dashboard");
@@ -96,7 +96,7 @@ describe("PaymentStatusContent", () => {
     expect(fetchMock).toHaveBeenCalledTimes(1);
 
     await act(async () => {
-      jest.advanceTimersByTime(5000);
+      jest.advanceTimersByTime(2000);
     });
 
     await waitFor(() => {

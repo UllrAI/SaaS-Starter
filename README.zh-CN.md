@@ -96,6 +96,7 @@ cp .env.example .env
 | 变量名                   | 描述                                            | 示例                                                |
 | :----------------------- | :---------------------------------------------- | :-------------------------------------------------- |
 | `DATABASE_URL`           | **必需。** PostgreSQL 连接字符串。              | `postgresql://user:password@localhost:5432/db_name` |
+| `RATE_LIMIT_IP_HEADER`   | 共享限流读取的可信反向代理 IP 请求头。          | `x-forwarded-for`                                   |
 | `NEXT_PUBLIC_APP_URL`    | **必需。** 您应用部署后的公开 URL。             | `http://localhost:3000` 或 `https://yourdomain.com` |
 | `BETTER_AUTH_SECRET`     | **必需。** 用于加密会话的密钥，必须是32个字符。 | `a_very_secure_random_32_char_string`               |
 | `RESEND_API_KEY`         | **必需。** 用于发送邮件的 Resend API Key。      | `re_xxxxxxxxxxxxxxxx`                               |

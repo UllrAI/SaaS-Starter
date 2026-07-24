@@ -317,8 +317,6 @@ describe("Database Schema", () => {
       expect(cliTokens).toHaveProperty("tokenPrefix");
       expect(cliTokens).toHaveProperty("lastFourChars");
       expect(cliTokens).toHaveProperty("refreshTokenHash");
-      expect(cliTokens).toHaveProperty("previousRefreshTokenHash");
-      expect(cliTokens).toHaveProperty("refreshRotatedAt");
       expect(cliTokens).toHaveProperty("isActive");
       expect(cliTokens).toHaveProperty("expiresAt");
       expect(cliTokens).toHaveProperty("refreshExpiresAt");
@@ -1477,21 +1475,21 @@ describe("Database Schema", () => {
       ]);
     });
 
-    it("subscriptions table indexes both userId and customerId", () => {
+    it("subscriptions table indexes user history and customerId", () => {
       const configs = getIndexConfigs(subscriptions);
       const indexNames = configs.map((cfg) => cfg.name);
       expect(indexNames).toEqual(
         expect.arrayContaining([
-          "subscriptions_userId_idx",
+          "subscriptions_userId_createdAt_idx",
           "subscriptions_customerId_idx",
         ]),
       );
     });
 
-    it("payments table exposes a userId index", () => {
+    it("payments table indexes user history", () => {
       const configs = getIndexConfigs(payments);
       const indexNames = configs.map((cfg) => cfg.name);
-      expect(indexNames).toContain("payments_userId_idx");
+      expect(indexNames).toContain("payments_userId_createdAt_idx");
     });
 
     it("webhook events table keeps provider-scoped idempotency indexes", () => {
@@ -1515,7 +1513,7 @@ describe("Database Schema", () => {
       const indexNames = configs.map((cfg) => cfg.name);
       expect(indexNames).toEqual(
         expect.arrayContaining([
-          "uploads_userId_idx",
+          "uploads_userId_createdAt_idx",
           "uploads_fileKey_unique",
         ]),
       );

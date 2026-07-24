@@ -35,6 +35,12 @@ const env = createEnv({
     DB_IDLE_TIMEOUT: z.coerce.number().default(300),
     DB_MAX_LIFETIME: z.coerce.number().default(14400),
     DB_CONNECT_TIMEOUT: z.coerce.number().default(30),
+    RATE_LIMIT_IP_HEADER: z.enum([
+      "cf-connecting-ip",
+      "x-vercel-forwarded-for",
+      "x-real-ip",
+      "x-forwarded-for",
+    ]),
 
     // Authentication credentials
     GOOGLE_CLIENT_ID: z.string().optional(),
@@ -81,6 +87,7 @@ const env = createEnv({
     DB_IDLE_TIMEOUT: process.env.DB_IDLE_TIMEOUT,
     DB_MAX_LIFETIME: process.env.DB_MAX_LIFETIME,
     DB_CONNECT_TIMEOUT: process.env.DB_CONNECT_TIMEOUT,
+    RATE_LIMIT_IP_HEADER: process.env.RATE_LIMIT_IP_HEADER,
 
     // Authentication credentials
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,

@@ -96,6 +96,7 @@ Then edit the `.env` file and fill in all required values.
 | Variable Name            | Description                                                       | Example                                             |
 | :----------------------- | :---------------------------------------------------------------- | :-------------------------------------------------- |
 | `DATABASE_URL`           | **Required.** PostgreSQL connection string.                       | `postgresql://user:password@localhost:5432/db_name` |
+| `RATE_LIMIT_IP_HEADER`   | Trusted reverse proxy header used for shared rate limits.         | `x-forwarded-for`                                   |
 | `NEXT_PUBLIC_APP_URL`    | **Required.** Public URL of your deployed app.                    | `http://localhost:3000` or `https://yourdomain.com` |
 | `BETTER_AUTH_SECRET`     | **Required.** Key for encrypting sessions, must be 32 characters. | `a_very_secure_random_32_char_string`               |
 | `RESEND_API_KEY`         | **Required.** Resend API Key for sending emails.                  | `re_xxxxxxxxxxxxxxxx`                               |

@@ -1,10 +1,9 @@
 import { randomBytes } from "crypto";
-import { and, eq } from "drizzle-orm";
+import { and, eq, gte } from "drizzle-orm";
 import { db } from "@/database";
 import { cliTokens } from "@/database/schema";
 import {
   CLI_ACCESS_TOKEN_TTL_MS,
-  CLI_REFRESH_GRACE_PERIOD_MS,
   CLI_REFRESH_PREFIX,
   CLI_REFRESH_TOKEN_TTL_MS,
   CLI_TOKEN_PREFIX,
@@ -137,20 +136,30 @@ export async function refreshCliToken(rawRefreshToken: string): Promise<{
     const nextAccessToken = createAccessToken();
     const nextRefreshToken = createRefreshToken();
 
-    await db
+    const [updated] = await db
       .update(cliTokens)
       .set({
         tokenHash: nextAccessToken.hash,
         tokenPrefix: nextAccessToken.prefix,
         lastFourChars: nextAccessToken.lastFourChars,
         refreshTokenHash: nextRefreshToken.hash,
-        previousRefreshTokenHash: refreshHash,
-        refreshRotatedAt: now,
         expiresAt: new Date(now.getTime() + CLI_ACCESS_TOKEN_TTL_MS),
         refreshExpiresAt: new Date(now.getTime() + CLI_REFRESH_TOKEN_TTL_MS),
         updatedAt: now,
       })
-      .where(eq(cliTokens.id, row.id));
+      .where(
+        and(
+          eq(cliTokens.id, row.id),
+          eq(cliTokens.refreshTokenHash, refreshHash),
+          eq(cliTokens.isActive, true),
+          gte(cliTokens.refreshExpiresAt, now),
+        ),
+      )
+      .returning({ id: cliTokens.id });
+
+    if (!updated) {
+      return null;
+    }
 
     return {
       accessToken: nextAccessToken.rawValue,
@@ -159,63 +168,7 @@ export async function refreshCliToken(rawRefreshToken: string): Promise<{
     };
   }
 
-  const graceRow = await db.query.cliTokens.findFirst({
-    where: and(
-      eq(cliTokens.previousRefreshTokenHash, refreshHash),
-      eq(cliTokens.isActive, true),
-    ),
-  });
-
-  if (!graceRow) {
-    return null;
-  }
-
-  if (
-    !graceRow.refreshRotatedAt ||
-    now.getTime() - graceRow.refreshRotatedAt.getTime() >
-      CLI_REFRESH_GRACE_PERIOD_MS
-  ) {
-    await db
-      .update(cliTokens)
-      .set({
-        isActive: false,
-        updatedAt: now,
-      })
-      .where(eq(cliTokens.id, graceRow.id));
-    return null;
-  }
-
-  if (!(await isMachineAuthUserActive(graceRow.userId))) {
-    return null;
-  }
-
-  const nextAccessToken = createAccessToken();
-  const nextRefreshToken = createRefreshToken();
-  const [updated] = await db
-    .update(cliTokens)
-    .set({
-      tokenHash: nextAccessToken.hash,
-      tokenPrefix: nextAccessToken.prefix,
-      lastFourChars: nextAccessToken.lastFourChars,
-      refreshTokenHash: nextRefreshToken.hash,
-      previousRefreshTokenHash: refreshHash,
-      refreshRotatedAt: now,
-      expiresAt: new Date(now.getTime() + CLI_ACCESS_TOKEN_TTL_MS),
-      refreshExpiresAt: new Date(now.getTime() + CLI_REFRESH_TOKEN_TTL_MS),
-      updatedAt: now,
-    })
-    .where(and(eq(cliTokens.id, graceRow.id), eq(cliTokens.isActive, true)))
-    .returning({ id: cliTokens.id });
-
-  if (!updated) {
-    return null;
-  }
-
-  return {
-    accessToken: nextAccessToken.rawValue,
-    refreshToken: nextRefreshToken.rawValue,
-    expiresIn: Math.floor(CLI_ACCESS_TOKEN_TTL_MS / 1000),
-  };
+  return null;
 }
 
 export async function listCliTokens(userId: string): Promise<CliTokenPublic[]> {

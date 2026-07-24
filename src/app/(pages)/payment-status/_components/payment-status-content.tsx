@@ -23,7 +23,13 @@ import {
 import Link from "next/link";
 import { type ReactNode, useEffect, useRef, useState } from "react";
 type PaymentStatus = "success" | "failed" | "pending" | "cancelled";
-type PaymentStatusErrorCode = "missing_reference" | "status_check_failed";
+type PaymentStatusErrorCode =
+  | "missing_reference"
+  | "status_check_failed"
+  | "status_check_timeout";
+const MAX_POLL_ATTEMPTS = 8;
+const INITIAL_POLL_DELAY_MS = 2000;
+const MAX_POLL_DELAY_MS = 15000;
 const DIRECT_STATUS_MAP: Record<
   Exclude<PaymentStatus, "success">,
   PaymentStatus
@@ -154,6 +160,15 @@ function PaymentStatusErrorMessage({ code }: { code: PaymentStatusErrorCode }) {
       );
     case "status_check_failed":
       return <>{t("0b075846d479", "Failed to check payment status.")}</>;
+    case "status_check_timeout":
+      return (
+        <>
+          {t(
+            "payment_status_timeout",
+            "Payment verification is taking longer than expected. Check your billing page for the latest status.",
+          )}
+        </>
+      );
     default:
       return null;
   }
@@ -162,7 +177,6 @@ export function PaymentStatusContent() {
   const { t } = useTranslation();
   const searchParams = useSearchParams();
   const [status, setStatus] = useState<PaymentStatus | null>(null);
-  const [sessionId, setSessionId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [errorCode, setErrorCode] = useState<PaymentStatusErrorCode | null>(
     null,
@@ -170,6 +184,7 @@ export function PaymentStatusContent() {
   const pollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
     let isActive = true;
+    let pollAttempt = 0;
     const abortController = new AbortController();
     const clearPollTimeout = () => {
       if (pollTimeoutRef.current) {
@@ -182,8 +197,8 @@ export function PaymentStatusContent() {
         const statusParam = searchParams.get("status") as PaymentStatus;
         const checkoutIdParam =
           searchParams.get("checkout_id") || searchParams.get("session_id");
-        setSessionId(checkoutIdParam);
         if (checkoutIdParam) {
+          pollAttempt += 1;
           const paymentStatusParams = new URLSearchParams({
             checkout_id: checkoutIdParam,
           });
@@ -202,10 +217,18 @@ export function PaymentStatusContent() {
             setStatus(data.status as PaymentStatus);
             setErrorCode(null);
             if (data.status === "pending") {
-              clearPollTimeout();
-              pollTimeoutRef.current = setTimeout(() => {
-                void checkPaymentStatus();
-              }, 5000);
+              if (pollAttempt >= MAX_POLL_ATTEMPTS) {
+                setErrorCode("status_check_timeout");
+              } else {
+                const delay = Math.min(
+                  INITIAL_POLL_DELAY_MS * 2 ** (pollAttempt - 1),
+                  MAX_POLL_DELAY_MS,
+                );
+                clearPollTimeout();
+                pollTimeoutRef.current = setTimeout(() => {
+                  void checkPaymentStatus();
+                }, delay);
+              }
             }
             return;
           }
@@ -337,24 +360,6 @@ export function PaymentStatusContent() {
             <p className="text-muted-foreground mb-8 text-lg leading-relaxed">
               {config.description}
             </p>
-
-            {/* Session ID */}
-            {sessionId && (
-              <Alert className="mb-8">
-                <CreditCard className="h-4 w-4" />
-                <AlertDescription>
-                  <span className="text-muted-foreground text-sm">
-                    {t("406e40715a42", "Transaction ID: <code0></code0>", {
-                      code0: () => (
-                        <code className="bg-muted rounded px-2 py-1 font-mono text-xs">
-                          {sessionId}
-                        </code>
-                      ),
-                    })}
-                  </span>
-                </AlertDescription>
-              </Alert>
-            )}
 
             {/* Error Message */}
             {errorCode && (

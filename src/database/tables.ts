@@ -11,6 +11,7 @@ import {
   apiKeys,
   deviceCodes,
   cliTokens,
+  rateLimitBuckets,
 } from "./schema";
 
 export {
@@ -26,4 +27,5 @@ export {
   apiKeys,
   deviceCodes,
   cliTokens,
+  rateLimitBuckets,
 };

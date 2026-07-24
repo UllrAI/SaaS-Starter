@@ -1,34 +1,34 @@
+import { getServerTranslations } from "@/lib/i18n/translation/server";
 import { StatCard } from "@/components/admin/StatCard";
 import { Upload, HardDrive, FileText } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getUploadStatsDetails } from "@/lib/admin/stats";
 import { getRequestLocale } from "@/lib/i18n/server-locale";
-
 export async function UploadStatsCards() {
+  const { t } = await getServerTranslations();
   const [locale, stats] = await Promise.all([
     getRequestLocale(),
     getUploadStatsDetails(),
   ]);
-
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       <StatCard
-        title="Total Uploads"
+        title={t("7040e675fbcb", "Total Uploads")}
         value={stats.total}
         description={`${stats.recentUploads} in last 24h`}
         icon={Upload}
         locale={locale}
       />
       <StatCard
-        title="Storage Used"
+        title={t("f8cf89aa44c7", "Storage Used")}
         value={stats.totalSizeFormatted}
         description={`Avg: ${stats.averageSizeFormatted}`}
         icon={HardDrive}
         locale={locale}
       />
       <StatCard
-        title="Top File Type"
+        title={t("408fd6596c8b", "Top File Type")}
         value={stats.topFileTypes?.[0]?.type || "N/A"}
         description={`${stats.topFileTypes?.[0]?.count || 0} files`}
         icon={FileText}
@@ -36,7 +36,9 @@ export async function UploadStatsCards() {
       />
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
-          <CardTitle className="text-sm font-medium">File Types</CardTitle>
+          <CardTitle className="text-sm font-medium">
+            {t("1f28c9e00994", "File Types")}
+          </CardTitle>
           <FileText className="text-muted-foreground h-4 w-4" />
         </CardHeader>
         <CardContent>

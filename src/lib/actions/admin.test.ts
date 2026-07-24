@@ -333,8 +333,13 @@ describe("Admin Actions", () => {
           banExpires: null,
           createdAt: new Date("2024-01-01"),
           updatedAt: new Date("2024-01-01"),
-          subscriptionStatus: "active",
+        },
+      ];
+      const mockSubscriptionsData = [
+        {
+          userId: "user1",
           subscriptionId: "sub1",
+          status: "active",
         },
       ];
 
@@ -354,10 +359,15 @@ describe("Admin Actions", () => {
         from: jest.fn().mockReturnThis(),
         where: jest.fn().mockResolvedValue(mockTotalData),
       };
+      const mockSubscriptionsQuery = {
+        from: jest.fn().mockReturnThis(),
+        where: jest.fn().mockResolvedValue(mockSubscriptionsData),
+      };
 
       mockDb.select
         .mockReturnValueOnce(mockQuery)
-        .mockReturnValueOnce(mockTotalQuery);
+        .mockReturnValueOnce(mockTotalQuery)
+        .mockReturnValueOnce(mockSubscriptionsQuery);
 
       // Import and test the function
       const { getUsers } = await import("./admin");
@@ -531,8 +541,13 @@ describe("Admin Actions", () => {
           banExpires: null,
           createdAt: new Date("2024-01-01"),
           updatedAt: new Date("2024-01-01"),
-          subscriptionStatus: "active",
-          subscriptionId: "sub2", // Different subscription ID
+        },
+      ];
+      const mockSubscriptionsData = [
+        {
+          userId: "user1",
+          subscriptionId: "sub2",
+          status: "active",
         },
       ];
 
@@ -551,10 +566,15 @@ describe("Admin Actions", () => {
         from: jest.fn().mockReturnThis(),
         where: jest.fn().mockResolvedValue(mockTotalData),
       };
+      const mockSubscriptionsQuery = {
+        from: jest.fn().mockReturnThis(),
+        where: jest.fn().mockResolvedValue(mockSubscriptionsData),
+      };
 
       mockDb.select
         .mockReturnValueOnce(mockQuery)
-        .mockReturnValueOnce(mockTotalQuery);
+        .mockReturnValueOnce(mockTotalQuery)
+        .mockReturnValueOnce(mockSubscriptionsQuery);
 
       const { getUsers } = await import("./admin");
 

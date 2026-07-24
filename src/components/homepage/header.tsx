@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/lib/i18n/translation/client";
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -21,24 +22,19 @@ import {
   isMarketingPath,
   withLocalePrefix,
 } from "@/lib/config/i18n-routing";
-
 interface NavItem {
   id: string;
   href: string;
   baseHref: string;
   title: React.ReactNode;
 }
-
 function getLocalizedMarketingHref(pathname: string, href: string): string {
   const pathLocale = extractLocaleFromPath(pathname);
-
   if (!pathLocale.locale || !isMarketingPath(href)) {
     return href;
   }
-
   return withLocalePrefix(href, pathLocale.locale);
 }
-
 function AuthButtons({
   session,
   isPending,
@@ -46,8 +42,8 @@ function AuthButtons({
   session: Session | null;
   isPending: boolean;
 }) {
+  const { t } = useTranslation();
   const mounted = useHydrated();
-
   if (!mounted || isPending) {
     return (
       <div className="hidden items-center gap-2 md:flex">
@@ -55,36 +51,33 @@ function AuthButtons({
       </div>
     );
   }
-
   if (session?.user && session?.session) {
     return (
       <div className="hidden items-center gap-2 md:flex">
         <Button asChild size="sm">
           <Link href="/dashboard">
             <UserCircle className="mr-2 h-4 w-4" />
-            <>Dashboard</>
+            <>{t("4487bd795e41", "Dashboard")}</>
           </Link>
         </Button>
       </div>
     );
   }
-
   return (
     <div className="hidden items-center gap-2 md:flex">
       <Button asChild variant="ghost" size="sm">
         <Link href="/login">
-          <>Sign In</>
+          <>{t("6639ec6351f1", "Sign In")}</>
         </Link>
       </Button>
       <Button asChild size="sm">
         <Link href="/signup">
-          <>Get Started</>
+          <>{t("3dd52b8e342a", "Get Started")}</>
         </Link>
       </Button>
     </div>
   );
 }
-
 function MobileAuthButtons({
   session,
   isPending,
@@ -92,8 +85,8 @@ function MobileAuthButtons({
   session: Session | null;
   isPending: boolean;
 }) {
+  const { t } = useTranslation();
   const mounted = useHydrated();
-
   if (!mounted || isPending) {
     return (
       <div className="mt-8 space-y-3">
@@ -102,36 +95,33 @@ function MobileAuthButtons({
       </div>
     );
   }
-
   if (session?.user && session?.session) {
     return (
       <div className="mt-8 space-y-3">
         <Button asChild className="w-full">
           <Link href="/dashboard">
             <UserCircle className="mr-2 h-4 w-4" />
-            <>Dashboard</>
+            <>{t("c63a3265f194", "Dashboard")}</>
           </Link>
         </Button>
       </div>
     );
   }
-
   return (
     <div className="mt-8 space-y-3">
       <Button asChild className="w-full">
         <Link href="/login">
-          <>Sign In</>
+          <>{t("516b3bff6996", "Sign In")}</>
         </Link>
       </Button>
       <Button asChild variant="outline" className="w-full">
         <Link href="/signup">
-          <>Get Started</>
+          <>{t("40d88743ebcb", "Get Started")}</>
         </Link>
       </Button>
     </div>
   );
 }
-
 function MobileNavigation({
   isOpen,
   onClose,
@@ -141,13 +131,13 @@ function MobileNavigation({
   onClose: () => void;
   items: NavItem[];
 }) {
+  const { t } = useTranslation();
   const { data: session, isPending } = useSession();
-
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
       <SheetContent side="right" className="w-80 p-0">
         <SheetTitle className="sr-only">
-          <>Navigation Menu</>
+          <>{t("2924b40503f8", "Navigation Menu")}</>
         </SheetTitle>
         <div className="border-border flex items-center gap-2 border-b p-6">
           <Logo className="text-primary h-6 w-6" variant="icon-only" />
@@ -174,8 +164,8 @@ function MobileNavigation({
     </Sheet>
   );
 }
-
 export function Header() {
+  const { t } = useTranslation();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
@@ -190,51 +180,48 @@ export function Header() {
       id: "nav-features",
       href: getLocalizedMarketingHref(pathname, "/features"),
       baseHref: "/features",
-      title: <>Features</>,
+      title: <>{t("cfdb02905783", "Features")}</>,
     },
     {
       id: "nav-pricing",
       href: getLocalizedMarketingHref(pathname, "/pricing"),
       baseHref: "/pricing",
-      title: <>Pricing</>,
+      title: <>{t("636e74a41e80", "Pricing")}</>,
     },
     {
       id: "nav-about",
       href: getLocalizedMarketingHref(pathname, "/about"),
       baseHref: "/about",
-      title: <>About</>,
+      title: <>{t("9310e918931e", "About")}</>,
     },
     {
       id: "nav-blog",
       href: getLocalizedMarketingHref(pathname, "/blog"),
       baseHref: "/blog",
-      title: <>Blog</>,
+      title: <>{t("3d3e4c83a046", "Blog")}</>,
     },
     {
       id: "nav-contact",
       href: getLocalizedMarketingHref(pathname, "/contact"),
       baseHref: "/contact",
-      title: <>Contact</>,
+      title: <>{t("1a5e08adf49a", "Contact")}</>,
     },
   ];
-
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
     };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("scroll", handleScroll, {
+      passive: true,
+    });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
   const isActive = (href: string) => {
     if (href === "/") {
       return activePathname === href;
     }
-
     return activePathname === href || activePathname.startsWith(`${href}/`);
   };
-
   return (
     <>
       <header
@@ -286,7 +273,7 @@ export function Header() {
               >
                 <Menu className="h-5 w-5" />
                 <span className="sr-only">
-                  <>Toggle menu</>
+                  <>{t("56980d19e13c", "Toggle menu")}</>
                 </span>
               </Button>
             </div>

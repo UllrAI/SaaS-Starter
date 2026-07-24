@@ -1,36 +1,44 @@
 import { beforeEach, describe, expect, it, jest } from "@jest/globals";
 
-const mockGetServerLocale = jest.fn<() => Promise<string | null | undefined>>();
+const mockHeaders = jest.fn<() => Promise<Headers>>();
+const mockCookies =
+  jest.fn<
+    () => Promise<{ get: (name: string) => { value: string } | undefined }>
+  >();
 
-jest.mock("@/.lingo/locale-resolver.server", () => ({
-  getServerLocale: mockGetServerLocale,
+jest.mock("next/headers", () => ({
+  headers: () => mockHeaders(),
+  cookies: () => mockCookies(),
 }));
 
 describe("server locale helpers", () => {
   beforeEach(() => {
     jest.resetModules();
-    jest.clearAllMocks();
+    mockHeaders.mockResolvedValue(new Headers());
+    mockCookies.mockResolvedValue({ get: () => undefined });
   });
 
-  it("normalizes the request locale and caches the result", async () => {
-    mockGetServerLocale.mockResolvedValue("zh-CN");
+  it("prefers and normalizes the proxy locale header", async () => {
+    mockHeaders.mockResolvedValue(new Headers({ "x-user-locale": "zh-CN" }));
 
     const { getRequestLocale } = await import("./server-locale");
 
     await expect(getRequestLocale()).resolves.toBe("zh-Hans");
-    await expect(getRequestLocale()).resolves.toBe("zh-Hans");
   });
 
-  it("falls back to the source locale when the request locale is invalid", async () => {
-    mockGetServerLocale.mockResolvedValue("fr-FR");
+  it("falls back to cookie and Accept-Language negotiation", async () => {
+    mockHeaders.mockResolvedValue(
+      new Headers({ "accept-language": "zh-CN,zh;q=0.9" }),
+    );
+    mockCookies.mockResolvedValue({ get: () => undefined });
 
     const { getRequestLocale } = await import("./server-locale");
 
-    await expect(getRequestLocale()).resolves.toBe("en");
+    await expect(getRequestLocale()).resolves.toBe("zh-Hans");
   });
 
   it("maps the request locale to the correct Intl locale", async () => {
-    mockGetServerLocale.mockResolvedValue("zh-Hans");
+    mockHeaders.mockResolvedValue(new Headers({ "x-user-locale": "zh-Hans" }));
 
     const { getRequestIntlLocale } = await import("./server-locale");
 

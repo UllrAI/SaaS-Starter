@@ -1,5 +1,6 @@
+import { useTranslation } from "@/lib/i18n/translation/client";
 import React from "react";
-import Link from "next/link";
+import { LocalizedLink as Link } from "@/components/localized-link";
 import { Separator } from "@/components/ui/separator";
 import { ModeToggle } from "@/components/mode-toggle";
 import { LocaleSwitcher } from "@/components/locale-switcher";
@@ -16,46 +17,96 @@ import {
   TWITTERACCOUNT,
 } from "@/lib/config/constants";
 import { Github, Heart, Mail, Twitter } from "lucide-react";
-
-const FooterSectionTitleProduct = () => <>Product</>;
-const FooterSectionTitleOtherProducts = () => <>Other Products</>;
-const FooterSectionTitleProject = () => <>Project</>;
-const FooterSectionTitleSupport = () => <>Support</>;
-const FooterSectionTitleLegal = () => <>Legal</>;
-
-const FooterLabelFeatures = () => <>Features</>;
-const FooterLabelPricing = () => <>Pricing</>;
-const FooterLabelBlog = () => <>Blog</>;
-const FooterLabelChangelog = () => <>Changelog</>;
-const FooterLabelAbout = () => <>About</>;
-const FooterLabelContact = () => <>Contact</>;
-const FooterLabelGitHub = () => <>GitHub</>;
-const FooterLabelIssues = () => <>Issue Tracker</>;
-const FooterLabelDiscussions = () => <>Discussions</>;
-const FooterLabelPrivacy = () => <>Privacy</>;
-const FooterLabelTerms = () => <>Terms</>;
-
+const FooterSectionTitleProduct = () => {
+  const { t } = useTranslation();
+  return <>{t("fd84b85a910b", "Product")}</>;
+};
+const FooterSectionTitleOtherProducts = () => {
+  const { t } = useTranslation();
+  return <>{t("094b7c067d00", "Other Products")}</>;
+};
+const FooterSectionTitleProject = () => {
+  const { t } = useTranslation();
+  return <>{t("41f1cb8601d7", "Project")}</>;
+};
+const FooterSectionTitleSupport = () => {
+  const { t } = useTranslation();
+  return <>{t("9affa2022fbb", "Support")}</>;
+};
+const FooterSectionTitleLegal = () => {
+  const { t } = useTranslation();
+  return <>{t("f9ecf779b2a9", "Legal")}</>;
+};
+const FooterLabelFeatures = () => {
+  const { t } = useTranslation();
+  return <>{t("9115d6ccbd95", "Features")}</>;
+};
+const FooterLabelPricing = () => {
+  const { t } = useTranslation();
+  return <>{t("5c4bdfc16060", "Pricing")}</>;
+};
+const FooterLabelBlog = () => {
+  const { t } = useTranslation();
+  return <>{t("6bb7a2815ca5", "Blog")}</>;
+};
+const FooterLabelChangelog = () => {
+  const { t } = useTranslation();
+  return <>{t("9968bdb69216", "Changelog")}</>;
+};
+const FooterLabelAbout = () => {
+  const { t } = useTranslation();
+  return <>{t("ee7f2113f9d0", "About")}</>;
+};
+const FooterLabelContact = () => {
+  const { t } = useTranslation();
+  return <>{t("e29355b65365", "Contact")}</>;
+};
+const FooterLabelGitHub = () => {
+  const { t } = useTranslation();
+  return <>{t("95ace8ef0b29", "GitHub")}</>;
+};
+const FooterLabelIssues = () => {
+  const { t } = useTranslation();
+  return <>{t("649fe5b20440", "Issue Tracker")}</>;
+};
+const FooterLabelDiscussions = () => {
+  const { t } = useTranslation();
+  return <>{t("beece701c3b7", "Discussions")}</>;
+};
+const FooterLabelPrivacy = () => {
+  const { t } = useTranslation();
+  return <>{t("9dd30e101b6b", "Privacy")}</>;
+};
+const FooterLabelTerms = () => {
+  const { t } = useTranslation();
+  return <>{t("9c45ba092e34", "Terms")}</>;
+};
 type FooterLink = {
   id: string;
   href: string;
   external?: boolean;
 } & (
-  | { kind: "i18n"; Label: React.ComponentType }
-  | { kind: "text"; labelText: string }
+  | {
+      kind: "i18n";
+      Label: React.ComponentType;
+    }
+  | {
+      kind: "text";
+      labelText: string;
+    }
 );
-
 interface FooterSection {
   id: string;
   Title: React.ComponentType;
   links: FooterLink[];
 }
-
 interface FooterSocialLink {
   name: string;
   href: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: React.ComponentType<{
+    className?: string;
+  }>;
 }
-
 const footerSections: FooterSection[] = [
   {
     id: "foot-product",
@@ -186,7 +237,6 @@ const footerSections: FooterSection[] = [
     ],
   },
 ];
-
 const socialLinks: FooterSocialLink[] = [
   {
     name: "GitHub",
@@ -204,13 +254,11 @@ const socialLinks: FooterSocialLink[] = [
     icon: Mail,
   },
 ];
-
 function FooterLinkComponent({ link }: { link: FooterLink }) {
   const linkClasses =
     "text-sm text-muted-foreground transition-colors hover:text-foreground";
   const label =
     link.kind === "i18n" ? React.createElement(link.Label) : link.labelText;
-
   if (link.external) {
     return (
       <a
@@ -223,17 +271,14 @@ function FooterLinkComponent({ link }: { link: FooterLink }) {
       </a>
     );
   }
-
   return (
     <Link href={link.href} className={linkClasses}>
       {label}
     </Link>
   );
 }
-
 function FooterSocialLinkComponent({ social }: { social: FooterSocialLink }) {
   const IconComponent = social.icon;
-
   return (
     <a
       href={social.href}
@@ -246,10 +291,9 @@ function FooterSocialLinkComponent({ social }: { social: FooterSocialLink }) {
     </a>
   );
 }
-
 export function Footer() {
+  const { t } = useTranslation();
   const currentYear = new Date().getFullYear();
-
   return (
     <footer className="border-border bg-background border-t">
       <ShellContainer>
@@ -264,9 +308,10 @@ export function Footer() {
               </div>
 
               <p className="text-muted-foreground mb-6 max-w-md text-sm">
-                A practical SaaS starter for teams that want auth, billing,
-                admin, upload, and content foundations without fake enterprise
-                promises.
+                {t(
+                  "f0716043de5a",
+                  "A practical SaaS starter for teams that want auth, billing, admin, upload, and content foundations without fake enterprise promises.",
+                )}
               </p>
 
               <div className="flex items-center gap-3">
@@ -314,13 +359,20 @@ export function Footer() {
           <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
             <div className="text-muted-foreground flex items-center gap-2 text-sm">
               <span>
-                © {currentYear} {COMPANY_NAME}. All rights reserved.
+                {t(
+                  "a5a8fd938f3c",
+                  "\xA9 {currentYear}{COMPANY_NAME}. All rights reserved.",
+                  {
+                    currentYear,
+                    COMPANY_NAME,
+                  },
+                )}
               </span>
             </div>
 
             <div className="text-muted-foreground flex items-center gap-2 text-sm">
               <Heart className="h-4 w-4 text-red-500" />
-              <span>by UllrAI, for developers</span>
+              <span>{t("511db36235ad", "by UllrAI, for developers")}</span>
             </div>
           </div>
         </div>

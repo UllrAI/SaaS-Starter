@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/lib/i18n/translation/client";
 import {
   BarChart,
   Bar,
@@ -11,18 +12,16 @@ import {
 } from "recharts";
 import { AlertTriangle } from "lucide-react";
 import { useIntlLocale } from "@/hooks/use-intl-locale";
-
 interface RevenueData {
   month: string;
   revenue: number;
   count: number;
 }
-
 interface RevenueChartProps {
   chartData: RevenueData[];
 }
-
 export function RevenueChart({ chartData }: RevenueChartProps) {
+  const { t } = useTranslation();
   const intlLocale = useIntlLocale();
 
   // Transform the data for the chart
@@ -32,7 +31,8 @@ export function RevenueChart({ chartData }: RevenueChartProps) {
         month: "short",
         year: "numeric",
       }),
-      revenue: item.revenue / 100, // Convert from cents to dollars
+      revenue: item.revenue / 100,
+      // Convert from cents to dollars
       count: item.count,
     }))
     .reverse(); // Reverse to show oldest to newest
@@ -42,12 +42,11 @@ export function RevenueChart({ chartData }: RevenueChartProps) {
       <div className="flex h-[400px] items-center justify-center">
         <div className="text-muted-foreground flex items-center space-x-2">
           <AlertTriangle className="h-4 w-4" />
-          <span>No revenue data available</span>
+          <span>{t("6eb5f3635950", "No revenue data available")}</span>
         </div>
       </div>
     );
   }
-
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat(intlLocale, {
       style: "currency",
@@ -55,7 +54,6 @@ export function RevenueChart({ chartData }: RevenueChartProps) {
       minimumFractionDigits: 0,
     }).format(value);
   };
-
   return (
     <ResponsiveContainer width="100%" height={400}>
       <BarChart data={transformedData}>

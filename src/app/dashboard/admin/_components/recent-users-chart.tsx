@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/lib/i18n/translation/client";
 import {
   LineChart,
   Line,
@@ -11,17 +12,15 @@ import {
 } from "recharts";
 import { AlertTriangle } from "lucide-react";
 import { useIntlLocale } from "@/hooks/use-intl-locale";
-
 interface ChartData {
   date: string;
   count: number;
 }
-
 interface RecentUsersChartProps {
   chartData: ChartData[];
 }
-
 export function RecentUsersChart({ chartData }: RecentUsersChartProps) {
+  const { t } = useTranslation();
   const intlLocale = useIntlLocale();
 
   // Transform the data for the chart
@@ -40,12 +39,11 @@ export function RecentUsersChart({ chartData }: RecentUsersChartProps) {
       <div className="flex h-[300px] items-center justify-center">
         <div className="text-muted-foreground flex items-center space-x-2">
           <AlertTriangle className="h-4 w-4" />
-          <span>No user data available</span>
+          <span>{t("6404b685c7dd", "No user data available")}</span>
         </div>
       </div>
     );
   }
-
   return (
     <ResponsiveContainer width="100%" height={300}>
       <LineChart data={transformedData}>
@@ -88,7 +86,9 @@ export function RecentUsersChart({ chartData }: RecentUsersChartProps) {
           type="monotone"
           dataKey="count"
           strokeWidth={2}
-          activeDot={{ r: 6 }}
+          activeDot={{
+            r: 6,
+          }}
           className="stroke-primary"
         />
       </LineChart>

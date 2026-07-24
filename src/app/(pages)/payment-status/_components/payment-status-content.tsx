@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/lib/i18n/translation/client";
 import { useSearchParams } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -21,10 +22,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { type ReactNode, useEffect, useRef, useState } from "react";
-
 type PaymentStatus = "success" | "failed" | "pending" | "cancelled";
 type PaymentStatusErrorCode = "missing_reference" | "status_check_failed";
-
 const DIRECT_STATUS_MAP: Record<
   Exclude<PaymentStatus, "success">,
   PaymentStatus
@@ -33,7 +32,6 @@ const DIRECT_STATUS_MAP: Record<
   pending: "pending",
   cancelled: "cancelled",
 };
-
 interface StatusConfig {
   badgeText: ReactNode;
   badgeVariant: "default" | "destructive" | "secondary" | "outline";
@@ -50,7 +48,6 @@ interface StatusConfig {
   };
   title: ReactNode;
 }
-
 function getStatusConfig(status: PaymentStatus): StatusConfig {
   switch (status) {
     case "success":
@@ -143,25 +140,26 @@ function getStatusConfig(status: PaymentStatus): StatusConfig {
       };
   }
 }
-
 function PaymentStatusErrorMessage({ code }: { code: PaymentStatusErrorCode }) {
+  const { t } = useTranslation();
   switch (code) {
     case "missing_reference":
       return (
         <>
-          We received the checkout return, but the checkout reference is
-          missing. Check your billing page in a few minutes or contact support
-          if access does not update.
+          {t(
+            "339aaf4ddc46",
+            "We received the checkout return, but the checkout reference is missing. Check your billing page in a few minutes or contact support if access does not update.",
+          )}
         </>
       );
     case "status_check_failed":
-      return <>Failed to check payment status.</>;
+      return <>{t("0b075846d479", "Failed to check payment status.")}</>;
     default:
       return null;
   }
 }
-
 export function PaymentStatusContent() {
+  const { t } = useTranslation();
   const searchParams = useSearchParams();
   const [status, setStatus] = useState<PaymentStatus | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -170,26 +168,21 @@ export function PaymentStatusContent() {
     null,
   );
   const pollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
   useEffect(() => {
     let isActive = true;
     const abortController = new AbortController();
-
     const clearPollTimeout = () => {
       if (pollTimeoutRef.current) {
         clearTimeout(pollTimeoutRef.current);
         pollTimeoutRef.current = null;
       }
     };
-
     const checkPaymentStatus = async () => {
       try {
         const statusParam = searchParams.get("status") as PaymentStatus;
         const checkoutIdParam =
           searchParams.get("checkout_id") || searchParams.get("session_id");
-
         setSessionId(checkoutIdParam);
-
         if (checkoutIdParam) {
           const paymentStatusParams = new URLSearchParams({
             checkout_id: checkoutIdParam,
@@ -197,21 +190,17 @@ export function PaymentStatusContent() {
           if (statusParam) {
             paymentStatusParams.set("status", statusParam);
           }
-
           const response = await fetch(
             `/api/payment-status?${paymentStatusParams}`,
             {
               signal: abortController.signal,
             },
           );
-
           if (response.ok) {
             const data = await response.json();
             if (!isActive) return;
-
             setStatus(data.status as PaymentStatus);
             setErrorCode(null);
-
             if (data.status === "pending") {
               clearPollTimeout();
               pollTimeoutRef.current = setTimeout(() => {
@@ -221,7 +210,6 @@ export function PaymentStatusContent() {
             return;
           }
         }
-
         if (statusParam && statusParam in DIRECT_STATUS_MAP) {
           setStatus(
             DIRECT_STATUS_MAP[statusParam as keyof typeof DIRECT_STATUS_MAP],
@@ -230,20 +218,17 @@ export function PaymentStatusContent() {
           setIsLoading(false);
           return;
         }
-
         if (statusParam === "success") {
           setStatus("pending");
           setErrorCode("missing_reference");
           setIsLoading(false);
           return;
         }
-
         setStatus("pending");
         setErrorCode(null);
       } catch (err) {
         if (!isActive) return;
         if (err instanceof DOMException && err.name === "AbortError") return;
-
         console.error("Error checking payment status:", err);
         setErrorCode("status_check_failed");
         const statusParam = searchParams.get("status") as PaymentStatus;
@@ -256,9 +241,7 @@ export function PaymentStatusContent() {
         if (isActive) setIsLoading(false);
       }
     };
-
     void checkPaymentStatus();
-
     return () => {
       isActive = false;
       abortController.abort();
@@ -289,16 +272,21 @@ export function PaymentStatusContent() {
               <div className="mb-4 flex justify-center">
                 <Badge variant="secondary" className="gap-2">
                   <Clock className="h-3 w-3" />
-                  <>Verifying Payment</>
+                  <>{t("95644d062359", "Verifying Payment")}</>
                 </Badge>
               </div>
 
               <h1 className="mb-3 text-xl font-semibold">
-                <>Checking Payment Status</>
+                <>{t("5e3803d0e6ec", "Checking Payment Status")}</>
               </h1>
 
               <p className="text-muted-foreground text-sm leading-relaxed">
-                <>Please wait while we confirm your payment...</>
+                <>
+                  {t(
+                    "278de7e66247",
+                    "Please wait while we confirm your payment...",
+                  )}
+                </>
               </p>
             </CardContent>
           </Card>
@@ -306,9 +294,7 @@ export function PaymentStatusContent() {
       </section>
     );
   }
-
   const config = getStatusConfig(status);
-
   return (
     <section className="bg-background relative flex min-h-screen items-center justify-center overflow-hidden">
       {/* Background Pattern */}
@@ -358,10 +344,13 @@ export function PaymentStatusContent() {
                 <CreditCard className="h-4 w-4" />
                 <AlertDescription>
                   <span className="text-muted-foreground text-sm">
-                    Transaction ID:{" "}
-                    <code className="bg-muted rounded px-2 py-1 font-mono text-xs">
-                      {sessionId}
-                    </code>
+                    {t("406e40715a42", "Transaction ID: <code0></code0>", {
+                      code0: () => (
+                        <code className="bg-muted rounded px-2 py-1 font-mono text-xs">
+                          {sessionId}
+                        </code>
+                      ),
+                    })}
                   </span>
                 </AlertDescription>
               </Alert>

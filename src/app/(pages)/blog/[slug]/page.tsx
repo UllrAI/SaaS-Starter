@@ -1,16 +1,15 @@
+import { getServerTranslations } from "@/lib/i18n/translation/server";
 import { notFound } from "next/navigation";
 import Script from "next/script";
 import env from "@/env";
 import { createMetadataDefaults } from "@/lib/metadata";
 import { BlogPostHeader } from "@/components/blog/blog-post-header";
 import { ReadingContainer } from "@/components/layout/page-container";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { SOURCE_LOCALE, type SupportedLocale } from "@/lib/config/i18n";
 import { COMPANY_NAME } from "@/lib/config/constants";
-import { Languages } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import {
@@ -21,21 +20,17 @@ import {
   getPostBySlug,
   getPostLocalizations,
 } from "@/lib/content/blog";
-
 interface BlogPostPageProps {
   params: Promise<{
     slug: string;
   }>;
 }
-
 export const dynamicParams = false;
-
 export async function generateStaticParams() {
   return getAllPostSlugs().map((slug) => ({
     slug,
   }));
 }
-
 export function generateBlogPostMetadata({
   slug,
   locale,
@@ -44,10 +39,8 @@ export function generateBlogPostMetadata({
   locale: SupportedLocale;
 }): Metadata {
   const post = getPostBySlug(slug, locale);
-
   if (!post) {
     const metadata = createMetadataDefaults();
-
     return {
       ...metadata,
       title: "Post Not Found",
@@ -64,7 +57,6 @@ export function generateBlogPostMetadata({
       },
     };
   }
-
   const localizations = getPostLocalizations(slug);
   const languageAlternates = Object.fromEntries(
     localizations.map((localizedPost) => [
@@ -82,7 +74,6 @@ export function generateBlogPostMetadata({
     ? new Date(post.publishedDate).toISOString()
     : undefined;
   const modifiedTime = publishedTime;
-
   const metadata = createMetadataDefaults({
     openGraph: {
       type: "article",
@@ -114,7 +105,6 @@ export function generateBlogPostMetadata({
       },
     },
   });
-
   return {
     ...metadata,
     title: post.title,
@@ -131,28 +121,27 @@ export function generateBlogPostMetadata({
     },
   };
 }
-
 export async function generateMetadata({
   params,
 }: BlogPostPageProps): Promise<Metadata> {
   const { slug } = await params;
-
-  return generateBlogPostMetadata({ slug, locale: SOURCE_LOCALE });
+  return generateBlogPostMetadata({
+    slug,
+    locale: SOURCE_LOCALE,
+  });
 }
-
 export async function BlogPostPageContent({
   locale,
   params,
 }: BlogPostPageProps & {
   locale: SupportedLocale;
 }) {
+  const { t } = await getServerTranslations();
   const { slug } = await params;
   const post = getPostBySlug(slug, locale);
-
   if (!post) {
     notFound();
   }
-
   const author = getAuthorBySlug(post.author);
   const canonicalUrl = new URL(
     getLocalizedBlogPostPath(slug, post.locale),
@@ -183,7 +172,6 @@ export async function BlogPostPageContent({
     mainEntityOfPage: canonicalUrl,
     inLanguage: post.locale,
   };
-
   return (
     <>
       <Script
@@ -208,23 +196,6 @@ export async function BlogPostPageContent({
         backHref={getLocalizedBlogPath(locale)}
       />
 
-      {post.isFallback && (
-        <section className="bg-background pt-8 sm:pt-10">
-          <ReadingContainer>
-            <Alert className="border-amber-300/60 bg-amber-50/80 text-amber-950">
-              <Languages className="text-amber-700" />
-              <AlertTitle>
-                This article is currently only available in English
-              </AlertTitle>
-              <AlertDescription>
-                You are viewing the English version because a localized version
-                is not available yet.
-              </AlertDescription>
-            </Alert>
-          </ReadingContainer>
-        </section>
-      )}
-
       {/* Article Content */}
       <section className="bg-background py-12 sm:py-16">
         <ReadingContainer>
@@ -241,18 +212,20 @@ export async function BlogPostPageContent({
         <ReadingContainer>
           <div className="text-center">
             <h2 className="text-foreground mb-4 text-xl font-bold sm:text-2xl">
-              Thanks for reading!
+              {t("77a15560ce8c", "Thanks for reading!")}
             </h2>
             <p className="text-muted-foreground mb-6 text-sm sm:mb-8 sm:text-base">
-              Want to read more articles? Check out our blog for the latest
-              insights and updates.
+              {t(
+                "b3d935a413da",
+                "Want to read more articles? Check out our blog for the latest insights and updates.",
+              )}
             </p>
             <Link href={getLocalizedBlogPath(locale)}>
               <Button
                 size="lg"
                 className="bg-primary hover:bg-primary/90 text-primary-foreground transition-colors"
               >
-                Explore More Articles
+                {t("251fa22c9d79", "Explore More Articles")}
               </Button>
             </Link>
           </div>
@@ -261,7 +234,6 @@ export async function BlogPostPageContent({
     </>
   );
 }
-
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
   return <BlogPostPageContent locale={SOURCE_LOCALE} params={params} />;
 }

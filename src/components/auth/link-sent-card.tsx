@@ -1,3 +1,4 @@
+import { useTranslation } from "@/lib/i18n/translation/client";
 import { CheckCircle } from "lucide-react";
 import Link from "next/link";
 import {
@@ -7,18 +8,17 @@ import {
   CardTitle,
   CardFooter,
 } from "@/components/ui/card";
-
 interface LinkSentCardProps {
   title: string;
   description: React.ReactNode;
   retryHref: string;
 }
-
 export function LinkSentCard({
   title,
   description,
   retryHref,
 }: LinkSentCardProps) {
+  const { t } = useTranslation();
   return (
     <Card className="bg-muted/30 w-full shadow-md backdrop-blur-sm">
       <CardHeader className="text-center">
@@ -38,14 +38,20 @@ export function LinkSentCard({
 
       <CardFooter className="flex-col space-y-0 border-t">
         <p className="text-muted-foreground text-center text-xs leading-relaxed">
-          Didn&apos;t receive?{" "}
-          <Link
-            href={retryHref}
-            className="font-medium underline-offset-2 hover:underline"
-          >
-            Send again
-          </Link>{" "}
-          or check your spam folder.
+          {t(
+            "f7ecef549a1a",
+            "Didn''t receive? <Link0>Send again </Link0> or check your spam folder.",
+            {
+              Link0: (chunks) => (
+                <Link
+                  href={retryHref}
+                  className="font-medium underline-offset-2 hover:underline"
+                >
+                  {chunks}
+                </Link>
+              ),
+            },
+          )}
         </p>
       </CardFooter>
     </Card>

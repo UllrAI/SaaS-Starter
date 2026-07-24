@@ -21,7 +21,7 @@
 - **身份验证 (Better-Auth + Resend):** 集成了 [Better-Auth](https://better-auth.com/)，提供安全的魔法链接登录和第三方 OAuth 功能。使用 [Resend](https://resend.com/) 提供可靠的邮件发送服务，并集成 Mailchecker 避免临时邮箱。
 - **面向 API 与 Agent 的机器认证:** 内置按用户创建的 API Key、CLI access token、refresh token 轮换，以及面向机器客户端的版本化 `/api/v1/*` 接口层。
 - **现代 Web 框架 (Next.js 16 + TypeScript):** 基于最新的 [Next.js 16](https://nextjs.org/)，使用 App Router 和服务器组件。整个项目采用严格的 TypeScript 类型检查。
-- **国际化 (Lingo.dev Compiler):** 基于 `@lingo.dev/compiler` 的本地化工作流，适配 App Router。详见 [docs/i18n-lingo.md](docs/i18n-lingo.md)。
+- **国际化 (next-intl):** 基于显式语言目录、语言感知路由、本地化元数据与规范 hreflang 输出的服务端国际化方案。详见 [docs/i18n-next-intl.md](docs/i18n-next-intl.md)。
 - **数据库与 ORM (Drizzle + PostgreSQL):** 使用 [Drizzle ORM](https://orm.drizzle.team/) 进行类型安全的数据库操作，并与 PostgreSQL 深度集成。支持模式迁移和优化的查询。
 - **支付与订阅 (Creem):** 集成了 [Creem](https://creem.io/) 作为支付提供商，轻松处理订阅和一次性支付。
 - **UI 组件库 (shadcn/ui + Tailwind CSS):** 使用 [shadcn/ui](https://ui.shadcn.com/) 构建，它是一个基于 Radix UI 和 Tailwind CSS 的可访问、可组合的组件库，内置主题支持。
@@ -119,9 +119,9 @@ cp .env.example .env
 >
 > **可选的本地 CLI 鉴权方式：** 对于脚本、本地 Agent 或临时终端调用，您可以直接导出 `SAAS_CLI_API_KEY=ssk_...`，而不必把凭证写入 CLI 配置文件。
 
-#### 统计脚本
+#### 数据统计
 
-根布局中包含 UllrAI 自建统计脚本。它没有设计成可复用的 `.env` 配置项，因为内置 website ID 只适用于 UllrAI 自己的统计服务。如果您 fork 此项目或把它作为模板使用，请在 `src/app/layout.tsx` 中替换成自己的统计方案，或直接删除该脚本。
+项目默认不包含统计服务或跟踪脚本。确有需要时再接入自己的服务；在依法需要用户授权的地区，必须先实现真实有效的同意管理，再加载非必要 Cookie 或跟踪器。
 
 ### 4. 数据库设置
 

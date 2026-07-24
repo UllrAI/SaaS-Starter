@@ -1,34 +1,27 @@
 import React from "react";
 import RootLayout from "./layout";
 import { getRequestLocale } from "@/lib/i18n/server-locale";
-import { loadLingoTranslations } from "@/lib/i18n/lingo-translations";
+import { loadMessages } from "@/lib/i18n/messages";
 
 jest.mock("next/font/google", () => ({
   Inter: () => ({ variable: "font-sans" }),
   JetBrains_Mono: () => ({ variable: "font-mono" }),
 }));
 
-jest.mock("next/script", () => ({
-  __esModule: true,
-  default: ({ children, ...props }: React.ComponentProps<"script">) => (
-    <script {...props}>{children}</script>
-  ),
-}));
-
-jest.mock("@/lib/i18n/lingo-provider", () => ({
-  AppLingoProvider: ({
+jest.mock("@/lib/i18n/provider", () => ({
+  AppIntlProvider: ({
     children,
-    initialLocale,
-    initialTranslations,
+    locale,
+    messages,
   }: {
     children: React.ReactNode;
-    initialLocale: string;
-    initialTranslations: Record<string, string>;
+    locale: string;
+    messages: Record<string, string>;
   }) => (
     <div
-      data-testid="lingo-provider"
-      data-locale={initialLocale}
-      data-translation-count={Object.keys(initialTranslations).length}
+      data-testid="intl-provider"
+      data-locale={locale}
+      data-translation-count={Object.keys(messages).length}
     >
       {children}
     </div>
@@ -45,8 +38,8 @@ jest.mock("@/lib/i18n/server-locale", () => ({
   getRequestLocale: jest.fn(() => Promise.resolve("zh-Hans")),
 }));
 
-jest.mock("@/lib/i18n/lingo-translations", () => ({
-  loadLingoTranslations: jest.fn(() => Promise.resolve({ hello: "你好" })),
+jest.mock("@/lib/i18n/messages", () => ({
+  loadMessages: jest.fn(() => Promise.resolve({ hello: "你好" })),
 }));
 
 jest.mock("@/env", () => ({
@@ -59,8 +52,8 @@ jest.mock("@/env", () => ({
 const mockGetRequestLocale = getRequestLocale as jest.MockedFunction<
   typeof getRequestLocale
 >;
-const mockLoadLingoTranslations = loadLingoTranslations as jest.MockedFunction<
-  typeof loadLingoTranslations
+const mockLoadMessages = loadMessages as jest.MockedFunction<
+  typeof loadMessages
 >;
 
 function getElementChildren(
@@ -75,10 +68,10 @@ describe("RootLayout", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockGetRequestLocale.mockResolvedValue("zh-Hans");
-    mockLoadLingoTranslations.mockResolvedValue({ hello: "你好" });
+    mockLoadMessages.mockResolvedValue({ hello: "你好" });
   });
 
-  it("initializes document and Lingo locale from the request", async () => {
+  it("initializes document and next-intl locale from the request", async () => {
     const root = (await RootLayout({
       children: <main data-testid="page-content">Page content</main>,
     })) as React.ReactElement<{ lang: string; children: React.ReactNode }>;
@@ -88,18 +81,18 @@ describe("RootLayout", () => {
     );
     expect(body).toBeDefined();
 
-    const lingoProvider = getElementChildren(
+    const intlProvider = getElementChildren(
       body as React.ReactElement<{ children: React.ReactNode }>,
     ).find(
       (child) =>
-        React.isValidElement(child) && child.props.initialLocale === "zh-Hans",
+        React.isValidElement(child) && child.props.locale === "zh-Hans",
     );
 
     expect(mockGetRequestLocale).toHaveBeenCalledTimes(1);
-    expect(mockLoadLingoTranslations).toHaveBeenCalledWith("zh-Hans");
+    expect(mockLoadMessages).toHaveBeenCalledWith("zh-Hans");
     expect(root.type).toBe("html");
     expect(root.props.lang).toBe("zh-Hans");
-    expect(lingoProvider?.props.initialLocale).toBe("zh-Hans");
-    expect(lingoProvider?.props.initialTranslations).toEqual({ hello: "你好" });
+    expect(intlProvider?.props.locale).toBe("zh-Hans");
+    expect(intlProvider?.props.messages).toEqual({ hello: "你好" });
   });
 });

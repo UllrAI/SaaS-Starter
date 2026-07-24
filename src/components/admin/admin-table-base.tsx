@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/lib/i18n/translation/client";
 import { useState, useEffect, ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,26 +20,22 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { AlertTriangle, Search, ChevronLeft, ChevronRight } from "lucide-react";
-
 interface TableColumn<T> {
   key: string;
   label: string | ReactNode;
   render?: (item: T) => ReactNode;
   sortable?: boolean;
 }
-
 interface FilterOption {
   value: string;
   label: ReactNode;
 }
-
 interface PaginationData {
   page: number;
   limit: number;
   total: number;
   totalPages: number;
 }
-
 interface AdminTableBaseProps<T> {
   columns: TableColumn<T>[];
   data: T[];
@@ -55,26 +52,31 @@ interface AdminTableBaseProps<T> {
   searchPlaceholder?: string | ReactNode;
   emptyMessage?: ReactNode;
 }
-
 function extractTextContent(node: ReactNode): string {
   if (typeof node === "string" || typeof node === "number") {
     return String(node);
   }
-
   if (Array.isArray(node)) {
     return node.map(extractTextContent).join("");
   }
-
   if (node && typeof node === "object" && "props" in node) {
     return extractTextContent(
-      (node as { props?: { children?: ReactNode } }).props?.children,
+      (
+        node as {
+          props?: {
+            children?: ReactNode;
+          };
+        }
+      ).props?.children,
     );
   }
-
   return "";
 }
-
-export function AdminTableBase<T extends { id: string | number }>({
+export function AdminTableBase<
+  T extends {
+    id: string | number;
+  },
+>({
   columns,
   data,
   loading,
@@ -88,8 +90,12 @@ export function AdminTableBase<T extends { id: string | number }>({
   pagination,
   onPageChange,
   searchPlaceholder = "Search...",
-  emptyMessage = <>No data found</>,
+  emptyMessage,
 }: AdminTableBaseProps<T>) {
+  const { t } = useTranslation();
+  const resolvedEmptyMessage = emptyMessage ?? (
+    <>{t("e833227881b2", "No data found")}</>
+  );
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm);
   const resolvedFilterPlaceholder = extractTextContent(filterPlaceholder);
   const resolvedSearchPlaceholder = extractTextContent(searchPlaceholder);
@@ -99,14 +105,11 @@ export function AdminTableBase<T extends { id: string | number }>({
     const timer = setTimeout(() => {
       onSearchChange(debouncedSearchTerm);
     }, 300);
-
     return () => clearTimeout(timer);
   }, [debouncedSearchTerm, onSearchChange]);
-
   const handleSearch = (value: string) => {
     setDebouncedSearchTerm(value);
   };
-
   if (error) {
     return (
       <div className="flex items-center justify-center p-8">
@@ -117,7 +120,6 @@ export function AdminTableBase<T extends { id: string | number }>({
       </div>
     );
   }
-
   return (
     <div className="space-y-4">
       {/* Search and Filter Controls */}
@@ -163,7 +165,9 @@ export function AdminTableBase<T extends { id: string | number }>({
           </TableHeader>
           <TableBody>
             {loading ? (
-              Array.from({ length: 5 }).map((_, i) => (
+              Array.from({
+                length: 5,
+              }).map((_, i) => (
                 <TableRow key={i}>
                   {columns.map((column) => (
                     <TableCell key={String(column.key)}>
@@ -178,7 +182,7 @@ export function AdminTableBase<T extends { id: string | number }>({
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  {emptyMessage}
+                  {resolvedEmptyMessage}
                 </TableCell>
               </TableRow>
             ) : (
@@ -204,9 +208,18 @@ export function AdminTableBase<T extends { id: string | number }>({
       {pagination.totalPages > 1 && (
         <div className="flex items-center justify-between">
           <div className="text-muted-foreground text-sm">
-            Showing {(pagination.page - 1) * pagination.limit + 1} to{" "}
-            {Math.min(pagination.page * pagination.limit, pagination.total)} of{" "}
-            {pagination.total} results
+            {t(
+              "f26407c46b2a",
+              "Showing {expression0} to {expression1} of {expression2} results",
+              {
+                expression0: (pagination.page - 1) * pagination.limit + 1,
+                expression1: Math.min(
+                  pagination.page * pagination.limit,
+                  pagination.total,
+                ),
+                expression2: pagination.total,
+              },
+            )}
           </div>
           <div className="flex items-center space-x-2">
             <Button
@@ -216,11 +229,13 @@ export function AdminTableBase<T extends { id: string | number }>({
               disabled={pagination.page <= 1 || loading}
             >
               <ChevronLeft className="h-4 w-4" />
-              Previous
+              {t("4353d18ed90b", "Previous")}
             </Button>
             <div className="flex items-center space-x-1">
               {Array.from(
-                { length: Math.min(5, pagination.totalPages) },
+                {
+                  length: Math.min(5, pagination.totalPages),
+                },
                 (_, i) => {
                   const pageNumber = i + 1;
                   return (
@@ -245,7 +260,7 @@ export function AdminTableBase<T extends { id: string | number }>({
               onClick={() => onPageChange(pagination.page + 1)}
               disabled={pagination.page >= pagination.totalPages || loading}
             >
-              Next
+              {t("e500d700b2f2", "Next")}
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>

@@ -2,13 +2,10 @@ import {
   S3Client,
   HeadObjectCommand,
   PutObjectCommand,
-  GetObjectCommand,
   DeleteObjectCommand,
   DeleteObjectsCommand,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { lookup } from "dns/promises";
-import { isIP } from "net";
 import env from "@/env";
 import {
   UPLOAD_CONFIG,
@@ -108,13 +105,6 @@ export async function createPresignedUrl({
   }
 }
 
-interface UploadResult {
-  success: boolean;
-  url?: string;
-  key?: string;
-  error?: string;
-}
-
 export interface R2ObjectMetadata {
   contentLength: number;
   contentType: string;
@@ -125,197 +115,6 @@ export function buildR2PublicUrl(
   baseUrl = env.R2_PUBLIC_URL,
 ): string {
   return `${baseUrl.replace(/\/+$/, "")}/${key.replace(/^\/+/, "")}`;
-}
-
-const BLOCKED_URL_ERROR = "Blocked URL host";
-
-const PRIVATE_IPV4_RANGES: Array<[number, number]> = [
-  [0x00000000, 0x00ffffff], // 0.0.0.0/8
-  [0x0a000000, 0x0affffff], // 10.0.0.0/8
-  [0x64400000, 0x647fffff], // 100.64.0.0/10
-  [0x7f000000, 0x7fffffff], // 127.0.0.0/8
-  [0xa9fe0000, 0xa9feffff], // 169.254.0.0/16
-  [0xac100000, 0xac1fffff], // 172.16.0.0/12
-  [0xc0000000, 0xc00000ff], // 192.0.0.0/24
-  [0xc0000200, 0xc00002ff], // 192.0.2.0/24
-  [0xc0a80000, 0xc0a8ffff], // 192.168.0.0/16
-  [0xc6120000, 0xc613ffff], // 198.18.0.0/15
-  [0xc6336400, 0xc63364ff], // 198.51.100.0/24
-  [0xcb007100, 0xcb0071ff], // 203.0.113.0/24
-  [0xe0000000, 0xefffffff], // 224.0.0.0/4
-  [0xf0000000, 0xffffffff], // 240.0.0.0/4
-];
-
-const isPrivateIpv4 = (ip: string): boolean => {
-  const parts = ip.split(".").map((part) => Number(part));
-  if (parts.length !== 4 || parts.some((part) => Number.isNaN(part)))
-    return true;
-  const value = parts.reduce((acc, part) => acc * 256 + part, 0);
-  return PRIVATE_IPV4_RANGES.some(
-    ([start, end]) => value >= start && value <= end,
-  );
-};
-
-const isPrivateIpv6 = (ip: string): boolean => {
-  const normalized = ip.toLowerCase();
-  if (normalized === "::" || normalized === "::1") return true;
-  if (normalized.startsWith("fc") || normalized.startsWith("fd")) return true;
-  if (/^fe[89ab]/.test(normalized)) return true;
-  if (normalized.startsWith("ff")) return true;
-  if (normalized.startsWith("2001:db8")) return true;
-  if (normalized.startsWith("::ffff:")) {
-    const v4Part = normalized.replace("::ffff:", "");
-    if (v4Part.includes(".")) {
-      return isPrivateIpv4(v4Part);
-    }
-  }
-  return false;
-};
-
-const isPrivateIpAddress = (ip: string): boolean => {
-  const ipVersion = isIP(ip);
-  if (ipVersion === 4) return isPrivateIpv4(ip);
-  if (ipVersion === 6) return isPrivateIpv6(ip);
-  return true;
-};
-
-const assertSafeRemoteUrl = async (url: string): Promise<URL> => {
-  let parsedUrl: URL;
-  try {
-    parsedUrl = new URL(url);
-  } catch {
-    throw new Error("Invalid URL");
-  }
-
-  if (!["http:", "https:"].includes(parsedUrl.protocol)) {
-    throw new Error("Unsupported URL protocol");
-  }
-
-  if (parsedUrl.username || parsedUrl.password) {
-    throw new Error(BLOCKED_URL_ERROR);
-  }
-
-  const hostname = parsedUrl.hostname.toLowerCase();
-  if (
-    hostname === "localhost" ||
-    hostname.endsWith(".localhost") ||
-    hostname.endsWith(".local") ||
-    hostname.endsWith(".internal")
-  ) {
-    throw new Error(BLOCKED_URL_ERROR);
-  }
-
-  if (isIP(hostname)) {
-    if (isPrivateIpAddress(hostname)) {
-      throw new Error(BLOCKED_URL_ERROR);
-    }
-    return parsedUrl;
-  }
-
-  let records: Array<{ address: string; family: number }>;
-  try {
-    records = await lookup(hostname, { all: true });
-  } catch {
-    throw new Error(BLOCKED_URL_ERROR);
-  }
-  if (!records.length) {
-    throw new Error(BLOCKED_URL_ERROR);
-  }
-
-  for (const record of records) {
-    if (isPrivateIpAddress(record.address)) {
-      throw new Error(BLOCKED_URL_ERROR);
-    }
-  }
-
-  return parsedUrl;
-};
-
-/**
- * Upload a file from URL to R2 (server-side)
- */
-export async function uploadFromUrl(
-  url: string,
-  key: string,
-  contentType?: string,
-): Promise<UploadResult> {
-  try {
-    const parsedUrl = await assertSafeRemoteUrl(url);
-
-    // Fetch the file from URL
-    const response = await fetch(parsedUrl.toString(), { redirect: "manual" });
-    if (response.status >= 300 && response.status < 400) {
-      throw new Error("Redirects are not allowed when fetching remote files.");
-    }
-    if (!response.ok) {
-      throw new Error(`Failed to fetch file from URL: ${response.statusText}`);
-    }
-
-    const buffer = await response.arrayBuffer();
-    const detectedContentType =
-      contentType ||
-      response.headers.get("content-type") ||
-      "application/octet-stream";
-
-    return await uploadBuffer(Buffer.from(buffer), key, detectedContentType);
-  } catch (error) {
-    console.error("Error uploading from URL:", error);
-    return {
-      success: false,
-      error:
-        error instanceof Error ? error.message : "Failed to upload from URL",
-    };
-  }
-}
-
-/**
- * Upload a buffer to R2 (server-side)
- */
-export async function uploadBuffer(
-  buffer: Buffer,
-  key: string,
-  contentType: string,
-): Promise<UploadResult> {
-  try {
-    // Validate file type
-    if (!isFileTypeAllowed(contentType)) {
-      return {
-        success: false,
-        error: `File type ${contentType} is not allowed`,
-      };
-    }
-
-    // Validate file size
-    if (!isFileSizeAllowed(buffer.length)) {
-      return {
-        success: false,
-        error: `File size ${buffer.length} bytes exceeds maximum allowed size of ${UPLOAD_CONFIG.MAX_FILE_SIZE} bytes`,
-      };
-    }
-
-    const command = new PutObjectCommand({
-      Bucket: env.R2_BUCKET_NAME,
-      Key: key,
-      Body: buffer,
-      ContentType: contentType,
-    });
-
-    await r2Client.send(command);
-
-    const publicUrl = buildR2PublicUrl(key);
-
-    return {
-      success: true,
-      url: publicUrl,
-      key,
-    };
-  } catch (error) {
-    console.error("Error uploading buffer:", error);
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : "Failed to upload buffer",
-    };
-  }
 }
 
 export async function getObjectMetadata(
@@ -357,11 +156,6 @@ export async function getObjectMetadata(
     console.error("Error reading object metadata:", error);
     throw error;
   }
-}
-
-export async function fileExists(key: string): Promise<boolean> {
-  const metadata = await getObjectMetadata(key);
-  return metadata !== null;
 }
 
 /**
@@ -413,26 +207,5 @@ export async function deleteFiles(
       success: false,
       error: error instanceof Error ? error.message : "Failed to delete files",
     };
-  }
-}
-
-/**
- * Get a presigned URL for downloading a file (optional, for private files)
- */
-export async function getDownloadUrl(
-  key: string,
-  expiresIn = 3600,
-): Promise<string | null> {
-  try {
-    const command = new GetObjectCommand({
-      Bucket: env.R2_BUCKET_NAME,
-      Key: key,
-    });
-
-    const presignedUrl = await getSignedUrl(r2Client, command, { expiresIn });
-    return presignedUrl;
-  } catch (error) {
-    console.error("Error creating download URL:", error);
-    return null;
   }
 }

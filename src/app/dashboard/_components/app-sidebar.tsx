@@ -1,5 +1,7 @@
 "use client";
-import Link from "next/link";
+
+import { useTranslation } from "@/lib/i18n/translation/client";
+import { LocalizedLink as Link } from "@/components/localized-link";
 import {
   BarChart3,
   CreditCard,
@@ -32,7 +34,6 @@ import { UserButton } from "./user-btn";
 import { Logo } from "@/components/logo";
 import { cn } from "@/lib/utils";
 import { useSession } from "@/lib/auth/client";
-
 type NavigationItem = {
   id: string;
   label: React.ReactNode;
@@ -40,39 +41,35 @@ type NavigationItem = {
   icon: LucideIcon;
   matchMode?: "exact" | "prefix";
 };
-
 interface MenuItemProps {
   item: NavigationItem;
   pathname: string;
   allItems: NavigationItem[];
 }
-
 function SidebarMenuLink({ item, pathname, allItems }: MenuItemProps) {
   const itemMatchMode = item.matchMode || "exact";
   const label = item.label;
-
   const isMatch =
     itemMatchMode === "exact"
       ? pathname === item.url
       : pathname.startsWith(item.url);
-
   const matchingItems = allItems.filter((otherItem) => {
     const otherMode = otherItem.matchMode || "exact";
     return otherMode === "exact"
       ? pathname === otherItem.url
       : pathname.startsWith(otherItem.url);
   });
-
   const maxMatchLength = Math.max(
     ...matchingItems.map((navItem) => navItem.url.length),
   );
   const isActive = isMatch && item.url.length === maxMatchLength;
-
   return (
     <SidebarMenuButton
       asChild
       isActive={isActive}
-      tooltip={{ children: label }}
+      tooltip={{
+        children: label,
+      }}
     >
       <Link href={item.url}>
         <item.icon className="size-4" />
@@ -81,13 +78,11 @@ function SidebarMenuLink({ item, pathname, allItems }: MenuItemProps) {
     </SidebarMenuButton>
   );
 }
-
 interface MenuSectionProps {
   title?: React.ReactNode;
   items: MenuItemProps["item"][];
   pathname: string;
 }
-
 function SidebarSection({ title, items, pathname }: MenuSectionProps) {
   return (
     <SidebarGroup>
@@ -112,17 +107,14 @@ function SidebarSection({ title, items, pathname }: MenuSectionProps) {
     </SidebarGroup>
   );
 }
-
 export function AppSidebar() {
+  const { t } = useTranslation();
   const pathname = usePathname();
   const { open } = useSidebar();
   const { data: session } = useSession();
-
   const getUserRole = () =>
     (session?.user?.role as "user" | "admin" | "super_admin") || "user";
-
   const showAdminSections = isAdminRole(getUserRole());
-
   const getNormalizedUser = () => {
     if (!session?.user) return null;
     return {
@@ -131,83 +123,80 @@ export function AppSidebar() {
       image: session.user.image || undefined,
     };
   };
-
   const navigation: NavigationItem[] = [
     {
       id: "home",
-      label: <>Home</>,
+      label: <>{t("f46e0c79923e", "Home")}</>,
       url: "/dashboard",
       icon: Home,
       matchMode: "exact",
     },
     {
       id: "upload",
-      label: <>Upload</>,
+      label: <>{t("feaff8adafd7", "Upload")}</>,
       url: "/dashboard/upload",
       icon: Upload,
       matchMode: "exact",
     },
     {
       id: "billing",
-      label: <>Billing</>,
+      label: <>{t("427f56136131", "Billing")}</>,
       url: "/dashboard/billing",
       icon: Wallet,
       matchMode: "exact",
     },
     {
       id: "developer-access",
-      label: <>Developer Access</>,
+      label: <>{t("498f27b35f6a", "Developer Access")}</>,
       url: "/dashboard/developer",
       icon: KeyRound,
       matchMode: "exact",
     },
     {
       id: "settings",
-      label: <>Settings</>,
+      label: <>{t("f907fab40310", "Settings")}</>,
       url: "/dashboard/settings",
       icon: Settings,
       matchMode: "exact",
     },
   ];
-
   const adminNavigation: NavigationItem[] = [
     {
       id: "admin-dashboard",
-      label: <>Admin Dashboard</>,
+      label: <>{t("5a5314407bc8", "Admin Dashboard")}</>,
       url: "/dashboard/admin",
       icon: BarChart3,
       matchMode: "exact",
     },
     {
       id: "user-management",
-      label: <>User Management</>,
+      label: <>{t("cd3ae754b513", "User Management")}</>,
       url: "/dashboard/admin/users",
       icon: Users,
       matchMode: "exact",
     },
     {
       id: "payments",
-      label: <>Payments Management</>,
+      label: <>{t("f9c91c2390bf", "Payments Management")}</>,
       url: "/dashboard/admin/payments",
       icon: CreditCard,
       matchMode: "exact",
     },
     {
       id: "subscriptions",
-      label: <>Subscriptions Management</>,
+      label: <>{t("15aad5874a7c", "Subscriptions Management")}</>,
       url: "/dashboard/admin/subscriptions",
       icon: Shield,
       matchMode: "exact",
     },
     {
       id: "uploads-management",
-      label: <>Uploads Management</>,
+      label: <>{t("ee57d04297c6", "Uploads Management")}</>,
       url: "/dashboard/admin/uploads",
       icon: Upload,
       matchMode: "exact",
     },
   ];
-
   return (
     <Sidebar collapsible="icon" variant="inset">
       <SidebarHeader
@@ -230,7 +219,7 @@ export function AppSidebar() {
 
         {showAdminSections && (
           <SidebarSection
-            title={open ? <>Admin</> : undefined}
+            title={open ? <>{t("358b062130d2", "Admin")}</> : undefined}
             items={adminNavigation}
             pathname={pathname}
           />
@@ -243,5 +232,4 @@ export function AppSidebar() {
     </Sidebar>
   );
 }
-
 export default AppSidebar;

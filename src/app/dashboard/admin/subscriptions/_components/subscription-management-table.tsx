@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/lib/i18n/translation/client";
 import { useState, ReactNode, useTransition, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -23,7 +24,6 @@ import {
 } from "@/lib/actions/admin";
 import { SubscriptionStatus } from "@/types/billing";
 import { useIntlLocale } from "@/hooks/use-intl-locale";
-
 interface SubscriptionManagementTableProps {
   initialData: SubscriptionWithUser[];
   initialPagination: {
@@ -33,30 +33,30 @@ interface SubscriptionManagementTableProps {
     totalPages: number;
   };
 }
-
 function SubscriptionStatusLabel({ status }: { status: string }) {
+  const { t } = useTranslation();
   switch (status) {
     case "active":
-      return <>Active</>;
+      return <>{t("2c465f05d500", "Active")}</>;
     case "trialing":
-      return <>Trialing</>;
+      return <>{t("c3edc911fa1d", "Trialing")}</>;
     case "canceled":
-      return <>Canceled</>;
+      return <>{t("814b0f3e70ac", "Canceled")}</>;
     case "past_due":
-      return <>Past Due</>;
+      return <>{t("64f180e9fb46", "Past Due")}</>;
     case "incomplete":
-      return <>Incomplete</>;
+      return <>{t("4704260a99f1", "Incomplete")}</>;
     case "unpaid":
-      return <>Unpaid</>;
+      return <>{t("685a7728149e", "Unpaid")}</>;
     default:
-      return <>Unknown</>;
+      return <>{t("7ffb1c89fbde", "Unknown")}</>;
   }
 }
-
 export function SubscriptionManagementTable({
   initialData,
   initialPagination,
 }: SubscriptionManagementTableProps) {
+  const { t } = useTranslation();
   const intlLocale = useIntlLocale();
   const [isPending, startTransition] = useTransition();
   const [cancellingSubscription, setCancellingSubscription] =
@@ -81,7 +81,6 @@ export function SubscriptionManagementTable({
       }),
     [],
   );
-
   const {
     data: subscriptions,
     loading,
@@ -94,18 +93,16 @@ export function SubscriptionManagementTable({
     setCurrentPage: handlePageChange,
     refresh,
   } = useAdminTable<SubscriptionWithUser>({
-    queryAction: querySubscriptions, // Use the wrapped function
+    queryAction: querySubscriptions,
+    // Use the wrapped function
     initialData,
     initialPagination,
   });
-
   const handleCancelClick = (subscription: SubscriptionWithUser) => {
     setCancellingSubscription(subscription);
   };
-
   const confirmCancelSubscription = async () => {
     if (!cancellingSubscription) return;
-
     startTransition(async () => {
       const result = await cancelSubscriptionAction({
         subscriptionId: cancellingSubscription.subscriptionId,
@@ -121,7 +118,6 @@ export function SubscriptionManagementTable({
       }
     });
   };
-
   const getStatusBadgeVariant = (status: string) => {
     const variants: {
       [key: string]: "default" | "secondary" | "destructive" | "outline";
@@ -135,7 +131,6 @@ export function SubscriptionManagementTable({
     };
     return variants[status] || "secondary";
   };
-
   const formatDate = (dateString?: Date | string | null) => {
     if (!dateString) return "N/A";
     return new Date(dateString).toLocaleDateString(intlLocale, {
@@ -144,7 +139,6 @@ export function SubscriptionManagementTable({
       day: "numeric",
     });
   };
-
   const columns: Array<{
     key: keyof SubscriptionWithUser | string;
     label: ReactNode;
@@ -152,7 +146,7 @@ export function SubscriptionManagementTable({
   }> = [
     {
       key: "user",
-      label: <>User</>,
+      label: <>{t("2fd5139478b6", "User")}</>,
       render: (sub) => (
         <UserAvatarCell
           name={sub.user?.name}
@@ -163,12 +157,12 @@ export function SubscriptionManagementTable({
     },
     {
       key: "plan",
-      label: <>Plan</>,
+      label: <>{t("26c0caae43e2", "Plan")}</>,
       render: (sub) => <div className="font-medium">{sub.planName}</div>,
     },
     {
       key: "status",
-      label: <>Status</>,
+      label: <>{t("9b86c85c7bea", "Status")}</>,
       render: (sub) => (
         <Badge
           variant={getStatusBadgeVariant(sub.status)}
@@ -180,7 +174,7 @@ export function SubscriptionManagementTable({
     },
     {
       key: "period",
-      label: <>Current Period</>,
+      label: <>{t("075acad5a68c", "Current Period")}</>,
       render: (sub) => (
         <div className="flex items-center gap-1 text-sm">
           <Calendar className="h-3 w-3" />
@@ -193,7 +187,7 @@ export function SubscriptionManagementTable({
     },
     {
       key: "actions",
-      label: <>Actions</>,
+      label: <>{t("37af94806549", "Actions")}</>,
       render: (sub) => (
         <Button
           variant="outline"
@@ -207,15 +201,28 @@ export function SubscriptionManagementTable({
       ),
     },
   ];
-
   const statusFilterOptions = [
-    { value: "all", label: <>All Statuses</> },
-    { value: "active", label: <>Active</> },
-    { value: "trialing", label: <>Trialing</> },
-    { value: "canceled", label: <>Canceled</> },
-    { value: "past_due", label: <>Past Due</> },
+    {
+      value: "all",
+      label: <>{t("635fd8dd282f", "All Statuses")}</>,
+    },
+    {
+      value: "active",
+      label: <>{t("a91043bb2ef9", "Active")}</>,
+    },
+    {
+      value: "trialing",
+      label: <>{t("8c6eb5ed9f62", "Trialing")}</>,
+    },
+    {
+      value: "canceled",
+      label: <>{t("c9f42d0e6f6f", "Canceled")}</>,
+    },
+    {
+      value: "past_due",
+      label: <>{t("493ace466900", "Past Due")}</>,
+    },
   ];
-
   return (
     <>
       <AdminTableBase<SubscriptionWithUser>
@@ -226,15 +233,20 @@ export function SubscriptionManagementTable({
         searchTerm={searchTerm}
         onSearchChange={handleSearch}
         searchPlaceholder={
-          <>Search by user name, email, or subscription ID...</>
+          <>
+            {t(
+              "95762e04faa9",
+              "Search by user name, email, or subscription ID...",
+            )}
+          </>
         }
         filterValue={statusFilter}
         onFilterChange={handleStatusFilter}
         filterOptions={statusFilterOptions}
-        filterPlaceholder={<>Filter by status</>}
+        filterPlaceholder={<>{t("a16185256691", "Filter by status")}</>}
         pagination={pagination}
         onPageChange={handlePageChange}
-        emptyMessage={<>No subscriptions found</>}
+        emptyMessage={<>{t("bfa63c6ce393", "No subscriptions found")}</>}
       />
       <Dialog
         open={!!cancellingSubscription}
@@ -242,11 +254,22 @@ export function SubscriptionManagementTable({
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Cancel Subscription</DialogTitle>
+            <DialogTitle>
+              {t("4f1689f83c9f", "Cancel Subscription")}
+            </DialogTitle>
             <DialogDescription>
-              Are you sure you want to cancel the subscription for{" "}
-              <strong>{cancellingSubscription?.user?.name}</strong>? This action
-              is irreversible.
+              {t(
+                "d6873b62f007",
+                "Are you sure you want to cancel the subscription for <strong0>{expression0}</strong0>? This action is irreversible.",
+                {
+                  expression0:
+                    cancellingSubscription?.user.name ??
+                    cancellingSubscription?.user.email ??
+                    cancellingSubscription?.subscriptionId ??
+                    "",
+                  strong0: (chunks) => <strong>{chunks}</strong>,
+                },
+              )}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -255,15 +278,18 @@ export function SubscriptionManagementTable({
               onClick={() => setCancellingSubscription(null)}
               disabled={isPending}
             >
-              Back
+              {t("be6fb3171b20", "Back")}
             </Button>
             <Button
               variant="destructive"
               onClick={confirmCancelSubscription}
               disabled={isPending}
             >
-              {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Confirm Cancellation
+              {t("063b2e3c90d9", "{expression0} Confirm Cancellation", {
+                expression0: isPending && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ),
+              })}
             </Button>
           </DialogFooter>
         </DialogContent>

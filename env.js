@@ -1,6 +1,29 @@
 import { createEnv } from "@t3-oss/env-nextjs";
 import { z } from "zod";
 
+const appOriginSchema = z
+  .string()
+  .url()
+  .transform((value, context) => {
+    const url = new URL(value);
+    if (
+      url.pathname !== "/" ||
+      url.search ||
+      url.hash ||
+      url.username ||
+      url.password
+    ) {
+      context.addIssue({
+        code: "custom",
+        message:
+          "NEXT_PUBLIC_APP_URL must be a URL origin without path, query, or hash",
+      });
+      return z.NEVER;
+    }
+
+    return url.origin;
+  });
+
 const env = createEnv({
   // Server-side environment variables
   server: {
@@ -45,7 +68,7 @@ const env = createEnv({
   // Client-side public environment variables
   client: {
     // Application settings
-    NEXT_PUBLIC_APP_URL: z.string().url(),
+    NEXT_PUBLIC_APP_URL: appOriginSchema,
   },
 
   // Linking runtime environment variables

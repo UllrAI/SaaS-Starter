@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/lib/i18n/translation/client";
 import React, { useMemo, useState } from "react";
 import { useRouter } from "nextjs-toploader/app";
 import { toast } from "sonner";
@@ -25,59 +26,59 @@ import { useIntlLocale } from "@/hooks/use-intl-locale";
 import { getSafeBillingRedirectUrl } from "@/lib/billing/url";
 import { formatCurrency } from "@/lib/utils";
 import type { PaymentRecord, Subscription } from "@/types/billing";
-
 interface BillingOverviewProps {
   subscription: Subscription | null;
   payments: PaymentRecord[];
 }
-
 function RedirectingToSubscriptionManagementToast() {
-  return <>Redirecting to subscription management...</>;
+  const { t } = useTranslation();
+  return <>{t("747a00e98aeb", "Redirecting to subscription management...")}</>;
 }
-
 function NoActiveSubscriptionLabel() {
-  return <>No active subscription</>;
+  const { t } = useTranslation();
+  return <>{t("596a916936d4", "No active subscription")}</>;
 }
-
 function NotScheduledLabel() {
-  return <>Not scheduled</>;
+  const { t } = useTranslation();
+  return <>{t("fc0eb782d580", "Not scheduled")}</>;
 }
-
 function LatestPaymentDateLabel({ date }: { date: string }) {
-  return <>Latest: {date}</>;
+  const { t } = useTranslation();
+  return (
+    <>
+      {t("c2bd30cfc54c", "Latest: {date}", {
+        date,
+      })}
+    </>
+  );
 }
-
 function NoPaymentRecordsLabel() {
-  return <>No records yet</>;
+  const { t } = useTranslation();
+  return <>{t("fe7244137ccf", "No records yet")}</>;
 }
-
 export function BillingOverview({
   subscription,
   payments,
 }: BillingOverviewProps) {
+  const { t } = useTranslation();
   const intlLocale = useIntlLocale();
   const router = useRouter();
   const [isPortalLoading, setIsPortalLoading] = useState(false);
-
   const paymentSummary = useMemo(() => {
     const successfulPayments = payments.filter(
       (payment) => payment.status === "succeeded",
     );
-
     return {
       count: successfulPayments.length,
       latestDate: successfulPayments[0]?.createdAt ?? null,
     };
   }, [payments]);
-
   const nextBillingDate = subscription?.currentPeriodEnd
     ? new Date(subscription.currentPeriodEnd).toLocaleDateString(intlLocale)
     : null;
-
   const handleManageSubscription = async () => {
     setIsPortalLoading(true);
     toast.info(<RedirectingToSubscriptionManagementToast />);
-
     try {
       const response = await fetch("/api/billing/portal");
       const data = await response.json();
@@ -85,7 +86,6 @@ export function BillingOverview({
         data.portalUrl,
         window.location,
       );
-
       if (!response.ok || !safePortalUrl) {
         throw new Error(
           data.error ||
@@ -94,7 +94,6 @@ export function BillingOverview({
               : "Could not create portal session."),
         );
       }
-
       window.location.assign(safePortalUrl);
     } catch (error) {
       toast.error(
@@ -104,18 +103,19 @@ export function BillingOverview({
       setIsPortalLoading(false);
     }
   };
-
   return (
     <div className="space-y-6">
       <section className="grid gap-3 sm:grid-cols-3">
         <Card>
           <CardHeader>
-            <CardDescription>Current Plan</CardDescription>
+            <CardDescription>
+              {t("ba99902b6481", "Current Plan")}
+            </CardDescription>
             <CardTitle className="text-base">
               {subscription ? (
                 `${subscription.tierId.charAt(0).toUpperCase()}${subscription.tierId.slice(1)}`
               ) : (
-                <>Free</>
+                <>{t("d4b2857ce5d2", "Free")}</>
               )}
             </CardTitle>
           </CardHeader>
@@ -142,7 +142,9 @@ export function BillingOverview({
 
         <Card>
           <CardHeader>
-            <CardDescription>Next Billing Date</CardDescription>
+            <CardDescription>
+              {t("b620b54bfdec", "Next Billing Date")}
+            </CardDescription>
             <CardTitle className="text-base">
               {nextBillingDate || <NotScheduledLabel />}
             </CardTitle>
@@ -150,16 +152,18 @@ export function BillingOverview({
           <CardContent className="text-muted-foreground flex items-center gap-2 text-sm">
             <CalendarClock className="h-4 w-4" />
             {subscription?.canceledAt ? (
-              <>Subscription ends at period close</>
+              <>{t("141680a4d3e7", "Subscription ends at period close")}</>
             ) : (
-              <>Based on your current billing cycle</>
+              <>{t("393e806b8041", "Based on your current billing cycle")}</>
             )}
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardDescription>Successful Payments</CardDescription>
+            <CardDescription>
+              {t("7534811de973", "Successful Payments")}
+            </CardDescription>
             <CardTitle className="text-base">{paymentSummary.count}</CardTitle>
           </CardHeader>
           <CardContent className="text-muted-foreground flex items-center gap-2 text-sm">
@@ -179,10 +183,12 @@ export function BillingOverview({
 
       <Card>
         <CardHeader>
-          <CardTitle>Subscription Management</CardTitle>
+          <CardTitle>{t("5912dc0d4006", "Subscription Management")}</CardTitle>
           <CardDescription>
-            Use the billing portal to update your payment method, invoices, and
-            subscription status.
+            {t(
+              "45011971a8f8",
+              "Use the billing portal to update your payment method, invoices, and subscription status.",
+            )}
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-wrap items-center gap-3">
@@ -191,22 +197,28 @@ export function BillingOverview({
               onClick={handleManageSubscription}
               disabled={isPortalLoading}
             >
-              {isPortalLoading && (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              )}
-              Manage Subscription
+              {t("f3d6ee9e6c3e", "{expression0} Manage Subscription", {
+                expression0: isPortalLoading && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ),
+              })}
             </Button>
           ) : (
-            <Button onClick={() => router.push("/pricing")}>View Plans</Button>
+            <Button onClick={() => router.push("/pricing")}>
+              {t("dd7d10cbc338", "View Plans")}
+            </Button>
           )}
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Payment History</CardTitle>
+          <CardTitle>{t("31a6950109ab", "Payment History")}</CardTitle>
           <CardDescription>
-            Review your recent subscription and one-time payment records.
+            {t(
+              "9e52dd2f01df",
+              "Review your recent subscription and one-time payment records.",
+            )}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -214,11 +226,11 @@ export function BillingOverview({
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Product</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Amount</TableHead>
-                  <TableHead>Status</TableHead>
+                  <TableHead>{t("7f2bf0739bb0", "Date")}</TableHead>
+                  <TableHead>{t("b02f3639bc71", "Product")}</TableHead>
+                  <TableHead>{t("740b64b79003", "Type")}</TableHead>
+                  <TableHead>{t("baf1b8816ca2", "Amount")}</TableHead>
+                  <TableHead>{t("383b7246808d", "Status")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -270,7 +282,7 @@ export function BillingOverview({
             </Table>
           ) : (
             <p className="text-muted-foreground text-sm">
-              No payment history found.
+              {t("294bb5d0dca3", "No payment history found.")}
             </p>
           )}
         </CardContent>

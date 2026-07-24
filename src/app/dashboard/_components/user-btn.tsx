@@ -1,4 +1,6 @@
 "use client";
+
+import { useTranslation } from "@/lib/i18n/translation/client";
 import { ChevronsUpDown, Loader2, LogOut, Settings } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getUserAvatarUrl } from "@/lib/avatar";
@@ -23,31 +25,27 @@ import { useRouter } from "nextjs-toploader/app";
 import React, { useState } from "react";
 import Link from "next/link";
 import type { AuthUser } from "@/lib/auth/permissions";
-
 interface UserButtonProps {
   user?: AuthUser | null;
 }
-
 function LoggedOutToast() {
-  return <>You have been logged out successfully.</>;
+  const { t } = useTranslation();
+  return <>{t("ebd9be9621fb", "You have been logged out successfully.")}</>;
 }
-
 function LogoutFailedToast() {
-  return <>Something went wrong. Please try again.</>;
+  const { t } = useTranslation();
+  return <>{t("3936237fcb58", "Something went wrong. Please try again.")}</>;
 }
-
 export function UserButton({ user }: UserButtonProps) {
+  const { t } = useTranslation();
   const { isMobile, open } = useSidebar();
   const router = useRouter();
   const [loggingOut, setLoggingOut] = useState(false);
-
   if (!user) {
     return null;
   }
-
   const userInitial = user.name?.slice(0, 1).toUpperCase() || "U";
   const avatarUrl = getUserAvatarUrl(user.image, user.email, user.name);
-
   const handleLogout = async () => {
     setLoggingOut(true);
     try {
@@ -69,7 +67,6 @@ export function UserButton({ user }: UserButtonProps) {
       setLoggingOut(false);
     }
   };
-
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -77,9 +74,7 @@ export function UserButton({ user }: UserButtonProps) {
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
               size={open ? "lg" : "default"}
-              className={`data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground ${
-                !open ? "h-8 w-8 justify-center p-0" : ""
-              }`}
+              className={`data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground ${!open ? "h-8 w-8 justify-center p-0" : ""}`}
             >
               <Avatar
                 className={`rounded-full ${open ? "h-8 w-8" : "h-6 w-6"}`}
@@ -125,7 +120,7 @@ export function UserButton({ user }: UserButtonProps) {
               <Link href="/dashboard/settings">
                 <DropdownMenuItem className="cursor-pointer">
                   <Settings className="size-4" />
-                  Settings
+                  {t("57c1186f9419", "Settings")}
                 </DropdownMenuItem>
               </Link>
             </DropdownMenuGroup>
@@ -134,12 +129,12 @@ export function UserButton({ user }: UserButtonProps) {
               {loggingOut ? (
                 <div className="flex items-center gap-2">
                   <Loader2 className="size-4 animate-spin" />
-                  <span>Log Out</span>
+                  <span>{t("b265105cba36", "Log Out")}</span>
                 </div>
               ) : (
                 <div className="flex items-center gap-2">
                   <LogOut className="size-4" />
-                  Log Out
+                  {t("b265105cba36", "Log Out")}
                 </div>
               )}
             </DropdownMenuItem>

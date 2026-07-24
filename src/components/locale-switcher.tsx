@@ -1,6 +1,9 @@
 "use client";
 
+import { useTranslation } from "@/lib/i18n/translation/client";
 import * as React from "react";
+import { useLocale } from "next-intl";
+import { useRouter } from "next/navigation";
 import { Languages, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,12 +23,9 @@ import {
 import { normalizeLocaleCandidate } from "@/lib/config/i18n-routing";
 import { persistLocale } from "@/lib/i18n/locale-client";
 import { resolveLocaleSwitchUrl } from "@/lib/i18n/locale-switch";
-import { useLingoContext } from "@lingo.dev/compiler/react";
 import { useIsClient } from "@/hooks/use-is-client";
-
 type ButtonVariant = React.ComponentProps<typeof Button>["variant"];
 type ButtonSize = React.ComponentProps<typeof Button>["size"];
-
 export type LocaleSwitcherProps = {
   locales?: readonly SupportedLocale[];
   className?: string;
@@ -34,12 +34,10 @@ export type LocaleSwitcherProps = {
   align?: "start" | "center" | "end";
   showLabel?: boolean;
 };
-
 function getMarketingLocaleHref(locale: SupportedLocale): string | null {
   if (typeof window === "undefined") {
     return null;
   }
-
   return resolveLocaleSwitchUrl({
     pathname: window.location.pathname,
     search: window.location.search,
@@ -47,7 +45,6 @@ function getMarketingLocaleHref(locale: SupportedLocale): string | null {
     locale,
   });
 }
-
 export function LocaleSwitcher({
   locales = SUPPORTED_LOCALES,
   className,
@@ -56,29 +53,27 @@ export function LocaleSwitcher({
   align = "end",
   showLabel = false,
 }: LocaleSwitcherProps) {
+  const { t } = useTranslation();
   const isClient = useIsClient();
+  const router = useRouter();
   const [isPending, startTransition] = React.useTransition();
   const availableLocales = locales.length > 0 ? locales : SUPPORTED_LOCALES;
-  const { locale: currentLocale, setLocale } = useLingoContext();
+  const currentLocale = useLocale();
   const normalizedCurrentLocale = normalizeLocaleCandidate(currentLocale);
   const activeLocale = normalizedCurrentLocale ?? availableLocales[0];
-
   const handleLocaleSelect = (locale: SupportedLocale) => {
     if (normalizedCurrentLocale && locale === normalizedCurrentLocale) {
       return;
     }
-
     startTransition(() => {
-      void setLocale(locale);
+      persistLocale(locale);
+      router.refresh();
     });
   };
-
   if (!availableLocales.length) {
     return null;
   }
-
   const activeLocaleDetails = getLocaleDisplayInfo(activeLocale);
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -99,7 +94,9 @@ export function LocaleSwitcher({
               {activeLocaleDetails.nativeName}
             </span>
           )}
-          <span className="sr-only">Select language</span>
+          <span className="sr-only">
+            {t("d5406e61d01d", "Select language")}
+          </span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent
@@ -107,13 +104,12 @@ export function LocaleSwitcher({
         sideOffset={8}
         className="min-w-[12rem]"
       >
-        <DropdownMenuLabel>Language</DropdownMenuLabel>
+        <DropdownMenuLabel>{t("33911e975b6d", "Language")}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         {availableLocales.map((locale) => {
           const details = getLocaleDisplayInfo(locale);
           const isSelected = locale === activeLocale;
           const localeHref = isClient ? getMarketingLocaleHref(locale) : null;
-
           if (localeHref && !isSelected) {
             return (
               <DropdownMenuItem key={locale} asChild className="py-2">
@@ -129,7 +125,6 @@ export function LocaleSwitcher({
               </DropdownMenuItem>
             );
           }
-
           return (
             <DropdownMenuItem
               key={locale}

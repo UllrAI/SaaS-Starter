@@ -120,12 +120,11 @@ describe("Constants Configuration", () => {
     it("should export correct SEO configuration", async () => {
       const constants = await import("./constants");
 
-      expect(constants.OGIMAGE).toBe("https://starter.ullrai.com/og.png");
+      expect(constants.OGIMAGE).toBe("/og.png");
       expect(constants.TWITTERACCOUNT).toBe("@ullr_ai");
 
-      // Validate URL format for OG image
-      const urlRegex = /^https?:\/\/.+/;
-      expect(urlRegex.test(constants.OGIMAGE)).toBe(true);
+      // Resolve relative assets against each deployment's metadataBase.
+      expect(constants.OGIMAGE.startsWith("/")).toBe(true);
 
       // Validate Twitter handle format
       expect(constants.TWITTERACCOUNT.startsWith("@")).toBe(true);
@@ -201,7 +200,7 @@ describe("Constants Configuration", () => {
       // URLs should start with https
       expect(constants.GITHUB_URL.startsWith("https://")).toBe(true);
       expect(constants.VERCEL_DEPLOY_URL.startsWith("https://")).toBe(true);
-      expect(constants.OGIMAGE.startsWith("https://")).toBe(true);
+      expect(constants.OGIMAGE.startsWith("/")).toBe(true);
     });
   });
 

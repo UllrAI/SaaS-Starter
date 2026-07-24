@@ -2,7 +2,7 @@ import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { LocaleSwitcher } from "./locale-switcher";
 
-const mockSetLocale = jest.fn();
+const mockRefresh = jest.fn();
 const mockPersistLocale = jest.fn();
 
 jest.mock("@/components/ui/button", () => ({
@@ -71,16 +71,22 @@ jest.mock("@/lib/i18n/locale-client", () => ({
   persistLocale: (locale: string) => mockPersistLocale(locale),
 }));
 
-jest.mock("@lingo.dev/compiler/react", () => ({
-  useLingoContext: () => ({
-    locale: "zh-Hans",
-    setLocale: mockSetLocale,
-  }),
+jest.mock("next-intl", () => ({
+  useLocale: () => "zh-Hans",
+  useTranslations: () =>
+    Object.assign((key: string) => key, {
+      has: () => false,
+      rich: (key: string) => key,
+    }),
+}));
+
+jest.mock("next/navigation", () => ({
+  useRouter: () => ({ refresh: mockRefresh }),
 }));
 
 describe("LocaleSwitcher", () => {
   beforeEach(() => {
-    mockSetLocale.mockReset();
+    mockRefresh.mockReset();
     mockPersistLocale.mockReset();
   });
 
@@ -101,11 +107,11 @@ describe("LocaleSwitcher", () => {
     fireEvent.click(englishLink);
 
     expect(mockPersistLocale).toHaveBeenCalledWith("en");
-    expect(mockSetLocale).not.toHaveBeenCalled();
+    expect(mockRefresh).not.toHaveBeenCalled();
     expect(screen.getAllByText("简体中文")).not.toHaveLength(0);
   });
 
-  it("falls back to setLocale for non-marketing routes", async () => {
+  it("persists the locale and refreshes non-marketing routes", async () => {
     window.history.pushState({}, "", "/dashboard");
 
     render(<LocaleSwitcher />);
@@ -114,10 +120,10 @@ describe("LocaleSwitcher", () => {
     fireEvent.click(englishItem);
 
     await waitFor(() => {
-      expect(mockSetLocale).toHaveBeenCalledWith("en");
+      expect(mockRefresh).toHaveBeenCalledTimes(1);
     });
 
-    expect(mockPersistLocale).not.toHaveBeenCalled();
+    expect(mockPersistLocale).toHaveBeenCalledWith("en");
   });
 
   it("keeps the active locale disabled and does not trigger handlers", async () => {
@@ -132,7 +138,7 @@ describe("LocaleSwitcher", () => {
 
     fireEvent.click(currentLocaleButton);
 
-    expect(mockSetLocale).not.toHaveBeenCalled();
+    expect(mockRefresh).not.toHaveBeenCalled();
     expect(mockPersistLocale).not.toHaveBeenCalled();
   });
 

@@ -55,7 +55,7 @@ pnpm set:admin
 - Billing: provider abstraction in `src/lib/billing/provider.ts`, current implementation uses Creem
 - Storage: Cloudflare R2 with presigned uploads
 - Content: Content Collections plus repository-managed Markdown
-- Localization: `@lingo.dev/compiler`
+- Localization: `next-intl`
 
 ## 4. Important Paths
 
@@ -71,13 +71,13 @@ pnpm set:admin
 - Auth logic: `src/lib/auth`
 - Billing logic: `src/lib/billing`
 - i18n helpers: `src/lib/i18n`, `src/lib/config/i18n.ts`, `src/lib/config/i18n-routing.ts`
-- Lingo compiler state: `src/.lingo`
+- Translation catalogs: `src/messages`
 - Database schema and migrations: `src/database`, `src/database/migrations`
 - Email templates: `src/emails`
 - Environment validation: `env.js`
 - Route protection: `src/proxy.ts`
 - Next config: `next.config.ts`
-- Lingo config: `lingo.config.ts`
+- next-intl request config: `src/i18n/request.ts`
 
 ## 5. Engineering Rules
 
@@ -116,70 +116,36 @@ pnpm set:admin
 - Keep schemas close to the form or in a clearly named schema module.
 - Handle loading, validation, and error states explicitly.
 
-## 6. Localization and Lingo
+## 6. Localization and next-intl
 
 ### Core policy
 
-- Do not hardcode user-visible language in code. Use the repository's Lingo-based i18n flow.
+- Do not hardcode user-visible language in code. Add copy to both `src/messages/en.json` and `src/messages/zh-Hans.json`.
 - Treat free-form business data such as `banReason` as raw content. It does not need translation, but any surrounding UI copy still must follow i18n rules.
-- Source copy should be authored in English unless a feature explicitly requires a different canonical source language.
+- Use stable, semantic message keys for new copy. Existing hash keys are retained only for migration compatibility.
 - Shipped UI must respect the active locale and must not mix English with translated copy in the same view.
 
 ### Source of truth for locale behavior
 
-- The Lingo compiler is wired through `withLingo()` in `next.config.ts`; keep that wrapper active for App Router, React Server Components, Webpack, and Turbopack builds.
-- This repository uses `sourceRoot: "src"` and `lingoDir: ".lingo"`, so tracked Lingo files live under `src/.lingo/`, not the project-root `.lingo/` path used by many upstream examples.
-- Keep locale detection and persistence in `src/.lingo/locale-resolver.server.ts` and `src/.lingo/locale-resolver.client.ts`.
-- Before upgrading `@lingo.dev/compiler`, check upstream docs, changelog, and the installed package for breaking changes, especially resolver exports and build mode behavior.
+- Keep `createNextIntlPlugin()` active in `next.config.ts` and request configuration in `src/i18n/request.ts`.
+- Keep locale detection and persistence in `src/lib/i18n/server-locale.ts`, `src/lib/i18n/locale-client.ts`, and `src/proxy.ts`.
 - In server code, read request locale through `src/lib/i18n/server-locale.ts`.
-- For client-side locale switching, prefer `useLingoContext().setLocale()` for same-route updates.
 - If a locale switch must change the URL for locale-prefixed marketing routes, use canonical `href`s, persist locale, and let the browser navigate.
+- Use `LocalizedLink` for links to public marketing routes so the active locale is preserved.
 - For numbers and dates, format with the active locale via helpers such as `resolveIntlLocale`. Do not hardcode `en-US`.
 
-### Build and cache workflow
+### Message usage
 
-- Use `LINGO_BUILD_MODE=translate pnpm build` when adding or changing translatable copy so Lingo can generate missing translations with the configured provider.
-- Use `LINGO_BUILD_MODE=cache-only pnpm build` for deterministic production-style validation. Production deploys should not need translation provider API keys.
-- Translation generation in this project uses the configured OpenRouter model, so `OPENROUTER_API_KEY` must be available when `LINGO_BUILD_MODE=translate`.
-- Keep Lingo cache files in version control. With this repository layout, that means `src/.lingo/cache/*` plus any related generated locale files.
-- Do not commit ephemeral Lingo runtime artifacts such as `src/.lingo/translation-server.log`, `src/.lingo/metadata-build*`, LMDB files, or SQLite files.
-
-### Extraction rules
-
-- Keep translatable UI and metadata in `.tsx` or `.jsx` route/component files in this repository; do not rely on Markdown, external JSON, or TypeScript-only copy tables being extracted.
-- Keep translatable copy directly in the JSX render tree.
-- Allowed localizable patterns include:
-  - JSX text nodes and fragments
-  - String literal JSX attributes such as `placeholder`, `alt`, `aria-label`, `title`, and `label`
-  - JSX text combined with expressions
-- Avoid storing translatable copy in module-level strings, template literals, object maps, or helper-returned string tables.
-- Do not branch translated copy with runtime locale conditionals such as `locale === "zh-Hans" ? "..." : "..."`.
-- Prefer small JSX subcomponents for reusable copy instead of exported string maps.
-- If a piece of copy is only used once or can be expressed directly at the call site, inline the JSX instead of wrapping it in a no-props helper component.
-- Default pattern for one-off marketing sections, cards, checklists, and similar page-local UI: define the data array inside the rendering component and place the localized JSX directly on each item, as in `title: <>...</>` and `description: <>...</>`.
-- If the structure must stay at module scope or be shared across multiple render sites, keep the structural data minimal, then map a stable id to localized JSX in one small leaf component or local `switch`.
-- Inline JSX is only a safe default when it is created inside the component render path. Do not hoist localizable `ReactNode` fragments into module-level config arrays, objects, or other top-level constants and expect Lingo to extract them reliably.
-- For structured UI config such as sidebar navigation, dropdown items, and card definitions, either build the config inside the rendering component with inline JSX there, or use a small JSX subcomponent when the config must stay at module scope.
-- Do not introduce `defineCopyCatalog`, `Label` factories, or module-scope `Title`/`Description` component registries for page-local marketing copy or small finite state labels unless the config truly must live outside the render path.
-- Prefer full-sentence JSX branches over concatenation such as `"More "`, `file(s)`, or mixed translated and untranslated fragments.
-- When a reusable component needs copy-bearing props such as titles, descriptions, empty states, or placeholders, prefer accepting JSX-friendly inputs at the call site and only coerce to plain strings at the final DOM or library boundary when required.
-- For fallback labels like anonymous authors, empty states, and button text, keep the fallback copy in JSX instead of `value || "..."` when the text is user-visible and localizable.
-- Avoid IIFEs or nested callback structures that hide localizable JSX from extraction when a small subcomponent would be clearer.
-- When content must stay unlocalized, use supported patterns such as `data-lingo-skip` as an attribute, not in `className`.
-- Use `data-lingo-override` sparingly when a brand name, technical term, legal phrase, or reviewed marketing sentence needs a specific translation. Locale keys must match configured target locales.
-- For small finite UI state sets such as auth feedback, payment status, and simple badges, prefer a single render-path component with a local `switch` over many zero-logic helper components that only `return <>...</>`.
-- Use module-scope label components only when structured config must stay at module scope for composition; if the copy is consumed in one place, render it inline or in one small leaf component instead of building `ReactNode` factories.
+- Use `useTranslation()` in synchronous components and `getServerTranslations()` in async Server Components or metadata.
+- Pass an explicit `locale` to `getServerTranslations({ locale })` for work detached from the current request, such as email rendering.
+- Keep English fallback text at the call site during the migrated-key transition and keep both catalogs in exact key parity.
+- Use next-intl rich-text tags for mixed text and React elements. Catalog tag names and call-site values must match exactly.
+- Use standard ICU `{name}` placeholders for primitive values and rich-text tags for React nodes. The compatibility adapter supports both forms.
+- Mark technical content that browsers should not translate with the standard `translate="no"` attribute.
+- Do not branch copy with locale conditionals or pass raw external error text to the UI.
+- Prefer full-sentence messages over concatenated fragments.
 - Prefer controlled UI message codes over raw strings in state for transient feedback such as payment status errors and checkout results; render the final localized message in JSX at the boundary.
-- Never pass raw external error text such as URL query descriptions straight to the UI. Normalize external states to an allowlisted key and render a controlled localized fallback in JSX.
-
-### Lingo integration constraints
-
-- Do not invent `useTranslation`, `FormattedMessage`, `localizeText`, or similar patterns.
-- Do not manually implement a parallel i18n system beside Lingo.
-- Keep `LingoProvider` at the root layout. Do not convert large trees to client components only to read locale.
-- For `generateMetadata`, return a metadata object literal directly from the route module when any localizable fields are involved. Do not wrap translatable metadata in helpers such as `createPageMetadata`, and if shared defaults are needed, spread only non-localizable metadata into the returned object while keeping `title`, `description`, `openGraph.title`, `openGraph.description`, `twitter.title`, and `twitter.description` visible in that object literal.
-- Keep localizable metadata values as plain string literals or static template literals. Current compiler metadata extraction does not handle template literals with expressions such as `` `${COMPANY_NAME} ...` ``.
-- Real translation QA must use a production build: run `pnpm build` and `pnpm start`.
+- Real localization and SEO QA must use `pnpm build`, `pnpm start`, and inspect rendered HTML for every supported locale.
 
 ## 7. Data, Billing, and Security
 
@@ -212,5 +178,4 @@ pnpm set:admin
 
 ## 10. Commit Policy
 
-- When a change touches Lingo outputs, always commit Lingo cache and language files together in the same commit.
-- Required include: `src/.lingo/cache/*` and related locale/language output files generated by Lingo.
+- Commit both locale catalogs whenever message keys or copy change.

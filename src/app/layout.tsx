@@ -1,5 +1,5 @@
+import { getServerTranslations } from "@/lib/i18n/translation/server";
 import "@/styles/globals.css";
-import Script from "next/script";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import {
   APP_NAME,
@@ -7,39 +7,43 @@ import {
   OGIMAGE,
   TWITTERACCOUNT,
 } from "@/lib/config/constants";
-import env from "@/env";
 import type { Metadata } from "next";
-
 import { AppProviders } from "@/components/app-providers";
 import { getRequestLocale } from "@/lib/i18n/server-locale";
-import { AppLingoProvider } from "@/lib/i18n/lingo-provider";
-import { loadLingoTranslations } from "@/lib/i18n/lingo-translations";
-
+import { AppIntlProvider } from "@/lib/i18n/provider";
+import { loadMessages } from "@/lib/i18n/messages";
+import { absoluteUrl, APP_ORIGIN } from "@/lib/url";
 const fontSans = Inter({
   subsets: ["latin"],
   variable: "--font-sans",
   display: "swap",
 });
-
 const fontMono = JetBrains_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
   display: "swap",
 });
-
 export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getServerTranslations();
   return {
-    metadataBase: new URL(env.NEXT_PUBLIC_APP_URL),
+    metadataBase: new URL(APP_ORIGIN),
     applicationName: APP_NAME,
-    authors: [{ name: COMPANY_NAME, url: env.NEXT_PUBLIC_APP_URL }],
+    authors: [
+      {
+        name: COMPANY_NAME,
+        url: APP_ORIGIN,
+      },
+    ],
     creator: COMPANY_NAME,
     publisher: COMPANY_NAME,
     title: {
       template: `%s | ${APP_NAME}`,
       default: APP_NAME,
     },
-    description:
+    description: t(
+      "47ef1ddddc70",
       "Complete Micro UllrAI SaaS starter with authentication, payments, database, and deployment.",
+    ),
     robots: {
       index: true,
       follow: true,
@@ -53,8 +57,10 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     openGraph: {
       title: APP_NAME,
-      description:
+      description: t(
+        "0863940a3e2f",
         "Complete Micro UllrAI SaaS starter with authentication, payments, database, and deployment.",
+      ),
       images: OGIMAGE,
       siteName: APP_NAME,
       type: "website",
@@ -63,37 +69,38 @@ export async function generateMetadata(): Promise<Metadata> {
       card: "summary_large_image",
       creator: TWITTERACCOUNT,
       title: APP_NAME,
-      description:
+      description: t(
+        "64b8511aff17",
         "Complete Micro UllrAI SaaS starter with authentication, payments, database, and deployment.",
+      ),
       images: OGIMAGE,
     },
   };
 }
-
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   const locale = await getRequestLocale();
-  const translations = await loadLingoTranslations(locale);
+  const messages = await loadMessages(locale);
   const structuredData = {
     "@context": "https://schema.org",
     "@graph": [
       {
         "@type": "Organization",
-        "@id": `${env.NEXT_PUBLIC_APP_URL}/#organization`,
+        "@id": absoluteUrl("/#organization"),
         name: COMPANY_NAME,
-        url: env.NEXT_PUBLIC_APP_URL,
-        logo: `${env.NEXT_PUBLIC_APP_URL}/logo.png`,
+        url: APP_ORIGIN,
+        logo: absoluteUrl("/logo.png"),
       },
       {
         "@type": "WebSite",
-        "@id": `${env.NEXT_PUBLIC_APP_URL}/#website`,
+        "@id": absoluteUrl("/#website"),
         name: APP_NAME,
-        url: env.NEXT_PUBLIC_APP_URL,
+        url: APP_ORIGIN,
         publisher: {
-          "@id": `${env.NEXT_PUBLIC_APP_URL}/#organization`,
+          "@id": absoluteUrl("/#organization"),
         },
         inLanguage: locale,
       },
@@ -107,23 +114,15 @@ export default async function RootLayout({
     >
       <head />
       <body>
-        <AppLingoProvider
-          initialLocale={locale}
-          initialTranslations={translations}
-        >
+        <AppIntlProvider locale={locale} messages={messages}>
           <AppProviders>{children}</AppProviders>
-        </AppLingoProvider>
-        <Script
+        </AppIntlProvider>
+        <script
           id="website-structured-data"
           type="application/ld+json"
-          strategy="beforeInteractive"
-        >
-          {JSON.stringify(structuredData)}
-        </Script>
-        <Script
-          src="https://track.pixmiller.com/script.js"
-          data-website-id="9315890d-80ba-455a-b624-ab2ab48595f4"
-          strategy="lazyOnload"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(structuredData).replace(/</g, "\\u003c"),
+          }}
         />
       </body>
     </html>

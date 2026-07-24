@@ -11,7 +11,7 @@ describe("createMetadataDefaults", () => {
     process.env.NODE_ENV === "development"
       ? "DEV - SaaS Starter"
       : "SaaS Starter";
-  const mockOGImage = "https://starter.ullrai.com/og.png";
+  const mockOGImage = "/og.png";
   const mockAppUrl = "http://localhost:3000";
   const mockTwitterAccount = "@ullr_ai";
 

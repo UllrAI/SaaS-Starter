@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/lib/i18n/translation/client";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import { KeyRound, Loader2, Plus, ShieldOff } from "lucide-react";
@@ -25,37 +26,38 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { ApiKeyPublic } from "@/lib/machine-auth/types";
-
 export function ApiKeysSection({
   initialKeys,
 }: {
   initialKeys: ApiKeyPublic[];
 }) {
+  const { t } = useTranslation();
   const [keys, setKeys] = useState(initialKeys);
-
   const refreshKeys = useCallback(async () => {
     try {
       const response = await fetch("/api/api-keys");
       if (!response.ok) {
         throw new Error("Failed to fetch API keys.");
       }
-
-      const data = (await response.json()) as { keys: ApiKeyPublic[] };
+      const data = (await response.json()) as {
+        keys: ApiKeyPublic[];
+      };
       setKeys(data.keys);
     } catch {
       toast.error(<>Failed to load API keys.</>);
     }
   }, []);
-
   return (
     <Card className="w-full">
       <CardHeader>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="space-y-1.5">
-            <CardTitle>API Keys</CardTitle>
+            <CardTitle>{t("808cf1a5b1ad", "API Keys")}</CardTitle>
             <CardDescription>
-              Create long-lived keys for servers, CI jobs, and other
-              non-interactive API clients.
+              {t(
+                "6f34c9c7057b",
+                "Create long-lived keys for servers, CI jobs, and other non-interactive API clients.",
+              )}
             </CardDescription>
           </div>
           <CreateApiKeyDialog onCreated={refreshKeys} />
@@ -66,7 +68,10 @@ export function ApiKeysSection({
           <div className="flex flex-col items-center gap-2 rounded-lg border border-dashed px-4 py-8 text-center">
             <KeyRound className="text-muted-foreground h-8 w-8" />
             <p className="text-muted-foreground text-sm">
-              No API keys yet. Create one when you need server-to-server access.
+              {t(
+                "61ca6f8370af",
+                "No API keys yet. Create one when you need server-to-server access.",
+              )}
             </p>
           </div>
         ) : (
@@ -82,7 +87,6 @@ export function ApiKeysSection({
     </Card>
   );
 }
-
 function ApiKeyRow({
   apiKey,
   onRevoked,
@@ -90,20 +94,17 @@ function ApiKeyRow({
   apiKey: ApiKeyPublic;
   onRevoked: () => void;
 }) {
+  const { t } = useTranslation();
   const [isRevoking, setIsRevoking] = useState(false);
-
   async function handleRevoke() {
     setIsRevoking(true);
-
     try {
       const response = await fetch(`/api/api-keys/${apiKey.id}`, {
         method: "DELETE",
       });
-
       if (!response.ok) {
         throw new Error("Failed to revoke API key.");
       }
-
       toast.success(<>API key revoked.</>);
       await onRevoked();
     } catch {
@@ -112,40 +113,51 @@ function ApiKeyRow({
       setIsRevoking(false);
     }
   }
-
   return (
     <div className="flex flex-col gap-4 rounded-lg border p-4 sm:flex-row sm:items-center sm:justify-between">
       <div className="min-w-0 flex-1 space-y-1.5">
         <div className="flex items-center gap-2">
-          <p className="truncate text-sm font-medium" data-lingo-skip>
+          <p className="truncate text-sm font-medium" translate="no">
             {apiKey.name}
           </p>
           <Badge variant={apiKey.isActive ? "secondary" : "outline"}>
-            {apiKey.isActive ? <>Active</> : <>Revoked</>}
+            {apiKey.isActive ? (
+              <>{t("4d6a56ae284d", "Active")}</>
+            ) : (
+              <>{t("50b644b2415a", "Revoked")}</>
+            )}
           </Badge>
         </div>
-        <p className="text-muted-foreground font-mono text-xs" data-lingo-skip>
+        <p className="text-muted-foreground font-mono text-xs" translate="no">
           {apiKey.keyPrefix}...{apiKey.lastFourChars}
         </p>
         <div className="text-muted-foreground flex flex-wrap gap-3 text-xs">
           <span>
-            Rate limit <span data-lingo-skip>{apiKey.rateLimit}</span>/min
+            {t("cdba25e3ba82", "Rate limit <span0></span0>/min", {
+              span0: () => <span translate="no">{apiKey.rateLimit}</span>,
+            })}
           </span>
           <span>
-            Created{" "}
-            <span data-lingo-skip>
-              {new Date(apiKey.createdAt).toLocaleDateString()}
-            </span>
+            {t("30e9afa24d8d", "Created <span0></span0>", {
+              span0: () => (
+                <span translate="no">
+                  {new Date(apiKey.createdAt).toLocaleDateString()}
+                </span>
+              ),
+            })}
           </span>
           {apiKey.lastUsedAt ? (
             <span>
-              Last used{" "}
-              <span data-lingo-skip>
-                {new Date(apiKey.lastUsedAt).toLocaleDateString()}
-              </span>
+              {t("e7bdd97d16d9", "Last used <span0></span0>", {
+                span0: () => (
+                  <span translate="no">
+                    {new Date(apiKey.lastUsedAt!).toLocaleDateString()}
+                  </span>
+                ),
+              })}
             </span>
           ) : (
-            <span>Never used</span>
+            <span>{t("6c7815348a0f", "Never used")}</span>
           )}
         </div>
       </div>
@@ -157,28 +169,27 @@ function ApiKeyRow({
           void handleRevoke();
         }}
       >
-        {isRevoking ? (
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-        ) : (
-          <ShieldOff className="mr-2 h-4 w-4" />
-        )}
-        Revoke
+        {t("20fb1816e98e", "{expression0} Revoke", {
+          expression0: isRevoking ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <ShieldOff className="mr-2 h-4 w-4" />
+          ),
+        })}
       </Button>
     </div>
   );
 }
-
 function CreateApiKeyDialog({ onCreated }: { onCreated: () => void }) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [createdKey, setCreatedKey] = useState<string | null>(null);
   const [isCreating, setIsCreating] = useState(false);
-
   function resetState() {
     setName("");
     setCreatedKey(null);
   }
-
   return (
     <Dialog
       open={open}
@@ -192,23 +203,23 @@ function CreateApiKeyDialog({ onCreated }: { onCreated: () => void }) {
       <DialogTrigger asChild>
         <Button size="sm" variant="secondary">
           <Plus className="mr-2 h-4 w-4" />
-          Create Key
+          {t("026500c40ae6", "Create Key")}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[440px]">
         {createdKey ? (
           <>
             <DialogHeader>
-              <DialogTitle>API Key Created</DialogTitle>
+              <DialogTitle>{t("d4a9b038617b", "API Key Created")}</DialogTitle>
               <DialogDescription>
-                Copy this key now. It will not be shown again.
+                {t(
+                  "ce68b6e9b6ef",
+                  "Copy this key now. It will not be shown again.",
+                )}
               </DialogDescription>
             </DialogHeader>
             <div className="bg-muted flex items-center gap-2 rounded-lg border p-3">
-              <code
-                className="min-w-0 flex-1 text-sm break-all"
-                data-lingo-skip
-              >
+              <code className="min-w-0 flex-1 text-sm break-all" translate="no">
                 {createdKey}
               </code>
               <CopyButton textToCopy={createdKey} />
@@ -219,25 +230,28 @@ function CreateApiKeyDialog({ onCreated }: { onCreated: () => void }) {
                   setOpen(false);
                 }}
               >
-                Done
+                {t("69a562e2e6ee", "Done")}
               </Button>
             </DialogFooter>
           </>
         ) : (
           <>
             <DialogHeader>
-              <DialogTitle>Create API Key</DialogTitle>
+              <DialogTitle>{t("555efac3a16b", "Create API Key")}</DialogTitle>
               <DialogDescription>
-                Use a descriptive name so you can identify this key later.
+                {t(
+                  "cdd513394b6d",
+                  "Use a descriptive name so you can identify this key later.",
+                )}
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-2 py-2">
-              <Label htmlFor="api-key-name">Name</Label>
+              <Label htmlFor="api-key-name">{t("0f3cfdaa1842", "Name")}</Label>
               <Input
                 id="api-key-name"
                 value={name}
                 onChange={(event) => setName(event.target.value)}
-                placeholder="Production server"
+                placeholder={t("52f00a1d717f", "Production server")}
               />
             </div>
             <DialogFooter>
@@ -245,7 +259,6 @@ function CreateApiKeyDialog({ onCreated }: { onCreated: () => void }) {
                 disabled={isCreating || !name.trim()}
                 onClick={async () => {
                   setIsCreating(true);
-
                   try {
                     const response = await fetch("/api/api-keys", {
                       method: "POST",
@@ -256,12 +269,12 @@ function CreateApiKeyDialog({ onCreated }: { onCreated: () => void }) {
                         name: name.trim(),
                       }),
                     });
-
                     if (!response.ok) {
                       throw new Error("Failed to create API key.");
                     }
-
-                    const data = (await response.json()) as { rawKey: string };
+                    const data = (await response.json()) as {
+                      rawKey: string;
+                    };
                     setCreatedKey(data.rawKey);
                     toast.success(<>API key created.</>);
                     await onCreated();
@@ -272,10 +285,11 @@ function CreateApiKeyDialog({ onCreated }: { onCreated: () => void }) {
                   }
                 }}
               >
-                {isCreating ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : null}
-                Create Key
+                {t("ee4a496d98ec", "{expression0} Create Key", {
+                  expression0: isCreating ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : null,
+                })}
               </Button>
             </DialogFooter>
           </>

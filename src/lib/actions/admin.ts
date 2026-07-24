@@ -101,11 +101,8 @@ export async function getUsers({
       banExpires: users.banExpires,
       createdAt: users.createdAt,
       updatedAt: users.updatedAt,
-      subscriptionStatus: subscriptions.status,
-      subscriptionId: subscriptions.subscriptionId,
     })
     .from(users)
-    .leftJoin(subscriptions, eq(users.id, subscriptions.userId))
     .where(whereClause)
     .orderBy(orderByClause)
     .limit(limit)
@@ -116,47 +113,42 @@ export async function getUsers({
     .from(users)
     .where(whereClause);
 
-  const [rawUsers, [{ total }]] = await Promise.all([usersQuery, totalQuery]);
-
-  const usersMap = new Map<string, UserWithSubscription>();
-  rawUsers.forEach((user) => {
-    const existingUser = usersMap.get(user.id);
-    if (!existingUser) {
-      const userSubscriptions = [];
-      if (user.subscriptionId && user.subscriptionStatus) {
-        userSubscriptions.push({
-          subscriptionId: user.subscriptionId,
-          status: user.subscriptionStatus,
-        });
-      }
-      usersMap.set(user.id, {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        emailVerified: user.emailVerified,
-        image: user.image,
-        role: user.role,
-        banned: user.banned,
-        banReason: user.banReason,
-        banExpires: user.banExpires,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
-        subscriptions: userSubscriptions,
-      });
-    } else if (user.subscriptionId && user.subscriptionStatus) {
-      const subscriptionExists = existingUser.subscriptions.some(
-        (sub) => sub.subscriptionId === user.subscriptionId,
-      );
-      if (!subscriptionExists) {
-        existingUser.subscriptions.push({
-          subscriptionId: user.subscriptionId,
-          status: user.subscriptionStatus,
-        });
-      }
+  const [pageUsers, [{ total }]] = await Promise.all([usersQuery, totalQuery]);
+  const pageSubscriptions =
+    pageUsers.length === 0
+      ? []
+      : await db
+          .select({
+            userId: subscriptions.userId,
+            subscriptionId: subscriptions.subscriptionId,
+            status: subscriptions.status,
+          })
+          .from(subscriptions)
+          .where(
+            inArray(
+              subscriptions.userId,
+              pageUsers.map((user) => user.id),
+            ),
+          );
+  const subscriptionsByUser = new Map<
+    string,
+    UserWithSubscription["subscriptions"]
+  >();
+  for (const subscription of pageSubscriptions) {
+    if (!subscription.subscriptionId) {
+      continue;
     }
-  });
-
-  const usersList = Array.from(usersMap.values());
+    const existing = subscriptionsByUser.get(subscription.userId) ?? [];
+    existing.push({
+      subscriptionId: subscription.subscriptionId,
+      status: subscription.status,
+    });
+    subscriptionsByUser.set(subscription.userId, existing);
+  }
+  const usersList: UserWithSubscription[] = pageUsers.map((user) => ({
+    ...user,
+    subscriptions: subscriptionsByUser.get(user.id) ?? [],
+  }));
 
   return {
     data: usersList,
@@ -602,7 +594,10 @@ export const deleteUploadAction = adminAction
       throw new Error("Upload not found");
     }
 
-    await deleteFileFromR2(upload.fileKey);
+    const deleteResult = await deleteFileFromR2(upload.fileKey);
+    if (!deleteResult.success) {
+      throw new Error(deleteResult.error || "Failed to delete file from R2.");
+    }
     await db.delete(uploads).where(eq(uploads.id, uploadId));
 
     revalidatePath("/dashboard/admin/uploads");

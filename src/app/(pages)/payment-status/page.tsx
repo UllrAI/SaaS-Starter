@@ -1,3 +1,4 @@
+import { useTranslation } from "@/lib/i18n/translation/client";
 import { Suspense } from "react";
 import { PaymentStatusContent } from "./_components/payment-status-content";
 import { Card, CardContent } from "@/components/ui/card";
@@ -5,8 +6,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { SectionContainer } from "@/components/layout/page-container";
 import { Clock } from "lucide-react";
-
 function PaymentStatusSkeleton() {
+  const { t } = useTranslation();
   return (
     <section className="bg-background relative flex min-h-screen items-center justify-center overflow-hidden">
       {/* Background Pattern */}
@@ -23,7 +24,7 @@ function PaymentStatusSkeleton() {
             className="border-border bg-background/50 text-muted-foreground inline-flex items-center border px-3 py-1 font-mono text-sm backdrop-blur-sm"
           >
             <Clock className="mr-2 h-3 w-3" />
-            LOADING_STATUS
+            {t("72c823a47fe1", "LOADING_STATUS")}
           </Badge>
         </div>
 
@@ -40,7 +41,6 @@ function PaymentStatusSkeleton() {
     </section>
   );
 }
-
 export default function PaymentStatusPage() {
   return (
     <Suspense fallback={<PaymentStatusSkeleton />}>

@@ -7,7 +7,6 @@ type BlogPost = (typeof allPosts)[number];
 
 export type LocalizedBlogPost = BlogPost & {
   availableLocales: SupportedLocale[];
-  isFallback: boolean;
 };
 
 const authorsBySlug = new Map<string, BlogAuthor>(
@@ -54,21 +53,15 @@ function getAvailableLocales(posts: BlogPost[]): SupportedLocale[] {
 function resolveLocalizedPost(
   posts: BlogPost[],
   locale: SupportedLocale,
-): LocalizedBlogPost {
-  const resolvedPost =
-    posts.find((post) => post.locale === locale) ??
-    posts.find((post) => post.locale === SOURCE_LOCALE) ??
-    posts[0];
+): LocalizedBlogPost | undefined {
+  const resolvedPost = posts.find((post) => post.locale === locale);
 
-  if (!resolvedPost) {
-    throw new Error("Expected at least one localized blog post.");
-  }
-
-  return {
-    ...resolvedPost,
-    availableLocales: getAvailableLocales(posts),
-    isFallback: resolvedPost.locale !== locale,
-  };
+  return resolvedPost
+    ? {
+        ...resolvedPost,
+        availableLocales: getAvailableLocales(posts),
+      }
+    : undefined;
 }
 
 export type { BlogAuthor, BlogPost };
@@ -77,8 +70,13 @@ export function getAllLocalizedPosts(): BlogPost[] {
   return allPosts.toSorted(comparePosts);
 }
 
-export function getAllPostSlugs(): string[] {
-  return [...postLocalizationsBySlug.keys()].sort();
+export function getAllPostSlugs(
+  locale: SupportedLocale = SOURCE_LOCALE,
+): string[] {
+  return [...postLocalizationsBySlug.entries()]
+    .filter(([, posts]) => posts.some((post) => post.locale === locale))
+    .map(([slug]) => slug)
+    .sort();
 }
 
 export function getAllPosts(
@@ -86,6 +84,7 @@ export function getAllPosts(
 ): LocalizedBlogPost[] {
   return [...postLocalizationsBySlug.values()]
     .map((posts) => resolveLocalizedPost(posts, locale))
+    .filter((post): post is LocalizedBlogPost => post !== undefined)
     .toSorted(comparePosts);
 }
 

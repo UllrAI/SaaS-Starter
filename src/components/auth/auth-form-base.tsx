@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/lib/i18n/translation/client";
 import {
   Card,
   CardContent,
@@ -7,7 +8,7 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import Link from "next/link";
+import { LocalizedLink as Link } from "@/components/localized-link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,30 +28,30 @@ import { ReactNode } from "react";
 import { UseFormReturn, FieldValues, Path } from "react-hook-form";
 import type { ResolvedAuthFeedback } from "@/lib/auth/feedback";
 import { AuthFeedbackAlert } from "@/components/auth/auth-feedback-alert";
-
 type AuthPendingAction = "magic-link" | "social" | null;
-
 interface AuthFormField<T extends FieldValues> {
   name: Path<T>;
   label: ReactNode;
   placeholder: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: React.ComponentType<{
+    className?: string;
+  }>;
   type?: string;
 }
-
 interface AuthFormConfig {
   title: ReactNode;
   description: ReactNode;
   badgeText: ReactNode;
   submitButtonText: ReactNode;
   magicLinkLoadingText: ReactNode;
-  submitIcon: React.ComponentType<{ className?: string }>;
+  submitIcon: React.ComponentType<{
+    className?: string;
+  }>;
   alternativeActionText: ReactNode;
   alternativeActionLink: ReactNode;
   showTerms?: boolean;
   callbackURL: string;
 }
-
 interface AuthFormBaseProps<T extends FieldValues> {
   form: UseFormReturn<T>;
   onSubmit: (data: T) => Promise<void>;
@@ -61,7 +62,6 @@ interface AuthFormBaseProps<T extends FieldValues> {
   availableProviders?: ReturnType<typeof getAvailableSocialProviders>;
   feedback?: ResolvedAuthFeedback | null;
 }
-
 export function AuthFormBase<T extends FieldValues>({
   form,
   onSubmit,
@@ -72,9 +72,9 @@ export function AuthFormBase<T extends FieldValues>({
   availableProviders,
   feedback,
 }: AuthFormBaseProps<T>) {
+  const { t } = useTranslation();
   const isPending = pendingAction !== null;
   const isMagicLinkPending = pendingAction === "magic-link";
-
   const handleSubmit = async (data: T) => {
     try {
       setPendingAction("magic-link");
@@ -86,7 +86,6 @@ export function AuthFormBase<T extends FieldValues>({
       setPendingAction(null);
     }
   };
-
   return (
     <Card className="bg-background/80 w-full shadow-lg backdrop-blur-sm">
       <CardHeader className="space-y-4">
@@ -138,7 +137,7 @@ export function AuthFormBase<T extends FieldValues>({
                   </div>
                   <div className="relative flex justify-center text-xs uppercase">
                     <span className="bg-background text-muted-foreground px-3 font-medium">
-                      Or continue with magic link
+                      {t("a47fb0abca67", "Or continue with magic link")}
                     </span>
                   </div>
                 </div>
@@ -210,21 +209,28 @@ export function AuthFormBase<T extends FieldValues>({
         {config.showTerms && (
           <div className="border-border/50 border-t pt-4">
             <p className="text-muted-foreground/70 text-center text-xs leading-relaxed">
-              By creating an account, you agree to our{" "}
-              <Link
-                href="/terms"
-                className="text-primary hover:text-primary/80 cursor-pointer font-medium underline-offset-4 transition-colors hover:underline"
-              >
-                Terms of Service
-              </Link>{" "}
-              and{" "}
-              <Link
-                href="/privacy"
-                className="text-primary hover:text-primary/80 cursor-pointer font-medium underline-offset-4 transition-colors hover:underline"
-              >
-                Privacy Policy
-              </Link>
-              .
+              {t(
+                "134da1decd2b",
+                "By creating an account, you agree to our <Link0>Terms of Service </Link0> and <Link1>Privacy Policy </Link1> .",
+                {
+                  Link0: (chunks) => (
+                    <Link
+                      href="/terms"
+                      className="text-primary hover:text-primary/80 cursor-pointer font-medium underline-offset-4 transition-colors hover:underline"
+                    >
+                      {chunks}
+                    </Link>
+                  ),
+                  Link1: (chunks) => (
+                    <Link
+                      href="/privacy"
+                      className="text-primary hover:text-primary/80 cursor-pointer font-medium underline-offset-4 transition-colors hover:underline"
+                    >
+                      {chunks}
+                    </Link>
+                  ),
+                },
+              )}
             </p>
           </div>
         )}

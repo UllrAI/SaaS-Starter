@@ -1,6 +1,4 @@
-import ContactPage, {
-  generateMetadata as generateSourceMetadata,
-} from "@/app/(pages)/contact/page";
+import ContactPage, { buildContactMetadata } from "@/app/(pages)/contact/page";
 import { withStaticLocalizedMetadata } from "@/lib/i18n/static-marketing-metadata";
 import { resolveStaticMarketingParams } from "@/lib/i18n/static-marketing-locale";
 
@@ -10,9 +8,14 @@ type LocalizedPageProps = {
 
 export async function generateMetadata({ params }: LocalizedPageProps) {
   const locale = await resolveStaticMarketingParams(params);
-  const metadata = await generateSourceMetadata();
+  const metadata = await buildContactMetadata(locale);
 
   return withStaticLocalizedMetadata(metadata, "/contact", locale);
 }
 
-export default ContactPage;
+export default async function LocalizedContactPage({
+  params,
+}: LocalizedPageProps) {
+  const locale = await resolveStaticMarketingParams(params);
+  return <ContactPage locale={locale} />;
+}

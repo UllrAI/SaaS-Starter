@@ -1,4 +1,4 @@
-import { useTranslation } from "@/lib/i18n/translation/client";
+import { getStaticTranslations } from "@/lib/i18n/translation/static";
 import type { ReactNode } from "react";
 import {
   Card,
@@ -13,6 +13,7 @@ import { Sparkles } from "lucide-react";
 import { BlogPostMeta } from "./blog-post-meta";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
+import { SOURCE_LOCALE, type SupportedLocale } from "@/lib/config/i18n";
 interface BlogPostCardProps {
   slug: string;
   href?: string;
@@ -24,8 +25,8 @@ interface BlogPostCardProps {
   variant?: "featured" | "regular";
   className?: string;
   author?: ReactNode;
-  readTime?: string;
-  locale?: string;
+  readingMinutes?: number;
+  locale?: SupportedLocale;
 }
 export function BlogPostCard({
   slug,
@@ -38,10 +39,10 @@ export function BlogPostCard({
   variant = "regular",
   className,
   author,
-  readTime,
+  readingMinutes,
   locale,
 }: BlogPostCardProps) {
-  const { t } = useTranslation();
+  const { t } = getStaticTranslations(locale ?? SOURCE_LOCALE);
   const postHref = href ?? `/blog/${slug}`;
   const isFeatured = variant === "featured";
   const hasImage = !!heroImage;
@@ -54,9 +55,13 @@ export function BlogPostCard({
   );
   const imageHeight = isFeatured ? "h-64 lg:h-80" : "h-48";
   const titleSize = isFeatured ? "text-2xl lg:text-3xl" : "text-xl lg:text-2xl";
-  const readMoreText = isFeatured ? "Read full article" : "Read article";
-  const defaultExcerpt =
-    "Discover the latest insights and updates in this comprehensive article. Click to read the full content and learn more about this topic.";
+  const readMoreText = isFeatured
+    ? t("blogReadFullArticle", "Read full article")
+    : t("blogReadArticle", "Read article");
+  const defaultExcerpt = t(
+    "blogDefaultExcerpt",
+    "Read the full article for implementation details, practical guidance, and related context.",
+  );
   return (
     <Card className={cardClasses}>
       {/* Hero Image */}
@@ -134,7 +139,7 @@ export function BlogPostCard({
             showBadge={false} // Don't show badge here as it's already shown above
             className="justify-start"
             author={author}
-            readTime={readTime}
+            readingMinutes={readingMinutes}
             locale={locale}
           />
         </div>

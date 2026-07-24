@@ -1,5 +1,5 @@
 import FeaturesPage, {
-  generateMetadata as generateSourceMetadata,
+  buildFeaturesMetadata,
 } from "@/app/(pages)/features/page";
 import { withStaticLocalizedMetadata } from "@/lib/i18n/static-marketing-metadata";
 import { resolveStaticMarketingParams } from "@/lib/i18n/static-marketing-locale";
@@ -10,9 +10,14 @@ type LocalizedPageProps = {
 
 export async function generateMetadata({ params }: LocalizedPageProps) {
   const locale = await resolveStaticMarketingParams(params);
-  const metadata = await generateSourceMetadata();
+  const metadata = await buildFeaturesMetadata(locale);
 
   return withStaticLocalizedMetadata(metadata, "/features", locale);
 }
 
-export default FeaturesPage;
+export default async function LocalizedFeaturesPage({
+  params,
+}: LocalizedPageProps) {
+  const locale = await resolveStaticMarketingParams(params);
+  return <FeaturesPage locale={locale} />;
+}

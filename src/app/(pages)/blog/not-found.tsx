@@ -1,12 +1,14 @@
-import { useTranslation } from "@/lib/i18n/translation/client";
 import { Home, ArrowLeft, Sparkles } from "lucide-react";
-import { LocalizedLink as Link } from "@/components/localized-link";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { BackgroundPattern } from "@/components/ui/background-pattern";
 import { ReadingContainer } from "@/components/layout/page-container";
+import { SOURCE_LOCALE } from "@/lib/config/i18n";
+import { getStaticTranslations } from "@/lib/i18n/translation/static";
+
 export default function PagesNotFound() {
-  const { t } = useTranslation();
+  const { t } = getStaticTranslations(SOURCE_LOCALE);
   return (
     <div className="bg-background relative flex min-h-[60vh] flex-col items-center justify-center overflow-hidden py-16">
       <BackgroundPattern />

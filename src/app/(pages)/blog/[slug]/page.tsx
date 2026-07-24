@@ -1,4 +1,4 @@
-import { getServerTranslations } from "@/lib/i18n/translation/server";
+import { getStaticTranslations } from "@/lib/i18n/translation/static";
 import { notFound } from "next/navigation";
 import Script from "next/script";
 import env from "@/env";
@@ -20,12 +20,12 @@ import {
   getPostBySlug,
   getPostLocalizations,
 } from "@/lib/content/blog";
+import { absoluteUrl } from "@/lib/url";
 interface BlogPostPageProps {
   params: Promise<{
     slug: string;
   }>;
 }
-export const dynamicParams = false;
 export async function generateStaticParams() {
   return getAllPostSlugs().map((slug) => ({
     slug,
@@ -38,22 +38,32 @@ export function generateBlogPostMetadata({
   slug: string;
   locale: SupportedLocale;
 }): Metadata {
+  const { t } = getStaticTranslations(locale);
   const post = getPostBySlug(slug, locale);
   if (!post) {
-    const metadata = createMetadataDefaults();
+    const metadata = createMetadataDefaults({ locale });
+    const title = t("blogPostNotFoundTitle", "Post not found");
+    const description = t(
+      "blogPostNotFoundDescription",
+      "The requested blog post could not be found.",
+    );
     return {
       ...metadata,
-      title: "Post Not Found",
-      description: "The requested blog post could not be found.",
+      title,
+      description,
+      robots: {
+        index: false,
+        follow: false,
+      },
       openGraph: {
         ...metadata.openGraph,
-        title: "Post Not Found",
-        description: "The requested blog post could not be found.",
+        title,
+        description,
       },
       twitter: {
         ...metadata.twitter,
-        title: "Post Not Found",
-        description: "The requested blog post could not be found.",
+        title,
+        description,
       },
     };
   }
@@ -69,12 +79,19 @@ export function generateBlogPostMetadata({
   );
   const description =
     post.excerpt ||
-    `Read our comprehensive blog post about ${post.title}. Discover insights, tips, and best practices in this detailed article.`;
+    t(
+      "blogPostDefaultDescription",
+      "Read {title} for implementation details, practical guidance, and related context.",
+      { title: post.title },
+    );
   const publishedTime = post.publishedDate
     ? new Date(post.publishedDate).toISOString()
     : undefined;
-  const modifiedTime = publishedTime;
+  const modifiedTime = post.updatedDate
+    ? new Date(post.updatedDate).toISOString()
+    : undefined;
   const metadata = createMetadataDefaults({
+    locale,
     openGraph: {
       type: "article",
       publishedTime,
@@ -83,8 +100,6 @@ export function generateBlogPostMetadata({
         ? [
             {
               url: post.heroImage,
-              width: 1200,
-              height: 630,
               alt: post.title,
             },
           ]
@@ -136,7 +151,7 @@ export async function BlogPostPageContent({
 }: BlogPostPageProps & {
   locale: SupportedLocale;
 }) {
-  const { t } = await getServerTranslations();
+  const { t } = getStaticTranslations(locale);
   const { slug } = await params;
   const post = getPostBySlug(slug, locale);
   if (!post) {
@@ -156,8 +171,8 @@ export async function BlogPostPageContent({
     datePublished: post.publishedDate
       ? new Date(post.publishedDate).toISOString()
       : undefined,
-    dateModified: post.publishedDate
-      ? new Date(post.publishedDate).toISOString()
+    dateModified: post.updatedDate
+      ? new Date(post.updatedDate).toISOString()
       : undefined,
     author: author?.name
       ? {
@@ -167,7 +182,14 @@ export async function BlogPostPageContent({
       : undefined,
     publisher: {
       "@type": "Organization",
+      "@id": absoluteUrl("/#organization"),
       name: COMPANY_NAME,
+      logo: {
+        "@type": "ImageObject",
+        url: absoluteUrl("/icon-512.png"),
+        width: 512,
+        height: 512,
+      },
     },
     mainEntityOfPage: canonicalUrl,
     inLanguage: post.locale,
@@ -179,7 +201,10 @@ export async function BlogPostPageContent({
         type="application/ld+json"
         strategy="beforeInteractive"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(articleStructuredData),
+          __html: JSON.stringify(articleStructuredData).replace(
+            /</g,
+            "\\u003c",
+          ),
         }}
       />
 

@@ -50,17 +50,26 @@ const posts = defineCollection({
   name: "posts",
   directory: "content/blog",
   include: "**/*.md",
-  schema: z.object({
-    slug: z.string().optional(),
-    title: z.string(),
-    publishedDate: z.string(),
-    author: z.string().optional(),
-    excerpt: z.string().optional(),
-    tags: z.array(z.string()).default([]),
-    featured: z.boolean().default(false),
-    heroImage: z.string().optional(),
-    content: z.string(),
-  }),
+  schema: z
+    .object({
+      slug: z.string().optional(),
+      title: z.string(),
+      publishedDate: z.iso.date(),
+      updatedDate: z.iso.date().optional(),
+      author: z.string().optional(),
+      excerpt: z.string().optional(),
+      tags: z.array(z.string()).default([]),
+      featured: z.boolean().default(false),
+      heroImage: z.string().optional(),
+      content: z.string(),
+    })
+    .refine(
+      (post) => !post.updatedDate || post.updatedDate >= post.publishedDate,
+      {
+        message: "updatedDate must not be earlier than publishedDate",
+        path: ["updatedDate"],
+      },
+    ),
   transform: (post) => {
     const { locale, pathSlug } = getPostLocaleAndSlug(post._meta.path);
 

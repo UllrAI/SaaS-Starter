@@ -9,9 +9,41 @@ import {
   isMarketingPath,
   resolvePreferredLocale,
   withLocalePrefix,
+  normalizeLocaleCandidate,
 } from "@/lib/config/i18n-routing";
 
-function setLocaleCookie(response: NextResponse, locale: string): void {
+const APPLICATION_ROUTE_PREFIXES = [
+  "/auth",
+  "/dashboard",
+  "/device",
+  "/login",
+  "/signup",
+] as const;
+const NOT_FOUND_ROUTE_PATH = "/not-found-response";
+
+function isApplicationRoute(pathname: string): boolean {
+  return APPLICATION_ROUTE_PREFIXES.some(
+    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
+  );
+}
+
+function isDashboardRoute(pathname: string): boolean {
+  return pathname === "/dashboard" || pathname.startsWith("/dashboard/");
+}
+
+function setLocaleCookieIfChanged(
+  response: NextResponse,
+  currentLocale: string | undefined,
+  locale: string,
+): void {
+  const normalizedCurrentLocale = normalizeLocaleCandidate(currentLocale);
+  if (
+    normalizedCurrentLocale === locale ||
+    (!currentLocale && locale === SOURCE_LOCALE)
+  ) {
+    return;
+  }
+
   response.cookies.set({
     name: LOCALE_COOKIE_NAME,
     value: locale,
@@ -45,7 +77,7 @@ export default async function authMiddleware(request: NextRequest) {
     : pathname;
 
   // Keep dashboard auth checks fast and deterministic.
-  const isDashboardPage = pathname.startsWith("/dashboard");
+  const isDashboardPage = isDashboardRoute(pathname);
   if (isDashboardPage) {
     const requestHeaders = createLocalizedRequestHeaders(
       request,
@@ -78,6 +110,21 @@ export default async function authMiddleware(request: NextRequest) {
       request,
       preferredLocale,
     );
+
+    if (
+      pathname !== NOT_FOUND_ROUTE_PATH &&
+      !pathLocale.locale &&
+      !isApplicationRoute(pathname)
+    ) {
+      const notFoundUrl = new URL(NOT_FOUND_ROUTE_PATH, request.url);
+      return NextResponse.rewrite(notFoundUrl, {
+        status: 404,
+        request: {
+          headers: requestHeaders,
+        },
+      });
+    }
+
     return NextResponse.next({
       request: {
         headers: requestHeaders,
@@ -92,7 +139,7 @@ export default async function authMiddleware(request: NextRequest) {
       const redirectUrl = new URL(request.url);
       redirectUrl.pathname = pathLocale.strippedPathname;
       const response = NextResponse.redirect(redirectUrl, 308);
-      setLocaleCookie(response, SOURCE_LOCALE);
+      setLocaleCookieIfChanged(response, localeFromCookie, SOURCE_LOCALE);
       return response;
     }
 
@@ -109,7 +156,7 @@ export default async function authMiddleware(request: NextRequest) {
       const redirectUrl = new URL(request.url);
       redirectUrl.pathname = canonicalLocalizedPath;
       const response = NextResponse.redirect(redirectUrl, 308);
-      setLocaleCookie(response, pathLocale.locale);
+      setLocaleCookieIfChanged(response, localeFromCookie, pathLocale.locale);
       return response;
     }
 
@@ -122,18 +169,31 @@ export default async function authMiddleware(request: NextRequest) {
         headers: requestHeaders,
       },
     });
-    setLocaleCookie(response, pathLocale.locale);
     return response;
   }
 
-  // Bare marketing paths are stable English canonical URLs.
+  // Keep language detection redirects user-specific so shared caches cannot
+  // serve one visitor's locale choice to another visitor.
+  if (preferredLocale !== SOURCE_LOCALE) {
+    const redirectUrl = new URL(request.url);
+    redirectUrl.pathname = withLocalePrefix(pathname, preferredLocale);
+    const response = NextResponse.redirect(redirectUrl, { status: 307 });
+    response.headers.set("Cache-Control", "private, no-store");
+    response.headers.set("Vary", "Accept-Language, Cookie");
+    setLocaleCookieIfChanged(response, localeFromCookie, preferredLocale);
+    return response;
+  }
+
+  // English uses canonical, unprefixed marketing URLs.
   const requestHeaders = createLocalizedRequestHeaders(request, SOURCE_LOCALE);
   const response = NextResponse.next({
     request: {
       headers: requestHeaders,
     },
   });
-  setLocaleCookie(response, SOURCE_LOCALE);
+  response.headers.set("Cache-Control", "private, no-store");
+  response.headers.set("Vary", "Accept-Language, Cookie");
+  setLocaleCookieIfChanged(response, localeFromCookie, SOURCE_LOCALE);
   return response;
 }
 

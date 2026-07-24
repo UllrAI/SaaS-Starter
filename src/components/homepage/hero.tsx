@@ -1,4 +1,5 @@
-import { useTranslation } from "@/lib/i18n/translation/client";
+import { getStaticTranslations } from "@/lib/i18n/translation/static";
+import { SOURCE_LOCALE, type SupportedLocale } from "@/lib/config/i18n";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Github, Terminal } from "lucide-react";
@@ -7,8 +8,12 @@ import Link from "next/link";
 import { ShellContainer } from "@/components/layout/page-container";
 import { CopyCommand } from "@/components/homepage/copy-command";
 const UI_STACK_LABEL = "Next.js 16 + shadcn/ui";
-export function Hero() {
-  const { t } = useTranslation();
+export function Hero({
+  locale = SOURCE_LOCALE,
+}: {
+  locale?: SupportedLocale;
+} = {}) {
+  const { t } = getStaticTranslations(locale);
   const command = "git clone https://github.com/UllrAI/SaaS-Starter.git";
   return (
     <section className="bg-background border-border relative overflow-hidden border-b pt-24 pb-32 lg:pt-32 lg:pb-48">

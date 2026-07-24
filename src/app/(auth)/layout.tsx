@@ -1,51 +1,41 @@
-import { useTranslation } from "@/lib/i18n/translation/client";
-import { Logo } from "@/components/logo";
-import { LocalizedLink as Link } from "@/components/localized-link";
-import { ArrowLeft } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { APP_NAME } from "@/lib/config/constants";
-import { BackgroundPattern } from "@/components/ui/background-pattern";
-import { CompactContainer } from "@/components/layout/page-container";
-import { createMetadataDefaults } from "@/lib/metadata";
-export const metadata = createMetadataDefaults({
-  robots: {
-    index: false,
-    follow: false,
-    googleBot: {
+import { AppProviders } from "@/components/app-providers";
+import {
+  AppDocument,
+  createRootMetadata,
+} from "@/components/layout/app-document";
+import { getRequestLocale } from "@/lib/i18n/server-locale";
+import { loadMessages } from "@/lib/i18n/messages";
+import { AuthShell } from "./_components/auth-shell";
+
+export async function generateMetadata() {
+  const locale = await getRequestLocale();
+  const metadata = await createRootMetadata(locale);
+  return {
+    ...metadata,
+    robots: {
       index: false,
       follow: false,
+      googleBot: {
+        index: false,
+        follow: false,
+      },
     },
-  },
-});
-export default function AuthLayout({
+  };
+}
+
+export default async function AuthLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { t } = useTranslation();
+  const locale = await getRequestLocale();
+  const messages = await loadMessages(locale);
+
   return (
-    <main className="bg-background relative flex min-h-screen flex-col items-center justify-center overflow-hidden">
-      <BackgroundPattern />
-
-      {/* Back to Home Button */}
-      <div className="absolute top-6 left-6">
-        <Button asChild variant="ghost" size="sm">
-          <Link href="/" className="flex items-center gap-2">
-            <ArrowLeft className="h-4 w-4" />
-            {t("ccee066905d2", "Back to Home")}
-          </Link>
-        </Button>
-      </div>
-
-      {/* Logo */}
-      <div className="absolute top-6 right-6">
-        <Link href="/" className="flex items-center gap-2">
-          <Logo className="text-primary h-6 w-6" variant="icon-only" />
-          <span className="text-lg font-bold">{APP_NAME}</span>
-        </Link>
-      </div>
-
-      <CompactContainer className="relative">{children}</CompactContainer>
-    </main>
+    <AppDocument locale={locale} messages={messages}>
+      <AppProviders>
+        <AuthShell>{children}</AuthShell>
+      </AppProviders>
+    </AppDocument>
   );
 }

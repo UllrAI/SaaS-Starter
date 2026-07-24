@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import AuthLayout from "./layout";
+import { AuthShell } from "./auth-shell";
 import { APP_NAME } from "@/lib/config/constants";
 
 // Mock the Logo component
@@ -30,11 +30,11 @@ jest.mock("next/link", () => {
   };
 });
 
-describe("AuthLayout", () => {
+describe("AuthShell", () => {
   it("renders the layout with all required elements", () => {
     const testContent = <div data-testid="test-content">Test Content</div>;
 
-    render(<AuthLayout>{testContent}</AuthLayout>);
+    render(<AuthShell>{testContent}</AuthShell>);
 
     // Check if the main container is rendered
     const mainElement = screen.getByRole("main");
@@ -56,9 +56,9 @@ describe("AuthLayout", () => {
 
   it("renders the back to home button", () => {
     render(
-      <AuthLayout>
+      <AuthShell>
         <div>Content</div>
-      </AuthLayout>,
+      </AuthShell>,
     );
 
     const backButton = screen.getByText("Back to Home");
@@ -70,9 +70,9 @@ describe("AuthLayout", () => {
 
   it("renders the logo and brand name", () => {
     render(
-      <AuthLayout>
+      <AuthShell>
         <div>Content</div>
-      </AuthLayout>,
+      </AuthShell>,
     );
 
     // Check if logo is rendered
@@ -88,9 +88,9 @@ describe("AuthLayout", () => {
 
   it("renders background patterns", () => {
     render(
-      <AuthLayout>
+      <AuthShell>
         <div>Content</div>
-      </AuthLayout>,
+      </AuthShell>,
     );
 
     const mainElement = screen.getByRole("main");
@@ -105,7 +105,7 @@ describe("AuthLayout", () => {
   it("renders children in the correct container", () => {
     const testContent = <div data-testid="child-content">Child Content</div>;
 
-    render(<AuthLayout>{testContent}</AuthLayout>);
+    render(<AuthShell>{testContent}</AuthShell>);
 
     const childContent = screen.getByTestId("child-content");
     expect(childContent).toBeInTheDocument();

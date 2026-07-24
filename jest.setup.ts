@@ -341,8 +341,23 @@ class MockResponseCookies {
     { value: string; options?: Record<string, unknown> }
   >();
 
-  set(name: string, value: string, options?: Record<string, unknown>): void {
-    this.cookies.set(name, { value, options });
+  set(
+    nameOrOptions:
+      | string
+      | ({ name: string; value: string } & Record<string, unknown>),
+    value?: string,
+    options?: Record<string, unknown>,
+  ): void {
+    if (typeof nameOrOptions === "string") {
+      this.cookies.set(nameOrOptions, { value: value ?? "", options });
+      return;
+    }
+
+    const { name, value: cookieValue, ...cookieOptions } = nameOrOptions;
+    this.cookies.set(name, {
+      value: cookieValue,
+      options: cookieOptions,
+    });
   }
 
   get(
@@ -507,6 +522,7 @@ const createIntlTranslatorMock = () =>
   });
 
 jest.mock("next-intl", () => ({
+  createTranslator: () => createIntlTranslatorMock(),
   NextIntlClientProvider: ({ children }: { children: React.ReactNode }) =>
     children,
   useLocale: () => "en",
@@ -901,12 +917,32 @@ class MockNextRequest {
       origin: url.origin,
     };
 
+    const requestCookies = new Map(
+      (this.headers.get("cookie") ?? "")
+        .split(";")
+        .map((part) => part.trim())
+        .filter(Boolean)
+        .map((part) => {
+          const separatorIndex = part.indexOf("=");
+          return separatorIndex === -1
+            ? [part, ""]
+            : [part.slice(0, separatorIndex), part.slice(separatorIndex + 1)];
+        }),
+    );
     this.cookies = {
-      get: () => null,
-      getAll: () => [],
-      has: () => false,
-      set: () => {},
-      delete: () => {},
+      get: (name) => {
+        const value = requestCookies.get(name);
+        return value === undefined ? null : { value };
+      },
+      getAll: () =>
+        Array.from(requestCookies, ([name, value]) => ({ name, value })),
+      has: (name) => requestCookies.has(name),
+      set: (name, value) => {
+        requestCookies.set(name, value);
+      },
+      delete: (name) => {
+        requestCookies.delete(name);
+      },
     };
   }
 

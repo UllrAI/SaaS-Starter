@@ -23,7 +23,10 @@ describe("i18n routing helpers", () => {
     ).toBe("zh-Hans");
     expect(
       resolveLocaleFromAcceptLanguage(" ,en-GB;q=not-a-number,zh;q=0.2"),
-    ).toBe("en");
+    ).toBe("zh-Hans");
+    expect(
+      resolveLocaleFromAcceptLanguage("fr,zh;q=0,en;q=1.1,zh-CN;q=-1"),
+    ).toBeNull();
     expect(resolveLocaleFromAcceptLanguage("fr-FR,fr;q=0.9")).toBeNull();
   });
 

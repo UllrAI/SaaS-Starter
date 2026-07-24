@@ -1,4 +1,5 @@
-import { useTranslation } from "@/lib/i18n/translation/client";
+import { getStaticTranslations } from "@/lib/i18n/translation/static";
+import { SOURCE_LOCALE, type SupportedLocale } from "@/lib/config/i18n";
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -13,8 +14,12 @@ import {
   TrendingUp,
   Zap,
 } from "lucide-react";
-export function OtherProducts() {
-  const { t } = useTranslation();
+export function OtherProducts({
+  locale = SOURCE_LOCALE,
+}: {
+  locale?: SupportedLocale;
+} = {}) {
+  const { t } = getStaticTranslations(locale);
   const products = [
     {
       id: "pixmiller",

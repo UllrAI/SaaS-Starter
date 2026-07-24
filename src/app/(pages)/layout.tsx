@@ -1,21 +1,30 @@
-import { Header } from "@/components/homepage/header";
-import { Footer } from "@/components/homepage/footer";
-import { Suspense } from "react";
+import {
+  AppDocument,
+  createRootMetadata,
+} from "@/components/layout/app-document";
+import { MarketingChrome } from "@/components/layout/marketing-chrome";
+import { MarketingProviders } from "@/providers/marketing-providers";
+import { loadMarketingMessages } from "@/lib/i18n/messages";
+import { SOURCE_LOCALE } from "@/lib/config/i18n";
 
 export const dynamic = "force-static";
 
-export default function PagesLayout({
+export function generateMetadata() {
+  return createRootMetadata(SOURCE_LOCALE);
+}
+
+export default async function PagesLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const messages = await loadMarketingMessages(SOURCE_LOCALE);
+
   return (
-    <div className="flex min-h-screen flex-col">
-      <Suspense fallback={<div className="h-16 w-full" />}>
-        <Header />
-      </Suspense>
-      <main className="flex-1">{children}</main>
-      <Footer />
-    </div>
+    <AppDocument locale={SOURCE_LOCALE} messages={messages}>
+      <MarketingProviders>
+        <MarketingChrome locale={SOURCE_LOCALE}>{children}</MarketingChrome>
+      </MarketingProviders>
+    </AppDocument>
   );
 }

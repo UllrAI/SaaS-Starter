@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 
 import type { SupportedLocale } from "@/lib/config/i18n";
 import { createLocalizedAlternates } from "@/lib/metadata";
+import { getOpenGraphLocale } from "@/lib/metadata";
+import { SUPPORTED_LOCALES } from "@/lib/config/i18n";
 
 function getCanonicalUrl(
   alternates: Metadata["alternates"],
@@ -30,6 +32,10 @@ export function withStaticLocalizedMetadata(
       ? {
           ...metadata.openGraph,
           url: canonicalUrl,
+          locale: getOpenGraphLocale(locale),
+          alternateLocale: SUPPORTED_LOCALES.filter(
+            (supportedLocale) => supportedLocale !== locale,
+          ).map(getOpenGraphLocale),
         }
       : metadata.openGraph,
   };

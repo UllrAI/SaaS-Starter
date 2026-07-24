@@ -5,8 +5,8 @@
   "scripts": {
     "content:build": "node scripts/build-content-collections.mjs",
     "dev": "pnpm content:build && next dev",
-    "build": "pnpm content:build && next build",
-    "start": "next start",
+    "build": "pnpm content:build && next build && node scripts/prepare-standalone.mjs",
+    "start": "node .next/standalone/server.js",
     "saas-cli": "node --import tsx packages/cli/src/index.ts",
     "lint": "eslint .",
     "type-check": "pnpm content:build && node scripts/clean-next-types.mjs && tsc --noEmit",

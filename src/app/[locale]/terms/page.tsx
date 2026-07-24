@@ -1,6 +1,4 @@
-import TermsPage, {
-  generateMetadata as generateSourceMetadata,
-} from "@/app/(pages)/terms/page";
+import TermsPage, { buildTermsMetadata } from "@/app/(pages)/terms/page";
 import { withStaticLocalizedMetadata } from "@/lib/i18n/static-marketing-metadata";
 import { resolveStaticMarketingParams } from "@/lib/i18n/static-marketing-locale";
 
@@ -10,9 +8,14 @@ type LocalizedPageProps = {
 
 export async function generateMetadata({ params }: LocalizedPageProps) {
   const locale = await resolveStaticMarketingParams(params);
-  const metadata = await generateSourceMetadata();
+  const metadata = await buildTermsMetadata(locale);
 
   return withStaticLocalizedMetadata(metadata, "/terms", locale);
 }
 
-export default TermsPage;
+export default async function LocalizedTermsPage({
+  params,
+}: LocalizedPageProps) {
+  const locale = await resolveStaticMarketingParams(params);
+  return <TermsPage locale={locale} />;
+}

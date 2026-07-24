@@ -1,67 +1,71 @@
-import { getServerTranslations } from "@/lib/i18n/translation/server";
-import "@/styles/globals.css";
 import { Inter, JetBrains_Mono } from "next/font/google";
+import type { Metadata } from "next";
+import type { ReactNode } from "react";
+
+import { AppIntlProvider } from "@/lib/i18n/provider";
+import type { AppMessages } from "@/lib/i18n/messages";
+import { SUPPORTED_LOCALES, type SupportedLocale } from "@/lib/config/i18n";
 import {
   APP_NAME,
   COMPANY_NAME,
   OGIMAGE,
   TWITTERACCOUNT,
 } from "@/lib/config/constants";
-import type { Metadata } from "next";
-import { AppProviders } from "@/components/app-providers";
-import { getRequestLocale } from "@/lib/i18n/server-locale";
-import { AppIntlProvider } from "@/lib/i18n/provider";
-import { loadMessages } from "@/lib/i18n/messages";
+import { getServerTranslations } from "@/lib/i18n/translation/server";
 import { absoluteUrl, APP_ORIGIN } from "@/lib/url";
+import "@/styles/globals.css";
+
 const fontSans = Inter({
   subsets: ["latin"],
   variable: "--font-sans",
   display: "swap",
 });
+
 const fontMono = JetBrains_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
   display: "swap",
 });
-export async function generateMetadata(): Promise<Metadata> {
-  const { t } = await getServerTranslations();
+
+export async function createRootMetadata(
+  locale: SupportedLocale,
+): Promise<Metadata> {
+  const { t } = await getServerTranslations({ locale });
+  const description = t(
+    "47ef1ddddc70",
+    "Complete Micro UllrAI SaaS starter with authentication, payments, database, and deployment.",
+  );
+  const openGraphLocale = locale === "zh-Hans" ? "zh_CN" : "en_US";
+
   return {
     metadataBase: new URL(APP_ORIGIN),
     applicationName: APP_NAME,
-    authors: [
-      {
-        name: COMPANY_NAME,
-        url: APP_ORIGIN,
-      },
-    ],
+    authors: [{ name: COMPANY_NAME, url: APP_ORIGIN }],
     creator: COMPANY_NAME,
     publisher: COMPANY_NAME,
+    manifest: "/manifest.webmanifest",
+    icons: {
+      icon: "/favicon.ico",
+      shortcut: "/favicon.ico",
+      apple: "/icon-192.png",
+    },
     title: {
       template: `%s | ${APP_NAME}`,
       default: APP_NAME,
     },
-    description: t(
-      "47ef1ddddc70",
-      "Complete Micro UllrAI SaaS starter with authentication, payments, database, and deployment.",
-    ),
-    robots: {
-      index: true,
-      follow: true,
-      googleBot: {
-        index: true,
-        follow: true,
-        "max-video-preview": -1,
-        "max-image-preview": "large",
-        "max-snippet": -1,
-      },
-    },
+    description,
     openGraph: {
       title: APP_NAME,
-      description: t(
-        "0863940a3e2f",
-        "Complete Micro UllrAI SaaS starter with authentication, payments, database, and deployment.",
-      ),
-      images: OGIMAGE,
+      description,
+      images: [
+        {
+          url: OGIMAGE,
+          width: 1480,
+          height: 777,
+          alt: APP_NAME,
+        },
+      ],
+      locale: openGraphLocale,
       siteName: APP_NAME,
       type: "website",
     },
@@ -69,21 +73,21 @@ export async function generateMetadata(): Promise<Metadata> {
       card: "summary_large_image",
       creator: TWITTERACCOUNT,
       title: APP_NAME,
-      description: t(
-        "64b8511aff17",
-        "Complete Micro UllrAI SaaS starter with authentication, payments, database, and deployment.",
-      ),
-      images: OGIMAGE,
+      description,
+      images: [{ url: OGIMAGE, width: 1480, height: 777, alt: APP_NAME }],
     },
   };
 }
-export default async function RootLayout({
+
+export function AppDocument({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  const locale = await getRequestLocale();
-  const messages = await loadMessages(locale);
+  locale,
+  messages,
+}: {
+  children: ReactNode;
+  locale: SupportedLocale;
+  messages: AppMessages;
+}) {
   const structuredData = {
     "@context": "https://schema.org",
     "@graph": [
@@ -92,7 +96,12 @@ export default async function RootLayout({
         "@id": absoluteUrl("/#organization"),
         name: COMPANY_NAME,
         url: APP_ORIGIN,
-        logo: absoluteUrl("/logo.png"),
+        logo: {
+          "@type": "ImageObject",
+          url: absoluteUrl("/icon-512.png"),
+          width: 512,
+          height: 512,
+        },
       },
       {
         "@type": "WebSite",
@@ -102,20 +111,20 @@ export default async function RootLayout({
         publisher: {
           "@id": absoluteUrl("/#organization"),
         },
-        inLanguage: locale,
+        inLanguage: SUPPORTED_LOCALES,
       },
     ],
   };
+
   return (
     <html
       lang={locale}
       className={`${fontSans.variable} ${fontMono.variable}`}
       suppressHydrationWarning
     >
-      <head />
       <body>
         <AppIntlProvider locale={locale} messages={messages}>
-          <AppProviders>{children}</AppProviders>
+          {children}
         </AppIntlProvider>
         <script
           id="website-structured-data"

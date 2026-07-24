@@ -11,7 +11,12 @@ describe("createMetadataDefaults", () => {
     process.env.NODE_ENV === "development"
       ? "DEV - SaaS Starter"
       : "SaaS Starter";
-  const mockOGImage = "/og.png";
+  const expectedSocialImage = {
+    url: "/og.png",
+    width: 1480,
+    height: 777,
+    alt: expectedAppName,
+  };
   const mockAppUrl = "http://localhost:3000";
   const mockTwitterAccount = "@ullr_ai";
 
@@ -19,15 +24,16 @@ describe("createMetadataDefaults", () => {
     const result = createMetadataDefaults();
 
     expect(result.openGraph?.url).toBeUndefined();
-    expect(result.openGraph?.images).toBe(mockOGImage);
+    expect(result.openGraph?.images).toEqual([expectedSocialImage]);
     expect(result.openGraph?.siteName).toBe(expectedAppName);
     expect((result.openGraph as Record<string, unknown>)?.type).toBe("website");
-    expect(result.openGraph?.locale).toBeUndefined();
+    expect(result.openGraph?.locale).toBe("en_US");
+    expect(result.openGraph?.alternateLocale).toEqual(["zh_CN"]);
     expect((result.twitter as Record<string, unknown>)?.card).toBe(
       "summary_large_image",
     );
     expect(result.twitter?.creator).toBe(mockTwitterAccount);
-    expect(result.twitter?.images).toBe(mockOGImage);
+    expect(result.twitter?.images).toEqual([expectedSocialImage]);
     expect(result.metadataBase?.href).toBe(mockAppUrl + "/");
   });
 
@@ -84,7 +90,8 @@ describe("createMetadataDefaults", () => {
     expect(result.openGraph?.url).toBeUndefined();
     expect(result.openGraph?.siteName).toBe(expectedAppName);
     expect((result.openGraph as Record<string, unknown>)?.type).toBe("website");
-    expect(result.openGraph?.locale).toBeUndefined();
+    expect(result.openGraph?.locale).toBe("en_US");
+    expect(result.openGraph?.alternateLocale).toEqual(["zh_CN"]);
   });
 
   it("should set correct default twitter card properties", () => {

@@ -1,5 +1,5 @@
-import { useTranslation } from "@/lib/i18n/translation/client";
 import { getServerTranslations } from "@/lib/i18n/translation/server";
+import { getStaticTranslations } from "@/lib/i18n/translation/static";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -30,12 +30,13 @@ import {
   createLocalizedAlternates,
   createMetadataDefaults,
 } from "@/lib/metadata";
-import { SOURCE_LOCALE } from "@/lib/config/i18n";
+import { SOURCE_LOCALE, type SupportedLocale } from "@/lib/config/i18n";
 import { ContactMethods } from "./contact-methods";
-export async function generateMetadata() {
-  const { t } = await getServerTranslations();
+export async function buildContactMetadata(locale: SupportedLocale) {
+  const { t } = await getServerTranslations({ locale });
   const metadata = createMetadataDefaults({
-    alternates: createLocalizedAlternates("/contact", SOURCE_LOCALE),
+    alternates: createLocalizedAlternates("/contact", locale),
+    locale,
   });
   return {
     ...metadata,
@@ -62,8 +63,15 @@ export async function generateMetadata() {
     },
   };
 }
-export default function ContactPage() {
-  const { t } = useTranslation();
+export function generateMetadata() {
+  return buildContactMetadata(SOURCE_LOCALE);
+}
+export default function ContactPage({
+  locale = SOURCE_LOCALE,
+}: {
+  locale?: SupportedLocale;
+} = {}) {
+  const { t } = getStaticTranslations(locale);
   return (
     <>
       <MarketingPageShell>
@@ -94,7 +102,7 @@ export default function ContactPage() {
             {t("1c0a7a57a7ca", "Contact Channels")}
           </PageSectionHeading>
 
-          <ContactMethods />
+          <ContactMethods locale={locale} />
         </div>
 
         <div className="mb-24">
@@ -361,10 +369,14 @@ export default function ContactPage() {
             </PageIntroDescription>
             <div className="flex flex-wrap justify-center gap-4">
               <Button asChild size="lg">
-                <Link href="/pricing">{t("b32e51fc5358", "View Pricing")}</Link>
+                <Link href="/pricing" locale={locale}>
+                  {t("b32e51fc5358", "View Pricing")}
+                </Link>
               </Button>
               <Button variant="outline" size="lg" asChild>
-                <Link href="/about">{t("5c315fc2d27e", "Learn More")}</Link>
+                <Link href="/about" locale={locale}>
+                  {t("5c315fc2d27e", "Learn More")}
+                </Link>
               </Button>
             </div>
           </PageIntro>

@@ -1,7 +1,9 @@
 import { Fragment, createElement, type ReactNode } from "react";
 
 type RichTag = (chunks: ReactNode) => ReactNode;
+type PlainValue = string | number | Date;
 type RichValue = ReactNode | Date | RichTag;
+type PlainValues = Record<string, PlainValue>;
 type RichValues = Record<string, RichValue>;
 type IntlRichValue = string | number | Date | RichTag;
 type IntlRichValues = Record<string, IntlRichValue>;
@@ -15,6 +17,7 @@ type IntlTranslator = {
 
 export type AppTranslate = {
   (key: string, fallback: string): string;
+  (key: string, fallback: string, values: PlainValues): string;
   (key: string, fallback: string, values: RichValues): ReactNode;
 };
 

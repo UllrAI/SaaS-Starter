@@ -13,10 +13,9 @@ jest.mock("@/components/homepage/hero", () => ({
   Hero: (props: React.ComponentProps<any>) => mockHero(props),
 }));
 
-const mockSocialProof = createMockSection("SocialProofUnified");
-jest.mock("@/components/homepage/social-proof-testimonials", () => ({
-  SocialProofUnified: (props: React.ComponentProps<any>) =>
-    mockSocialProof(props),
+const mockProductProof = createMockSection("ProductProof");
+jest.mock("@/components/homepage/product-proof", () => ({
+  ProductProof: (props: React.ComponentProps<any>) => mockProductProof(props),
 }));
 
 const mockFeatures = createMockSection("Features");
@@ -72,6 +71,7 @@ describe("HomePage", () => {
 
     expect(mockCreateLocalizedAlternates).toHaveBeenCalledWith("/", "en");
     expect(mockCreateMetadataDefaults).toHaveBeenCalledWith({
+      locale: "en",
       alternates: {
         canonical: "/",
         languages: {
@@ -90,14 +90,14 @@ describe("HomePage", () => {
       sections.map((section) => section.getAttribute("data-component")),
     ).toEqual([
       "Hero",
-      "SocialProofUnified",
+      "ProductProof",
       "Features",
       "OtherProducts",
       "CallToAction",
     ]);
 
     expect(mockHero).toHaveBeenCalledTimes(1);
-    expect(mockSocialProof).toHaveBeenCalledTimes(1);
+    expect(mockProductProof).toHaveBeenCalledTimes(1);
     expect(mockFeatures).toHaveBeenCalledTimes(1);
     expect(mockOtherProducts).toHaveBeenCalledTimes(1);
     expect(mockCallToAction).toHaveBeenCalledTimes(1);

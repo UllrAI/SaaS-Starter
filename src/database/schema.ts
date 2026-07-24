@@ -10,12 +10,20 @@ import {
   pgEnum,
   primaryKey,
   foreignKey,
+  check,
 } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 
 export const userRoleEnum = pgEnum("user_role", [
   "user",
   "admin",
   "super_admin",
+]);
+
+export const uploadIntentStatusEnum = pgEnum("upload_intent_status", [
+  "pending",
+  "cleaning",
+  "completed",
 ]);
 
 export const users = pgTable("users", {
@@ -320,6 +328,52 @@ export const rateLimitBuckets = pgTable(
   }),
 );
 
+export const uploadIntents = pgTable(
+  "upload_intents",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    fileKey: text("fileKey").notNull(),
+    fileName: text("fileName").notNull(),
+    fileSize: integer("fileSize").notNull(),
+    contentType: text("contentType").notNull(),
+    status: uploadIntentStatusEnum("status").notNull().default("pending"),
+    expiresAt: timestamp("expiresAt", { withTimezone: true }).notNull(),
+    completedAt: timestamp("completedAt", { withTimezone: true }),
+    cleanupAttempts: integer("cleanupAttempts").notNull().default(0),
+    lastCleanupError: text("lastCleanupError"),
+    createdAt: timestamp("createdAt", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updatedAt", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => ({
+    fileSizePositive: check(
+      "upload_intents_fileSize_positive",
+      sql`${table.fileSize} > 0`,
+    ),
+    cleanupAttemptsNonNegative: check(
+      "upload_intents_cleanupAttempts_non_negative",
+      sql`${table.cleanupAttempts} >= 0`,
+    ),
+    fileKeyUnique: uniqueIndex("upload_intents_fileKey_unique").on(
+      table.fileKey,
+    ),
+    userStatusExpiresAtIdx: index(
+      "upload_intents_userId_status_expiresAt_idx",
+    ).on(table.userId, table.status, table.expiresAt),
+    cleanupIdx: index("upload_intents_cleanup_queue_idx").on(
+      table.status,
+      table.cleanupAttempts,
+      table.expiresAt,
+    ),
+  }),
+);
+
 // File uploads table to store uploaded file metadata
 export const uploads = pgTable(
   "uploads",
@@ -328,6 +382,9 @@ export const uploads = pgTable(
     userId: text("userId")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
+    uploadIntentId: uuid("uploadIntentId").references(() => uploadIntents.id, {
+      onDelete: "set null",
+    }),
     fileKey: text("fileKey").notNull(), // Key in R2 storage
     url: text("url").notNull(), // Public access URL
     fileName: text("fileName").notNull(), // Original file name
@@ -340,6 +397,13 @@ export const uploads = pgTable(
       userCreatedAtIdx: index("uploads_userId_createdAt_idx").on(
         table.userId,
         table.createdAt.desc(),
+      ),
+      uploadIntentUnique: uniqueIndex("uploads_uploadIntentId_unique").on(
+        table.uploadIntentId,
+      ),
+      fileSizePositive: check(
+        "uploads_fileSize_positive",
+        sql`${table.fileSize} > 0`,
       ),
       fileKeyUnique: uniqueIndex("uploads_fileKey_unique").on(table.fileKey),
     };

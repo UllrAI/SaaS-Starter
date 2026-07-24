@@ -1,6 +1,6 @@
 "use client";
 
-import { UPLOAD_CONFIG } from "@/lib/config/upload";
+import { normalizeContentType, UPLOAD_CONFIG } from "@/lib/config/upload";
 import {
   FileUploadIssueError,
   type UploadTransport,
@@ -8,9 +8,12 @@ import {
 } from "./types";
 
 interface PresignedUploadPayload {
+  intentId?: string;
   presignedUrl: string;
   publicUrl: string;
   key: string;
+  protocolVersion: 2;
+  requiredHeaders: Record<string, string>;
 }
 
 interface CreatePresignedUploadTransportOptions {
@@ -60,18 +63,22 @@ function uploadToPresignedUrl({
   file,
   onProgress,
   signal,
+  requiredHeaders,
 }: {
   presignedUrl: string;
   file: File;
   onProgress: (progress: number) => void;
   signal: AbortSignal;
+  requiredHeaders: Record<string, string>;
 }): Promise<void> {
   let xhr: XMLHttpRequest | null = null;
 
   return new Promise<void>((resolve, reject) => {
     xhr = new XMLHttpRequest();
     xhr.open("PUT", presignedUrl);
-    xhr.setRequestHeader("Content-Type", file.type);
+    Object.entries(requiredHeaders).forEach(([name, value]) => {
+      xhr?.setRequestHeader(name, value);
+    });
 
     const abortUpload = () => {
       xhr?.abort();
@@ -136,26 +143,46 @@ export function createPresignedUploadTransport(
       const abortController = new AbortController();
 
       const promise = (async () => {
+        const contentType = normalizeContentType(file.type);
         const presignedResponse = await fetch(presignedUrlEndpoint, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
+            protocolVersion: 2,
             fileName: file.name,
-            contentType: file.type,
+            contentType,
             size: file.size,
           }),
           signal: abortController.signal,
         });
 
         if (!presignedResponse.ok) {
-          await parseJsonSafely(presignedResponse);
+          const error = await parseJsonSafely(presignedResponse);
+          if (error?.code === "UPLOAD_QUOTA_EXCEEDED") {
+            throw new FileUploadIssueError({
+              code: "upload-quota-exceeded",
+              fileName: file.name,
+            });
+          }
           throw createRequestFailure();
         }
 
-        const { key, presignedUrl, publicUrl } =
-          (await presignedResponse.json()) as PresignedUploadPayload;
+        const {
+          intentId,
+          key,
+          presignedUrl,
+          protocolVersion,
+          publicUrl,
+          requiredHeaders,
+        } = (await presignedResponse.json()) as PresignedUploadPayload;
 
-        if (!presignedUrl || !isAllowedUploadUrl(presignedUrl)) {
+        if (
+          protocolVersion !== 2 ||
+          requiredHeaders?.["If-None-Match"] !== "*" ||
+          requiredHeaders?.["Content-Type"] !== contentType ||
+          !presignedUrl ||
+          !isAllowedUploadUrl(presignedUrl)
+        ) {
           throw new FileUploadIssueError({
             code: "unsafe-upload-url",
             fileName: file.name,
@@ -167,14 +194,16 @@ export function createPresignedUploadTransport(
           file,
           onProgress,
           signal: abortController.signal,
+          requiredHeaders,
         });
 
         const completeResponse = await fetch(completeEndpoint, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
+            intentId,
             fileName: file.name,
-            contentType: file.type,
+            contentType,
             size: file.size,
             key,
             url: publicUrl,

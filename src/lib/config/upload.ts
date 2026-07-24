@@ -109,7 +109,12 @@ export const UPLOAD_CONFIG = {
   /**
    * Maximum aggregate size accepted by server-upload in one request.
    */
-  MAX_SERVER_UPLOAD_TOTAL_SIZE: 100 * 1024 * 1024,
+  MAX_SERVER_UPLOAD_TOTAL_SIZE: 20 * 1024 * 1024,
+
+  /**
+   * Maximum single-file size accepted by the buffered server-upload route.
+   */
+  MAX_SERVER_UPLOAD_FILE_SIZE: 10 * 1024 * 1024,
 
   /**
    * Maximum concurrent R2 uploads performed by server-upload.
@@ -131,6 +136,17 @@ export const UPLOAD_CONFIG = {
    * @default 15 minutes
    */
   PRESIGNED_URL_EXPIRATION: 15 * 60,
+
+  /**
+   * Upload intent lifetime. The 24-hour window safely covers a PUT that starts
+   * immediately before its signed URL expires and continues in flight.
+   */
+  UPLOAD_INTENT_EXPIRATION: 24 * 60 * 60,
+
+  /**
+   * Maximum JSON request size for upload coordination endpoints.
+   */
+  MAX_JSON_BODY_SIZE: 4 * 1024,
 
   /**
    * MIME types allowed for public uploads.
@@ -220,6 +236,7 @@ export function getFileExtension(contentType: string): string {
 }
 
 export const presignedUrlRequestSchema = z.object({
+  protocolVersion: z.literal(2),
   fileName: z
     .string()
     .min(1, "File name cannot be empty.")
@@ -229,6 +246,7 @@ export const presignedUrlRequestSchema = z.object({
 });
 
 export const uploadCompleteRequestSchema = z.object({
+  intentId: z.uuid("Upload intent ID must be valid.").optional(),
   fileName: z
     .string()
     .min(1, "File name cannot be empty.")
@@ -236,5 +254,5 @@ export const uploadCompleteRequestSchema = z.object({
   contentType: z.string().min(1, "Content type cannot be empty."),
   size: z.number().positive("File size must be positive."),
   key: z.string().min(1, "Upload key cannot be empty."),
-  url: z.string().url("Upload URL must be valid."),
+  url: z.url("Upload URL must be valid."),
 });

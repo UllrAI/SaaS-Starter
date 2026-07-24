@@ -21,6 +21,7 @@ This directory contains Docker configuration for running the UllrAI Starter appl
 
    Store the generated value in `BETTER_AUTH_SECRET`. Set
    `RESEND_EMAIL_FROM` to an address on a domain verified in Resend. Set
+   a second generated value in `UPLOAD_CLEANUP_SECRET`. Set
    `NEXT_PUBLIC_APP_URL` to the exact public origin used to access the build;
    production SEO metadata is generated from this value at build time.
 
@@ -106,6 +107,11 @@ For production deployment:
 4. **Network**: Use proper network configuration
 5. **Health Checks**: Ensure all services have appropriate health checks
 6. **Secrets**: Use Docker secrets or external secret management
+7. **Upload cleanup**: Schedule an authenticated `POST` to
+   `/api/internal/uploads/cleanup` at least every five minutes
+8. **Upload protocol rollout**: Set `UPLOAD_LEGACY_COMPLETION_SINCE` and
+   `UPLOAD_LEGACY_COMPLETION_UNTIL` only for the bounded v1-to-v2 rollout
+   window, then remove both after the cutoff
 
 ## Troubleshooting
 

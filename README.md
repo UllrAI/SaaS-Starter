@@ -93,28 +93,33 @@ Then edit the `.env` file and fill in all required values.
 
 #### Environment Variables
 
-| Variable Name            | Description                                                  | Example                                             |
-| :----------------------- | :----------------------------------------------------------- | :-------------------------------------------------- |
-| `DATABASE_URL`           | **Required.** PostgreSQL connection string.                  | `postgresql://user:password@localhost:5432/db_name` |
-| `RATE_LIMIT_IP_HEADER`   | Trusted reverse proxy header used for shared rate limits.    | `x-forwarded-for`                                   |
-| `NEXT_PUBLIC_APP_URL`    | **Required.** Public URL of your deployed app.               | `http://localhost:3000` or `https://yourdomain.com` |
-| `BETTER_AUTH_SECRET`     | **Required.** Random session secret, at least 32 characters. | Generate with `openssl rand -base64 32`             |
-| `RESEND_API_KEY`         | **Required.** Resend API Key for sending emails.             | `re_xxxxxxxxxxxxxxxx`                               |
-| `RESEND_EMAIL_FROM`      | **Required.** Sender on a domain verified in Resend.         | `noreply@your-verified-domain.com`                  |
-| `CREEM_API_KEY`          | **Required.** Creem API Key.                                 | `your_creem_api_key`                                |
-| `CREEM_ENVIRONMENT`      | **Required.** Creem environment mode.                        | `test_mode` or `live_mode`                          |
-| `CREEM_WEBHOOK_SECRET`   | **Required.** Creem webhook secret.                          | `whsec_your_webhook_secret`                         |
-| `R2_ENDPOINT`            | **Required.** Cloudflare R2 API endpoint.                    | `https://<ACCOUNT_ID>.r2.cloudflarestorage.com`     |
-| `R2_ACCESS_KEY_ID`       | **Required.** R2 access key ID.                              | `your_r2_access_key_id`                             |
-| `R2_SECRET_ACCESS_KEY`   | **Required.** R2 secret access key.                          | `your_r2_secret_access_key`                         |
-| `R2_BUCKET_NAME`         | **Required.** R2 bucket name.                                | `your_r2_bucket_name`                               |
-| `R2_PUBLIC_URL`          | **Required.** Public access URL for R2 bucket.               | `https://your-bucket.your-account.r2.dev`           |
-| `GITHUB_CLIENT_ID`       | _Optional._ GitHub OAuth Client ID.                          | `your_github_client_id`                             |
-| `GITHUB_CLIENT_SECRET`   | _Optional._ GitHub OAuth Client Secret.                      | `your_github_client_secret`                         |
-| `GOOGLE_CLIENT_ID`       | _Optional._ Google OAuth Client ID.                          | `your_google_client_id`                             |
-| `GOOGLE_CLIENT_SECRET`   | _Optional._ Google OAuth Client Secret.                      | `your_google_client_secret`                         |
-| `LINKEDIN_CLIENT_ID`     | _Optional._ LinkedIn OAuth Client ID.                        | `your_linkedin_client_id`                           |
-| `LINKEDIN_CLIENT_SECRET` | _Optional._ LinkedIn OAuth Client Secret.                    | `your_linkedin_client_secret`                       |
+| Variable Name                    | Description                                                     | Example                                             |
+| :------------------------------- | :-------------------------------------------------------------- | :-------------------------------------------------- |
+| `DATABASE_URL`                   | **Required.** PostgreSQL connection string.                     | `postgresql://user:password@localhost:5432/db_name` |
+| `RATE_LIMIT_IP_HEADER`           | Trusted reverse proxy header used for shared rate limits.       | `x-forwarded-for`                                   |
+| `NEXT_PUBLIC_APP_URL`            | **Required.** Public URL of your deployed app.                  | `http://localhost:3000` or `https://yourdomain.com` |
+| `BETTER_AUTH_SECRET`             | **Required.** Random session secret, at least 32 characters.    | Generate with `openssl rand -base64 32`             |
+| `RESEND_API_KEY`                 | **Required.** Resend API Key for sending emails.                | `re_xxxxxxxxxxxxxxxx`                               |
+| `RESEND_EMAIL_FROM`              | **Required.** Sender on a domain verified in Resend.            | `noreply@your-verified-domain.com`                  |
+| `CREEM_API_KEY`                  | **Required.** Creem API Key.                                    | `your_creem_api_key`                                |
+| `CREEM_ENVIRONMENT`              | **Required.** Creem environment mode.                           | `test_mode` or `live_mode`                          |
+| `CREEM_WEBHOOK_SECRET`           | **Required.** Creem webhook secret.                             | `whsec_your_webhook_secret`                         |
+| `R2_ENDPOINT`                    | **Required.** Cloudflare R2 API endpoint.                       | `https://<ACCOUNT_ID>.r2.cloudflarestorage.com`     |
+| `R2_ACCESS_KEY_ID`               | **Required.** R2 access key ID.                                 | `your_r2_access_key_id`                             |
+| `R2_SECRET_ACCESS_KEY`           | **Required.** R2 secret access key.                             | `your_r2_secret_access_key`                         |
+| `R2_BUCKET_NAME`                 | **Required.** R2 bucket name.                                   | `your_r2_bucket_name`                               |
+| `R2_PUBLIC_URL`                  | **Required.** Public access URL for R2 bucket.                  | `https://your-bucket.your-account.r2.dev`           |
+| `UPLOAD_CLEANUP_SECRET`          | **Required.** 32+ character bearer secret for upload cleanup.   | Generate with `openssl rand -base64 32`             |
+| `UPLOAD_DAILY_QUOTA_BYTES`       | Optional rolling 24-hour upload quota per user.                 | `1073741824` (1 GiB)                                |
+| `UPLOAD_TOTAL_QUOTA_BYTES`       | Optional total stored and reserved bytes per user.              | `5368709120` (5 GiB)                                |
+| `UPLOAD_LEGACY_COMPLETION_SINCE` | Optional ISO-8601 start of the bounded v1 compatibility window. | Set with `UPLOAD_LEGACY_COMPLETION_UNTIL` only      |
+| `UPLOAD_LEGACY_COMPLETION_UNTIL` | Optional ISO-8601 end of the bounded v1 compatibility window.   | At most 24 hours after the matching start           |
+| `GITHUB_CLIENT_ID`               | _Optional._ GitHub OAuth Client ID.                             | `your_github_client_id`                             |
+| `GITHUB_CLIENT_SECRET`           | _Optional._ GitHub OAuth Client Secret.                         | `your_github_client_secret`                         |
+| `GOOGLE_CLIENT_ID`               | _Optional._ Google OAuth Client ID.                             | `your_google_client_id`                             |
+| `GOOGLE_CLIENT_SECRET`           | _Optional._ Google OAuth Client Secret.                         | `your_google_client_secret`                         |
+| `LINKEDIN_CLIENT_ID`             | _Optional._ LinkedIn OAuth Client ID.                           | `your_linkedin_client_id`                           |
+| `LINKEDIN_CLIENT_SECRET`         | _Optional._ LinkedIn OAuth Client Secret.                       | `your_linkedin_client_secret`                       |
 
 > **Tip:** You can generate a secure key using the following command:
 > `openssl rand -base64 32`
@@ -292,6 +297,8 @@ The Playwright runner starts the production server through `pnpm start` and enab
 ## 📁 File Upload Feature
 
 This project integrates a secure file upload system based on Cloudflare R2.
+Direct and server-side uploads share the same short-lived upload intent,
+per-user byte quotas, one-time completion, and orphan cleanup flow.
 
 ### 1. Cloudflare R2 Configuration
 
@@ -304,15 +311,50 @@ This project integrates a secure file upload system based on Cloudflare R2.
 [
   {
     "AllowedOrigins": ["http://localhost:3000", "https://yourdomain.com"],
-    "AllowedMethods": ["PUT", "GET"],
-    "AllowedHeaders": ["*"],
+    "AllowedMethods": ["PUT"],
+    "AllowedHeaders": ["Content-Type", "If-None-Match"],
     "ExposeHeaders": ["ETag"],
     "MaxAgeSeconds": 3000
   }
 ]
 ```
 
-### 2. Using the `FileUploader` Component
+Direct uploads use protocol version 2. The presign response declares the
+required `Content-Type` and `If-None-Match: *` headers, so an issued object key
+can only be written once. The signed URL lasts 15 minutes. Its database
+reservation remains for 24 hours so a slow PUT that starts before signature
+expiry cannot outlive orphan protection. Clients built against the older
+unsigned-header protocol must be refreshed when this version is deployed.
+
+For a rolling v1-to-v2 deployment, set `UPLOAD_LEGACY_COMPLETION_SINCE` to the
+rollout start and `UPLOAD_LEGACY_COMPLETION_UNTIL` to an absolute timestamp no
+more than 24 hours later. The compatibility path only accepts the authenticated
+user's timestamp-and-UUID v1 keys issued up to 15 minutes before that start,
+verifies the declared URL and actual R2 metadata, applies upload quotas, and is
+idempotent. Remove both variables after the cutoff. Then perform a one-time,
+dry-run inventory comparison between R2's `uploads/` prefix and the upload
+records' `"fileKey"` values; review the difference before deleting untracked
+legacy objects. New clients always require a database-backed v2 intent.
+
+### 2. Schedule Upload Cleanup
+
+Call the cleanup endpoint at least every five minutes from your deployment
+platform. It claims expired upload intents, deletes abandoned R2 objects, and
+only then releases the reserved quota. Failed object deletions remain reserved
+and are retried.
+
+```bash
+curl -fsS -X POST \
+  -H "Authorization: Bearer $UPLOAD_CLEANUP_SECRET" \
+  "https://yourdomain.com/api/internal/uploads/cleanup"
+```
+
+The endpoint processes up to 100 intents per run and recovers stale cleanup
+claims automatically. R2 lifecycle rules may additionally abort incomplete
+multipart uploads after one day, but they do not replace this database-aware
+cleanup.
+
+### 3. Using the `FileUploader` Component
 
 We provide a powerful `FileUploader` component that supports drag-and-drop, progress display, image compression, and error handling.
 

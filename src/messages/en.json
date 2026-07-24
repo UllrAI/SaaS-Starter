@@ -909,7 +909,7 @@
   "eb0600bded40": "Support Hours",
   "eb81c62b0ebb": "Payment Status",
   "ebd9be9621fb": "You have been logged out successfully.",
-  "ec3fbe6e72ea": "Streaming upload",
+  "ec3fbe6e72ea": "Bounded request",
   "ec6fe33b24a4": "Profile Picture",
   "eccca2ef193a": "Pricing for the SaaS Starter codebase. Review the current package structure, verification stack, and what is included before checkout.",
   "ecd94a4d7e74": "Default uploader demos",
@@ -1049,5 +1049,6 @@
   "subscription_action_cancel": "Cancel",
   "subscription_status_expired": "Expired",
   "subscription_status_paused": "Paused",
-  "subscription_status_scheduled_cancel": "Scheduled to cancel"
+  "subscription_status_scheduled_cancel": "Scheduled to cancel",
+  "uploadQuotaExceeded": "Your upload quota has been reached. Remove files or try again later."
 }

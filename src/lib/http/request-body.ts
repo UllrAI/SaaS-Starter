@@ -43,3 +43,11 @@ export async function readTextBodyWithLimit(
 
   return body + decoder.decode();
 }
+
+export async function readJsonBodyWithLimit(
+  request: Request,
+  maxBytes: number,
+): Promise<unknown> {
+  const body = await readTextBodyWithLimit(request, maxBytes);
+  return JSON.parse(body);
+}

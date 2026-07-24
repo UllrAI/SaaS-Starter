@@ -909,7 +909,7 @@
   "eb0600bded40": "支持时间",
   "eb81c62b0ebb": "支付状态",
   "ebd9be9621fb": "您已成功退出登录。",
-  "ec3fbe6e72ea": "流式上传",
+  "ec3fbe6e72ea": "受限请求",
   "ec6fe33b24a4": "个人头像",
   "eccca2ef193a": "SaaS Starter 代码库的定价。在结账前，请查看当前的包结构、验证堆栈以及包含的内容。",
   "ecd94a4d7e74": "默认上传器演示",
@@ -1049,5 +1049,6 @@
   "subscription_action_cancel": "取消",
   "subscription_status_expired": "已过期",
   "subscription_status_paused": "已暂停",
-  "subscription_status_scheduled_cancel": "计划取消"
+  "subscription_status_scheduled_cancel": "计划取消",
+  "uploadQuotaExceeded": "上传额度已用尽。请删除部分文件或稍后再试。"
 }

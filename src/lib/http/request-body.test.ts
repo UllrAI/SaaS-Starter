@@ -1,4 +1,5 @@
 import {
+  readJsonBodyWithLimit,
   readTextBodyWithLimit,
   RequestBodyTooLargeError,
 } from "./request-body";
@@ -55,6 +56,24 @@ describe("readTextBodyWithLimit", () => {
 
     await expect(readTextBodyWithLimit(request, 7)).rejects.toBeInstanceOf(
       RequestBodyTooLargeError,
+    );
+  });
+});
+
+describe("readJsonBodyWithLimit", () => {
+  it("parses JSON within the limit", async () => {
+    const request = createStreamingRequest(['{"ok":', "true}"]);
+
+    await expect(readJsonBodyWithLimit(request, 64)).resolves.toEqual({
+      ok: true,
+    });
+  });
+
+  it("rejects malformed JSON", async () => {
+    const request = createStreamingRequest(["not-json"]);
+
+    await expect(readJsonBodyWithLimit(request, 64)).rejects.toBeInstanceOf(
+      SyntaxError,
     );
   });
 });

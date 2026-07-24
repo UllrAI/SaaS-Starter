@@ -17,13 +17,12 @@ const mockSend = jest.fn<(...args: unknown[]) => Promise<unknown>>();
 const mockGetSignedUrl = jest.fn<(...args: unknown[]) => Promise<string>>();
 const mockIsFileTypeAllowed = jest.fn<(contentType: string) => boolean>();
 const mockIsFileSizeAllowed = jest.fn<(size: number) => boolean>();
-const mockGetFileExtension = jest.fn<(contentType: string) => string>();
-const mockRandomUUID = jest.fn<() => string>();
+const mockPutObjectCommand = jest.fn();
 
 jest.mock("@aws-sdk/client-s3", () => ({
   S3Client: jest.fn().mockImplementation(() => ({ send: mockSend })),
   HeadObjectCommand: jest.fn(),
-  PutObjectCommand: jest.fn(),
+  PutObjectCommand: mockPutObjectCommand,
   DeleteObjectCommand: jest.fn(),
   DeleteObjectsCommand: jest.fn(),
 }));
@@ -39,12 +38,7 @@ jest.mock("./config/upload", () => ({
   },
   isFileTypeAllowed: mockIsFileTypeAllowed,
   isFileSizeAllowed: mockIsFileSizeAllowed,
-  getFileExtension: mockGetFileExtension,
   normalizeContentType: jest.fn((contentType: string) => contentType),
-}));
-
-jest.mock("crypto", () => ({
-  randomUUID: mockRandomUUID,
 }));
 
 describe("R2 storage", () => {
@@ -52,11 +46,8 @@ describe("R2 storage", () => {
     jest.clearAllMocks();
     mockIsFileTypeAllowed.mockReturnValue(true);
     mockIsFileSizeAllowed.mockReturnValue(true);
-    mockGetFileExtension.mockReturnValue("jpeg");
     mockGetSignedUrl.mockResolvedValue("https://mock-presigned-url.com");
     mockSend.mockResolvedValue({});
-    mockRandomUUID.mockReturnValue("mock-uuid-123");
-    jest.spyOn(Date, "now").mockReturnValue(1234567890000);
   });
 
   afterEach(() => {
@@ -78,8 +69,7 @@ describe("R2 storage", () => {
 
   describe("createPresignedUrl", () => {
     const input = {
-      userId: "user-123",
-      fileName: "test.jpeg",
+      key: "uploads/user-123/upload-id.jpeg",
       contentType: "image/jpeg",
       size: 1024,
     };
@@ -91,8 +81,15 @@ describe("R2 storage", () => {
         success: true,
         presignedUrl: "https://mock-presigned-url.com",
         publicUrl:
-          "https://mock-public-url.com/uploads/user-123/1234567890000-mock-uuid-123.jpeg",
-        key: "uploads/user-123/1234567890000-mock-uuid-123.jpeg",
+          "https://mock-public-url.com/uploads/user-123/upload-id.jpeg",
+        key: "uploads/user-123/upload-id.jpeg",
+      });
+      expect(mockPutObjectCommand).toHaveBeenCalledWith({
+        Bucket: "mock-bucket",
+        Key: input.key,
+        ContentType: "image/jpeg",
+        ContentLength: 1024,
+        IfNoneMatch: "*",
       });
       expect(mockGetSignedUrl).toHaveBeenCalledWith(
         expect.anything(),

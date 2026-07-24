@@ -61,30 +61,19 @@ jest.mock("@aws-sdk/lib-storage", () => ({
   Upload: jest.fn(() => mockUpload),
 }));
 
-const mockDeleteFile = jest.fn() as any;
 jest.mock("@/lib/r2", () => ({
-  buildR2PublicUrl: (key: string) => `https://cdn.example.com/${key}`,
-  deleteFile: mockDeleteFile,
+  r2Client: { send: jest.fn() },
 }));
 
-// Mock database
-const mockInsertValues = jest.fn() as any;
-const mockDb = {
-  insert: jest.fn().mockReturnValue({
-    values: mockInsertValues,
-  }) as any,
-};
-jest.mock("@/database", () => ({
-  db: mockDb,
-}));
-
-jest.mock("@/database/schema", () => ({
-  uploads: "uploads-table",
-}));
-
-// Mock crypto
-jest.mock("crypto", () => ({
-  randomUUID: jest.fn(() => "test-uuid-123"),
+const mockCreateUploadIntent = jest.fn() as any;
+const mockCompleteUploadIntent = jest.fn() as any;
+const mockReleaseUploadIntent = jest.fn() as any;
+class MockUploadQuotaExceededError extends Error {}
+jest.mock("@/lib/uploads/upload-intents", () => ({
+  createUploadIntent: mockCreateUploadIntent,
+  completeUploadIntent: mockCompleteUploadIntent,
+  releaseUploadIntent: mockReleaseUploadIntent,
+  UploadQuotaExceededError: MockUploadQuotaExceededError,
 }));
 
 // Mock env
@@ -103,19 +92,18 @@ jest.mock("@/env", () => ({
 // Mock upload config
 const mockIsFileTypeAllowed = jest.fn() as any;
 const mockIsFileSizeAllowed = jest.fn() as any;
-const mockGetFileExtension = jest.fn() as any;
 const mockFormatFileSize = jest.fn() as any;
 
 jest.mock("@/lib/config/upload", () => ({
   UPLOAD_CONFIG: {
     MAX_FILE_SIZE: 10485760, // 10MB
+    MAX_SERVER_UPLOAD_FILE_SIZE: 10485760,
     MAX_SERVER_UPLOAD_FILES: 5,
     MAX_SERVER_UPLOAD_TOTAL_SIZE: 20 * 1024 * 1024,
     SERVER_UPLOAD_CONCURRENCY: 2,
   },
   isFileTypeAllowed: mockIsFileTypeAllowed,
   isFileSizeAllowed: mockIsFileSizeAllowed,
-  getFileExtension: mockGetFileExtension,
   formatFileSize: mockFormatFileSize,
   normalizeContentType: jest.fn((contentType: string) => contentType),
 }));
@@ -123,8 +111,6 @@ jest.mock("@/lib/config/upload", () => ({
 describe("Upload Server Upload API", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    // Set default Date.now for consistent timestamps
-    jest.spyOn(Date, "now").mockReturnValue(1640995200000); // 2022-01-01
     mockCheckUploadRateLimit.mockReturnValue({
       allowed: true,
       limit: 30,
@@ -133,9 +119,18 @@ describe("Upload Server Upload API", () => {
       retryAfter: 0,
     });
     mockFormatFileSize.mockImplementation((size: number) => `${size} bytes`);
-    mockDeleteFile.mockResolvedValue({ success: true });
-    mockInsertValues.mockResolvedValue(undefined);
-    mockDb.insert.mockReturnValue({ values: mockInsertValues });
+    mockCreateUploadIntent.mockResolvedValue({
+      id: "11111111-1111-4111-8111-111111111111",
+      fileKey: "uploads/user-123/test-intent.jpg",
+    });
+    mockCompleteUploadIntent.mockResolvedValue({
+      fileKey: "uploads/user-123/test-intent.jpg",
+      url: "https://cdn.example.com/uploads/user-123/test-intent.jpg",
+      fileName: "test.jpg",
+      fileSize: 1024,
+      contentType: "image/jpeg",
+    });
+    mockReleaseUploadIntent.mockResolvedValue(undefined);
   });
 
   afterEach(() => {
@@ -351,7 +346,6 @@ describe("Upload Server Upload API", () => {
       mockGetSession.mockResolvedValue(mockSession);
       mockIsFileTypeAllowed.mockReturnValue(true);
       mockIsFileSizeAllowed.mockReturnValue(true);
-      mockGetFileExtension.mockReturnValue("jpg");
       mockUpload.done.mockResolvedValue({});
 
       const file = createMockFile("test.jpg", "image/jpeg", 1024);
@@ -376,8 +370,8 @@ describe("Upload Server Upload API", () => {
       expect(data.results).toHaveLength(1);
       expect(data.results[0]).toEqual({
         fileName: "test.jpg",
-        url: "https://cdn.example.com/uploads/user-123/1640995200000-test-uuid-123.jpg",
-        key: "uploads/user-123/1640995200000-test-uuid-123.jpg",
+        url: "https://cdn.example.com/uploads/user-123/test-intent.jpg",
+        key: "uploads/user-123/test-intent.jpg",
         size: 1024,
         contentType: "image/jpeg",
         success: true,
@@ -448,7 +442,6 @@ describe("Upload Server Upload API", () => {
       mockGetSession.mockResolvedValue(mockSession);
       mockIsFileTypeAllowed.mockReturnValue(true);
       mockIsFileSizeAllowed.mockReturnValue(true);
-      mockGetFileExtension.mockReturnValue("jpg");
       mockUpload.done.mockRejectedValue(new Error("S3 upload failed"));
 
       const file = createMockFile("test.jpg", "image/jpeg", 1024);
@@ -471,16 +464,43 @@ describe("Upload Server Upload API", () => {
         success: false,
         error: "Upload failed. Please try again.",
       });
-      expect(mockDeleteFile).not.toHaveBeenCalled();
+      expect(mockReleaseUploadIntent).not.toHaveBeenCalled();
     });
 
-    it("should handle database insert failure", async () => {
+    it("should release the reservation when storage upload never starts", async () => {
       mockGetSession.mockResolvedValue(mockSession);
       mockIsFileTypeAllowed.mockReturnValue(true);
       mockIsFileSizeAllowed.mockReturnValue(true);
-      mockGetFileExtension.mockReturnValue("jpg");
+
+      const file = createMockFile("test.jpg", "image/jpeg", 1024);
+      (file.stream as jest.Mock).mockImplementation(() => {
+        throw new Error("stream unavailable");
+      });
+      const mockFormData = {
+        getAll: jest.fn(() => [file]),
+      };
+
+      const { POST } = await import("./route");
+      const request = createMockRequest(
+        "multipart/form-data",
+        mockFormData as unknown as FormData,
+      );
+      const response = await POST(request);
+
+      expect(response.status).toBe(200);
+      expect(mockUpload.done).not.toHaveBeenCalled();
+      expect(mockReleaseUploadIntent).toHaveBeenCalledWith(
+        "11111111-1111-4111-8111-111111111111",
+        "user-123",
+      );
+    });
+
+    it("should defer cleanup when upload finalization has an uncertain result", async () => {
+      mockGetSession.mockResolvedValue(mockSession);
+      mockIsFileTypeAllowed.mockReturnValue(true);
+      mockIsFileSizeAllowed.mockReturnValue(true);
       mockUpload.done.mockResolvedValue({});
-      mockInsertValues.mockRejectedValue(new Error("Database error"));
+      mockCompleteUploadIntent.mockRejectedValue(new Error("Database error"));
 
       const file = createMockFile("test.jpg", "image/jpeg", 1024);
       const mockFormData = {
@@ -502,20 +522,12 @@ describe("Upload Server Upload API", () => {
         success: false,
         error: "Upload failed. Please try again.",
       });
-      expect(mockDeleteFile).toHaveBeenCalledWith(
-        "uploads/user-123/1640995200000-test-uuid-123.jpg",
-      );
+      expect(mockReleaseUploadIntent).not.toHaveBeenCalled();
     });
 
     it("should handle multiple files with mixed results", async () => {
       mockGetSession.mockResolvedValue(mockSession);
-      mockGetFileExtension.mockReturnValue("jpg");
       mockUpload.done.mockResolvedValue({});
-
-      // Ensure database insert succeeds for successful uploads
-      mockDb.insert.mockReturnValue({
-        values: jest.fn().mockResolvedValue(undefined) as any,
-      });
 
       const file1 = createMockFile("success.jpg", "image/jpeg", 1024);
       const file2 = createMockFile(

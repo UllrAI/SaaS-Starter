@@ -11,10 +11,8 @@ import {
   UPLOAD_CONFIG,
   isFileTypeAllowed,
   isFileSizeAllowed,
-  getFileExtension,
   normalizeContentType,
 } from "./config/upload";
-import { randomUUID } from "crypto";
 
 // Initialize S3 client for Cloudflare R2
 const r2Client = new S3Client({
@@ -30,8 +28,7 @@ const r2Client = new S3Client({
 export { r2Client };
 
 interface CreatePresignedUrlParams {
-  userId: string;
-  fileName: string;
+  key: string;
   contentType: string;
   size: number;
 }
@@ -48,7 +45,7 @@ interface CreatePresignedUrlResult {
  * Create a presigned URL for direct client upload to R2
  */
 export async function createPresignedUrl({
-  userId,
+  key,
   contentType,
   size,
 }: CreatePresignedUrlParams): Promise<CreatePresignedUrlResult> {
@@ -69,18 +66,13 @@ export async function createPresignedUrl({
       };
     }
 
-    // Generate unique key for the file (without original filename for security)
-    const fileExtension = getFileExtension(contentType);
-    const timestamp = Date.now();
-    const uuid = randomUUID();
-    const key = `uploads/${userId}/${timestamp}-${uuid}.${fileExtension}`;
-
     // Create presigned URL for PUT operation
     const command = new PutObjectCommand({
       Bucket: env.R2_BUCKET_NAME,
       Key: key,
       ContentType: contentType,
       ContentLength: size,
+      IfNoneMatch: "*",
     });
 
     const presignedUrl = await getSignedUrl(r2Client, command, {

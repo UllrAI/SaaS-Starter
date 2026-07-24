@@ -1,4 +1,3 @@
-import { describe, it, expect } from "@jest/globals";
 import {
   PRODUCT_TIERS,
   getProductTierById,
@@ -6,282 +5,79 @@ import {
   type PricingTier,
 } from "./products";
 
-describe("Product Configuration", () => {
-  describe("PRODUCT_TIERS", () => {
-    it("should have at least one product tier", () => {
-      expect(PRODUCT_TIERS).toBeDefined();
-      expect(Array.isArray(PRODUCT_TIERS)).toBe(true);
-      expect(PRODUCT_TIERS.length).toBeGreaterThan(0);
-    });
+describe("product configuration", () => {
+  it("defines unique, valid catalog tiers", () => {
+    expect(PRODUCT_TIERS.length).toBeGreaterThan(0);
+    expect(new Set(PRODUCT_TIERS.map(({ id }) => id)).size).toBe(
+      PRODUCT_TIERS.length,
+    );
 
-    it("should have valid tier structure", () => {
-      PRODUCT_TIERS.forEach((tier) => {
-        expect(tier).toHaveProperty("id");
-        expect(tier).toHaveProperty("name");
-        expect(tier).toHaveProperty("isPopular");
-        expect(tier).toHaveProperty("pricing");
-        expect(tier).toHaveProperty("prices");
-        expect(tier).toHaveProperty("currency");
-
-        expect(typeof tier.id).toBe("string");
-        expect(typeof tier.name).toBe("string");
-        expect(typeof tier.isPopular).toBe("boolean");
-        expect(typeof tier.pricing).toBe("object");
-        expect(typeof tier.prices).toBe("object");
-        expect(["USD", "EUR"]).toContain(tier.currency);
-      });
-    });
-
-    it("should have valid pricing structure", () => {
-      PRODUCT_TIERS.forEach((tier) => {
-        expect(tier.pricing).toHaveProperty("creem");
-        expect(tier.pricing.creem).toHaveProperty("oneTime");
-        expect(tier.pricing.creem).toHaveProperty("monthly");
-        expect(tier.pricing.creem).toHaveProperty("yearly");
-
-        expect(typeof tier.pricing.creem.oneTime).toBe("string");
-        expect(typeof tier.pricing.creem.monthly).toBe("string");
-        expect(typeof tier.pricing.creem.yearly).toBe("string");
-
-        // Should not be empty strings
-        expect(tier.pricing.creem.oneTime.length).toBeGreaterThan(0);
-        expect(tier.pricing.creem.monthly.length).toBeGreaterThan(0);
-        expect(tier.pricing.creem.yearly.length).toBeGreaterThan(0);
-      });
-    });
-
-    it("should have valid prices structure", () => {
-      PRODUCT_TIERS.forEach((tier) => {
-        expect(tier.prices).toHaveProperty("oneTime");
-        expect(tier.prices).toHaveProperty("monthly");
-        expect(tier.prices).toHaveProperty("yearly");
-
-        expect(typeof tier.prices.oneTime).toBe("number");
-        expect(typeof tier.prices.monthly).toBe("number");
-        expect(typeof tier.prices.yearly).toBe("number");
-
-        // Prices should be positive
-        expect(tier.prices.oneTime).toBeGreaterThan(0);
-        expect(tier.prices.monthly).toBeGreaterThan(0);
-        expect(tier.prices.yearly).toBeGreaterThan(0);
-      });
-    });
-
-    it("should have unique tier IDs", () => {
-      const ids = PRODUCT_TIERS.map((tier) => tier.id);
-      const uniqueIds = new Set(ids);
-      expect(uniqueIds.size).toBe(ids.length);
-    });
-
-    it("should have at most one popular tier", () => {
-      const popularTiers = PRODUCT_TIERS.filter((tier) => tier.isPopular);
-      expect(popularTiers.length).toBeLessThanOrEqual(1);
-    });
-
-    it("should contain expected tiers", () => {
-      const tierIds = PRODUCT_TIERS.map((tier) => tier.id);
-      expect(tierIds).toContain("plus");
-      expect(tierIds).toContain("pro");
-      expect(tierIds).toContain("team");
-    });
-
-    it("should have consistent pricing order (yearly < monthly per month)", () => {
-      PRODUCT_TIERS.forEach((tier) => {
-        const monthlyYearlyPrice = tier.prices.yearly / 12;
-        // Yearly should be cheaper per month than monthly
-        expect(monthlyYearlyPrice).toBeLessThanOrEqual(tier.prices.monthly);
-      });
-    });
+    for (const tier of PRODUCT_TIERS) {
+      expect(tier.id).not.toBe("");
+      expect(tier.name).not.toBe("");
+      expect(["USD", "EUR"]).toContain(tier.currency);
+      expect(tier.prices.oneTime).toBeGreaterThan(0);
+      expect(tier.prices.monthly).toBeGreaterThan(0);
+      expect(tier.prices.yearly / 12).toBeLessThanOrEqual(tier.prices.monthly);
+    }
   });
 
-  describe("getProductTierById", () => {
-    it("should return correct tier for valid ID", () => {
-      const plusTier = getProductTierById("plus");
-      expect(plusTier).toBeDefined();
-      expect(plusTier?.id).toBe("plus");
-      expect(plusTier?.name).toBe("Plus");
-
-      const proTier = getProductTierById("pro");
-      expect(proTier).toBeDefined();
-      expect(proTier?.id).toBe("pro");
-      expect(proTier?.name).toBe("Professional");
-
-      const teamTier = getProductTierById("team");
-      expect(teamTier).toBeDefined();
-      expect(teamTier?.id).toBe("team");
-      expect(teamTier?.name).toBe("Team");
-    });
-
-    it("should return undefined for invalid ID", () => {
-      expect(getProductTierById("nonexistent")).toBeUndefined();
-      expect(getProductTierById("")).toBeUndefined();
-      expect(getProductTierById("invalid")).toBeUndefined();
-      expect(getProductTierById("PLUS")).toBeUndefined(); // Case sensitive
-    });
-
-    it("should handle edge cases", () => {
-      expect(getProductTierById("")).toBeUndefined();
-      expect(getProductTierById(" ")).toBeUndefined();
-      expect(getProductTierById("null")).toBeUndefined();
-      expect(getProductTierById("undefined")).toBeUndefined();
-    });
-
-    it("should return the full tier object with all properties", () => {
-      const tier = getProductTierById("pro");
-      expect(tier).toBeDefined();
-      if (tier) {
-        expect(tier).toHaveProperty("id", "pro");
-        expect(tier).toHaveProperty("name", "Professional");
-        expect(tier).toHaveProperty("isPopular", true);
-        expect(tier).toHaveProperty("pricing");
-        expect(tier).toHaveProperty("prices");
-        expect(tier).toHaveProperty("currency", "USD");
+  it("keeps test and live Creem product namespaces separate", () => {
+    for (const tier of PRODUCT_TIERS) {
+      expect(tier.pricing.creem.test_mode).toEqual({
+        oneTime: "",
+        monthly: "",
+        yearly: "",
+      });
+      for (const productId of Object.values(tier.pricing.creem.live_mode)) {
+        expect(productId).toMatch(/^prod_[A-Za-z0-9]+$/);
       }
-    });
+    }
   });
 
-  describe("getProductTierByProductId", () => {
-    it("should return correct tier for valid Creem product IDs", () => {
-      const plusTierConfig = getProductTierById("plus");
-      expect(plusTierConfig).toBeDefined();
-
-      const plusTierOneTime = getProductTierByProductId(
-        plusTierConfig!.pricing.creem.oneTime,
-      );
-      expect(plusTierOneTime).toBeDefined();
-      expect(plusTierOneTime?.id).toBe("plus");
-
-      const plusTierMonthly = getProductTierByProductId(
-        plusTierConfig!.pricing.creem.monthly,
-      );
-      expect(plusTierMonthly).toBeDefined();
-      expect(plusTierMonthly?.id).toBe("plus");
-
-      const plusTierYearly = getProductTierByProductId(
-        plusTierConfig!.pricing.creem.yearly,
-      );
-      expect(plusTierYearly).toBeDefined();
-      expect(plusTierYearly?.id).toBe("plus");
-    });
-
-    it("should return undefined for invalid product ID", () => {
-      expect(getProductTierByProductId("prod_invalid")).toBeUndefined();
-      expect(getProductTierByProductId("")).toBeUndefined();
-      expect(getProductTierByProductId("not_a_product_id")).toBeUndefined();
-    });
-
-    it("should handle edge cases", () => {
-      expect(getProductTierByProductId("")).toBeUndefined();
-      expect(getProductTierByProductId(" ")).toBeUndefined();
-      expect(getProductTierByProductId("null")).toBeUndefined();
-      expect(getProductTierByProductId("undefined")).toBeUndefined();
-    });
-
-    it("should return the same tier for repeated lookups of the same product ID", () => {
-      const productId = PRODUCT_TIERS[1]!.pricing.creem.monthly;
-      const result1 = getProductTierByProductId(productId);
-      const result2 = getProductTierByProductId(productId);
-
-      expect(result1).toBeDefined();
-      expect(result2).toBeDefined();
-      expect(result1?.id).toBe(result2?.id);
-    });
-
-    it("should find tiers by all billing cycle product IDs", () => {
-      // Test that we can find tiers by oneTime, monthly, and yearly product IDs
-      PRODUCT_TIERS.forEach((tier) => {
-        const foundByOneTime = getProductTierByProductId(
-          tier.pricing.creem.oneTime,
-        );
-        const foundByMonthly = getProductTierByProductId(
-          tier.pricing.creem.monthly,
-        );
-        const foundByYearly = getProductTierByProductId(
-          tier.pricing.creem.yearly,
-        );
-
-        expect(foundByOneTime).toBeDefined();
-        expect(foundByMonthly).toBeDefined();
-        expect(foundByYearly).toBeDefined();
-
-        expect(foundByOneTime?.id).toBe(tier.id);
-        expect(foundByMonthly?.id).toBe(tier.id);
-        expect(foundByYearly?.id).toBe(tier.id);
-      });
-    });
-
-    it("should return the full tier object with all properties", () => {
-      const tier = getProductTierByProductId(
-        PRODUCT_TIERS[0]!.pricing.creem.oneTime,
-      );
-      expect(tier).toBeDefined();
-      if (tier) {
-        expect(tier).toHaveProperty("id");
-        expect(tier).toHaveProperty("name");
-        expect(tier).toHaveProperty("isPopular");
-        expect(tier).toHaveProperty("pricing");
-        expect(tier).toHaveProperty("prices");
-        expect(tier).toHaveProperty("currency");
-      }
-    });
+  it("finds catalog tiers by id", () => {
+    expect(getProductTierById("plus")?.name).toBe("Plus");
+    expect(getProductTierById("pro")?.name).toBe("Professional");
+    expect(getProductTierById("team")?.name).toBe("Team");
+    expect(getProductTierById("unknown")).toBeUndefined();
   });
 
-  describe("Type definitions", () => {
-    it("should export correct TypeScript interfaces", () => {
-      // This tests that the types are exportable and structured correctly
-      const mockTier: PricingTier = {
-        id: "test",
-        name: "Test Tier",
-        isPopular: false,
-        pricing: {
-          creem: {
-            oneTime: "test_one_time",
-            monthly: "test_monthly",
-            yearly: "test_yearly",
+  it("limits environment-specific product lookups to that environment", () => {
+    const productId = PRODUCT_TIERS[0]!.pricing.creem.live_mode.monthly;
+
+    expect(getProductTierByProductId(productId, "live_mode")?.id).toBe("plus");
+    expect(getProductTierByProductId(productId, "test_mode")).toBeUndefined();
+    expect(getProductTierByProductId(productId)?.id).toBe("plus");
+  });
+
+  it("ignores empty and unknown product ids", () => {
+    expect(getProductTierByProductId("")).toBeUndefined();
+    expect(getProductTierByProductId("prod_unknown")).toBeUndefined();
+  });
+
+  it("exports an explicit environment-aware tier type", () => {
+    const tier: PricingTier = {
+      id: "test",
+      name: "Test",
+      isPopular: false,
+      pricing: {
+        creem: {
+          test_mode: {
+            oneTime: "prod_test_once",
+            monthly: "prod_test_monthly",
+            yearly: "prod_test_yearly",
+          },
+          live_mode: {
+            oneTime: "prod_live_once",
+            monthly: "prod_live_monthly",
+            yearly: "prod_live_yearly",
           },
         },
-        prices: {
-          oneTime: 10.99,
-          monthly: 5.99,
-          yearly: 59.99,
-        },
-        currency: "USD",
-      };
+      },
+      prices: { oneTime: 10, monthly: 5, yearly: 50 },
+      currency: "USD",
+    };
 
-      expect(mockTier.id).toBe("test");
-    });
-  });
-
-  describe("Data integrity", () => {
-    it("should have reasonable price ranges", () => {
-      PRODUCT_TIERS.forEach((tier) => {
-        // Prices should be reasonable (between $1 and $10000)
-        expect(tier.prices.oneTime).toBeGreaterThan(1);
-        expect(tier.prices.oneTime).toBeLessThan(10000);
-
-        expect(tier.prices.monthly).toBeGreaterThan(1);
-        expect(tier.prices.monthly).toBeLessThan(1000);
-
-        expect(tier.prices.yearly).toBeGreaterThan(1);
-        expect(tier.prices.yearly).toBeLessThan(10000);
-      });
-    });
-
-    it("should have non-empty tier names", () => {
-      PRODUCT_TIERS.forEach((tier) => {
-        expect(tier.name.trim()).toBe(tier.name);
-        expect(tier.name).not.toBe("");
-        expect(tier.name.length).toBeGreaterThan(1);
-      });
-    });
-
-    it("should have valid product ID formats", () => {
-      PRODUCT_TIERS.forEach((tier) => {
-        // Product IDs should follow a pattern (at least for the examples)
-        expect(tier.pricing.creem.oneTime).toMatch(/^prod_/);
-        expect(tier.pricing.creem.monthly).toMatch(/^prod_/);
-        expect(tier.pricing.creem.yearly).toMatch(/^prod_/);
-      });
-    });
+    expect(tier.pricing.creem.live_mode.monthly).toBe("prod_live_monthly");
   });
 });

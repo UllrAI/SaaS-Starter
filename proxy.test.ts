@@ -175,6 +175,16 @@ describe("proxy", () => {
     expect(response.headers.get("cache-control")).toBe("private, no-store");
   });
 
+  it("redirects unsupported locale-prefixed marketing paths to English", async () => {
+    const request = new NextRequest("http://localhost/zh-TW/about");
+
+    const response = await proxy(request);
+
+    expect(response.status).toBe(308);
+    expect(response.headers.get("location")).toBe("http://localhost/about");
+    expect(response.cookies.get("locale")).toBeUndefined();
+  });
+
   it("does not select a locale explicitly excluded by q=0", async () => {
     const request = new NextRequest("http://localhost/about", {
       headers: {

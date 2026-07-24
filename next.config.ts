@@ -4,11 +4,6 @@ import { withContentCollections } from "@content-collections/next";
 import createNextIntlPlugin from "next-intl/plugin";
 import { getRemotePatterns } from "./next-images.config";
 
-(
-  globalThis as typeof globalThis & { AI_SDK_LOG_WARNINGS?: false }
-).AI_SDK_LOG_WARNINGS = false;
-process.env.DOTENV_CONFIG_QUIET = "true";
-
 const isDevelopment = process.env.NODE_ENV === "development";
 const contentSecurityPolicy = [
   "default-src 'self'",
@@ -17,12 +12,12 @@ const contentSecurityPolicy = [
   "img-src 'self' data: blob: https:",
   "font-src 'self' data:",
   "connect-src 'self' https: wss:",
-  "frame-src 'self' https:",
+  "frame-src 'none'",
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",
   "frame-ancestors 'none'",
-  "upgrade-insecure-requests",
+  ...(isDevelopment ? [] : ["upgrade-insecure-requests"]),
 ].join("; ");
 
 const securityHeaders = [

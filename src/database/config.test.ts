@@ -1,18 +1,34 @@
-import { beforeEach, describe, expect, it, jest } from "@jest/globals";
-
-jest.mock("@/env", () => ({
-  DATABASE_URL: "postgresql://test:password@localhost:5432/testdb",
-}));
+import {
+  afterAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  jest,
+} from "@jest/globals";
 
 const mockDefineConfig = jest.fn((config) => config);
 jest.mock("drizzle-kit", () => ({
-  defineConfig: mockDefineConfig,
+  defineConfig: (...args: unknown[]) => mockDefineConfig(...args),
 }));
 
 describe("database/config.ts", () => {
+  const originalDatabaseUrl = process.env.DATABASE_URL;
+
   beforeEach(() => {
+    process.env.DATABASE_URL =
+      "postgresql://test:password@localhost:5432/testdb";
     mockDefineConfig.mockClear();
     jest.resetModules();
+  });
+
+  afterAll(() => {
+    if (originalDatabaseUrl === undefined) {
+      delete process.env.DATABASE_URL;
+      return;
+    }
+
+    process.env.DATABASE_URL = originalDatabaseUrl;
   });
 
   it("exports a single migration configuration", () => {

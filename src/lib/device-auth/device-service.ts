@@ -17,6 +17,13 @@ import { createCliToken } from "./token-service";
 
 const SAFE_CHARS = "ABCDEFGHJKMNPQRTUVWXYZ2346789";
 
+export type PendingDeviceInfo = {
+  clientName: string | null;
+  clientVersion: string | null;
+  deviceOs: string | null;
+  deviceHostname: string | null;
+};
+
 function generateUserCode(): string {
   const bytes = randomBytes(8);
   let code = "";
@@ -41,7 +48,9 @@ export async function createDeviceCode(params: {
   verificationBaseUri: string;
 }): Promise<DeviceCodeResponse> {
   if (Math.random() < 0.1) {
-    cleanupExpiredCodes().catch(() => {});
+    cleanupExpiredCodes().catch((error) => {
+      console.error("Failed to clean expired device codes:", error);
+    });
   }
 
   const now = new Date();
@@ -131,6 +140,26 @@ export async function authorizeDeviceCode(
   }
 
   return { success: true };
+}
+
+export async function getPendingDeviceInfo(
+  userCode: string,
+): Promise<PendingDeviceInfo | null> {
+  const row = await db.query.deviceCodes.findFirst({
+    where: and(
+      eq(deviceCodes.userCode, userCode),
+      eq(deviceCodes.status, "pending"),
+      sql`${deviceCodes.expiresAt} > now()`,
+    ),
+    columns: {
+      clientName: true,
+      clientVersion: true,
+      deviceOs: true,
+      deviceHostname: true,
+    },
+  });
+
+  return row ?? null;
 }
 
 export async function pollDeviceCode(

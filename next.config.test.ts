@@ -126,10 +126,6 @@ describe("next.config.ts", () => {
       },
       {
         protocol: "https",
-        hostname: "unsplash.com",
-      },
-      {
-        protocol: "https",
         hostname: "valid-r2.example.com",
       },
     ]);
@@ -149,10 +145,6 @@ describe("next.config.ts", () => {
       {
         protocol: "https",
         hostname: "images.unsplash.com",
-      },
-      {
-        protocol: "https",
-        hostname: "unsplash.com",
       },
     ]);
   });

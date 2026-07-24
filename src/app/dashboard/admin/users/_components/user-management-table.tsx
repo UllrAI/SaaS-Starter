@@ -58,10 +58,20 @@ function RoleLabel({ role }: { role: UserRole }) {
   }
 }
 function EmailStatusLabel({ verified }: { verified: boolean | null }) {
-  return verified ? <>Verified</> : <>Unverified</>;
+  const { t } = useTranslation();
+  return verified ? (
+    <>{t("admin_user_email_verified", "Verified")}</>
+  ) : (
+    <>{t("admin_user_email_unverified", "Unverified")}</>
+  );
 }
 function AccessStatusLabel({ banned }: { banned: boolean }) {
-  return banned ? <>Disabled</> : <>Active</>;
+  const { t } = useTranslation();
+  return banned ? (
+    <>{t("admin_user_access_disabled", "Disabled")}</>
+  ) : (
+    <>{t("admin_user_access_active", "Active")}</>
+  );
 }
 export function UserManagementTable({
   initialData,
@@ -74,7 +84,6 @@ export function UserManagementTable({
     null,
   );
 
-  // FIX: Wrap queryAction with useCallback to stabilize its reference
   const queryUsers = useCallback(
     async ({
       page,
@@ -126,11 +135,16 @@ export function UserManagementTable({
         role: editingUser.role as UserRole,
       });
       if (result.data) {
-        toast.success(result.data.message);
+        toast.success(t("admin_user_update_success", "User details updated."));
         setEditingUser(null);
         refresh();
       } else if (result.serverError || result.validationErrors) {
-        toast.error(result.serverError || <>Validation failed.</>);
+        toast.error(
+          t(
+            "admin_user_update_error",
+            "Could not save the user changes. Please try again.",
+          ),
+        );
       }
     });
   };
@@ -144,15 +158,22 @@ export function UserManagementTable({
       if (result.data) {
         toast.success(
           result.data.disabled ? (
-            <>User disabled and signed out successfully.</>
+            <>
+              {t("admin_user_disable_success", "User disabled and signed out.")}
+            </>
           ) : (
-            <>User re-enabled successfully.</>
+            <>{t("admin_user_enable_success", "User access restored.")}</>
           ),
         );
         setEditingUser(null);
         refresh();
       } else if (result.serverError || result.validationErrors) {
-        toast.error(result.serverError || <>Validation failed.</>);
+        toast.error(
+          t(
+            "admin_user_access_update_error",
+            "Could not update user access. Please try again.",
+          ),
+        );
       }
     });
   };

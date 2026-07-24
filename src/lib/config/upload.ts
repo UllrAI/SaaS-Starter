@@ -69,7 +69,7 @@ const MIME_TYPE_TO_EXTENSION = {
   "application/x-7z-compressed": "7z",
 } as const;
 
-export const BLOCKED_ACTIVE_CONTENT_TYPES = [
+const BLOCKED_ACTIVE_CONTENT_TYPES = [
   "image/svg+xml",
   "text/html",
   "text/css",
@@ -138,10 +138,21 @@ export const UPLOAD_CONFIG = {
   PRESIGNED_URL_EXPIRATION: 15 * 60,
 
   /**
-   * Upload intent lifetime. The 24-hour window safely covers a PUT that starts
-   * immediately before its signed URL expires and continues in flight.
+   * Upload intent lifetime. This allows a signed PUT to finish without keeping
+   * abandoned reservations for an entire day.
    */
-  UPLOAD_INTENT_EXPIRATION: 24 * 60 * 60,
+  UPLOAD_INTENT_EXPIRATION: 60 * 60,
+
+  /**
+   * Retention after the first orphan deletion check. A second deletion after
+   * this window catches a PUT that started before its signed URL expired.
+   */
+  UPLOAD_TOMBSTONE_RECHECK_DELAY: 24 * 60 * 60,
+
+  /**
+   * Delay before retrying an R2 deletion that failed.
+   */
+  UPLOAD_CLEANUP_RETRY_DELAY: 5 * 60,
 
   /**
    * Maximum JSON request size for upload coordination endpoints.
@@ -234,6 +245,10 @@ export function getFileExtension(contentType: string): string {
 
   return "bin"; // Default fallback
 }
+
+export const uploadCancelRequestSchema = z.object({
+  intentId: z.uuid(),
+});
 
 export const presignedUrlRequestSchema = z.object({
   protocolVersion: z.literal(2),

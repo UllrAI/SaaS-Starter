@@ -25,34 +25,25 @@ jest.mock("@/components/auth/link-sent-card", () => ({
   LinkSentCard: (props: React.ComponentProps<any>) => mockLinkSentCard(props),
 }));
 
+jest.mock("next/headers", () => ({
+  headers: async () => new Headers({ "x-user-locale": "en" }),
+  cookies: async () => ({ get: () => undefined }),
+}));
+
 describe("MagicLinkSent page", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.resetModules();
   });
 
-  it("passes the provided email address to the description", async () => {
+  it("uses generic copy without exposing an email address in the URL", async () => {
     const pageModule = await import("./page");
-    const element = await pageModule.default({
-      searchParams: Promise.resolve({ email: "test@example.com" }),
-    });
+    const element = await pageModule.default();
     render(element);
 
     const card = screen.getByTestId("link-sent-card");
     expect(card).toHaveAttribute("data-title", "Check your email");
     expect(card).toHaveAttribute("data-retry-href", "/login");
-    expect(card.textContent).toContain("test@example.com");
-    expect(card.textContent).not.toContain("your email address");
-  });
-
-  it("falls back to generic copy when email is missing", async () => {
-    const pageModule = await import("./page");
-    const element = await pageModule.default({
-      searchParams: Promise.resolve({}),
-    });
-    render(element);
-
-    const card = screen.getByTestId("link-sent-card");
     expect(card.textContent).toContain("your email address");
   });
 });

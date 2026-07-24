@@ -36,6 +36,11 @@ const SUPPORTED_LOCALE_LOOKUP = new Map(
   SUPPORTED_LOCALES.map((locale) => [locale.toLowerCase(), locale]),
 );
 
+const UNSUPPORTED_TRADITIONAL_CHINESE_LOCALES =
+  /^(?:zh-hant|zh-(?:tw|hk|mo))(?:-|$)/;
+const LOCALE_SEGMENT_PATTERN =
+  /^[a-z]{2,3}(?:[-_](?:[a-z]{2}|[a-z]{4}|\d{3}))*$/i;
+
 function normalizePathname(pathname: string): string {
   if (!pathname || pathname === "/") {
     return "/";
@@ -105,6 +110,9 @@ export function normalizeLocaleCandidate(
   if (!normalized) {
     return null;
   }
+  if (UNSUPPORTED_TRADITIONAL_CHINESE_LOCALES.test(normalized)) {
+    return null;
+  }
 
   const exact = SUPPORTED_LOCALE_LOOKUP.get(normalized);
   if (exact) {
@@ -125,6 +133,22 @@ export function normalizeLocaleCandidate(
   }
 
   return null;
+}
+
+export function getEnglishFallbackPathForUnsupportedLocale(
+  pathname: string,
+): string | null {
+  const segment = getFirstPathSegment(pathname);
+  if (
+    !segment ||
+    !LOCALE_SEGMENT_PATTERN.test(segment) ||
+    normalizeLocaleCandidate(segment)
+  ) {
+    return null;
+  }
+
+  const strippedPathname = stripFirstPathSegment(pathname);
+  return isMarketingPath(strippedPathname) ? strippedPathname : null;
 }
 
 export function resolveLocaleFromAcceptLanguage(

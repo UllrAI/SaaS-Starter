@@ -110,6 +110,7 @@ describe("Billing Index", () => {
       const { billing } = await import("./index");
 
       const mockOptions = {
+        requestId: "request-123",
         userId: "user123",
         userEmail: "test@example.com",
         userName: "Test User",
@@ -191,6 +192,7 @@ describe("Billing Index", () => {
       const { billing } = await import("./index");
 
       const mockOptions = {
+        requestId: "request-123",
         userId: "user123",
         userEmail: "test@example.com",
         tierId: "tier123",
@@ -287,6 +289,7 @@ describe("Billing Index", () => {
       const { billing } = await import("./index");
 
       const subscriptionOptions = {
+        requestId: "subscription-request",
         userId: "user123",
         userEmail: "test@example.com",
         tierId: "tier123",
@@ -295,6 +298,7 @@ describe("Billing Index", () => {
       };
 
       const oneTimeOptions = {
+        requestId: "one-time-request",
         userId: "user123",
         userEmail: "test@example.com",
         tierId: "tier123",
@@ -326,6 +330,7 @@ describe("Billing Index", () => {
       const { billing } = await import("./index");
 
       const monthlyOptions = {
+        requestId: "monthly-request",
         userId: "user123",
         userEmail: "test@example.com",
         tierId: "tier123",
@@ -335,6 +340,7 @@ describe("Billing Index", () => {
       };
 
       const yearlyOptions = {
+        requestId: "yearly-request",
         userId: "user123",
         userEmail: "test@example.com",
         tierId: "tier123",

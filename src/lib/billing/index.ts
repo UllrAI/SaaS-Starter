@@ -1,11 +1,9 @@
 import { PAYMENT_PROVIDER } from "@/lib/config/constants";
 import type { PaymentProvider } from "./provider";
 import creemProvider from "./creem/provider";
-// import stripeProvider from "./stripe/provider"; // Example: add later.
 
 const BILLING_PROVIDERS: Record<string, PaymentProvider> = {
   creem: creemProvider,
-  // stripe: stripeProvider,
 };
 
 const billingProvider = BILLING_PROVIDERS[PAYMENT_PROVIDER];

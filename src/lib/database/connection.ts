@@ -1,5 +1,25 @@
 import env from "@/env";
 
+const utcTimestamp = {
+  to: 1114,
+  from: [1114],
+  serialize: (value: Date | string) =>
+    (value instanceof Date ? value : new Date(value))
+      .toISOString()
+      .replace("T", " ")
+      .replace("Z", ""),
+  parse: (value: string) => new Date(`${value.replace(" ", "T")}Z`),
+};
+
+const utcConnectionOptions = {
+  connection: {
+    TimeZone: "UTC",
+  },
+  types: {
+    utcTimestamp,
+  },
+};
+
 /**
  * Detects if the application is running in a serverless environment
  */
@@ -8,7 +28,6 @@ function isServerlessEnvironment(): boolean {
     process.env.VERCEL ||
     process.env.AWS_LAMBDA_FUNCTION_NAME ||
     process.env.NETLIFY ||
-    process.env.RAILWAY_ENVIRONMENT ||
     process.env.FUNCTIONS_EMULATOR || // Google Cloud Functions
     process.env.AZURE_FUNCTIONS_ENVIRONMENT, // Azure Functions
   );
@@ -23,6 +42,8 @@ export function getConnectionConfig() {
   if (isServerless) {
     // Serverless environment configuration
     return {
+      ...utcConnectionOptions,
+
       // Maximum connections per instance (keep low for serverless)
       max: 1,
 
@@ -32,8 +53,8 @@ export function getConnectionConfig() {
       // Maximum connection lifetime (30 minutes)
       max_lifetime: 60 * 30,
 
-      // Connection timeout (30 seconds)
-      connect_timeout: 30,
+      // Match the readiness deadline so failed connects cannot accumulate.
+      connect_timeout: 4,
 
       // Enable prepared statements for performance
       prepare: true,
@@ -45,6 +66,8 @@ export function getConnectionConfig() {
 
   // Traditional server environment configuration
   return {
+    ...utcConnectionOptions,
+
     // Higher connection pool for traditional servers
     max: env.DB_POOL_SIZE,
 
@@ -59,12 +82,6 @@ export function getConnectionConfig() {
 
     // Enable prepared statements
     prepare: true,
-
-    // Transform settings (removed due to compatibility issues)
-    // transform: {
-    //   column: postgres.toCamel,
-    //   value: postgres.fromCamel,
-    // },
 
     // Debug mode for development
     debug: process.env.NODE_ENV === "development",
@@ -97,10 +114,6 @@ export function validateDatabaseConfig(): void {
   const envType = getEnvironmentType();
 
   console.log(`Database configuration loaded for ${envType} environment.`);
-  // console.log(`- Max connections: ${config.max}`);
-  // console.log(`- Idle timeout: ${config.idle_timeout}s`);
-  // console.log(`- Max lifetime: ${config.max_lifetime}s`);
-  // console.log(`- Connect timeout: ${config.connect_timeout}s`);
 
   // Warn about potential issues
   if (envType === "serverless" && config.max && config.max > 2) {

@@ -109,11 +109,18 @@ export function UploadManagementTable({
         uploadId: uploadToDelete.id,
       });
       if (result.data) {
-        toast.success(result.data.message);
+        toast.success(
+          t("upload_delete_success", "The upload has been deleted."),
+        );
         setUploadToDelete(null);
         refresh();
       } else if (result.serverError) {
-        toast.error(result.serverError);
+        toast.error(
+          t(
+            "upload_delete_error",
+            "We couldn't delete the upload. Please try again.",
+          ),
+        );
       }
     });
   };
@@ -124,12 +131,22 @@ export function UploadManagementTable({
         uploadIds: Array.from(selectedUploads),
       });
       if (result.data) {
-        toast.success(result.data.message);
+        toast.success(
+          t(
+            "upload_batch_delete_success",
+            "The selected uploads were deleted.",
+          ),
+        );
         setSelectedUploads(new Set());
         setIsBatchDeleteConfirmOpen(false);
         refresh();
       } else if (result.serverError) {
-        toast.error(result.serverError);
+        toast.error(
+          t(
+            "upload_batch_delete_error",
+            "We couldn't delete the selected uploads. Please try again.",
+          ),
+        );
       }
     });
   };
@@ -211,6 +228,9 @@ export function UploadManagementTable({
           <Button
             variant="ghost"
             size="icon"
+            aria-label={t("upload_action_view", "View {fileName}", {
+              fileName: upload.fileName,
+            })}
             onClick={() => {
               setSelectedUpload(upload);
               setIsViewDialogOpen(true);
@@ -219,13 +239,23 @@ export function UploadManagementTable({
             <Eye className="h-4 w-4" />
           </Button>
           <Button variant="ghost" size="icon" asChild>
-            <a href={upload.url} target="_blank" rel="noopener noreferrer">
+            <a
+              href={upload.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={t("upload_action_open", "Open {fileName}", {
+                fileName: upload.fileName,
+              })}
+            >
               <ExternalLink className="h-4 w-4" />
             </a>
           </Button>
           <Button
             variant="ghost"
             size="icon"
+            aria-label={t("upload_action_delete", "Delete {fileName}", {
+              fileName: upload.fileName,
+            })}
             onClick={() => setUploadToDelete(upload)}
             disabled={isPending}
           >

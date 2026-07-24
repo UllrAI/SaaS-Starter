@@ -10,8 +10,8 @@ import {
 } from "@/lib/admin/stats";
 import { getRequestLocale } from "@/lib/i18n/server-locale";
 export async function generateMetadata() {
-  const { t } = await getServerTranslations();
-  const metadata = createMetadataDefaults();
+  const { locale, t } = await getServerTranslations();
+  const metadata = createMetadataDefaults({ locale });
   return {
     ...metadata,
     title: t("37d73939b141", "Admin Dashboard"),

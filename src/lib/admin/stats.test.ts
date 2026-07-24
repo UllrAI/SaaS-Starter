@@ -22,6 +22,7 @@ const mockDesc = jest.fn();
 const mockEq = jest.fn();
 const mockInArray = jest.fn();
 const mockGte = jest.fn();
+const mockAnd = jest.fn();
 const mockSql = jest.fn();
 
 // Mock database tables
@@ -38,6 +39,7 @@ const mockSubscriptions = {
 const mockPayments = {
   amount: "payments.amount",
   status: "payments.status",
+  currency: "payments.currency",
   createdAt: "payments.created_at",
 };
 
@@ -74,6 +76,7 @@ jest.mock("drizzle-orm", () => ({
   eq: mockEq,
   inArray: mockInArray,
   gte: mockGte,
+  and: mockAnd,
   sql: mockSql,
 }));
 
@@ -104,6 +107,7 @@ describe("Admin Stats", () => {
     mockEq.mockReturnValue("column = value");
     mockInArray.mockReturnValue("column IN (values)");
     mockGte.mockReturnValue("column >= value");
+    mockAnd.mockReturnValue("condition AND condition");
     mockSql.mockReturnValue("formatted_date");
     mockFormatFileSize.mockImplementation((size) => `${size} B`);
 
@@ -267,7 +271,9 @@ describe("Admin Stats", () => {
         from: jest.fn().mockResolvedValue([{ value: 342 }]),
       };
       const mockPayRevenue = {
-        from: jest.fn().mockResolvedValue([{ value: "125000" }]),
+        from: jest.fn().mockReturnValue({
+          where: jest.fn().mockResolvedValue([{ value: "125000" }]),
+        }),
       };
       const mockPaySuccessful = {
         from: jest.fn().mockReturnValue({
@@ -292,6 +298,7 @@ describe("Admin Stats", () => {
 
       expect(mockSum).toHaveBeenCalledWith(mockPayments.amount);
       expect(mockEq).toHaveBeenCalledWith(mockPayments.status, "succeeded");
+      expect(mockEq).toHaveBeenCalledWith(mockPayments.currency, "usd");
     });
 
     it("should handle null revenue values", async () => {
@@ -299,7 +306,9 @@ describe("Admin Stats", () => {
         from: jest.fn().mockResolvedValue([{ value: 10 }]),
       };
       const mockPayRevenue = {
-        from: jest.fn().mockResolvedValue([{ value: null }]),
+        from: jest.fn().mockReturnValue({
+          where: jest.fn().mockResolvedValue([{ value: null }]),
+        }),
       };
       const mockPaySuccessful = {
         from: jest.fn().mockReturnValue({
@@ -427,7 +436,11 @@ describe("Admin Stats", () => {
           }),
         }, // sub canceled
         { from: jest.fn().mockResolvedValue([{ value: 200 }]) }, // pay total
-        { from: jest.fn().mockResolvedValue([{ value: "50000" }]) }, // pay revenue
+        {
+          from: jest.fn().mockReturnValue({
+            where: jest.fn().mockResolvedValue([{ value: "50000" }]),
+          }),
+        }, // pay revenue
         {
           from: jest.fn().mockReturnValue({
             where: jest.fn().mockResolvedValue([{ value: 180 }]),
@@ -500,7 +513,11 @@ describe("Admin Stats", () => {
           }),
         }, // sub canceled
         { from: jest.fn().mockResolvedValue([{ value: 200 }]) }, // pay total
-        { from: jest.fn().mockResolvedValue([{ value: "50000" }]) }, // pay revenue
+        {
+          from: jest.fn().mockReturnValue({
+            where: jest.fn().mockResolvedValue([{ value: "50000" }]),
+          }),
+        }, // settled USD revenue
         {
           from: jest.fn().mockReturnValue({
             where: jest.fn().mockResolvedValue([{ value: 180 }]),
@@ -575,7 +592,11 @@ describe("Admin Stats", () => {
           }),
         },
         { from: jest.fn().mockResolvedValue([{ value: 200 }]) },
-        { from: jest.fn().mockResolvedValue([{ value: "50000" }]) },
+        {
+          from: jest.fn().mockReturnValue({
+            where: jest.fn().mockResolvedValue([{ value: "50000" }]),
+          }),
+        },
         {
           from: jest.fn().mockReturnValue({
             where: jest.fn().mockResolvedValue([{ value: 180 }]),

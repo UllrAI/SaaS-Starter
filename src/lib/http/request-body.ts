@@ -48,6 +48,15 @@ export async function readJsonBodyWithLimit(
   request: Request,
   maxBytes: number,
 ): Promise<unknown> {
+  if (!request.body) {
+    const body = await request.json();
+    const serialized = JSON.stringify(body);
+    if (new TextEncoder().encode(serialized).byteLength > maxBytes) {
+      throw new RequestBodyTooLargeError();
+    }
+    return body;
+  }
+
   const body = await readTextBodyWithLimit(request, maxBytes);
   return JSON.parse(body);
 }

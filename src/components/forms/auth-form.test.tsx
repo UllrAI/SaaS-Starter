@@ -200,9 +200,7 @@ describe("AuthForm", () => {
           callbackURL: "/dashboard",
           errorCallbackURL: "/login?callbackUrl=%2Fdashboard",
         });
-        expect(mockPush).toHaveBeenCalledWith(
-          "/auth/sent?email=test%40example.com",
-        );
+        expect(mockPush).toHaveBeenCalledWith("/auth/sent");
       });
     });
 

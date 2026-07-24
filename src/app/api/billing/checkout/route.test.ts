@@ -24,6 +24,7 @@ const mockCreateCheckoutSession = jest.fn();
 const mockCreateCustomerPortalUrl = jest.fn();
 const mockGetUserSubscription = jest.fn();
 const mockHasUserProductEntitlement = jest.fn();
+const mockCheckRateLimit = jest.fn();
 
 jest.mock("@/lib/auth/server", () => ({
   auth: {
@@ -45,6 +46,10 @@ jest.mock("@/lib/database/subscription", () => ({
   hasUserProductEntitlement: mockHasUserProductEntitlement,
 }));
 
+jest.mock("@/lib/rate-limit", () => ({
+  checkRateLimit: mockCheckRateLimit,
+}));
+
 // Mock environment variable
 const originalEnv = process.env;
 
@@ -52,6 +57,10 @@ describe("Billing Checkout API", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockHasUserProductEntitlement.mockResolvedValue(false);
+    mockCheckRateLimit.mockResolvedValue({
+      allowed: true,
+      info: { limit: 20, remaining: 19, resetAt: 2_000_000_000 },
+    });
 
     // Setup mock implementations
     mockJson.mockImplementation((data: any, init?: { status?: number }) => ({
@@ -78,7 +87,10 @@ describe("Billing Checkout API", () => {
         set: () => {},
         entries: () => [],
       },
-      json: jest.fn().mockResolvedValue(body),
+      json: jest.fn().mockResolvedValue({
+        requestId: "22a24fd6-c394-4c09-b1df-fd93a2e16d20",
+        ...body,
+      }),
       cookies: { get: () => null, has: () => false },
       nextUrl: { pathname: "/api/billing/checkout" },
       url: "http://localhost:3000/api/billing/checkout",
@@ -121,6 +133,36 @@ describe("Billing Checkout API", () => {
       expect(response.status).toBe(400);
       expect(data.error).toBe("Invalid request body");
       expect(data.details).toBeDefined();
+    });
+
+    it("should rate-limit repeated checkout creation", async () => {
+      mockGetSession.mockResolvedValue(mockSession);
+      mockCheckRateLimit.mockResolvedValue({
+        allowed: false,
+        info: { limit: 20, remaining: 0, resetAt: 2_000_000_000 },
+      });
+
+      const { POST } = await import("./route");
+      const response = await POST(createMockRequest({}));
+
+      expect(response.status).toBe(429);
+      expect(mockCreateCheckoutSession).not.toHaveBeenCalled();
+    });
+
+    it("should reject an invalid checkout request ID", async () => {
+      mockGetSession.mockResolvedValue(mockSession);
+
+      const { POST } = await import("./route");
+      const response = await POST(
+        createMockRequest({
+          requestId: "not-a-uuid",
+          tierId: "pro",
+          paymentMode: "one_time",
+        }),
+      );
+
+      expect(response.status).toBe(400);
+      expect(mockCreateCheckoutSession).not.toHaveBeenCalled();
     });
 
     it("should return 409 when user has active subscription", async () => {
@@ -255,6 +297,7 @@ describe("Billing Checkout API", () => {
       const response = await POST(request);
 
       expect(mockCreateCheckoutSession).toHaveBeenCalledWith({
+        requestId: "22a24fd6-c394-4c09-b1df-fd93a2e16d20",
         userId: "user-123",
         userEmail: "test@example.com",
         userName: "Test User",
@@ -364,7 +407,7 @@ describe("Billing Checkout API", () => {
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data.error).toBe("Invalid request body");
+      expect(data.error).toBe("Request body must be valid JSON.");
     });
 
     it("should validate checkoutSchema with all valid enum values", async () => {

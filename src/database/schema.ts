@@ -22,6 +22,7 @@ export const userRoleEnum = pgEnum("user_role", [
 
 export const uploadIntentStatusEnum = pgEnum("upload_intent_status", [
   "pending",
+  "cancelled",
   "cleaning",
   "completed",
 ]);
@@ -249,6 +250,9 @@ export const payments = pgTable(
         table.userId,
         table.createdAt.desc(),
       ),
+      settledCurrencyCreatedAtIdx: index(
+        "payments_status_currency_createdAt_idx",
+      ).on(table.status, table.currency, table.createdAt.desc()),
       paymentOwnerProductUnique: uniqueIndex(
         "payments_paymentId_userId_productId_unique",
       ).on(table.paymentId, table.userId, table.productId),
@@ -342,6 +346,7 @@ export const uploadIntents = pgTable(
     status: uploadIntentStatusEnum("status").notNull().default("pending"),
     expiresAt: timestamp("expiresAt", { withTimezone: true }).notNull(),
     completedAt: timestamp("completedAt", { withTimezone: true }),
+    deleteCheckedAt: timestamp("deleteCheckedAt", { withTimezone: true }),
     cleanupAttempts: integer("cleanupAttempts").notNull().default(0),
     lastCleanupError: text("lastCleanupError"),
     createdAt: timestamp("createdAt", { withTimezone: true })

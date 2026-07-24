@@ -15,8 +15,8 @@ import { StatsCardsSkeleton } from "../_components/stats-cards-skeleton";
 import { getPayments } from "@/lib/actions/admin";
 import { createMetadataDefaults } from "@/lib/metadata";
 export async function generateMetadata() {
-  const { t } = await getServerTranslations();
-  const metadata = createMetadataDefaults();
+  const { locale, t } = await getServerTranslations();
+  const metadata = createMetadataDefaults({ locale });
   return {
     ...metadata,
     title: t("4630c4ba4580", "Payment Management"),

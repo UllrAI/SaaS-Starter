@@ -63,6 +63,7 @@ jest.mock("drizzle-orm", () => ({
 }));
 
 jest.mock("./client", () => ({
+  creemEnvironment: "live_mode",
   creemWebhookSecret: mockCreemWebhookSecret,
 }));
 
@@ -130,15 +131,26 @@ describe("Creem Webhook Handler", () => {
     mockUpsertSubscription.mockResolvedValue([]);
     mockUpsertPayment.mockResolvedValue([{ status: "succeeded" }]);
     mockUpdatePaymentStatus.mockResolvedValue([{ id: "payment-row" }]);
+    mockLockPaymentAdjustmentScope.mockImplementation(
+      async ([paymentReference]: string[]) => paymentReference,
+    );
     mockGetProductTierByProductId.mockReturnValue({
       id: "tier_pro",
       name: "Pro Tier",
-      pricing: { creem: { oneTime: "prod_one_time" } },
+      pricing: {
+        creem: {
+          live_mode: { oneTime: "prod_one_time" },
+        },
+      },
     });
     mockGetProductTierById.mockReturnValue({
       id: "tier_pro",
       name: "Pro Tier",
-      pricing: { creem: { oneTime: "prod_one_time" } },
+      pricing: {
+        creem: {
+          live_mode: { oneTime: "prod_one_time" },
+        },
+      },
     });
   });
 
@@ -198,6 +210,28 @@ describe("Creem Webhook Handler", () => {
       expect(
         mockLockBillingProductScope.mock.invocationCallOrder[0],
       ).toBeLessThan(mockUpsertSubscription.mock.invocationCallOrder[0]!);
+    });
+
+    it("rejects webhook objects from another Creem environment", async () => {
+      const payload = createWebhookPayload({
+        eventType: "payment.succeeded",
+        object: {
+          id: "payment_123",
+          mode: "test",
+          customer: "cus_123",
+          product_id: "prod_123",
+          amount: 1000,
+          currency: "usd",
+        },
+      });
+
+      const { handleCreemWebhook, InvalidWebhookPayloadError } =
+        await import("./webhook");
+
+      await expect(
+        handleCreemWebhook(payload, "test-signature"),
+      ).rejects.toThrow(InvalidWebhookPayloadError);
+      expect(mockDb.transaction).not.toHaveBeenCalled();
     });
 
     it("should handle payment.succeeded event", async () => {
@@ -558,6 +592,61 @@ describe("Creem Webhook Handler", () => {
       expect(mockUpsertSubscription).not.toHaveBeenCalled();
     });
 
+    it("accepts the documented checkout order shape without a transaction", async () => {
+      const payload = createWebhookPayload({
+        eventType: "checkout.completed",
+        object: {
+          id: "ch_7Whn2iLUXNdlN1aaP8h5t3",
+          product: {
+            id: "prod_6tW66i0oZM7Uao6h7G0SGN",
+          },
+          customer: {
+            id: "cust_QwkD7pVtbG8Q5h5Y5fP1l",
+          },
+          metadata: {
+            userId: "user1",
+            paymentMode: "one_time",
+            tierId: "tier_pro",
+          },
+          order: {
+            id: "ord_4PXekRpPPDfdAsW4rMPm7R",
+            amount: 1000,
+            currency: "EUR",
+          },
+          subscription: null,
+        },
+      });
+      mockGetProductTierById.mockReturnValue({
+        id: "tier_pro",
+        pricing: {
+          creem: {
+            live_mode: {
+              oneTime: "prod_6tW66i0oZM7Uao6h7G0SGN",
+            },
+          },
+        },
+      });
+      const { handleCreemWebhook } = await import("./webhook");
+
+      await expect(
+        handleCreemWebhook(payload, "test-signature"),
+      ).resolves.toEqual({ received: true });
+      expect(mockUpsertPayment).toHaveBeenCalledWith(
+        expect.objectContaining({
+          paymentId: "ord_4PXekRpPPDfdAsW4rMPm7R",
+          amount: 1000,
+          currency: "EUR",
+        }),
+        expect.any(Object),
+      );
+      expect(mockGrantProductEntitlement).toHaveBeenCalledWith(
+        expect.objectContaining({
+          sourcePaymentId: "ord_4PXekRpPPDfdAsW4rMPm7R",
+        }),
+        expect.any(Object),
+      );
+    });
+
     it("rejects one-time entitlement when checkout product mismatches metadata", async () => {
       const payload = createWebhookPayload({
         eventType: "checkout.completed",
@@ -615,6 +704,43 @@ describe("Creem Webhook Handler", () => {
       );
       expect(mockRevokeProductEntitlementByPaymentId).toHaveBeenCalledWith(
         "txn_123",
+        "refunded",
+        expect.any(Object),
+      );
+    });
+
+    it("falls back to the order reference for refund adjustments", async () => {
+      mockLockPaymentAdjustmentScope.mockResolvedValueOnce("order_123");
+      const payload = createWebhookPayload({
+        eventType: "refund.created",
+        object: {
+          id: "refund_123",
+          status: "succeeded",
+          refund_amount: 1000,
+          transaction: {
+            id: "txn_123",
+            order: "order_123",
+            amount: 1000,
+            refunded_amount: 1000,
+            status: "refunded",
+          },
+        },
+      });
+      const { handleCreemWebhook } = await import("./webhook");
+
+      await handleCreemWebhook(payload, "signature");
+
+      expect(mockLockPaymentAdjustmentScope).toHaveBeenCalledWith(
+        ["txn_123", "order_123"],
+        expect.any(Object),
+      );
+      expect(mockUpdatePaymentStatus).toHaveBeenCalledWith(
+        "order_123",
+        "refunded",
+        expect.any(Object),
+      );
+      expect(mockRevokeProductEntitlementByPaymentId).toHaveBeenCalledWith(
+        "order_123",
         "refunded",
         expect.any(Object),
       );
@@ -934,7 +1060,10 @@ describe("Creem Webhook Handler", () => {
       const result = await handleCreemWebhook(payload, "test-signature");
 
       expect(result).toEqual({ received: true });
-      expect(mockGetProductTierByProductId).toHaveBeenCalledWith("prod_123");
+      expect(mockGetProductTierByProductId).toHaveBeenCalledWith(
+        "prod_123",
+        "live_mode",
+      );
     });
 
     it("should handle user not found error in subscription events", async () => {
@@ -1188,6 +1317,7 @@ describe("Creem Webhook Handler", () => {
 
       // Ensure webhook secret is set
       jest.doMock("./client", () => ({
+        creemEnvironment: "live_mode",
         creemWebhookSecret: "test-webhook-secret",
       }));
     });

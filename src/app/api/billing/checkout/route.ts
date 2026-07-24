@@ -9,7 +9,15 @@ import { assertTrustedBillingUrl } from "@/lib/billing/url";
 import { getAuthSessionFromHeaders } from "@/lib/auth/session";
 import { getProductTierById } from "@/lib/config/products";
 import { hasCurrentSubscriptionAccess } from "@/lib/billing/access";
+import {
+  readJsonBodyWithLimit,
+  RequestBodyTooLargeError,
+} from "@/lib/http/request-body";
+import { checkRateLimit } from "@/lib/rate-limit";
 
+const MAX_CHECKOUT_BODY_BYTES = 4 * 1024;
+const CHECKOUT_RATE_LIMIT = 20;
+const CHECKOUT_RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const tierIdSchema = z
   .string()
   .refine((tierId) => Boolean(getProductTierById(tierId)), {
@@ -17,11 +25,13 @@ const tierIdSchema = z
   });
 const checkoutSchema = z.discriminatedUnion("paymentMode", [
   z.object({
+    requestId: z.uuid(),
     tierId: tierIdSchema,
     paymentMode: z.literal("subscription"),
     billingCycle: z.enum(["monthly", "yearly"]),
   }),
   z.object({
+    requestId: z.uuid(),
     tierId: tierIdSchema,
     paymentMode: z.literal("one_time"),
     billingCycle: z.never().optional(),
@@ -39,7 +49,41 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const body = await request.json().catch(() => null);
+    const rateLimit = await checkRateLimit({
+      scope: "billing_checkout",
+      key: session.user.id,
+      limit: CHECKOUT_RATE_LIMIT,
+      windowMs: CHECKOUT_RATE_LIMIT_WINDOW_MS,
+    });
+    if (!rateLimit.allowed) {
+      const retryAfter = Math.max(
+        rateLimit.info.resetAt - Math.ceil(Date.now() / 1000),
+        1,
+      );
+      return NextResponse.json(
+        {
+          code: "rate_limit_exceeded",
+          error: "Too many checkout attempts. Please try again shortly.",
+        },
+        { status: 429, headers: { "Retry-After": String(retryAfter) } },
+      );
+    }
+
+    let body: unknown;
+    try {
+      body = await readJsonBodyWithLimit(request, MAX_CHECKOUT_BODY_BYTES);
+    } catch (error) {
+      return NextResponse.json(
+        {
+          code: "invalid_request",
+          error:
+            error instanceof RequestBodyTooLargeError
+              ? "Request body is too large."
+              : "Request body must be valid JSON.",
+        },
+        { status: error instanceof RequestBodyTooLargeError ? 413 : 400 },
+      );
+    }
     const parsedBody = checkoutSchema.safeParse(body);
 
     if (!parsedBody.success) {
@@ -53,7 +97,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { tierId, paymentMode, billingCycle } = parsedBody.data;
+    const { requestId, tierId, paymentMode, billingCycle } = parsedBody.data;
 
     if (paymentMode === "subscription") {
       const existingSubscription = await getUserSubscription(session.user.id);
@@ -104,6 +148,7 @@ export async function POST(request: NextRequest) {
     failureUrl.searchParams.set("status", "failed");
 
     const checkoutOptions = {
+      requestId,
       userId: session.user.id,
       userEmail: session.user.email,
       userName: session.user.name,

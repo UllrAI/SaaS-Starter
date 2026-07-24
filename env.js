@@ -24,6 +24,14 @@ const appOriginSchema = z
     return url.origin;
   });
 
+const databaseUrlSchema = z
+  .string()
+  .url()
+  .refine(
+    (value) => ["postgres:", "postgresql:"].includes(new URL(value).protocol),
+    "DATABASE_URL must use the postgres or postgresql protocol",
+  );
+
 const optionalCredentialSchema = z.preprocess(
   (value) =>
     typeof value === "string" && value.trim() === "" ? undefined : value,
@@ -38,19 +46,24 @@ const optionalCredentialSchema = z.preprocess(
     .optional(),
 );
 
+const requiredCredentialSchema = z
+  .string()
+  .trim()
+  .min(1, "Credential must not be empty");
+
 const env = createEnv({
   skipValidation: process.env.SKIP_ENV_VALIDATION === "1",
 
   // Server-side environment variables
   server: {
     // Database URL
-    DATABASE_URL: z.string().url({ message: "Invalid database URL" }),
+    DATABASE_URL: databaseUrlSchema,
 
     // Database connection pool settings
-    DB_POOL_SIZE: z.coerce.number().default(20),
-    DB_IDLE_TIMEOUT: z.coerce.number().default(300),
-    DB_MAX_LIFETIME: z.coerce.number().default(14400),
-    DB_CONNECT_TIMEOUT: z.coerce.number().default(30),
+    DB_POOL_SIZE: z.coerce.number().int().positive().default(20),
+    DB_IDLE_TIMEOUT: z.coerce.number().int().nonnegative().default(300),
+    DB_MAX_LIFETIME: z.coerce.number().int().nonnegative().default(14400),
+    DB_CONNECT_TIMEOUT: z.coerce.number().int().positive().max(4).default(4),
     RATE_LIMIT_IP_HEADER: z.enum([
       "cf-connecting-ip",
       "x-vercel-forwarded-for",
@@ -74,14 +87,14 @@ const env = createEnv({
       ),
 
     // API keys
-    RESEND_API_KEY: z.string(),
+    RESEND_API_KEY: requiredCredentialSchema,
     RESEND_EMAIL_FROM: z.string().email(),
 
     // Cloudflare R2 Storage
     R2_ENDPOINT: z.string().url(),
-    R2_ACCESS_KEY_ID: z.string(),
-    R2_SECRET_ACCESS_KEY: z.string(),
-    R2_BUCKET_NAME: z.string(),
+    R2_ACCESS_KEY_ID: requiredCredentialSchema,
+    R2_SECRET_ACCESS_KEY: requiredCredentialSchema,
+    R2_BUCKET_NAME: requiredCredentialSchema,
     R2_PUBLIC_URL: z.string().url(),
     UPLOAD_CLEANUP_SECRET: z
       .string()
@@ -112,9 +125,9 @@ const env = createEnv({
     ),
 
     // Payments
-    CREEM_API_KEY: z.string(),
+    CREEM_API_KEY: requiredCredentialSchema,
     CREEM_ENVIRONMENT: z.enum(["test_mode", "live_mode"]).default("test_mode"),
-    CREEM_WEBHOOK_SECRET: z.string(),
+    CREEM_WEBHOOK_SECRET: requiredCredentialSchema,
 
     // E2E testing
     E2E_TEST_MODE: z.enum(["true", "false"]).optional(),
@@ -190,6 +203,18 @@ if (process.env.SKIP_ENV_VALIDATION !== "1") {
         `${provider} OAuth requires both its client ID and client secret.`,
       );
     }
+  }
+
+  const isTestCreemKey = env.CREEM_API_KEY.startsWith("creem_test_");
+  const hasCreemKeyPrefix = env.CREEM_API_KEY.startsWith("creem_");
+  if (
+    (env.CREEM_ENVIRONMENT === "test_mode" && !isTestCreemKey) ||
+    (env.CREEM_ENVIRONMENT === "live_mode" &&
+      (!hasCreemKeyPrefix || isTestCreemKey))
+  ) {
+    throw new Error(
+      `CREEM_API_KEY does not match CREEM_ENVIRONMENT=${env.CREEM_ENVIRONMENT}.`,
+    );
   }
 
   const legacySince = env.UPLOAD_LEGACY_COMPLETION_SINCE;

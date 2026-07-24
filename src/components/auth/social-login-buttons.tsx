@@ -61,6 +61,7 @@ export function SocialLoginButtons({
   loading: externalLoading = false,
   onLoadingChange,
 }: SocialLoginButtonsProps) {
+  const { t } = useTranslation();
   const [activeProvider, setActiveProvider] = useState<SocialProvider | null>(
     null,
   );
@@ -93,7 +94,10 @@ export function SocialLoginButtons({
       redirectToProvider(redirectUrl);
     } catch {
       toast.error(
-        "Something went wrong. Contact support if the issue persists",
+        t(
+          "auth_unexpected_error",
+          "Something went wrong. Contact support if the issue persists.",
+        ),
       );
       setActiveProvider(null);
       onLoadingChange?.(false);

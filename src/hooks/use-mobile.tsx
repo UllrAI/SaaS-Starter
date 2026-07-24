@@ -12,7 +12,7 @@ const MOBILE_BREAKPOINT = 768;
  * @returns {boolean} - True if the viewport width is less than 768px, otherwise false.
  */
 export function useIsMobile(): boolean {
-  // FIX: Default to `false` on the server and for the initial client render.
+  // Match the server render until the client media query is available.
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {

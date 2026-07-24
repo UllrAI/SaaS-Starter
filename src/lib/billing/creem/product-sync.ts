@@ -1,12 +1,14 @@
-import type { PricingTier } from "@/lib/config/products";
+import { createHash } from "node:crypto";
 import type {
-  ProductBillingPeriod,
-  ProductBillingType,
-  ProductCurrency,
-  ProductEntity,
-} from "creem/models/components";
+  CreemEnvironment,
+  CreemProductVariant,
+  PricingTier,
+} from "@/lib/config/products";
+import type { CreemClient, CreemProduct } from "./api-client";
 
-export type CreemProductVariant = keyof PricingTier["pricing"]["creem"];
+type ProductBillingType = CreemProduct["billingType"];
+type ProductBillingPeriod = "every-month" | "every-year";
+type ProductCurrency = PricingTier["currency"];
 
 export interface CreemProductSpec {
   tierId: string;
@@ -17,7 +19,9 @@ export interface CreemProductSpec {
   price: number;
   currency: ProductCurrency;
   billingType: ProductBillingType;
-  billingPeriod: ProductBillingPeriod;
+  billingPeriod?: ProductBillingPeriod;
+  taxMode: "exclusive";
+  taxCategory: "saas";
 }
 
 export interface ResolvedCreemProduct extends CreemProductSpec {
@@ -30,14 +34,13 @@ const CREEM_VARIANT_CONFIG: Record<
   {
     suffix: string;
     billingType: ProductBillingType;
-    billingPeriod: ProductBillingPeriod;
+    billingPeriod?: ProductBillingPeriod;
     priceKey: keyof PricingTier["prices"];
   }
 > = {
   oneTime: {
     suffix: "Lifetime",
     billingType: "onetime",
-    billingPeriod: "once",
     priceKey: "oneTime",
   },
   monthly: {
@@ -83,46 +86,109 @@ export function buildCreemProductSpecs(
         currency: tier.currency,
         billingType: config.billingType,
         billingPeriod: config.billingPeriod,
+        taxMode: "exclusive",
+        taxCategory: "saas",
       };
     }),
   );
 }
 
 export function findMatchingCreemProduct(
-  products: ProductEntity[],
+  products: CreemProduct[],
   spec: CreemProductSpec,
-): ProductEntity | undefined {
+): CreemProduct | undefined {
   return products.find(
     (product) =>
       product.name === spec.name &&
+      product.description === spec.description &&
       product.price === spec.price &&
       product.currency === spec.currency &&
       product.billingType === spec.billingType &&
-      product.billingPeriod === spec.billingPeriod,
+      product.billingPeriod === spec.billingPeriod &&
+      product.status === "active" &&
+      product.taxMode === spec.taxMode &&
+      product.taxCategory === spec.taxCategory,
   );
+}
+
+export async function loadAllCreemProducts(
+  client: CreemClient,
+): Promise<CreemProduct[]> {
+  const products: CreemProduct[] = [];
+  let pageNumber = 1;
+  const visitedPages = new Set<number>();
+
+  while (true) {
+    if (visitedPages.has(pageNumber)) {
+      throw new Error(`Creem product pagination repeated page ${pageNumber}.`);
+    }
+    visitedPages.add(pageNumber);
+
+    const page = await client.products.search(pageNumber, 100);
+    products.push(...page.items);
+    if (page.pagination.nextPage === null) {
+      return products;
+    }
+    pageNumber = page.pagination.nextPage;
+  }
+}
+
+export function buildCreemProductIdempotencyKey(
+  environment: CreemEnvironment,
+  spec: CreemProductSpec,
+): string {
+  const fingerprint = createHash("sha256")
+    .update(
+      JSON.stringify({
+        name: spec.name,
+        description: spec.description,
+        price: spec.price,
+        currency: spec.currency,
+        billingType: spec.billingType,
+        billingPeriod: spec.billingPeriod,
+        taxMode: spec.taxMode,
+        taxCategory: spec.taxCategory,
+      }),
+    )
+    .digest("hex")
+    .slice(0, 32);
+
+  return [
+    "product-sync",
+    environment,
+    spec.tierId,
+    spec.variant,
+    fingerprint,
+  ].join("-");
 }
 
 export function updateProductsConfigSource(
   source: string,
   resolvedProducts: ResolvedCreemProduct[],
+  environment: CreemEnvironment,
 ): string {
   return resolvedProducts.reduce((updatedSource, resolvedProduct) => {
     const tierBlock = getTierBlock(updatedSource, resolvedProduct.tierId);
+    const environmentBlock = getEnvironmentBlock(tierBlock.block, environment);
     const fieldPattern = new RegExp(
-      `(${resolvedProduct.variant}:\\s*")[^"]+(")`,
+      `(${resolvedProduct.variant}:\\s*")[^"]*(")`,
       "m",
     );
 
-    if (!fieldPattern.test(tierBlock.block)) {
+    if (!fieldPattern.test(environmentBlock.block)) {
       throw new Error(
-        `Unable to find "${resolvedProduct.variant}" field for tier "${resolvedProduct.tierId}".`,
+        `Unable to find "${resolvedProduct.variant}" field for tier "${resolvedProduct.tierId}" in ${environment}.`,
       );
     }
 
-    const updatedBlock = tierBlock.block.replace(
+    const updatedEnvironmentBlock = environmentBlock.block.replace(
       fieldPattern,
       `$1${resolvedProduct.productId}$2`,
     );
+    const updatedBlock =
+      tierBlock.block.slice(0, environmentBlock.start) +
+      updatedEnvironmentBlock +
+      tierBlock.block.slice(environmentBlock.end);
 
     return (
       updatedSource.slice(0, tierBlock.start) +
@@ -130,6 +196,25 @@ export function updateProductsConfigSource(
       updatedSource.slice(tierBlock.end)
     );
   }, source);
+}
+
+function getEnvironmentBlock(source: string, environment: CreemEnvironment) {
+  const marker = `${environment}: {`;
+  const start = source.indexOf(marker);
+  if (start === -1) {
+    throw new Error(`Unable to find ${environment} product configuration.`);
+  }
+
+  const end = source.indexOf("\n        },", start);
+  if (end === -1) {
+    throw new Error(`Unable to determine ${environment} product block.`);
+  }
+
+  return {
+    start,
+    end,
+    block: source.slice(start, end),
+  };
 }
 
 function getTierBlock(source: string, tierId: string) {

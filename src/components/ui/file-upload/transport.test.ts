@@ -7,6 +7,7 @@ const originalXmlHttpRequest = global.XMLHttpRequest;
 
 class MockXmlHttpRequest {
   static latest: MockXmlHttpRequest | null = null;
+  static autoComplete = true;
 
   status = 201;
   upload: { onprogress: ((event: ProgressEvent) => void) | null } = {
@@ -31,6 +32,10 @@ class MockXmlHttpRequest {
   }
 
   send() {
+    if (!MockXmlHttpRequest.autoComplete) {
+      return;
+    }
+
     this.upload.onprogress?.({
       lengthComputable: true,
       loaded: 4,
@@ -49,6 +54,7 @@ describe("presigned upload transport", () => {
     global.fetch = originalFetch;
     global.XMLHttpRequest = originalXmlHttpRequest;
     MockXmlHttpRequest.latest = null;
+    MockXmlHttpRequest.autoComplete = true;
   });
 
   it("uses a conditional PUT and completes the original API contract", async () => {
@@ -139,6 +145,111 @@ describe("presigned upload transport", () => {
     await expect(task.promise).rejects.toEqual(
       expect.objectContaining<FileUploadIssueError>({
         issue: expect.objectContaining({ code: "upload-quota-exceeded" }),
+      }),
+    );
+  });
+
+  it("releases the reservation after a post-presign failure", async () => {
+    const intentId = "11111111-1111-4111-8111-111111111111";
+    const fetchMock = jest
+      .fn()
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            intentId,
+            key: "uploads/user/upload-id.jpeg",
+            protocolVersion: 2,
+            publicUrl: "https://cdn.example.com/uploads/user/upload-id.jpeg",
+            requiredHeaders: {
+              "Content-Type": "image/jpeg",
+              "If-None-Match": "*",
+            },
+            presignedUrl: "https://untrusted.example.com/upload",
+          }),
+          { status: 200 },
+        ),
+      )
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify({ success: true }), { status: 200 }),
+      );
+    global.fetch = fetchMock as typeof fetch;
+
+    const file = new File(["data"], "photo.jpeg", { type: "image/jpeg" });
+    const task = createPresignedUploadTransport().startUpload({
+      file,
+      onProgress: jest.fn(),
+    });
+
+    await expect(task.promise).rejects.toEqual(
+      expect.objectContaining<FileUploadIssueError>({
+        issue: expect.objectContaining({ code: "unsafe-upload-url" }),
+      }),
+    );
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      2,
+      "/api/upload/cancel",
+      expect.objectContaining({
+        method: "POST",
+        body: JSON.stringify({ intentId }),
+        keepalive: true,
+      }),
+    );
+  });
+
+  it("sends one cancellation when abort handling and cancel overlap", async () => {
+    const intentId = "11111111-1111-4111-8111-111111111111";
+    const fetchMock = jest
+      .fn()
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            intentId,
+            key: "uploads/user/upload-id.jpeg",
+            protocolVersion: 2,
+            publicUrl: "https://cdn.example.com/uploads/user/upload-id.jpeg",
+            requiredHeaders: {
+              "Content-Type": "image/jpeg",
+              "If-None-Match": "*",
+            },
+            presignedUrl:
+              "https://bucket.r2.cloudflarestorage.com/signed-upload",
+          }),
+          { status: 200 },
+        ),
+      )
+      .mockResolvedValue(
+        new Response(JSON.stringify({ success: true }), { status: 200 }),
+      );
+    global.fetch = fetchMock as typeof fetch;
+    global.XMLHttpRequest =
+      MockXmlHttpRequest as unknown as typeof XMLHttpRequest;
+    MockXmlHttpRequest.autoComplete = false;
+
+    const file = new File(["data"], "photo.jpeg", { type: "image/jpeg" });
+    const task = createPresignedUploadTransport().startUpload({
+      file,
+      onProgress: jest.fn(),
+    });
+    await Promise.resolve();
+    await Promise.resolve();
+
+    task.cancel?.();
+    task.cancel?.();
+
+    await expect(task.promise).rejects.toEqual(
+      expect.objectContaining<FileUploadIssueError>({
+        issue: expect.objectContaining({ code: "upload-aborted" }),
+      }),
+    );
+    const cancelRequests = fetchMock.mock.calls.filter(
+      ([url]) => url === "/api/upload/cancel",
+    );
+    expect(cancelRequests).toHaveLength(1);
+    expect(cancelRequests[0]?.[1]).toEqual(
+      expect.objectContaining({
+        method: "POST",
+        body: JSON.stringify({ intentId }),
+        keepalive: true,
       }),
     );
   });

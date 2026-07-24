@@ -32,9 +32,11 @@ export function CliTokensSection({
       };
       setTokens(data.tokens);
     } catch {
-      toast.error(<>Failed to load CLI sessions.</>);
+      toast.error(
+        t("developer_cli_load_error", "Failed to load CLI sessions."),
+      );
     }
-  }, []);
+  }, [t]);
   return (
     <Card className="w-full">
       <CardHeader>
@@ -98,10 +100,12 @@ function CliTokenRow({
       if (!response.ok) {
         throw new Error("Failed to revoke CLI session.");
       }
-      toast.success(<>CLI session revoked.</>);
+      toast.success(t("developer_cli_revoke_success", "CLI session revoked."));
       await onRevoked();
     } catch {
-      toast.error(<>Failed to revoke CLI session.</>);
+      toast.error(
+        t("developer_cli_revoke_error", "Failed to revoke CLI session."),
+      );
     } finally {
       setIsRevoking(false);
     }

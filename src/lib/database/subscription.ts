@@ -84,10 +84,18 @@ export async function upsertSubscription(
 export async function upsertPayment(data: UpsertPaymentData, tx?: Tx) {
   const dbase = getDb(tx);
   const now = new Date();
+  const currency = data.currency.trim().toLowerCase();
+  if (!/^[a-z]{3}$/.test(currency)) {
+    throw new Error("Payment currency must be a three-letter ISO code.");
+  }
+  const normalizedData = {
+    ...data,
+    currency,
+  };
 
   const rows = await dbase
     .insert(payments)
-    .values({ ...data, updatedAt: now })
+    .values({ ...normalizedData, updatedAt: now })
     .onConflictDoUpdate({
       target: payments.paymentId,
       set: {
@@ -107,11 +115,13 @@ export async function upsertPayment(data: UpsertPaymentData, tx?: Tx) {
     payment.userId !== data.userId ||
     payment.customerId !== data.customerId ||
     payment.productId !== data.productId ||
+    payment.amount !== data.amount ||
+    payment.currency !== normalizedData.currency ||
     payment.paymentType !== data.paymentType ||
     payment.subscriptionId !== (data.subscriptionId ?? null)
   ) {
     throw new Error(
-      `Payment ${data.paymentId} conflicts with an existing payment owner or product.`,
+      `Payment ${data.paymentId} conflicts with existing immutable payment data.`,
     );
   }
 
@@ -273,19 +283,38 @@ export async function updatePaymentStatus(
   return rows;
 }
 
-export async function lockPaymentAdjustmentScope(paymentId: string, tx: Tx) {
-  const [payment] = await tx
-    .select({
-      userId: payments.userId,
-      productId: payments.productId,
-    })
-    .from(payments)
-    .where(eq(payments.paymentId, paymentId))
-    .limit(1);
+export async function lockPaymentAdjustmentScope(
+  paymentReferences: string[],
+  tx: Tx,
+): Promise<string> {
+  const references = [
+    ...new Set(paymentReferences.map((value) => value.trim()).filter(Boolean)),
+  ];
+  if (references.length === 0) {
+    throw new Error("A payment reference is required for an adjustment.");
+  }
+
+  let payment:
+    | { paymentId: string; userId: string; productId: string }
+    | undefined;
+  for (const reference of references) {
+    [payment] = await tx
+      .select({
+        paymentId: payments.paymentId,
+        userId: payments.userId,
+        productId: payments.productId,
+      })
+      .from(payments)
+      .where(eq(payments.paymentId, reference))
+      .limit(1);
+    if (payment) {
+      break;
+    }
+  }
 
   if (!payment) {
     throw new Error(
-      `Payment ${paymentId} is not available for a billing adjustment yet.`,
+      `Payment ${references.join(", ")} is not available for a billing adjustment yet.`,
     );
   }
 
@@ -294,14 +323,16 @@ export async function lockPaymentAdjustmentScope(paymentId: string, tx: Tx) {
   const [lockedPayment] = await tx
     .select({ id: payments.id })
     .from(payments)
-    .where(eq(payments.paymentId, paymentId))
+    .where(eq(payments.paymentId, payment.paymentId))
     .for("update");
 
   if (!lockedPayment) {
     throw new Error(
-      `Payment ${paymentId} is not available for a billing adjustment yet.`,
+      `Payment ${payment.paymentId} is not available for a billing adjustment yet.`,
     );
   }
+
+  return payment.paymentId;
 }
 
 export async function lockBillingProductScope(

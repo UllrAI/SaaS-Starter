@@ -37,6 +37,11 @@ jest.mock("@/lib/metadata", () => ({
   createMetadataDefaults: () => mockCreateMetadataDefaults(),
 }));
 
+jest.mock("next/headers", () => ({
+  headers: async () => new Headers({ "x-user-locale": "en" }),
+  cookies: async () => ({ get: () => undefined }),
+}));
+
 describe("SignUpPage", () => {
   beforeEach(() => {
     jest.clearAllMocks();

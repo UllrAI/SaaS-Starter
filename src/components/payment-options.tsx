@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslation } from "@/lib/i18n/translation/client";
-import { type ReactNode, useState } from "react";
+import { type ReactNode, useRef, useState } from "react";
 import {
   Card,
   CardContent,
@@ -210,6 +210,11 @@ export function PricingSection({ className }: { className?: string }) {
     mode: PaymentMode;
     tierId: string;
   } | null>(null);
+  const checkoutInFlightRef = useRef(false);
+  const checkoutAttemptRef = useRef<{
+    key: string;
+    requestId: string;
+  } | null>(null);
   const isClient = useIsClient();
   const { data: session, isPending: isSessionLoading } = useSession();
   const router = useRouter();
@@ -303,23 +308,34 @@ export function PricingSection({ className }: { className?: string }) {
     },
   };
   const redirectToLogin = () => {
-    router.push("/login?redirect=/pricing");
+    router.push("/login?callbackUrl=%2Fpricing");
   };
   const handleCheckout = async (
     tier: PricingTier,
     mode: PaymentMode,
     cycle?: BillingCycle,
   ) => {
+    if (checkoutInFlightRef.current) {
+      return;
+    }
     if (!session?.user) {
       toast.error(<CheckoutMessage code="login_required" />, {
         action: {
-          label: <>Login</>,
+          label: t("pricing_action_login", "Log in"),
           onClick: redirectToLogin,
         },
       });
       redirectToLogin();
       return;
     }
+    const attemptKey = `${tier.id}:${mode}:${cycle ?? ""}`;
+    if (checkoutAttemptRef.current?.key !== attemptKey) {
+      checkoutAttemptRef.current = {
+        key: attemptKey,
+        requestId: crypto.randomUUID(),
+      };
+    }
+    checkoutInFlightRef.current = true;
     setLoadingState({
       tierId: tier.id,
       mode,
@@ -334,6 +350,7 @@ export function PricingSection({ className }: { className?: string }) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          requestId: checkoutAttemptRef.current.requestId,
           tierId: tier.id,
           paymentMode: mode,
           billingCycle: mode === "subscription" ? cycle : undefined,
@@ -354,7 +371,7 @@ export function PricingSection({ className }: { className?: string }) {
             ...(safeManagementUrl
               ? {
                   action: {
-                    label: <>Manage Plan</>,
+                    label: t("pricing_action_manage_plan", "Manage plan"),
                     onClick: () => {
                       window.location.assign(safeManagementUrl);
                     },
@@ -371,7 +388,7 @@ export function PricingSection({ className }: { className?: string }) {
       if (response.status === 401) {
         toast.error(<CheckoutMessage code="login_required" />, {
           action: {
-            label: <>Login</>,
+            label: t("pricing_action_login", "Log in"),
             onClick: redirectToLogin,
           },
         });
@@ -399,6 +416,7 @@ export function PricingSection({ className }: { className?: string }) {
           : "unexpected_checkout_error";
       toast.error(<CheckoutMessage code={code} />);
     } finally {
+      checkoutInFlightRef.current = false;
       if (!isRedirecting) {
         setLoadingState(null);
       }
@@ -492,7 +510,8 @@ export function PricingSection({ className }: { className?: string }) {
             loadingState?.tierId === tier.id &&
             loadingState.mode === paymentMode &&
             (paymentMode === "one_time" || loadingState.cycle === billingCycle);
-          const isDisabled = !isClient || isLoading || isSessionLoading;
+          const isDisabled =
+            !isClient || loadingState !== null || isSessionLoading;
           return (
             <Card
               key={tier.id}

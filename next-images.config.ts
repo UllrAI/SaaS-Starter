@@ -5,14 +5,10 @@ type RemotePattern = {
   hostname: string;
 };
 
-const DEFAULT_REMOTE_PATTERNS: RemotePattern[] = [
+const CONTENT_IMAGE_PATTERNS: RemotePattern[] = [
   {
     protocol: "https",
     hostname: "images.unsplash.com",
-  },
-  {
-    protocol: "https",
-    hostname: "unsplash.com",
   },
 ];
 
@@ -36,11 +32,11 @@ export function getRemotePatterns(): RemotePattern[] {
   const r2Hostname = resolveR2Hostname(env.R2_PUBLIC_URL);
 
   if (!r2Hostname) {
-    return [...DEFAULT_REMOTE_PATTERNS];
+    return [...CONTENT_IMAGE_PATTERNS];
   }
 
   return [
-    ...DEFAULT_REMOTE_PATTERNS,
+    ...CONTENT_IMAGE_PATTERNS,
     {
       protocol: "https",
       hostname: r2Hostname,

@@ -19,7 +19,7 @@ jobs:
     timeout-minutes: 20
     services:
       postgres:
-        image: postgres:17-alpine
+        image: postgres:16-alpine
         env:
           POSTGRES_DB: saas_ci
           POSTGRES_PASSWORD: postgres
@@ -43,27 +43,39 @@ jobs:
       R2_BUCKET_NAME: ci-placeholder
       R2_PUBLIC_URL: https://cdn.example.com
       UPLOAD_CLEANUP_SECRET: ci-only-upload-cleanup-secret-32-chars
-      CREEM_API_KEY: creem_ci_placeholder
+      CREEM_API_KEY: creem_test_ci_placeholder
       CREEM_ENVIRONMENT: test_mode
       CREEM_WEBHOOK_SECRET: creem_ci_webhook_placeholder
       NEXT_PUBLIC_APP_URL: https://example.com
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
 
-      - uses: pnpm/action-setup@v6
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6
         with:
           version: 10.33.0
 
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version: 22
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile
+      - run: pnpm db:generate
+      - name: Verify committed migration history
+        run: |
+          if [ -n "$(git status --porcelain -- src/database/migrations)" ]; then
+            git status --short -- src/database/migrations
+            exit 1
+          fi
       - run: pnpm db:migrate
       - run: pnpm prettier:check
       - run: pnpm lint
+      - run: pnpm dead-code:check
       - run: pnpm type-check
       - run: pnpm test --runInBand
       - run: pnpm build
+        env:
+          NEXT_PUBLIC_APP_URL: http://127.0.0.1:3100
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm exec playwright test

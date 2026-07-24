@@ -20,6 +20,15 @@ interface RevenueData {
 interface RevenueChartProps {
   chartData: RevenueData[];
 }
+
+export function formatRevenueMonth(month: string, locale: string): string {
+  return new Date(`${month}-01T00:00:00.000Z`).toLocaleDateString(locale, {
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC",
+  });
+}
+
 export function RevenueChart({ chartData }: RevenueChartProps) {
   const { t } = useTranslation();
   const intlLocale = useIntlLocale();
@@ -27,10 +36,7 @@ export function RevenueChart({ chartData }: RevenueChartProps) {
   // Transform the data for the chart
   const transformedData = chartData
     .map((item) => ({
-      month: new Date(item.month + "-01").toLocaleDateString(intlLocale, {
-        month: "short",
-        year: "numeric",
-      }),
+      month: formatRevenueMonth(item.month, intlLocale),
       revenue: item.revenue / 100,
       // Convert from cents to dollars
       count: item.count,
@@ -83,7 +89,7 @@ export function RevenueChart({ chartData }: RevenueChartProps) {
                     </div>
                     <div className="flex flex-col">
                       <span className="text-muted-foreground text-[0.70rem] uppercase">
-                        Revenue
+                        {t("admin_settled_usd_revenue", "Settled USD Revenue")}
                       </span>
                       <span className="font-bold">
                         {formatCurrency(payload[0].value as number)}
@@ -91,7 +97,7 @@ export function RevenueChart({ chartData }: RevenueChartProps) {
                     </div>
                     <div className="flex flex-col">
                       <span className="text-muted-foreground text-[0.70rem] uppercase">
-                        Payments
+                        {t("admin_payments_label", "Payments")}
                       </span>
                       <span className="text-muted-foreground font-bold">
                         {payload[0].payload.count}

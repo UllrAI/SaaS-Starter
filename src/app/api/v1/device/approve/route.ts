@@ -5,7 +5,12 @@ import { getAuthSessionFromHeaders } from "@/lib/auth/session";
 import { authorizeDeviceCode } from "@/lib/device-auth/device-service";
 import { apiSuccess, handleApiError } from "@/lib/machine-auth/api-response";
 import { MachineAuthError } from "@/lib/machine-auth/error";
+import {
+  readJsonBodyWithLimit,
+  RequestBodyTooLargeError,
+} from "@/lib/http/request-body";
 
+const MAX_DEVICE_APPROVAL_BODY_BYTES = 1024;
 const approveDeviceSchema = z.object({
   userCode: z
     .string()
@@ -40,12 +45,23 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const body = await request.json().catch(() => null);
-    if (!body) {
+    let body: unknown;
+    try {
+      body = await readJsonBodyWithLimit(
+        request,
+        MAX_DEVICE_APPROVAL_BODY_BYTES,
+      );
+    } catch (error) {
       throw new MachineAuthError({
-        code: "INVALID_BODY",
-        message: "Request body must be valid JSON.",
-        status: 400,
+        code:
+          error instanceof RequestBodyTooLargeError
+            ? "BODY_TOO_LARGE"
+            : "INVALID_BODY",
+        message:
+          error instanceof RequestBodyTooLargeError
+            ? "Request body is too large."
+            : "Request body must be valid JSON.",
+        status: error instanceof RequestBodyTooLargeError ? 413 : 400,
       });
     }
 

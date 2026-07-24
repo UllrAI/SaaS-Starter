@@ -44,7 +44,7 @@ export type DeviceCodeResponse = {
   interval: number;
 };
 
-export type DeviceTokenPendingStatus =
+type DeviceTokenPendingStatus =
   | "authorization_pending"
   | "slow_down"
   | "expired";

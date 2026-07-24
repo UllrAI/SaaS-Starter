@@ -40,7 +40,7 @@ interface AdminTableBaseProps<T> {
   columns: TableColumn<T>[];
   data: T[];
   loading: boolean;
-  error: string | null;
+  error: boolean;
   searchTerm: string;
   onSearchChange: (value: string) => void;
   filterValue?: string;
@@ -86,10 +86,10 @@ export function AdminTableBase<
   filterValue,
   onFilterChange,
   filterOptions,
-  filterPlaceholder = "Filter...",
+  filterPlaceholder,
   pagination,
   onPageChange,
-  searchPlaceholder = "Search...",
+  searchPlaceholder,
   emptyMessage,
 }: AdminTableBaseProps<T>) {
   const { t } = useTranslation();
@@ -97,8 +97,12 @@ export function AdminTableBase<
     <>{t("e833227881b2", "No data found")}</>
   );
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm);
-  const resolvedFilterPlaceholder = extractTextContent(filterPlaceholder);
-  const resolvedSearchPlaceholder = extractTextContent(searchPlaceholder);
+  const resolvedFilterPlaceholder = extractTextContent(
+    filterPlaceholder ?? t("admin_table_filter_placeholder", "Filter..."),
+  );
+  const resolvedSearchPlaceholder = extractTextContent(
+    searchPlaceholder ?? t("admin_table_search_placeholder", "Search..."),
+  );
 
   // Debounce search input
   useEffect(() => {
@@ -115,7 +119,12 @@ export function AdminTableBase<
       <div className="flex items-center justify-center p-8">
         <div className="text-destructive flex items-center space-x-2">
           <AlertTriangle className="h-4 w-4" />
-          <span>{error}</span>
+          <span>
+            {t(
+              "admin_table_load_error",
+              "We couldn't load this data. Please try again.",
+            )}
+          </span>
         </div>
       </div>
     );

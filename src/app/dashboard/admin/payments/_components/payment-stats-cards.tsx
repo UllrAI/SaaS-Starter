@@ -20,13 +20,16 @@ export async function PaymentStatsCards() {
       currency: "USD",
     }).format(amount / 100);
   };
-  const failedPayments = stats.total - stats.successful;
+  const nonSettledPayments = stats.total - stats.successful;
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       <StatCard
-        title={t("4e96ac8f328f", "Total Revenue")}
+        title={t("admin_settled_usd_revenue", "Settled USD Revenue")}
         value={formatCurrency(stats.totalRevenue)}
-        description={t("3cdf9159a9eb", "All-time revenue")}
+        description={t(
+          "admin_settled_usd_revenue_description",
+          "All-time succeeded payments in USD",
+        )}
         icon={DollarSign}
         locale={locale}
       />
@@ -45,9 +48,12 @@ export async function PaymentStatsCards() {
         locale={locale}
       />
       <StatCard
-        title={t("7d3199659236", "Failed Payments")}
-        value={failedPayments}
-        description={t("67a9aa00457d", "Transactions that did not complete")}
+        title={t("admin_non_settled_payments", "Non-settled Payments")}
+        value={nonSettledPayments}
+        description={t(
+          "admin_non_settled_payments_description",
+          "Pending, refunded, disputed, or failed transactions",
+        )}
         icon={AlertTriangle}
         locale={locale}
       />

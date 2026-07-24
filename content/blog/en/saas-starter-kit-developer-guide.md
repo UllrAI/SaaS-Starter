@@ -93,7 +93,7 @@ The application will run at `http://localhost:3000`.
 - **Code Quality**: ESLint, Prettier, Jest, Playwright smoke tests
 - **Admin Dashboard**: Generic data management dashboard, easily extensible to manage any database table
 - **Agent-Friendly Workflow**: First-party `saas-cli`, API verification, and management surfaces for authorized devices
-- **Deployment**: One-click Vercel deployment
+- **Deployment**: Zeabur reference deployment and standalone Docker image
 
 ### 1.4. Technical Architecture Diagram
 
@@ -105,7 +105,7 @@ graph TD
         A[User] --> B{Next.js App};
     end
 
-    subgraph "Vercel Platform"
+    subgraph "Zeabur Service"
         B -- React Server Components --> C["UI (shadcn/ui, Tailwind)"];
         B -- API Routes/Server Actions --> D[Backend Logic];
     end
@@ -584,7 +584,7 @@ All required and optional environment variables are detailed in the environment 
 
 ### 10.2. Security Considerations
 
-- **Environment Variables**: **Never** commit `.env` file to Git repository. Use secret management tools from platforms like Vercel to store production environment variables.
+- **Environment Variables**: **Never** commit `.env` files to Git. Store production values in Zeabur's service variables or an equivalent secret manager.
 - **Route Protection**: `proxy.ts` is the first line of defense, but **must** use functions like `requireAuth`, `requireAdmin` in Server Actions and API routes for backend permission verification.
 - **SQL Injection**: Using Drizzle ORM effectively prevents SQL injection attacks because it automatically parameterizes queries.
 - **XSS**: Next.js and React escape JSX content by default, preventing cross-site scripting attacks. When handling user-generated content, use mature libraries (like `DOMPurify`) for sanitization.
@@ -592,14 +592,14 @@ All required and optional environment variables are detailed in the environment 
 
 ### 10.3. Deployment Guide
 
-**Vercel** deployment is recommended.
+The production reference deployment uses **Zeabur**.
 
-1. Push your code to GitHub/GitLab/Bitbucket repository.
-1. Import the Git repository in Vercel.
-1. Vercel will automatically detect Next.js project and configure build settings.
-1. In Vercel project's `Settings > Environment Variables`, add all environment variables defined in your `.env` file.
-1. Configure database migration as a dedicated CI/CD release step, ensuring `pnpm db:migrate` runs once against the production `DATABASE_URL` instead of on every app startup.
-1. Each push to main branch will automatically build and deploy your application on Vercel.
+1. Push a reviewed commit to the connected Git repository.
+1. Configure the required service variables from `.env.example`.
+1. Run `pnpm db:migrate` once against the production `DATABASE_URL`.
+1. Deploy the application after migration succeeds.
+1. Use `/api/ready` for database-backed readiness and inspect build and runtime logs.
+1. Verify both locale URL variants, authentication redirects, and an authenticated Dashboard session.
 
 ---
 

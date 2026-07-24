@@ -243,6 +243,9 @@ describe("Admin Actions", () => {
     mockDb.delete.mockReturnValue({
       where: jest.fn().mockResolvedValue([]),
     });
+    mockDb.transaction.mockImplementation(
+      async (callback: (tx: typeof mockDb) => unknown) => callback(mockDb),
+    );
   });
 
   afterEach(() => {

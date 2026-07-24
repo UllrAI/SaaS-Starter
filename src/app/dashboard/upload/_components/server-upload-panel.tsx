@@ -27,10 +27,15 @@ interface ServerUploadResponse {
   };
 }
 function ServerUploadSuccessToast({ count }: { count: number }) {
-  return count === 1 ? (
-    <>1 file finished through the server pipeline.</>
-  ) : (
-    <>{count} files finished through the server pipeline.</>
+  const { t } = useTranslation();
+  return (
+    <>
+      {t(
+        "server_upload_success",
+        "{count, plural, one {# file finished through the server pipeline.} other {# files finished through the server pipeline.}}",
+        { count },
+      )}
+    </>
   );
 }
 function ServerUploadWarningToast({
@@ -272,7 +277,9 @@ export function ServerUploadPanel() {
               )}
               <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/65 via-black/15 to-transparent p-3 text-white">
                 <p className="truncate text-xs font-medium">{file.fileName}</p>
-                <p className="text-[11px] text-white/80">Uploaded</p>
+                <p className="text-[11px] text-white/80">
+                  {t("server_upload_status_uploaded", "Uploaded")}
+                </p>
               </div>
             </a>
           ))}

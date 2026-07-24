@@ -25,6 +25,8 @@ import { formatCurrency } from "@/lib/utils";
 import { formatFileSize } from "@/lib/config/upload";
 import { createMetadataDefaults } from "@/lib/metadata";
 import { getRequestLocale } from "@/lib/i18n/server-locale";
+import type { AppTranslate } from "@/lib/i18n/translation/shared";
+import type { SubscriptionStatus } from "@/types/billing";
 import {
   ArrowRight,
   CreditCard,
@@ -33,9 +35,90 @@ import {
   Sparkles,
   UserCircle2,
 } from "lucide-react";
+
+function getPlanLabel(planId: string | null, t: AppTranslate) {
+  switch (planId) {
+    case "plus":
+      return t("dashboard_plan_plus", "Plus");
+    case "pro":
+      return t("dashboard_plan_professional", "Pro");
+    case "team":
+      return t("dashboard_plan_team", "Team");
+    default:
+      return planId ?? t("dashboard_plan_free", "Free");
+  }
+}
+
+function getSubscriptionStatusLabel(
+  status: SubscriptionStatus,
+  t: AppTranslate,
+) {
+  switch (status) {
+    case "active":
+      return t("billing_status_active", status);
+    case "canceled":
+      return t("billing_status_canceled", status);
+    case "expired":
+      return t("subscription_status_expired", "Expired");
+    case "past_due":
+      return t("64f180e9fb46", "Past Due");
+    case "unpaid":
+      return t("685a7728149e", "Unpaid");
+    case "paused":
+      return t("subscription_status_paused", "Paused");
+    case "scheduled_cancel":
+      return t("subscription_status_scheduled_cancel", "Scheduled to cancel");
+    case "trialing":
+      return t("billing_status_trialing", "Trialing");
+    case "incomplete":
+      return t("4704260a99f1", "Incomplete");
+  }
+}
+
+function getPaymentStatusLabel(status: string, t: AppTranslate) {
+  switch (status) {
+    case "succeeded":
+      return t("billing_payment_status_succeeded", "Succeeded");
+    case "pending":
+      return t("billing_payment_status_pending", "Pending");
+    case "failed":
+      return t("billing_payment_status_failed", "Failed");
+    case "refunded":
+      return t("billing_payment_status_refunded", "Refunded");
+    case "partially_refunded":
+      return t(
+        "billing_payment_status_partially_refunded",
+        "Partially refunded",
+      );
+    case "disputed":
+      return t("billing_payment_status_disputed", "Disputed");
+    case "canceled":
+      return t("billing_status_canceled", "Canceled");
+    default:
+      return t("billing_payment_status_unknown", "Unknown");
+  }
+}
+
+function getPaymentTypeLabel(paymentType: string, t: AppTranslate) {
+  return paymentType === "subscription"
+    ? t("billing_payment_type_subscription", "Subscription")
+    : t("billing_payment_type_one_time", "One-time purchase");
+}
+
+function getRoleLabel(role: string, t: AppTranslate) {
+  switch (role) {
+    case "admin":
+      return t("8881841729d7", role);
+    case "super_admin":
+      return t("9d7302206bac", role.replace("_", " "));
+    default:
+      return t("6ccd40cf07d2", role);
+  }
+}
+
 export async function generateMetadata() {
-  const { t } = await getServerTranslations();
-  const metadata = createMetadataDefaults();
+  const { locale, t } = await getServerTranslations();
+  const metadata = createMetadataDefaults({ locale });
   return {
     ...metadata,
     title: t("268278a36d91", "Dashboard"),
@@ -88,9 +171,7 @@ export default async function HomeRoute() {
       : billingAccess.kind === "lifetime"
         ? billingAccess.entitlement.productId
         : null;
-  const subscriptionLabel = currentPlanId
-    ? `${currentPlanId.charAt(0).toUpperCase()}${currentPlanId.slice(1)}`
-    : "Free";
+  const subscriptionLabel = getPlanLabel(currentPlanId, t);
   const checklistLinks = [
     {
       id: "billing",
@@ -171,7 +252,10 @@ export default async function HomeRoute() {
                 }
               >
                 {billingAccess.kind === "subscription" ? (
-                  billingAccess.subscription.status
+                  getSubscriptionStatusLabel(
+                    billingAccess.subscription.status,
+                    t,
+                  )
                 ) : billingAccess.kind === "lifetime" ? (
                   <>{t("billing_lifetime_access", "Lifetime access")}</>
                 ) : (
@@ -235,7 +319,7 @@ export default async function HomeRoute() {
                 {t("666a2a3f4ded", "Role")}
               </p>
               <p className="font-medium capitalize">
-                {user.role.replace("_", " ")}
+                {getRoleLabel(user.role, t)}
               </p>
             </div>
           </CardContent>
@@ -268,7 +352,7 @@ export default async function HomeRoute() {
                   </div>
                   <Button asChild size="sm" variant="outline">
                     <Link href={item.href}>
-                      <>Open</>
+                      <>{t("dashboard_checklist_open", "Open")}</>
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
                   </Button>
@@ -301,9 +385,9 @@ export default async function HomeRoute() {
                   >
                     <div>
                       <p className="font-medium">{payment.tierName}</p>
-                      <p className="text-muted-foreground text-sm capitalize">
-                        {payment.status} •{" "}
-                        {payment.paymentType.replace("_", " ")}
+                      <p className="text-muted-foreground text-sm">
+                        {getPaymentStatusLabel(payment.status, t)} •{" "}
+                        {getPaymentTypeLabel(payment.paymentType, t)}
                       </p>
                     </div>
                     <div className="text-right">

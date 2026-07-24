@@ -72,11 +72,7 @@ export function AuthForm({
       return;
     }
 
-    // Navigate to the unified sent page with the email as a query param
-    const params = new URLSearchParams({
-      email: data.email,
-    });
-    router.push(`/auth/sent?${params.toString()}`);
+    router.push("/auth/sent");
   };
   const isLogin = mode === "login";
   const config = {

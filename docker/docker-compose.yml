@@ -43,7 +43,7 @@ services:
         NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:?Set NEXT_PUBLIC_APP_URL to the public deployment origin}
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "127.0.0.1:3000:3000"
     environment:
       # Database
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/ullrai_starter
@@ -52,8 +52,8 @@ services:
       DB_POOL_SIZE: 20
       DB_IDLE_TIMEOUT: 300
       DB_MAX_LIFETIME: 14400
-      DB_CONNECT_TIMEOUT: 30
-      RATE_LIMIT_IP_HEADER: ${RATE_LIMIT_IP_HEADER:-x-forwarded-for}
+      DB_CONNECT_TIMEOUT: 4
+      RATE_LIMIT_IP_HEADER: ${RATE_LIMIT_IP_HEADER:?Set the client IP header overwritten by your trusted reverse proxy}
 
       # Application URL
       NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:?Set NEXT_PUBLIC_APP_URL}
@@ -101,30 +101,15 @@ services:
           "wget",
           "--quiet",
           "--spider",
-          "http://127.0.0.1:3000/api/health",
+          "http://127.0.0.1:3000/api/ready",
         ]
       interval: 15s
       timeout: 5s
       retries: 5
       start_period: 20s
 
-  # Redis (optional - for caching and sessions)
-  redis:
-    image: redis:7-alpine
-    profiles: ["cache"]
-    restart: unless-stopped
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_data:/data
-    networks:
-      - ullrai-network
-    command: redis-server --appendonly yes
-
 volumes:
   postgres_data:
-    driver: local
-  redis_data:
     driver: local
 
 networks:

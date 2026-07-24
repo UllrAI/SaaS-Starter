@@ -165,7 +165,11 @@ export function OtherProducts({
                     target="_blank"
                     rel="noopener noreferrer"
                     className="absolute inset-0 z-10"
-                    aria-label={`Visit ${product.name}`}
+                    aria-label={t(
+                      "other_product_visit",
+                      "Visit {productName}",
+                      { productName: product.name },
+                    )}
                   />
                 </CardContent>
               </Card>

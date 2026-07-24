@@ -1,11 +1,10 @@
 import type { PaymentProvider } from "../provider";
 import type { CreateCheckoutOptions } from "@/types/billing";
 import { z } from "zod";
-import { creemClient, creemWebhookSecret } from "./client";
+import { creemClient, creemEnvironment, creemWebhookSecret } from "./client";
 import { getProductTierById } from "@/lib/config/products";
 import { handleCreemWebhook } from "./webhook";
 
-// Zod schemas for Creem API responses
 const CreemCheckoutResponseSchema = z.object({
   checkoutUrl: z.string().url(),
 });
@@ -25,13 +24,14 @@ const creemProvider: PaymentProvider = {
       }
 
       let creemProductId: string;
+      const productIds = tier.pricing.creem[creemEnvironment];
       if (options.paymentMode === "one_time") {
-        creemProductId = tier.pricing.creem.oneTime;
+        creemProductId = productIds.oneTime;
       } else {
         creemProductId =
           options.billingCycle === "yearly"
-            ? tier.pricing.creem.yearly
-            : tier.pricing.creem.monthly;
+            ? productIds.yearly
+            : productIds.monthly;
       }
 
       if (!creemProductId) {
@@ -41,21 +41,17 @@ const creemProvider: PaymentProvider = {
       }
 
       const checkoutRequestData = {
+        requestId: options.requestId,
         productId: creemProductId,
         successUrl: options.successUrl,
-        // Note: Creem may not support cancelUrl directly, but we include it in metadata
-        // for potential future use or custom handling
         customer: {
           email: options.userEmail,
-          name: options.userName ?? undefined,
         },
         metadata: {
           userId: options.userId,
           tierId: options.tierId,
           paymentMode: options.paymentMode,
           billingCycle: options.billingCycle ?? null,
-          cancelUrl: options.cancelUrl ?? null,
-          failureUrl: options.failureUrl ?? null,
         },
       };
 
@@ -65,9 +61,7 @@ const creemProvider: PaymentProvider = {
 
       if (!parsed.success) {
         console.error("Invalid Creem checkout response:", parsed.error);
-        throw new Error(
-          `Failed to parse checkout response from Creem. API Response: ${JSON.stringify(response)}`,
-        );
+        throw new Error("Failed to parse checkout response from Creem.");
       }
 
       return { checkoutUrl: parsed.data.checkoutUrl };
@@ -91,9 +85,7 @@ const creemProvider: PaymentProvider = {
 
       if (!parsed.success) {
         console.error("Invalid Creem customer portal response:", parsed.error);
-        throw new Error(
-          `Failed to parse customer portal response from Creem. API Response: ${JSON.stringify(response)}`,
-        );
+        throw new Error("Failed to parse customer portal response from Creem.");
       }
 
       return { portalUrl: parsed.data.customerPortalLink };

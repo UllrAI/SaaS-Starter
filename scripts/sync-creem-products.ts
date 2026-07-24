@@ -1,13 +1,18 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
-import { Creem } from "creem";
-import type { ProductEntity } from "creem/models/components";
 import { z } from "zod";
 import { PRODUCT_TIERS } from "@/lib/config/products";
 import {
+  createCreemClient,
+  type CreemClient,
+  type CreemProduct,
+} from "@/lib/billing/creem/api-client";
+import {
   buildCreemProductSpecs,
+  buildCreemProductIdempotencyKey,
   type CreemProductSpec,
   findMatchingCreemProduct,
+  loadAllCreemProducts,
   type ResolvedCreemProduct,
   updateProductsConfigSource,
 } from "@/lib/billing/creem/product-sync";
@@ -26,12 +31,12 @@ async function main() {
   const prefix =
     getArgumentValue("--prefix") ??
     humanizePackageName(await readPackageName());
-  const client = new Creem({
-    server: env.CREEM_ENVIRONMENT === "live_mode" ? "prod" : "test",
+  const client = createCreemClient({
+    environment: env.CREEM_ENVIRONMENT,
     apiKey: env.CREEM_API_KEY,
   });
 
-  const existingProducts = await loadAllProducts(client);
+  const existingProducts = await loadAllCreemProducts(client);
   const specs = buildCreemProductSpecs(PRODUCT_TIERS, prefix);
   const resolvedProducts: ResolvedCreemProduct[] = [];
 
@@ -47,7 +52,11 @@ async function main() {
       continue;
     }
 
-    const createdProduct = await createProduct(client, spec);
+    const createdProduct = await createProduct(
+      client,
+      spec,
+      env.CREEM_ENVIRONMENT,
+    );
 
     existingProducts.push(createdProduct);
     resolvedProducts.push({
@@ -57,48 +66,58 @@ async function main() {
     });
   }
 
-  await writeResolvedProducts(resolvedProducts);
+  await writeResolvedProducts(resolvedProducts, env.CREEM_ENVIRONMENT);
   printSummary(env.CREEM_ENVIRONMENT, prefix, resolvedProducts);
 }
 
-async function loadAllProducts(client: Creem): Promise<ProductEntity[]> {
-  const products: ProductEntity[] = [];
-
-  const response = await client.products.search(1, 100);
-  for await (const page of response) {
-    products.push(...page.result.items);
-  }
-
-  return products;
-}
-
 async function createProduct(
-  client: Creem,
+  client: CreemClient,
   spec: CreemProductSpec,
-): Promise<ProductEntity> {
-  return client.products.create({
+  environment: "test_mode" | "live_mode",
+): Promise<CreemProduct> {
+  const product = {
     name: spec.name,
     description: spec.description,
     price: spec.price,
     currency: spec.currency,
-    billingType: spec.billingType,
-    taxMode: "exclusive",
-    taxCategory: "saas",
-    ...(spec.billingType === "recurring"
-      ? { billingPeriod: spec.billingPeriod }
-      : {}),
+    taxMode: spec.taxMode,
+    taxCategory: spec.taxCategory,
+    idempotencyKey: buildCreemProductIdempotencyKey(environment, spec),
+  };
+
+  if (spec.billingType === "recurring") {
+    if (!spec.billingPeriod) {
+      throw new Error(
+        `Recurring product "${spec.name}" needs a billing period.`,
+      );
+    }
+    return client.products.create({
+      ...product,
+      billingType: "recurring",
+      billingPeriod: spec.billingPeriod,
+    });
+  }
+
+  return client.products.create({
+    ...product,
+    billingType: "onetime",
   });
 }
 
 async function writeResolvedProducts(
   resolvedProducts: ResolvedCreemProduct[],
+  environment: "test_mode" | "live_mode",
 ): Promise<void> {
   const productsConfigPath = resolve(
     process.cwd(),
     "src/lib/config/products.ts",
   );
   const source = await readFile(productsConfigPath, "utf8");
-  const nextSource = updateProductsConfigSource(source, resolvedProducts);
+  const nextSource = updateProductsConfigSource(
+    source,
+    resolvedProducts,
+    environment,
+  );
 
   if (source !== nextSource) {
     await writeFile(productsConfigPath, nextSource, "utf8");

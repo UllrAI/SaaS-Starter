@@ -53,6 +53,3 @@ export function CompactContainer(props: ContainerProps) {
 export function FocusContainer(props: ContainerProps) {
   return <BaseContainer width="focus" {...props} />;
 }
-
-// Temporary alias for older imports. Prefer semantic container names in new code.
-export const SiteContainer = ShellContainer;

@@ -117,11 +117,21 @@ export function SubscriptionManagementTable({
       });
 
       if (result.data) {
-        toast.success(result.data.message);
+        toast.success(
+          t(
+            "subscription_cancel_success",
+            "The subscription has been canceled.",
+          ),
+        );
         setCancellingSubscription(null);
         refresh();
       } else if (result.serverError) {
-        toast.error(result.serverError);
+        toast.error(
+          t(
+            "subscription_cancel_error",
+            "We couldn't cancel the subscription. Please try again.",
+          ),
+        );
       }
     });
   };
@@ -142,7 +152,7 @@ export function SubscriptionManagementTable({
     return variants[status] || "secondary";
   };
   const formatDate = (dateString?: Date | string | null) => {
-    if (!dateString) return "N/A";
+    if (!dateString) return t("common_not_available", "Not available");
     return new Date(dateString).toLocaleDateString(intlLocale, {
       year: "numeric",
       month: "short",

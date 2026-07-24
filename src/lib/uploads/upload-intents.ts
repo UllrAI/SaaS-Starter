@@ -1,5 +1,5 @@
 import { randomUUID } from "crypto";
-import { and, eq, inArray, sql } from "drizzle-orm";
+import { and, eq, or, sql } from "drizzle-orm";
 import { db } from "@/database";
 import { uploadIntents, uploads } from "@/database/schema";
 import env from "@/env";
@@ -104,7 +104,8 @@ async function getUploadUsage(userId: string, tx: Transaction) {
     .where(
       and(
         eq(uploadIntents.userId, userId),
-        inArray(uploadIntents.status, ["pending", "cleaning"]),
+        eq(uploadIntents.status, "pending"),
+        sql`${uploadIntents.expiresAt} > now()`,
       ),
     );
 
@@ -167,6 +168,28 @@ export async function releaseUploadIntent(intentId: string, userId: string) {
           eq(uploadIntents.status, "pending"),
         ),
       );
+  });
+}
+
+export async function cancelUploadIntent(intentId: string, userId: string) {
+  return db.transaction(async (tx) => {
+    await lockUserUploadScope(userId, tx);
+    const [cancelled] = await tx
+      .update(uploadIntents)
+      .set({
+        status: "cancelled",
+        updatedAt: sql`now()`,
+      })
+      .where(
+        and(
+          eq(uploadIntents.id, intentId),
+          eq(uploadIntents.userId, userId),
+          eq(uploadIntents.status, "pending"),
+        ),
+      )
+      .returning({ id: uploadIntents.id });
+
+    return Boolean(cancelled);
   });
 }
 
@@ -380,7 +403,7 @@ export async function completeLegacyUpload({
 }
 
 async function claimExpiredIntent(
-  intent: Pick<UploadIntent, "id" | "userId">,
+  intent: Pick<UploadIntent, "id" | "userId" | "status">,
 ): Promise<UploadIntent | null> {
   return db.transaction(async (tx) => {
     await lockUserUploadScope(intent.userId, tx);
@@ -391,7 +414,11 @@ async function claimExpiredIntent(
         and(
           eq(uploadIntents.id, intent.id),
           eq(uploadIntents.userId, intent.userId),
-          eq(uploadIntents.status, "pending"),
+          eq(uploadIntents.status, intent.status),
+          or(
+            eq(uploadIntents.status, "pending"),
+            eq(uploadIntents.status, "cancelled"),
+          ),
           sql`${uploadIntents.expiresAt} <= now()`,
         ),
       )
@@ -406,11 +433,18 @@ export async function cleanupExpiredUploadIntents(
 ) {
   const safeLimit = Math.max(1, Math.min(limit, 100));
   const candidates = await db
-    .select({ id: uploadIntents.id, userId: uploadIntents.userId })
+    .select({
+      id: uploadIntents.id,
+      userId: uploadIntents.userId,
+      status: uploadIntents.status,
+    })
     .from(uploadIntents)
     .where(
       and(
-        eq(uploadIntents.status, "pending"),
+        or(
+          eq(uploadIntents.status, "pending"),
+          eq(uploadIntents.status, "cancelled"),
+        ),
         sql`${uploadIntents.expiresAt} <= now()`,
       ),
     )
@@ -418,6 +452,7 @@ export async function cleanupExpiredUploadIntents(
     .limit(safeLimit);
 
   let deleted = 0;
+  let deferred = 0;
   let failed = 0;
 
   for (const candidate of candidates) {
@@ -428,6 +463,26 @@ export async function cleanupExpiredUploadIntents(
 
     const result = await deleteObject(claimed.fileKey);
     if (result.success) {
+      if (!claimed.deleteCheckedAt) {
+        await db
+          .update(uploadIntents)
+          .set({
+            status: "cancelled",
+            deleteCheckedAt: sql`now()`,
+            expiresAt: sql`now() + make_interval(secs => ${UPLOAD_CONFIG.UPLOAD_TOMBSTONE_RECHECK_DELAY})`,
+            lastCleanupError: null,
+            updatedAt: sql`now()`,
+          })
+          .where(
+            and(
+              eq(uploadIntents.id, claimed.id),
+              eq(uploadIntents.status, "cleaning"),
+            ),
+          );
+        deferred += 1;
+        continue;
+      }
+
       await db
         .delete(uploadIntents)
         .where(
@@ -443,7 +498,8 @@ export async function cleanupExpiredUploadIntents(
     await db
       .update(uploadIntents)
       .set({
-        status: "pending",
+        status: candidate.status,
+        expiresAt: sql`now() + make_interval(secs => ${UPLOAD_CONFIG.UPLOAD_CLEANUP_RETRY_DELAY})`,
         cleanupAttempts: sql`${uploadIntents.cleanupAttempts} + 1`,
         lastCleanupError: (result.error ?? "Object deletion failed.").slice(
           0,
@@ -460,13 +516,13 @@ export async function cleanupExpiredUploadIntents(
     failed += 1;
   }
 
-  return { scanned: candidates.length, deleted, failed };
+  return { scanned: candidates.length, deleted, deferred, failed };
 }
 
 export async function recoverStaleUploadCleanupClaims() {
   const rows = await db
     .update(uploadIntents)
-    .set({ status: "pending", updatedAt: sql`now()` })
+    .set({ status: "cancelled", updatedAt: sql`now()` })
     .where(
       and(
         eq(uploadIntents.status, "cleaning"),

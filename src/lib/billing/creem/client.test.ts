@@ -1,536 +1,272 @@
 import {
-  describe,
-  it,
-  expect,
-  jest,
-  beforeEach,
-  afterEach,
-} from "@jest/globals";
+  CreemApiError,
+  createCreemClient,
+  type CreateCreemProductInput,
+} from "./api-client";
 
-// Mock Creem client
-const mockCreemInstance = {
-  config: {
-    server: "prod",
-  },
-  // Add other Creem methods that might be used
-  createPayment: jest.fn(),
-  getPayment: jest.fn(),
-  cancelPayment: jest.fn(),
+function jsonResponse(body: unknown, status = 200): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { "Content-Type": "application/json" },
+  });
+}
+
+function createTestClient(fetchImpl: jest.MockedFunction<typeof fetch>) {
+  return createCreemClient({
+    apiKey: "creem_test_secret-key",
+    environment: "test_mode",
+    fetchImpl,
+  });
+}
+
+const productWire = {
+  id: "prod_123",
+  mode: "test",
+  object: "product",
+  name: "Plus Monthly",
+  description: "Plus plan",
+  price: 999,
+  currency: "USD",
+  billing_type: "recurring",
+  billing_period: "every-month",
+  status: "active",
+  tax_mode: "exclusive",
+  tax_category: "saas",
+  created_at: "2026-01-01T00:00:00Z",
+  updated_at: "2026-01-01T00:00:00Z",
+  product_url: "",
+  default_success_url: "",
 };
 
-const mockCreemConstructor = jest.fn(() => mockCreemInstance);
+describe("Creem REST client", () => {
+  it("uses the test API and maps checkout fields at the boundary", async () => {
+    const fetchImpl = jest.fn<typeof fetch>().mockResolvedValue(
+      jsonResponse({
+        id: "ch_123",
+        status: "pending",
+        checkout_url: "https://checkout.creem.io/ch_123",
+        metadata: { userId: "user_123" },
+      }),
+    );
+    const client = createTestClient(fetchImpl);
 
-// Mock environment variables with default values
-const mockEnv = {
-  CREEM_API_KEY: "creem_api_key_test_12345",
-  CREEM_ENVIRONMENT: "test_mode",
-  CREEM_WEBHOOK_SECRET: "creem_webhook_secret_test_67890",
-};
-
-// Setup mocks before imports
-jest.mock("creem", () => ({
-  Creem: mockCreemConstructor,
-}));
-
-jest.mock("@/env", () => mockEnv);
-
-describe("Creem Client", () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-
-    // Reset mock environment to default values
-    mockEnv.CREEM_API_KEY = "creem_api_key_test_12345";
-    mockEnv.CREEM_ENVIRONMENT = "test_mode";
-    mockEnv.CREEM_WEBHOOK_SECRET = "creem_webhook_secret_test_67890";
-
-    // Reset mock constructor behavior
-    mockCreemConstructor.mockReturnValue(mockCreemInstance);
-  });
-
-  afterEach(() => {
-    jest.resetAllMocks();
-  });
-
-  describe("Module Initialization", () => {
-    it("should initialize Creem client with test mode configuration", async () => {
-      // Reset modules to force re-import with current mock values
-      jest.resetModules();
-
-      const clientModule = await import("./client");
-
-      expect(mockCreemConstructor).toHaveBeenCalledWith(
-        expect.objectContaining({
-          server: "test",
-        }),
-      );
-
-      expect(clientModule.creemClient).toBe(mockCreemInstance);
+    await expect(
+      client.checkouts.create({
+        productId: "prod_123",
+        requestId: "req_123",
+        successUrl: "https://example.com/success",
+        customer: { email: "user@example.com" },
+        metadata: { userId: "user_123" },
+      }),
+    ).resolves.toEqual({
+      id: "ch_123",
+      status: "pending",
+      checkoutUrl: "https://checkout.creem.io/ch_123",
+      metadata: { userId: "user_123" },
     });
 
-    it("should initialize Creem client with live mode configuration", async () => {
-      mockEnv.CREEM_ENVIRONMENT = "live_mode";
-
-      jest.resetModules();
-      const clientModule = await import("./client");
-
-      expect(mockCreemConstructor).toHaveBeenCalledWith(
-        expect.objectContaining({
-          server: "prod",
-        }),
-      );
-
-      expect(clientModule.creemClient).toBe(mockCreemInstance);
+    const [url, init] = fetchImpl.mock.calls[0]!;
+    expect(url).toBe("https://test-api.creem.io/v1/checkouts");
+    expect(init?.headers).toMatchObject({
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      "x-api-key": "creem_test_secret-key",
     });
-
-    it("should use test mode for unknown environment values", async () => {
-      mockEnv.CREEM_ENVIRONMENT = "unknown_mode";
-
-      jest.resetModules();
-      await import("./client");
-
-      expect(mockCreemConstructor).toHaveBeenCalledWith(
-        expect.objectContaining({
-          server: "test",
-        }),
-      );
-    });
-
-    it("should use test mode when CREEM_ENVIRONMENT is undefined", async () => {
-      delete (mockEnv as any).CREEM_ENVIRONMENT;
-
-      jest.resetModules();
-      await import("./client");
-
-      expect(mockCreemConstructor).toHaveBeenCalledWith(
-        expect.objectContaining({
-          server: "test",
-        }),
-      );
-    });
-
-    it("should use test mode when CREEM_ENVIRONMENT is empty string", async () => {
-      mockEnv.CREEM_ENVIRONMENT = "";
-
-      jest.resetModules();
-      await import("./client");
-
-      expect(mockCreemConstructor).toHaveBeenCalledWith(
-        expect.objectContaining({
-          server: "test",
-        }),
-      );
+    expect(JSON.parse(String(init?.body))).toEqual({
+      product_id: "prod_123",
+      request_id: "req_123",
+      success_url: "https://example.com/success",
+      customer: { email: "user@example.com" },
+      metadata: { userId: "user_123" },
     });
   });
 
-  describe("Environment Variable Validation", () => {
-    it("should throw error when CREEM_API_KEY is not set", async () => {
-      delete (mockEnv as any).CREEM_API_KEY;
-
-      jest.resetModules();
-
-      await expect(import("./client")).rejects.toThrow(
-        "CREEM_API_KEY environment variable is not set.",
-      );
+  it("uses the production API and URL-encodes checkout identifiers", async () => {
+    const fetchImpl = jest
+      .fn<typeof fetch>()
+      .mockResolvedValue(jsonResponse({ status: "completed" }));
+    const client = createCreemClient({
+      apiKey: "creem_live-key",
+      environment: "live_mode",
+      fetchImpl,
     });
 
-    it("should throw error when CREEM_API_KEY is empty string", async () => {
-      mockEnv.CREEM_API_KEY = "";
+    await client.checkouts.retrieve("ch_1 & 2");
 
-      jest.resetModules();
+    expect(fetchImpl).toHaveBeenCalledWith(
+      "https://api.creem.io/v1/checkouts?checkout_id=ch_1+%26+2",
+      expect.objectContaining({ signal: expect.any(AbortSignal) }),
+    );
+  });
 
-      await expect(import("./client")).rejects.toThrow(
-        "CREEM_API_KEY environment variable is not set.",
-      );
+  it("maps the customer portal response", async () => {
+    const fetchImpl = jest.fn<typeof fetch>().mockResolvedValue(
+      jsonResponse({
+        customer_portal_link: "https://creem.io/portal/cust_123",
+      }),
+    );
+
+    await expect(
+      createTestClient(fetchImpl).customers.generateBillingLinks({
+        customerId: "cust_123",
+      }),
+    ).resolves.toEqual({
+      customerPortalLink: "https://creem.io/portal/cust_123",
     });
 
-    it("should throw error when CREEM_API_KEY is null", async () => {
-      (mockEnv as any).CREEM_API_KEY = null;
-
-      jest.resetModules();
-
-      await expect(import("./client")).rejects.toThrow(
-        "CREEM_API_KEY environment variable is not set.",
-      );
-    });
-
-    it("should throw error when CREEM_API_KEY is undefined", async () => {
-      (mockEnv as any).CREEM_API_KEY = undefined;
-
-      jest.resetModules();
-
-      await expect(import("./client")).rejects.toThrow(
-        "CREEM_API_KEY environment variable is not set.",
-      );
-    });
-
-    it("should accept valid CREEM_API_KEY", async () => {
-      mockEnv.CREEM_API_KEY = "valid_api_key_123";
-
-      jest.resetModules();
-
-      await expect(import("./client")).resolves.not.toThrow();
+    expect(JSON.parse(String(fetchImpl.mock.calls[0]?.[1]?.body))).toEqual({
+      customer_id: "cust_123",
     });
   });
 
-  describe("Exported Values", () => {
-    it("should export creemClient instance", async () => {
-      jest.resetModules();
-      const { creemClient } = await import("./client");
+  it("sends the complete subscription cancellation contract", async () => {
+    const fetchImpl = jest
+      .fn<typeof fetch>()
+      .mockResolvedValue(jsonResponse({ id: "sub_123", status: "canceled" }));
 
-      expect(creemClient).toBe(mockCreemInstance);
-      expect(creemClient).toBeDefined();
+    await createTestClient(fetchImpl).subscriptions.cancel("sub/123", {
+      mode: "immediate",
     });
 
-    it("should export creemApiKey from environment", async () => {
-      const testApiKey = "test_api_key_456";
-      mockEnv.CREEM_API_KEY = testApiKey;
-
-      jest.resetModules();
-      const { creemApiKey } = await import("./client");
-
-      expect(creemApiKey).toBe(testApiKey);
-    });
-
-    it("should export creemWebhookSecret from environment", async () => {
-      const testWebhookSecret = "test_webhook_secret_789";
-      mockEnv.CREEM_WEBHOOK_SECRET = testWebhookSecret;
-
-      jest.resetModules();
-      const { creemWebhookSecret } = await import("./client");
-
-      expect(creemWebhookSecret).toBe(testWebhookSecret);
-    });
-
-    it("should handle undefined webhook secret", async () => {
-      delete (mockEnv as any).CREEM_WEBHOOK_SECRET;
-
-      jest.resetModules();
-      const { creemWebhookSecret } = await import("./client");
-
-      expect(creemWebhookSecret).toBeUndefined();
-    });
-
-    it("should handle empty webhook secret", async () => {
-      mockEnv.CREEM_WEBHOOK_SECRET = "";
-
-      jest.resetModules();
-      const { creemWebhookSecret } = await import("./client");
-
-      expect(creemWebhookSecret).toBe("");
+    expect(fetchImpl.mock.calls[0]?.[0]).toBe(
+      "https://test-api.creem.io/v1/subscriptions/sub%2F123/cancel",
+    );
+    expect(JSON.parse(String(fetchImpl.mock.calls[0]?.[1]?.body))).toEqual({
+      mode: "immediate",
+      onExecute: "cancel",
     });
   });
 
-  describe("Server Selection", () => {
-    it("should use the production server for live_mode", async () => {
-      mockEnv.CREEM_ENVIRONMENT = "live_mode";
-
-      jest.resetModules();
-      await import("./client");
-
-      expect(mockCreemConstructor).toHaveBeenCalledWith(
-        expect.objectContaining({
-          server: "prod",
+  it("maps paginated products and serializes product creation", async () => {
+    const fetchImpl = jest
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(
+        jsonResponse({
+          items: [productWire],
+          pagination: {
+            total_records: 1,
+            total_pages: 1,
+            current_page: 1,
+            next_page: null,
+            prev_page: null,
+          },
         }),
-      );
+      )
+      .mockResolvedValueOnce(jsonResponse(productWire));
+    const client = createTestClient(fetchImpl);
+
+    await expect(client.products.search(1, 100)).resolves.toMatchObject({
+      items: [
+        {
+          id: "prod_123",
+          billingType: "recurring",
+          billingPeriod: "every-month",
+          createdAt: "2026-01-01T00:00:00Z",
+          productUrl: undefined,
+          defaultSuccessUrl: undefined,
+        },
+      ],
+      pagination: { totalRecords: 1, nextPage: null },
     });
 
-    it("should use the test server for test_mode", async () => {
-      mockEnv.CREEM_ENVIRONMENT = "test_mode";
+    const input: CreateCreemProductInput = {
+      name: "Plus Monthly",
+      description: "Plus plan",
+      price: 999,
+      currency: "USD",
+      billingType: "recurring",
+      billingPeriod: "every-month",
+      taxMode: "exclusive",
+      taxCategory: "saas",
+      idempotencyKey: "product-sync-test-plus-monthly",
+    };
+    await client.products.create(input);
 
-      jest.resetModules();
-      await import("./client");
-
-      expect(mockCreemConstructor).toHaveBeenCalledWith(
-        expect.objectContaining({
-          server: "test",
-        }),
-      );
+    expect(fetchImpl.mock.calls[1]?.[1]?.headers).toMatchObject({
+      "Idempotency-Key": "product-sync-test-plus-monthly",
     });
+    expect(JSON.parse(String(fetchImpl.mock.calls[1]?.[1]?.body))).toEqual({
+      name: "Plus Monthly",
+      description: "Plus plan",
+      price: 999,
+      currency: "USD",
+      billing_type: "recurring",
+      billing_period: "every-month",
+      tax_mode: "exclusive",
+      tax_category: "saas",
+    });
+  });
 
-    it("should use the test server for any non-live_mode value", async () => {
-      const nonLiveModeValues = [
-        "test_mode",
-        "development",
-        "staging",
-        "prod",
-        "production",
-        "demo",
-        "sandbox",
-        "preview",
-        "",
-        null,
-        undefined,
-        123,
-        true,
-        false,
-      ];
+  it("returns controlled errors without exposing provider response bodies", async () => {
+    const fetchImpl = jest
+      .fn<typeof fetch>()
+      .mockResolvedValue(jsonResponse({ error: "sensitive detail" }, 401));
 
-      for (const value of nonLiveModeValues) {
-        (mockEnv as any).CREEM_ENVIRONMENT = value;
+    const result = createTestClient(fetchImpl).checkouts.retrieve("ch_123");
 
-        jest.resetModules();
-        await import("./client");
+    await expect(result).rejects.toMatchObject({
+      name: "CreemApiError",
+      operation: "retrieve checkout",
+      status: 401,
+      message: "Creem request failed (retrieve checkout, HTTP 401).",
+    });
+    await expect(result).rejects.not.toThrow("sensitive detail");
+  });
 
-        expect(mockCreemConstructor).toHaveBeenCalledWith(
-          expect.objectContaining({
-            server: "test",
-          }),
+  it("rejects malformed success responses", async () => {
+    const fetchImpl = jest
+      .fn<typeof fetch>()
+      .mockResolvedValue(jsonResponse({ status: 123 }));
+
+    await expect(
+      createTestClient(fetchImpl).checkouts.retrieve("ch_123"),
+    ).rejects.toEqual(
+      expect.objectContaining<Partial<CreemApiError>>({
+        name: "CreemApiError",
+        message: "Creem returned an invalid response (retrieve checkout).",
+      }),
+    );
+  });
+
+  it("aborts requests at the configured timeout", async () => {
+    jest.useFakeTimers();
+    const fetchImpl = jest.fn<typeof fetch>((_url, init) => {
+      return new Promise((_resolve, reject) => {
+        init?.signal?.addEventListener("abort", () =>
+          reject(new DOMException("Aborted", "AbortError")),
         );
-      }
-    });
-
-    it("should be case sensitive for live_mode", async () => {
-      const caseSensitiveValues = [
-        "Live_Mode",
-        "LIVE_MODE",
-        "live_Mode",
-        "Live_mode",
-        " live_mode",
-        "live_mode ",
-        "live-mode",
-        "livemode",
-      ];
-
-      for (const value of caseSensitiveValues) {
-        mockEnv.CREEM_ENVIRONMENT = value;
-
-        jest.resetModules();
-        await import("./client");
-
-        expect(mockCreemConstructor).toHaveBeenCalledWith(
-          expect.objectContaining({
-            server: "test",
-          }),
-        );
-      }
-    });
-  });
-
-  describe("Integration Tests", () => {
-    it("should properly configure client for production environment", async () => {
-      mockEnv.CREEM_API_KEY = "live_api_key_prod_123";
-      mockEnv.CREEM_ENVIRONMENT = "live_mode";
-      mockEnv.CREEM_WEBHOOK_SECRET = "live_webhook_secret_456";
-
-      jest.resetModules();
-      const { creemClient, creemApiKey, creemWebhookSecret } =
-        await import("./client");
-
-      expect(mockCreemConstructor).toHaveBeenCalledWith(
-        expect.objectContaining({
-          server: "prod",
-        }),
-      );
-      expect(creemClient).toBe(mockCreemInstance);
-      expect(creemApiKey).toBe("live_api_key_prod_123");
-      expect(creemWebhookSecret).toBe("live_webhook_secret_456");
-    });
-
-    it("should properly configure client for development environment", async () => {
-      mockEnv.CREEM_API_KEY = "test_api_key_dev_789";
-      mockEnv.CREEM_ENVIRONMENT = "test_mode";
-      mockEnv.CREEM_WEBHOOK_SECRET = "test_webhook_secret_012";
-
-      jest.resetModules();
-      const { creemClient, creemApiKey, creemWebhookSecret } =
-        await import("./client");
-
-      expect(mockCreemConstructor).toHaveBeenCalledWith(
-        expect.objectContaining({
-          server: "test",
-        }),
-      );
-      expect(creemClient).toBe(mockCreemInstance);
-      expect(creemApiKey).toBe("test_api_key_dev_789");
-      expect(creemWebhookSecret).toBe("test_webhook_secret_012");
-    });
-
-    it("should handle minimal configuration", async () => {
-      mockEnv.CREEM_API_KEY = "minimal_api_key";
-      delete (mockEnv as any).CREEM_ENVIRONMENT;
-      delete (mockEnv as any).CREEM_WEBHOOK_SECRET;
-
-      jest.resetModules();
-      const { creemClient, creemApiKey, creemWebhookSecret } =
-        await import("./client");
-
-      expect(mockCreemConstructor).toHaveBeenCalledWith(
-        expect.objectContaining({
-          server: "test",
-        }),
-      );
-      expect(creemClient).toBe(mockCreemInstance);
-      expect(creemApiKey).toBe("minimal_api_key");
-      expect(creemWebhookSecret).toBeUndefined();
-    });
-  });
-
-  describe("Error Scenarios", () => {
-    it("should handle Creem constructor errors", async () => {
-      const constructorError = new Error("Creem initialization failed");
-      mockCreemConstructor.mockImplementation(() => {
-        throw constructorError;
       });
-
-      jest.resetModules();
-
-      await expect(import("./client")).rejects.toThrow(
-        "Creem initialization failed",
-      );
+    });
+    const client = createCreemClient({
+      apiKey: "creem_test_key",
+      environment: "test_mode",
+      timeoutMs: 25,
+      fetchImpl,
     });
 
-    it("should propagate validation errors before Creem instantiation", async () => {
-      delete (mockEnv as any).CREEM_API_KEY;
-
-      // Ensure Creem constructor is never called when validation fails
-      jest.resetModules();
-
-      await expect(import("./client")).rejects.toThrow(
-        "CREEM_API_KEY environment variable is not set.",
-      );
-
-      expect(mockCreemConstructor).not.toHaveBeenCalled();
+    const result = client.checkouts.retrieve("ch_123");
+    const expectation = expect(result).rejects.toMatchObject({
+      name: "CreemApiError",
+      message: "Creem request timed out after 25ms (retrieve checkout).",
     });
+    await jest.advanceTimersByTimeAsync(25);
+
+    await expectation;
+    jest.useRealTimers();
   });
 
-  describe("Module Loading Behavior", () => {
-    it("should maintain same exports across multiple imports", async () => {
-      jest.resetModules();
-      const import1 = await import("./client");
-      const import2 = await import("./client");
-
-      expect(import1.creemClient).toBe(import2.creemClient);
-      expect(import1.creemApiKey).toBe(import2.creemApiKey);
-      expect(import1.creemWebhookSecret).toBe(import2.creemWebhookSecret);
-    });
-
-    it("should re-initialize after module reset", async () => {
-      jest.resetModules();
-      await import("./client");
-
-      const firstCallCount = mockCreemConstructor.mock.calls.length;
-
-      jest.resetModules();
-      await import("./client");
-
-      expect(mockCreemConstructor.mock.calls.length).toBe(firstCallCount + 1);
-    });
-
-    it("should validate environment variables on each import", async () => {
-      // First import with valid API key
-      mockEnv.CREEM_API_KEY = "valid_key";
-      jest.resetModules();
-      await expect(import("./client")).resolves.not.toThrow();
-
-      // Second import with invalid API key
-      delete (mockEnv as any).CREEM_API_KEY;
-      jest.resetModules();
-      await expect(import("./client")).rejects.toThrow(
-        "CREEM_API_KEY environment variable is not set.",
-      );
-    });
-  });
-
-  describe("Environment Variable Edge Cases", () => {
-    it("should handle various falsy values for CREEM_API_KEY", async () => {
-      const falsyValues = ["", null, undefined, 0, false];
-
-      for (const value of falsyValues) {
-        (mockEnv as any).CREEM_API_KEY = value;
-
-        jest.resetModules();
-
-        await expect(import("./client")).rejects.toThrow(
-          "CREEM_API_KEY environment variable is not set.",
-        );
-      }
-    });
-
-    it("should accept various truthy values for CREEM_API_KEY", async () => {
-      const truthyValues = [
-        "valid_key",
-        "key_123",
-        "creem_live_key_abc",
-        "test_key",
-        "1",
-        "true",
-        " key_with_spaces ",
-      ];
-
-      for (const value of truthyValues) {
-        mockEnv.CREEM_API_KEY = value;
-
-        jest.resetModules();
-
-        await expect(import("./client")).resolves.not.toThrow();
-
-        const { creemApiKey } = await import("./client");
-        expect(creemApiKey).toBe(value);
-      }
-    });
-
-    it("should handle special characters in environment variables", async () => {
-      mockEnv.CREEM_API_KEY = "key_with_!@#$%^&*()_+-=[]{}|;:,.<>?";
-      mockEnv.CREEM_WEBHOOK_SECRET = "secret_with_!@#$%^&*()_+-=[]{}|;:,.<>?";
-
-      jest.resetModules();
-      const { creemApiKey, creemWebhookSecret } = await import("./client");
-
-      expect(creemApiKey).toBe("key_with_!@#$%^&*()_+-=[]{}|;:,.<>?");
-      expect(creemWebhookSecret).toBe("secret_with_!@#$%^&*()_+-=[]{}|;:,.<>?");
-    });
-
-    it("should handle unicode characters in environment variables", async () => {
-      mockEnv.CREEM_API_KEY = "key_测试_🔑_émoji";
-      mockEnv.CREEM_WEBHOOK_SECRET = "secret_测试_🔐_émoji";
-
-      jest.resetModules();
-      const { creemApiKey, creemWebhookSecret } = await import("./client");
-
-      expect(creemApiKey).toBe("key_测试_🔑_émoji");
-      expect(creemWebhookSecret).toBe("secret_测试_🔐_émoji");
-    });
-  });
-
-  describe("Configuration Consistency", () => {
-    it("should maintain consistent configuration between imports", async () => {
-      mockEnv.CREEM_API_KEY = "consistent_key";
-      mockEnv.CREEM_ENVIRONMENT = "live_mode";
-      mockEnv.CREEM_WEBHOOK_SECRET = "consistent_secret";
-
-      jest.resetModules();
-      const firstImport = await import("./client");
-      const secondImport = await import("./client");
-
-      expect(firstImport.creemApiKey).toBe(secondImport.creemApiKey);
-      expect(firstImport.creemWebhookSecret).toBe(
-        secondImport.creemWebhookSecret,
-      );
-      expect(firstImport.creemClient).toBe(secondImport.creemClient);
-    });
-
-    it("should reflect environment changes after module reset", async () => {
-      // Initial configuration
-      mockEnv.CREEM_API_KEY = "initial_key";
-      mockEnv.CREEM_ENVIRONMENT = "test_mode";
-
-      jest.resetModules();
-      const { creemApiKey: key1 } = await import("./client");
-      expect(key1).toBe("initial_key");
-      expect(mockCreemConstructor).toHaveBeenLastCalledWith(
-        expect.objectContaining({ server: "test" }),
-      );
-
-      // Changed configuration
-      mockEnv.CREEM_API_KEY = "changed_key";
-      mockEnv.CREEM_ENVIRONMENT = "live_mode";
-
-      jest.resetModules();
-      const { creemApiKey: key2 } = await import("./client");
-      expect(key2).toBe("changed_key");
-      expect(mockCreemConstructor).toHaveBeenLastCalledWith(
-        expect.objectContaining({ server: "prod" }),
-      );
-    });
+  it("rejects API keys from the other Creem environment", () => {
+    expect(() =>
+      createCreemClient({
+        apiKey: "creem_test_key",
+        environment: "live_mode",
+      }),
+    ).toThrow("CREEM_API_KEY does not match CREEM_ENVIRONMENT=live_mode.");
+    expect(() =>
+      createCreemClient({
+        apiKey: "creem_live_key",
+        environment: "test_mode",
+      }),
+    ).toThrow("CREEM_API_KEY does not match CREEM_ENVIRONMENT=test_mode.");
   });
 });

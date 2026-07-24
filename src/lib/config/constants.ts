@@ -5,8 +5,6 @@ export const APP_NAME =
     : "SaaS Starter";
 export const COMPANY_NAME = "UllrAI Lab";
 
-export const TRIAL_DAYS = 7;
-
 // https://www.dicebear.com/playground/
 // DEFAULT: initials
 export const AVATAR_STYLE = "adventurer-neutral";
@@ -22,8 +20,6 @@ export const GITHUB_ISSUES_URL = `${GITHUB_URL}/issues`;
 export const GITHUB_RELEASES_URL = `${GITHUB_URL}/releases`;
 export const GITHUB_DISCUSSIONS_URL = `${GITHUB_URL}/discussions`;
 export const DOCS_URL = `${GITHUB_URL}#readme`;
-export const VERCEL_DEPLOY_URL =
-  "https://vercel.com/new/clone?repository-url=https://github.com/ullrai/saas-starter";
 
 export const PAYMENT_PROVIDER = "creem" as const;
 // SEO

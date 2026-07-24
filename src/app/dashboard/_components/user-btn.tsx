@@ -57,7 +57,7 @@ export function UserButton({ user }: UserButtonProps) {
         },
       });
       if (error) {
-        toast.error(error.message);
+        toast.error(<LogoutFailedToast />);
         return;
       }
       toast.success(<LoggedOutToast />);

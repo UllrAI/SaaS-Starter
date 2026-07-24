@@ -1,7 +1,4 @@
-import {
-  BlogPageContent,
-  generateMetadata as generateSourceMetadata,
-} from "@/app/(pages)/blog/page";
+import { BlogPageContent, buildBlogMetadata } from "@/app/(pages)/blog/page";
 import { withStaticLocalizedMetadata } from "@/lib/i18n/static-marketing-metadata";
 import { resolveStaticMarketingParams } from "@/lib/i18n/static-marketing-locale";
 
@@ -11,7 +8,7 @@ type LocalizedPageProps = {
 
 export async function generateMetadata({ params }: LocalizedPageProps) {
   const locale = await resolveStaticMarketingParams(params);
-  const metadata = await generateSourceMetadata();
+  const metadata = await buildBlogMetadata(locale);
 
   return withStaticLocalizedMetadata(metadata, "/blog", locale);
 }

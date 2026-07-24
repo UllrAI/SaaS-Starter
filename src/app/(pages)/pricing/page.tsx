@@ -1,5 +1,5 @@
-import { useTranslation } from "@/lib/i18n/translation/client";
 import { getServerTranslations } from "@/lib/i18n/translation/server";
+import { getStaticTranslations } from "@/lib/i18n/translation/static";
 import { LocalizedLink as Link } from "@/components/localized-link";
 import {
   Card,
@@ -23,7 +23,7 @@ import {
   createLocalizedAlternates,
   createMetadataDefaults,
 } from "@/lib/metadata";
-import { SOURCE_LOCALE } from "@/lib/config/i18n";
+import { SOURCE_LOCALE, type SupportedLocale } from "@/lib/config/i18n";
 import {
   Boxes,
   CreditCard,
@@ -32,10 +32,11 @@ import {
   LockKeyhole,
   Upload,
 } from "lucide-react";
-export async function generateMetadata() {
-  const { t } = await getServerTranslations();
+export async function buildPricingMetadata(locale: SupportedLocale) {
+  const { t } = await getServerTranslations({ locale });
   const metadata = createMetadataDefaults({
-    alternates: createLocalizedAlternates("/pricing", SOURCE_LOCALE),
+    alternates: createLocalizedAlternates("/pricing", locale),
+    locale,
   });
   return {
     ...metadata,
@@ -69,8 +70,15 @@ export async function generateMetadata() {
     },
   };
 }
-export default function PricingPage() {
-  const { t } = useTranslation();
+export function generateMetadata() {
+  return buildPricingMetadata(SOURCE_LOCALE);
+}
+export default function PricingPage({
+  locale = SOURCE_LOCALE,
+}: {
+  locale?: SupportedLocale;
+} = {}) {
+  const { t } = getStaticTranslations(locale);
   const includedCards = [
     {
       id: "auth",
@@ -253,12 +261,12 @@ export default function PricingPage() {
 
             <div className="space-y-3">
               <Button asChild className="w-full">
-                <Link href="/features">
+                <Link href="/features" locale={locale}>
                   {t("5e7e631987bc", "Review included modules")}
                 </Link>
               </Button>
               <Button asChild variant="outline" className="w-full">
-                <Link href="/contact">
+                <Link href="/contact" locale={locale}>
                   {t("fed723d3bdb1", "Talk through fit")}
                 </Link>
               </Button>

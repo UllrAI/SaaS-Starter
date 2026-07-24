@@ -29,8 +29,19 @@ to keep the migration lossless. New code should use descriptive keys.
 ## Routing and SEO
 
 English marketing URLs are unprefixed. Simplified Chinese URLs use the
-`/zh-Hans` prefix. Canonical URLs never redirect based on cookies or
-`Accept-Language`; users switch language through explicit locale-aware links.
+`/zh-Hans` prefix. On an unprefixed marketing URL, the saved locale cookie
+takes precedence over `Accept-Language`. A supported non-English preference
+receives a temporary `307` redirect to its localized URL; unsupported
+languages fall back to the canonical English URL. Explicit locale-prefixed
+URLs do not undergo language detection.
+
+Negotiated redirects vary on `Cookie` and `Accept-Language`. All unprefixed
+marketing responses that participate in language detection are private and
+not cacheable, which prevents an upstream shared cache from bypassing
+negotiation or replaying one visitor's language choice. Locale-prefixed pages
+remain statically generated and cacheable. Locale switcher links remain
+explicit and crawlable. Canonical, `hreflang`, and `x-default` metadata always
+point to stable language URLs.
 
 When copy or routing changes, run:
 

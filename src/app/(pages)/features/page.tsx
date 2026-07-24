@@ -1,5 +1,5 @@
-import { useTranslation } from "@/lib/i18n/translation/client";
 import { getServerTranslations } from "@/lib/i18n/translation/server";
+import { getStaticTranslations } from "@/lib/i18n/translation/static";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Features } from "@/components/homepage/features";
@@ -14,11 +14,12 @@ import {
   createLocalizedAlternates,
   createMetadataDefaults,
 } from "@/lib/metadata";
-import { SOURCE_LOCALE } from "@/lib/config/i18n";
-export async function generateMetadata() {
-  const { t } = await getServerTranslations();
+import { SOURCE_LOCALE, type SupportedLocale } from "@/lib/config/i18n";
+export async function buildFeaturesMetadata(locale: SupportedLocale) {
+  const { t } = await getServerTranslations({ locale });
   const metadata = createMetadataDefaults({
-    alternates: createLocalizedAlternates("/features", SOURCE_LOCALE),
+    alternates: createLocalizedAlternates("/features", locale),
+    locale,
   });
   return {
     ...metadata,
@@ -45,8 +46,15 @@ export async function generateMetadata() {
     },
   };
 }
-export default function FeaturesPage() {
-  const { t } = useTranslation();
+export function generateMetadata() {
+  return buildFeaturesMetadata(SOURCE_LOCALE);
+}
+export default function FeaturesPage({
+  locale = SOURCE_LOCALE,
+}: {
+  locale?: SupportedLocale;
+} = {}) {
+  const { t } = getStaticTranslations(locale);
   const includedItems = [
     <>
       {t(
@@ -185,7 +193,7 @@ export default function FeaturesPage() {
         </div>
       </MarketingPageShell>
 
-      <Features />
+      <Features locale={locale} />
     </>
   );
 }

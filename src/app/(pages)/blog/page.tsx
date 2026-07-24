@@ -1,5 +1,5 @@
-import { useTranslation } from "@/lib/i18n/translation/client";
 import { getServerTranslations } from "@/lib/i18n/translation/server";
+import { getStaticTranslations } from "@/lib/i18n/translation/static";
 import { Sparkles, BookOpen } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { BackgroundPattern } from "@/components/ui/background-pattern";
@@ -19,10 +19,11 @@ import {
   getAuthorBySlug,
   getLocalizedBlogPostPath,
 } from "@/lib/content/blog";
-export async function generateMetadata() {
-  const { t } = await getServerTranslations();
+export async function buildBlogMetadata(locale: SupportedLocale) {
+  const { t } = await getServerTranslations({ locale });
   const metadata = createMetadataDefaults({
-    alternates: createLocalizedAlternates("/blog", SOURCE_LOCALE),
+    alternates: createLocalizedAlternates("/blog", locale),
+    locale,
   });
   return {
     ...metadata,
@@ -49,8 +50,11 @@ export async function generateMetadata() {
     },
   };
 }
+export function generateMetadata() {
+  return buildBlogMetadata(SOURCE_LOCALE);
+}
 export function BlogPageContent({ locale }: { locale: SupportedLocale }) {
-  const { t } = useTranslation();
+  const { t } = getStaticTranslations(locale);
   const sortedPosts = getAllPosts(locale);
   const featuredPosts = sortedPosts.filter((post) => post.featured);
   const regularPosts = sortedPosts.filter((post) => !post.featured);
@@ -71,7 +75,7 @@ export function BlogPageContent({ locale }: { locale: SupportedLocale }) {
         featured={post.featured}
         variant={variant}
         author={author?.name}
-        readTime={calculateReadingTime(post.content)}
+        readingMinutes={calculateReadingTime(post.content)}
         locale={locale}
       />
     );

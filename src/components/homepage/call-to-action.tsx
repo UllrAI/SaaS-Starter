@@ -1,12 +1,17 @@
-import { useTranslation } from "@/lib/i18n/translation/client";
+import { getStaticTranslations } from "@/lib/i18n/translation/static";
+import { SOURCE_LOCALE, type SupportedLocale } from "@/lib/config/i18n";
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/logo";
 import { SectionContainer } from "@/components/layout/page-container";
 import { ArrowRight, CheckCircle } from "lucide-react";
 import { LocalizedLink as Link } from "@/components/localized-link";
-export function CallToAction() {
-  const { t } = useTranslation();
+export function CallToAction({
+  locale = SOURCE_LOCALE,
+}: {
+  locale?: SupportedLocale;
+} = {}) {
+  const { t } = getStaticTranslations(locale);
   const proofPoints = [
     {
       id: "typed",
@@ -66,7 +71,7 @@ export function CallToAction() {
               className="group h-14 px-10 text-base font-bold shadow-lg transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-md active:translate-x-[4px] active:translate-y-[4px]"
               asChild
             >
-              <Link href="/pricing">
+              <Link href="/pricing" locale={locale}>
                 <>{t("12f934de1f96", "View pricing")}</>
                 <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Link>
@@ -78,7 +83,7 @@ export function CallToAction() {
               className="hover:bg-secondary h-14 border-2 px-10 text-base font-bold transition-colors"
               asChild
             >
-              <Link href="/features">
+              <Link href="/features" locale={locale}>
                 <>{t("8a9b896f234f", "See what's inside")}</>
               </Link>
             </Button>

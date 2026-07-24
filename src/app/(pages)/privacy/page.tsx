@@ -1,5 +1,5 @@
-import { useTranslation } from "@/lib/i18n/translation/client";
 import { getServerTranslations } from "@/lib/i18n/translation/server";
+import { getStaticTranslations } from "@/lib/i18n/translation/static";
 import { LocalizedLink as Link } from "@/components/localized-link";
 import { GITHUB_DISCUSSIONS_URL, PRIVACY_EMAIL } from "@/lib/config/constants";
 import { Shield } from "lucide-react";
@@ -7,7 +7,7 @@ import {
   createLocalizedAlternates,
   createMetadataDefaults,
 } from "@/lib/metadata";
-import { SOURCE_LOCALE } from "@/lib/config/i18n";
+import { SOURCE_LOCALE, type SupportedLocale } from "@/lib/config/i18n";
 import { ReadingContainer } from "@/components/layout/page-container";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -15,10 +15,11 @@ import {
   PageIntroDescription,
   PageIntroHeading,
 } from "@/components/layout/page-intro";
-export async function generateMetadata() {
-  const { t } = await getServerTranslations();
+export async function buildPrivacyMetadata(locale: SupportedLocale) {
+  const { t } = await getServerTranslations({ locale });
   const metadata = createMetadataDefaults({
-    alternates: createLocalizedAlternates("/privacy", SOURCE_LOCALE),
+    alternates: createLocalizedAlternates("/privacy", locale),
+    locale,
   });
   return {
     ...metadata,
@@ -45,8 +46,15 @@ export async function generateMetadata() {
     },
   };
 }
-export default function PrivacyPage() {
-  const { t } = useTranslation();
+export function generateMetadata() {
+  return buildPrivacyMetadata(SOURCE_LOCALE);
+}
+export default function PrivacyPage({
+  locale = SOURCE_LOCALE,
+}: {
+  locale?: SupportedLocale;
+} = {}) {
+  const { t } = getStaticTranslations(locale);
   const privacySections = [
     {
       id: "information-collection",
@@ -221,7 +229,11 @@ export default function PrivacyPage() {
             </p>
             <p>
               <strong>{t("7ba1a8e44572", "Support:")}</strong>{" "}
-              <Link href="/contact" className="underline underline-offset-4">
+              <Link
+                href="/contact"
+                locale={locale}
+                className="underline underline-offset-4"
+              >
                 {t("3f5b18c72fe6", "Contact page")}
               </Link>
             </p>

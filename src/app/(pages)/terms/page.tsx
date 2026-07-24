@@ -1,5 +1,5 @@
-import { useTranslation } from "@/lib/i18n/translation/client";
 import { getServerTranslations } from "@/lib/i18n/translation/server";
+import { getStaticTranslations } from "@/lib/i18n/translation/static";
 import { LocalizedLink as Link } from "@/components/localized-link";
 import {
   COMPANY_NAME,
@@ -18,11 +18,12 @@ import {
   createLocalizedAlternates,
   createMetadataDefaults,
 } from "@/lib/metadata";
-import { SOURCE_LOCALE } from "@/lib/config/i18n";
-export async function generateMetadata() {
-  const { t } = await getServerTranslations();
+import { SOURCE_LOCALE, type SupportedLocale } from "@/lib/config/i18n";
+export async function buildTermsMetadata(locale: SupportedLocale) {
+  const { t } = await getServerTranslations({ locale });
   const metadata = createMetadataDefaults({
-    alternates: createLocalizedAlternates("/terms", SOURCE_LOCALE),
+    alternates: createLocalizedAlternates("/terms", locale),
+    locale,
   });
   return {
     ...metadata,
@@ -49,8 +50,15 @@ export async function generateMetadata() {
     },
   };
 }
-export default function TermsPage() {
-  const { t } = useTranslation();
+export function generateMetadata() {
+  return buildTermsMetadata(SOURCE_LOCALE);
+}
+export default function TermsPage({
+  locale = SOURCE_LOCALE,
+}: {
+  locale?: SupportedLocale;
+} = {}) {
+  const { t } = getStaticTranslations(locale);
   const termsSections = [
     {
       id: "acceptance",
@@ -406,7 +414,11 @@ export default function TermsPage() {
             </p>
             <p>
               <strong>{t("cb7a3f78f46f", "Support:")}</strong>{" "}
-              <Link href="/contact" className="underline underline-offset-4">
+              <Link
+                href="/contact"
+                locale={locale}
+                className="underline underline-offset-4"
+              >
                 {t("f675139b980f", "Contact page")}
               </Link>
             </p>

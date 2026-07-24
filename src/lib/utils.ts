@@ -18,7 +18,7 @@ export function formatCurrency(
   }).format(amountInDollars);
 }
 
-export function calculateReadingTime(text: string): string {
+export function calculateReadingTime(text: string): number {
   const plainText = text
     .replace(/```[\s\S]*?```/g, " ")
     .replace(/`([^`]+)`/g, "$1")
@@ -30,12 +30,17 @@ export function calculateReadingTime(text: string): string {
     .replace(/^\s*\d+\.\s+/gm, "")
     .replace(/^\s*>\s?/gm, "")
     .replace(/[*_~#>|-]/g, " ");
-  const wordsPerMinute = 200;
-  const noOfWords = plainText
-    .split(/\s/g)
-    .filter((word) => word.length > 0).length;
-  const minutes = noOfWords / wordsPerMinute;
-  const readTime = Math.max(1, Math.ceil(minutes));
+  const cjkCharacters =
+    plainText.match(
+      /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}]/gu,
+    )?.length ?? 0;
+  const nonCjkText = plainText.replace(
+    /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}]/gu,
+    " ",
+  );
+  const words =
+    nonCjkText.match(/[\p{L}\p{N}]+(?:['’.-][\p{L}\p{N}]+)*/gu)?.length ?? 0;
+  const minutes = words / 200 + cjkCharacters / 500;
 
-  return `${readTime} min read`;
+  return Math.max(1, Math.ceil(minutes));
 }

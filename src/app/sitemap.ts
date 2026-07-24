@@ -48,12 +48,15 @@ const localizedMarketingRoutes = [
 ] as const;
 
 function buildLocaleAlternates(pathname: string) {
-  return Object.fromEntries(
-    SUPPORTED_LOCALES.map((locale) => [
-      locale,
-      absoluteUrl(withLocalePrefix(pathname, locale)),
-    ]),
-  );
+  return {
+    ...Object.fromEntries(
+      SUPPORTED_LOCALES.map((locale) => [
+        locale,
+        absoluteUrl(withLocalePrefix(pathname, locale)),
+      ]),
+    ),
+    "x-default": absoluteUrl(withLocalePrefix(pathname, SOURCE_LOCALE)),
+  };
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -62,8 +65,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       SUPPORTED_LOCALES.map((locale) => ({
         url: absoluteUrl(withLocalePrefix(pathname, locale)),
         changeFrequency,
-        priority:
-          locale === SOURCE_LOCALE ? priority : Math.max(priority - 0.1, 0.1),
+        priority,
         alternates: {
           languages: buildLocaleAlternates(pathname),
         },
@@ -81,16 +83,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         ),
       ]),
     );
+    const defaultPost = localizations.find(
+      (localizedPost) => localizedPost.locale === SOURCE_LOCALE,
+    );
 
     return {
       url: absoluteUrl(getLocalizedPostPath(post.slug, post.locale)),
-      lastModified: post.publishedDate
-        ? new Date(post.publishedDate)
-        : undefined,
+      lastModified: post.updatedDate ? new Date(post.updatedDate) : undefined,
       changeFrequency: "monthly" as const,
       priority: post.featured ? 0.8 : 0.7,
       alternates: {
-        languages,
+        languages: {
+          ...languages,
+          ...(defaultPost
+            ? {
+                "x-default": absoluteUrl(
+                  getLocalizedPostPath(defaultPost.slug, defaultPost.locale),
+                ),
+              }
+            : {}),
+        },
       },
     };
   });

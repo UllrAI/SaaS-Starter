@@ -1,6 +1,4 @@
-import PricingPage, {
-  generateMetadata as generateSourceMetadata,
-} from "@/app/(pages)/pricing/page";
+import PricingPage, { buildPricingMetadata } from "@/app/(pages)/pricing/page";
 import { withStaticLocalizedMetadata } from "@/lib/i18n/static-marketing-metadata";
 import { resolveStaticMarketingParams } from "@/lib/i18n/static-marketing-locale";
 
@@ -10,9 +8,14 @@ type LocalizedPageProps = {
 
 export async function generateMetadata({ params }: LocalizedPageProps) {
   const locale = await resolveStaticMarketingParams(params);
-  const metadata = await generateSourceMetadata();
+  const metadata = await buildPricingMetadata(locale);
 
   return withStaticLocalizedMetadata(metadata, "/pricing", locale);
 }
 
-export default PricingPage;
+export default async function LocalizedPricingPage({
+  params,
+}: LocalizedPageProps) {
+  const locale = await resolveStaticMarketingParams(params);
+  return <PricingPage locale={locale} />;
+}

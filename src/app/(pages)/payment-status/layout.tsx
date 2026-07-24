@@ -2,8 +2,16 @@ import { getServerTranslations } from "@/lib/i18n/translation/server";
 import { APP_NAME, OGIMAGE, TWITTERACCOUNT } from "@/lib/config/constants";
 import env from "@/env";
 import type { Metadata } from "next";
-export async function generateMetadata(): Promise<Metadata> {
-  const { t } = await getServerTranslations();
+import {
+  SOURCE_LOCALE,
+  SUPPORTED_LOCALES,
+  type SupportedLocale,
+} from "@/lib/config/i18n";
+import { getOpenGraphLocale } from "@/lib/metadata";
+export async function buildPaymentStatusMetadata(
+  locale: SupportedLocale,
+): Promise<Metadata> {
+  const { t } = await getServerTranslations({ locale });
   return {
     metadataBase: new URL(env.NEXT_PUBLIC_APP_URL),
     robots: {
@@ -21,7 +29,11 @@ export async function generateMetadata(): Promise<Metadata> {
         "8f8029a1177c",
         "Check your payment status and next steps for your subscription.",
       ),
-      images: OGIMAGE,
+      images: [{ url: OGIMAGE, width: 1480, height: 777, alt: APP_NAME }],
+      locale: getOpenGraphLocale(locale),
+      alternateLocale: SUPPORTED_LOCALES.filter(
+        (supportedLocale) => supportedLocale !== locale,
+      ).map(getOpenGraphLocale),
       siteName: APP_NAME,
       type: "website",
     },
@@ -33,9 +45,12 @@ export async function generateMetadata(): Promise<Metadata> {
         "fc23ed777341",
         "Check your payment status and next steps for your subscription.",
       ),
-      images: OGIMAGE,
+      images: [{ url: OGIMAGE, width: 1480, height: 777, alt: APP_NAME }],
     },
   };
+}
+export function generateMetadata(): Promise<Metadata> {
+  return buildPaymentStatusMetadata(SOURCE_LOCALE);
 }
 export default function PaymentStatusLayout({
   children,

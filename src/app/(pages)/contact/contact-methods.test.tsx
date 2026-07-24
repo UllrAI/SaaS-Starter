@@ -16,13 +16,13 @@ describe("ContactMethods", () => {
       `mailto:${CONTACT_EMAIL}`,
     );
     expect(
-      screen.getByRole("link", { name: "Open Discussions" }),
+      screen.getByRole("link", { name: "Open discussions" }),
     ).toHaveAttribute("href", GITHUB_DISCUSSIONS_URL);
-    expect(screen.getByRole("link", { name: "Open Issues" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Open issues" })).toHaveAttribute(
       "href",
       GITHUB_ISSUES_URL,
     );
-    expect(screen.getByRole("link", { name: "Read Docs" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Read docs" })).toHaveAttribute(
       "href",
       DOCS_URL,
     );

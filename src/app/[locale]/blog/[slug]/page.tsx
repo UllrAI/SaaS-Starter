@@ -15,8 +15,6 @@ type LocalizedBlogPostPageProps = {
   }>;
 };
 
-export const dynamicParams = false;
-
 export function generateStaticParams() {
   return TARGET_LOCALES.flatMap((locale) =>
     getAllPostSlugs(locale).map((slug) => ({

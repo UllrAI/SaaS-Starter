@@ -1,4 +1,4 @@
-import { useTranslation } from "@/lib/i18n/translation/client";
+import { getStaticTranslations } from "@/lib/i18n/translation/static";
 import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { BackgroundPattern } from "@/components/ui/background-pattern";
@@ -9,6 +9,7 @@ import { ArrowLeft } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { calculateReadingTime } from "@/lib/utils";
+import { SOURCE_LOCALE, type SupportedLocale } from "@/lib/config/i18n";
 interface BlogPostHeaderProps {
   title: string;
   excerpt?: string;
@@ -20,7 +21,7 @@ interface BlogPostHeaderProps {
   backText?: string;
   author?: ReactNode;
   content: string;
-  locale?: string;
+  locale?: SupportedLocale;
 }
 export function BlogPostHeader({
   title,
@@ -30,12 +31,13 @@ export function BlogPostHeader({
   featured = false,
   tags = [],
   backHref = "/blog",
-  backText = "Back to Blog",
+  backText,
   author,
   content,
   locale,
 }: BlogPostHeaderProps) {
-  const { t } = useTranslation();
+  const { t } = getStaticTranslations(locale ?? SOURCE_LOCALE);
+  const resolvedBackText = backText ?? t("blogBackToBlog", "Back to blog");
   const hasImage = !!heroImage;
   if (hasImage) {
     return (
@@ -62,7 +64,7 @@ export function BlogPostHeader({
               >
                 <Link href={backHref}>
                   <ArrowLeft className="mr-2 h-4 w-4" />
-                  <span className="hidden sm:inline">{backText}</span>
+                  <span className="hidden sm:inline">{resolvedBackText}</span>
                   <span className="sm:hidden">{t("9da9a1670f77", "Back")}</span>
                 </Link>
               </Button>
@@ -78,7 +80,7 @@ export function BlogPostHeader({
                   className="mb-6 justify-center"
                   showBadge={true}
                   author={author}
-                  readTime={calculateReadingTime(content)}
+                  readingMinutes={calculateReadingTime(content)}
                   locale={locale}
                 />
 
@@ -134,7 +136,7 @@ export function BlogPostHeader({
             >
               <Link href={backHref}>
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                <span className="hidden sm:inline">{backText}</span>
+                <span className="hidden sm:inline">{resolvedBackText}</span>
                 <span className="sm:hidden">{t("9da9a1670f77", "Back")}</span>
               </Link>
             </Button>
@@ -148,7 +150,7 @@ export function BlogPostHeader({
               className="mb-6 justify-center sm:mb-8"
               showBadge={true}
               author={author}
-              readTime={calculateReadingTime(content)}
+              readingMinutes={calculateReadingTime(content)}
               locale={locale}
             />
 

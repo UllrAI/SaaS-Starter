@@ -1,7 +1,5 @@
 import React from "react";
-import RootLayout from "./layout";
-import { getRequestLocale } from "@/lib/i18n/server-locale";
-import { loadMessages } from "@/lib/i18n/messages";
+import { AppDocument } from "./app-document";
 
 jest.mock("next/font/google", () => ({
   Inter: () => ({ variable: "font-sans" }),
@@ -34,27 +32,12 @@ jest.mock("@/components/app-providers", () => ({
   ),
 }));
 
-jest.mock("@/lib/i18n/server-locale", () => ({
-  getRequestLocale: jest.fn(() => Promise.resolve("zh-Hans")),
-}));
-
-jest.mock("@/lib/i18n/messages", () => ({
-  loadMessages: jest.fn(() => Promise.resolve({ hello: "你好" })),
-}));
-
 jest.mock("@/env", () => ({
   __esModule: true,
   default: {
     NEXT_PUBLIC_APP_URL: "http://localhost:3000",
   },
 }));
-
-const mockGetRequestLocale = getRequestLocale as jest.MockedFunction<
-  typeof getRequestLocale
->;
-const mockLoadMessages = loadMessages as jest.MockedFunction<
-  typeof loadMessages
->;
 
 function getElementChildren(
   element: React.ReactElement<{ children?: React.ReactNode }>,
@@ -64,17 +47,13 @@ function getElementChildren(
   );
 }
 
-describe("RootLayout", () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-    mockGetRequestLocale.mockResolvedValue("zh-Hans");
-    mockLoadMessages.mockResolvedValue({ hello: "你好" });
-  });
-
-  it("initializes document and next-intl locale from the request", async () => {
-    const root = (await RootLayout({
+describe("AppDocument", () => {
+  it("initializes the document and provider from an explicit locale", () => {
+    const root = AppDocument({
       children: <main data-testid="page-content">Page content</main>,
-    })) as React.ReactElement<{ lang: string; children: React.ReactNode }>;
+      locale: "zh-Hans",
+      messages: { hello: "你好" },
+    }) as React.ReactElement<{ lang: string; children: React.ReactNode }>;
 
     const body = getElementChildren(root).find(
       (child) => child.type === "body",
@@ -88,11 +67,17 @@ describe("RootLayout", () => {
         React.isValidElement(child) && child.props.locale === "zh-Hans",
     );
 
-    expect(mockGetRequestLocale).toHaveBeenCalledTimes(1);
-    expect(mockLoadMessages).toHaveBeenCalledWith("zh-Hans");
     expect(root.type).toBe("html");
     expect(root.props.lang).toBe("zh-Hans");
     expect(intlProvider?.props.locale).toBe("zh-Hans");
     expect(intlProvider?.props.messages).toEqual({ hello: "你好" });
+
+    const structuredDataScript = getElementChildren(
+      body as React.ReactElement<{ children: React.ReactNode }>,
+    ).find((child) => child.props.id === "website-structured-data");
+    const structuredData = JSON.parse(
+      structuredDataScript?.props.dangerouslySetInnerHTML.__html,
+    );
+    expect(structuredData["@graph"][1].inLanguage).toEqual(["en", "zh-Hans"]);
   });
 });

@@ -533,7 +533,7 @@ export function PricingSection({ className }: { className?: string }) {
                     </span>
                     {paymentMode === "subscription" && (
                       <span className="text-muted-foreground font-mono text-sm">
-                        /mo
+                        {t("pricing_per_month", "/mo")}
                       </span>
                     )}
                   </div>

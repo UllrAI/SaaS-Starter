@@ -1,4 +1,5 @@
-import { useTranslation } from "@/lib/i18n/translation/client";
+import { getStaticTranslations } from "@/lib/i18n/translation/static";
+import { SOURCE_LOCALE, type SupportedLocale } from "@/lib/config/i18n";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { BookOpen, Bug, Mail, MessageSquare } from "lucide-react";
@@ -8,8 +9,12 @@ import {
   GITHUB_DISCUSSIONS_URL,
   GITHUB_ISSUES_URL,
 } from "@/lib/config/constants";
-export function ContactMethods() {
-  const { t } = useTranslation();
+export function ContactMethods({
+  locale = SOURCE_LOCALE,
+}: {
+  locale?: SupportedLocale;
+} = {}) {
+  const { t } = getStaticTranslations(locale);
   const contactMethods = [
     {
       icon: Mail,
@@ -17,7 +22,7 @@ export function ContactMethods() {
       description: <>{t("27f27aad58ab", "Technical support via email")}</>,
       action: CONTACT_EMAIL,
       href: `mailto:${CONTACT_EMAIL}`,
-      label: "EMAIL_GATEWAY",
+      label: <>{t("contactEmailGateway", "Email gateway")}</>,
       actionSkip: true,
     },
     {
@@ -28,9 +33,9 @@ export function ContactMethods() {
           {t("202cdce01ea9", "Ask product and integration questions in public")}
         </>
       ),
-      action: "Open Discussions",
+      action: <>{t("contactOpenDiscussions", "Open discussions")}</>,
       href: GITHUB_DISCUSSIONS_URL,
-      label: "DISCUSSION_BOARD",
+      label: <>{t("contactDiscussionBoard", "Discussion board")}</>,
       external: true,
     },
     {
@@ -44,9 +49,9 @@ export function ContactMethods() {
           )}
         </>
       ),
-      action: "Open Issues",
+      action: <>{t("contactOpenIssues", "Open issues")}</>,
       href: GITHUB_ISSUES_URL,
-      label: "ISSUE_TRACKER",
+      label: <>{t("contactIssueTracker", "Issue tracker")}</>,
       external: true,
     },
     {
@@ -60,9 +65,9 @@ export function ContactMethods() {
           )}
         </>
       ),
-      action: "Read Docs",
+      action: <>{t("contactReadDocs", "Read docs")}</>,
       href: DOCS_URL,
-      label: "DOCS_PORTAL",
+      label: <>{t("contactDocsPortal", "Documentation portal")}</>,
       external: true,
     },
   ];
@@ -72,7 +77,7 @@ export function ContactMethods() {
         const Icon = method.icon;
         return (
           <Card
-            key={method.label}
+            key={method.href}
             className="group shadow-sm transition-all hover:shadow-md"
           >
             <CardHeader>

@@ -4,9 +4,12 @@ import type { AnchorHTMLAttributes } from "react";
 
 import { normalizeLocaleCandidate } from "@/lib/config/i18n-routing";
 import { isMarketingPath, withLocalePrefix } from "@/lib/config/i18n-routing";
+import type { SupportedLocale } from "@/lib/config/i18n";
 
 type LocalizedLinkProps = LinkProps &
-  Omit<AnchorHTMLAttributes<HTMLAnchorElement>, keyof LinkProps>;
+  Omit<AnchorHTMLAttributes<HTMLAnchorElement>, keyof LinkProps> & {
+    locale?: SupportedLocale;
+  };
 
 export function localizeHref(
   href: LinkProps["href"],
@@ -34,8 +37,13 @@ export function localizeHref(
   };
 }
 
-export function LocalizedLink({ href, ...props }: LocalizedLinkProps) {
-  const locale = normalizeLocaleCandidate(useLocale());
+export function LocalizedLink({
+  href,
+  locale: explicitLocale,
+  ...props
+}: LocalizedLinkProps) {
+  const requestLocale = normalizeLocaleCandidate(useLocale());
+  const locale = explicitLocale ?? requestLocale;
   const localizedHref = locale ? localizeHref(href, locale) : href;
 
   return <Link href={localizedHref} {...props} />;

@@ -2,9 +2,8 @@ import { render, screen } from "@testing-library/react";
 import LocalizedMarketingLayout from "./layout";
 import { resolveStaticMarketingParams } from "@/lib/i18n/static-marketing-locale";
 
-jest.mock("@/app/(pages)/layout", () => ({
-  __esModule: true,
-  default: ({ children }: { children: React.ReactNode }) => (
+jest.mock("@/components/layout/marketing-chrome", () => ({
+  MarketingChrome: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="pages-layout">
       <header data-testid="homepage-header">Header</header>
       <main>{children}</main>
@@ -13,7 +12,25 @@ jest.mock("@/app/(pages)/layout", () => ({
   ),
 }));
 
+jest.mock("@/components/layout/app-document", () => ({
+  AppDocument: ({ children }: { children: React.ReactNode }) => children,
+  createRootMetadata: jest.fn(),
+}));
+
+jest.mock("@/providers/marketing-providers", () => ({
+  MarketingProviders: ({ children }: { children: React.ReactNode }) => children,
+}));
+
+jest.mock("@/lib/i18n/messages", () => ({
+  loadMarketingMessages: jest.fn(() => Promise.resolve({})),
+}));
+
+jest.mock("next-intl/server", () => ({
+  setRequestLocale: jest.fn(),
+}));
+
 jest.mock("@/lib/i18n/static-marketing-locale", () => ({
+  getStaticMarketingLocaleParams: jest.fn(() => [{ locale: "zh-Hans" }]),
   resolveStaticMarketingParams: jest.fn(() => Promise.resolve("zh-Hans")),
 }));
 

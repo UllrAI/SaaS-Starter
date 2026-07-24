@@ -1,6 +1,4 @@
-import PrivacyPage, {
-  generateMetadata as generateSourceMetadata,
-} from "@/app/(pages)/privacy/page";
+import PrivacyPage, { buildPrivacyMetadata } from "@/app/(pages)/privacy/page";
 import { withStaticLocalizedMetadata } from "@/lib/i18n/static-marketing-metadata";
 import { resolveStaticMarketingParams } from "@/lib/i18n/static-marketing-locale";
 
@@ -10,9 +8,14 @@ type LocalizedPageProps = {
 
 export async function generateMetadata({ params }: LocalizedPageProps) {
   const locale = await resolveStaticMarketingParams(params);
-  const metadata = await generateSourceMetadata();
+  const metadata = await buildPrivacyMetadata(locale);
 
   return withStaticLocalizedMetadata(metadata, "/privacy", locale);
 }
 
-export default PrivacyPage;
+export default async function LocalizedPrivacyPage({
+  params,
+}: LocalizedPageProps) {
+  const locale = await resolveStaticMarketingParams(params);
+  return <PrivacyPage locale={locale} />;
+}

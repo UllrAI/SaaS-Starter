@@ -1,4 +1,4 @@
-import { useTranslation } from "@/lib/i18n/translation/client";
+import { getStaticTranslations } from "@/lib/i18n/translation/static";
 import { Suspense } from "react";
 import { PaymentStatusContent } from "./_components/payment-status-content";
 import { Card, CardContent } from "@/components/ui/card";
@@ -6,8 +6,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { SectionContainer } from "@/components/layout/page-container";
 import { Clock } from "lucide-react";
-function PaymentStatusSkeleton() {
-  const { t } = useTranslation();
+import { SOURCE_LOCALE, type SupportedLocale } from "@/lib/config/i18n";
+function PaymentStatusSkeleton({ locale }: { locale: SupportedLocale }) {
+  const { t } = getStaticTranslations(locale);
   return (
     <section className="bg-background relative flex min-h-screen items-center justify-center overflow-hidden">
       {/* Background Pattern */}
@@ -41,9 +42,13 @@ function PaymentStatusSkeleton() {
     </section>
   );
 }
-export default function PaymentStatusPage() {
+export default function PaymentStatusPage({
+  locale = SOURCE_LOCALE,
+}: {
+  locale?: SupportedLocale;
+} = {}) {
   return (
-    <Suspense fallback={<PaymentStatusSkeleton />}>
+    <Suspense fallback={<PaymentStatusSkeleton locale={locale} />}>
       <PaymentStatusContent />
     </Suspense>
   );

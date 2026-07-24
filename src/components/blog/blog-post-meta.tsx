@@ -1,17 +1,18 @@
-import { useTranslation } from "@/lib/i18n/translation/client";
+import { getStaticTranslations } from "@/lib/i18n/translation/static";
 import type { ReactNode } from "react";
 import { Badge } from "@/components/ui/badge";
 import { CalendarDays, Clock, Sparkles, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { resolveIntlLocale } from "@/lib/locale";
+import { SOURCE_LOCALE, type SupportedLocale } from "@/lib/config/i18n";
 interface BlogPostMetaProps {
   publishedDate?: string;
   featured?: boolean;
   tags?: string[];
-  readTime?: string;
+  readingMinutes?: number;
   author?: ReactNode;
   showBadge?: boolean;
-  locale?: string;
+  locale?: SupportedLocale;
   variant?: "overlay" | "default";
   className?: string;
 }
@@ -19,14 +20,15 @@ export function BlogPostMeta({
   publishedDate,
   featured = false,
   tags = [],
-  readTime,
+  readingMinutes,
   author,
   showBadge = true,
   locale,
   variant = "default",
   className,
 }: BlogPostMetaProps) {
-  const { t } = useTranslation();
+  const supportedLocale = locale ?? SOURCE_LOCALE;
+  const { t } = getStaticTranslations(supportedLocale);
   const resolvedAuthor = author ?? <>{t("cd29aaf35997", "Anonymous")}</>;
   const isOverlay = variant === "overlay";
   const textColor = isOverlay ? "text-white/80" : "text-muted-foreground";
@@ -38,7 +40,7 @@ export function BlogPostMeta({
   const articleBadgeClasses = isOverlay
     ? "bg-background/90 text-foreground border-border backdrop-blur-sm"
     : "bg-muted/50 text-muted-foreground border-muted";
-  const intlLocale = resolveIntlLocale(locale);
+  const intlLocale = resolveIntlLocale(supportedLocale);
   return (
     <div className={cn("space-y-4", className)}>
       {/* Badge */}
@@ -100,10 +102,14 @@ export function BlogPostMeta({
               </span>
             </div>
           )}
-          {readTime && (
+          {readingMinutes && (
             <div className="flex items-center gap-2">
               <Clock className="h-4 w-4 flex-shrink-0" />
-              <span className="whitespace-nowrap">{readTime}</span>
+              <span className="whitespace-nowrap">
+                {t("blog_reading_time", "{minutes} min read", {
+                  minutes: readingMinutes,
+                })}
+              </span>
             </div>
           )}
           {resolvedAuthor && (

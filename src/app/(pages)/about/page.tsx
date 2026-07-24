@@ -1,5 +1,5 @@
-import { useTranslation } from "@/lib/i18n/translation/client";
 import { getServerTranslations } from "@/lib/i18n/translation/server";
+import { getStaticTranslations } from "@/lib/i18n/translation/static";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -23,9 +23,15 @@ import { SOURCE_LOCALE } from "@/lib/config/i18n";
 import { APP_NAME, OGIMAGE, TWITTERACCOUNT } from "@/lib/config/constants";
 import env from "@/env";
 import type { Metadata } from "next";
-export async function generateMetadata(): Promise<Metadata> {
-  const { t } = await getServerTranslations();
-  const alternates = createLocalizedAlternates("/about", SOURCE_LOCALE);
+import type { SupportedLocale } from "@/lib/config/i18n";
+import { SUPPORTED_LOCALES } from "@/lib/config/i18n";
+import { getOpenGraphLocale } from "@/lib/metadata";
+
+export async function buildAboutMetadata(
+  locale: SupportedLocale,
+): Promise<Metadata> {
+  const { t } = await getServerTranslations({ locale });
+  const alternates = createLocalizedAlternates("/about", locale);
   const canonical = alternates.canonical;
   const canonicalUrl =
     typeof canonical === "string" || canonical instanceof URL
@@ -46,7 +52,11 @@ export async function generateMetadata(): Promise<Metadata> {
         "Learn about our mission to help developers build and launch SaaS products faster with real, tested, and agent-friendly foundations.",
       ),
       url: canonicalUrl,
-      images: OGIMAGE,
+      images: [{ url: OGIMAGE, width: 1480, height: 777, alt: APP_NAME }],
+      locale: getOpenGraphLocale(locale),
+      alternateLocale: SUPPORTED_LOCALES.filter(
+        (supportedLocale) => supportedLocale !== locale,
+      ).map(getOpenGraphLocale),
       siteName: APP_NAME,
       type: "website",
     },
@@ -58,12 +68,21 @@ export async function generateMetadata(): Promise<Metadata> {
         "ef16e86ea5be",
         "Learn about our mission to help developers build and launch SaaS products faster with real, tested, and agent-friendly foundations.",
       ),
-      images: OGIMAGE,
+      images: [{ url: OGIMAGE, width: 1480, height: 777, alt: APP_NAME }],
     },
   };
 }
-export default function AboutPage() {
-  const { t } = useTranslation();
+
+export function generateMetadata(): Promise<Metadata> {
+  return buildAboutMetadata(SOURCE_LOCALE);
+}
+
+export default function AboutPage({
+  locale = SOURCE_LOCALE,
+}: {
+  locale?: SupportedLocale;
+} = {}) {
+  const { t } = getStaticTranslations(locale);
   return (
     <>
       <MarketingPageShell>
@@ -247,12 +266,12 @@ export default function AboutPage() {
             </PageIntroDescription>
             <div className="flex flex-wrap justify-center gap-4">
               <Button asChild size="lg">
-                <Link href="/pricing">
+                <Link href="/pricing" locale={locale}>
                   {t("6ea7de9594bc", "Get Started Today")}
                 </Link>
               </Button>
               <Button variant="outline" size="lg" asChild>
-                <Link href="/contact">
+                <Link href="/contact" locale={locale}>
                   {t("a2d38631c005", "Contact Sales")}
                 </Link>
               </Button>

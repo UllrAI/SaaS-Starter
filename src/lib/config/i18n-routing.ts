@@ -83,10 +83,11 @@ function parseAcceptLanguageEntry(
   for (const param of params) {
     const [key, value] = param.split("=");
     if (key?.trim().toLowerCase() === "q") {
-      const parsed = Number.parseFloat(value?.trim() ?? "");
-      if (Number.isFinite(parsed)) {
-        q = parsed;
+      const parsed = Number(value?.trim() ?? "");
+      if (!Number.isFinite(parsed) || parsed <= 0 || parsed > 1) {
+        return null;
       }
+      q = parsed;
     }
   }
 

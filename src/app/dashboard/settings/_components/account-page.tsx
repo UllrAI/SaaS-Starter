@@ -21,14 +21,26 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { authClient, useSession } from "@/lib/auth/client";
-import { Session } from "@/types/auth";
 import { Edit, Loader2 } from "lucide-react";
+
+interface EditableSession {
+  user: {
+    email: string;
+    image?: string | null;
+    name: string;
+  };
+}
+
 function ProfileUpdatedToast() {
   const { t } = useTranslation();
   return <>{t("119e58d8b4fc", "Profile updated successfully")}</>;
 }
 
-// Props are no longer needed for active sessions
+function ProfileUpdateFailedToast() {
+  const { t } = useTranslation();
+  return <>{t("profile_update_failed", "We couldn't update your profile.")}</>;
+}
+
 export function AccountPage() {
   const { t } = useTranslation();
   const { data: currentUserSession, isPending } = useSession();
@@ -50,7 +62,10 @@ export function AccountPage() {
                     currentUserSession?.user.email,
                     currentUserSession?.user.name,
                   )}
-                  alt={currentUserSession?.user.name || "User Avatar"}
+                  alt={
+                    currentUserSession?.user.name ||
+                    t("profile_avatar_alt", "User avatar")
+                  }
                   className="object-cover"
                 />
                 <AvatarFallback className="text-lg uppercase">
@@ -74,12 +89,11 @@ export function AccountPage() {
   );
 }
 
-// EditUserDialog component remains unchanged, as its functionality is separate.
 function EditUserDialog({
   session,
   isPending,
 }: {
-  session: Session | null;
+  session: EditableSession | null;
   isPending: boolean;
 }) {
   const { t } = useTranslation();
@@ -87,8 +101,17 @@ function EditUserDialog({
   const router = useRouter();
   const [open, setOpen] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog
+      open={open}
+      onOpenChange={(nextOpen) => {
+        if (nextOpen) {
+          setName(session?.user.name || "");
+        }
+        setOpen(nextOpen);
+      }}
+    >
       <DialogTrigger asChild>
         <Button size="sm" variant="secondary" className="gap-2">
           <Edit size={16} />
@@ -99,7 +122,7 @@ function EditUserDialog({
         <DialogHeader>
           <DialogTitle>{t("3c698fc5fdb8", "Edit Your Profile")}</DialogTitle>
           <DialogDescription>
-            {t("becd198609cc", "Change your name and profile picture")}
+            {t("becd198609cc", "Change your display name")}
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
@@ -125,7 +148,7 @@ function EditUserDialog({
                       session?.user.email,
                       session?.user.name,
                     )}
-                    alt={name || "User Avatar"}
+                    alt={name || t("profile_avatar_alt", "User avatar")}
                   />
                   <AvatarFallback>{name?.charAt(0) || "U"}</AvatarFallback>
                 </Avatar>
@@ -143,23 +166,38 @@ function EditUserDialog({
         </div>
         <DialogFooter>
           <Button
-            disabled={isLoading}
+            disabled={isLoading || isPending || !session || !name.trim()}
             onClick={async () => {
+              const normalizedName = name.trim();
+              if (!normalizedName) {
+                toast.error(
+                  t("profile_name_required", "Enter your display name."),
+                );
+                return;
+              }
               setIsLoading(true);
-              await authClient.updateUser({
-                name: name !== session?.user.name ? name : undefined,
-                fetchOptions: {
-                  onSuccess: () => {
-                    toast.success(<ProfileUpdatedToast />);
-                    setOpen(false);
-                    router.refresh();
+              try {
+                await authClient.updateUser({
+                  name:
+                    normalizedName !== session?.user.name
+                      ? normalizedName
+                      : undefined,
+                  fetchOptions: {
+                    onSuccess: () => {
+                      toast.success(<ProfileUpdatedToast />);
+                      setOpen(false);
+                      router.refresh();
+                    },
+                    onError: () => {
+                      toast.error(<ProfileUpdateFailedToast />);
+                    },
                   },
-                  onError: (error) => {
-                    toast.error(error.error.message);
-                  },
-                },
-              });
-              setIsLoading(false);
+                });
+              } catch {
+                toast.error(<ProfileUpdateFailedToast />);
+              } finally {
+                setIsLoading(false);
+              }
             }}
           >
             {t("63b43f92aa70", "{expression0} Update Profile", {

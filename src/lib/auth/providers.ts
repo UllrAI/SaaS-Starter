@@ -39,18 +39,3 @@ export function getAvailableSocialProviders(): SocialProvider[] {
     )
     .map(({ name }) => name);
 }
-
-/**
- * Check if a specific social provider is available
- */
-export function isSocialProviderAvailable(provider: SocialProvider): boolean {
-  const availableProviders = getAvailableSocialProviders();
-  return availableProviders.includes(provider);
-}
-
-/**
- * Get the total number of available social providers
- */
-export function getAvailableSocialProvidersCount(): number {
-  return getAvailableSocialProviders().length;
-}

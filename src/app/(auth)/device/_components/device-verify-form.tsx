@@ -16,6 +16,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useSession } from "@/lib/auth/client";
 type ViewState = "idle" | "error" | "success";
+type PendingDeviceInfo = {
+  clientName: string | null;
+  clientVersion: string | null;
+  deviceOs: string | null;
+  deviceHostname: string | null;
+};
 function normalizeDeviceCode(value: string): string {
   const stripped = value
     .toUpperCase()
@@ -39,13 +45,58 @@ export function DeviceVerifyForm({
   const [viewState, setViewState] = useState<ViewState>("idle");
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [pendingDevice, setPendingDevice] = useState<PendingDeviceInfo | null>(
+    null,
+  );
   const normalizedCode = useMemo(() => normalizeDeviceCode(code), [code]);
   const isSignedIn = initialIsSignedIn || Boolean(session?.user);
   const canSubmit = /^[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(normalizedCode);
-  async function authorizeDevice() {
+  async function reviewDevice() {
     if (!canSubmit) {
-      setErrorMessage("Please enter a valid 8-character code.");
+      setErrorMessage(
+        t("device_code_invalid", "Enter a valid 8-character code."),
+      );
       setViewState("error");
+      return;
+    }
+
+    setIsSubmitting(true);
+    setErrorMessage("");
+    try {
+      const response = await fetch(
+        `/api/v1/device/pending?user_code=${encodeURIComponent(normalizedCode)}`,
+      );
+      const payload = (await response.json()) as {
+        success: boolean;
+        data?: {
+          device?: PendingDeviceInfo;
+        };
+      };
+      if (!response.ok || !payload.success || !payload.data?.device) {
+        setErrorMessage(
+          t(
+            "device_review_failed",
+            "This device request is invalid or expired.",
+          ),
+        );
+        setViewState("error");
+        return;
+      }
+      setPendingDevice(payload.data.device);
+      setViewState("idle");
+    } catch {
+      setErrorMessage(
+        t("device_network_error", "Network error. Please try again."),
+      );
+      setViewState("error");
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  async function authorizeDevice() {
+    if (!canSubmit || !pendingDevice) {
+      await reviewDevice();
       return;
     }
     setIsSubmitting(true);
@@ -68,14 +119,19 @@ export function DeviceVerifyForm({
       };
       if (!response.ok || !payload.success) {
         setErrorMessage(
-          payload.error?.message ?? "Failed to authorize this device.",
+          t(
+            "device_authorize_failed",
+            "We couldn't authorize this device request.",
+          ),
         );
         setViewState("error");
         return;
       }
       setViewState("success");
     } catch {
-      setErrorMessage("Network error. Please try again.");
+      setErrorMessage(
+        t("device_network_error", "Network error. Please try again."),
+      );
       setViewState("error");
     } finally {
       setIsSubmitting(false);
@@ -167,27 +223,85 @@ export function DeviceVerifyForm({
           <Input
             id="device-code"
             value={normalizedCode}
-            onChange={(event) =>
-              setCode(normalizeDeviceCode(event.target.value))
-            }
+            onChange={(event) => {
+              setCode(normalizeDeviceCode(event.target.value));
+              setPendingDevice(null);
+            }}
             placeholder={t("0c5580d504b6", "ABCD-EFGH")}
             className="text-center font-mono text-lg tracking-[0.2em]"
             maxLength={9}
             autoFocus
           />
         </div>
+        {pendingDevice ? (
+          <div className="border-border bg-muted/40 space-y-3 rounded-lg border p-4">
+            <div>
+              <p className="font-medium">
+                {t("device_review_title", "Review this device")}
+              </p>
+              <p className="text-muted-foreground text-sm">
+                {t(
+                  "device_review_warning",
+                  "Only continue if these details match the terminal you are signing in from.",
+                )}
+              </p>
+            </div>
+            <dl className="grid gap-2 text-sm sm:grid-cols-2">
+              <div>
+                <dt className="text-muted-foreground">
+                  {t("device_client_label", "Client")}
+                </dt>
+                <dd>
+                  {pendingDevice.clientName || t("device_unknown", "Unknown")}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-muted-foreground">
+                  {t("device_version_label", "Version")}
+                </dt>
+                <dd>
+                  {pendingDevice.clientVersion ||
+                    t("device_unknown", "Unknown")}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-muted-foreground">
+                  {t("device_hostname_label", "Device")}
+                </dt>
+                <dd>
+                  {pendingDevice.deviceHostname ||
+                    t("device_unknown", "Unknown")}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-muted-foreground">
+                  {t("device_os_label", "Operating system")}
+                </dt>
+                <dd>
+                  {pendingDevice.deviceOs || t("device_unknown", "Unknown")}
+                </dd>
+              </div>
+            </dl>
+          </div>
+        ) : null}
         <Button
           className="w-full"
           disabled={isSubmitting || !canSubmit}
           onClick={() => {
-            void authorizeDevice();
+            void (pendingDevice ? authorizeDevice() : reviewDevice());
           }}
         >
-          {t("129a1b275d19", "{expression0} Authorize", {
-            expression0: isSubmitting ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : null,
-          })}
+          {t(
+            pendingDevice ? "device_confirm_authorize" : "device_review_action",
+            pendingDevice
+              ? "{expression0} Authorize this device"
+              : "{expression0} Review device",
+            {
+              expression0: isSubmitting ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : null,
+            },
+          )}
         </Button>
       </CardContent>
     </Card>

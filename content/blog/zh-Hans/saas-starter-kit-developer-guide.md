@@ -94,7 +94,7 @@ pnpm dev
 - **代码质量**: ESLint、Prettier、Jest、Playwright 冒烟测试
 - **管理后台**: 通用的数据管理后台，可轻松扩展以管理任何数据库表
 - **Agent 友好工作流**: 内置一等公民 `saas-cli`、API 校验与已授权设备管理能力
-- **部署**: Vercel 一键部署
+- **部署**: Zeabur 参考部署与独立 Docker 镜像
 
 ### 1.4. 技术架构图
 
@@ -106,7 +106,7 @@ graph TD
         A[用户] --> B{Next.js App};
     end
 
-    subgraph "Vercel 平台"
+    subgraph "Zeabur 服务"
         B -- React Server Components --> C["UI (shadcn/ui, Tailwind)"];
         B -- API Routes/Server Actions --> D[后端逻辑];
     end
@@ -585,7 +585,7 @@ sequenceDiagram
 
 ### 10.2. 安全考虑
 
-- **环境变量**: **绝不**将 `.env` 文件提交到 Git 仓库。使用 Vercel 等平台的秘密管理工具来存储生产环境变量。
+- **环境变量**: **绝不**将 `.env` 文件提交到 Git 仓库。生产值应存储在 Zeabur 服务变量或同等的密钥管理工具中。
 - **路由保护**: `proxy.ts` 是第一道防线，但**必须**在 Server Actions 和 API 路由中使用 `requireAuth`、`requireAdmin` 等函数进行后端权限验证。
 - **SQL 注入**: 使用 Drizzle ORM 可以有效防止 SQL 注入攻击，因为它会自动参数化查询。
 - **XSS**: Next.js 和 React 默认会对 JSX 内容进行转义，防止跨站脚本攻击。处理用户生成的内容时，请使用成熟的库（如 `DOMPurify`）进行清理。
@@ -593,14 +593,14 @@ sequenceDiagram
 
 ### 10.3. 部署指南
 
-推荐使用 **Vercel** 进行部署。
+生产参考环境使用 **Zeabur**。
 
-1. 将您的代码推送到 GitHub/GitLab/Bitbucket 仓库。
-1. 在 Vercel 中导入该 Git 仓库。
-1. Vercel 会自动检测到 Next.js 项目并配置好构建设置。
-1. 在 Vercel 项目的 `Settings > Environment Variables` 中，添加您在 `.env` 文件中定义的所有环境变量。
-1. 在 CI/CD 中把数据库迁移配置为单次发布步骤，确保 `pnpm db:migrate` 只针对生产 `DATABASE_URL` 执行一次，而不是挂在每个应用实例启动时运行。
-1. 每次推送到主分支时，Vercel 将自动构建和部署您的应用。
+1. 将已通过审查的 commit 推送到已连接的 Git 仓库。
+1. 根据 `.env.example` 配置全部必需的服务变量。
+1. 使用生产 `DATABASE_URL` 单独执行一次 `pnpm db:migrate`。
+1. 迁移成功后再部署应用。
+1. 使用 `/api/ready` 做数据库就绪检查，并查看构建及运行日志。
+1. 验证两种语言 URL、认证重定向以及已登录 Dashboard 会话。
 
 ---
 

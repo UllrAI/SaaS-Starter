@@ -6,6 +6,7 @@ import {
   LOCALE_HEADER_NAME,
   SOURCE_LOCALE,
   extractLocaleFromPath,
+  getEnglishFallbackPathForUnsupportedLocale,
   isMarketingPath,
   resolvePreferredLocale,
   withLocalePrefix,
@@ -70,6 +71,15 @@ export default async function authMiddleware(request: NextRequest) {
     cookieLocale: localeFromCookie,
     acceptLanguage: request.headers.get("accept-language"),
   });
+  const englishFallbackPath =
+    getEnglishFallbackPathForUnsupportedLocale(pathname);
+  if (englishFallbackPath) {
+    const redirectUrl = new URL(request.url);
+    redirectUrl.pathname = englishFallbackPath;
+    const response = NextResponse.redirect(redirectUrl, { status: 308 });
+    setLocaleCookieIfChanged(response, localeFromCookie, SOURCE_LOCALE);
+    return response;
+  }
 
   const pathLocale = extractLocaleFromPath(pathname);
   const basePathname = pathLocale.locale

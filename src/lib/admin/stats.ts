@@ -2,11 +2,11 @@
 import type { AdminStats } from "@/app/dashboard/admin/_components/admin-stats-cards";
 import { db } from "@/database";
 import { users, subscriptions, payments, uploads } from "@/database/schema";
-import { count, sum, desc, eq, inArray, gte, sql } from "drizzle-orm";
+import { and, count, sum, desc, eq, inArray, gte, sql } from "drizzle-orm";
 import { formatFileSize } from "@/lib/config/upload";
 
 // Extended interface for chart data
-export interface ChartData {
+interface ChartData {
   recentUsers: Array<{
     date: string;
     count: number;
@@ -22,7 +22,7 @@ export interface AdminStatsWithCharts extends AdminStats {
   charts: ChartData;
 }
 
-export interface UploadStatsDetails {
+interface UploadStatsDetails {
   total: number;
   totalSize: number;
   totalSizeFormatted: string;
@@ -81,7 +81,12 @@ export async function getSubscriptionStats(): Promise<
 export async function getPaymentStats(): Promise<AdminStats["payments"]> {
   const [payTotal, payTotalRevenue, paySuccessful] = await Promise.all([
     db.select({ value: count() }).from(payments),
-    db.select({ value: sum(payments.amount) }).from(payments),
+    db
+      .select({ value: sum(payments.amount) })
+      .from(payments)
+      .where(
+        and(eq(payments.status, "succeeded"), eq(payments.currency, "usd")),
+      ),
     db
       .select({ value: count() })
       .from(payments)
@@ -151,7 +156,13 @@ export async function getAdminStatsWithCharts(): Promise<AdminStatsWithCharts> {
         count: count(),
       })
       .from(payments)
-      .where(gte(payments.createdAt, twelveMonthsAgo))
+      .where(
+        and(
+          eq(payments.status, "succeeded"),
+          eq(payments.currency, "usd"),
+          gte(payments.createdAt, twelveMonthsAgo),
+        ),
+      )
       .groupBy(paymentCreatedMonth)
       .orderBy(desc(paymentCreatedMonth)),
   ]);

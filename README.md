@@ -1,12 +1,6 @@
 # UllrAI SaaS Starter Kit
 
-[中文版](README.zh-CN.md) | English | [📋 Roadmap](ROADMAP.md)
-
-🚧 Note: This project is currently under intensive development and modification
-
----
-
-<!-- [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/ullrai/saas-starter) -->
+[中文版](README.zh-CN.md) | English | [Changelog](CHANGELOG.md) | [Roadmap](ROADMAP.md)
 
 This is a free, open-source, production-ready full-stack SaaS starter kit designed to help you launch your next project at unprecedented speed. It integrates modern web development tools and practices to provide you with a solid foundation.
 
@@ -56,7 +50,7 @@ This starter kit provides a comprehensive set of powerful features to help you q
 | **Payments**        | [Creem](https://creem.io/)                                                                                                                             |
 | **Email**           | [Resend](https://resend.com/), [React Email](https://react.email/)                                                                                     |
 | **Forms**           | [React Hook Form](https://react-hook-form.com/), [Zod](https://zod.dev/)                                                                               |
-| **Deployment**      | [Vercel](https://vercel.com/)                                                                                                                          |
+| **Deployment**      | [Zeabur](https://zeabur.com/) or Docker                                                                                                                |
 | **Package Manager** | [pnpm](https://pnpm.io/)                                                                                                                               |
 
 ## 🚀 Quick Start
@@ -65,7 +59,7 @@ This starter kit provides a comprehensive set of powerful features to help you q
 
 Ensure you have the following software installed in your development environment:
 
-- [Node.js](https://nodejs.org/en/) (recommended v20.x or higher)
+- [Node.js](https://nodejs.org/en/) 22 or newer
 - [pnpm](https://pnpm.io/installation)
 
 ### 2. Project Clone & Installation
@@ -96,12 +90,12 @@ Then edit the `.env` file and fill in all required values.
 | Variable Name                    | Description                                                     | Example                                             |
 | :------------------------------- | :-------------------------------------------------------------- | :-------------------------------------------------- |
 | `DATABASE_URL`                   | **Required.** PostgreSQL connection string.                     | `postgresql://user:password@localhost:5432/db_name` |
-| `RATE_LIMIT_IP_HEADER`           | Trusted reverse proxy header used for shared rate limits.       | `x-forwarded-for`                                   |
+| `RATE_LIMIT_IP_HEADER`           | Client-IP header overwritten by your trusted ingress.           | Platform-specific                                   |
 | `NEXT_PUBLIC_APP_URL`            | **Required.** Public URL of your deployed app.                  | `http://localhost:3000` or `https://yourdomain.com` |
 | `BETTER_AUTH_SECRET`             | **Required.** Random session secret, at least 32 characters.    | Generate with `openssl rand -base64 32`             |
 | `RESEND_API_KEY`                 | **Required.** Resend API Key for sending emails.                | `re_xxxxxxxxxxxxxxxx`                               |
 | `RESEND_EMAIL_FROM`              | **Required.** Sender on a domain verified in Resend.            | `noreply@your-verified-domain.com`                  |
-| `CREEM_API_KEY`                  | **Required.** Creem API Key.                                    | `your_creem_api_key`                                |
+| `CREEM_API_KEY`                  | **Required.** Key matching the selected Creem environment.      | `creem_test_...` or `creem_...`                     |
 | `CREEM_ENVIRONMENT`              | **Required.** Creem environment mode.                           | `test_mode` or `live_mode`                          |
 | `CREEM_WEBHOOK_SECRET`           | **Required.** Creem webhook secret.                             | `whsec_your_webhook_secret`                         |
 | `R2_ENDPOINT`                    | **Required.** Cloudflare R2 API endpoint.                       | `https://<ACCOUNT_ID>.r2.cloudflarestorage.com`     |
@@ -130,6 +124,15 @@ Then edit the `.env` file and fill in all required values.
 
 No analytics provider or tracking script is bundled. Add your own provider only when needed, and implement a real consent flow before loading non-essential cookies or trackers in jurisdictions where consent is required.
 
+#### Creem product setup
+
+Test and live product IDs are intentionally separate in
+`src/lib/config/products.ts`. Set `CREEM_ENVIRONMENT` and its matching API key,
+then run `pnpm creem:sync-products`. The command reuses or creates the catalog
+products and updates only the selected environment namespace. Review and commit
+that configuration change before deploying. Checkout fails closed when the
+active environment has no configured product ID.
+
 ### 4. Database Setup
 
 This project uses a single Drizzle config file, `src/database/config.ts`, and a single committed migration history in `src/database/migrations/`. The target database is selected only by `DATABASE_URL`.
@@ -157,10 +160,10 @@ Shared environments should use committed SQL migrations only:
 # 1. Generate and commit the migration from your schema change
 pnpm db:generate
 
-# 2. Deploy the code that includes the new migration files
-
-# 3. Run migrations once against the target DATABASE_URL
+# 2. Run the committed migration once against the target DATABASE_URL
 pnpm db:migrate
+
+# 3. Deploy the application after the migration succeeds
 ```
 
 > **Recommended release practice**
@@ -176,7 +179,7 @@ pnpm db:migrate
 The project uses Content Collections plus plain Markdown files for blog content. Posts live in locale-scoped paths such as `content/blog/en/*.md` and `content/blog/zh-Hans/*.md`, authors live in `content/authors/*.json`, and build-time generation produces typed collections for the blog pages and sitemap.
 
 - **Authoring workflow:** Add or edit posts directly in the repository with frontmatter and Markdown content.
-- **Generated content data:** Run `pnpm content:build` to refresh the generated collections manually. The command is already wired into the build, test, and type-check scripts.
+- **Generated content data:** Run `pnpm content:build` to refresh the generated collections manually. The Next.js plugin handles development and production builds; test and type-check scripts invoke the generator explicitly.
 - **Production behavior:** There is no CMS admin route or runtime content API. All blog content is built from the repository content files.
 
 ### 6. Agent-Friendly API and CLI Auth
@@ -245,8 +248,10 @@ After successful execution, the user receives `super_admin` privileges and can a
 | `pnpm start`           | Start production server.                                       |
 | `pnpm saas-cli`        | Run the first-party CLI for device login and API verification. |
 | `pnpm lint`            | Check code for linting errors.                                 |
+| `pnpm dead-code:check` | Detect unused files, exports, and dependencies.                |
 | `pnpm type-check`      | Run TypeScript type checking.                                  |
-| `pnpm test`            | Run unit tests and generate coverage report.                   |
+| `pnpm test`            | Run the Jest test suite.                                       |
+| `pnpm test:coverage`   | Run Jest and generate a coverage report.                       |
 | `pnpm test:e2e`        | Build and run Playwright E2E smoke tests.                      |
 | `pnpm prettier:format` | Format all code using Prettier.                                |
 | `pnpm set:admin`       | Promote specified email user to super admin.                   |
@@ -321,10 +326,13 @@ per-user byte quotas, one-time completion, and orphan cleanup flow.
 
 Direct uploads use protocol version 2. The presign response declares the
 required `Content-Type` and `If-None-Match: *` headers, so an issued object key
-can only be written once. The signed URL lasts 15 minutes. Its database
-reservation remains for 24 hours so a slow PUT that starts before signature
-expiry cannot outlive orphan protection. Clients built against the older
-unsigned-header protocol must be refreshed when this version is deployed.
+can only be written once. The signed URL lasts 15 minutes and its database
+reservation lasts one hour. Cancelling releases quota immediately without
+shortening that original expiry. After expiry, cleanup deletes the object but
+retains a tombstone for 24 hours and deletes the object again before removing
+the intent. This second check catches a late PUT that began while the signed URL
+was still valid. Clients built against the older unsigned-header protocol must
+be refreshed when this version is deployed.
 
 For a rolling v1-to-v2 deployment, set `UPLOAD_LEGACY_COMPLETION_SINCE` to the
 rollout start and `UPLOAD_LEGACY_COMPLETION_UNTIL` to an absolute timestamp no
@@ -339,9 +347,8 @@ legacy objects. New clients always require a database-backed v2 intent.
 ### 2. Schedule Upload Cleanup
 
 Call the cleanup endpoint at least every five minutes from your deployment
-platform. It claims expired upload intents, deletes abandoned R2 objects, and
-only then releases the reserved quota. Failed object deletions remain reserved
-and are retried.
+platform. It claims expired upload intents and deletes abandoned R2 objects.
+Failed object deletions are deferred until the next five-minute retry window.
 
 ```bash
 curl -fsS -X POST \
@@ -349,10 +356,13 @@ curl -fsS -X POST \
   "https://yourdomain.com/api/internal/uploads/cleanup"
 ```
 
-The endpoint processes up to 100 intents per run and recovers stale cleanup
-claims automatically. R2 lifecycle rules may additionally abort incomplete
-multipart uploads after one day, but they do not replace this database-aware
-cleanup.
+The endpoint processes up to five batches of 100 intents per run and recovers
+stale cleanup claims automatically. This capacity covers the five-minute
+arrival window allowed by the per-user cancellation limit, including both
+tombstone deletion stages. If a run reports five full batches, schedule it more
+frequently until the queue is drained. R2 lifecycle rules may additionally
+abort incomplete multipart uploads after one day, but they do not replace this
+database-aware cleanup.
 
 ### 3. Using the `FileUploader` Component
 
@@ -421,23 +431,26 @@ After execution, bundle size analysis reports for both client and server will au
 
 ## ☁️ Deployment
 
-We recommend using [Vercel](https://vercel.com) for deployment as it seamlessly integrates with Next.js.
+The production reference deployment uses [Zeabur](https://zeabur.com/). The
+repository also includes a standalone multi-stage Docker build.
 
-1. **Push to Git Repository:**
-   Push your code to a GitHub, GitLab, or Bitbucket repository.
+1. Push the reviewed commit to your Git repository and connect it to a Zeabur
+   service.
+2. Configure every required variable from `.env.example`. Set
+   `NEXT_PUBLIC_APP_URL` to the final HTTPS origin before building because
+   canonical URLs and client configuration are compiled from it.
+3. Run `pnpm db:migrate` once as a dedicated release command against the
+   production `DATABASE_URL`. Do not attach migrations to every web process
+   startup.
+4. Deploy the application only after the migration succeeds. Use
+   `/api/health` for liveness and `/api/ready` for database-backed readiness.
+5. Schedule an authenticated `POST /api/internal/uploads/cleanup` at least
+   every five minutes.
+6. Verify the public origin, both locale URL variants, authentication redirects,
+   Dashboard access, `robots.txt`, `sitemap.xml`, and application logs.
 
-2. **Import Project in Vercel:**
-   - Log into your Vercel account, click "Add New... > Project", then select your Git repository.
-   - Vercel will automatically detect this is a Next.js project and configure the build settings.
-
-3. **Configure Environment Variables:**
-   - In your Vercel project's "Settings" -> "Environment Variables", add all the environment variables you defined in your `.env` file. **Do not commit the `.env` file to your Git repository**.
-
-4. **Configure Database Migration as a Release Step:**
-   Run `pnpm db:migrate` once in a dedicated CI/CD or platform release step using the production `DATABASE_URL`. Avoid running migrations from web process startup hooks.
-
-5. **Deploy!**
-   After completing the above steps, Vercel will automatically build and deploy your application every time you push to the main branch.
+Docker Compose follows the same order with a one-shot `migrate` service. See
+[docker/README.md](docker/README.md) for local and self-hosted instructions.
 
 ## 📄 License
 

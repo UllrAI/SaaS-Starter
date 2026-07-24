@@ -2,7 +2,6 @@ import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import postgres from "postgres";
-import env from "@/env";
 
 type MigrationEntry = {
   idx: number;
@@ -99,13 +98,18 @@ async function assertDatabaseMatchesBaseline(sql: postgres.Sql) {
 }
 
 async function main() {
+  const databaseUrl = process.env.DATABASE_URL;
+  if (!databaseUrl) {
+    throw new Error("DATABASE_URL is required.");
+  }
+
   const migrations = loadMigrations();
 
   if (migrations.length === 0) {
     throw new Error("No migrations found in src/database/migrations");
   }
 
-  const sql = postgres(env.DATABASE_URL, {
+  const sql = postgres(databaseUrl, {
     max: 1,
   });
 

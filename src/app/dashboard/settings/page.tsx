@@ -7,8 +7,8 @@ import { AppearancePage } from "./_components/appearance-page";
 import { DeveloperAccessCard } from "./_components/developer-access-card";
 import { createMetadataDefaults } from "@/lib/metadata";
 export async function generateMetadata() {
-  const { t } = await getServerTranslations();
-  const metadata = createMetadataDefaults();
+  const { locale, t } = await getServerTranslations();
+  const metadata = createMetadataDefaults({ locale });
   return {
     ...metadata,
     title: t("1d469220fba5", "Settings"),

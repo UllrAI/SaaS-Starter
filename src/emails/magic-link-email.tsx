@@ -10,8 +10,8 @@ import {
   Preview,
   Section,
   Text,
-} from "@react-email/components";
-import { render } from "@react-email/render";
+  render,
+} from "react-email";
 export interface MagicLinkEmailDeviceInfo {
   browser?: string;
   os?: string;

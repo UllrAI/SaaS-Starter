@@ -173,7 +173,7 @@ export function Hero({
                         className="bg-primary block h-4 w-2"
                       />
                       <span>
-                        <>Running...</>
+                        <>{t("hero_running", "Running...")}</>
                       </span>
                     </div>
                   </div>

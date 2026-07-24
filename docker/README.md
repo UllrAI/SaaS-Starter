@@ -5,7 +5,7 @@ This directory contains Docker configuration for running the UllrAI Starter appl
 ## Files
 
 - `Dockerfile` - Multi-stage build configuration for the Next.js application
-- `docker-compose.yml` - Complete development environment with PostgreSQL and Redis
+- `docker-compose.yml` - Development environment with PostgreSQL
 - Root `.dockerignore` - Excludes secrets and build artifacts
 
 ## Quick Start
@@ -24,6 +24,9 @@ This directory contains Docker configuration for running the UllrAI Starter appl
    a second generated value in `UPLOAD_CLEANUP_SECRET`. Set
    `NEXT_PUBLIC_APP_URL` to the exact public origin used to access the build;
    production SEO metadata is generated from this value at build time.
+   `RATE_LIMIT_IP_HEADER` must name a client-IP header that your trusted
+   ingress overwrites; never trust a header passed through directly from the
+   public internet.
 
 2. **Run the application**
 
@@ -39,7 +42,6 @@ This directory contains Docker configuration for running the UllrAI Starter appl
 3. **Access the application**
    - Application: http://localhost:3000
    - Database: localhost:5432
-   - Redis: localhost:6379
 
 ## Services
 
@@ -60,13 +62,6 @@ This directory contains Docker configuration for running the UllrAI Starter appl
 - **Database**: `ullrai_starter`
 - **Credentials**: postgres/postgres (development only)
 - **Persistence**: Docker volume `postgres_data`
-
-### redis (optional)
-
-- **Port**: 6379
-- **Persistence**: Docker volume `redis_data`
-- **Use case**: Caching and session storage
-- **Start**: `docker compose --env-file ../.env --profile cache up --build`
 
 ## Development Workflow
 
@@ -112,6 +107,10 @@ For production deployment:
 8. **Upload protocol rollout**: Set `UPLOAD_LEGACY_COMPLETION_SINCE` and
    `UPLOAD_LEGACY_COMPLETION_UNTIL` only for the bounded v1-to-v2 rollout
    window, then remove both after the cutoff
+9. **Trusted proxy**: Keep the default loopback-only application port binding
+   or place the container on a private network behind a reverse proxy. The
+   proxy must overwrite `RATE_LIMIT_IP_HEADER`; exposing port 3000 publicly
+   while trusting a client-supplied header makes IP rate limits bypassable.
 
 ## Troubleshooting
 
@@ -128,9 +127,10 @@ docker compose --env-file ../.env up --build
 
 ### Build Issues
 
+Rebuild the application images without removing unrelated Docker data:
+
 ```bash
-# Clean build
 docker compose down
-docker system prune -f
-docker compose --env-file ../.env up --build
+docker compose --env-file ../.env build --no-cache app migrate
+docker compose --env-file ../.env up
 ```

@@ -21,6 +21,7 @@ pnpm dev
 pnpm build
 pnpm start
 pnpm lint
+pnpm dead-code:check
 pnpm type-check
 pnpm test
 pnpm test:watch
@@ -43,6 +44,7 @@ pnpm db:push
 
 ```bash
 pnpm set:admin
+pnpm creem:sync-products
 ```
 
 ## 3. Project Snapshot
@@ -150,6 +152,8 @@ pnpm set:admin
 ## 7. Data, Billing, and Security
 
 - Validate environment variables only through `env.js`.
+- Database CLI configuration may validate only `DATABASE_URL` so a one-shot
+  migrator does not require unrelated application credentials.
 - Keep server and client environment variables separated and validated.
 - Preserve the billing provider abstraction. Route payment behavior through `src/lib/billing/provider.ts`.
 - Follow existing upload security flow in `src/lib/config/upload.ts` and related server logic.

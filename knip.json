@@ -1,0 +1,8 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "ignoreBinaries": ["xdg-open"],
+  "ignoreFiles": ["content-collections.ts"],
+  "ignoreIssues": {
+    "src/database/tables.ts": ["exports"]
+  }
+}

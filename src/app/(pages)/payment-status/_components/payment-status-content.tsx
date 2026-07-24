@@ -264,6 +264,7 @@ export function PaymentStatusContent() {
             }
             return;
           }
+          throw new Error(`Payment status request failed: ${response.status}`);
         }
         if (statusParam && statusParam in DIRECT_STATUS_MAP) {
           setStatus(

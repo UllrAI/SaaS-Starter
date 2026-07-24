@@ -96,7 +96,7 @@ export function AdminStatsCards({ stats, locale }: AdminStatsCardsProps) {
       <Card className="relative overflow-hidden">
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
           <CardTitle className="text-sm font-medium">
-            {t("2b2b75e07b24", "Total Revenue")}
+            {t("admin_settled_usd_revenue", "Settled USD Revenue")}
           </CardTitle>
           <CreditCard className="text-muted-foreground h-4 w-4" />
         </CardHeader>

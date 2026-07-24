@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import { creemWebhookSecret } from "./client";
+import { creemEnvironment, creemWebhookSecret } from "./client";
 import type {
   CreemWebhookPayload,
   CreemCheckoutObject,
@@ -68,13 +68,29 @@ function isCheckoutObject(obj: unknown): obj is CreemCheckoutObject {
 
   const order = (obj as { order?: unknown }).order;
   const subscription = (obj as { subscription?: unknown }).subscription;
+  if (typeof order !== "object" || order === null) {
+    return false;
+  }
+
+  const checkoutOrder = order as {
+    id?: unknown;
+    transaction?: unknown;
+    amount?: unknown;
+    amount_due?: unknown;
+    currency?: unknown;
+  };
+  const amount = checkoutOrder.amount_due ?? checkoutOrder.amount;
   return (
-    typeof order === "object" &&
-    order !== null &&
-    typeof (order as { id?: unknown }).id === "string" &&
-    typeof (order as { transaction?: unknown }).transaction === "string" &&
-    typeof (order as { amount_due?: unknown }).amount_due === "number" &&
-    typeof (order as { currency?: unknown }).currency === "string" &&
+    typeof checkoutOrder.id === "string" &&
+    checkoutOrder.id.trim().length > 0 &&
+    (checkoutOrder.transaction === undefined ||
+      (typeof checkoutOrder.transaction === "string" &&
+        checkoutOrder.transaction.trim().length > 0)) &&
+    typeof amount === "number" &&
+    Number.isFinite(amount) &&
+    amount >= 0 &&
+    typeof checkoutOrder.currency === "string" &&
+    checkoutOrder.currency.trim().length > 0 &&
     (subscription == null || isCheckoutSubscriptionObject(subscription))
   );
 }
@@ -87,6 +103,9 @@ function isTransactionReference(
     value !== null &&
     typeof (value as { id?: unknown }).id === "string" &&
     (value as { id: string }).id.trim().length > 0 &&
+    (!("order" in value) ||
+      (typeof (value as { order?: unknown }).order === "string" &&
+        (value as { order: string }).order.trim().length > 0)) &&
     typeof (value as { amount?: unknown }).amount === "number" &&
     [
       "pending",
@@ -303,6 +322,7 @@ export async function handleCreemWebhook(payload: string, signature: string) {
   }
 
   const event = parseCreemWebhookPayload(payload);
+  assertCreemObjectEnvironment(event.object);
   console.log(`Received valid Creem webhook: ${event.eventType}`);
 
   const eventId = event.id.trim();
@@ -388,6 +408,25 @@ export async function handleCreemWebhook(payload: string, signature: string) {
   return { received: true };
 }
 
+function assertCreemObjectEnvironment(object: unknown): void {
+  if (!object || typeof object !== "object") {
+    return;
+  }
+
+  const mode = (object as Record<string, unknown>).mode;
+  if (typeof mode !== "string") {
+    return;
+  }
+
+  const allowedModes =
+    creemEnvironment === "live_mode" ? ["prod"] : ["test", "sandbox"];
+  if (!allowedModes.includes(mode)) {
+    throw new InvalidWebhookPayloadError(
+      "Webhook object mode does not match the configured Creem environment.",
+    );
+  }
+}
+
 async function processCheckoutCompletedEvent(
   checkoutData: CreemCheckoutObject,
   eventCreatedAt: Date,
@@ -412,6 +451,8 @@ async function processCheckoutCompletedEvent(
   }
 
   const customerId = getCustomerId(customerField);
+  const paymentId = order.transaction?.trim() || order.id.trim();
+  const amount = order.amount_due ?? order.amount;
   await tx
     .update(users)
     .set({ paymentProviderCustomerId: customerId })
@@ -425,7 +466,7 @@ async function processCheckoutCompletedEvent(
       typeof subscription.product === "string"
         ? subscription.product
         : subscription.product.id;
-    const tier = getProductTierByProductId(productId);
+    const tier = getProductTierByProductId(productId, creemEnvironment);
     const storedProductId = tier?.id || productId;
 
     await lockBillingProductScope(userId, storedProductId, tx);
@@ -464,8 +505,8 @@ async function processCheckoutCompletedEvent(
         customerId,
         subscriptionId: subscription.id,
         productId: storedProductId,
-        paymentId: order.transaction,
-        amount: order.amount_due,
+        paymentId,
+        amount,
         currency: order.currency,
         status: "succeeded",
         paymentType: paymentMode,
@@ -492,7 +533,7 @@ async function processCheckoutCompletedEvent(
       typeof checkoutData.product === "string"
         ? checkoutData.product
         : checkoutData.product.id;
-    if (checkoutProductId !== tier.pricing.creem.oneTime) {
+    if (checkoutProductId !== tier.pricing.creem[creemEnvironment].oneTime) {
       throw new InvalidWebhookPayloadError(
         "One-time checkout product does not match its tier metadata.",
       );
@@ -505,8 +546,8 @@ async function processCheckoutCompletedEvent(
         customerId,
         subscriptionId: null,
         productId: tier.id,
-        paymentId: order.transaction,
-        amount: order.amount_due,
+        paymentId,
+        amount,
         currency: order.currency,
         status: "succeeded",
         paymentType: "one_time",
@@ -519,7 +560,7 @@ async function processCheckoutCompletedEvent(
         {
           userId,
           productId: tier.id,
-          sourcePaymentId: order.transaction,
+          sourcePaymentId: paymentId,
         },
         tx,
       );
@@ -539,7 +580,12 @@ async function processRefundCreatedEvent(
   if (refundData.status !== "succeeded") {
     return;
   }
-  await lockPaymentAdjustmentScope(refundData.transaction.id, tx);
+  const paymentId = await lockPaymentAdjustmentScope(
+    [refundData.transaction.id, refundData.transaction.order].filter(
+      (reference): reference is string => Boolean(reference),
+    ),
+    tx,
+  );
 
   const refundedAmount =
     refundData.transaction.refunded_amount ?? refundData.refund_amount;
@@ -550,16 +596,12 @@ async function processRefundCreatedEvent(
     refundedAmount >= paidAmount;
 
   const [payment] = await updatePaymentStatus(
-    refundData.transaction.id,
+    paymentId,
     isFullRefund ? "refunded" : "partially_refunded",
     tx,
   );
   if (isFullRefund) {
-    await revokeProductEntitlementByPaymentId(
-      refundData.transaction.id,
-      "refunded",
-      tx,
-    );
+    await revokeProductEntitlementByPaymentId(paymentId, "refunded", tx);
     if (payment?.subscriptionId) {
       await suspendSubscriptionAccess(
         payment.subscriptionId,
@@ -575,17 +617,14 @@ async function processDisputeCreatedEvent(
   eventCreatedAt: Date,
   tx: Tx,
 ) {
-  await lockPaymentAdjustmentScope(disputeData.transaction.id, tx);
-  const [payment] = await updatePaymentStatus(
-    disputeData.transaction.id,
-    "disputed",
+  const paymentId = await lockPaymentAdjustmentScope(
+    [disputeData.transaction.id, disputeData.transaction.order].filter(
+      (reference): reference is string => Boolean(reference),
+    ),
     tx,
   );
-  await revokeProductEntitlementByPaymentId(
-    disputeData.transaction.id,
-    "disputed",
-    tx,
-  );
+  const [payment] = await updatePaymentStatus(paymentId, "disputed", tx);
+  await revokeProductEntitlementByPaymentId(paymentId, "disputed", tx);
   if (payment?.subscriptionId) {
     await suspendSubscriptionAccess(payment.subscriptionId, eventCreatedAt, tx);
   }
@@ -607,7 +646,7 @@ async function processSubscriptionEvent(
     typeof subscriptionData.product === "string"
       ? subscriptionData.product
       : subscriptionData.product.id;
-  const tier = getProductTierByProductId(productId);
+  const tier = getProductTierByProductId(productId, creemEnvironment);
   const storedProductId = tier?.id || productId;
 
   await lockBillingProductScope(user.id, storedProductId, tx);
@@ -713,7 +752,7 @@ async function processSubscriptionRenewal(
   if (!productId)
     throw new InvalidWebhookPayloadError("Product ID missing in renewal event");
 
-  const tier = getProductTierByProductId(productId);
+  const tier = getProductTierByProductId(productId, creemEnvironment);
   const storedProductId = tier?.id || productId;
 
   await lockBillingProductScope(user.id, storedProductId, tx);
@@ -753,7 +792,7 @@ async function processPaymentSucceededEvent(
   if (!productId)
     throw new InvalidWebhookPayloadError("Product ID missing in payment event");
 
-  const tier = getProductTierByProductId(productId);
+  const tier = getProductTierByProductId(productId, creemEnvironment);
 
   await upsertPayment(
     {

@@ -260,7 +260,7 @@ describe("Database Subscription Functions", () => {
   });
 
   describe("upsertPayment", () => {
-    it("should create a new payment", async () => {
+    it("normalizes ISO currency codes when creating a payment", async () => {
       const paymentData = {
         userId: "user-123",
         customerId: "customer-123",
@@ -268,19 +268,22 @@ describe("Database Subscription Functions", () => {
         productId: "product-123",
         paymentId: "payment-123",
         amount: 1000,
-        currency: "usd",
+        currency: "USD",
         status: "succeeded",
         paymentType: "subscription",
       };
 
-      const mockResult = [{ id: "payment-id", ...paymentData }];
+      const mockResult = [
+        { id: "payment-id", ...paymentData, currency: "usd" },
+      ];
+      const mockValues = jest.fn().mockReturnValue({
+        onConflictDoUpdate: jest.fn().mockReturnValue({
+          returning: jest.fn().mockResolvedValue(mockResult),
+        }),
+      });
 
       mockDb.insert.mockReturnValue({
-        values: jest.fn().mockReturnValue({
-          onConflictDoUpdate: jest.fn().mockReturnValue({
-            returning: jest.fn().mockResolvedValue(mockResult),
-          }),
-        }),
+        values: mockValues,
       });
 
       const { upsertPayment } = await import("./subscription");
@@ -289,6 +292,9 @@ describe("Database Subscription Functions", () => {
 
       expect(result).toEqual(mockResult);
       expect(mockDb.insert).toHaveBeenCalledWith(mockPayments);
+      expect(mockValues).toHaveBeenCalledWith(
+        expect.objectContaining({ currency: "usd" }),
+      );
     });
 
     it("should update existing payment on conflict", async () => {
@@ -359,6 +365,25 @@ describe("Database Subscription Functions", () => {
       expect(mockDb.insert).toHaveBeenCalled();
     });
 
+    it("rejects invalid currency codes before writing", async () => {
+      const { upsertPayment } = await import("./subscription");
+
+      await expect(
+        upsertPayment({
+          userId: "user-123",
+          customerId: "customer-123",
+          subscriptionId: null,
+          productId: "product-123",
+          paymentId: "payment-123",
+          amount: 1000,
+          currency: "US dollars",
+          status: "succeeded",
+          paymentType: "one_time",
+        }),
+      ).rejects.toThrow("three-letter ISO code");
+      expect(mockDb.insert).not.toHaveBeenCalled();
+    });
+
     it("rejects a conflicting payment owner or product", async () => {
       const paymentData = {
         userId: "user-123",
@@ -386,7 +411,7 @@ describe("Database Subscription Functions", () => {
       const { upsertPayment } = await import("./subscription");
 
       await expect(upsertPayment(paymentData)).rejects.toThrow(
-        "conflicts with an existing payment owner or product",
+        "conflicts with existing immutable payment data",
       );
     });
   });
@@ -577,7 +602,9 @@ describe("Database Subscription Functions", () => {
     it("takes the product transaction lock before locking the payment", async () => {
       const paymentLimit = jest
         .fn()
-        .mockResolvedValue([{ userId: "user-1", productId: "pro" }]);
+        .mockResolvedValue([
+          { paymentId: "payment-1", userId: "user-1", productId: "pro" },
+        ]);
       const paymentForUpdate = jest
         .fn()
         .mockResolvedValue([{ id: "payment-row" }]);
@@ -597,7 +624,9 @@ describe("Database Subscription Functions", () => {
       const tx = { execute, select };
       const { lockPaymentAdjustmentScope } = await import("./subscription");
 
-      await lockPaymentAdjustmentScope("payment-1", tx as any);
+      await expect(
+        lockPaymentAdjustmentScope(["payment-1"], tx as any),
+      ).resolves.toBe("payment-1");
 
       expect(paymentLimit).toHaveBeenCalledWith(1);
       expect(execute).toHaveBeenCalled();

@@ -74,6 +74,7 @@ describe("Database Schema", () => {
       expect(uploadIntents).toBeDefined();
       expect(uploadIntentStatusEnum.enumValues).toEqual([
         "pending",
+        "cancelled",
         "cleaning",
         "completed",
       ]);

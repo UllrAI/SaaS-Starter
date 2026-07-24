@@ -6,7 +6,7 @@ export interface UploadedFile {
   fileName: string;
 }
 
-export type FileUploadIssueCode =
+type FileUploadIssueCode =
   | "too-many-files"
   | "file-type-not-accepted"
   | "file-type-not-supported"
@@ -36,7 +36,7 @@ export class FileUploadIssueError extends Error {
   }
 }
 
-export type FileUploadItemStatus =
+type FileUploadItemStatus =
   | "queued"
   | "uploading"
   | "success"

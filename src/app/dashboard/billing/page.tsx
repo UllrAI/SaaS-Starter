@@ -11,8 +11,8 @@ import { BillingOverview } from "./_components/billing-overview";
 import { createMetadataDefaults } from "@/lib/metadata";
 import { getAuthSessionFromHeaders } from "@/lib/auth/session";
 export async function generateMetadata() {
-  const { t } = await getServerTranslations();
-  const metadata = createMetadataDefaults();
+  const { locale, t } = await getServerTranslations();
+  const metadata = createMetadataDefaults({ locale });
   return {
     ...metadata,
     title: t("f8de466fe579", "Billing"),

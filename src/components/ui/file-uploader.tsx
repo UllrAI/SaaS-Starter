@@ -456,9 +456,19 @@ export function FileUploader({
                         options.maxFileSize ?? UPLOAD_CONFIG.MAX_FILE_SIZE,
                       ),
                       expression2: allFormatsEnabled ? (
-                        <>All supported formats.</>
+                        <>
+                          {t(
+                            "upload_all_supported_formats",
+                            "All supported formats.",
+                          )}
+                        </>
                       ) : (
-                        <>Preset formats only.</>
+                        <>
+                          {t(
+                            "upload_preset_formats_only",
+                            "Preset formats only.",
+                          )}
+                        </>
                       ),
                     },
                   )}
@@ -611,11 +621,4 @@ export function FileUploader({
     </div>
   );
 }
-export { useFileUpload };
-export type {
-  FileUploadIssue,
-  FileUploadItem,
-  FileUploadItemStatus,
-  UploadedFile,
-  UploadTransport,
-} from "./file-upload/types";
+export type { UploadedFile } from "./file-upload/types";

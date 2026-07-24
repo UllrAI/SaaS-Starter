@@ -19,6 +19,7 @@ interface PresignedUploadPayload {
 interface CreatePresignedUploadTransportOptions {
   presignedUrlEndpoint?: string;
   completeEndpoint?: string;
+  cancelEndpoint?: string;
 }
 
 function isAllowedUploadUrl(url: string): boolean {
@@ -137,10 +138,28 @@ export function createPresignedUploadTransport(
   const presignedUrlEndpoint =
     options.presignedUrlEndpoint ?? "/api/upload/presigned-url";
   const completeEndpoint = options.completeEndpoint ?? "/api/upload/complete";
+  const cancelEndpoint = options.cancelEndpoint ?? "/api/upload/cancel";
 
   return {
     startUpload({ file, onProgress }) {
       const abortController = new AbortController();
+      let intentId: string | undefined;
+      let completed = false;
+      let cancelSent = false;
+
+      const cancelIntent = () => {
+        if (!intentId || completed || cancelSent) {
+          return;
+        }
+
+        cancelSent = true;
+        void fetch(cancelEndpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ intentId }),
+          keepalive: true,
+        }).catch(() => undefined);
+      };
 
       const promise = (async () => {
         const contentType = normalizeContentType(file.type);
@@ -168,13 +187,14 @@ export function createPresignedUploadTransport(
         }
 
         const {
-          intentId,
+          intentId: reservedIntentId,
           key,
           presignedUrl,
           protocolVersion,
           publicUrl,
           requiredHeaders,
         } = (await presignedResponse.json()) as PresignedUploadPayload;
+        intentId = reservedIntentId;
 
         if (
           protocolVersion !== 2 ||
@@ -201,7 +221,7 @@ export function createPresignedUploadTransport(
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            intentId,
+            intentId: reservedIntentId,
             fileName: file.name,
             contentType,
             size: file.size,
@@ -217,8 +237,10 @@ export function createPresignedUploadTransport(
           throw createRequestFailure();
         }
 
+        completed = true;
         return completeData.file as UploadedFile;
       })().catch((error) => {
+        cancelIntent();
         if (error instanceof DOMException && error.name === "AbortError") {
           throw new FileUploadIssueError({
             code: "upload-aborted",
@@ -233,6 +255,7 @@ export function createPresignedUploadTransport(
         promise,
         cancel: () => {
           abortController.abort();
+          cancelIntent();
         },
       };
     },

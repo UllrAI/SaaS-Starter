@@ -19,10 +19,7 @@ const customJestConfig = {
     "<rootDir>/.next/",
     "<rootDir>/e2e/",
   ],
-  modulePathIgnorePatterns: [
-    "<rootDir>/.next/",
-    "<rootDir>/src/lib/email.test.tsx.disabled",
-  ],
+  modulePathIgnorePatterns: ["<rootDir>/.next/"],
 };
 
 module.exports = createJestConfig(customJestConfig);

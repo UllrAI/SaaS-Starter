@@ -1,5 +1,6 @@
 import {
   extractLocaleFromPath,
+  getEnglishFallbackPathForUnsupportedLocale,
   isMarketingPath,
   normalizeLocaleCandidate,
   resolvePreferredLocale,
@@ -13,8 +14,23 @@ describe("i18n routing helpers", () => {
     expect(normalizeLocaleCandidate("zh-CN")).toBe("zh-Hans");
     expect(normalizeLocaleCandidate("en-US")).toBe("en");
     expect(normalizeLocaleCandidate("zh_Hans")).toBe("zh-Hans");
+    expect(normalizeLocaleCandidate("zh-TW")).toBeNull();
+    expect(normalizeLocaleCandidate("zh-Hant-HK")).toBeNull();
     expect(normalizeLocaleCandidate("  ")).toBeNull();
     expect(normalizeLocaleCandidate("fr")).toBeNull();
+  });
+
+  it("maps unsupported locale-prefixed marketing paths to English", () => {
+    expect(getEnglishFallbackPathForUnsupportedLocale("/zh-TW/about")).toBe(
+      "/about",
+    );
+    expect(getEnglishFallbackPathForUnsupportedLocale("/fr/blog/post")).toBe(
+      "/blog/post",
+    );
+    expect(
+      getEnglishFallbackPathForUnsupportedLocale("/fr/dashboard"),
+    ).toBeNull();
+    expect(getEnglishFallbackPathForUnsupportedLocale("/about")).toBeNull();
   });
 
   it("resolves locale from Accept-Language by quality score", () => {
@@ -28,6 +44,7 @@ describe("i18n routing helpers", () => {
       resolveLocaleFromAcceptLanguage("fr,zh;q=0,en;q=1.1,zh-CN;q=-1"),
     ).toBeNull();
     expect(resolveLocaleFromAcceptLanguage("fr-FR,fr;q=0.9")).toBeNull();
+    expect(resolveLocaleFromAcceptLanguage("zh-TW,zh-HK;q=0.9")).toBeNull();
   });
 
   it("extracts locale prefixes and stripped paths", () => {

@@ -30,7 +30,7 @@ export type AuthVerifyResponse = {
   };
 };
 
-export async function tryRefreshToken(): Promise<string | null> {
+async function tryRefreshToken(): Promise<string | null> {
   const config = loadConfig();
   if (!config.refreshToken?.startsWith(CLI_REFRESH_PREFIX)) {
     return null;

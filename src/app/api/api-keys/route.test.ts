@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, jest } from "@jest/globals";
 const mockGetAuthSessionFromHeaders = jest.fn();
 const mockListApiKeys = jest.fn();
 const mockGenerateApiKey = jest.fn();
+const mockCheckRateLimit = jest.fn();
 
 jest.mock("@/lib/auth/session", () => ({
   getAuthSessionFromHeaders: mockGetAuthSessionFromHeaders,
@@ -13,9 +14,17 @@ jest.mock("@/lib/api-keys/key-service", () => ({
   generateApiKey: mockGenerateApiKey,
 }));
 
+jest.mock("@/lib/rate-limit", () => ({
+  checkRateLimit: mockCheckRateLimit,
+}));
+
 describe("/api/api-keys", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockCheckRateLimit.mockResolvedValue({
+      allowed: true,
+      info: { limit: 10, remaining: 9, resetAt: 2_000_000_000 },
+    });
   });
 
   it("lists API keys for the current user", async () => {
@@ -62,5 +71,24 @@ describe("/api/api-keys", () => {
       rateLimit: undefined,
       expiresAt: null,
     });
+  });
+
+  it("rate-limits repeated API key creation", async () => {
+    mockGetAuthSessionFromHeaders.mockResolvedValue({
+      user: { id: "user-1" },
+    });
+    mockCheckRateLimit.mockResolvedValue({
+      allowed: false,
+      info: { limit: 10, remaining: 0, resetAt: 2_000_000_000 },
+    });
+
+    const { POST } = await import("./route");
+    const response = await POST({
+      headers: new Headers(),
+      json: jest.fn().mockResolvedValue({ name: "Primary" }),
+    } as any);
+
+    expect(response.status).toBe(429);
+    expect(mockGenerateApiKey).not.toHaveBeenCalled();
   });
 });

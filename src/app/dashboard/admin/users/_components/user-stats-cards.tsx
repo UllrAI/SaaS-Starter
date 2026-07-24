@@ -24,7 +24,9 @@ export async function UserStatsCards() {
       <StatCard
         title={t("c0970292b61e", "Verified Users")}
         value={stats.verified}
-        description={`${verificationRate}% verification rate`}
+        description={t("user_verification_rate", "{rate}% verification rate", {
+          rate: verificationRate,
+        })}
         icon={UserCheck}
         locale={locale}
       />

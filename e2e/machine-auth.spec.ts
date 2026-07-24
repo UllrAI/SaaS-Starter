@@ -54,7 +54,11 @@ test("authorizes a CLI device through the browser and exchanges it for a CLI tok
   await page.goto(
     `/device?code=${encodeURIComponent(codePayload.data.userCode)}`,
   );
-  await page.getByRole("button", { name: "Authorize" }).click();
+  await page.getByRole("button", { name: "Review device" }).click();
+
+  await expect(page.getByText("Playwright CLI")).toBeVisible();
+  await expect(page.getByText("pw-host")).toBeVisible();
+  await page.getByRole("button", { name: "Authorize this device" }).click();
 
   await expect(page.getByText("Device authorized")).toBeVisible();
 

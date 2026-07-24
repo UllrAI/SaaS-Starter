@@ -48,7 +48,9 @@ export async function requireAuth(
       result.apiKeyId,
       result.rateLimit,
     );
-    void Promise.resolve(updateLastUsedAt(result.apiKeyId)).catch(() => {});
+    void Promise.resolve(updateLastUsedAt(result.apiKeyId)).catch((error) => {
+      console.error("Failed to update API key usage timestamp:", error);
+    });
 
     return {
       userId: result.userId,

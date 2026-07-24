@@ -103,7 +103,7 @@ describe("SocialLoginButtons", () => {
 
     await waitFor(() => {
       expect(mockToast.error).toHaveBeenCalledWith(
-        "Something went wrong. Contact support if the issue persists",
+        "Something went wrong. Contact support if the issue persists.",
       );
     });
 
@@ -148,7 +148,7 @@ describe("SocialLoginButtons", () => {
 
     await waitFor(() => {
       expect(mockToast.error).toHaveBeenCalledWith(
-        "Something went wrong. Contact support if the issue persists",
+        "Something went wrong. Contact support if the issue persists.",
       );
     });
 

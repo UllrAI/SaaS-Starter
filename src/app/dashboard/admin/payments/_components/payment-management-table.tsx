@@ -11,6 +11,7 @@ import { useAdminTable } from "@/hooks/use-admin-table";
 import { Button } from "@/components/ui/button";
 import { getPayments } from "@/lib/actions/admin";
 import { useIntlLocale } from "@/hooks/use-intl-locale";
+import type { AppTranslate } from "@/lib/i18n/translation/shared";
 interface PaymentManagementTableProps {
   initialData: PaymentWithUser[];
   initialPagination: {
@@ -82,6 +83,7 @@ function PaymentMethodLabel({ paymentType }: { paymentType: string }) {
 }
 const createColumns = (
   locale: string,
+  t: AppTranslate,
 ): Array<{
   key: keyof PaymentWithUser | string;
   label: ReactNode;
@@ -89,7 +91,7 @@ const createColumns = (
 }> => [
   {
     key: "user",
-    label: <>User</>,
+    label: <>{t("admin_payment_column_user", "User")}</>,
     render: (payment) => (
       <UserAvatarCell
         name={payment.user?.name}
@@ -100,7 +102,7 @@ const createColumns = (
   },
   {
     key: "amount",
-    label: <>Amount</>,
+    label: <>{t("admin_payment_column_amount", "Amount")}</>,
     render: (payment) => (
       <div className="font-medium">
         {formatCurrency(payment.amount, payment.currency, locale)}
@@ -109,7 +111,7 @@ const createColumns = (
   },
   {
     key: "status",
-    label: <>Status</>,
+    label: <>{t("admin_payment_column_status", "Status")}</>,
     render: (payment) => (
       <Badge
         variant={getStatusBadgeVariant(payment.status)}
@@ -121,7 +123,7 @@ const createColumns = (
   },
   {
     key: "method",
-    label: <>Method</>,
+    label: <>{t("admin_payment_column_method", "Method")}</>,
     render: (payment) => (
       <div className="text-sm">
         <PaymentMethodLabel paymentType={payment.paymentType} />
@@ -130,44 +132,22 @@ const createColumns = (
   },
   {
     key: "created",
-    label: <>Created</>,
+    label: <>{t("admin_payment_column_created", "Created")}</>,
     render: (payment) => formatDate(payment.createdAt, locale),
   },
   {
     key: "actions",
-    label: <>Actions</>,
+    label: <>{t("admin_payment_column_actions", "Actions")}</>,
     render: (payment) => (
       <Button
         variant="ghost"
         size="sm"
         onClick={() => openProviderPayment(payment.paymentId)}
-        title="View in Creem Dashboard"
+        title={t("admin_payment_view_in_creem", "View in the Creem dashboard")}
       >
         <ExternalLink className="h-4 w-4" />
       </Button>
     ),
-  },
-];
-const statusFilterOptions = [
-  {
-    value: "all",
-    label: <>All Statuses</>,
-  },
-  {
-    value: "succeeded",
-    label: <>Succeeded</>,
-  },
-  {
-    value: "pending",
-    label: <>Pending</>,
-  },
-  {
-    value: "failed",
-    label: <>Failed</>,
-  },
-  {
-    value: "canceled",
-    label: <>Canceled</>,
   },
 ];
 export function PaymentManagementTable({
@@ -176,7 +156,6 @@ export function PaymentManagementTable({
 }: PaymentManagementTableProps) {
   const { t } = useTranslation();
   const intlLocale = useIntlLocale();
-  // FIX: Wrap queryAction with useCallback
   const queryPayments = useCallback(
     async ({
       page,
@@ -214,11 +193,32 @@ export function PaymentManagementTable({
     setCurrentPage: handlePageChange,
   } = useAdminTable<PaymentWithUser>({
     queryAction: queryPayments,
-    // Use the wrapped function
     initialData,
     initialPagination,
   });
-  const columns = createColumns(intlLocale);
+  const columns = createColumns(intlLocale, t);
+  const statusFilterOptions = [
+    {
+      value: "all",
+      label: <>{t("admin_payment_filter_all_statuses", "All statuses")}</>,
+    },
+    {
+      value: "succeeded",
+      label: <PaymentStatusLabel status="succeeded" />,
+    },
+    {
+      value: "pending",
+      label: <PaymentStatusLabel status="pending" />,
+    },
+    {
+      value: "failed",
+      label: <PaymentStatusLabel status="failed" />,
+    },
+    {
+      value: "canceled",
+      label: <PaymentStatusLabel status="canceled" />,
+    },
+  ];
   return (
     <AdminTableBase<PaymentWithUser>
       data={payments}

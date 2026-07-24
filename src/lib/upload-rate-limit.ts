@@ -1,7 +1,7 @@
 import { UPLOAD_CONFIG } from "@/lib/config/upload";
 import { checkRateLimit } from "@/lib/rate-limit";
 
-export type UploadRateLimitScope = "complete" | "presign" | "server";
+export type UploadRateLimitScope = "cancel" | "complete" | "presign" | "server";
 
 export async function checkUploadRateLimit(
   userId: string,

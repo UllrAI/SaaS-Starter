@@ -1,589 +1,184 @@
-import { describe, it, expect, jest, beforeEach } from "@jest/globals";
-import { z } from "zod";
+import type { CreateCheckoutOptions } from "@/types/billing";
+import type { PaymentProvider } from "../provider";
 
-// Mock environment first
-jest.mock("@/env", () => ({
-  __esModule: true,
-  default: {
-    CREEM_API_KEY: "test_api_key",
-    CREEM_WEBHOOK_SECRET: "test_webhook_secret",
-    CREEM_ENVIRONMENT: "test_mode",
-  },
-}));
-
-// Mock all dependencies before importing anything
 const mockCreemClient = {
-  checkouts: {
-    create: jest.fn(),
-  },
-  customers: {
-    generateBillingLinks: jest.fn(),
-  },
+  checkouts: { create: jest.fn() },
+  customers: { generateBillingLinks: jest.fn() },
 };
-
 const mockGetProductTierById = jest.fn();
 const mockHandleCreemWebhook = jest.fn();
 
-// Mock fetch and related HTTP APIs comprehensively
-const mockResponse = {
-  ok: true,
-  status: 200,
-  statusText: "OK",
-  headers: new Map(),
-  json: jest.fn().mockResolvedValue({}),
-  text: jest.fn().mockResolvedValue(""),
-  arrayBuffer: jest.fn().mockResolvedValue(new ArrayBuffer(0)),
-  blob: jest.fn().mockResolvedValue(new Blob()),
-  clone: jest.fn().mockReturnThis(),
-} as any;
-
-global.fetch = jest.fn().mockResolvedValue(mockResponse) as any;
-global.Request = jest.fn().mockImplementation((url, options) => ({
-  url,
-  method: "GET",
-  headers: new Map(),
-  ...options,
-  clone: jest.fn().mockReturnThis(),
-  json: jest.fn().mockResolvedValue({}),
-  text: jest.fn().mockResolvedValue(""),
-  arrayBuffer: jest.fn().mockResolvedValue(new ArrayBuffer(0)),
-})) as any;
-global.Response = jest.fn().mockImplementation(() => mockResponse) as any;
-global.Headers = jest.fn().mockImplementation(() => new Map()) as any;
-
-// Mock any potential HTTP clients that Creem might use internally
-// (removed axios and node-fetch as they are not used in actual code)
-
-// Mock the Creem SDK completely - this must come before importing any modules that use it
-jest.mock("creem", () => {
-  const MockCreem = jest.fn().mockImplementation(() => mockCreemClient);
-  return {
-    Creem: MockCreem,
-    __esModule: true,
-    default: MockCreem,
-  };
-});
-
-// Mock the client module to return our mock client
 jest.mock("./client", () => ({
-  __esModule: true,
   creemClient: mockCreemClient,
-  creemApiKey: "test_api_key",
-  creemWebhookSecret: "test_webhook_secret",
+  creemEnvironment: "live_mode",
+  creemWebhookSecret: "webhook-secret",
 }));
-
 jest.mock("@/lib/config/products", () => ({
-  __esModule: true,
   getProductTierById: mockGetProductTierById,
 }));
-
 jest.mock("./webhook", () => ({
-  __esModule: true,
   handleCreemWebhook: mockHandleCreemWebhook,
 }));
 
-// Import types first
-import type { CreateCheckoutOptions } from "@/types/billing";
-
-// Import types and interfaces
-import type { PaymentProvider } from "../provider";
-
-// Define variable to hold the provider
 let creemProvider: PaymentProvider;
 
-// Test the Zod schemas directly
-const CreemCheckoutResponseSchema = z.object({
-  checkoutUrl: z.string().url(),
-});
+const tier = {
+  id: "plus",
+  name: "Plus",
+  pricing: {
+    creem: {
+      test_mode: { oneTime: "", monthly: "", yearly: "" },
+      live_mode: {
+        oneTime: "prod_once",
+        monthly: "prod_monthly",
+        yearly: "prod_yearly",
+      },
+    },
+  },
+};
 
-const CreemCustomerPortalResponseSchema = z.object({
-  customerPortalLink: z.string().url(),
-});
+const checkoutOptions: CreateCheckoutOptions = {
+  requestId: "req_123",
+  tierId: "plus",
+  userId: "user_123",
+  userEmail: "user@example.com",
+  userName: "Taylor",
+  paymentMode: "subscription",
+  billingCycle: "monthly",
+  successUrl: "https://example.com/success",
+  cancelUrl: "https://example.com/cancel",
+  failureUrl: "https://example.com/failure",
+};
 
-describe("Creem Provider Zod Validation", () => {
-  describe("CreemCheckoutResponseSchema", () => {
-    it("should validate valid checkout response", () => {
-      const validResponse = {
-        checkoutUrl: "https://checkout.creem.io/session-123",
-      };
-
-      const result = CreemCheckoutResponseSchema.safeParse(validResponse);
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.checkoutUrl).toBe(
-          "https://checkout.creem.io/session-123",
-        );
-      }
-    });
-
-    it("should reject invalid URL format", () => {
-      const invalidResponse = {
-        checkoutUrl: "invalid-url",
-      };
-
-      const result = CreemCheckoutResponseSchema.safeParse(invalidResponse);
-      expect(result.success).toBe(false);
-    });
-
-    it("should reject missing checkoutUrl", () => {
-      const invalidResponse = {};
-
-      const result = CreemCheckoutResponseSchema.safeParse(invalidResponse);
-      expect(result.success).toBe(false);
-    });
-
-    it("should reject null checkoutUrl", () => {
-      const invalidResponse = {
-        checkoutUrl: null,
-      };
-
-      const result = CreemCheckoutResponseSchema.safeParse(invalidResponse);
-      expect(result.success).toBe(false);
-    });
-  });
-
-  describe("CreemCustomerPortalResponseSchema", () => {
-    it("should validate valid customer portal response", () => {
-      const validResponse = {
-        customerPortalLink: "https://portal.creem.io/customer-123",
-      };
-
-      const result = CreemCustomerPortalResponseSchema.safeParse(validResponse);
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.customerPortalLink).toBe(
-          "https://portal.creem.io/customer-123",
-        );
-      }
-    });
-
-    it("should reject invalid URL format", () => {
-      const invalidResponse = {
-        customerPortalLink: "invalid-url",
-      };
-
-      const result =
-        CreemCustomerPortalResponseSchema.safeParse(invalidResponse);
-      expect(result.success).toBe(false);
-    });
-
-    it("should reject missing customerPortalLink", () => {
-      const invalidResponse = {};
-
-      const result =
-        CreemCustomerPortalResponseSchema.safeParse(invalidResponse);
-      expect(result.success).toBe(false);
-    });
-
-    it("should reject null customerPortalLink", () => {
-      const invalidResponse = {
-        customerPortalLink: null,
-      };
-
-      const result =
-        CreemCustomerPortalResponseSchema.safeParse(invalidResponse);
-      expect(result.success).toBe(false);
-    });
-  });
-
-  describe("Error handling patterns", () => {
-    it("should demonstrate safe parsing pattern for checkout", () => {
-      const mockApiResponse = { someOtherField: "value" };
-
-      const parsed = CreemCheckoutResponseSchema.safeParse(mockApiResponse);
-
-      if (!parsed.success) {
-        // This is the pattern we implemented in the provider
-        const errorMessage = `Failed to parse checkout response from Creem. API Response: ${JSON.stringify(mockApiResponse)}`;
-        expect(errorMessage).toContain("Failed to parse checkout response");
-        expect(parsed.error).toBeDefined();
-      }
-    });
-
-    it("should demonstrate safe parsing pattern for customer portal", () => {
-      const mockApiResponse = { someOtherField: "value" };
-
-      const parsed =
-        CreemCustomerPortalResponseSchema.safeParse(mockApiResponse);
-
-      if (!parsed.success) {
-        // This is the pattern we implemented in the provider
-        const errorMessage = `Failed to parse customer portal response from Creem. API Response: ${JSON.stringify(mockApiResponse)}`;
-        expect(errorMessage).toContain(
-          "Failed to parse customer portal response",
-        );
-        expect(parsed.error).toBeDefined();
-      }
-    });
-  });
-});
-
-describe("Creem Provider Implementation", () => {
-  let consoleErrorSpy: jest.SpyInstance;
-
-  beforeEach(async () => {
-    jest.clearAllMocks();
-    // Mock console.error to suppress expected error logs during tests
-    consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
-    // Re-import the provider to ensure fresh mocks
+describe("Creem provider", () => {
+  beforeAll(async () => {
     creemProvider = (await import("./provider")).default;
   });
 
-  afterEach(() => {
-    // Restore console.error after each test
-    consoleErrorSpy.mockRestore();
+  beforeEach(() => {
+    jest.clearAllMocks();
+    jest.spyOn(console, "error").mockImplementation(() => undefined);
+    mockGetProductTierById.mockReturnValue(tier);
   });
 
-  describe("createCheckoutSession", () => {
-    const mockCheckoutOptions: CreateCheckoutOptions = {
-      tierId: "pro",
-      userId: "user123",
-      userEmail: "user@example.com",
-      userName: "John Doe",
-      paymentMode: "subscription",
-      billingCycle: "monthly",
-      successUrl: "https://example.com/success",
-      cancelUrl: "https://example.com/cancel",
-      failureUrl: "https://example.com/failure",
-    };
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
 
-    it("should create checkout session successfully", async () => {
-      const mockTier = {
-        id: "pro",
-        name: "Professional",
-        pricing: {
-          creem: {
-            oneTime: "prod_one_time",
-            monthly: "prod_monthly",
-            yearly: "prod_yearly",
-          },
-        },
-      };
+  it.each([
+    ["subscription", "monthly", "prod_monthly"],
+    ["subscription", "yearly", "prod_yearly"],
+    ["one_time", "monthly", "prod_once"],
+  ] as const)(
+    "selects the configured product for %s/%s",
+    async (paymentMode, billingCycle, expectedProductId) => {
+      mockCreemClient.checkouts.create.mockResolvedValue({
+        checkoutUrl: "https://checkout.creem.io/ch_123",
+      });
 
-      const mockCheckoutResponse = {
-        checkoutUrl: "https://checkout.creem.io/session-123",
-      };
+      await expect(
+        creemProvider.createCheckoutSession({
+          ...checkoutOptions,
+          paymentMode,
+          billingCycle,
+        }),
+      ).resolves.toEqual({
+        checkoutUrl: "https://checkout.creem.io/ch_123",
+      });
 
-      mockGetProductTierById.mockReturnValue(mockTier);
-      mockCreemClient.checkouts.create.mockResolvedValue(mockCheckoutResponse);
-
-      const result =
-        await creemProvider.createCheckoutSession(mockCheckoutOptions);
-
-      expect(mockGetProductTierById).toHaveBeenCalledWith("pro");
       expect(mockCreemClient.checkouts.create).toHaveBeenCalledWith({
-        productId: "prod_monthly",
+        requestId: "req_123",
+        productId: expectedProductId,
         successUrl: "https://example.com/success",
         customer: {
           email: "user@example.com",
-          name: "John Doe",
         },
         metadata: {
-          userId: "user123",
-          tierId: "pro",
-          paymentMode: "subscription",
-          billingCycle: "monthly",
-          cancelUrl: "https://example.com/cancel",
-          failureUrl: "https://example.com/failure",
+          userId: "user_123",
+          tierId: "plus",
+          paymentMode,
+          billingCycle,
         },
       });
-      expect(result).toEqual({
-        checkoutUrl: "https://checkout.creem.io/session-123",
-      });
-    });
+    },
+  );
 
-    it("should handle yearly billing cycle", async () => {
-      const mockTier = {
-        id: "pro",
-        pricing: {
-          creem: {
-            oneTime: "prod_one_time",
-            monthly: "prod_monthly",
-            yearly: "prod_yearly",
-          },
-        },
-      };
+  it("rejects unknown tiers before contacting Creem", async () => {
+    mockGetProductTierById.mockReturnValue(undefined);
 
-      const yearlyOptions = {
-        ...mockCheckoutOptions,
-        billingCycle: "yearly" as const,
-      };
-
-      mockGetProductTierById.mockReturnValue(mockTier);
-      mockCreemClient.checkouts.create.mockResolvedValue({
-        checkoutUrl: "https://checkout.creem.io/session-yearly",
-      });
-
-      await creemProvider.createCheckoutSession(yearlyOptions);
-
-      expect(mockCreemClient.checkouts.create).toHaveBeenCalledWith(
-        expect.objectContaining({
-          productId: "prod_yearly",
-        }),
-      );
-    });
-
-    it("should handle one-time payment mode", async () => {
-      const mockTier = {
-        id: "pro",
-        pricing: {
-          creem: {
-            oneTime: "prod_one_time",
-            monthly: "prod_monthly",
-            yearly: "prod_yearly",
-          },
-        },
-      };
-
-      const oneTimeOptions = {
-        ...mockCheckoutOptions,
-        paymentMode: "one_time" as const,
-      };
-
-      mockGetProductTierById.mockReturnValue(mockTier);
-      mockCreemClient.checkouts.create.mockResolvedValue({
-        checkoutUrl: "https://checkout.creem.io/session-onetime",
-      });
-
-      await creemProvider.createCheckoutSession(oneTimeOptions);
-
-      expect(mockCreemClient.checkouts.create).toHaveBeenCalledWith(
-        expect.objectContaining({
-          productId: "prod_one_time",
-        }),
-      );
-    });
-
-    it("should handle optional user name", async () => {
-      const mockTier = {
-        id: "pro",
-        pricing: {
-          creem: {
-            oneTime: "prod_one_time",
-            monthly: "prod_monthly",
-            yearly: "prod_yearly",
-          },
-        },
-      };
-
-      const optionsWithoutName = {
-        ...mockCheckoutOptions,
-        userName: undefined,
-      };
-
-      mockGetProductTierById.mockReturnValue(mockTier);
-      mockCreemClient.checkouts.create.mockResolvedValue({
-        checkoutUrl: "https://checkout.creem.io/session-123",
-      });
-
-      await creemProvider.createCheckoutSession(optionsWithoutName);
-
-      expect(mockCreemClient.checkouts.create).toHaveBeenCalledWith(
-        expect.objectContaining({
-          customer: {
-            email: "user@example.com",
-            name: undefined,
-          },
-        }),
-      );
-    });
-
-    it("should throw error when tier not found", async () => {
-      mockGetProductTierById.mockReturnValue(null);
-
-      await expect(
-        creemProvider.createCheckoutSession(mockCheckoutOptions),
-      ).rejects.toThrow('Pricing tier with id "pro" not found.');
-
-      expect(mockCreemClient.checkouts.create).not.toHaveBeenCalled();
-    });
-
-    it("should throw error when product ID not found for payment mode", async () => {
-      const mockTier = {
-        id: "pro",
-        pricing: {
-          creem: {
-            oneTime: "",
-            monthly: "prod_monthly",
-            yearly: "prod_yearly",
-          },
-        },
-      };
-
-      const oneTimeOptions = {
-        ...mockCheckoutOptions,
-        paymentMode: "one_time" as const,
-      };
-
-      mockGetProductTierById.mockReturnValue(mockTier);
-
-      await expect(
-        creemProvider.createCheckoutSession(oneTimeOptions),
-      ).rejects.toThrow(
-        'Creem product ID not found for tier "pro" with mode "one_time" and cycle "monthly".',
-      );
-    });
-
-    it("should handle invalid Creem API response", async () => {
-      const mockTier = {
-        id: "pro",
-        pricing: {
-          creem: {
-            oneTime: "prod_one_time",
-            monthly: "prod_monthly",
-            yearly: "prod_yearly",
-          },
-        },
-      };
-
-      const invalidApiResponse = {
-        someOtherField: "value",
-      };
-
-      mockGetProductTierById.mockReturnValue(mockTier);
-      mockCreemClient.checkouts.create.mockResolvedValue(invalidApiResponse);
-
-      await expect(
-        creemProvider.createCheckoutSession(mockCheckoutOptions),
-      ).rejects.toThrow("Failed to parse checkout response from Creem");
-    });
-
-    it("should handle Creem API errors", async () => {
-      const mockTier = {
-        id: "pro",
-        pricing: {
-          creem: {
-            oneTime: "prod_one_time",
-            monthly: "prod_monthly",
-            yearly: "prod_yearly",
-          },
-        },
-      };
-
-      mockGetProductTierById.mockReturnValue(mockTier);
-      mockCreemClient.checkouts.create.mockRejectedValue(
-        new Error("API Error"),
-      );
-
-      await expect(
-        creemProvider.createCheckoutSession(mockCheckoutOptions),
-      ).rejects.toThrow("Failed to create checkout session: API Error");
-    });
+    await expect(
+      creemProvider.createCheckoutSession(checkoutOptions),
+    ).rejects.toThrow('Pricing tier with id "plus" not found.');
+    expect(mockCreemClient.checkouts.create).not.toHaveBeenCalled();
   });
 
-  describe("createCustomerPortalUrl", () => {
-    it("should create customer portal URL successfully", async () => {
-      const mockPortalResponse = {
-        customerPortalLink: "https://portal.creem.io/customer-123",
-      };
-
-      mockCreemClient.customers.generateBillingLinks.mockResolvedValue(
-        mockPortalResponse,
-      );
-
-      const result =
-        await creemProvider.createCustomerPortalUrl("customer-123");
-
-      expect(
-        mockCreemClient.customers.generateBillingLinks,
-      ).toHaveBeenCalledWith({
-        customerId: "customer-123",
-      });
-      expect(result).toEqual({
-        portalUrl: "https://portal.creem.io/customer-123",
-      });
+  it("rejects missing product configuration", async () => {
+    mockGetProductTierById.mockReturnValue({
+      ...tier,
+      pricing: {
+        creem: {
+          ...tier.pricing.creem,
+          live_mode: { ...tier.pricing.creem.live_mode, monthly: "" },
+        },
+      },
     });
 
-    it("should handle invalid Creem portal API response", async () => {
-      const invalidApiResponse = {
-        someOtherField: "value",
-      };
-
-      mockCreemClient.customers.generateBillingLinks.mockResolvedValue(
-        invalidApiResponse,
-      );
-
-      await expect(
-        creemProvider.createCustomerPortalUrl("customer-123"),
-      ).rejects.toThrow("Failed to parse customer portal response from Creem");
-    });
-
-    it("should handle Creem portal API errors", async () => {
-      mockCreemClient.customers.generateBillingLinks.mockRejectedValue(
-        new Error("Portal API Error"),
-      );
-
-      await expect(
-        creemProvider.createCustomerPortalUrl("customer-123"),
-      ).rejects.toThrow(
-        "Failed to create customer portal session: Portal API Error",
-      );
-    });
+    await expect(
+      creemProvider.createCheckoutSession(checkoutOptions),
+    ).rejects.toThrow("Creem product ID not found");
   });
 
-  describe("handleWebhook", () => {
-    it("should handle webhook successfully", async () => {
-      const mockWebhookResult = {
-        received: true,
-        message: "Webhook processed successfully",
-      };
+  it("rejects malformed checkout responses", async () => {
+    mockCreemClient.checkouts.create.mockResolvedValue({ status: "pending" });
 
-      mockHandleCreemWebhook.mockResolvedValue(mockWebhookResult);
+    await expect(
+      creemProvider.createCheckoutSession(checkoutOptions),
+    ).rejects.toThrow("Failed to parse checkout response from Creem");
+  });
 
-      const result = await creemProvider.handleWebhook("payload", "signature");
+  it("preserves controlled client error messages", async () => {
+    mockCreemClient.checkouts.create.mockRejectedValue(
+      new Error("Creem request failed (create checkout, HTTP 503)."),
+    );
 
-      expect(mockHandleCreemWebhook).toHaveBeenCalledWith(
-        "payload",
-        "signature",
-      );
-      expect(result).toEqual(mockWebhookResult);
+    await expect(
+      creemProvider.createCheckoutSession(checkoutOptions),
+    ).rejects.toThrow(
+      "Failed to create checkout session: Creem request failed (create checkout, HTTP 503).",
+    );
+  });
+
+  it("creates and validates customer portal links", async () => {
+    mockCreemClient.customers.generateBillingLinks.mockResolvedValue({
+      customerPortalLink: "https://creem.io/portal/cust_123",
     });
 
-    it("should handle webhook processing errors", async () => {
-      mockHandleCreemWebhook.mockRejectedValue(
-        new Error("Webhook processing failed"),
-      );
+    await expect(
+      creemProvider.createCustomerPortalUrl("cust_123"),
+    ).resolves.toEqual({
+      portalUrl: "https://creem.io/portal/cust_123",
+    });
+    expect(mockCreemClient.customers.generateBillingLinks).toHaveBeenCalledWith(
+      { customerId: "cust_123" },
+    );
+  });
 
-      await expect(
-        creemProvider.handleWebhook("payload", "signature"),
-      ).rejects.toThrow("Webhook processing failed");
+  it("rejects malformed portal links", async () => {
+    mockCreemClient.customers.generateBillingLinks.mockResolvedValue({
+      customerPortalLink: "not-a-url",
     });
 
-    it("should handle webhook with no secret configured", async () => {
-      // Create a new mock without the webhook secret
-      jest.doMock("./client", () => ({
-        __esModule: true,
-        creemClient: mockCreemClient,
-        creemApiKey: "test_api_key",
-        creemWebhookSecret: undefined,
-      }));
+    await expect(
+      creemProvider.createCustomerPortalUrl("cust_123"),
+    ).rejects.toThrow("Failed to parse customer portal response from Creem");
+  });
 
-      // Clear the module cache and re-import
-      jest.resetModules();
-      const { default: providerWithoutSecret } = await import("./provider");
+  it("delegates verified webhook processing", async () => {
+    mockHandleCreemWebhook.mockResolvedValue({ received: true });
 
-      await expect(
-        providerWithoutSecret.handleWebhook("payload", "signature"),
-      ).rejects.toThrow("Webhook secret not configured.");
-    });
-
-    it("should handle unknown webhook errors", async () => {
-      // Restore the mock with secret to ensure webhook processing
-      jest.doMock("./client", () => ({
-        __esModule: true,
-        creemClient: mockCreemClient,
-        creemApiKey: "test_api_key",
-        creemWebhookSecret: "test_webhook_secret",
-      }));
-
-      jest.resetModules();
-      const { default: providerWithSecret } = await import("./provider");
-
-      mockHandleCreemWebhook.mockRejectedValue("String error");
-
-      await expect(
-        providerWithSecret.handleWebhook("payload", "signature"),
-      ).rejects.toThrow("Webhook handling failed");
-    });
+    await expect(
+      creemProvider.handleWebhook("payload", "signature"),
+    ).resolves.toEqual({ received: true });
+    expect(mockHandleCreemWebhook).toHaveBeenCalledWith("payload", "signature");
   });
 });

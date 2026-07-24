@@ -16,21 +16,30 @@ export async function UploadStatsCards() {
       <StatCard
         title={t("7040e675fbcb", "Total Uploads")}
         value={stats.total}
-        description={`${stats.recentUploads} in last 24h`}
+        description={t("upload_recent_count", "{count} in the last 24 hours", {
+          count: stats.recentUploads,
+        })}
         icon={Upload}
         locale={locale}
       />
       <StatCard
         title={t("f8cf89aa44c7", "Storage Used")}
         value={stats.totalSizeFormatted}
-        description={`Avg: ${stats.averageSizeFormatted}`}
+        description={t("upload_average_size", "Average: {size}", {
+          size: stats.averageSizeFormatted,
+        })}
         icon={HardDrive}
         locale={locale}
       />
       <StatCard
         title={t("408fd6596c8b", "Top File Type")}
-        value={stats.topFileTypes?.[0]?.type || "N/A"}
-        description={`${stats.topFileTypes?.[0]?.count || 0} files`}
+        value={
+          stats.topFileTypes?.[0]?.type ??
+          t("common_not_available", "Not available")
+        }
+        description={t("upload_file_count", "{count} files", {
+          count: stats.topFileTypes?.[0]?.count ?? 0,
+        })}
         icon={FileText}
         locale={locale}
       />

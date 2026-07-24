@@ -161,6 +161,35 @@ describe("PaymentStatusContent", () => {
     consoleErrorSpy.mockRestore();
   });
 
+  it("shows a controlled error when checkout verification returns non-2xx", async () => {
+    const consoleErrorSpy = jest
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
+    mockUseSearchParams.mockReturnValue(
+      new URLSearchParams(
+        "status=pending&session_id=checkout-502",
+      ) as unknown as ReturnType<typeof useSearchParams>,
+    );
+    (global.fetch as jest.MockedFunction<typeof fetch>).mockResolvedValue({
+      ok: false,
+      status: 502,
+    } as Response);
+
+    render(<PaymentStatusContent />);
+
+    await waitFor(() => {
+      expect(
+        screen.getByText("Failed to check payment status."),
+      ).toBeInTheDocument();
+    });
+    expect(
+      screen.getByRole("heading", { name: "Payment processing" }),
+    ).toBeInTheDocument();
+    expect(global.fetch).toHaveBeenCalledTimes(1);
+
+    consoleErrorSpy.mockRestore();
+  });
+
   it("describes verified one-time purchases as lifetime access", async () => {
     mockUseSearchParams.mockReturnValue(
       new URLSearchParams("session_id=checkout-123") as unknown as ReturnType<

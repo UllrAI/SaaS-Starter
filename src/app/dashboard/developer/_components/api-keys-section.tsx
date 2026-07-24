@@ -44,9 +44,11 @@ export function ApiKeysSection({
       };
       setKeys(data.keys);
     } catch {
-      toast.error(<>Failed to load API keys.</>);
+      toast.error(
+        t("developer_api_keys_load_error", "Failed to load API keys."),
+      );
     }
-  }, []);
+  }, [t]);
   return (
     <Card className="w-full">
       <CardHeader>
@@ -105,10 +107,12 @@ function ApiKeyRow({
       if (!response.ok) {
         throw new Error("Failed to revoke API key.");
       }
-      toast.success(<>API key revoked.</>);
+      toast.success(t("developer_api_key_revoke_success", "API key revoked."));
       await onRevoked();
     } catch {
-      toast.error(<>Failed to revoke API key.</>);
+      toast.error(
+        t("developer_api_key_revoke_error", "Failed to revoke API key."),
+      );
     } finally {
       setIsRevoking(false);
     }
@@ -276,10 +280,17 @@ function CreateApiKeyDialog({ onCreated }: { onCreated: () => void }) {
                       rawKey: string;
                     };
                     setCreatedKey(data.rawKey);
-                    toast.success(<>API key created.</>);
+                    toast.success(
+                      t("developer_api_key_create_success", "API key created."),
+                    );
                     await onCreated();
                   } catch {
-                    toast.error(<>Failed to create API key.</>);
+                    toast.error(
+                      t(
+                        "developer_api_key_create_error",
+                        "Failed to create API key.",
+                      ),
+                    );
                   } finally {
                     setIsCreating(false);
                   }

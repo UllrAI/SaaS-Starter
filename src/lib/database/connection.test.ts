@@ -12,7 +12,7 @@ const mockEnv = {
   DB_POOL_SIZE: 10,
   DB_IDLE_TIMEOUT: 300,
   DB_MAX_LIFETIME: 14400,
-  DB_CONNECT_TIMEOUT: 30,
+  DB_CONNECT_TIMEOUT: 4,
 };
 
 jest.mock("@/env", () => mockEnv);
@@ -46,7 +46,7 @@ describe("Database Connection Configuration", () => {
       DB_POOL_SIZE: 10, // Safe value that won't trigger warnings
       DB_IDLE_TIMEOUT: 300,
       DB_MAX_LIFETIME: 14400,
-      DB_CONNECT_TIMEOUT: 30,
+      DB_CONNECT_TIMEOUT: 4,
     });
 
     // Reset modules and configuration validation flag
@@ -80,10 +80,10 @@ describe("Database Connection Configuration", () => {
       expect(getEnvironmentType()).toBe("serverless");
     });
 
-    it("should detect Railway environment", async () => {
+    it("should treat Railway container services as traditional", async () => {
       process.env.RAILWAY_ENVIRONMENT = "production";
       const { getEnvironmentType } = await import("./connection");
-      expect(getEnvironmentType()).toBe("serverless");
+      expect(getEnvironmentType()).toBe("traditional");
     });
 
     it("should detect Google Cloud Functions environment", async () => {
@@ -111,10 +111,19 @@ describe("Database Connection Configuration", () => {
       const config = getConnectionConfig();
 
       expect(config).toEqual({
+        connection: { TimeZone: "UTC" },
+        types: {
+          utcTimestamp: {
+            to: 1114,
+            from: [1114],
+            serialize: expect.any(Function),
+            parse: expect.any(Function),
+          },
+        },
         max: 1,
         idle_timeout: 20,
         max_lifetime: 1800, // 60 * 30
-        connect_timeout: 30,
+        connect_timeout: 4,
         prepare: true,
         onnotice: expect.any(Function),
       });
@@ -125,6 +134,15 @@ describe("Database Connection Configuration", () => {
       const config = getConnectionConfig();
 
       expect(config).toEqual({
+        connection: { TimeZone: "UTC" },
+        types: {
+          utcTimestamp: {
+            to: 1114,
+            from: [1114],
+            serialize: expect.any(Function),
+            parse: expect.any(Function),
+          },
+        },
         max: mockEnv.DB_POOL_SIZE,
         idle_timeout: mockEnv.DB_IDLE_TIMEOUT,
         max_lifetime: mockEnv.DB_MAX_LIFETIME,
@@ -133,6 +151,15 @@ describe("Database Connection Configuration", () => {
         debug: false, // NODE_ENV is 'test', not 'development'
         onnotice: expect.any(Function),
       });
+    });
+
+    it("treats timestamp without time zone values as UTC", async () => {
+      const { getConnectionConfig } = await import("./connection");
+      const timestampType = getConnectionConfig().types.utcTimestamp;
+      const parsed = timestampType.parse("2026-07-24 07:01:10.534");
+
+      expect(parsed.toISOString()).toBe("2026-07-24T07:01:10.534Z");
+      expect(timestampType.serialize(parsed)).toBe("2026-07-24 07:01:10.534");
     });
 
     it("should enable debug mode in development environment", async () => {
@@ -319,7 +346,7 @@ describe("Database Connection Configuration", () => {
           max: 5, // High value that will trigger warning
           idle_timeout: 20,
           max_lifetime: 1800,
-          connect_timeout: 30,
+          connect_timeout: 4,
           prepare: true,
           onnotice: () => {},
         }),
@@ -391,7 +418,7 @@ describe("Database Connection Configuration", () => {
       expect(config.max).toBe(1);
       expect(config.idle_timeout).toBe(20);
       expect(config.max_lifetime).toBe(1800); // 60 * 30
-      expect(config.connect_timeout).toBe(30);
+      expect(config.connect_timeout).toBe(4);
       expect(config.prepare).toBe(true);
       expect(typeof config.onnotice).toBe("function");
     });
@@ -502,9 +529,9 @@ describe("Database Connection Configuration", () => {
       expect(config.prepare).toBe(true);
     });
 
-    it("should handle zero values in configuration", async () => {
+    it("should allow zero timeout values but keep a positive pool size", async () => {
       Object.assign(mockEnv, {
-        DB_POOL_SIZE: 0,
+        DB_POOL_SIZE: 1,
         DB_IDLE_TIMEOUT: 0,
         DB_MAX_LIFETIME: 0,
         DB_CONNECT_TIMEOUT: 0,
@@ -514,7 +541,7 @@ describe("Database Connection Configuration", () => {
       const { getConnectionConfig } = await import("./connection");
       const config = getConnectionConfig();
 
-      expect(config.max).toBe(0);
+      expect(config.max).toBe(1);
       expect(config.idle_timeout).toBe(0);
       expect(config.max_lifetime).toBe(0);
       expect(config.connect_timeout).toBe(0);
@@ -531,7 +558,7 @@ describe("Database Connection Configuration", () => {
       expect(config).toHaveProperty("max", 1);
       expect(config).toHaveProperty("idle_timeout", 20);
       expect(config).toHaveProperty("max_lifetime", 1800);
-      expect(config).toHaveProperty("connect_timeout", 30);
+      expect(config).toHaveProperty("connect_timeout", 4);
       expect(config).toHaveProperty("prepare", true);
       expect(config).toHaveProperty("onnotice");
       expect(typeof config.onnotice).toBe("function");

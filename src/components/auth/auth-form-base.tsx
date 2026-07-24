@@ -81,7 +81,10 @@ export function AuthFormBase<T extends FieldValues>({
       await onSubmit(data);
     } catch {
       toast.error(
-        <>Something went wrong. Contact support if the issue persists.</>,
+        t(
+          "auth_unexpected_error",
+          "Something went wrong. Contact support if the issue persists.",
+        ),
       );
       setPendingAction(null);
     }

@@ -1,17 +1,3 @@
-import type {
-  SubscriptionEntity,
-  CustomerEntity,
-  CheckoutEntity,
-  CustomerLinksEntity as CreemCustomerPortalLink,
-} from "creem/models/components";
-
-export type {
-  SubscriptionEntity,
-  CustomerEntity,
-  CheckoutEntity,
-  CreemCustomerPortalLink,
-};
-
 export type PaymentMode = "subscription" | "one_time";
 export type BillingCycle = "monthly" | "yearly";
 
@@ -48,8 +34,9 @@ export interface ProductEntitlement {
   createdAt: Date;
 }
 
-export interface CreemTransactionReference {
+interface CreemTransactionReference {
   id: string;
+  order?: string;
   amount: number;
   amount_paid?: number | null;
   refunded_amount?: number | null;
@@ -79,6 +66,7 @@ export interface CreemDisputeObject {
 }
 
 export interface CreateCheckoutOptions {
+  requestId: string;
   userId: string;
   userEmail: string;
   userName?: string | null;
@@ -92,7 +80,7 @@ export interface CreateCheckoutOptions {
 
 // --- Detailed Creem webhook object types ---
 
-export type CreemMetadata = {
+type CreemMetadata = {
   userId?: string;
   tierId?: string;
   paymentMode?: PaymentMode;
@@ -140,8 +128,9 @@ export interface CreemCheckoutObject extends CreemBaseObject {
   subscription?: CreemSubscriptionObject;
   order?: {
     id: string;
-    transaction: string;
-    amount_due: number;
+    transaction?: string;
+    amount: number;
+    amount_due?: number;
     currency: string;
   };
 }

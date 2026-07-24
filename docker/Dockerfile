@@ -34,6 +34,7 @@ FROM base AS migrator
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ENV NODE_ENV=production
+USER node
 CMD ["pnpm", "db:migrate"]
 
 # Production image

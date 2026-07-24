@@ -75,7 +75,7 @@ describe("useAdminTable", () => {
       });
       // Loading starts as true due to useTransition and initial effect
       expect(result.current.loading).toBe(true);
-      expect(result.current.error).toBeNull();
+      expect(result.current.error).toBe(false);
       expect(result.current.searchTerm).toBe("");
       expect(result.current.filter).toBe("all");
 
@@ -169,13 +169,12 @@ describe("useAdminTable", () => {
       await waitFor(() => {
         expect(result.current.data).toEqual(mockData);
         expect(result.current.pagination).toEqual(mockPagination);
-        expect(result.current.error).toBeNull();
+        expect(result.current.error).toBe(false);
       });
     });
 
     it("should handle fetch errors properly", async () => {
-      const errorMessage = "Failed to fetch data";
-      mockQueryAction.mockRejectedValue(new Error(errorMessage));
+      mockQueryAction.mockRejectedValue(new Error("Sensitive server error"));
 
       const { result } = renderHook(() =>
         useAdminTable({
@@ -184,7 +183,7 @@ describe("useAdminTable", () => {
       );
 
       await waitFor(() => {
-        expect(result.current.error).toBe(errorMessage);
+        expect(result.current.error).toBe(true);
         expect(result.current.data).toEqual([]);
       });
     });
@@ -199,7 +198,7 @@ describe("useAdminTable", () => {
       );
 
       await waitFor(() => {
-        expect(result.current.error).toBe("An unknown error occurred");
+        expect(result.current.error).toBe(true);
       });
     });
   });
@@ -461,7 +460,7 @@ describe("useAdminTable", () => {
 
       // Wait for error to be set
       await waitFor(() => {
-        expect(result.current.error).toBe("Initial error");
+        expect(result.current.error).toBe(true);
       });
 
       // Now make queryAction succeed
@@ -476,7 +475,7 @@ describe("useAdminTable", () => {
       });
 
       await waitFor(() => {
-        expect(result.current.error).toBeNull();
+        expect(result.current.error).toBe(false);
       });
     });
 
@@ -657,7 +656,7 @@ describe("useAdminTable", () => {
       );
 
       await waitFor(() => {
-        expect(result.current.error).toBe("Network error");
+        expect(result.current.error).toBe(true);
       });
     });
 
@@ -671,7 +670,7 @@ describe("useAdminTable", () => {
       );
 
       await waitFor(() => {
-        expect(result.current.error).toBe("An unknown error occurred");
+        expect(result.current.error).toBe(true);
       });
     });
 
@@ -685,7 +684,7 @@ describe("useAdminTable", () => {
       );
 
       await waitFor(() => {
-        expect(result.current.error).toBe("An unknown error occurred");
+        expect(result.current.error).toBe(true);
       });
     });
 
@@ -700,7 +699,7 @@ describe("useAdminTable", () => {
       );
 
       await waitFor(() => {
-        expect(result.current.error).toBe("First error");
+        expect(result.current.error).toBe(true);
       });
 
       // Second call succeeds
@@ -714,7 +713,7 @@ describe("useAdminTable", () => {
       });
 
       await waitFor(() => {
-        expect(result.current.error).toBeNull();
+        expect(result.current.error).toBe(false);
       });
     });
   });
@@ -1002,7 +1001,7 @@ describe("useAdminTable", () => {
       });
 
       await waitFor(() => {
-        expect(result.current.error).toBe("Refresh failed");
+        expect(result.current.error).toBe(true);
         expect(result.current.loading).toBe(false);
       });
     });
@@ -1027,7 +1026,7 @@ describe("useAdminTable", () => {
       });
 
       await waitFor(() => {
-        expect(result.current.error).toBe("An unknown error occurred");
+        expect(result.current.error).toBe(true);
       });
     });
 

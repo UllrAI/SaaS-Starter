@@ -5,8 +5,8 @@ import { DashboardPageWrapper } from "../_components/dashboard-page-wrapper";
 import { DeveloperAccessSections } from "./_components/developer-access-sections";
 import { createMetadataDefaults } from "@/lib/metadata";
 export async function generateMetadata() {
-  const { t } = await getServerTranslations();
-  const metadata = createMetadataDefaults();
+  const { locale, t } = await getServerTranslations();
+  const metadata = createMetadataDefaults({ locale });
   return {
     ...metadata,
     title: t("b32fd3f9981d", "Developer Access"),

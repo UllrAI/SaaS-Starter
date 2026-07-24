@@ -531,18 +531,20 @@ export const setUserDisabledAction = adminAction
 
     const nextBanned = input.disabled;
 
-    await db
-      .update(users)
-      .set({
-        banned: nextBanned,
-        banReason: null,
-        banExpires: null,
-      })
-      .where(eq(users.id, input.id));
+    await db.transaction(async (tx) => {
+      await tx
+        .update(users)
+        .set({
+          banned: nextBanned,
+          banReason: null,
+          banExpires: null,
+        })
+        .where(eq(users.id, input.id));
 
-    if (nextBanned) {
-      await db.delete(sessions).where(eq(sessions.userId, input.id));
-    }
+      if (nextBanned) {
+        await tx.delete(sessions).where(eq(sessions.userId, input.id));
+      }
+    });
 
     revalidatePath("/dashboard/admin/users");
 

@@ -6,6 +6,7 @@ import {
   formatFileSize,
   getFileExtension,
   presignedUrlRequestSchema,
+  uploadCancelRequestSchema,
   uploadCompleteRequestSchema,
 } from "./upload";
 
@@ -18,7 +19,9 @@ describe("Upload Configuration", () => {
 
     it("should have correct presigned URL expiration", () => {
       expect(UPLOAD_CONFIG.PRESIGNED_URL_EXPIRATION).toBe(15 * 60); // 15 minutes
-      expect(UPLOAD_CONFIG.UPLOAD_INTENT_EXPIRATION).toBe(24 * 60 * 60);
+      expect(UPLOAD_CONFIG.UPLOAD_INTENT_EXPIRATION).toBe(60 * 60);
+      expect(UPLOAD_CONFIG.UPLOAD_TOMBSTONE_RECHECK_DELAY).toBe(24 * 60 * 60);
+      expect(UPLOAD_CONFIG.UPLOAD_CLEANUP_RETRY_DELAY).toBe(5 * 60);
       expect(UPLOAD_CONFIG.MAX_SERVER_UPLOAD_TOTAL_SIZE).toBe(20 * 1024 * 1024);
       expect(UPLOAD_CONFIG.MAX_SERVER_UPLOAD_FILE_SIZE).toBe(10 * 1024 * 1024);
     });
@@ -33,6 +36,20 @@ describe("Upload Configuration", () => {
       expect(UPLOAD_CONFIG.ALLOWED_FILE_TYPES).toContain("image/png");
       expect(UPLOAD_CONFIG.ALLOWED_FILE_TYPES).toContain("application/pdf");
       expect(UPLOAD_CONFIG.ALLOWED_FILE_TYPES).toContain("text/plain");
+    });
+  });
+
+  describe("uploadCancelRequestSchema", () => {
+    it("accepts only UUID upload intents", () => {
+      expect(
+        uploadCancelRequestSchema.safeParse({
+          intentId: "11111111-1111-4111-8111-111111111111",
+        }).success,
+      ).toBe(true);
+      expect(
+        uploadCancelRequestSchema.safeParse({ intentId: "not-an-intent" })
+          .success,
+      ).toBe(false);
     });
   });
 

@@ -33,7 +33,7 @@ interface UseAdminTableReturn<T> {
   data: T[];
   pagination: Pagination;
   loading: boolean;
-  error: string | null;
+  error: boolean;
   searchTerm: string;
   filter: string;
   setSearchTerm: (term: string) => void;
@@ -52,7 +52,7 @@ export function useAdminTable<T>({
 }: UseAdminTableProps<T>): UseAdminTableReturn<T> {
   const [data, setData] = useState<T[]>(initialData);
   const [pagination, setPagination] = useState<Pagination>(initialPagination);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState(false);
 
   const [searchTerm, setSearchTerm] = useState(initialSearch);
   const [filter, setFilter] = useState(initialFilter);
@@ -63,13 +63,13 @@ export function useAdminTable<T>({
 
   const isInitialMount = useRef(true);
 
-  // FIX: Store queryAction in a ref to maintain a stable reference
+  // Keep the latest action without changing callback identity.
   const queryActionRef = useRef(queryAction);
   useEffect(() => {
     queryActionRef.current = queryAction;
   }, [queryAction]);
 
-  // FIX: Major change here to fix the infinite loop
+  // Stable callbacks prevent query-state synchronization loops.
   useEffect(() => {
     // Skip fetch on initial mount if we already have data
     if (isInitialMount.current && initialData.length > 0) {
@@ -81,7 +81,7 @@ export function useAdminTable<T>({
     isInitialMount.current = false;
 
     startTransition(async () => {
-      setError(null);
+      setError(false);
       try {
         const result = await queryActionRef.current({
           page: currentPage,
@@ -91,13 +91,11 @@ export function useAdminTable<T>({
         });
         setData(result.data);
         setPagination(result.pagination);
-      } catch (err) {
-        setError(
-          err instanceof Error ? err.message : "An unknown error occurred",
-        );
+      } catch {
+        setError(true);
       }
     });
-    // FIX: The dependency array is now stable and correct.
+    // Dependencies intentionally contain only stable values.
   }, [
     currentPage,
     debouncedSearchTerm,
@@ -119,7 +117,7 @@ export function useAdminTable<T>({
 
   const refresh = useCallback(() => {
     startTransition(async () => {
-      setError(null);
+      setError(false);
       try {
         const result = await queryActionRef.current({
           page: currentPage,
@@ -129,10 +127,8 @@ export function useAdminTable<T>({
         });
         setData(result.data);
         setPagination(result.pagination);
-      } catch (err) {
-        setError(
-          err instanceof Error ? err.message : "An unknown error occurred",
-        );
+      } catch {
+        setError(true);
       }
     });
   }, [currentPage, debouncedSearchTerm, filter, initialPagination.limit]);

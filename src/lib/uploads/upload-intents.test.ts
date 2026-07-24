@@ -65,7 +65,9 @@ jest.mock("@/lib/r2", () => ({
 jest.mock("@/lib/config/upload", () => ({
   getFileExtension: () => "jpeg",
   UPLOAD_CONFIG: {
-    UPLOAD_INTENT_EXPIRATION: 86_400,
+    UPLOAD_INTENT_EXPIRATION: 3_600,
+    UPLOAD_TOMBSTONE_RECHECK_DELAY: 86_400,
+    UPLOAD_CLEANUP_RETRY_DELAY: 300,
     PRESIGNED_URL_EXPIRATION: 900,
   },
 }));
@@ -82,6 +84,7 @@ jest.mock("drizzle-orm", () => ({
     field,
     values,
   }),
+  or: (...conditions: unknown[]) => ({ type: "or", conditions }),
   sql: (strings: TemplateStringsArray, ...values: unknown[]) => ({
     strings,
     values,
@@ -98,6 +101,7 @@ const pendingIntent = {
   status: "pending",
   expiresAt: new Date(Date.now() + 60_000),
   completedAt: null,
+  deleteCheckedAt: null,
   cleanupAttempts: 0,
   lastCleanupError: null,
   createdAt: new Date(),
@@ -177,6 +181,27 @@ describe("upload intent service", () => {
       }),
     ).rejects.toBeInstanceOf(UploadQuotaExceededError);
     expect(mockInsert).not.toHaveBeenCalled();
+  });
+
+  it("marks a pending intent cancelled without deleting it immediately", async () => {
+    const returning = jest.fn().mockResolvedValue([{ id: pendingIntent.id }]);
+    const set = jest.fn(() => ({
+      where: jest.fn(() => ({ returning })),
+    }));
+    mockUpdate.mockReturnValue({
+      set,
+    });
+
+    const { cancelUploadIntent } = await import("./upload-intents");
+    await expect(
+      cancelUploadIntent(pendingIntent.id, pendingIntent.userId),
+    ).resolves.toBe(true);
+    expect(mockExecute).toHaveBeenCalledTimes(1);
+    expect(returning).toHaveBeenCalledTimes(1);
+    expect(set).toHaveBeenCalledWith({
+      status: "cancelled",
+      updatedAt: expect.anything(),
+    });
   });
 
   it("completes a pending intent atomically from reserved metadata", async () => {
@@ -632,7 +657,7 @@ describe("upload intent service", () => {
     expect(result).toBeNull();
   });
 
-  it("deletes a claimed expired intent only after object removal succeeds", async () => {
+  it("retains a tombstone after the first successful object deletion", async () => {
     mockDb.select.mockReturnValue({
       from: jest.fn(() => ({
         where: jest.fn(() => ({
@@ -641,6 +666,7 @@ describe("upload intent service", () => {
               {
                 id: pendingIntent.id,
                 userId: pendingIntent.userId,
+                status: "pending",
               },
             ]),
           })),
@@ -654,21 +680,36 @@ describe("upload intent service", () => {
         })),
       })),
     });
-    const deleteWhere = jest.fn().mockResolvedValue([]);
-    mockDb.delete.mockReturnValue({ where: deleteWhere });
+    const tombstoneWhere = jest.fn().mockResolvedValue([]);
+    const tombstoneSet = jest.fn(() => ({ where: tombstoneWhere }));
+    mockDb.update.mockReturnValue({ set: tombstoneSet });
     mockDeleteFile.mockResolvedValue({ success: true });
 
     const { cleanupExpiredUploadIntents } = await import("./upload-intents");
     const result = await cleanupExpiredUploadIntents();
 
-    expect(result).toEqual({ scanned: 1, deleted: 1, failed: 0 });
+    expect(result).toEqual({
+      scanned: 1,
+      deleted: 0,
+      deferred: 1,
+      failed: 0,
+    });
     expect(mockDeleteFile).toHaveBeenCalledWith(pendingIntent.fileKey);
+    expect(mockDb.delete).not.toHaveBeenCalled();
+    expect(tombstoneSet).toHaveBeenCalledWith(
+      expect.objectContaining({
+        status: "cancelled",
+        deleteCheckedAt: expect.anything(),
+        expiresAt: expect.objectContaining({ values: [86_400] }),
+        lastCleanupError: null,
+      }),
+    );
     expect(mockDeleteFile.mock.invocationCallOrder[0]).toBeLessThan(
-      mockDb.delete.mock.invocationCallOrder[0]!,
+      mockDb.update.mock.invocationCallOrder[0]!,
     );
   });
 
-  it("retains quota reservation state when object removal fails", async () => {
+  it("deletes a tombstone after the second successful object deletion", async () => {
     mockDb.select.mockReturnValue({
       from: jest.fn(() => ({
         where: jest.fn(() => ({
@@ -677,6 +718,56 @@ describe("upload intent service", () => {
               {
                 id: pendingIntent.id,
                 userId: pendingIntent.userId,
+                status: "cancelled",
+              },
+            ]),
+          })),
+        })),
+      })),
+    });
+    mockUpdate.mockReturnValue({
+      set: jest.fn(() => ({
+        where: jest.fn(() => ({
+          returning: jest.fn().mockResolvedValue([
+            {
+              ...pendingIntent,
+              status: "cleaning",
+              deleteCheckedAt: new Date(),
+            },
+          ]),
+        })),
+      })),
+    });
+    const deleteWhere = jest.fn().mockResolvedValue([]);
+    mockDb.delete.mockReturnValue({ where: deleteWhere });
+    mockDeleteFile.mockResolvedValue({ success: true });
+
+    const { cleanupExpiredUploadIntents } = await import("./upload-intents");
+    const result = await cleanupExpiredUploadIntents();
+
+    expect(result).toEqual({
+      scanned: 1,
+      deleted: 1,
+      deferred: 0,
+      failed: 0,
+    });
+    expect(mockDeleteFile).toHaveBeenCalledWith(pendingIntent.fileKey);
+    expect(mockDb.delete).toHaveBeenCalledTimes(1);
+    expect(mockDeleteFile.mock.invocationCallOrder[0]).toBeLessThan(
+      mockDb.delete.mock.invocationCallOrder[0]!,
+    );
+  });
+
+  it("delays retry after an object deletion failure", async () => {
+    mockDb.select.mockReturnValue({
+      from: jest.fn(() => ({
+        where: jest.fn(() => ({
+          orderBy: jest.fn(() => ({
+            limit: jest.fn().mockResolvedValue([
+              {
+                id: pendingIntent.id,
+                userId: pendingIntent.userId,
+                status: "pending",
               },
             ]),
           })),
@@ -701,11 +792,17 @@ describe("upload intent service", () => {
     const { cleanupExpiredUploadIntents } = await import("./upload-intents");
     const result = await cleanupExpiredUploadIntents();
 
-    expect(result).toEqual({ scanned: 1, deleted: 0, failed: 1 });
+    expect(result).toEqual({
+      scanned: 1,
+      deleted: 0,
+      deferred: 0,
+      failed: 1,
+    });
     expect(mockDb.delete).not.toHaveBeenCalled();
     expect(failureSet).toHaveBeenCalledWith(
       expect.objectContaining({
         status: "pending",
+        expiresAt: expect.objectContaining({ values: [300] }),
         lastCleanupError: "R2 unavailable",
       }),
     );

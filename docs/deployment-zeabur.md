@@ -47,7 +47,7 @@ database or schema is unavailable.
 
 ## Scheduled maintenance
 
-Call the upload cleanup endpoint at least every five minutes:
+Call the upload cleanup endpoint once per day:
 
 ```bash
 curl -fsS -X POST \
@@ -61,7 +61,9 @@ in a public build argument or repository file. Each call drains up to five
 queue reached the per-run safety cap; schedule the endpoint more frequently
 until a later response reports a partial batch. Cancelled uploads release quota
 immediately, while their cleanup tombstones remain for a second object deletion
-24 hours later so late signed PUTs cannot leave an orphan.
+24 hours later so late signed PUTs cannot leave an orphan. With a daily
+schedule, expired objects and second-stage tombstones may remain until the next
+run, while expired intents stop counting toward quota immediately.
 
 The repository includes an opt-in `.github/workflows/production-maintenance.yml`
 schedule for hosts without a native cron facility. To enable it, set the

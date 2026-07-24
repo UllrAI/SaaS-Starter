@@ -429,7 +429,7 @@ Docker 构建。
    每个 Web 进程的启动钩子上。
 4. 迁移成功后再部署应用。`/api/health` 用于存活检查，`/api/ready` 用于包含数据库
    检查的就绪探针。
-5. 至少每五分钟调度一次带认证的 `POST /api/internal/uploads/cleanup`。
+5. 每天调度一次带认证的 `POST /api/internal/uploads/cleanup`。
 6. 验证公开 Origin、两种语言 URL、认证重定向、Dashboard、`robots.txt`、
    `sitemap.xml` 以及应用日志。
 

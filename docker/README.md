@@ -107,7 +107,7 @@ For production deployment:
 5. **Health Checks**: Ensure all services have appropriate health checks
 6. **Secrets**: Use Docker secrets or external secret management
 7. **Upload cleanup**: Schedule an authenticated `POST` to
-   `/api/internal/uploads/cleanup` at least every five minutes
+   `/api/internal/uploads/cleanup` once per day
 8. **Upload protocol rollout**: Set `UPLOAD_LEGACY_COMPLETION_SINCE` and
    `UPLOAD_LEGACY_COMPLETION_UNTIL` only for the bounded v1-to-v2 rollout
    window, then remove both after the cutoff

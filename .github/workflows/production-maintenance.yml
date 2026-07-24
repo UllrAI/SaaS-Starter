@@ -2,7 +2,7 @@ name: Production maintenance
 
 on:
   schedule:
-    - cron: "*/5 * * * *"
+    - cron: "17 3 * * *"
   workflow_dispatch:
 
 permissions: {}

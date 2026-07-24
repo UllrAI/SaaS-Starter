@@ -42,6 +42,8 @@ Routine formatting and test-only maintenance are omitted.
   the Docker image user.
 - Added an opt-in daily production maintenance workflow for upload orphan
   cleanup on hosts without a native scheduler.
+- Added release-tag promotion: `release/*` tags are validated against the
+  repository's default branch before moving the Zeabur-tracked `prod` branch.
 - Updated English and Chinese project documentation and added Zeabur release
   guidance.
 

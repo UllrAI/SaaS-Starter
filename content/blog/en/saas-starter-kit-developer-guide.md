@@ -594,10 +594,18 @@ All required and optional environment variables are detailed in the environment 
 
 The production reference deployment uses **Zeabur**.
 
-1. Push a reviewed commit to the connected Git repository.
+> **Save 10% on a Zeabur server:** Purchase a server at
+> [Zeabur](https://zeabur.com/) and enter referral code `visoar` at checkout.
+
+Configure Zeabur to deploy the `prod` branch, not direct pushes to the default
+development branch (`main` in this repository). A `release/*` tag promotes its
+commit to `prod` only when that commit belongs to the default branch.
+
+1. Merge a reviewed commit into the default branch and wait for CI.
 1. Configure the required service variables from `.env.example`.
 1. Run `pnpm db:migrate` once against the production `DATABASE_URL`.
-1. Deploy the application after migration succeeds.
+1. Push an annotated `release/*` tag on that commit.
+1. Wait for the promotion workflow and the subsequent Zeabur deployment.
 1. Use `/api/ready` for database-backed readiness and inspect build and runtime logs.
 1. Verify both locale URL variants, authentication redirects, and an authenticated Dashboard session.
 

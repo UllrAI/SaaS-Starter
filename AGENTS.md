@@ -170,7 +170,20 @@ pnpm creem:sync-products
 - In CI/CD, run migrations as a dedicated one-shot release step, not on every app process startup.
 - Keep schema, queries, and types aligned when data models change.
 
-## 9. Testing and Verification
+## 9. Production Promotion
+
+- The production Zeabur service tracks `prod`, not the default development
+  branch.
+- Publish production changes by pushing a `release/*` tag on a reviewed commit
+  from the repository's default branch.
+- `.github/workflows/promote-release-to-prod.yml` validates the tag ancestry and
+  updates `prod`. Do not push or merge directly into `prod`.
+- Resolve the default branch dynamically in release automation. The current
+  branch is `main`, but forks may use `master` or another name.
+- Run production migrations as a dedicated release step before pushing the
+  release tag.
+
+## 10. Testing and Verification
 
 - After every meaningful change, run the narrowest relevant checks first, then the broader project checks.
 - Minimum expectation for code changes:
@@ -180,6 +193,6 @@ pnpm creem:sync-products
 - Run `pnpm build` when changing app structure, configuration, localization behavior, or anything that could affect production compilation.
 - Do not mark work complete without reporting what was verified and what was not.
 
-## 10. Commit Policy
+## 11. Commit Policy
 
 - Commit both locale catalogs whenever message keys or copy change.

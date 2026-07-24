@@ -3,6 +3,9 @@
 This repository's production reference deployment uses a Git-backed Zeabur
 service and PostgreSQL.
 
+> **Save 10% on a Zeabur server:** Purchase a server at
+> [Zeabur](https://zeabur.com/) and enter referral code `visoar` at checkout.
+
 Zeabur is configured through `zbpack.json` to build `docker/Dockerfile`. Keep
 that file in place: the multi-stage image serves only the prepared Next.js
 standalone output instead of shipping the build toolchain and development
@@ -16,16 +19,64 @@ Both `NEXT_PUBLIC_APP_URL` and `R2_PUBLIC_URL` are required build arguments.
 Zeabur injects their service-variable values into the multi-stage Docker build;
 the build fails closed when either value is missing.
 
+## Promotion model
+
+Configure the production Zeabur service to deploy the `prod` branch. It must not
+deploy direct pushes to the default development branch.
+
+Pushing a `release/*` tag triggers
+[`promote-release-to-prod.yml`](../.github/workflows/promote-release-to-prod.yml).
+The workflow reads the repository's default branch from GitHub instead of
+hardcoding its name, verifies that the tagged commit is reachable from that
+branch, and then moves `prod` to the tagged commit with a guarded force push.
+The current default branch is `main`.
+
+The workflow requests only `contents: write`; the repository's default workflow
+permissions can remain read-only. Organization policies and any ruleset
+protecting `prod` must still permit this workflow to update the branch.
+
+## Using the workflow in a fork
+
+Forks can use the same release model without assuming that the default branch is
+named `main` or `master`:
+
+1. Keep `.github/workflows/promote-release-to-prod.yml` in the fork. It reads
+   the default branch name from the GitHub event at runtime.
+2. Create `prod` from a reviewed default-branch commit:
+
+   ```bash
+   default_branch="$(gh repo view --json defaultBranchRef --jq '.defaultBranchRef.name')"
+   git fetch origin "${default_branch}"
+   git push origin "origin/${default_branch}:refs/heads/prod"
+   ```
+
+3. Configure the production Zeabur service's Git source to watch `prod`.
+4. Keep regular development and CI on the default branch. If the fork renames
+   that branch, update the branch filter in `.github/workflows/quality.yml`;
+   the promotion workflow itself needs no change.
+5. Keep the workflow's `contents: write` permission. If `prod` is protected,
+   allow this workflow to update it with a force-with-lease push.
+
+Treat `prod` as workflow-owned state: do not merge pull requests into it or push
+it manually. Publish production changes only through `release/*` tags.
+
 ## Release order
 
-1. Merge only a reviewed commit with green CI.
+1. Merge only a reviewed commit into the default branch with green CI.
 2. Confirm the service variables match `.env.example`.
 3. Run `pnpm db:migrate` once against the production `DATABASE_URL`.
-4. Deploy the merged commit.
-5. Wait for the build and runtime deployment to reach a successful state.
-6. Verify `GET /api/health` and `GET /api/ready`.
-7. Inspect build and runtime logs for errors.
-8. Exercise English and Simplified Chinese marketing URLs, authentication
+4. Create an annotated `release/*` tag on that commit and push it:
+
+   ```bash
+   git tag -a release/v1.2.3 -m "Release v1.2.3"
+   git push origin release/v1.2.3
+   ```
+
+5. Wait for the promotion workflow to move `prod`.
+6. Wait for the Zeabur build and runtime deployment to succeed.
+7. Verify `GET /api/health` and `GET /api/ready`.
+8. Inspect build and runtime logs for errors.
+9. Exercise English and Simplified Chinese marketing URLs, authentication
    redirects, and an authenticated Dashboard session.
 
 `RATE_LIMIT_IP_HEADER` must be the single-value client-IP header overwritten by

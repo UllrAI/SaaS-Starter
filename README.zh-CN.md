@@ -422,16 +422,33 @@ pnpm analyze:dev
 生产参考环境部署在 [Zeabur](https://zeabur.com/)，仓库同时提供可独立运行的多阶段
 Docker 构建。
 
-1. 将通过审查的 commit 推送到 Git 仓库，并连接到 Zeabur 服务。
+> **Zeabur 服务器九折优惠：**前往 [Zeabur](https://zeabur.com/) 购买服务器，并在
+> 结账时输入推荐码 `visoar`，即可享受 10% 折扣。
+
+将生产环境 Zeabur 服务的部署分支设为 `prod`，不要监听日常开发使用的默认分支（本仓库
+为 `main`）。推送 `release/*` tag 后，
+[`promote-release-to-prod.yml`](.github/workflows/promote-release-to-prod.yml)
+会先确认对应 commit 位于仓库默认分支的历史中，再将 `prod` 指向该 commit；只有分支
+更新成功后，Zeabur 才会开始部署。fork 后可沿用同一方案，详见
+[Zeabur 部署指南](docs/deployment-zeabur.md#using-the-workflow-in-a-fork)。
+
+1. 将通过审查的 commit 合并到默认分支，并等待 Quality workflow 通过。
 2. 配置 `.env.example` 中的全部必需变量。构建前必须把 `NEXT_PUBLIC_APP_URL`
    设置为最终 HTTPS Origin，因为 canonical URL 与客户端配置会在构建时写入；同时设置
    `R2_PUBLIC_URL`，让 Next.js 把存储域名加入图片优化白名单。
 3. 使用生产 `DATABASE_URL` 把 `pnpm db:migrate` 作为一次性发布命令执行；不要挂在
    每个 Web 进程的启动钩子上。
-4. 迁移成功后再部署应用。`/api/health` 用于存活检查，`/api/ready` 用于包含数据库
-   检查的就绪探针。
-5. 每天调度一次带认证的 `POST /api/internal/uploads/cleanup`。
-6. 验证公开 Origin、两种语言 URL、认证重定向、Dashboard、`robots.txt`、
+4. 在该 commit 上创建 `release/*` 附注标签（annotated tag）并推送：
+
+   ```bash
+   git tag -a release/v1.2.3 -m "Release v1.2.3"
+   git push origin release/v1.2.3
+   ```
+
+5. 等待分支更新 workflow 与随后触发的 Zeabur 部署成功。`/api/health` 用于存活
+   检查，`/api/ready` 用于包含数据库检查的就绪探针。
+6. 每天调度一次带认证的 `POST /api/internal/uploads/cleanup`。
+7. 验证公开 Origin、两种语言 URL、认证重定向、Dashboard、`robots.txt`、
    `sitemap.xml` 以及应用日志。
 
 Docker Compose 使用相同顺序，并通过一次性的 `migrate` 服务执行迁移。自托管和本地

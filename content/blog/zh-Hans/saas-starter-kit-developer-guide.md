@@ -595,10 +595,18 @@ sequenceDiagram
 
 生产参考环境使用 **Zeabur**。
 
-1. 将已通过审查的 commit 推送到已连接的 Git 仓库。
+> **Zeabur 服务器九折优惠：**前往 [Zeabur](https://zeabur.com/) 购买服务器，并在
+> 结账时输入推荐码 `visoar`，即可享受 10% 折扣。
+
+将 Zeabur 的部署分支设为 `prod`，不要让日常开发使用的默认分支（本仓库为 `main`）
+push 直接触发生产部署。只有 `release/*` tag 对应的 commit 位于仓库默认分支历史中时，
+workflow 才会将 `prod` 更新到该 commit。
+
+1. 将通过审查的 commit 合并到默认分支，并等待 CI 通过。
 1. 根据 `.env.example` 配置全部必需的服务变量。
 1. 使用生产 `DATABASE_URL` 单独执行一次 `pnpm db:migrate`。
-1. 迁移成功后再部署应用。
+1. 在该 commit 上创建并推送 `release/*` 附注标签（annotated tag）。
+1. 等待分支更新 workflow 与随后触发的 Zeabur 部署成功。
 1. 使用 `/api/ready` 做数据库就绪检查，并查看构建及运行日志。
 1. 验证两种语言 URL、认证重定向以及已登录 Dashboard 会话。
 

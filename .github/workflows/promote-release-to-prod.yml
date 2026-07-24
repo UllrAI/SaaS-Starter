@@ -1,0 +1,62 @@
+name: Promote release tag to prod
+
+on:
+  push:
+    tags:
+      - "release/*"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: promote-release-to-prod
+  cancel-in-progress: false
+
+jobs:
+  promote:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout full history
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          fetch-depth: 0
+
+      - name: Promote tagged commit to prod
+        env:
+          PRIMARY_BRANCH: ${{ github.event.repository.default_branch }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+
+          git fetch origin \
+            "+refs/heads/${PRIMARY_BRANCH}:refs/remotes/origin/${PRIMARY_BRANCH}" \
+            --tags \
+            --force
+
+          release_commit="$(git rev-list -n 1 "${RELEASE_TAG}")"
+          printf 'Promoting %s to prod at %s\n' "${RELEASE_TAG}" "${release_commit}"
+
+          if ! git merge-base --is-ancestor \
+            "${release_commit}" \
+            "refs/remotes/origin/${PRIMARY_BRANCH}"; then
+            echo "::error::${RELEASE_TAG} is not reachable from ${PRIMARY_BRANCH}"
+            exit 1
+          fi
+
+          remote_prod_commit="$(
+            git ls-remote --heads origin refs/heads/prod | awk '{print $1}'
+          )"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -B prod "${release_commit}"
+
+          if [ -n "${remote_prod_commit}" ]; then
+            git push origin HEAD:refs/heads/prod \
+              --force-with-lease="refs/heads/prod:${remote_prod_commit}"
+          else
+            git push origin HEAD:refs/heads/prod \
+              --force-with-lease="refs/heads/prod:"
+          fi

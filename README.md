@@ -434,8 +434,20 @@ After execution, bundle size analysis reports for both client and server will au
 The production reference deployment uses [Zeabur](https://zeabur.com/). The
 repository also includes a standalone multi-stage Docker build.
 
-1. Push the reviewed commit to your Git repository and connect it to a Zeabur
-   service.
+> **Save 10% on a Zeabur server:** Purchase a server at
+> [Zeabur](https://zeabur.com/) and enter referral code `visoar` at checkout.
+
+Configure the production Zeabur service to deploy the `prod` branch, not
+the default development branch (`main` in this repository). Pushing a
+`release/*` tag runs
+[`promote-release-to-prod.yml`](.github/workflows/promote-release-to-prod.yml),
+which verifies that the tagged commit belongs to the repository's default
+branch (`main` at present) before moving `prod` to that commit. Zeabur deploys
+only after the promotion succeeds. Fork maintainers can reuse the same setup;
+see [the Zeabur deployment guide](docs/deployment-zeabur.md#using-the-workflow-in-a-fork).
+
+1. Merge the reviewed commit into the default branch and wait for the Quality
+   workflow to pass.
 2. Configure every required variable from `.env.example`. Set
    `NEXT_PUBLIC_APP_URL` to the final HTTPS origin before building because
    canonical URLs and client configuration are compiled from it. Set
@@ -444,10 +456,18 @@ repository also includes a standalone multi-stage Docker build.
 3. Run `pnpm db:migrate` once as a dedicated release command against the
    production `DATABASE_URL`. Do not attach migrations to every web process
    startup.
-4. Deploy the application only after the migration succeeds. Use
-   `/api/health` for liveness and `/api/ready` for database-backed readiness.
-5. Schedule an authenticated `POST /api/internal/uploads/cleanup` once per day.
-6. Verify the public origin, both locale URL variants, authentication redirects,
+4. Tag that commit with an annotated `release/*` tag and push the tag:
+
+   ```bash
+   git tag -a release/v1.2.3 -m "Release v1.2.3"
+   git push origin release/v1.2.3
+   ```
+
+5. Wait for the promotion workflow and the subsequent Zeabur deployment to
+   succeed. Use `/api/health` for liveness and `/api/ready` for database-backed
+   readiness.
+6. Schedule an authenticated `POST /api/internal/uploads/cleanup` once per day.
+7. Verify the public origin, both locale URL variants, authentication redirects,
    Dashboard access, `robots.txt`, `sitemap.xml`, and application logs.
 
 Docker Compose follows the same order with a one-shot `migrate` service. See

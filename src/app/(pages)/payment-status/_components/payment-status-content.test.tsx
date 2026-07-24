@@ -34,7 +34,7 @@ describe("PaymentStatusContent", () => {
       ).toBeInTheDocument();
     });
 
-    expect(screen.getByText("Payment Processing")).toBeInTheDocument();
+    expect(screen.getByText("Payment processing")).toBeInTheDocument();
     expect(global.fetch).not.toHaveBeenCalled();
   });
 
@@ -53,18 +53,19 @@ describe("PaymentStatusContent", () => {
 
     await waitFor(() => {
       expect(
-        screen.getByRole("heading", { name: "Payment Successful!" }),
+        screen.getByRole("heading", { name: "Payment successful" }),
       ).toBeInTheDocument();
     });
 
-    expect(screen.getByText("Payment Completed")).toBeInTheDocument();
+    expect(screen.getByText("Payment completed")).toBeInTheDocument();
     expect(screen.queryByText(/Transaction ID:/)).not.toBeInTheDocument();
     expect(
       screen.getByRole("link", { name: /Access Dashboard/i }),
     ).toHaveAttribute("href", "/dashboard");
-    expect(
-      screen.getByRole("link", { name: /Manage Billing/i }),
-    ).toHaveAttribute("href", "/dashboard/billing");
+    expect(screen.getByRole("link", { name: /View billing/i })).toHaveAttribute(
+      "href",
+      "/dashboard/billing",
+    );
   });
 
   it("polls again when the payment remains pending", async () => {
@@ -90,7 +91,7 @@ describe("PaymentStatusContent", () => {
 
     await waitFor(() => {
       expect(
-        screen.getByRole("heading", { name: "Payment Processing" }),
+        screen.getByRole("heading", { name: "Payment processing" }),
       ).toBeInTheDocument();
     });
     expect(fetchMock).toHaveBeenCalledTimes(1);
@@ -104,7 +105,7 @@ describe("PaymentStatusContent", () => {
     });
     await waitFor(() => {
       expect(
-        screen.getByRole("heading", { name: "Payment Successful!" }),
+        screen.getByRole("heading", { name: "Payment successful" }),
       ).toBeInTheDocument();
     });
   });
@@ -120,7 +121,7 @@ describe("PaymentStatusContent", () => {
 
     await waitFor(() => {
       expect(
-        screen.getByRole("heading", { name: "Payment Failed" }),
+        screen.getByRole("heading", { name: "Payment failed" }),
       ).toBeInTheDocument();
     });
 
@@ -145,18 +146,44 @@ describe("PaymentStatusContent", () => {
 
     await waitFor(() => {
       expect(
-        screen.getByRole("heading", { name: "Payment Cancelled" }),
+        screen.getByRole("heading", { name: "Payment cancelled" }),
       ).toBeInTheDocument();
     });
 
     expect(
       screen.getByText("Failed to check payment status."),
     ).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /View Plans/i })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: /View plans/i })).toHaveAttribute(
       "href",
       "/pricing",
     );
 
     consoleErrorSpy.mockRestore();
+  });
+
+  it("describes verified one-time purchases as lifetime access", async () => {
+    mockUseSearchParams.mockReturnValue(
+      new URLSearchParams("session_id=checkout-123") as unknown as ReturnType<
+        typeof useSearchParams
+      >,
+    );
+    (global.fetch as jest.MockedFunction<typeof fetch>).mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        status: "success",
+        paymentMode: "one_time",
+      }),
+    } as Response);
+
+    render(<PaymentStatusContent />);
+
+    expect(
+      await screen.findByText(
+        "Your one-time purchase is complete. Lifetime access is now active, with no recurring charge.",
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText(/Your subscription is active/),
+    ).not.toBeInTheDocument();
   });
 });

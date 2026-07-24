@@ -2,7 +2,6 @@
 
 import { useTranslation } from "@/lib/i18n/translation/client";
 import React, { useMemo, useState } from "react";
-import { useRouter } from "nextjs-toploader/app";
 import { toast } from "sonner";
 import { CalendarClock, Loader2, ReceiptText } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -24,15 +23,36 @@ import {
 } from "@/components/ui/table";
 import { useIntlLocale } from "@/hooks/use-intl-locale";
 import { getSafeBillingRedirectUrl } from "@/lib/billing/url";
+import {
+  canManageSubscription,
+  resolveBillingAccess,
+} from "@/lib/billing/access";
 import { formatCurrency } from "@/lib/utils";
-import type { PaymentRecord, Subscription } from "@/types/billing";
+import type {
+  PaymentRecord,
+  ProductEntitlement,
+  Subscription,
+} from "@/types/billing";
+import { LocalizedLink } from "@/components/localized-link";
 interface BillingOverviewProps {
   subscription: Subscription | null;
+  entitlement: ProductEntitlement | null;
   payments: PaymentRecord[];
 }
 function RedirectingToSubscriptionManagementToast() {
   const { t } = useTranslation();
   return <>{t("747a00e98aeb", "Redirecting to subscription management...")}</>;
+}
+function BillingPortalErrorToast() {
+  const { t } = useTranslation();
+  return (
+    <>
+      {t(
+        "billing_portal_error",
+        "We could not open billing management. Please try again.",
+      )}
+    </>
+  );
 }
 function NoActiveSubscriptionLabel() {
   const { t } = useTranslation();
@@ -56,14 +76,65 @@ function NoPaymentRecordsLabel() {
   const { t } = useTranslation();
   return <>{t("fe7244137ccf", "No records yet")}</>;
 }
+function SubscriptionStatusLabel({ status }: { status: string }) {
+  const { t } = useTranslation();
+  switch (status) {
+    case "active":
+      return <>{t("billing_status_active", "Active")}</>;
+    case "trialing":
+      return <>{t("billing_status_trialing", "Trialing")}</>;
+    case "scheduled_cancel":
+      return <>{t("billing_status_scheduled_cancel", "Scheduled to cancel")}</>;
+    case "canceled":
+      return <>{t("billing_status_canceled", "Canceled")}</>;
+    default:
+      return <>{t("billing_status_inactive", "Inactive")}</>;
+  }
+}
+function PaymentTypeLabel({ type }: { type: string }) {
+  const { t } = useTranslation();
+  return type === "one_time" ? (
+    <>{t("billing_payment_type_one_time", "One-time purchase")}</>
+  ) : (
+    <>{t("billing_payment_type_subscription", "Subscription")}</>
+  );
+}
+function PaymentStatusLabel({ status }: { status: string }) {
+  const { t } = useTranslation();
+  switch (status) {
+    case "succeeded":
+      return <>{t("billing_payment_status_succeeded", "Succeeded")}</>;
+    case "pending":
+      return <>{t("billing_payment_status_pending", "Pending")}</>;
+    case "partially_refunded":
+      return (
+        <>
+          {t("billing_payment_status_partially_refunded", "Partially refunded")}
+        </>
+      );
+    case "refunded":
+      return <>{t("billing_payment_status_refunded", "Refunded")}</>;
+    case "disputed":
+      return <>{t("billing_payment_status_disputed", "Disputed")}</>;
+    case "failed":
+      return <>{t("billing_payment_status_failed", "Failed")}</>;
+    default:
+      return <>{t("billing_payment_status_unknown", "Unknown")}</>;
+  }
+}
 export function BillingOverview({
   subscription,
+  entitlement,
   payments,
 }: BillingOverviewProps) {
   const { t } = useTranslation();
   const intlLocale = useIntlLocale();
-  const router = useRouter();
   const [isPortalLoading, setIsPortalLoading] = useState(false);
+  const billingAccess = resolveBillingAccess(subscription, entitlement);
+  const currentSubscription =
+    billingAccess.kind === "subscription" ? billingAccess.subscription : null;
+  const hasLifetimeAccess = billingAccess.kind === "lifetime";
+  const canManage = canManageSubscription(subscription);
   const paymentSummary = useMemo(() => {
     const successfulPayments = payments.filter(
       (payment) => payment.status === "succeeded",
@@ -73,9 +144,17 @@ export function BillingOverview({
       latestDate: successfulPayments[0]?.createdAt ?? null,
     };
   }, [payments]);
-  const nextBillingDate = subscription?.currentPeriodEnd
-    ? new Date(subscription.currentPeriodEnd).toLocaleDateString(intlLocale)
+  const nextBillingDate = currentSubscription?.currentPeriodEnd
+    ? new Date(currentSubscription.currentPeriodEnd).toLocaleDateString(
+        intlLocale,
+      )
     : null;
+  const currentTierId =
+    billingAccess.kind === "subscription"
+      ? billingAccess.subscription.tierId
+      : billingAccess.kind === "lifetime"
+        ? billingAccess.entitlement.productId
+        : null;
   const handleManageSubscription = async () => {
     setIsPortalLoading(true);
     toast.info(<RedirectingToSubscriptionManagementToast />);
@@ -87,18 +166,12 @@ export function BillingOverview({
         window.location,
       );
       if (!response.ok || !safePortalUrl) {
-        throw new Error(
-          data.error ||
-            (response.ok
-              ? "Received an unsafe management URL."
-              : "Could not create portal session."),
-        );
+        throw new Error("Billing portal request failed.");
       }
       window.location.assign(safePortalUrl);
     } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "An error occurred.",
-      );
+      console.error("Unable to open billing portal:", error);
+      toast.error(<BillingPortalErrorToast />);
     } finally {
       setIsPortalLoading(false);
     }
@@ -112,8 +185,8 @@ export function BillingOverview({
               {t("ba99902b6481", "Current Plan")}
             </CardDescription>
             <CardTitle className="text-base">
-              {subscription ? (
-                `${subscription.tierId.charAt(0).toUpperCase()}${subscription.tierId.slice(1)}`
+              {currentTierId ? (
+                `${currentTierId.charAt(0).toUpperCase()}${currentTierId.slice(1)}`
               ) : (
                 <>{t("d4b2857ce5d2", "Free")}</>
               )}
@@ -121,16 +194,20 @@ export function BillingOverview({
           </CardHeader>
           <CardContent className="flex items-center gap-2 text-sm">
             {/* <CreditCard className="text-muted-foreground h-4 w-4" /> */}
-            {subscription ? (
+            {currentSubscription ? (
               <Badge
                 className="capitalize"
                 variant={
-                  ["active", "trialing"].includes(subscription.status)
+                  ["active", "trialing"].includes(currentSubscription.status)
                     ? "default"
-                    : "destructive"
+                    : "secondary"
                 }
               >
-                {subscription.status}
+                <SubscriptionStatusLabel status={currentSubscription.status} />
+              </Badge>
+            ) : hasLifetimeAccess ? (
+              <Badge variant="default">
+                {t("billing_lifetime_access", "Lifetime access")}
               </Badge>
             ) : (
               <span className="text-muted-foreground">
@@ -143,15 +220,26 @@ export function BillingOverview({
         <Card>
           <CardHeader>
             <CardDescription>
-              {t("b620b54bfdec", "Next Billing Date")}
+              {hasLifetimeAccess
+                ? t("billing_access_term", "Access Term")
+                : t("b620b54bfdec", "Next Billing Date")}
             </CardDescription>
             <CardTitle className="text-base">
-              {nextBillingDate || <NotScheduledLabel />}
+              {hasLifetimeAccess
+                ? t("billing_lifetime", "Lifetime")
+                : nextBillingDate || <NotScheduledLabel />}
             </CardTitle>
           </CardHeader>
           <CardContent className="text-muted-foreground flex items-center gap-2 text-sm">
             <CalendarClock className="h-4 w-4" />
-            {subscription?.canceledAt ? (
+            {hasLifetimeAccess ? (
+              <>
+                {t(
+                  "billing_no_renewal",
+                  "One-time purchase; no renewal is required.",
+                )}
+              </>
+            ) : currentSubscription?.canceledAt ? (
               <>{t("141680a4d3e7", "Subscription ends at period close")}</>
             ) : (
               <>{t("393e806b8041", "Based on your current billing cycle")}</>
@@ -192,7 +280,7 @@ export function BillingOverview({
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-wrap items-center gap-3">
-          {subscription ? (
+          {canManage ? (
             <Button
               onClick={handleManageSubscription}
               disabled={isPortalLoading}
@@ -204,8 +292,10 @@ export function BillingOverview({
               })}
             </Button>
           ) : (
-            <Button onClick={() => router.push("/pricing")}>
-              {t("dd7d10cbc338", "View Plans")}
+            <Button asChild>
+              <LocalizedLink href="/pricing">
+                {t("dd7d10cbc338", "View Plans")}
+              </LocalizedLink>
             </Button>
           )}
         </CardContent>
@@ -252,9 +342,7 @@ export function BillingOverview({
                             : "default"
                         }
                       >
-                        {payment.paymentType === "one_time"
-                          ? "One Time Purchase"
-                          : "Subscription"}
+                        <PaymentTypeLabel type={payment.paymentType} />
                       </Badge>
                     </TableCell>
                     <TableCell>
@@ -273,7 +361,7 @@ export function BillingOverview({
                             : "destructive"
                         }
                       >
-                        {payment.status}
+                        <PaymentStatusLabel status={payment.status} />
                       </Badge>
                     </TableCell>
                   </TableRow>

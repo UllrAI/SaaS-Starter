@@ -18,6 +18,7 @@ export type BillingCycle = "monthly" | "yearly";
 export type SubscriptionStatus =
   | "active"
   | "canceled"
+  | "expired"
   | "past_due"
   | "unpaid"
   | "paused"
@@ -35,6 +36,46 @@ export interface Subscription {
   currentPeriodStart?: Date | null;
   currentPeriodEnd?: Date | null;
   canceledAt?: Date | null;
+}
+
+export interface ProductEntitlement {
+  id: string;
+  userId: string;
+  productId: string;
+  sourcePaymentId: string;
+  revokedAt: Date | null;
+  revocationReason: string | null;
+  createdAt: Date;
+}
+
+export interface CreemTransactionReference {
+  id: string;
+  amount: number;
+  amount_paid?: number | null;
+  refunded_amount?: number | null;
+  status:
+    | "pending"
+    | "paid"
+    | "refunded"
+    | "partialRefund"
+    | "chargedBack"
+    | "uncollectible"
+    | "declined"
+    | "canceled"
+    | "void";
+}
+
+export interface CreemRefundObject {
+  id: string;
+  status: "pending" | "requiresAction" | "succeeded" | "failed" | "canceled";
+  refund_amount: number;
+  transaction: CreemTransactionReference;
+}
+
+export interface CreemDisputeObject {
+  id: string;
+  amount: number;
+  transaction: CreemTransactionReference;
 }
 
 export interface CreateCheckoutOptions {
@@ -95,6 +136,7 @@ export interface CreemPaymentObject extends CreemBaseObject {
 }
 
 export interface CreemCheckoutObject extends CreemBaseObject {
+  product: string | { id: string };
   subscription?: CreemSubscriptionObject;
   order?: {
     id: string;
@@ -108,7 +150,12 @@ export type CreemWebhookPayload = {
   id: string;
   eventType: string;
   created_at: number;
-  object: CreemCheckoutObject | CreemSubscriptionObject | CreemPaymentObject;
+  object:
+    | CreemCheckoutObject
+    | CreemSubscriptionObject
+    | CreemPaymentObject
+    | CreemRefundObject
+    | CreemDisputeObject;
 };
 
 export interface PaymentRecord {
@@ -118,8 +165,8 @@ export interface PaymentRecord {
   currency: string;
   status: string;
   paymentType: string;
-  productId: string; // Changed from tierId to productId to match db
-  tierName: string; // Added missing tierName
+  productId: string;
+  tierName: string;
   createdAt: Date;
   subscriptionId: string | null;
 }

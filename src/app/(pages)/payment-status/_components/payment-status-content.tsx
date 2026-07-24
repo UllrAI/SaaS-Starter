@@ -20,9 +20,10 @@ import {
   Settings,
   Sparkles,
 } from "lucide-react";
-import Link from "next/link";
+import { LocalizedLink } from "@/components/localized-link";
 import { type ReactNode, useEffect, useRef, useState } from "react";
 type PaymentStatus = "success" | "failed" | "pending" | "cancelled";
+type PaymentMode = "subscription" | "one_time";
 type PaymentStatusErrorCode =
   | "missing_reference"
   | "status_check_failed"
@@ -54,95 +55,119 @@ interface StatusConfig {
   };
   title: ReactNode;
 }
-function getStatusConfig(status: PaymentStatus): StatusConfig {
+function getStatusConfig(
+  status: PaymentStatus,
+  paymentMode: PaymentMode | null,
+  t: ReturnType<typeof useTranslation>["t"],
+): StatusConfig {
   switch (status) {
     case "success":
       return {
-        badgeText: <>Payment Completed</>,
-        badgeVariant: "default",
-        description: (
-          <>
-            Thank you for your purchase! Your subscription has been activated
-            and you now have access to all premium features.
-          </>
+        badgeText: (
+          <>{t("payment_status_completed_badge", "Payment completed")}</>
         ),
+        badgeVariant: "default",
+        description:
+          paymentMode === "one_time" ? (
+            <>
+              {t(
+                "payment_status_lifetime_success_description",
+                "Your one-time purchase is complete. Lifetime access is now active, with no recurring charge.",
+              )}
+            </>
+          ) : (
+            <>
+              {t(
+                "payment_status_subscription_success_description",
+                "Your subscription is active, and your account now includes the purchased features.",
+              )}
+            </>
+          ),
         icon: <CheckCircle className="h-20 w-20 text-emerald-500" />,
         primaryAction: {
           href: "/dashboard",
-          text: <>Access Dashboard</>,
+          text: <>{t("payment_status_access_dashboard", "Access dashboard")}</>,
           variant: "default",
         },
         secondaryAction: {
           href: "/dashboard/billing",
-          text: <>Manage Billing</>,
+          text: <>{t("payment_status_manage_billing", "View billing")}</>,
         },
-        title: <>Payment Successful!</>,
+        title: <>{t("payment_status_success_title", "Payment successful")}</>,
       };
     case "failed":
       return {
-        badgeText: <>Payment Failed</>,
+        badgeText: <>{t("payment_status_failed_badge", "Payment failed")}</>,
         badgeVariant: "destructive",
         description: (
           <>
-            We couldn&apos;t process your payment. Please check your payment
-            method and try again, or contact our support team for assistance.
+            {t(
+              "payment_status_failed_description",
+              "We could not process your payment. Check your payment method and try again, or contact support for help.",
+            )}
           </>
         ),
         icon: <XCircle className="h-20 w-20 text-red-500" />,
         primaryAction: {
           href: "/pricing",
-          text: <>Try Again</>,
+          text: <>{t("payment_status_try_again", "Try again")}</>,
           variant: "default",
         },
         secondaryAction: {
           href: "/contact",
-          text: <>Contact Support</>,
+          text: <>{t("payment_status_contact_support", "Contact support")}</>,
         },
-        title: <>Payment Failed</>,
+        title: <>{t("payment_status_failed_title", "Payment failed")}</>,
       };
     case "pending":
       return {
-        badgeText: <>Processing</>,
+        badgeText: <>{t("payment_status_processing_badge", "Processing")}</>,
         badgeVariant: "secondary",
         description: (
           <>
-            Your payment is being processed. This may take a few minutes. The
-            page will automatically refresh to show the latest status.
+            {t(
+              "payment_status_processing_description",
+              "Your payment is still processing. This page will update automatically when its status changes.",
+            )}
           </>
         ),
         icon: <Clock className="h-20 w-20 text-amber-500" />,
         primaryAction: {
           href: "/dashboard",
-          text: <>Go to Dashboard</>,
+          text: <>{t("payment_status_go_dashboard", "Go to dashboard")}</>,
           variant: "outline",
         },
         secondaryAction: {
           href: "/dashboard/billing",
-          text: <>Check Status</>,
+          text: <>{t("payment_status_check_billing", "Check billing")}</>,
         },
-        title: <>Payment Processing</>,
+        title: (
+          <>{t("payment_status_processing_title", "Payment processing")}</>
+        ),
       };
     case "cancelled":
       return {
-        badgeText: <>Cancelled</>,
+        badgeText: <>{t("payment_status_cancelled_badge", "Cancelled")}</>,
         badgeVariant: "outline",
         description: (
           <>
-            You cancelled the payment process. No charges have been made to your
-            account. You can try again anytime.
+            {t(
+              "payment_status_cancelled_description",
+              "You cancelled checkout. No charge was made, and you can try again at any time.",
+            )}
           </>
         ),
         icon: <AlertCircle className="h-20 w-20 text-slate-500" />,
         primaryAction: {
           href: "/pricing",
-          text: <>View Plans</>,
+          text: <>{t("payment_status_view_plans", "View plans")}</>,
           variant: "default",
         },
         secondaryAction: {
           href: "/dashboard",
-          text: <>Go to Dashboard</>,
+          text: <>{t("payment_status_go_dashboard", "Go to dashboard")}</>,
         },
-        title: <>Payment Cancelled</>,
+        title: <>{t("payment_status_cancelled_title", "Payment cancelled")}</>,
       };
   }
 }
@@ -177,6 +202,7 @@ export function PaymentStatusContent() {
   const { t } = useTranslation();
   const searchParams = useSearchParams();
   const [status, setStatus] = useState<PaymentStatus | null>(null);
+  const [paymentMode, setPaymentMode] = useState<PaymentMode | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [errorCode, setErrorCode] = useState<PaymentStatusErrorCode | null>(
     null,
@@ -215,6 +241,12 @@ export function PaymentStatusContent() {
             const data = await response.json();
             if (!isActive) return;
             setStatus(data.status as PaymentStatus);
+            setPaymentMode(
+              data.paymentMode === "subscription" ||
+                data.paymentMode === "one_time"
+                ? data.paymentMode
+                : null,
+            );
             setErrorCode(null);
             if (data.status === "pending") {
               if (pollAttempt >= MAX_POLL_ATTEMPTS) {
@@ -317,7 +349,7 @@ export function PaymentStatusContent() {
       </section>
     );
   }
-  const config = getStatusConfig(status);
+  const config = getStatusConfig(status, paymentMode, t);
   return (
     <section className="bg-background relative flex min-h-screen items-center justify-center overflow-hidden">
       {/* Background Pattern */}
@@ -379,7 +411,7 @@ export function PaymentStatusContent() {
                 size="lg"
                 className="w-full min-w-[200px] sm:w-auto"
               >
-                <Link
+                <LocalizedLink
                   href={config.primaryAction.href}
                   className="flex items-center justify-center gap-2"
                 >
@@ -388,7 +420,7 @@ export function PaymentStatusContent() {
                   {status === "pending" && <Home className="h-4 w-4" />}
                   {status === "cancelled" && <ArrowRight className="h-4 w-4" />}
                   {config.primaryAction.text}
-                </Link>
+                </LocalizedLink>
               </Button>
 
               {config.secondaryAction && (
@@ -398,7 +430,7 @@ export function PaymentStatusContent() {
                   size="lg"
                   className="w-full min-w-[200px] sm:w-auto"
                 >
-                  <Link
+                  <LocalizedLink
                     href={config.secondaryAction.href}
                     className="flex items-center justify-center gap-2"
                   >
@@ -407,7 +439,7 @@ export function PaymentStatusContent() {
                     {status === "pending" && <CreditCard className="h-4 w-4" />}
                     {status === "cancelled" && <Home className="h-4 w-4" />}
                     {config.secondaryAction.text}
-                  </Link>
+                  </LocalizedLink>
                 </Button>
               )}
             </div>

@@ -5,6 +5,8 @@ import type {
   CreemCheckoutObject,
   CreemSubscriptionObject,
   CreemPaymentObject,
+  CreemRefundObject,
+  CreemDisputeObject,
   SubscriptionStatus,
 } from "@/types/billing";
 import { db } from "@/database";
@@ -14,12 +16,19 @@ import {
   findUserByCustomerId,
   upsertSubscription,
   upsertPayment,
+  grantProductEntitlement,
+  lockBillingProductScope,
+  lockPaymentAdjustmentScope,
   recordWebhookEvent,
+  revokeProductEntitlementByPaymentId,
+  suspendSubscriptionAccess,
+  updatePaymentStatus,
 } from "@/lib/database/subscription";
 import type { Tx } from "@/lib/database/subscription";
-import { getProductTierByProductId } from "@/lib/config/products";
-
-// --- Helper functions and type guards (no changes here) ---
+import {
+  getProductTierById,
+  getProductTierByProductId,
+} from "@/lib/config/products";
 
 export class CreemWebhookSignatureError extends Error {
   constructor(message = "Invalid signature.") {
@@ -70,9 +79,56 @@ function isCheckoutObject(obj: unknown): obj is CreemCheckoutObject {
   );
 }
 
+function isTransactionReference(
+  value: unknown,
+): value is CreemRefundObject["transaction"] {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    typeof (value as { id?: unknown }).id === "string" &&
+    (value as { id: string }).id.trim().length > 0 &&
+    typeof (value as { amount?: unknown }).amount === "number" &&
+    [
+      "pending",
+      "paid",
+      "refunded",
+      "partialRefund",
+      "chargedBack",
+      "uncollectible",
+      "declined",
+      "canceled",
+      "void",
+    ].includes(String((value as { status?: unknown }).status))
+  );
+}
+
+function isRefundObject(obj: unknown): obj is CreemRefundObject {
+  return (
+    typeof obj === "object" &&
+    obj !== null &&
+    typeof (obj as { id?: unknown }).id === "string" &&
+    typeof (obj as { refund_amount?: unknown }).refund_amount === "number" &&
+    ["pending", "requiresAction", "succeeded", "failed", "canceled"].includes(
+      String((obj as { status?: unknown }).status),
+    ) &&
+    isTransactionReference((obj as { transaction?: unknown }).transaction)
+  );
+}
+
+function isDisputeObject(obj: unknown): obj is CreemDisputeObject {
+  return (
+    typeof obj === "object" &&
+    obj !== null &&
+    typeof (obj as { id?: unknown }).id === "string" &&
+    typeof (obj as { amount?: unknown }).amount === "number" &&
+    isTransactionReference((obj as { transaction?: unknown }).transaction)
+  );
+}
+
 const subscriptionStatuses = new Set<SubscriptionStatus>([
   "active",
   "canceled",
+  "expired",
   "past_due",
   "unpaid",
   "paused",
@@ -285,6 +341,18 @@ export async function handleCreemWebhook(payload: string, signature: string) {
           await processPaymentSucceededEvent(eventObject, tx);
         }
         break;
+      case "refund.created":
+        if (!isRefundObject(eventObject)) {
+          invalidEventObject(event.eventType);
+        }
+        await processRefundCreatedEvent(eventObject, eventCreatedAt, tx);
+        break;
+      case "dispute.created":
+        if (!isDisputeObject(eventObject)) {
+          invalidEventObject(event.eventType);
+        }
+        await processDisputeCreatedEvent(eventObject, eventCreatedAt, tx);
+        break;
 
       case "subscription.active":
       case "subscription.trialing":
@@ -358,13 +426,15 @@ async function processCheckoutCompletedEvent(
         ? subscription.product
         : subscription.product.id;
     const tier = getProductTierByProductId(productId);
+    const storedProductId = tier?.id || productId;
 
+    await lockBillingProductScope(userId, storedProductId, tx);
     await upsertSubscription(
       {
         userId,
         customerId,
         subscriptionId: subscription.id,
-        productId: tier?.id || productId,
+        productId: storedProductId,
         status: subscription.status,
         currentPeriodStart: parseOptionalWebhookDate(
           subscription.current_period_start_date,
@@ -393,7 +463,7 @@ async function processCheckoutCompletedEvent(
         userId,
         customerId,
         subscriptionId: subscription.id,
-        productId: tier?.id || productId,
+        productId: storedProductId,
         paymentId: order.transaction,
         amount: order.amount_due,
         currency: order.currency,
@@ -405,29 +475,119 @@ async function processCheckoutCompletedEvent(
   }
   // Handle one_time purchases
   else if (paymentMode === "one_time") {
-    // For one_time purchases, we need to get the product ID from metadata or order
-    const productId = metadata?.tierId || order.id; // Fallback to order ID if no tierId
-    const tier = getProductTierByProductId(productId);
+    const tierId =
+      typeof metadata?.tierId === "string" ? metadata.tierId : undefined;
+    const tier = tierId ? getProductTierById(tierId) : undefined;
+    if (!tier) {
+      throw new InvalidWebhookPayloadError(
+        "One-time checkout is missing a valid tierId.",
+      );
+    }
+    if (!isIdReference(checkoutData.product)) {
+      throw new InvalidWebhookPayloadError(
+        "One-time checkout is missing a valid product.",
+      );
+    }
+    const checkoutProductId =
+      typeof checkoutData.product === "string"
+        ? checkoutData.product
+        : checkoutData.product.id;
+    if (checkoutProductId !== tier.pricing.creem.oneTime) {
+      throw new InvalidWebhookPayloadError(
+        "One-time checkout product does not match its tier metadata.",
+      );
+    }
 
-    // Create a one_time payment record
-    await upsertPayment(
+    await lockBillingProductScope(userId, tier.id, tx);
+    const [payment] = await upsertPayment(
       {
         userId,
         customerId,
-        subscriptionId: null, // No subscription for one_time purchases
-        productId: tier?.id || productId,
+        subscriptionId: null,
+        productId: tier.id,
         paymentId: order.transaction,
         amount: order.amount_due,
         currency: order.currency,
         status: "succeeded",
-        paymentType: "one_time", // Normalize to one_time format
+        paymentType: "one_time",
       },
       tx,
     );
+
+    if (payment?.status === "succeeded") {
+      await grantProductEntitlement(
+        {
+          userId,
+          productId: tier.id,
+          sourcePaymentId: order.transaction,
+        },
+        tx,
+      );
+    }
   } else {
     throw new InvalidWebhookPayloadError(
       `Unsupported payment mode: ${paymentMode} or missing subscription data for subscription mode`,
     );
+  }
+}
+
+async function processRefundCreatedEvent(
+  refundData: CreemRefundObject,
+  eventCreatedAt: Date,
+  tx: Tx,
+) {
+  if (refundData.status !== "succeeded") {
+    return;
+  }
+  await lockPaymentAdjustmentScope(refundData.transaction.id, tx);
+
+  const refundedAmount =
+    refundData.transaction.refunded_amount ?? refundData.refund_amount;
+  const paidAmount =
+    refundData.transaction.amount_paid ?? refundData.transaction.amount;
+  const isFullRefund =
+    refundData.transaction.status === "refunded" &&
+    refundedAmount >= paidAmount;
+
+  const [payment] = await updatePaymentStatus(
+    refundData.transaction.id,
+    isFullRefund ? "refunded" : "partially_refunded",
+    tx,
+  );
+  if (isFullRefund) {
+    await revokeProductEntitlementByPaymentId(
+      refundData.transaction.id,
+      "refunded",
+      tx,
+    );
+    if (payment?.subscriptionId) {
+      await suspendSubscriptionAccess(
+        payment.subscriptionId,
+        eventCreatedAt,
+        tx,
+      );
+    }
+  }
+}
+
+async function processDisputeCreatedEvent(
+  disputeData: CreemDisputeObject,
+  eventCreatedAt: Date,
+  tx: Tx,
+) {
+  await lockPaymentAdjustmentScope(disputeData.transaction.id, tx);
+  const [payment] = await updatePaymentStatus(
+    disputeData.transaction.id,
+    "disputed",
+    tx,
+  );
+  await revokeProductEntitlementByPaymentId(
+    disputeData.transaction.id,
+    "disputed",
+    tx,
+  );
+  if (payment?.subscriptionId) {
+    await suspendSubscriptionAccess(payment.subscriptionId, eventCreatedAt, tx);
   }
 }
 
@@ -448,13 +608,15 @@ async function processSubscriptionEvent(
       ? subscriptionData.product
       : subscriptionData.product.id;
   const tier = getProductTierByProductId(productId);
+  const storedProductId = tier?.id || productId;
 
+  await lockBillingProductScope(user.id, storedProductId, tx);
   await upsertSubscription(
     {
       userId: user.id,
       customerId,
       subscriptionId: subscriptionData.id,
-      productId: tier?.id || productId,
+      productId: storedProductId,
       status: subscriptionData.status,
       currentPeriodStart: parseOptionalWebhookDate(
         subscriptionData.current_period_start_date,
@@ -552,13 +714,15 @@ async function processSubscriptionRenewal(
     throw new InvalidWebhookPayloadError("Product ID missing in renewal event");
 
   const tier = getProductTierByProductId(productId);
+  const storedProductId = tier?.id || productId;
 
+  await lockBillingProductScope(user.id, storedProductId, tx);
   await upsertSubscription(
     {
       userId: user.id,
       customerId,
       subscriptionId,
-      productId: tier?.id || productId,
+      productId: storedProductId,
       status: "active",
       currentPeriodStart,
       currentPeriodEnd,

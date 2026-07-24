@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import { DashboardPageWrapper } from "../_components/dashboard-page-wrapper";
 import {
   getUserPayments,
+  getUserProductEntitlement,
   getUserSubscription,
 } from "@/lib/database/subscription";
 import { BillingOverview } from "./_components/billing-overview";
@@ -41,9 +42,12 @@ export default async function DashboardBillingPage() {
   const { t } = await getServerTranslations();
   const requestHeaders = await headers();
   const session = await getAuthSessionFromHeaders(requestHeaders);
-  const [subscription, payments] = await Promise.all([
+  const [subscription, entitlement, payments] = await Promise.all([
     session?.user?.id
       ? getUserSubscription(session.user.id)
+      : Promise.resolve(null),
+    session?.user?.id
+      ? getUserProductEntitlement(session.user.id)
       : Promise.resolve(null),
     session?.user?.id
       ? getUserPayments(session.user.id, 20)
@@ -61,7 +65,11 @@ export default async function DashboardBillingPage() {
         </>
       }
     >
-      <BillingOverview subscription={subscription} payments={payments} />
+      <BillingOverview
+        subscription={subscription}
+        entitlement={entitlement}
+        payments={payments}
+      />
     </DashboardPageWrapper>
   );
 }

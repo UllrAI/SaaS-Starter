@@ -129,8 +129,26 @@ describe("Payment Status API", () => {
     expect(data).toEqual({
       status: "success",
       message: "Payment completed successfully",
+      paymentMode: null,
     });
     expect(data).not.toHaveProperty("sessionId");
+  });
+
+  it("returns an allowlisted one-time payment mode", async () => {
+    mockRetrieveCheckout.mockResolvedValue({
+      status: "completed",
+      metadata: { userId: "user-1", paymentMode: "one_time" },
+    });
+
+    const response = await GET(
+      createRequest(
+        "http://localhost:3000/api/payment-status?checkout_id=checkout-1",
+      ),
+    );
+
+    expect(await response.json()).toEqual(
+      expect.objectContaining({ paymentMode: "one_time" }),
+    );
   });
 
   it.each([

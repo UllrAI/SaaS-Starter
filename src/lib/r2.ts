@@ -199,7 +199,17 @@ export async function deleteFiles(
         Quiet: false,
       },
     });
-    await r2Client.send(command);
+    const result = await r2Client.send(command);
+    if (result.Errors?.length) {
+      const failedKeys = result.Errors.map(
+        (item) => item.Key ?? "unknown key",
+      ).join(", ");
+      return {
+        success: false,
+        error: `Failed to delete ${result.Errors.length} object(s): ${failedKeys}`,
+      };
+    }
+
     return { success: true };
   } catch (error) {
     console.error("Error deleting files in batch:", error);

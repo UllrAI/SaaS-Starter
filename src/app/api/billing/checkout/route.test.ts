@@ -23,6 +23,7 @@ const mockGetSession = jest.fn();
 const mockCreateCheckoutSession = jest.fn();
 const mockCreateCustomerPortalUrl = jest.fn();
 const mockGetUserSubscription = jest.fn();
+const mockHasUserProductEntitlement = jest.fn();
 
 jest.mock("@/lib/auth/server", () => ({
   auth: {
@@ -41,6 +42,7 @@ jest.mock("@/lib/billing", () => ({
 
 jest.mock("@/lib/database/subscription", () => ({
   getUserSubscription: mockGetUserSubscription,
+  hasUserProductEntitlement: mockHasUserProductEntitlement,
 }));
 
 // Mock environment variable
@@ -49,6 +51,7 @@ const originalEnv = process.env;
 describe("Billing Checkout API", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockHasUserProductEntitlement.mockResolvedValue(false);
 
     // Setup mock implementations
     mockJson.mockImplementation((data: any, init?: { status?: number }) => ({
@@ -132,7 +135,7 @@ describe("Billing Checkout API", () => {
 
       const { POST } = await import("./route");
       const request = createMockRequest({
-        tierId: "tier-1",
+        tierId: "pro",
         paymentMode: "subscription",
         billingCycle: "monthly",
       });
@@ -157,7 +160,7 @@ describe("Billing Checkout API", () => {
 
       const { POST } = await import("./route");
       const request = createMockRequest({
-        tierId: "tier-1",
+        tierId: "pro",
         paymentMode: "subscription",
         billingCycle: "monthly",
       });
@@ -181,7 +184,7 @@ describe("Billing Checkout API", () => {
 
       const { POST } = await import("./route");
       const request = createMockRequest({
-        tierId: "tier-1",
+        tierId: "pro",
         paymentMode: "subscription",
         billingCycle: "monthly",
       });
@@ -205,7 +208,7 @@ describe("Billing Checkout API", () => {
 
       const { POST } = await import("./route");
       const request = createMockRequest({
-        tierId: "tier-1",
+        tierId: "pro",
         paymentMode: "one_time",
       });
 
@@ -217,6 +220,24 @@ describe("Billing Checkout API", () => {
       expect(mockGetUserSubscription).not.toHaveBeenCalled();
     });
 
+    it("should reject a duplicate one-time purchase", async () => {
+      mockGetSession.mockResolvedValue(mockSession);
+      mockHasUserProductEntitlement.mockResolvedValue(true);
+
+      const { POST } = await import("./route");
+      const response = await POST(
+        createMockRequest({
+          tierId: "pro",
+          paymentMode: "one_time",
+        }),
+      );
+      const data = await response.json();
+
+      expect(response.status).toBe(409);
+      expect(data.code).toBe("product_owned");
+      expect(mockCreateCheckoutSession).not.toHaveBeenCalled();
+    });
+
     it("should create checkout session with correct parameters", async () => {
       mockGetSession.mockResolvedValue(mockSession);
       mockGetUserSubscription.mockResolvedValue(null);
@@ -226,7 +247,7 @@ describe("Billing Checkout API", () => {
 
       const { POST } = await import("./route");
       const request = createMockRequest({
-        tierId: "tier-premium",
+        tierId: "pro",
         paymentMode: "subscription",
         billingCycle: "yearly",
       });
@@ -237,7 +258,7 @@ describe("Billing Checkout API", () => {
         userId: "user-123",
         userEmail: "test@example.com",
         userName: "Test User",
-        tierId: "tier-premium",
+        tierId: "pro",
         paymentMode: "subscription",
         billingCycle: "yearly",
         successUrl: "https://example.com/payment-status?status=pending",
@@ -250,7 +271,7 @@ describe("Billing Checkout API", () => {
       expect(data.checkoutUrl).toBe("https://checkout.creem.io/session-123");
     });
 
-    it("should handle optional billingCycle parameter", async () => {
+    it("should require billingCycle for subscriptions", async () => {
       mockGetSession.mockResolvedValue(mockSession);
       mockGetUserSubscription.mockResolvedValue(null);
       mockCreateCheckoutSession.mockResolvedValue({
@@ -259,19 +280,15 @@ describe("Billing Checkout API", () => {
 
       const { POST } = await import("./route");
       const request = createMockRequest({
-        tierId: "tier-1",
+        tierId: "pro",
         paymentMode: "subscription",
         // billingCycle omitted
       });
 
       const response = await POST(request);
 
-      expect(mockCreateCheckoutSession).toHaveBeenCalledWith(
-        expect.objectContaining({
-          billingCycle: undefined,
-        }),
-      );
-      expect(response.status).toBe(200);
+      expect(mockCreateCheckoutSession).not.toHaveBeenCalled();
+      expect(response.status).toBe(400);
     });
 
     it("should return 500 when NEXT_PUBLIC_APP_URL is not set", async () => {
@@ -281,7 +298,7 @@ describe("Billing Checkout API", () => {
 
       const { POST } = await import("./route");
       const request = createMockRequest({
-        tierId: "tier-1",
+        tierId: "pro",
         paymentMode: "subscription",
         billingCycle: "monthly",
       });
@@ -300,7 +317,7 @@ describe("Billing Checkout API", () => {
 
       const { POST } = await import("./route");
       const request = createMockRequest({
-        tierId: "tier-1",
+        tierId: "pro",
         paymentMode: "subscription",
         billingCycle: "monthly",
       });
@@ -361,7 +378,7 @@ describe("Billing Checkout API", () => {
 
       // Test monthly billing cycle
       const monthlyRequest = createMockRequest({
-        tierId: "tier-1",
+        tierId: "pro",
         paymentMode: "subscription",
         billingCycle: "monthly",
       });
@@ -371,7 +388,7 @@ describe("Billing Checkout API", () => {
 
       // Test yearly billing cycle
       const yearlyRequest = createMockRequest({
-        tierId: "tier-1",
+        tierId: "pro",
         paymentMode: "subscription",
         billingCycle: "yearly",
       });
@@ -381,7 +398,7 @@ describe("Billing Checkout API", () => {
 
       // Test one_time payment mode
       const oneTimeRequest = createMockRequest({
-        tierId: "tier-1",
+        tierId: "pro",
         paymentMode: "one_time",
       });
 
@@ -396,7 +413,7 @@ describe("Billing Checkout API", () => {
 
       // Test invalid payment mode
       const invalidModeRequest = createMockRequest({
-        tierId: "tier-1",
+        tierId: "pro",
         paymentMode: "invalid_mode",
         billingCycle: "monthly",
       });
@@ -406,13 +423,35 @@ describe("Billing Checkout API", () => {
 
       // Test invalid billing cycle
       const invalidCycleRequest = createMockRequest({
-        tierId: "tier-1",
+        tierId: "pro",
         paymentMode: "subscription",
         billingCycle: "invalid_cycle",
       });
 
       response = await POST(invalidCycleRequest);
       expect(response.status).toBe(400);
+    });
+
+    it("rejects unknown tiers and billing cycles on one-time purchases", async () => {
+      const { POST } = await import("./route");
+
+      const unknownTier = await POST(
+        createMockRequest({
+          tierId: "unknown-tier",
+          paymentMode: "one_time",
+        }),
+      );
+      const oneTimeWithCycle = await POST(
+        createMockRequest({
+          tierId: "pro",
+          paymentMode: "one_time",
+          billingCycle: "monthly",
+        }),
+      );
+
+      expect(unknownTier.status).toBe(400);
+      expect(oneTimeWithCycle.status).toBe(400);
+      expect(mockCreateCheckoutSession).not.toHaveBeenCalled();
     });
   });
 });

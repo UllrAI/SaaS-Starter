@@ -33,9 +33,16 @@ const mockCreemWebhookSecret = "test-webhook-secret";
 const mockFindUserByCustomerId = jest.fn();
 const mockUpsertSubscription = jest.fn();
 const mockUpsertPayment = jest.fn();
+const mockGrantProductEntitlement = jest.fn();
+const mockLockBillingProductScope = jest.fn();
+const mockLockPaymentAdjustmentScope = jest.fn();
 const mockRecordWebhookEvent = jest.fn();
+const mockRevokeProductEntitlementByPaymentId = jest.fn();
+const mockSuspendSubscriptionAccess = jest.fn();
+const mockUpdatePaymentStatus = jest.fn();
 
 const mockGetProductTierByProductId = jest.fn();
+const mockGetProductTierById = jest.fn();
 
 const mockEq = jest.fn();
 
@@ -63,10 +70,17 @@ jest.mock("@/lib/database/subscription", () => ({
   findUserByCustomerId: mockFindUserByCustomerId,
   upsertSubscription: mockUpsertSubscription,
   upsertPayment: mockUpsertPayment,
+  grantProductEntitlement: mockGrantProductEntitlement,
+  lockBillingProductScope: mockLockBillingProductScope,
+  lockPaymentAdjustmentScope: mockLockPaymentAdjustmentScope,
   recordWebhookEvent: mockRecordWebhookEvent,
+  revokeProductEntitlementByPaymentId: mockRevokeProductEntitlementByPaymentId,
+  suspendSubscriptionAccess: mockSuspendSubscriptionAccess,
+  updatePaymentStatus: mockUpdatePaymentStatus,
 }));
 
 jest.mock("@/lib/config/products", () => ({
+  getProductTierById: mockGetProductTierById,
   getProductTierByProductId: mockGetProductTierByProductId,
 }));
 
@@ -114,10 +128,17 @@ describe("Creem Webhook Handler", () => {
       email: "test@example.com",
     });
     mockUpsertSubscription.mockResolvedValue([]);
-    mockUpsertPayment.mockResolvedValue([]);
+    mockUpsertPayment.mockResolvedValue([{ status: "succeeded" }]);
+    mockUpdatePaymentStatus.mockResolvedValue([{ id: "payment-row" }]);
     mockGetProductTierByProductId.mockReturnValue({
       id: "tier_pro",
       name: "Pro Tier",
+      pricing: { creem: { oneTime: "prod_one_time" } },
+    });
+    mockGetProductTierById.mockReturnValue({
+      id: "tier_pro",
+      name: "Pro Tier",
+      pricing: { creem: { oneTime: "prod_one_time" } },
     });
   });
 
@@ -132,6 +153,7 @@ describe("Creem Webhook Handler", () => {
         eventType: "checkout.completed",
         object: {
           id: "checkout_123",
+          product: "prod_one_time",
           customer: "cus_123",
           metadata: {
             userId: "user1",
@@ -168,6 +190,14 @@ describe("Creem Webhook Handler", () => {
       );
       expect(mockUpsertSubscription).toHaveBeenCalled();
       expect(mockUpsertPayment).toHaveBeenCalled();
+      expect(mockLockBillingProductScope).toHaveBeenCalledWith(
+        "user1",
+        "tier_pro",
+        expect.any(Object),
+      );
+      expect(
+        mockLockBillingProductScope.mock.invocationCallOrder[0],
+      ).toBeLessThan(mockUpsertSubscription.mock.invocationCallOrder[0]!);
     });
 
     it("should handle payment.succeeded event", async () => {
@@ -366,6 +396,39 @@ describe("Creem Webhook Handler", () => {
         }),
         expect.any(Object),
       );
+      expect(mockLockBillingProductScope).toHaveBeenCalledWith(
+        "user1",
+        "tier_pro",
+        expect.any(Object),
+      );
+      expect(
+        mockLockBillingProductScope.mock.invocationCallOrder[0],
+      ).toBeLessThan(mockUpsertSubscription.mock.invocationCallOrder[0]!);
+    });
+
+    it("should persist subscription.expired events", async () => {
+      const payload = createWebhookPayload({
+        eventType: "subscription.expired",
+        object: {
+          id: "sub_expired",
+          customer: "cus_123",
+          product: "prod_123",
+          status: "expired",
+        },
+      });
+
+      const { handleCreemWebhook } = await import("./webhook");
+
+      await expect(
+        handleCreemWebhook(payload, "test-signature"),
+      ).resolves.toEqual({ received: true });
+      expect(mockUpsertSubscription).toHaveBeenCalledWith(
+        expect.objectContaining({
+          subscriptionId: "sub_expired",
+          status: "expired",
+        }),
+        expect.any(Object),
+      );
     });
 
     it("should handle subscription renewal with payment object", async () => {
@@ -447,6 +510,7 @@ describe("Creem Webhook Handler", () => {
         eventType: "checkout.completed",
         object: {
           id: "checkout_123",
+          product: "prod_one_time",
           customer: "cus_123",
           metadata: {
             userId: "user1",
@@ -475,8 +539,232 @@ describe("Creem Webhook Handler", () => {
         }),
         expect.any(Object),
       );
-      // Should not call upsertSubscription for one_time payments
+      expect(mockGrantProductEntitlement).toHaveBeenCalledWith(
+        {
+          userId: "user1",
+          productId: "tier_pro",
+          sourcePaymentId: "txn_123",
+        },
+        expect.any(Object),
+      );
+      expect(mockLockBillingProductScope).toHaveBeenCalledWith(
+        "user1",
+        "tier_pro",
+        expect.any(Object),
+      );
+      expect(
+        mockLockBillingProductScope.mock.invocationCallOrder[0],
+      ).toBeLessThan(mockUpsertPayment.mock.invocationCallOrder[0]!);
       expect(mockUpsertSubscription).not.toHaveBeenCalled();
+    });
+
+    it("rejects one-time entitlement when checkout product mismatches metadata", async () => {
+      const payload = createWebhookPayload({
+        eventType: "checkout.completed",
+        object: {
+          id: "checkout_123",
+          product: "prod_wrong",
+          customer: "cus_123",
+          metadata: {
+            userId: "user1",
+            paymentMode: "one_time",
+            tierId: "tier_pro",
+          },
+          order: {
+            id: "order_123",
+            transaction: "txn_123",
+            amount_due: 1000,
+            currency: "usd",
+          },
+        },
+      });
+      const { handleCreemWebhook, InvalidWebhookPayloadError } =
+        await import("./webhook");
+
+      await expect(handleCreemWebhook(payload, "signature")).rejects.toThrow(
+        InvalidWebhookPayloadError,
+      );
+      expect(mockUpsertPayment).not.toHaveBeenCalled();
+      expect(mockGrantProductEntitlement).not.toHaveBeenCalled();
+    });
+
+    it("revokes lifetime access after a succeeded full refund", async () => {
+      const payload = createWebhookPayload({
+        eventType: "refund.created",
+        object: {
+          id: "refund_123",
+          status: "succeeded",
+          refund_amount: 1210,
+          transaction: {
+            id: "txn_123",
+            amount: 1000,
+            amount_paid: 1210,
+            refunded_amount: 1210,
+            status: "refunded",
+          },
+        },
+      });
+      const { handleCreemWebhook } = await import("./webhook");
+
+      await handleCreemWebhook(payload, "signature");
+
+      expect(mockUpdatePaymentStatus).toHaveBeenCalledWith(
+        "txn_123",
+        "refunded",
+        expect.any(Object),
+      );
+      expect(mockRevokeProductEntitlementByPaymentId).toHaveBeenCalledWith(
+        "txn_123",
+        "refunded",
+        expect.any(Object),
+      );
+    });
+
+    it("records a partial refund without revoking lifetime access", async () => {
+      const payload = createWebhookPayload({
+        eventType: "refund.created",
+        object: {
+          id: "refund_123",
+          status: "succeeded",
+          refund_amount: 1000,
+          transaction: {
+            id: "txn_123",
+            amount: 1000,
+            amount_paid: 1210,
+            status: "partialRefund",
+          },
+        },
+      });
+      const { handleCreemWebhook } = await import("./webhook");
+
+      await handleCreemWebhook(payload, "signature");
+
+      expect(mockUpdatePaymentStatus).toHaveBeenCalledWith(
+        "txn_123",
+        "partially_refunded",
+        expect.any(Object),
+      );
+      expect(mockRevokeProductEntitlementByPaymentId).not.toHaveBeenCalled();
+    });
+
+    it("suspends subscription access after a full refund", async () => {
+      mockUpdatePaymentStatus.mockResolvedValue([
+        { subscriptionId: "subscription_123" },
+      ]);
+      const payload = createWebhookPayload({
+        eventType: "refund.created",
+        object: {
+          id: "refund_subscription",
+          status: "succeeded",
+          refund_amount: 1210,
+          transaction: {
+            id: "txn_subscription",
+            amount: 1000,
+            amount_paid: 1210,
+            refunded_amount: 1210,
+            status: "refunded",
+          },
+        },
+      });
+      const { handleCreemWebhook } = await import("./webhook");
+
+      await handleCreemWebhook(payload, "signature");
+
+      expect(mockSuspendSubscriptionAccess).toHaveBeenCalledWith(
+        "subscription_123",
+        expect.any(Date),
+        expect.any(Object),
+      );
+    });
+
+    it("revokes lifetime access when a dispute is created", async () => {
+      mockUpdatePaymentStatus.mockResolvedValue([
+        { subscriptionId: "subscription_123" },
+      ]);
+      const payload = createWebhookPayload({
+        eventType: "dispute.created",
+        object: {
+          id: "dispute_123",
+          amount: 1000,
+          transaction: {
+            id: "txn_123",
+            amount: 1000,
+            status: "chargedBack",
+          },
+        },
+      });
+      const { handleCreemWebhook } = await import("./webhook");
+
+      await handleCreemWebhook(payload, "signature");
+
+      expect(mockUpdatePaymentStatus).toHaveBeenCalledWith(
+        "txn_123",
+        "disputed",
+        expect.any(Object),
+      );
+      expect(mockRevokeProductEntitlementByPaymentId).toHaveBeenCalledWith(
+        "txn_123",
+        "disputed",
+        expect.any(Object),
+      );
+      expect(mockSuspendSubscriptionAccess).toHaveBeenCalledWith(
+        "subscription_123",
+        expect.any(Date),
+        expect.any(Object),
+      );
+    });
+
+    it("retries an adjustment that arrives before its payment", async () => {
+      mockLockPaymentAdjustmentScope.mockRejectedValue(
+        new Error("Payment txn_123 is not available yet"),
+      );
+      const payload = createWebhookPayload({
+        eventType: "dispute.created",
+        object: {
+          id: "dispute_early",
+          amount: 1000,
+          transaction: {
+            id: "txn_123",
+            amount: 1000,
+            status: "chargedBack",
+          },
+        },
+      });
+      const { handleCreemWebhook } = await import("./webhook");
+
+      await expect(handleCreemWebhook(payload, "signature")).rejects.toThrow(
+        "not available yet",
+      );
+      expect(mockUpdatePaymentStatus).not.toHaveBeenCalled();
+      expect(mockRevokeProductEntitlementByPaymentId).not.toHaveBeenCalled();
+    });
+
+    it("does not restore lifetime access from a delayed checkout event", async () => {
+      mockUpsertPayment.mockResolvedValue([{ status: "refunded" }]);
+      const payload = createWebhookPayload({
+        eventType: "checkout.completed",
+        object: {
+          id: "checkout_late",
+          product: "prod_one_time",
+          customer: "cus_123",
+          metadata: {
+            userId: "user1",
+            paymentMode: "one_time",
+            tierId: "tier_pro",
+          },
+          order: {
+            id: "order_late",
+            transaction: "txn_refunded",
+            amount_due: 1210,
+            currency: "usd",
+          },
+        },
+      });
+      const { handleCreemWebhook } = await import("./webhook");
+
+      await handleCreemWebhook(payload, "signature");
+
+      expect(mockGrantProductEntitlement).not.toHaveBeenCalled();
     });
 
     it("should skip already processed events", async () => {
@@ -530,9 +818,6 @@ describe("Creem Webhook Handler", () => {
         handleCreemWebhook(payload, "invalid-signature"),
       ).rejects.toThrow(CreemWebhookSignatureError);
     });
-
-    // Note: Testing webhook secret configuration is complex due to module mocking
-    // and is covered by integration tests
 
     it("should handle signature comparison errors gracefully", async () => {
       mockTimingSafeEqual.mockImplementation(() => {
@@ -723,6 +1008,7 @@ describe("Creem Webhook Handler", () => {
         eventType: "checkout.completed",
         object: {
           id: "checkout_123",
+          product: "prod_one_time",
           customer: "cus_123",
           metadata: {
             userId: "user1",
@@ -795,14 +1081,17 @@ describe("Creem Webhook Handler", () => {
 
   describe("Type guards", () => {
     it("should correctly identify checkout objects", async () => {
-      // We need to test the internal type guards, but they're not exported
-      // So we test indirectly through webhook handling
       const checkoutPayload = createWebhookPayload({
         eventType: "checkout.completed",
         object: {
           id: "checkout_123",
+          product: "prod_one_time",
           customer: "cus_123",
-          metadata: { userId: "user1", paymentMode: "one_time" },
+          metadata: {
+            userId: "user1",
+            paymentMode: "one_time",
+            tierId: "tier_pro",
+          },
           order: {
             id: "order_123",
             transaction: "txn_123",
@@ -920,12 +1209,6 @@ describe("Creem Webhook Handler", () => {
       await expect(
         handleCreemWebhook(payload, "test-signature"),
       ).rejects.toThrow(InvalidWebhookPayloadError);
-    });
-
-    it("should handle missing webhook secret configuration", async () => {
-      // Test that was already covered - this covers lines 73-75
-      // This test demonstrates the webhook secret validation
-      expect(true).toBe(true); // Test already exists in main describe block
     });
 
     it("should handle user not found error in subscription renewal", async () => {

@@ -50,6 +50,34 @@
       "when": 1784859373326,
       "tag": "0006_jittery_mauler",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1784860935162,
+      "tag": "0007_whole_gorilla_man",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1784861315572,
+      "tag": "0008_backfill-product-entitlements",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1784861352951,
+      "tag": "0009_sharp_slipstream",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1784862078084,
+      "tag": "0010_greedy_the_hood",
+      "breakpoints": true
     }
   ]
 }

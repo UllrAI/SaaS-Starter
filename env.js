@@ -24,7 +24,23 @@ const appOriginSchema = z
     return url.origin;
   });
 
+const optionalCredentialSchema = z.preprocess(
+  (value) =>
+    typeof value === "string" && value.trim() === "" ? undefined : value,
+  z
+    .string()
+    .trim()
+    .min(1)
+    .refine((value) => value.toLowerCase() !== "optional", {
+      message:
+        'Remove optional credentials instead of setting them to "optional"',
+    })
+    .optional(),
+);
+
 const env = createEnv({
+  skipValidation: process.env.SKIP_ENV_VALIDATION === "1",
+
   // Server-side environment variables
   server: {
     // Database URL
@@ -43,16 +59,23 @@ const env = createEnv({
     ]),
 
     // Authentication credentials
-    GOOGLE_CLIENT_ID: z.string().optional(),
-    GOOGLE_CLIENT_SECRET: z.string().optional(),
-    GITHUB_CLIENT_ID: z.string().optional(),
-    GITHUB_CLIENT_SECRET: z.string().optional(),
-    LINKEDIN_CLIENT_ID: z.string().optional(),
-    LINKEDIN_CLIENT_SECRET: z.string().optional(),
-    BETTER_AUTH_SECRET: z.string(),
+    GOOGLE_CLIENT_ID: optionalCredentialSchema,
+    GOOGLE_CLIENT_SECRET: optionalCredentialSchema,
+    GITHUB_CLIENT_ID: optionalCredentialSchema,
+    GITHUB_CLIENT_SECRET: optionalCredentialSchema,
+    LINKEDIN_CLIENT_ID: optionalCredentialSchema,
+    LINKEDIN_CLIENT_SECRET: optionalCredentialSchema,
+    BETTER_AUTH_SECRET: z
+      .string()
+      .min(32, "BETTER_AUTH_SECRET must be at least 32 characters")
+      .refine(
+        (value) => value !== "replace-with-at-least-32-random-characters",
+        "BETTER_AUTH_SECRET must not use the example placeholder",
+      ),
 
     // API keys
     RESEND_API_KEY: z.string(),
+    RESEND_EMAIL_FROM: z.string().email(),
 
     // Cloudflare R2 Storage
     R2_ENDPOINT: z.string().url(),
@@ -100,6 +123,7 @@ const env = createEnv({
 
     // API keys
     RESEND_API_KEY: process.env.RESEND_API_KEY,
+    RESEND_EMAIL_FROM: process.env.RESEND_EMAIL_FROM,
 
     // Cloudflare R2 Storage
     R2_ENDPOINT: process.env.R2_ENDPOINT,
@@ -120,5 +144,21 @@ const env = createEnv({
     E2E_TEST_SECRET: process.env.E2E_TEST_SECRET,
   },
 });
+
+if (process.env.SKIP_ENV_VALIDATION !== "1") {
+  const oauthPairs = [
+    ["Google", env.GOOGLE_CLIENT_ID, env.GOOGLE_CLIENT_SECRET],
+    ["GitHub", env.GITHUB_CLIENT_ID, env.GITHUB_CLIENT_SECRET],
+    ["LinkedIn", env.LINKEDIN_CLIENT_ID, env.LINKEDIN_CLIENT_SECRET],
+  ];
+
+  for (const [provider, clientId, clientSecret] of oauthPairs) {
+    if (Boolean(clientId) !== Boolean(clientSecret)) {
+      throw new Error(
+        `${provider} OAuth requires both its client ID and client secret.`,
+      );
+    }
+  }
+}
 
 export default env;

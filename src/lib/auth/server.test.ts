@@ -220,6 +220,41 @@ describe("Auth Server Configuration", () => {
     expect(config.plugins).toHaveLength(2);
   });
 
+  it("should hash magic-link tokens and use the documented TTL", async () => {
+    jest.doMock("@/env", () => mockEnv);
+
+    const { magicLink } = await import("better-auth/plugins");
+    await import("./server");
+
+    expect(magicLink).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        expiresIn: 15 * 60,
+        storeToken: "hashed",
+        sendMagicLink: expect.any(Function),
+      }),
+    );
+  });
+
+  it("should reject disposable email providers on the server", async () => {
+    jest.doMock("@/env", () => mockEnv);
+
+    const { magicLink } = await import("better-auth/plugins");
+    const { sendMagicLink } = await import("@/emails/magic-link");
+    await import("./server");
+    const pluginConfig = (magicLink as jest.Mock).mock.calls.at(-1)?.[0];
+
+    await expect(
+      pluginConfig.sendMagicLink(
+        {
+          email: "person@mailinator.com",
+          url: "http://localhost:3000/magic-link",
+        },
+        {},
+      ),
+    ).rejects.toThrow("This email provider is not allowed.");
+    expect(sendMagicLink).not.toHaveBeenCalled();
+  });
+
   it("should configure magicLink plugin with development console logging", async () => {
     // Set NODE_ENV to development to test the dev console.log path
     const originalNodeEnv = process.env.NODE_ENV;

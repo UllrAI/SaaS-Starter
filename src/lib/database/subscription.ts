@@ -3,10 +3,11 @@ import * as schema from "@/database/schema";
 import {
   subscriptions,
   payments,
+  productEntitlements,
   users,
   webhookEvents,
 } from "@/database/tables";
-import { eq, desc, sql } from "drizzle-orm"; // Added desc for descending order
+import { and, desc, eq, isNull, sql } from "drizzle-orm";
 import type { PgTransaction } from "drizzle-orm/pg-core";
 import type { PostgresJsQueryResultHKT } from "drizzle-orm/postgres-js";
 import type { Subscription, SubscriptionStatus } from "@/types/billing";
@@ -46,6 +47,12 @@ interface UpsertPaymentData {
   paymentType: string;
 }
 
+interface GrantProductEntitlementData {
+  userId: string;
+  productId: string;
+  sourcePaymentId: string;
+}
+
 const getDb = (tx?: Tx) => tx || db;
 
 export async function upsertSubscription(
@@ -78,17 +85,286 @@ export async function upsertPayment(data: UpsertPaymentData, tx?: Tx) {
   const dbase = getDb(tx);
   const now = new Date();
 
-  return dbase
+  const rows = await dbase
     .insert(payments)
     .values({ ...data, updatedAt: now })
     .onConflictDoUpdate({
       target: payments.paymentId,
       set: {
-        status: data.status,
+        status: sql`case
+          when ${payments.status} in ('partially_refunded', 'refunded', 'disputed')
+            then ${payments.status}
+          else ${data.status}
+        end`,
         updatedAt: now,
       },
     })
     .returning();
+
+  const payment = rows[0];
+  if (
+    !payment ||
+    payment.userId !== data.userId ||
+    payment.customerId !== data.customerId ||
+    payment.productId !== data.productId ||
+    payment.paymentType !== data.paymentType ||
+    payment.subscriptionId !== (data.subscriptionId ?? null)
+  ) {
+    throw new Error(
+      `Payment ${data.paymentId} conflicts with an existing payment owner or product.`,
+    );
+  }
+
+  return rows;
+}
+
+export async function suspendSubscriptionAccess(
+  subscriptionId: string,
+  eventCreatedAt: Date,
+  tx?: Tx,
+) {
+  const dbase = getDb(tx);
+  const applySuspension = () =>
+    dbase
+      .update(subscriptions)
+      .set({
+        status: "unpaid",
+        lastWebhookCreatedAt: eventCreatedAt,
+        updatedAt: new Date(),
+      })
+      .where(
+        and(
+          eq(subscriptions.subscriptionId, subscriptionId),
+          sql`${subscriptions.lastWebhookCreatedAt} is null or ${subscriptions.lastWebhookCreatedAt} <= ${eventCreatedAt}`,
+        ),
+      )
+      .returning();
+  let rows = await applySuspension();
+
+  if (rows.length === 0) {
+    const [existingSubscription] = await dbase
+      .select({
+        id: subscriptions.id,
+        lastWebhookCreatedAt: subscriptions.lastWebhookCreatedAt,
+      })
+      .from(subscriptions)
+      .where(eq(subscriptions.subscriptionId, subscriptionId))
+      .limit(1);
+
+    if (!existingSubscription) {
+      throw new Error(
+        `Subscription ${subscriptionId} is not available for a billing adjustment yet.`,
+      );
+    }
+
+    if (
+      !existingSubscription.lastWebhookCreatedAt ||
+      existingSubscription.lastWebhookCreatedAt <= eventCreatedAt
+    ) {
+      rows = await applySuspension();
+      if (rows.length === 0) {
+        throw new Error(
+          `Subscription ${subscriptionId} changed during its billing adjustment.`,
+        );
+      }
+    }
+  }
+
+  return rows;
+}
+
+export async function grantProductEntitlement(
+  data: GrantProductEntitlementData,
+  tx?: Tx,
+) {
+  return getDb(tx)
+    .insert(productEntitlements)
+    .values(data)
+    .onConflictDoUpdate({
+      target: [productEntitlements.userId, productEntitlements.productId],
+      set: {
+        sourcePaymentId: data.sourcePaymentId,
+        revokedAt: null,
+        revocationReason: null,
+      },
+    })
+    .returning();
+}
+
+export async function revokeProductEntitlementByPaymentId(
+  sourcePaymentId: string,
+  reason: "refunded" | "disputed",
+  tx?: Tx,
+) {
+  const dbase = getDb(tx);
+  const revokedRows = await dbase
+    .update(productEntitlements)
+    .set({
+      revokedAt: new Date(),
+      revocationReason: reason,
+    })
+    .where(
+      and(
+        eq(productEntitlements.sourcePaymentId, sourcePaymentId),
+        isNull(productEntitlements.revokedAt),
+      ),
+    )
+    .returning({
+      id: productEntitlements.id,
+      userId: productEntitlements.userId,
+      productId: productEntitlements.productId,
+    });
+
+  for (const entitlement of revokedRows) {
+    const [fallbackPayment] = await dbase
+      .select({ paymentId: payments.paymentId })
+      .from(payments)
+      .where(
+        and(
+          eq(payments.userId, entitlement.userId),
+          eq(payments.productId, entitlement.productId),
+          eq(payments.paymentType, "one_time"),
+          eq(payments.status, "succeeded"),
+        ),
+      )
+      .orderBy(desc(payments.createdAt))
+      .limit(1);
+
+    if (fallbackPayment) {
+      await dbase
+        .update(productEntitlements)
+        .set({
+          sourcePaymentId: fallbackPayment.paymentId,
+          revokedAt: null,
+          revocationReason: null,
+        })
+        .where(eq(productEntitlements.id, entitlement.id));
+    }
+  }
+
+  return revokedRows;
+}
+
+export async function updatePaymentStatus(
+  paymentId: string,
+  status: "partially_refunded" | "refunded" | "disputed",
+  tx?: Tx,
+) {
+  const rows = await getDb(tx)
+    .update(payments)
+    .set({
+      status: sql`case
+        when ${payments.status} = 'disputed' then ${payments.status}
+        when ${payments.status} = 'refunded' and ${status} = 'partially_refunded'
+          then ${payments.status}
+        else ${status}
+      end`,
+      updatedAt: new Date(),
+    })
+    .where(eq(payments.paymentId, paymentId))
+    .returning();
+
+  if (rows.length === 0) {
+    throw new Error(
+      `Payment ${paymentId} is not available for a billing adjustment yet.`,
+    );
+  }
+
+  return rows;
+}
+
+export async function lockPaymentAdjustmentScope(paymentId: string, tx: Tx) {
+  const [payment] = await tx
+    .select({
+      userId: payments.userId,
+      productId: payments.productId,
+    })
+    .from(payments)
+    .where(eq(payments.paymentId, paymentId))
+    .limit(1);
+
+  if (!payment) {
+    throw new Error(
+      `Payment ${paymentId} is not available for a billing adjustment yet.`,
+    );
+  }
+
+  await lockBillingProductScope(payment.userId, payment.productId, tx);
+
+  const [lockedPayment] = await tx
+    .select({ id: payments.id })
+    .from(payments)
+    .where(eq(payments.paymentId, paymentId))
+    .for("update");
+
+  if (!lockedPayment) {
+    throw new Error(
+      `Payment ${paymentId} is not available for a billing adjustment yet.`,
+    );
+  }
+}
+
+export async function lockBillingProductScope(
+  userId: string,
+  productId: string,
+  tx: Tx,
+) {
+  const lockKey = `${userId.length}:${userId}:${productId}`;
+  await tx.execute(
+    sql`select pg_advisory_xact_lock(hashtextextended(${lockKey}, 0))`,
+  );
+}
+
+export async function hasUserProductEntitlement(
+  userId: string,
+  productId: string,
+): Promise<boolean> {
+  const [entitlement] = await db
+    .select({ id: productEntitlements.id })
+    .from(productEntitlements)
+    .where(
+      and(
+        eq(productEntitlements.userId, userId),
+        eq(productEntitlements.productId, productId),
+        isNull(productEntitlements.revokedAt),
+      ),
+    )
+    .limit(1);
+
+  return Boolean(entitlement);
+}
+
+export async function getUserProductEntitlement(
+  userId: string,
+): Promise<typeof productEntitlements.$inferSelect | null> {
+  const rows = await db
+    .select()
+    .from(productEntitlements)
+    .where(
+      and(
+        eq(productEntitlements.userId, userId),
+        isNull(productEntitlements.revokedAt),
+      ),
+    );
+
+  return (
+    rows
+      .map((row) => ({
+        row,
+        tier: getProductTierById(row.productId),
+      }))
+      .filter(
+        (
+          item,
+        ): item is typeof item & {
+          tier: NonNullable<typeof item.tier>;
+        } => Boolean(item.tier),
+      )
+      .sort(
+        (left, right) => right.tier.prices.oneTime - left.tier.prices.oneTime,
+      )
+      .at(0)?.row ?? null
+  );
 }
 
 export async function findUserByCustomerId(customerId: string, tx?: Tx) {

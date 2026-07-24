@@ -9,6 +9,7 @@ import {
   uniqueIndex,
   pgEnum,
   primaryKey,
+  foreignKey,
 } from "drizzle-orm/pg-core";
 
 export const userRoleEnum = pgEnum("user_role", [
@@ -240,8 +241,43 @@ export const payments = pgTable(
         table.userId,
         table.createdAt.desc(),
       ),
+      paymentOwnerProductUnique: uniqueIndex(
+        "payments_paymentId_userId_productId_unique",
+      ).on(table.paymentId, table.userId, table.productId),
     };
   },
+);
+
+export const productEntitlements = pgTable(
+  "product_entitlements",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    productId: text("productId").notNull(),
+    sourcePaymentId: text("sourcePaymentId").notNull(),
+    revokedAt: timestamp("revokedAt"),
+    revocationReason: text("revocationReason"),
+    createdAt: timestamp("createdAt").notNull().defaultNow(),
+  },
+  (table) => ({
+    userProductUnique: uniqueIndex(
+      "product_entitlements_userId_productId_unique",
+    ).on(table.userId, table.productId),
+    sourcePaymentUnique: uniqueIndex(
+      "product_entitlements_sourcePaymentId_unique",
+    ).on(table.sourcePaymentId),
+    userCreatedAtIdx: index("product_entitlements_userId_createdAt_idx").on(
+      table.userId,
+      table.createdAt.desc(),
+    ),
+    paymentOwnerProductFk: foreignKey({
+      columns: [table.sourcePaymentId, table.userId, table.productId],
+      foreignColumns: [payments.paymentId, payments.userId, payments.productId],
+      name: "product_entitlements_payment_owner_product_fk",
+    }),
+  }),
 );
 
 // Webhook events table to ensure idempotency

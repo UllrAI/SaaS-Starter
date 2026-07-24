@@ -74,8 +74,6 @@ export async function authorizeDeviceCode(
   userCode: string,
   userId: string,
 ): Promise<{ success: boolean; error?: string }> {
-  const now = new Date();
-
   const [attemptUpdate] = await db
     .update(deviceCodes)
     .set({
@@ -85,19 +83,15 @@ export async function authorizeDeviceCode(
       and(
         eq(deviceCodes.userCode, userCode),
         eq(deviceCodes.status, "pending"),
+        sql`${deviceCodes.expiresAt} > now()`,
       ),
     )
     .returning({
       attempts: deviceCodes.attempts,
-      expiresAt: deviceCodes.expiresAt,
     });
 
   if (!attemptUpdate) {
     return { success: false, error: "Invalid or expired code." };
-  }
-
-  if (attemptUpdate.expiresAt < now) {
-    return { success: false, error: "Code has expired." };
   }
 
   if (attemptUpdate.attempts > DEVICE_CODE_MAX_ATTEMPTS) {
@@ -124,6 +118,7 @@ export async function authorizeDeviceCode(
       and(
         eq(deviceCodes.userCode, userCode),
         eq(deviceCodes.status, "pending"),
+        sql`${deviceCodes.expiresAt} > now()`,
       ),
     )
     .returning({ id: deviceCodes.id });
@@ -211,43 +206,54 @@ export async function pollDeviceCode(
     };
   }
 
-  const [usedRow] = await db
-    .update(deviceCodes)
-    .set({
-      status: "used",
-    })
-    .where(
-      and(eq(deviceCodes.id, row.id), eq(deviceCodes.status, "authorized")),
-    )
-    .returning({ id: deviceCodes.id });
-
-  if (!usedRow) {
-    return {
-      type: "pending",
-      data: {
-        status: "authorization_pending",
-      },
-    };
-  }
-
   const tokenName = [row.deviceHostname, row.clientName]
     .filter(Boolean)
     .join(" - ");
-  const token = await createCliToken({
-    userId: row.userId,
-    name: tokenName || "CLI Device",
-    deviceOs: row.deviceOs ?? row.clientName ?? undefined,
-    deviceHostname: row.deviceHostname ?? undefined,
-    cliVersion: row.clientVersion ?? undefined,
-  });
+  const userId = row.userId;
 
-  return {
-    type: "token",
-    data: {
-      accessToken: token.accessToken,
-      refreshToken: token.refreshToken,
-      tokenType: "bearer",
-      expiresIn: token.expiresIn,
-    },
-  };
+  return db.transaction(async (tx) => {
+    const [usedRow] = await tx
+      .update(deviceCodes)
+      .set({
+        status: "used",
+      })
+      .where(
+        and(
+          eq(deviceCodes.id, row.id),
+          eq(deviceCodes.status, "authorized"),
+          sql`${deviceCodes.expiresAt} > now()`,
+        ),
+      )
+      .returning({ id: deviceCodes.id });
+
+    if (!usedRow) {
+      return {
+        type: "pending" as const,
+        data: {
+          status: "authorization_pending" as const,
+        },
+      };
+    }
+
+    const token = await createCliToken(
+      {
+        userId,
+        name: tokenName || "CLI Device",
+        deviceOs: row.deviceOs ?? row.clientName ?? undefined,
+        deviceHostname: row.deviceHostname ?? undefined,
+        cliVersion: row.clientVersion ?? undefined,
+      },
+      tx,
+    );
+
+    return {
+      type: "token" as const,
+      data: {
+        accessToken: token.accessToken,
+        refreshToken: token.refreshToken,
+        tokenType: "bearer" as const,
+        expiresIn: token.expiresIn,
+      },
+    };
+  });
 }

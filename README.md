@@ -438,7 +438,9 @@ repository also includes a standalone multi-stage Docker build.
    service.
 2. Configure every required variable from `.env.example`. Set
    `NEXT_PUBLIC_APP_URL` to the final HTTPS origin before building because
-   canonical URLs and client configuration are compiled from it.
+   canonical URLs and client configuration are compiled from it. Set
+   `R2_PUBLIC_URL` before building so Next.js includes the storage hostname in
+   its image optimization allowlist.
 3. Run `pnpm db:migrate` once as a dedicated release command against the
    production `DATABASE_URL`. Do not attach migrations to every web process
    startup.

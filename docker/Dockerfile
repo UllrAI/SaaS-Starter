@@ -21,12 +21,16 @@ COPY . .
 
 # Set environment to production for build
 ARG NEXT_PUBLIC_APP_URL
+ARG R2_PUBLIC_URL
 ENV NODE_ENV=production
 ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
+ENV R2_PUBLIC_URL=$R2_PUBLIC_URL
 ENV SKIP_ENV_VALIDATION=1
 
 # Build the Next.js application
-RUN test -n "$NEXT_PUBLIC_APP_URL" && pnpm run build
+RUN test -n "$NEXT_PUBLIC_APP_URL" \
+  && test -n "$R2_PUBLIC_URL" \
+  && pnpm run build
 
 # One-shot database migration image. It intentionally contains development
 # dependencies and source files, but is never used to serve application traffic.
@@ -40,6 +44,9 @@ CMD ["pnpm", "db:migrate"]
 # Production image
 FROM node:22-alpine AS runner
 WORKDIR /app
+
+LABEL "language"="nodejs"
+LABEL "framework"="next.js"
 
 ENV NODE_ENV=production
 

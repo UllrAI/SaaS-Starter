@@ -36,6 +36,8 @@ Routine formatting and test-only maintenance are omitted.
   deployment configuration.
 - Tightened Node, CI, Docker, database configuration, dependency, lint, and
   formatting contracts.
+- Configured Zeabur to use the existing multi-stage standalone Dockerfile
+  instead of packaging the full Node.js build environment into the Web image.
 - Updated English and Chinese project documentation and added Zeabur release
   guidance.
 

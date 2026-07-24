@@ -3,6 +3,15 @@
 This repository's production reference deployment uses a Git-backed Zeabur
 service and PostgreSQL.
 
+Zeabur is configured through `zbpack.json` to build `docker/Dockerfile`. Keep
+that file in place: the multi-stage image serves only the prepared Next.js
+standalone output instead of shipping the build toolchain and development
+dependencies in the Web runtime.
+
+Both `NEXT_PUBLIC_APP_URL` and `R2_PUBLIC_URL` are required build arguments.
+Zeabur injects their service-variable values into the multi-stage Docker build;
+the build fails closed when either value is missing.
+
 ## Release order
 
 1. Merge only a reviewed commit with green CI.

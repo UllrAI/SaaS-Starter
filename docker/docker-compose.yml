@@ -41,6 +41,7 @@ services:
       dockerfile: docker/Dockerfile
       args:
         NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:?Set NEXT_PUBLIC_APP_URL to the public deployment origin}
+        R2_PUBLIC_URL: ${R2_PUBLIC_URL:?Set R2_PUBLIC_URL to the public R2 origin}
     restart: unless-stopped
     ports:
       - "127.0.0.1:3000:3000"

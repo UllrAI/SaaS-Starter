@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/lib/i18n/translation/client";
 import { useState, ReactNode, useTransition, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -25,7 +26,6 @@ import {
 } from "@/lib/actions/admin";
 import Image from "next/image";
 import { useIntlLocale } from "@/hooks/use-intl-locale";
-
 interface Upload {
   id: string;
   userId: string;
@@ -42,7 +42,6 @@ interface Upload {
     image?: string | null;
   };
 }
-
 interface UploadManagementTableProps {
   initialData: Upload[];
   initialPagination: {
@@ -52,11 +51,11 @@ interface UploadManagementTableProps {
     totalPages: number;
   };
 }
-
 export function UploadManagementTable({
   initialData,
   initialPagination,
 }: UploadManagementTableProps) {
+  const { t } = useTranslation();
   const intlLocale = useIntlLocale();
   const [isPending, startTransition] = useTransition();
   const [selectedUpload, setSelectedUpload] = useState<Upload | null>(null);
@@ -67,7 +66,6 @@ export function UploadManagementTable({
   );
   const [isBatchDeleteConfirmOpen, setIsBatchDeleteConfirmOpen] =
     useState(false);
-
   const queryUploads = useCallback(
     async ({
       page,
@@ -79,10 +77,15 @@ export function UploadManagementTable({
       limit: number;
       search?: string;
       filter?: string;
-    }) => getUploads({ page, limit, search, fileType: filter }),
+    }) =>
+      getUploads({
+        page,
+        limit,
+        search,
+        fileType: filter,
+      }),
     [],
   );
-
   const {
     data: uploads,
     loading,
@@ -99,11 +102,12 @@ export function UploadManagementTable({
     initialData,
     initialPagination,
   });
-
   const confirmDeleteUpload = async () => {
     if (!uploadToDelete) return;
     startTransition(async () => {
-      const result = await deleteUploadAction({ uploadId: uploadToDelete.id });
+      const result = await deleteUploadAction({
+        uploadId: uploadToDelete.id,
+      });
       if (result.data) {
         toast.success(result.data.message);
         setUploadToDelete(null);
@@ -113,14 +117,12 @@ export function UploadManagementTable({
       }
     });
   };
-
   const handleBatchDelete = async () => {
     if (selectedUploads.size === 0) return;
     startTransition(async () => {
       const result = await batchDeleteUploadsAction({
         uploadIds: Array.from(selectedUploads),
       });
-
       if (result.data) {
         toast.success(result.data.message);
         setSelectedUploads(new Set());
@@ -131,7 +133,6 @@ export function UploadManagementTable({
       }
     });
   };
-
   const handleSelectUpload = (uploadId: string, checked: boolean) => {
     setSelectedUploads((prev) => {
       const newSelected = new Set(prev);
@@ -140,17 +141,14 @@ export function UploadManagementTable({
       return newSelected;
     });
   };
-
   const handleSelectAll = (checked: boolean) => {
     if (checked) setSelectedUploads(new Set(uploads.map((u) => u.id)));
     else setSelectedUploads(new Set());
   };
-
   const isAllSelected =
     uploads.length > 0 && selectedUploads.size === uploads.length;
   const isPartiallySelected =
     selectedUploads.size > 0 && selectedUploads.size < uploads.length;
-
   const columns: Array<{
     key: string;
     label: ReactNode;
@@ -175,7 +173,7 @@ export function UploadManagementTable({
     },
     {
       key: "user",
-      label: <>User</>,
+      label: <>{t("514431f55c7e", "User")}</>,
       render: (upload) => (
         <UserAvatarCell
           name={upload.user.name}
@@ -186,7 +184,7 @@ export function UploadManagementTable({
     },
     {
       key: "fileName",
-      label: <>File</>,
+      label: <>{t("5e145188557e", "File")}</>,
       render: (upload) => (
         <div>
           <p className="max-w-xs truncate font-medium">{upload.fileName}</p>
@@ -198,7 +196,7 @@ export function UploadManagementTable({
     },
     {
       key: "createdAt",
-      label: <>Uploaded</>,
+      label: <>{t("ffde76f4a727", "Uploaded")}</>,
       render: (upload) => (
         <p className="text-sm">
           {new Date(upload.createdAt).toLocaleDateString(intlLocale)}
@@ -207,7 +205,7 @@ export function UploadManagementTable({
     },
     {
       key: "actions",
-      label: <>Actions</>,
+      label: <>{t("9f137695ba61", "Actions")}</>,
       render: (upload) => (
         <div className="flex items-center space-x-1">
           <Button
@@ -237,24 +235,48 @@ export function UploadManagementTable({
       ),
     },
   ];
-
   const filterOptions = [
-    { value: "all", label: <>All Types</> },
-    { value: "image", label: <>Images</> },
-    { value: "video", label: <>Videos</> },
-    { value: "audio", label: <>Audio</> },
-    { value: "pdf", label: <>PDF</> },
-    { value: "text", label: <>Text</> },
-    { value: "archive", label: <>Archives</> },
-    { value: "other", label: <>Other</> },
+    {
+      value: "all",
+      label: <>{t("6c87d07fa3ba", "All Types")}</>,
+    },
+    {
+      value: "image",
+      label: <>{t("00e0b9a5b021", "Images")}</>,
+    },
+    {
+      value: "video",
+      label: <>{t("691a4d62d303", "Videos")}</>,
+    },
+    {
+      value: "audio",
+      label: <>{t("be426db45a24", "Audio")}</>,
+    },
+    {
+      value: "pdf",
+      label: <>{t("90d98b7d948c", "PDF")}</>,
+    },
+    {
+      value: "text",
+      label: <>{t("7b1868906fb0", "Text")}</>,
+    },
+    {
+      value: "archive",
+      label: <>{t("5a216d466d5c", "Archives")}</>,
+    },
+    {
+      value: "other",
+      label: <>{t("951452e15e4f", "Other")}</>,
+    },
   ];
-
   return (
     <>
       {selectedUploads.size > 0 && (
         <div className="bg-muted/50 mb-4 flex items-center justify-between rounded-lg border p-3">
           <span className="text-sm font-medium">
-            {selectedUploads.size} selected
+            {t("730c99a71ece", "{expression0} selected", {
+              expression0: selectedUploads.size,
+            })}
           </span>
           <Button
             variant="destructive"
@@ -262,12 +284,14 @@ export function UploadManagementTable({
             onClick={() => setIsBatchDeleteConfirmOpen(true)}
             disabled={isPending}
           >
-            {isPending && selectedUploads.size > 1 ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <Trash2 className="mr-2 h-4 w-4" />
-            )}
-            Delete Selected
+            {t("1e3fefabd96e", "{expression0} Delete Selected", {
+              expression0:
+                isPending && selectedUploads.size > 1 ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Trash2 className="mr-2 h-4 w-4" />
+                ),
+            })}
           </Button>
         </div>
       )}
@@ -281,18 +305,20 @@ export function UploadManagementTable({
         filterValue={fileTypeFilter}
         onFilterChange={handleFileTypeFilter}
         filterOptions={filterOptions}
-        filterPlaceholder={<>Filter by type</>}
+        filterPlaceholder={<>{t("829e33769ac3", "Filter by type")}</>}
         pagination={pagination}
         onPageChange={setCurrentPage}
-        searchPlaceholder={<>Search by filename, user email...</>}
-        emptyMessage={<>No uploads found</>}
+        searchPlaceholder={
+          <>{t("990e229fe2fd", "Search by filename, user email...")}</>
+        }
+        emptyMessage={<>{t("520c81e71e76", "No uploads found")}</>}
       />
 
       {/* View Details Dialog */}
       <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Upload Details</DialogTitle>
+            <DialogTitle>{t("a9e49ca89ebf", "Upload Details")}</DialogTitle>
           </DialogHeader>
           {selectedUpload && (
             <div className="space-y-4 py-4">
@@ -306,13 +332,13 @@ export function UploadManagementTable({
                 />
               )}
               <div className="grid grid-cols-2 gap-x-4 gap-y-2">
-                <Label>File Name</Label>
+                <Label>{t("2fef1a146020", "File Name")}</Label>
                 <p className="truncate text-sm">{selectedUpload.fileName}</p>
-                <Label>Size</Label>
+                <Label>{t("444237d85d03", "Size")}</Label>
                 <p className="text-sm">
                   {formatFileSize(selectedUpload.fileSize)}
                 </p>
-                <Label>User</Label>
+                <Label>{t("514431f55c7e", "User")}</Label>
                 <p className="truncate text-sm">{selectedUpload.user.email}</p>
               </div>
             </div>
@@ -327,13 +353,17 @@ export function UploadManagementTable({
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Confirm Deletion</DialogTitle>
+            <DialogTitle>{t("c1bf9d481601", "Confirm Deletion")}</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete this file? This action is
-              irreversible.
+              {t(
+                "df49d0b41a73",
+                "Are you sure you want to delete this file? This action is irreversible.",
+              )}
             </DialogDescription>
             <div className="bg-muted mt-2 rounded border p-2">
-              <p className="text-muted-foreground mb-1 text-sm">File name:</p>
+              <p className="text-muted-foreground mb-1 text-sm">
+                {t("15ae218f669b", "File name:")}
+              </p>
               <p className="text-sm font-medium break-all">
                 {uploadToDelete?.fileName}
               </p>
@@ -345,15 +375,18 @@ export function UploadManagementTable({
               onClick={() => setUploadToDelete(null)}
               disabled={isPending}
             >
-              Cancel
+              {t("27b708e1a958", "Cancel")}
             </Button>
             <Button
               variant="destructive"
               onClick={confirmDeleteUpload}
               disabled={isPending}
             >
-              {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Delete
+              {t("800ae00d147c", "{expression0} Delete", {
+                expression0: isPending && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ),
+              })}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -366,10 +399,17 @@ export function UploadManagementTable({
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Confirm Batch Deletion</DialogTitle>
+            <DialogTitle>
+              {t("6f5d43ea59d1", "Confirm Batch Deletion")}
+            </DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete {selectedUploads.size} selected
-              file(s)? This action is irreversible.
+              {t(
+                "d7f7af03fb5c",
+                "Are you sure you want to delete {expression0} selected file(s)? This action is irreversible.",
+                {
+                  expression0: selectedUploads.size,
+                },
+              )}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -378,15 +418,18 @@ export function UploadManagementTable({
               onClick={() => setIsBatchDeleteConfirmOpen(false)}
               disabled={isPending}
             >
-              Cancel
+              {t("27b708e1a958", "Cancel")}
             </Button>
             <Button
               variant="destructive"
               onClick={handleBatchDelete}
               disabled={isPending}
             >
-              {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Delete
+              {t("800ae00d147c", "{expression0} Delete", {
+                expression0: isPending && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ),
+              })}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -11,22 +11,9 @@ import {
 } from "@/lib/config/i18n-routing";
 import type { SupportedLocale } from "@/lib/config/i18n";
 import { resolveIntlLocale } from "@/lib/locale";
+import { getServerTranslations } from "@/lib/i18n/translation/server";
 import {
-  MagicLinkEmailCta,
-  MagicLinkEmailDeviceDetailsTitle,
-  MagicLinkEmailDeviceLine,
-  MagicLinkEmailFallback,
-  MagicLinkEmailFooter,
-  MagicLinkEmailGreeting,
-  MagicLinkEmailHeading,
   type MagicLinkEmailCopy,
-  MagicLinkEmailSubject,
-  MagicLinkEmailPreview,
-  MagicLinkEmailIntro,
-  MagicLinkEmailLocationLine,
-  MagicLinkEmailRequestDetails,
-  MagicLinkEmailSecurityReminder,
-  MagicLinkEmailSentToLabel,
   type MagicLinkEmailDeviceInfo,
   renderMagicLinkEmail,
 } from "@/emails/magic-link-email";
@@ -146,77 +133,81 @@ async function createMagicLinkEmailCopy({
   currentYear,
   formattedDate,
   deviceInfo,
+  locale,
 }: {
   appName: string;
   companyName: string;
   currentYear: number;
   formattedDate: string;
   deviceInfo?: DeviceInfo;
+  locale: SupportedLocale;
 }): Promise<MagicLinkEmailCopy> {
-  const [
-    preview,
-    heading,
-    intro,
-    greeting,
-    requestDetails,
-    cta,
-    securityReminder,
-    fallback,
-    sentToLabel,
-    footer,
-    deviceDetailsTitle,
-    deviceLine,
-    locationLine,
-  ] = await Promise.all([
-    resolveText(MagicLinkEmailPreview({ appName })),
-    resolveText(MagicLinkEmailHeading()),
-    resolveText(MagicLinkEmailIntro()),
-    resolveText(MagicLinkEmailGreeting()),
-    resolveText(MagicLinkEmailRequestDetails({ appName })),
-    resolveText(MagicLinkEmailCta()),
-    resolveText(MagicLinkEmailSecurityReminder()),
-    resolveText(MagicLinkEmailFallback()),
-    resolveText(MagicLinkEmailSentToLabel()),
-    resolveText(
-      MagicLinkEmailFooter({
+  const { t } = await getServerTranslations({ locale });
+
+  const preview = await resolveText(
+    t(
+      "80b889e83a0f",
+      "Click the secure button below to complete your sign-in process. Your secure sign-in link for {appName}",
+      { appName },
+    ),
+  );
+  const requestDetails = await resolveText(
+    t(
+      "414469cce093",
+      "We received a request to sign in to your {appName} account. Select the button below to continue.",
+      { appName },
+    ),
+  );
+  const footer = await resolveText(
+    t(
+      "c99d7d8ebb54",
+      "© {currentYear}{appName}, {companyName}. All rights reserved. | {formattedDate}",
+      {
         currentYear,
         appName,
         companyName,
         formattedDate,
-      }),
+      },
     ),
-    deviceInfo?.browser || deviceInfo?.location
-      ? resolveText(MagicLinkEmailDeviceDetailsTitle())
-      : Promise.resolve(""),
+  );
+  const deviceLine =
     deviceInfo?.browser && deviceInfo.os
-      ? resolveText(
-          MagicLinkEmailDeviceLine({
+      ? await resolveText(
+          t("5b8ceb90d76a", "Device: {browser} on {os}", {
             browser: deviceInfo.browser,
             os: deviceInfo.os,
           }),
         )
-      : Promise.resolve(""),
-    deviceInfo?.location
-      ? resolveText(
-          MagicLinkEmailLocationLine({
-            location: deviceInfo.location,
-          }),
-        )
-      : Promise.resolve(""),
-  ]);
+      : "";
+  const locationLine = deviceInfo?.location
+    ? await resolveText(
+        t("78a42b99e1c7", "Location: {location} (approximate)", {
+          location: deviceInfo.location,
+        }),
+      )
+    : "";
 
   return {
     preview,
-    heading,
-    intro,
-    greeting,
+    heading: t("e0193ab6916d", "Access your account securely"),
+    intro: t("580361ef9c77", "Use the link below to finish signing in."),
+    greeting: t("c1e7f10203d5", "Hello,"),
     requestDetails,
-    cta,
-    securityReminder,
-    fallback,
-    sentToLabel,
+    cta: t("41a27364d337", "Open sign-in link"),
+    securityReminder: t(
+      "5b8eb59cbe7a",
+      "Security reminder: This link expires in 15 minutes. If you did not request it, you can safely ignore this message.",
+    ),
+    fallback: t(
+      "79f9112819d8",
+      "If the button doesn't work, you can copy and paste this link into your browser:",
+    ),
+    sentToLabel: t("47e283e92be3", "Sent to"),
     footer,
-    deviceDetailsTitle: deviceDetailsTitle || undefined,
+    deviceDetailsTitle:
+      deviceInfo?.browser || deviceInfo?.location
+        ? t("eef4d90780f4", "Sign-in request details")
+        : undefined,
     deviceLine: deviceLine || undefined,
     locationLine: locationLine || undefined,
   };
@@ -237,16 +228,22 @@ export async function sendMagicLink(
   const deviceInfo = request ? parseDeviceInfo(request) : undefined;
 
   try {
-    const [subject, copy] = await Promise.all([
-      resolveText(MagicLinkEmailSubject({ appName: APP_NAME })),
+    const [{ t }, copy] = await Promise.all([
+      getServerTranslations({ locale }),
       createMagicLinkEmailCopy({
         appName: APP_NAME,
         companyName: COMPANY_NAME,
         currentYear: now.getFullYear(),
         formattedDate,
         deviceInfo,
+        locale,
       }),
     ]);
+    const subject = await resolveText(
+      t("7f6896e52a0f", "Your secure sign-in link for {appName}", {
+        appName: APP_NAME,
+      }),
+    );
 
     const body = await renderMagicLinkEmail({
       copy,

@@ -1,3 +1,4 @@
+import { getServerTranslations } from "@/lib/i18n/translation/server";
 import { requireAdmin } from "@/lib/auth/permissions";
 import {
   Card,
@@ -13,35 +14,39 @@ import { SubscriptionManagementTable } from "./_components/subscription-manageme
 import { StatsCardsSkeleton } from "../_components/stats-cards-skeleton";
 import { getSubscriptions } from "@/lib/actions/admin";
 import { createMetadataDefaults } from "@/lib/metadata";
-
 export async function generateMetadata() {
+  const { t } = await getServerTranslations();
   const metadata = createMetadataDefaults();
-
   return {
     ...metadata,
-    title: "Subscription Management",
-    description: "Monitor and manage all user subscriptions",
+    title: t("c844cc919bcd", "Subscription Management"),
+    description: t("a8c659f66456", "Monitor and manage all user subscriptions"),
     openGraph: {
       ...metadata.openGraph,
-      title: "Subscription Management",
-      description: "Monitor and manage all user subscriptions",
+      title: t("e8c1fbee141d", "Subscription Management"),
+      description: t(
+        "04705fda0cbf",
+        "Monitor and manage all user subscriptions",
+      ),
     },
     twitter: {
       ...metadata.twitter,
-      title: "Subscription Management",
-      description: "Monitor and manage all user subscriptions",
+      title: t("feac3ec25b7a", "Subscription Management"),
+      description: t(
+        "25d0e638c25c",
+        "Monitor and manage all user subscriptions",
+      ),
     },
   };
 }
-
 export default async function SubscriptionsPage() {
+  const { t } = await getServerTranslations();
   await requireAdmin();
   const initialTableData = await getSubscriptions({});
-
   return (
     <DashboardPageWrapper
-      title={<>Subscription Management</>}
-      parentTitle={<>Admin Dashboard</>}
+      title={<>{t("1282ce5222ea", "Subscription Management")}</>}
+      parentTitle={<>{t("04698bc5e784", "Admin Dashboard")}</>}
       parentUrl="/dashboard/admin"
     >
       <Suspense fallback={<StatsCardsSkeleton />}>
@@ -50,8 +55,10 @@ export default async function SubscriptionsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>All Subscriptions</CardTitle>
-          <CardDescription>View and manage user subscriptions</CardDescription>
+          <CardTitle>{t("871178931506", "All Subscriptions")}</CardTitle>
+          <CardDescription>
+            {t("d8d425f405d7", "View and manage user subscriptions")}
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <SubscriptionManagementTable

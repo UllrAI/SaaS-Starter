@@ -12,7 +12,6 @@ import {
   Text,
 } from "@react-email/components";
 import { render } from "@react-email/render";
-
 export interface MagicLinkEmailDeviceInfo {
   browser?: string;
   os?: string;
@@ -20,7 +19,6 @@ export interface MagicLinkEmailDeviceInfo {
   location?: string;
   ip?: string;
 }
-
 export interface MagicLinkEmailCopy {
   preview: string;
   heading: string;
@@ -36,7 +34,6 @@ export interface MagicLinkEmailCopy {
   deviceLine?: string;
   locationLine?: string;
 }
-
 export interface MagicLinkEmailTemplateProps {
   copy: MagicLinkEmailCopy;
   email: string;
@@ -44,7 +41,6 @@ export interface MagicLinkEmailTemplateProps {
   appName: string;
   locale: string;
 }
-
 const theme = {
   background: "#fbfcfd",
   surface: "#ffffff",
@@ -58,7 +54,6 @@ const theme = {
   link: "#1b3478",
   shadow: "0 12px 32px rgba(15, 23, 42, 0.08)",
 } as const;
-
 const styles = {
   body: {
     margin: "0",
@@ -214,116 +209,6 @@ const styles = {
     margin: "0",
   },
 } as const;
-
-export async function MagicLinkEmailSubject({ appName }: { appName: string }) {
-  return <>Your secure sign-in link for {appName}</>;
-}
-
-export async function MagicLinkEmailPreview({ appName }: { appName: string }) {
-  return (
-    <>
-      Click the secure button below to complete your sign-in process. Your
-      secure sign-in link for {appName}
-    </>
-  );
-}
-
-export async function MagicLinkEmailHeading() {
-  return <>Access your account securely</>;
-}
-
-export async function MagicLinkEmailIntro() {
-  return <>Use the link below to finish signing in.</>;
-}
-
-export async function MagicLinkEmailGreeting() {
-  return <>Hello,</>;
-}
-
-export async function MagicLinkEmailRequestDetails({
-  appName,
-}: {
-  appName: string;
-}) {
-  return (
-    <>
-      We received a request to sign in to your {appName} account. Select the
-      button below to continue.
-    </>
-  );
-}
-
-export async function MagicLinkEmailCta() {
-  return <>Open sign-in link</>;
-}
-
-export async function MagicLinkEmailSecurityReminder() {
-  return (
-    <>
-      Security reminder: This link expires in 15 minutes. If you did not request
-      it, you can safely ignore this message.
-    </>
-  );
-}
-
-export async function MagicLinkEmailFallback() {
-  return (
-    <>
-      If the button doesn&apos;t work, you can copy and paste this link into
-      your browser:
-    </>
-  );
-}
-
-export async function MagicLinkEmailSentToLabel() {
-  return <>Sent to</>;
-}
-
-export async function MagicLinkEmailFooter({
-  currentYear,
-  appName,
-  companyName,
-  formattedDate,
-}: {
-  currentYear: number;
-  appName: string;
-  companyName: string;
-  formattedDate: string;
-}) {
-  return (
-    <>
-      &copy; {currentYear} {appName}, {companyName}. All rights reserved. |{" "}
-      {formattedDate}
-    </>
-  );
-}
-
-export async function MagicLinkEmailDeviceDetailsTitle() {
-  return <>Sign-in request details</>;
-}
-
-export async function MagicLinkEmailDeviceLine({
-  browser,
-  os,
-}: {
-  browser: string;
-  os: string;
-}) {
-  return (
-    <>
-      Device: {browser} on {os}
-    </>
-  );
-}
-
-export async function MagicLinkEmailLocationLine({
-  location,
-}: {
-  location: string;
-}) {
-  return <>Location: {location} (approximate)</>;
-}
-
 export function MagicLinkEmailTemplate({
   copy,
   email,
@@ -367,7 +252,12 @@ export function MagicLinkEmailTemplate({
                     <Text style={styles.detailsLine}>{copy.deviceLine}</Text>
                   ) : null}
                   {copy.locationLine ? (
-                    <Text style={{ ...styles.detailsLine, margin: 0 }}>
+                    <Text
+                      style={{
+                        ...styles.detailsLine,
+                        margin: 0,
+                      }}
+                    >
                       {copy.locationLine}
                     </Text>
                   ) : null}
@@ -396,7 +286,6 @@ export function MagicLinkEmailTemplate({
     </Html>
   );
 }
-
 export async function renderMagicLinkEmail({
   copy,
   email,
@@ -413,9 +302,12 @@ export async function renderMagicLinkEmail({
       locale={locale}
     />
   );
-
   const html = await render(template);
-  const text = await render(template, { plainText: true });
-
-  return { html, text };
+  const text = await render(template, {
+    plainText: true,
+  });
+  return {
+    html,
+    text,
+  };
 }

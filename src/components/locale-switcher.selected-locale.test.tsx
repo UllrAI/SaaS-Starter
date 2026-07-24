@@ -1,7 +1,7 @@
 import type React from "react";
 import { fireEvent, render, screen } from "@testing-library/react";
 
-const mockSetLocale = jest.fn();
+const mockRefresh = jest.fn();
 
 jest.mock("@/components/ui/button", () => ({
   Button: ({
@@ -60,18 +60,24 @@ jest.mock("@/lib/i18n/locale-switch", () => ({
   resolveLocaleSwitchUrl: () => null,
 }));
 
-jest.mock("@lingo.dev/compiler/react", () => ({
-  useLingoContext: () => ({
-    locale: "en",
-    setLocale: mockSetLocale,
-  }),
+jest.mock("next-intl", () => ({
+  useLocale: () => "en",
+  useTranslations: () =>
+    Object.assign((key: string) => key, {
+      has: () => false,
+      rich: (key: string) => key,
+    }),
+}));
+
+jest.mock("next/navigation", () => ({
+  useRouter: () => ({ refresh: mockRefresh }),
 }));
 
 import { LocaleSwitcher } from "./locale-switcher";
 
 describe("LocaleSwitcher current locale selection", () => {
   beforeEach(() => {
-    mockSetLocale.mockReset();
+    mockRefresh.mockReset();
   });
 
   it("returns early when the current locale is selected again", () => {
@@ -79,6 +85,6 @@ describe("LocaleSwitcher current locale selection", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "English" }));
 
-    expect(mockSetLocale).not.toHaveBeenCalled();
+    expect(mockRefresh).not.toHaveBeenCalled();
   });
 });

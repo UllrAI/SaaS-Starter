@@ -1,3 +1,5 @@
+import { useTranslation } from "@/lib/i18n/translation/client";
+import { getServerTranslations } from "@/lib/i18n/translation/server";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Features } from "@/components/homepage/features";
@@ -13,54 +15,113 @@ import {
   createMetadataDefaults,
 } from "@/lib/metadata";
 import { SOURCE_LOCALE } from "@/lib/config/i18n";
-
 export async function generateMetadata() {
+  const { t } = await getServerTranslations();
   const metadata = createMetadataDefaults({
     alternates: createLocalizedAlternates("/features", SOURCE_LOCALE),
   });
-
   return {
     ...metadata,
-    title: "Features",
-    description:
+    title: t("3066d18a9353", "Features"),
+    description: t(
+      "574e5c0dfd61",
       "Review the actual modules included in the SaaS Starter: auth, agent-ready APIs, CLI device auth, billing, admin tooling, uploads, localization, content infrastructure, and E2E smoke coverage.",
+    ),
     openGraph: {
       ...metadata.openGraph,
-      title: "Features",
-      description:
+      title: t("89726523c9d8", "Features"),
+      description: t(
+        "b2f32e9e2b99",
         "Review the actual modules included in the SaaS Starter: auth, agent-ready APIs, CLI device auth, billing, admin tooling, uploads, localization, content infrastructure, and E2E smoke coverage.",
+      ),
     },
     twitter: {
       ...metadata.twitter,
-      title: "Features",
-      description:
+      title: t("b15c21ba6e9e", "Features"),
+      description: t(
+        "bba3ef238890",
         "Review the actual modules included in the SaaS Starter: auth, agent-ready APIs, CLI device auth, billing, admin tooling, uploads, localization, content infrastructure, and E2E smoke coverage.",
+      ),
     },
   };
 }
-
 export default function FeaturesPage() {
+  const { t } = useTranslation();
   const includedItems = [
-    <>Next.js App Router structure with page/layout conventions</>,
-    <>Better Auth login, signup, session, and permission guards</>,
     <>
-      API keys, CLI device login, and versioned `/api/v1/*` machine auth routes
+      {t(
+        "90c8216f7003",
+        "Next.js App Router structure with page/layout conventions",
+      )}
     </>,
-    <>Creem checkout, portal, subscription records, and webhooks</>,
-    <>Admin pages for users, payments, subscriptions, and uploads</>,
-    <>Cloudflare R2 upload flows for browser and server uploads</>,
-    <>Markdown blog content, typed collections, and marketing pages</>,
     <>
-      Playwright smoke coverage for auth, API key flows, CLI auth, admin, and
-      locale routing
+      {t(
+        "50efeda0fa84",
+        "Better Auth login, signup, session, and permission guards",
+      )}
+    </>,
+    <>
+      {t(
+        "722c5c5143e8",
+        "API keys, CLI device login, and versioned `/api/v1/*` machine auth routes",
+      )}
+    </>,
+    <>
+      {t(
+        "b8882e039cf4",
+        "Creem checkout, portal, subscription records, and webhooks",
+      )}
+    </>,
+    <>
+      {t(
+        "2a76f83b6397",
+        "Admin pages for users, payments, subscriptions, and uploads",
+      )}
+    </>,
+    <>
+      {t(
+        "41c2b7079b63",
+        "Cloudflare R2 upload flows for browser and server uploads",
+      )}
+    </>,
+    <>
+      {t(
+        "7d92d3db117c",
+        "Markdown blog content, typed collections, and marketing pages",
+      )}
+    </>,
+    <>
+      {t(
+        "94e552f228cc",
+        "Playwright smoke coverage for auth, API key flows, CLI auth, admin, and locale routing",
+      )}
     </>,
   ];
-
   const customizationItems = [
-    <>Your own product logic, domain-specific data model, and integrations</>,
-    <>Production infrastructure, deployment, secrets, and observability</>,
-    <>Brand assets, copy, and plan definitions that match your business</>,
-    <>Provider credentials for auth, billing, email, storage, and analytics</>,
+    <>
+      {t(
+        "b1f73a16f7e9",
+        "Your own product logic, domain-specific data model, and integrations",
+      )}
+    </>,
+    <>
+      {t(
+        "37cf87afc594",
+        "Production infrastructure, deployment, secrets, and observability",
+      )}
+    </>,
+    <>
+      {t(
+        "1895e5f9ed0d",
+        "Brand assets, copy, and plan definitions that match your business",
+      )}
+    </>,
+    <>
+      {t(
+        "5f4cbefebe30",
+        "Provider credentials for auth, billing, email, storage, and analytics",
+      )}
+    </>,
   ];
   return (
     <>
@@ -71,16 +132,19 @@ export default function FeaturesPage() {
             <Badge className="border-border bg-background/50 inline-flex items-center border px-3 py-1 text-sm backdrop-blur-sm">
               <Package2 className="text-muted-foreground mr-2 h-3 w-3" />
               <span className="text-muted-foreground font-mono">
-                STARTER_SCOPE
+                {t("cfc8e2b1b876", "STARTER_SCOPE")}
               </span>
             </Badge>
           }
         >
-          <PageIntroHeading>Shipped and ready to scale</PageIntroHeading>
+          <PageIntroHeading>
+            {t("2394a342a71d", "Shipped and ready to scale")}
+          </PageIntroHeading>
           <PageIntroDescription>
-            Every feature listed here exists in the codebase today. No roadmaps
-            or placeholders. Just tested foundations for human users, APIs, and
-            agent workflows you can reuse immediately.
+            {t(
+              "edb54b41a6e2",
+              "Every feature listed here exists in the codebase today. No roadmaps or placeholders. Just tested foundations for human users, APIs, and agent workflows you can reuse immediately.",
+            )}
           </PageIntroDescription>
         </PageIntro>
 
@@ -89,7 +153,7 @@ export default function FeaturesPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <CheckCircle2 className="text-primary h-5 w-5" />
-                Included today
+                {t("d955f2dd58b3", "Included today")}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-sm leading-relaxed">
@@ -106,7 +170,7 @@ export default function FeaturesPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Wrench className="text-primary h-5 w-5" />
-                You still configure
+                {t("570ae678dc3e", "You still configure")}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-sm leading-relaxed">

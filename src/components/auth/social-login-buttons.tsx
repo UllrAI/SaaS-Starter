@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/lib/i18n/translation/client";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -46,17 +47,14 @@ const socialProviders = {
     ),
   },
 } as const;
-
 type SocialProvider = keyof typeof socialProviders;
 type SocialProviderConfig = (typeof socialProviders)[SocialProvider];
-
 interface SocialLoginButtonsProps {
   callbackURL?: string;
   availableProviders?: SocialProvider[];
   loading?: boolean;
   onLoadingChange?: (loading: boolean) => void;
 }
-
 export function SocialLoginButtons({
   callbackURL = "/dashboard",
   availableProviders,
@@ -68,20 +66,16 @@ export function SocialLoginButtons({
   );
   const [isRedirecting, setIsRedirecting] = useState(false);
   const errorCallbackURL = buildLoginRedirectPath(callbackURL);
-
   const redirectToProvider = (url: string) => {
     setIsRedirecting(true);
     redirectBrowserTo(url);
   };
-
   const handleSocialLogin = async (provider: SocialProvider) => {
     if (isRedirecting) {
       return;
     }
-
     setActiveProvider(provider);
     onLoadingChange?.(true);
-
     try {
       const result = await signIn.social({
         provider,
@@ -89,16 +83,13 @@ export function SocialLoginButtons({
         errorCallbackURL,
         disableRedirect: true,
       });
-
       if (result.error) {
         throw new Error(result.error.message);
       }
-
       const redirectUrl = result.data?.url;
       if (!redirectUrl) {
         throw new Error("Authentication provider redirect URL is missing.");
       }
-
       redirectToProvider(redirectUrl);
     } catch {
       toast.error(
@@ -113,23 +104,19 @@ export function SocialLoginButtons({
   // In a real implementation, this would come from server-side configuration
   const providers =
     availableProviders || (Object.keys(socialProviders) as SocialProvider[]);
-
   if (providers.length === 0) {
     return null;
   }
-
   return (
     <div className="space-y-3">
       {providers.map((provider) => {
         const config = socialProviders[provider];
         const IconComponent = config.icon;
-
         const isLoading = activeProvider === provider;
         const isDisabled =
           (activeProvider !== null && activeProvider !== provider) ||
           externalLoading ||
           isRedirecting;
-
         const buttonLabel = isLoading ? (
           <SocialLoginPendingLabel provider={config} />
         ) : (
@@ -138,7 +125,6 @@ export function SocialLoginButtons({
             IconComponent={IconComponent}
           />
         );
-
         return (
           <Button
             key={provider}
@@ -155,20 +141,23 @@ export function SocialLoginButtons({
     </div>
   );
 }
-
 function SocialLoginPendingLabel({
   provider,
 }: {
   provider: SocialProviderConfig;
 }) {
+  const { t } = useTranslation();
   return (
     <span className="flex items-center gap-2">
       <Loader2 className="h-4 w-4 animate-spin" />
-      <span>Redirecting to {provider.name}...</span>
+      <span>
+        {t("500f8b068867", "Redirecting to {expression0}...", {
+          expression0: provider.name,
+        })}
+      </span>
     </span>
   );
 }
-
 function SocialLoginDefaultLabel({
   provider,
   IconComponent,
@@ -176,10 +165,15 @@ function SocialLoginDefaultLabel({
   provider: SocialProviderConfig;
   IconComponent: SocialProviderConfig["icon"];
 }) {
+  const { t } = useTranslation();
   return (
     <span className="flex items-center gap-3">
       <IconComponent className="h-5 w-5" />
-      <span className="font-medium">Continue with {provider.name}</span>
+      <span className="font-medium">
+        {t("6233922e4f71", "Continue with {expression0}", {
+          expression0: provider.name,
+        })}
+      </span>
     </span>
   );
 }

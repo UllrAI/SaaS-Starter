@@ -38,7 +38,7 @@ describe("proxy", () => {
     expect(response.headers.get("location")).toBeNull();
   });
 
-  it("redirects bare marketing path to localized path when preferred locale is non-English", async () => {
+  it("keeps bare marketing paths as stable English canonical URLs", async () => {
     const request = new NextRequest("http://localhost/about", {
       headers: {
         "accept-language": "zh-CN,zh;q=0.9,en;q=0.8",
@@ -47,11 +47,8 @@ describe("proxy", () => {
 
     const response = await proxy(request);
 
-    expect(response.status).toBeGreaterThanOrEqual(300);
-    expect(response.status).toBeLessThan(400);
-    expect(response.headers.get("location")).toBe(
-      "http://localhost/zh-Hans/about",
-    );
+    expect(response.headers.get("x-middleware-next")).toBe("1");
+    expect(response.headers.get("location")).toBeNull();
   });
 
   it("keeps localized marketing path on its static route", async () => {

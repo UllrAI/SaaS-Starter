@@ -30,12 +30,6 @@ jest.mock("next/link", () => {
   };
 });
 
-jest.mock("@/lib/i18n/request-lingo-provider", () => ({
-  RequestLingoProvider: ({ children }: { children: React.ReactNode }) => (
-    <>{children}</>
-  ),
-}));
-
 describe("AuthLayout", () => {
   it("renders the layout with all required elements", () => {
     const testContent = <div data-testid="test-content">Test Content</div>;

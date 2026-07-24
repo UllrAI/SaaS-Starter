@@ -1,9 +1,8 @@
 "use client";
 
-import { useLingoContext } from "@lingo.dev/compiler/react";
+import { useLocale } from "next-intl";
 import { resolveIntlLocale } from "@/lib/locale";
 
 export function useIntlLocale(): string {
-  const { locale } = useLingoContext();
-  return resolveIntlLocale(locale);
+  return resolveIntlLocale(useLocale());
 }

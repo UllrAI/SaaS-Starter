@@ -1,3 +1,4 @@
+import { useTranslation } from "@/lib/i18n/translation/client";
 import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { BackgroundPattern } from "@/components/ui/background-pattern";
@@ -8,7 +9,6 @@ import { ArrowLeft } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { calculateReadingTime } from "@/lib/utils";
-
 interface BlogPostHeaderProps {
   title: string;
   excerpt?: string;
@@ -22,7 +22,6 @@ interface BlogPostHeaderProps {
   content: string;
   locale?: string;
 }
-
 export function BlogPostHeader({
   title,
   excerpt,
@@ -36,8 +35,8 @@ export function BlogPostHeader({
   content,
   locale,
 }: BlogPostHeaderProps) {
+  const { t } = useTranslation();
   const hasImage = !!heroImage;
-
   if (hasImage) {
     return (
       <>
@@ -64,7 +63,7 @@ export function BlogPostHeader({
                 <Link href={backHref}>
                   <ArrowLeft className="mr-2 h-4 w-4" />
                   <span className="hidden sm:inline">{backText}</span>
-                  <span className="sm:hidden">Back</span>
+                  <span className="sm:hidden">{t("9da9a1670f77", "Back")}</span>
                 </Link>
               </Button>
             </div>
@@ -136,7 +135,7 @@ export function BlogPostHeader({
               <Link href={backHref}>
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 <span className="hidden sm:inline">{backText}</span>
-                <span className="sm:hidden">Back</span>
+                <span className="sm:hidden">{t("9da9a1670f77", "Back")}</span>
               </Link>
             </Button>
           </div>

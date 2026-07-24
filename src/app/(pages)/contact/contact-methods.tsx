@@ -1,3 +1,4 @@
+import { useTranslation } from "@/lib/i18n/translation/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { BookOpen, Bug, Mail, MessageSquare } from "lucide-react";
@@ -7,13 +8,13 @@ import {
   GITHUB_DISCUSSIONS_URL,
   GITHUB_ISSUES_URL,
 } from "@/lib/config/constants";
-
 export function ContactMethods() {
+  const { t } = useTranslation();
   const contactMethods = [
     {
       icon: Mail,
-      title: <>Email Support</>,
-      description: <>Technical support via email</>,
+      title: <>{t("97cf6b64f238", "Email Support")}</>,
+      description: <>{t("27f27aad58ab", "Technical support via email")}</>,
       action: CONTACT_EMAIL,
       href: `mailto:${CONTACT_EMAIL}`,
       label: "EMAIL_GATEWAY",
@@ -21,8 +22,12 @@ export function ContactMethods() {
     },
     {
       icon: MessageSquare,
-      title: <>Community Discussions</>,
-      description: <>Ask product and integration questions in public</>,
+      title: <>{t("4cbfb21b1f5e", "Community Discussions")}</>,
+      description: (
+        <>
+          {t("202cdce01ea9", "Ask product and integration questions in public")}
+        </>
+      ),
       action: "Open Discussions",
       href: GITHUB_DISCUSSIONS_URL,
       label: "DISCUSSION_BOARD",
@@ -30,8 +35,15 @@ export function ContactMethods() {
     },
     {
       icon: Bug,
-      title: <>Bug Reports</>,
-      description: <>Report reproducible bugs and integration failures</>,
+      title: <>{t("77fffae104d0", "Bug Reports")}</>,
+      description: (
+        <>
+          {t(
+            "862aa9e582a9",
+            "Report reproducible bugs and integration failures",
+          )}
+        </>
+      ),
       action: "Open Issues",
       href: GITHUB_ISSUES_URL,
       label: "ISSUE_TRACKER",
@@ -39,20 +51,25 @@ export function ContactMethods() {
     },
     {
       icon: BookOpen,
-      title: <>Documentation</>,
-      description: <>Setup guides, billing flow notes, and deployment docs</>,
+      title: <>{t("3699b19f764e", "Documentation")}</>,
+      description: (
+        <>
+          {t(
+            "eeaabc2cfd8d",
+            "Setup guides, billing flow notes, and deployment docs",
+          )}
+        </>
+      ),
       action: "Read Docs",
       href: DOCS_URL,
       label: "DOCS_PORTAL",
       external: true,
     },
   ];
-
   return (
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
       {contactMethods.map((method) => {
         const Icon = method.icon;
-
         return (
           <Card
             key={method.label}
@@ -80,7 +97,7 @@ export function ContactMethods() {
                 <a
                   href={method.href}
                   className="block font-mono text-xs"
-                  data-lingo-skip={method.actionSkip ? true : undefined}
+                  translate={method.actionSkip ? "no" : undefined}
                   target={method.external ? "_blank" : undefined}
                   rel={method.external ? "noreferrer" : undefined}
                 >

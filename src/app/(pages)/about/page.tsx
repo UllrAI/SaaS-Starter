@@ -1,3 +1,5 @@
+import { useTranslation } from "@/lib/i18n/translation/client";
+import { getServerTranslations } from "@/lib/i18n/translation/server";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -7,7 +9,7 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { Terminal, Zap, Shield, Users, Info } from "lucide-react";
-import Link from "next/link";
+import { LocalizedLink as Link } from "@/components/localized-link";
 import { SectionContainer } from "@/components/layout/page-container";
 import { MarketingPageShell } from "@/components/layout/marketing-page-shell";
 import {
@@ -21,25 +23,28 @@ import { SOURCE_LOCALE } from "@/lib/config/i18n";
 import { APP_NAME, OGIMAGE, TWITTERACCOUNT } from "@/lib/config/constants";
 import env from "@/env";
 import type { Metadata } from "next";
-
 export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getServerTranslations();
   const alternates = createLocalizedAlternates("/about", SOURCE_LOCALE);
   const canonical = alternates.canonical;
   const canonicalUrl =
     typeof canonical === "string" || canonical instanceof URL
       ? canonical
       : undefined;
-
   return {
     metadataBase: new URL(env.NEXT_PUBLIC_APP_URL),
     alternates,
-    title: "About Us",
-    description:
+    title: t("dcbcddb08da8", "About Us"),
+    description: t(
+      "738d96acb3ec",
       "Learn about our mission to help developers build and launch SaaS products faster with real, tested, and agent-friendly foundations.",
+    ),
     openGraph: {
-      title: "About Us",
-      description:
+      title: t("56484a099905", "About Us"),
+      description: t(
+        "8657781dfed4",
         "Learn about our mission to help developers build and launch SaaS products faster with real, tested, and agent-friendly foundations.",
+      ),
       url: canonicalUrl,
       images: OGIMAGE,
       siteName: APP_NAME,
@@ -48,15 +53,17 @@ export async function generateMetadata(): Promise<Metadata> {
     twitter: {
       card: "summary_large_image",
       creator: TWITTERACCOUNT,
-      title: "About Us",
-      description:
+      title: t("d53727d26488", "About Us"),
+      description: t(
+        "ef16e86ea5be",
         "Learn about our mission to help developers build and launch SaaS products faster with real, tested, and agent-friendly foundations.",
+      ),
       images: OGIMAGE,
     },
   };
 }
-
 export default function AboutPage() {
+  const { t } = useTranslation();
   return (
     <>
       <MarketingPageShell>
@@ -65,16 +72,20 @@ export default function AboutPage() {
           badge={
             <Badge className="border-border bg-background/50 inline-flex items-center border px-3 py-1 text-sm backdrop-blur-sm">
               <Info className="text-muted-foreground mr-2 h-3 w-3" />
-              <span className="text-muted-foreground font-mono">README.md</span>
+              <span className="text-muted-foreground font-mono">
+                {t("47d2f67d382a", "README.md")}
+              </span>
             </Badge>
           }
         >
-          <PageIntroHeading>Building the future of SaaS</PageIntroHeading>
+          <PageIntroHeading>
+            {t("a548106ca626", "Building the future of SaaS")}
+          </PageIntroHeading>
           <PageIntroDescription>
-            This starter focuses on real SaaS foundations: authentication,
-            billing, database access, uploads, localization, and operational
-            screens that can be inspected, tested, and extended without
-            replacing placeholder flows first.
+            {t(
+              "07102d1ab9fa",
+              "This starter focuses on real SaaS foundations: authentication, billing, database access, uploads, localization, and operational screens that can be inspected, tested, and extended without replacing placeholder flows first.",
+            )}
           </PageIntroDescription>
         </PageIntro>
 
@@ -82,7 +93,7 @@ export default function AboutPage() {
           <PageSectionHeading
             icon={<Terminal className="text-primary h-6 w-6" />}
           >
-            Core Principles
+            {t("edcd2a5b1739", "Core Principles")}
           </PageSectionHeading>
 
           <div className="grid gap-6 md:grid-cols-3">
@@ -91,11 +102,14 @@ export default function AboutPage() {
                 <div className="bg-primary/10 text-primary border-primary/20 mb-4 flex h-12 w-12 items-center justify-center border">
                   <Zap className="h-6 w-6" />
                 </div>
-                <CardTitle>Practical Workflow Speed</CardTitle>
+                <CardTitle>
+                  {t("0646fd4af9db", "Practical Workflow Speed")}
+                </CardTitle>
                 <CardDescription>
-                  The project is shaped for builders who need to move quickly
-                  without losing the ability to understand, test, and modify the
-                  code they ship.
+                  {t(
+                    "968cfe723315",
+                    "The project is shaped for builders who need to move quickly without losing the ability to understand, test, and modify the code they ship.",
+                  )}
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -105,11 +119,14 @@ export default function AboutPage() {
                 <div className="bg-primary/10 text-primary border-primary/20 mb-4 flex h-12 w-12 items-center justify-center border">
                   <Shield className="h-6 w-6" />
                 </div>
-                <CardTitle>Security Boundaries</CardTitle>
+                <CardTitle>
+                  {t("ab52be4cfa25", "Security Boundaries")}
+                </CardTitle>
                 <CardDescription>
-                  Auth, billing, uploads, and environment configuration are kept
-                  behind explicit server-side checks instead of optimistic UI
-                  assumptions.
+                  {t(
+                    "e0651c9e8d2c",
+                    "Auth, billing, uploads, and environment configuration are kept behind explicit server-side checks instead of optimistic UI assumptions.",
+                  )}
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -119,11 +136,14 @@ export default function AboutPage() {
                 <div className="bg-primary/10 text-primary border-primary/20 mb-4 flex h-12 w-12 items-center justify-center border">
                   <Users className="h-6 w-6" />
                 </div>
-                <CardTitle>Maintainable Defaults</CardTitle>
+                <CardTitle>
+                  {t("9a92b2f918be", "Maintainable Defaults")}
+                </CardTitle>
                 <CardDescription>
-                  The code favors ordinary Next.js conventions, small modules,
-                  and reusable components over framework tricks or hidden
-                  generators.
+                  {t(
+                    "a5ef9f037036",
+                    "The code favors ordinary Next.js conventions, small modules, and reusable components over framework tricks or hidden generators.",
+                  )}
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -132,36 +152,44 @@ export default function AboutPage() {
 
         <div className="mb-24">
           <PageSectionHeading icon={<Users className="text-primary h-6 w-6" />}>
-            What You Can Verify
+            {t("492dd43ed958", "What You Can Verify")}
           </PageSectionHeading>
 
           <div className="grid gap-6 md:grid-cols-3">
             <Card className="shadow-sm">
               <CardHeader>
-                <CardTitle>Real Checkout Flow</CardTitle>
+                <CardTitle>{t("1722062dfe43", "Real Checkout Flow")}</CardTitle>
                 <CardDescription>
-                  Pricing actions call the billing provider abstraction and
-                  return users through a verifiable payment status page.
+                  {t(
+                    "ea1140bc6bc8",
+                    "Pricing actions call the billing provider abstraction and return users through a verifiable payment status page.",
+                  )}
                 </CardDescription>
               </CardHeader>
             </Card>
 
             <Card className="shadow-sm">
               <CardHeader>
-                <CardTitle>Protected App Routes</CardTitle>
+                <CardTitle>
+                  {t("a8811ad25407", "Protected App Routes")}
+                </CardTitle>
                 <CardDescription>
-                  Dashboard, settings, and admin areas use the same route
-                  protection and session boundaries as production features.
+                  {t(
+                    "ad35a59a4592",
+                    "Dashboard, settings, and admin areas use the same route protection and session boundaries as production features.",
+                  )}
                 </CardDescription>
               </CardHeader>
             </Card>
 
             <Card className="shadow-sm">
               <CardHeader>
-                <CardTitle>Repository Content</CardTitle>
+                <CardTitle>{t("f4217c42d973", "Repository Content")}</CardTitle>
                 <CardDescription>
-                  Marketing pages, blog content, and legal pages live in the
-                  repository so changes can be reviewed with the code.
+                  {t(
+                    "d14985bd43af",
+                    "Marketing pages, blog content, and legal pages live in the repository so changes can be reviewed with the code.",
+                  )}
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -172,27 +200,32 @@ export default function AboutPage() {
           <PageSectionHeading
             icon={<Shield className="text-primary h-6 w-6" />}
           >
-            Maintenance Model
+            {t("523111aac9c9", "Maintenance Model")}
           </PageSectionHeading>
 
           <div className="grid gap-6 md:grid-cols-2">
             <Card className="shadow-sm">
               <CardHeader>
-                <CardTitle>Code Over Claims</CardTitle>
+                <CardTitle>{t("54be371c8938", "Code Over Claims")}</CardTitle>
                 <CardDescription>
-                  Project capabilities are represented by implemented routes,
-                  configuration, tests, and documentation instead of invented
-                  release milestones.
+                  {t(
+                    "453c97a71789",
+                    "Project capabilities are represented by implemented routes, configuration, tests, and documentation instead of invented release milestones.",
+                  )}
                 </CardDescription>
               </CardHeader>
             </Card>
 
             <Card className="shadow-sm">
               <CardHeader>
-                <CardTitle>Small, Reviewable Changes</CardTitle>
+                <CardTitle>
+                  {t("ac3bdad7cedf", "Small, Reviewable Changes")}
+                </CardTitle>
                 <CardDescription>
-                  Improvements should stay scoped, keep migrations and generated
-                  assets aligned, and include the checks needed for confidence.
+                  {t(
+                    "37d70e1ab0da",
+                    "Improvements should stay scoped, keep migrations and generated assets aligned, and include the checks needed for confidence.",
+                  )}
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -204,18 +237,24 @@ export default function AboutPage() {
         <SectionContainer>
           <PageIntro>
             <PageIntroHeading as="h2" className="mb-4 text-3xl">
-              Ready to Build Something Amazing?
+              {t("bee6c832c1f1", "Ready to Build Something Amazing?")}
             </PageIntroHeading>
             <PageIntroDescription className="mb-8 text-lg">
-              Build a SaaS product that works well for end users, internal
-              tooling, and agent-friendly automation from day one.
+              {t(
+                "bf22e396ed21",
+                "Build a SaaS product that works well for end users, internal tooling, and agent-friendly automation from day one.",
+              )}
             </PageIntroDescription>
             <div className="flex flex-wrap justify-center gap-4">
               <Button asChild size="lg">
-                <Link href="/pricing">Get Started Today</Link>
+                <Link href="/pricing">
+                  {t("6ea7de9594bc", "Get Started Today")}
+                </Link>
               </Button>
               <Button variant="outline" size="lg" asChild>
-                <Link href="/contact">Contact Sales</Link>
+                <Link href="/contact">
+                  {t("a2d38631c005", "Contact Sales")}
+                </Link>
               </Button>
             </div>
           </PageIntro>

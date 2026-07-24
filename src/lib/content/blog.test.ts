@@ -16,24 +16,22 @@ describe("blog content localization helpers", () => {
 
     expect(post).toBeDefined();
     expect(post?.locale).toBe("zh-Hans");
-    expect(post?.isFallback).toBe(false);
     expect(post?.title).toContain("开发者文档");
     expect(post?.availableLocales).toEqual(["en", "zh-Hans"]);
   });
 
-  it("falls back to english when a translation is missing", () => {
+  it("does not serve english content under a localized URL", () => {
     const post = getPostBySlug("modern-css-techniques", "zh-Hans");
 
-    expect(post).toBeDefined();
-    expect(post?.locale).toBe("en");
-    expect(post?.isFallback).toBe(true);
+    expect(post).toBeUndefined();
   });
 
-  it("returns a locale-aware list without duplicating translated slugs", () => {
+  it("returns only posts authored for the requested locale", () => {
     const posts = getAllPosts("zh-Hans");
 
-    expect(posts).toHaveLength(5);
+    expect(posts).toHaveLength(2);
     expect(posts[0]?.slug).toBe("agent-friendly-saas-template");
+    expect(posts.every((post) => post.locale === "zh-Hans")).toBe(true);
     expect(getAllPostSlugs()).toEqual([
       "agent-friendly-saas-template",
       "modern-css-techniques",

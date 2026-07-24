@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/lib/i18n/translation/client";
 import {
   Blocks,
   HardDriveUpload,
@@ -25,7 +26,6 @@ import { cn } from "@/lib/utils";
 import { formatFileSize } from "@/lib/config/upload";
 import { ServerUploadPanel } from "./server-upload-panel";
 import type { UseFileUploadResult } from "@/components/ui/file-upload/use-file-upload";
-
 function DirectUploadToast({ count }: { count: number }) {
   return count === 1 ? (
     <>1 file uploaded directly to storage.</>
@@ -33,7 +33,6 @@ function DirectUploadToast({ count }: { count: number }) {
     <>{count} files uploaded directly to storage.</>
   );
 }
-
 function HeadlessUploadToast({ count }: { count: number }) {
   return count === 1 ? (
     <>1 file uploaded through the headless demo.</>
@@ -41,29 +40,43 @@ function HeadlessUploadToast({ count }: { count: number }) {
     <>{count} files uploaded through the headless demo.</>
   );
 }
-
 function HeadlessIssueMessage({ code }: { code: string }) {
+  const { t } = useTranslation();
   switch (code) {
     case "too-many-files":
-      return <>Too many files selected for this demo.</>;
+      return <>{t("bf52a4ed08a8", "Too many files selected for this demo.")}</>;
     case "file-type-not-accepted":
-      return <>This demo only accepts image files.</>;
+      return <>{t("f494964c8306", "This demo only accepts image files.")}</>;
     case "file-too-large":
     case "file-too-large-for-app":
-      return <>One of the files is larger than the allowed limit.</>;
+      return (
+        <>
+          {t(
+            "052cfb5d5952",
+            "One of the files is larger than the allowed limit.",
+          )}
+        </>
+      );
     case "upload-preparation-failed":
-      return <>The file could not be prepared before upload.</>;
+      return (
+        <>
+          {t("9587f0d021fb", "The file could not be prepared before upload.")}
+        </>
+      );
     case "request-failed":
-      return <>The upload request failed. Try again.</>;
+      return <>{t("46af5583eda6", "The upload request failed. Try again.")}</>;
     case "network-error":
-      return <>The network connection dropped during upload.</>;
+      return (
+        <>
+          {t("162f5326e719", "The network connection dropped during upload.")}
+        </>
+      );
     case "upload-aborted":
-      return <>The upload was canceled.</>;
+      return <>{t("155cdbd26440", "The upload was canceled.")}</>;
     default:
-      return <>The upload could not be completed.</>;
+      return <>{t("36a9df773d18", "The upload could not be completed.")}</>;
   }
 }
-
 function HeadlessTileStatus({
   status,
   progress,
@@ -71,20 +84,26 @@ function HeadlessTileStatus({
   status: UseFileUploadResult["items"][number]["status"];
   progress: number;
 }) {
+  const { t } = useTranslation();
   switch (status) {
     case "uploading":
-      return <>{progress}%</>;
+      return (
+        <>
+          {t("59ba3bcd229b", "{progress}%", {
+            progress,
+          })}
+        </>
+      );
     case "success":
-      return <>Uploaded</>;
+      return <>{t("119f40118528", "Uploaded")}</>;
     case "error":
-      return <>Needs attention</>;
+      return <>{t("9e307de530ea", "Needs attention")}</>;
     case "canceled":
-      return <>Canceled</>;
+      return <>{t("fe240bb1914c", "Canceled")}</>;
     default:
-      return <>Queued</>;
+      return <>{t("6964a1a16283", "Queued")}</>;
   }
 }
-
 function HeadlessUploadTile({
   uploader,
 }: {
@@ -93,10 +112,10 @@ function HeadlessUploadTile({
     "canAddMore" | "getRootProps" | "isDragActive"
   >;
 }) {
+  const { t } = useTranslation();
   if (!uploader.canAddMore) {
     return null;
   }
-
   return (
     <div
       {...uploader.getRootProps({
@@ -107,12 +126,13 @@ function HeadlessUploadTile({
       })}
     >
       <Upload className="mb-2 h-5 w-5" />
-      <p className="text-sm font-medium">Add images</p>
-      <p className="mt-1 text-xs">Drag, drop, or browse</p>
+      <p className="text-sm font-medium">{t("e721b549cc34", "Add images")}</p>
+      <p className="mt-1 text-xs">
+        {t("175943341e11", "Drag, drop, or browse")}
+      </p>
     </div>
   );
 }
-
 function HeadlessUploadContent({
   uploader,
 }: {
@@ -127,13 +147,17 @@ function HeadlessUploadContent({
     | "items"
   >;
 }) {
+  const { t } = useTranslation();
   const completedCount = uploader.items.filter(
     (item) => item.status === "success",
   ).length;
-
   return (
     <div className="space-y-4">
-      <input {...uploader.getInputProps({ className: "hidden" })} />
+      <input
+        {...uploader.getInputProps({
+          className: "hidden",
+        })}
+      />
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         {uploader.items.map((item) => (
@@ -180,14 +204,13 @@ function HeadlessUploadContent({
       {completedCount > 0 ? (
         <div className="flex flex-wrap gap-2">
           <Button size="sm" variant="outline" onClick={uploader.clearCompleted}>
-            Clear completed
+            {t("62046b76c6d5", "Clear completed")}
           </Button>
         </div>
       ) : null}
     </div>
   );
 }
-
 function HeadlessUploadDemo() {
   return (
     <FileUploader
@@ -213,8 +236,8 @@ function HeadlessUploadDemo() {
     </FileUploader>
   );
 }
-
 export function UploadWorkbench() {
+  const { t } = useTranslation();
   const presetConfigs = {
     images: {
       acceptedFileTypes: [
@@ -228,11 +251,20 @@ export function UploadWorkbench() {
       ],
       description: (
         <>
-          Best for gallery-style uploads with image compression and instant
-          preview tiles.
+          {t(
+            "f2f10c1a7bcf",
+            "Best for gallery-style uploads with image compression and instant preview tiles.",
+          )}
         </>
       ),
-      meta: <>5 files • 10 MB each • compression enabled</>,
+      meta: (
+        <>
+          {t(
+            "94a9e189bfb5",
+            "5 files \u2022 10 MB each \u2022 compression enabled",
+          )}
+        </>
+      ),
       settings: {
         enableImageCompression: true,
         imageCompressionMaxHeight: 1080,
@@ -241,7 +273,7 @@ export function UploadWorkbench() {
         maxFileSize: 10 * 1024 * 1024,
         maxFiles: 5,
       },
-      title: <>Image uploads</>,
+      title: <>{t("c9cc19dc1748", "Image uploads")}</>,
     },
     documents: {
       acceptedFileTypes: [
@@ -255,87 +287,112 @@ export function UploadWorkbench() {
       ],
       description: (
         <>
-          Shows a narrower preset for single-file document collection and
-          validation feedback.
+          {t(
+            "d5d53a3c02f4",
+            "Shows a narrower preset for single-file document collection and validation feedback.",
+          )}
         </>
       ),
-      meta: <>1 file • 10 MB • document formats only</>,
+      meta: (
+        <>
+          {t(
+            "bf93f825d493",
+            "1 file \u2022 10 MB \u2022 document formats only",
+          )}
+        </>
+      ),
       settings: {
         maxFileSize: 10 * 1024 * 1024,
         maxFiles: 1,
       },
-      title: <>Document uploads</>,
+      title: <>{t("7b7cff8f07f2", "Document uploads")}</>,
     },
     batch: {
       acceptedFileTypes: undefined,
       description: (
         <>
-          Use the full supported matrix when a workflow needs several files in
-          one run.
+          {t(
+            "26ba16e3e580",
+            "Use the full supported matrix when a workflow needs several files in one run.",
+          )}
         </>
       ),
-      meta: <>10 files • default global limits</>,
+      meta: <>{t("e61174f4a548", "10 files \u2022 default global limits")}</>,
       settings: {
         maxFiles: 10,
       },
-      title: <>Batch uploads</>,
+      title: <>{t("24aac2d699ef", "Batch uploads")}</>,
     },
     large: {
       acceptedFileTypes: undefined,
       description: (
         <>
-          Demonstrates a looser preset without changing the application-wide
-          safety checks.
+          {t(
+            "5ad776a79d22",
+            "Demonstrates a looser preset without changing the application-wide safety checks.",
+          )}
         </>
       ),
-      meta: <>2 files • {formatFileSize(50 * 1024 * 1024)} each</>,
+      meta: (
+        <>
+          {t("b55fc81b5407", "2 files \u2022 {expression0} each", {
+            expression0: formatFileSize(50 * 1024 * 1024),
+          })}
+        </>
+      ),
       settings: {
         maxFileSize: 50 * 1024 * 1024,
         maxFiles: 2,
       },
-      title: <>Large files</>,
+      title: <>{t("42eb954ee399", "Large files")}</>,
     },
   };
-
   const capabilityCards = [
     {
       id: "default",
       description: (
-        <>Preset demos for image, document, batch, and larger file uploads.</>
+        <>
+          {t(
+            "c3d284136549",
+            "Preset demos for image, document, batch, and larger file uploads.",
+          )}
+        </>
       ),
       icon: LayoutTemplate,
-      title: <>Default component</>,
+      title: <>{t("30fae2042253", "Default component")}</>,
     },
     {
       id: "headless",
       description: (
         <>
-          The same upload state can drive a custom image grid through render
-          props.
+          {t(
+            "08b217b883d1",
+            "The same upload state can drive a custom image grid through render props.",
+          )}
         </>
       ),
       icon: Blocks,
-      title: <>Headless usage</>,
+      title: <>{t("53fe962d76c7", "Headless usage")}</>,
     },
     {
       id: "server",
       description: (
         <>
-          Route files through your backend when validation or processing must
-          happen first.
+          {t(
+            "aea6d90b4fb9",
+            "Route files through your backend when validation or processing must happen first.",
+          )}
         </>
       ),
       icon: HardDriveUpload,
-      title: <>Server pipeline</>,
+      title: <>{t("d6eb86764c39", "Server pipeline")}</>,
     },
   ];
-
   return (
     <div className="space-y-6">
       <section className="grid gap-4 lg:grid-cols-3">
         {capabilityCards.map((card) => {
           const Icon = card.icon;
-
           return (
             <Card key={card.id} className="shadow-sm">
               <CardHeader className="space-y-3">
@@ -355,19 +412,29 @@ export function UploadWorkbench() {
       <section className="grid gap-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]">
         <Card className="shadow-sm">
           <CardHeader>
-            <CardTitle>Default uploader demos</CardTitle>
+            <CardTitle>{t("ecd94a4d7e74", "Default uploader demos")}</CardTitle>
             <CardDescription>
-              Reuse the shared uploader with different presets to demonstrate
-              the common paths most products need.
+              {t(
+                "52646e63593e",
+                "Reuse the shared uploader with different presets to demonstrate the common paths most products need.",
+              )}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <Tabs defaultValue="images">
               <TabsList className="h-auto w-full justify-start">
-                <TabsTrigger value="images">Images</TabsTrigger>
-                <TabsTrigger value="documents">Documents</TabsTrigger>
-                <TabsTrigger value="batch">Batch</TabsTrigger>
-                <TabsTrigger value="large">Large</TabsTrigger>
+                <TabsTrigger value="images">
+                  {t("b7b5d0331413", "Images")}
+                </TabsTrigger>
+                <TabsTrigger value="documents">
+                  {t("0191297727bb", "Documents")}
+                </TabsTrigger>
+                <TabsTrigger value="batch">
+                  {t("a425b80f7878", "Batch")}
+                </TabsTrigger>
+                <TabsTrigger value="large">
+                  {t("f0d14e47d4c9", "Large")}
+                </TabsTrigger>
               </TabsList>
 
               {Object.entries(presetConfigs).map(([key, preset]) => (
@@ -397,21 +464,25 @@ export function UploadWorkbench() {
 
         <Card className="shadow-sm">
           <CardHeader>
-            <CardTitle>Headless example</CardTitle>
+            <CardTitle>{t("2ccce01e2f96", "Headless example")}</CardTitle>
             <CardDescription>
-              This demo uses the same uploader state, but renders a custom image
-              grid instead of the default shell.
+              {t(
+                "f2bbf612fabc",
+                "This demo uses the same uploader state, but renders a custom image grid instead of the default shell.",
+              )}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="text-muted-foreground bg-muted/30 rounded-lg border p-3 text-sm">
               <div className="text-foreground flex items-center gap-2 font-medium">
                 <Blocks className="h-4 w-4" />
-                <span>Why this matters</span>
+                <span>{t("7dd29325ac4a", "Why this matters")}</span>
               </div>
               <p className="mt-2">
-                Product pages often need bespoke previews. The upload logic
-                stays shared while the layout stays page-specific.
+                {t(
+                  "50224d71556f",
+                  "Product pages often need bespoke previews. The upload logic stays shared while the layout stays page-specific.",
+                )}
               </p>
             </div>
 
@@ -424,11 +495,13 @@ export function UploadWorkbench() {
         <CardHeader>
           <div className="flex items-center gap-2">
             <Server className="text-primary h-5 w-5" />
-            <CardTitle>Server-side uploads</CardTitle>
+            <CardTitle>{t("5a5fe63d2053", "Server-side uploads")}</CardTitle>
           </div>
           <CardDescription>
-            Use this lane when your application must inspect or transform files
-            on the server before they reach object storage.
+            {t(
+              "179dea16873a",
+              "Use this lane when your application must inspect or transform files on the server before they reach object storage.",
+            )}
           </CardDescription>
         </CardHeader>
         <CardContent>

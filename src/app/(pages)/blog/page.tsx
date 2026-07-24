@@ -1,3 +1,5 @@
+import { useTranslation } from "@/lib/i18n/translation/client";
+import { getServerTranslations } from "@/lib/i18n/translation/server";
 import { Sparkles, BookOpen } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { BackgroundPattern } from "@/components/ui/background-pattern";
@@ -17,44 +19,46 @@ import {
   getAuthorBySlug,
   getLocalizedBlogPostPath,
 } from "@/lib/content/blog";
-
 export async function generateMetadata() {
+  const { t } = await getServerTranslations();
   const metadata = createMetadataDefaults({
     alternates: createLocalizedAlternates("/blog", SOURCE_LOCALE),
   });
-
   return {
     ...metadata,
-    title: "Blog",
-    description:
+    title: t("fb69566ae615", "Blog"),
+    description: t(
+      "3c8a82874d5b",
       "Read implementation notes, tutorials, and insights about shipping agent-friendly SaaS products with strong auth, APIs, CLI tooling, and testing.",
+    ),
     openGraph: {
       ...metadata.openGraph,
-      title: "Blog",
-      description:
+      title: t("d4cd40ad926d", "Blog"),
+      description: t(
+        "0d402cc9bcaa",
         "Read implementation notes, tutorials, and insights about shipping agent-friendly SaaS products with strong auth, APIs, CLI tooling, and testing.",
+      ),
     },
     twitter: {
       ...metadata.twitter,
-      title: "Blog",
-      description:
+      title: t("343ee1208c33", "Blog"),
+      description: t(
+        "b8db195501b8",
         "Read implementation notes, tutorials, and insights about shipping agent-friendly SaaS products with strong auth, APIs, CLI tooling, and testing.",
+      ),
     },
   };
 }
-
 export function BlogPageContent({ locale }: { locale: SupportedLocale }) {
+  const { t } = useTranslation();
   const sortedPosts = getAllPosts(locale);
-
   const featuredPosts = sortedPosts.filter((post) => post.featured);
   const regularPosts = sortedPosts.filter((post) => !post.featured);
-
   const renderPostCard = (
     post: (typeof sortedPosts)[number],
     variant: "featured" | "regular",
   ) => {
     const author = getAuthorBySlug(post.author);
-
     return (
       <BlogPostCard
         key={post.slug}
@@ -69,18 +73,15 @@ export function BlogPageContent({ locale }: { locale: SupportedLocale }) {
         author={author?.name}
         readTime={calculateReadingTime(post.content)}
         locale={locale}
-        isFallback={post.isFallback}
       />
     );
   };
-
   const featuredPostCards = featuredPosts.map((post) =>
     renderPostCard(post, "featured"),
   );
   const regularPostCards = regularPosts.map((post) =>
     renderPostCard(post, "regular"),
   );
-
   return (
     <>
       {/* Hero Section */}
@@ -92,16 +93,17 @@ export function BlogPageContent({ locale }: { locale: SupportedLocale }) {
             <Badge className="border-border bg-background/50 mb-4 inline-flex items-center border px-3 py-1 text-sm backdrop-blur-sm sm:mb-6">
               <Sparkles className="text-muted-foreground mr-2 h-3 w-3" />
               <span className="text-muted-foreground font-mono">
-                BLOG_INDEX
+                {t("a1a06427fbc3", "BLOG_INDEX")}
               </span>
             </Badge>
             <h1 className="text-foreground mb-4 text-3xl font-bold tracking-tight sm:mb-6 sm:text-4xl lg:text-5xl xl:text-6xl">
-              Our Blog
+              {t("7395e77efd89", "Our Blog")}
             </h1>
             <p className="text-muted-foreground text-lg leading-relaxed sm:text-xl">
-              Discover implementation notes, tutorials, and release updates on
-              how we build, test, and market an agent-friendly SaaS starter in
-              practice.
+              {t(
+                "55a16e58d31c",
+                "Discover implementation notes, tutorials, and release updates on how we build, test, and market an agent-friendly SaaS starter in practice.",
+              )}
             </p>
           </div>
         </ReadingContainer>
@@ -116,10 +118,13 @@ export function BlogPageContent({ locale }: { locale: SupportedLocale }) {
                 <BookOpen className="text-muted-foreground h-8 w-8 sm:h-10 sm:w-10" />
               </div>
               <h2 className="text-foreground mb-4 text-xl font-semibold sm:text-2xl">
-                No posts yet
+                {t("109e37fca92d", "No posts yet")}
               </h2>
               <p className="text-muted-foreground mx-auto max-w-md text-sm sm:text-base">
-                We are working on some great content. Check back soon!
+                {t(
+                  "48159a678705",
+                  "We are working on some great content. Check back soon!",
+                )}
               </p>
             </div>
           ) : (
@@ -129,11 +134,13 @@ export function BlogPageContent({ locale }: { locale: SupportedLocale }) {
                 <section>
                   <div className="mb-6 text-center sm:mb-8">
                     <h2 className="text-foreground mb-2 text-2xl font-bold tracking-tight sm:text-3xl">
-                      Featured Posts
+                      {t("95a57be1116a", "Featured Posts")}
                     </h2>
                     <p className="text-muted-foreground text-sm sm:text-base">
-                      Our most popular and insightful articles about SaaS
-                      foundations, agent workflows, and product delivery
+                      {t(
+                        "f012146ee30a",
+                        "Our most popular and insightful articles about SaaS foundations, agent workflows, and product delivery",
+                      )}
                     </p>
                   </div>
                   <div className="grid gap-6 sm:gap-8 lg:gap-12">
@@ -148,10 +155,13 @@ export function BlogPageContent({ locale }: { locale: SupportedLocale }) {
                   {featuredPosts.length > 0 && (
                     <div className="mb-6 text-center sm:mb-8">
                       <h2 className="text-foreground mb-2 text-2xl font-bold tracking-tight sm:text-3xl">
-                        All Posts
+                        {t("bdfd12b5d617", "All Posts")}
                       </h2>
                       <p className="text-muted-foreground text-sm sm:text-base">
-                        Explore our complete collection of articles
+                        {t(
+                          "75bc78813c9f",
+                          "Explore our complete collection of articles",
+                        )}
                       </p>
                     </div>
                   )}
@@ -167,7 +177,6 @@ export function BlogPageContent({ locale }: { locale: SupportedLocale }) {
     </>
   );
 }
-
 export default function BlogPage() {
   return <BlogPageContent locale={SOURCE_LOCALE} />;
 }

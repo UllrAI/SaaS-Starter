@@ -190,13 +190,13 @@ SaaS-Starter-main/
   - Integrating `ThemeProvider` for dark/light mode.
   - Integrating `NextTopLoader` for page loading progress.
   - Integrating `Toaster` for global notifications.
-  - Integrating `CookieConsent` for cookie consent management.
+  - Providing the request locale and next-intl messages to the application.
 - **`proxy.ts`**: Runs before requests reach pages, core for route protection.
   - Checks user session cookies.
   - Redirects to `/login` if user is not logged in but accessing `/dashboard/*`.
-  - Redirects to `/dashboard` if user is logged in but accessing `/login` or `/signup`.
+  - Canonicalizes locale-prefixed marketing URLs and forwards the active locale.
 - **`src/app/dashboard/layout.tsx`**: Root layout for the dashboard.
-  - Uses `SessionGuard` component to protect all child routes. `SessionGuard` is a client component that verifies session existence, redirects to login if not found, and shows loading animation during verification.
+  - Enforces authentication on the server with `requireAuth` before rendering protected content.
   - Renders `AppSidebar` and main content area `SidebarInset`.
 
 #### 2.2.2. Configuration System Design
@@ -223,7 +223,7 @@ The project uses Next.js App Router and leverages Route Groups for logical page 
 
 - `(pages)`: Contains all public pages like home, about, blog, pricing, etc. Uses `src/app/(pages)/layout.tsx` to provide unified header and footer.
 - `(auth)`: Contains authentication flow pages like login, signup. Uses `src/app/(auth)/layout.tsx` to provide a centered, clean layout.
-- `(dashboard)`: Contains all pages requiring user login. Its layout `src/app/dashboard/layout.tsx` implements route protection through `SessionGuard`.
+- `dashboard`: Contains all pages requiring user login. Its layout enforces server-side route protection with `requireAuth`.
 - `api/v1`: Contains versioned machine-facing auth endpoints for API verification, device approval, token exchange, and refresh.
 
 #### 2.2.5. Build and Packaging Process

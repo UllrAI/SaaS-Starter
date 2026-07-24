@@ -1,3 +1,4 @@
+import { useTranslation } from "@/lib/i18n/translation/client";
 import type { ReactNode } from "react";
 import {
   Card,
@@ -12,7 +13,6 @@ import { Sparkles } from "lucide-react";
 import { BlogPostMeta } from "./blog-post-meta";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
-
 interface BlogPostCardProps {
   slug: string;
   href?: string;
@@ -26,9 +26,7 @@ interface BlogPostCardProps {
   author?: ReactNode;
   readTime?: string;
   locale?: string;
-  isFallback?: boolean;
 }
-
 export function BlogPostCard({
   slug,
   href,
@@ -42,12 +40,11 @@ export function BlogPostCard({
   author,
   readTime,
   locale,
-  isFallback = false,
 }: BlogPostCardProps) {
+  const { t } = useTranslation();
   const postHref = href ?? `/blog/${slug}`;
   const isFeatured = variant === "featured";
   const hasImage = !!heroImage;
-
   const cardClasses = cn(
     "group overflow-hidden backdrop-blur-sm transition-all duration-300",
     isFeatured
@@ -55,14 +52,11 @@ export function BlogPostCard({
       : "border-border bg-background/50 hover:bg-background/80 hover:shadow-lg",
     className,
   );
-
   const imageHeight = isFeatured ? "h-64 lg:h-80" : "h-48";
   const titleSize = isFeatured ? "text-2xl lg:text-3xl" : "text-xl lg:text-2xl";
   const readMoreText = isFeatured ? "Read full article" : "Read article";
-
   const defaultExcerpt =
     "Discover the latest insights and updates in this comprehensive article. Click to read the full content and learn more about this topic.";
-
   return (
     <Card className={cardClasses}>
       {/* Hero Image */}
@@ -85,14 +79,14 @@ export function BlogPostCard({
                 className="bg-primary/90 text-primary-foreground border-primary/20 hover:bg-primary backdrop-blur-sm transition-colors"
               >
                 <Sparkles className="mr-1 h-3 w-3" />
-                Featured
+                {t("82cc9cd0a5e8", "Featured")}
               </Badge>
             ) : (
               <Badge
                 variant="secondary"
                 className="bg-background/90 text-foreground border-border hover:bg-background backdrop-blur-sm transition-colors"
               >
-                Article
+                {t("296b6f037924", "Article")}
               </Badge>
             )}
           </div>
@@ -109,14 +103,14 @@ export function BlogPostCard({
                 className="bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 transition-colors"
               >
                 <Sparkles className="mr-1 h-3 w-3" />
-                Featured
+                {t("82cc9cd0a5e8", "Featured")}
               </Badge>
             ) : (
               <Badge
                 variant="secondary"
                 className="bg-muted/50 text-muted-foreground border-muted hover:bg-muted transition-colors"
               >
-                Article
+                {t("296b6f037924", "Article")}
               </Badge>
             )}
           </div>
@@ -143,17 +137,6 @@ export function BlogPostCard({
             readTime={readTime}
             locale={locale}
           />
-
-          {isFallback && (
-            <div>
-              <Badge
-                variant="outline"
-                className="border-amber-300/60 bg-amber-50 text-amber-900"
-              >
-                English only
-              </Badge>
-            </div>
-          )}
         </div>
       </CardHeader>
 
@@ -174,7 +157,7 @@ export function BlogPostCard({
           {readMoreText}
           <span
             className="transition-transform group-hover:translate-x-1"
-            data-lingo-skip
+            translate="no"
           >
             →
           </span>

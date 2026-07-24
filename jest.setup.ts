@@ -1,4 +1,5 @@
 import "@testing-library/jest-dom";
+import type React from "react";
 
 // Jest setup for test environment
 
@@ -497,13 +498,24 @@ const mockCrypto: MockCrypto = {
 // Mock crypto module to avoid ES module issues
 jest.mock("uncrypto", () => mockCrypto, { virtual: true });
 
-// Mock lingo react client to avoid ESM-only dependency in Jest
-jest.mock("@lingo.dev/compiler/react", () => ({
-  useLingoContext: () => ({
-    locale: "en",
-    setLocale: jest.fn().mockResolvedValue(undefined),
-    isLoading: false,
-  }),
+const createIntlTranslatorMock = () =>
+  Object.assign((key: string) => key, {
+    has: () => false,
+    rich: (key: string) => key,
+    raw: (key: string) => key,
+  });
+
+jest.mock("next-intl", () => ({
+  NextIntlClientProvider: ({ children }: { children: React.ReactNode }) =>
+    children,
+  useLocale: () => "en",
+  useTranslations: () => createIntlTranslatorMock(),
+}));
+
+jest.mock("next-intl/server", () => ({
+  getRequestConfig: (config: unknown) => config,
+  getTranslations: async () => createIntlTranslatorMock(),
+  setRequestLocale: jest.fn(),
 }));
 
 // Type-safe better-auth mock

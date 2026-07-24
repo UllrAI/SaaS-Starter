@@ -50,11 +50,17 @@ jest.mock("@/lib/i18n/locale-switch", () => ({
   resolveLocaleSwitchUrl: () => null,
 }));
 
-jest.mock("@lingo.dev/compiler/react", () => ({
-  useLingoContext: () => ({
-    locale: null,
-    setLocale: jest.fn(),
-  }),
+jest.mock("next-intl", () => ({
+  useLocale: () => "en",
+  useTranslations: () =>
+    Object.assign((key: string) => key, {
+      has: () => false,
+      rich: (key: string) => key,
+    }),
+}));
+
+jest.mock("next/navigation", () => ({
+  useRouter: () => ({ refresh: jest.fn() }),
 }));
 
 import { LocaleSwitcher } from "./locale-switcher";

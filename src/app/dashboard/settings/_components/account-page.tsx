@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/lib/i18n/translation/client";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -22,19 +23,19 @@ import {
 import { authClient, useSession } from "@/lib/auth/client";
 import { Session } from "@/types/auth";
 import { Edit, Loader2 } from "lucide-react";
-
 function ProfileUpdatedToast() {
-  return <>Profile updated successfully</>;
+  const { t } = useTranslation();
+  return <>{t("119e58d8b4fc", "Profile updated successfully")}</>;
 }
 
 // Props are no longer needed for active sessions
 export function AccountPage() {
+  const { t } = useTranslation();
   const { data: currentUserSession, isPending } = useSession();
-
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle>Account Information</CardTitle>
+        <CardTitle>{t("cd253ef38d3e", "Account Information")}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="flex flex-col items-start justify-between gap-4 sm:flex-row">
@@ -81,29 +82,29 @@ function EditUserDialog({
   session: Session | null;
   isPending: boolean;
 }) {
+  const { t } = useTranslation();
   const [name, setName] = useState<string>(session?.user.name || "");
   const router = useRouter();
   const [open, setOpen] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button size="sm" variant="secondary" className="gap-2">
           <Edit size={16} />
-          Edit Profile
+          {t("3a1df89dfa18", "Edit Profile")}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Edit Your Profile</DialogTitle>
+          <DialogTitle>{t("3c698fc5fdb8", "Edit Your Profile")}</DialogTitle>
           <DialogDescription>
-            Change your name and profile picture
+            {t("becd198609cc", "Change your name and profile picture")}
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid gap-2">
-            <Label htmlFor="name">Full Name</Label>
+            <Label htmlFor="name">{t("c016235dc4f0", "Full Name")}</Label>
             <Input
               id="name"
               value={name}
@@ -112,7 +113,7 @@ function EditUserDialog({
             />
           </div>
           <div className="grid gap-2">
-            <Label>Profile Picture</Label>
+            <Label>{t("ec6fe33b24a4", "Profile Picture")}</Label>
             <div className="flex items-center gap-4">
               {isPending ? (
                 <Skeleton className="h-16 w-16 rounded-full" />
@@ -131,8 +132,10 @@ function EditUserDialog({
               )}
               <div className="flex-1">
                 <p className="text-muted-foreground text-sm">
-                  Profile pictures are automatically generated using DiceBear
-                  avatars based on your email address.
+                  {t(
+                    "90b3f2ab1933",
+                    "Profile pictures are automatically generated using DiceBear avatars based on your email address.",
+                  )}
                 </p>
               </div>
             </div>
@@ -159,10 +162,11 @@ function EditUserDialog({
               setIsLoading(false);
             }}
           >
-            {isLoading ? (
-              <Loader2 size={15} className="mr-2 animate-spin" />
-            ) : null}
-            Update Profile
+            {t("63b43f92aa70", "{expression0} Update Profile", {
+              expression0: isLoading ? (
+                <Loader2 size={15} className="mr-2 animate-spin" />
+              ) : null,
+            })}
           </Button>
         </DialogFooter>
       </DialogContent>

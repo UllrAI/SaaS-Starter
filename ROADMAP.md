@@ -13,7 +13,7 @@ These parts already exist in the repository today:
 - Billing flow with Creem checkout, portal handoff, and webhook processing
 - Dashboard and admin pages for users, payments, subscriptions, and uploads
 - Cloudflare R2 upload flows for browser and server-side uploads
-- Localization foundation with Lingo multiple language support
+- Localization foundation with next-intl multiple language support
 - Marketing pages, blog content, sitemap, and baseline SEO support
 - Jest coverage and Playwright smoke tests for critical browser flows
 - An agent-friendly developer workflow for scripts, coding agents, and local automation
@@ -90,7 +90,7 @@ These are not treated as default roadmap items unless a real use case appears:
 - 基于 Creem 的计费流程，包括 checkout、portal 跳转和 webhook 处理
 - 用户、支付、订阅、上传等 Dashboard 与后台管理页面
 - 面向浏览器直传和服务端上传的 Cloudflare R2 上传链路
-- 基于 Lingo 的多语言本地化基础设施
+- 基于 next-intl 的多语言本地化基础设施
 - 营销页、博客内容、sitemap 和基础 SEO 支持
 - 覆盖关键浏览器链路的 Jest 与 Playwright 冒烟测试
 - 面向脚本、Coding Agent 和本地自动化工具的 Agent 友好工作流

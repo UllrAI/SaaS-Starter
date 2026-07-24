@@ -2,7 +2,6 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { AuthForm } from "./auth-form";
 import { signIn } from "@/lib/auth/client";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
 import type { ResolvedAuthFeedback } from "@/lib/auth/feedback";
 import { AuthFeedbackAlert } from "@/components/auth/auth-feedback-alert";
 
@@ -88,7 +87,6 @@ jest.mock("@/components/auth/auth-form-base", () => ({
 }));
 
 jest.mock("next/navigation");
-jest.mock("sonner");
 jest.mock("next/link", () => {
   return function Link({
     children,
@@ -105,19 +103,12 @@ jest.mock("next/link", () => {
 
 const mockSignIn = signIn as jest.Mocked<typeof signIn>;
 const mockUseRouter = useRouter as jest.MockedFunction<typeof useRouter>;
-const mockToast = toast as jest.Mocked<typeof toast>;
-
 const mockPush = jest.fn();
 const mockPrefetch = jest.fn();
-const mockFetch = jest.fn();
 
 describe("AuthForm", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    global.fetch = mockFetch as unknown as typeof fetch;
-    mockFetch.mockResolvedValue({
-      json: async () => ({ status: "active" }),
-    });
     mockUseRouter.mockReturnValue({
       push: mockPush,
       back: jest.fn(),
@@ -204,9 +195,6 @@ describe("AuthForm", () => {
       fireEvent.click(submitButton);
 
       await waitFor(() => {
-        expect(mockFetch).toHaveBeenCalledWith(
-          "/api/auth/account-status?email=test%40example.com",
-        );
         expect(mockSignIn.magicLink).toHaveBeenCalledWith({
           email: "test@example.com",
           callbackURL: "/dashboard",
@@ -218,7 +206,7 @@ describe("AuthForm", () => {
       });
     });
 
-    it("shows error toast on submission failure", async () => {
+    it("shows a controlled error on submission failure", async () => {
       const errorMessage = "Invalid email address";
       mockSignIn.magicLink = jest.fn().mockResolvedValue({
         error: { message: errorMessage },
@@ -235,7 +223,10 @@ describe("AuthForm", () => {
       fireEvent.click(submitButton);
 
       await waitFor(() => {
-        expect(mockToast.error).toHaveBeenCalledWith(errorMessage);
+        expect(screen.getByTestId("auth-feedback")).toHaveTextContent(
+          "Unable to sign in. Try again.",
+        );
+        expect(screen.queryByText(errorMessage)).not.toBeInTheDocument();
         expect(mockPush).not.toHaveBeenCalled();
       });
     });
@@ -259,12 +250,9 @@ describe("AuthForm", () => {
       });
     });
 
-    it("shows a disabled-account message before sending magic link", async () => {
-      mockFetch.mockResolvedValue({
-        json: async () => ({
-          status: "banned",
-          message: "This account is disabled. Contact support.",
-        }),
+    it("does not perform an account-enumeration preflight", async () => {
+      mockSignIn.magicLink = jest.fn().mockResolvedValue({
+        error: { message: "This account is disabled. Contact support." },
       });
 
       render(<AuthForm mode="login" />);
@@ -275,12 +263,14 @@ describe("AuthForm", () => {
       fireEvent.click(screen.getByRole("button", { name: /Send Magic Link/i }));
 
       await waitFor(() => {
-        expect(mockSignIn.magicLink).not.toHaveBeenCalled();
-        expect(mockToast.error).not.toHaveBeenCalled();
+        expect(mockSignIn.magicLink).toHaveBeenCalledTimes(1);
         expect(mockPush).not.toHaveBeenCalled();
         expect(screen.getByTestId("auth-feedback")).toHaveTextContent(
-          "This account is disabled. Contact support.",
+          "Unable to sign in. Try again.",
         );
+        expect(
+          screen.queryByText("This account is disabled. Contact support."),
+        ).not.toBeInTheDocument();
       });
     });
   });

@@ -1,17 +1,26 @@
+import { useTranslation } from "@/lib/i18n/translation/client";
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/logo";
 import { SectionContainer } from "@/components/layout/page-container";
 import { ArrowRight, CheckCircle } from "lucide-react";
-import Link from "next/link";
-
+import { LocalizedLink as Link } from "@/components/localized-link";
 export function CallToAction() {
+  const { t } = useTranslation();
   const proofPoints = [
-    { id: "typed", label: <>Type-safe data flow</> },
-    { id: "self-hosted", label: <>Self-hosted by default</> },
-    { id: "extensible", label: <>Built to customize</> },
+    {
+      id: "typed",
+      label: <>{t("df3d4b6f7ff0", "Type-safe data flow")}</>,
+    },
+    {
+      id: "self-hosted",
+      label: <>{t("df7bca868e28", "Self-hosted by default")}</>,
+    },
+    {
+      id: "extensible",
+      label: <>{t("c090fb34c3eb", "Built to customize")}</>,
+    },
   ];
-
   return (
     <section className="border-border bg-background border-t">
       <SectionContainer className="py-24 sm:py-32">
@@ -22,16 +31,22 @@ export function CallToAction() {
 
           <div className="mx-auto mt-10 max-w-3xl space-y-6">
             <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase">
-              <>Ship the foundation first</>
+              <>{t("fd4b42b55477", "Ship the foundation first")}</>
             </p>
             <h2 className="text-foreground text-4xl font-bold tracking-tight sm:text-5xl">
-              <>Start from a working product shell, not a blank repo</>
+              <>
+                {t(
+                  "f7db926a45d4",
+                  "Start from a working product shell, not a blank repo",
+                )}
+              </>
             </h2>
             <p className="text-muted-foreground text-lg leading-relaxed sm:text-xl">
               <>
-                The starter gives you auth, billing, uploads, admin pages, and
-                content scaffolding so your next sprint can focus on product
-                logic and customer workflows.
+                {t(
+                  "14e4aa55896a",
+                  "The starter gives you auth, billing, uploads, admin pages, and content scaffolding so your next sprint can focus on product logic and customer workflows.",
+                )}
               </>
             </p>
           </div>
@@ -52,7 +67,7 @@ export function CallToAction() {
               asChild
             >
               <Link href="/pricing">
-                <>View pricing</>
+                <>{t("12f934de1f96", "View pricing")}</>
                 <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Link>
             </Button>
@@ -64,15 +79,17 @@ export function CallToAction() {
               asChild
             >
               <Link href="/features">
-                <>See what&apos;s inside</>
+                <>{t("8a9b896f234f", "See what's inside")}</>
               </Link>
             </Button>
           </div>
 
           <p className="text-muted-foreground mt-6 text-sm">
             <>
-              Own the codebase, keep the architecture, and adapt the pieces you
-              actually need.
+              {t(
+                "55b4630c0c02",
+                "Own the codebase, keep the architecture, and adapt the pieces you actually need.",
+              )}
             </>
           </p>
         </div>

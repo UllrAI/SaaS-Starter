@@ -1,18 +1,21 @@
+import { useTranslation } from "@/lib/i18n/translation/client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DashboardPageWrapper } from "../_components/dashboard-page-wrapper";
-
 function DeveloperAccessPageTitle() {
-  return <>Developer Access</>;
+  const { t } = useTranslation();
+  return <>{t("5ec8aa48aae2", "Developer Access")}</>;
 }
-
 function DeveloperAccessPageDescription() {
+  const { t } = useTranslation();
   return (
     <>
-      Manage API keys, CLI sessions, and agent-friendly access from one place.
+      {t(
+        "9db4b59fc7ce",
+        "Manage API keys, CLI sessions, and agent-friendly access from one place.",
+      )}
     </>
   );
 }
-
 export default function DashboardDeveloperAccessLoading() {
   return (
     <DashboardPageWrapper

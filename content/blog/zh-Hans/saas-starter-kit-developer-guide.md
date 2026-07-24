@@ -191,13 +191,13 @@ SaaS-Starter-main/
   - 集成 `ThemeProvider` 实现深色/浅色模式。
   - 集成 `NextTopLoader` 提供页面加载进度条。
   - 集成 `Toaster` 用于全局通知。
-  - 集成 `CookieConsent` 用于 Cookie 同意管理。
+  - 向应用提供请求语言和 next-intl 消息。
 - **`proxy.ts`**: 在请求到达页面之前运行，是实现路由保护的核心。
   - 检查用户会话 Cookie。
   - 如果用户未登录但访问 `/dashboard/*`，重定向到 `/login`。
-  - 如果用户已登录但访问 `/login` 或 `/signup`，重定向到 `/dashboard`。
+  - 规范化带语言前缀的营销 URL，并转发当前语言。
 - **`src/app/dashboard/layout.tsx`**: 仪表盘的根布局。
-  - 使用 `SessionGuard` 组件保护所有子路由。`SessionGuard` 是一个客户端组件，它会验证会话是否存在，如果不存在则重定向到登录页，并在验证期间显示加载动画。
+  - 在服务端使用 `requireAuth` 校验身份，未通过前不会渲染受保护内容。
   - 渲染 `AppSidebar` 和主内容区域 `SidebarInset`。
 
 #### 2.2.2. 配置系统设计
@@ -224,7 +224,7 @@ SaaS-Starter-main/
 
 - `(pages)`: 存放所有对公众可见的页面，如首页、关于、博客、定价等。使用 `src/app/(pages)/layout.tsx` 提供统一的页头和页脚。
 - `(auth)`: 存放认证流程中的页面，如登录、注册。使用 `src/app/(auth)/layout.tsx` 提供一个居中、简洁的布局。
-- `(dashboard)`: 存放所有需要用户登录才能访问的页面。其布局 `src/app/dashboard/layout.tsx` 通过 `SessionGuard` 实现了路由保护。
+- `dashboard`: 存放所有需要用户登录才能访问的页面，其布局通过服务端 `requireAuth` 实现路由保护。
 - `api/v1`: 存放面向机器客户端的版本化认证接口，包括 API 校验、设备批准、token 换取与刷新。
 
 #### 2.2.5. 构建和打包流程

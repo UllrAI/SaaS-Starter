@@ -91,7 +91,7 @@ export default async function authMiddleware(request: NextRequest) {
     if (pathLocale.locale === SOURCE_LOCALE) {
       const redirectUrl = new URL(request.url);
       redirectUrl.pathname = pathLocale.strippedPathname;
-      const response = NextResponse.redirect(redirectUrl);
+      const response = NextResponse.redirect(redirectUrl, 308);
       setLocaleCookie(response, SOURCE_LOCALE);
       return response;
     }
@@ -108,7 +108,7 @@ export default async function authMiddleware(request: NextRequest) {
     ) {
       const redirectUrl = new URL(request.url);
       redirectUrl.pathname = canonicalLocalizedPath;
-      const response = NextResponse.redirect(redirectUrl);
+      const response = NextResponse.redirect(redirectUrl, 308);
       setLocaleCookie(response, pathLocale.locale);
       return response;
     }
@@ -126,15 +126,7 @@ export default async function authMiddleware(request: NextRequest) {
     return response;
   }
 
-  // Bare marketing paths are canonical for English, but redirect for other locales.
-  if (preferredLocale !== SOURCE_LOCALE) {
-    const redirectUrl = new URL(request.url);
-    redirectUrl.pathname = withLocalePrefix(pathname, preferredLocale);
-    const response = NextResponse.redirect(redirectUrl);
-    setLocaleCookie(response, preferredLocale);
-    return response;
-  }
-
+  // Bare marketing paths are stable English canonical URLs.
   const requestHeaders = createLocalizedRequestHeaders(request, SOURCE_LOCALE);
   const response = NextResponse.next({
     request: {

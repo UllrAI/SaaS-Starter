@@ -1,3 +1,4 @@
+import { getServerTranslations } from "@/lib/i18n/translation/server";
 import React from "react";
 import Link from "next/link";
 import { count, eq, sum } from "drizzle-orm";
@@ -30,31 +31,36 @@ import {
   Sparkles,
   UserCircle2,
 } from "lucide-react";
-
 export async function generateMetadata() {
+  const { t } = await getServerTranslations();
   const metadata = createMetadataDefaults();
-
   return {
     ...metadata,
-    title: "Dashboard",
-    description:
+    title: t("268278a36d91", "Dashboard"),
+    description: t(
+      "045b5a0161f5",
       "Account overview, billing status, and starter setup progress.",
+    ),
     openGraph: {
       ...metadata.openGraph,
-      title: "Dashboard",
-      description:
+      title: t("2e5e078f6788", "Dashboard"),
+      description: t(
+        "549ad5b172bb",
         "Account overview, billing status, and starter setup progress.",
+      ),
     },
     twitter: {
       ...metadata.twitter,
-      title: "Dashboard",
-      description:
+      title: t("cb58fa7417a6", "Dashboard"),
+      description: t(
+        "c4a28414dd48",
         "Account overview, billing status, and starter setup progress.",
+      ),
     },
   };
 }
-
 export default async function HomeRoute() {
+  const { t } = await getServerTranslations();
   const user = await requireAuth();
   const [locale, subscription, payments, [uploadSummary]] = await Promise.all([
     getRequestLocale(),
@@ -68,7 +74,6 @@ export default async function HomeRoute() {
       .from(uploads)
       .where(eq(uploads.userId, user.id)),
   ]);
-
   const latestPayment = payments[0] ?? null;
   const uploadedFileCount = uploadSummary?.count ?? 0;
   const uploadedFileSize = Number(uploadSummary?.totalSize ?? 0);
@@ -78,33 +83,54 @@ export default async function HomeRoute() {
   const checklistLinks = [
     {
       id: "billing",
-      title: <>Review billing flow</>,
-      description: <>Check plan selection, checkout, and portal access.</>,
+      title: <>{t("c073a40a7e0b", "Review billing flow")}</>,
+      description: (
+        <>
+          {t(
+            "c6e1e570d858",
+            "Check plan selection, checkout, and portal access.",
+          )}
+        </>
+      ),
       href: "/dashboard/billing",
     },
     {
       id: "upload",
-      title: <>Verify uploads</>,
+      title: <>{t("e1e660cf23a9", "Verify uploads")}</>,
       description: (
-        <>Test client and server uploads against your storage config.</>
+        <>
+          {t(
+            "f648e7207015",
+            "Test client and server uploads against your storage config.",
+          )}
+        </>
       ),
       href: "/dashboard/upload",
     },
     {
       id: "settings",
-      title: <>Finish account setup</>,
+      title: <>{t("fe6f44def372", "Finish account setup")}</>,
       description: (
-        <>Update your profile and validate theme and locale preferences.</>
+        <>
+          {t(
+            "a70035543f9a",
+            "Update your profile and validate theme and locale preferences.",
+          )}
+        </>
       ),
       href: "/dashboard/settings",
     },
   ];
-
   return (
     <DashboardPageWrapper
-      title={<>Dashboard</>}
+      title={<>{t("f33256a53736", "Dashboard")}</>}
       description={
-        <>Account overview, billing status, and starter setup progress.</>
+        <>
+          {t(
+            "8a325ee3005b",
+            "Account overview, billing status, and starter setup progress.",
+          )}
+        </>
       }
     >
       <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
@@ -112,15 +138,20 @@ export default async function HomeRoute() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <UserCircle2 className="text-primary h-5 w-5" />
-              Account overview
+              {t("03b04b82b57a", "Account overview")}
             </CardTitle>
             <CardDescription>
-              A summary of the account and starter modules currently in use.
+              {t(
+                "c2b5a91643a5",
+                "A summary of the account and starter modules currently in use.",
+              )}
             </CardDescription>
           </CardHeader>
           <CardContent className="grid gap-4 md:grid-cols-3">
             <div className="border-border space-y-2 border p-4">
-              <p className="text-muted-foreground text-xs uppercase">Plan</p>
+              <p className="text-muted-foreground text-xs uppercase">
+                {t("371bd6f449f6", "Plan")}
+              </p>
               <p className="text-lg font-semibold">{subscriptionLabel}</p>
               <Badge
                 className="capitalize"
@@ -131,19 +162,25 @@ export default async function HomeRoute() {
                     : "secondary"
                 }
               >
-                {subscription?.status ?? <>No active subscription</>}
+                {subscription?.status ?? (
+                  <>{t("4269fcc20a1d", "No active subscription")}</>
+                )}
               </Badge>
             </div>
             <div className="border-border space-y-2 border p-4">
-              <p className="text-muted-foreground text-xs uppercase">Uploads</p>
+              <p className="text-muted-foreground text-xs uppercase">
+                {t("8a69847fa5c4", "Uploads")}
+              </p>
               <p className="text-lg font-semibold">{uploadedFileCount}</p>
               <p className="text-muted-foreground text-sm">
-                {formatFileSize(uploadedFileSize)} stored
+                {t("1639540e6c5b", "{expression0} stored", {
+                  expression0: formatFileSize(uploadedFileSize),
+                })}
               </p>
             </div>
             <div className="border-border space-y-2 border p-4">
               <p className="text-muted-foreground text-xs uppercase">
-                Payments
+                {t("e6dc7b2a7611", "Payments")}
               </p>
               <p className="text-lg font-semibold">{payments.length}</p>
               <p className="text-muted-foreground text-sm">
@@ -154,7 +191,7 @@ export default async function HomeRoute() {
                     locale,
                   )
                 ) : (
-                  <>No payment records yet</>
+                  <>{t("e0ad3db6609c", "No payment records yet")}</>
                 )}
               </p>
             </div>
@@ -165,20 +202,26 @@ export default async function HomeRoute() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <ShieldCheck className="text-primary h-5 w-5" />
-              Current account
+              {t("ed775b2ca635", "Current account")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4 text-sm">
             <div className="border-border border p-4">
-              <p className="text-muted-foreground">Name</p>
+              <p className="text-muted-foreground">
+                {t("71579b491980", "Name")}
+              </p>
               <p className="font-medium">{user.name}</p>
             </div>
             <div className="border-border border p-4">
-              <p className="text-muted-foreground">Email</p>
+              <p className="text-muted-foreground">
+                {t("9c1b07e30177", "Email")}
+              </p>
               <p className="font-medium">{user.email}</p>
             </div>
             <div className="border-border border p-4">
-              <p className="text-muted-foreground">Role</p>
+              <p className="text-muted-foreground">
+                {t("666a2a3f4ded", "Role")}
+              </p>
               <p className="font-medium capitalize">
                 {user.role.replace("_", " ")}
               </p>
@@ -192,11 +235,13 @@ export default async function HomeRoute() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Sparkles className="text-primary h-5 w-5" />
-              Setup checklist
+              {t("971aa604f9c3", "Setup checklist")}
             </CardTitle>
             <CardDescription>
-              The starter is already wired up. These are the next places to make
-              it match your product.
+              {t(
+                "b4f335c74f5b",
+                "The starter is already wired up. These are the next places to make it match your product.",
+              )}
             </CardDescription>
           </CardHeader>
           <CardContent className="grid gap-3">
@@ -225,10 +270,13 @@ export default async function HomeRoute() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <CreditCard className="text-primary h-5 w-5" />
-              Recent billing activity
+              {t("c595dd7db3ee", "Recent billing activity")}
             </CardTitle>
             <CardDescription>
-              Recent payment records attached to your current account.
+              {t(
+                "dfcc3bcdf4eb",
+                "Recent payment records attached to your current account.",
+              )}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -265,8 +313,10 @@ export default async function HomeRoute() {
               <div className="border-border flex items-center gap-3 border p-4 text-sm">
                 <Files className="text-primary h-4 w-4" />
                 <span className="text-muted-foreground">
-                  No payment history yet. Visit billing when you are ready to
-                  test checkout.
+                  {t(
+                    "5ed90e574285",
+                    "No payment history yet. Visit billing when you are ready to test checkout.",
+                  )}
                 </span>
               </div>
             )}

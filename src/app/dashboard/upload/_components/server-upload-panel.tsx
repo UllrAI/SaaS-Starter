@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/lib/i18n/translation/client";
 import { useId, useRef, useState } from "react";
 import { Server, Sparkles, ShieldCheck, Workflow } from "lucide-react";
 import { toast } from "sonner";
@@ -8,7 +9,6 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import type { UploadedFile } from "@/components/ui/file-uploader";
-
 interface ServerUploadResult {
   contentType?: string;
   error?: string;
@@ -18,7 +18,6 @@ interface ServerUploadResult {
   success: boolean;
   url?: string;
 }
-
 interface ServerUploadResponse {
   results: ServerUploadResult[];
   summary: {
@@ -27,7 +26,6 @@ interface ServerUploadResponse {
     total: number;
   };
 }
-
 function ServerUploadSuccessToast({ count }: { count: number }) {
   return count === 1 ? (
     <>1 file finished through the server pipeline.</>
@@ -35,7 +33,6 @@ function ServerUploadSuccessToast({ count }: { count: number }) {
     <>{count} files finished through the server pipeline.</>
   );
 }
-
 function ServerUploadWarningToast({
   failed,
   success,
@@ -43,59 +40,60 @@ function ServerUploadWarningToast({
   failed: number;
   success: number;
 }) {
+  const { t } = useTranslation();
   return (
     <>
-      {success} file(s) uploaded and {failed} file(s) need attention.
+      {t(
+        "b1dc545d7aa6",
+        "{success} file(s) uploaded and {failed} file(s) need attention.",
+        {
+          success,
+          failed,
+        },
+      )}
     </>
   );
 }
-
 function ServerUploadFailureToast() {
-  return <>The server upload did not complete.</>;
+  const { t } = useTranslation();
+  return <>{t("ae0459f95b24", "The server upload did not complete.")}</>;
 }
-
 export function ServerUploadPanel() {
+  const { t } = useTranslation();
   const [isUploading, setIsUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const inputId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
-
   const handleFiles = async (files: FileList | null) => {
     if (!files || files.length === 0) {
       return;
     }
-
     setIsUploading(true);
     setProgress(8);
-
     try {
       const formData = new FormData();
       Array.from(files).forEach((file) => {
         formData.append("files", file);
       });
-
       setProgress(24);
-
       const response = await fetch("/api/upload/server-upload", {
         method: "POST",
         body: formData,
       });
-
       setProgress(76);
-
       if (!response.ok) {
         throw new Error("server-upload-failed");
       }
-
       const payload = (await response.json()) as ServerUploadResponse;
       setProgress(100);
-
       const uploadedFiles = payload.results
         .filter(
           (
             result,
-          ): result is Required<ServerUploadResult> & { success: true } =>
+          ): result is Required<ServerUploadResult> & {
+            success: true;
+          } =>
             Boolean(
               result.success &&
               result.url &&
@@ -111,19 +109,15 @@ export function ServerUploadPanel() {
           size: result.size,
           url: result.url,
         }));
-
       if (uploadedFiles.length > 0) {
         setUploadedFiles((currentFiles) => {
           const merged = new Map<string, UploadedFile>();
-
           [...uploadedFiles, ...currentFiles].forEach((file) => {
             merged.set(file.key, file);
           });
-
           return Array.from(merged.values());
         });
       }
-
       if (payload.summary.failed > 0) {
         toast.warning(
           <ServerUploadWarningToast
@@ -146,25 +140,30 @@ export function ServerUploadPanel() {
       }, 250);
     }
   };
-
   return (
     <div className="space-y-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="space-y-1">
           <div className="flex items-center gap-2 text-sm font-medium">
             <Server className="h-4 w-4" />
-            <span>Upload through the server</span>
+            <span>{t("5dd19b25af8a", "Upload through the server")}</span>
           </div>
           <p className="text-muted-foreground text-sm">
-            Use this path when the backend needs to validate or transform files
-            before storage.
+            {t(
+              "1a6174bb1602",
+              "Use this path when the backend needs to validate or transform files before storage.",
+            )}
           </p>
         </div>
 
         <div className="flex flex-wrap gap-2">
-          <Badge variant="secondary">Streaming upload</Badge>
-          <Badge variant="secondary">Auth checked</Badge>
-          <Badge variant="outline">Parallel processing</Badge>
+          <Badge variant="secondary">
+            {t("ec3fbe6e72ea", "Streaming upload")}
+          </Badge>
+          <Badge variant="secondary">{t("c6502cf5c4d9", "Auth checked")}</Badge>
+          <Badge variant="outline">
+            {t("4c49ff5d676b", "Parallel processing")}
+          </Badge>
         </div>
       </div>
 
@@ -195,19 +194,25 @@ export function ServerUploadPanel() {
           <div className="space-y-2">
             <p className="text-sm font-medium">
               {isUploading ? (
-                <>Uploading through the server…</>
+                <>{t("c4ddc0b77d12", "Uploading through the server\u2026")}</>
               ) : (
-                <>Select files for server processing</>
+                <>{t("bd91f9d34131", "Select files for server processing")}</>
               )}
             </p>
             <p className="text-muted-foreground text-sm">
-              The request stays inside your application boundary before landing
-              in storage.
+              {t(
+                "b04c54dc22b6",
+                "The request stays inside your application boundary before landing in storage.",
+              )}
             </p>
           </div>
 
           <span className="text-muted-foreground group-hover:text-foreground text-sm transition">
-            {isUploading ? <>Working…</> : <>Browse files</>}
+            {isUploading ? (
+              <>{t("e4ce2f9573fe", "Working\u2026")}</>
+            ) : (
+              <>{t("bb5859e3a5fc", "Browse files")}</>
+            )}
           </span>
         </div>
       </button>
@@ -215,8 +220,12 @@ export function ServerUploadPanel() {
       {isUploading ? (
         <div className="bg-background space-y-2 rounded-lg border p-3">
           <div className="flex items-center justify-between text-sm">
-            <span>Pipeline progress</span>
-            <span>{progress}%</span>
+            <span>{t("0e93b7a482a9", "Pipeline progress")}</span>
+            <span>
+              {t("42b3855d0f95", "{progress}%", {
+                progress,
+              })}
+            </span>
           </div>
           <Progress value={progress} className="h-2" />
         </div>
@@ -226,15 +235,15 @@ export function ServerUploadPanel() {
         <div className="flex flex-wrap items-center gap-4">
           <span className="inline-flex items-center gap-2">
             <ShieldCheck className="h-4 w-4" />
-            Validation
+            {t("be4eff358729", "Validation")}
           </span>
           <span className="inline-flex items-center gap-2">
             <Sparkles className="h-4 w-4" />
-            Enrichment
+            {t("c54161b505a7", "Enrichment")}
           </span>
           <span className="inline-flex items-center gap-2">
             <Workflow className="h-4 w-4" />
-            Parallel processing
+            {t("4c49ff5d676b", "Parallel processing")}
           </span>
         </div>
       </div>

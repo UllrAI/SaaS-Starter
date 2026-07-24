@@ -1,27 +1,15 @@
-"use client";
-
-import React, { useState } from "react";
+import { useTranslation } from "@/lib/i18n/translation/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Github, Terminal, Copy, Check } from "lucide-react";
+import { Github, Terminal } from "lucide-react";
 import { GITHUB_URL } from "@/lib/config/constants";
 import Link from "next/link";
-import { useHydrated } from "@/hooks/use-hydrated";
 import { ShellContainer } from "@/components/layout/page-container";
-
+import { CopyCommand } from "@/components/homepage/copy-command";
 const UI_STACK_LABEL = "Next.js 16 + shadcn/ui";
-
 export function Hero() {
-  const [copied, setCopied] = useState(false);
-  const mounted = useHydrated();
+  const { t } = useTranslation();
   const command = "git clone https://github.com/UllrAI/SaaS-Starter.git";
-
-  const handleCopy = () => {
-    navigator.clipboard.writeText(command);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
   return (
     <section className="bg-background border-border relative overflow-hidden border-b pt-24 pb-32 lg:pt-32 lg:pb-48">
       <ShellContainer className="relative z-10">
@@ -29,9 +17,7 @@ export function Hero() {
           {/* Left Side: Content */}
           <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
             {/* Badge */}
-            <div
-              className={`transform transition-all duration-1000 ${mounted ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"}`}
-            >
+            <div>
               <Badge
                 variant="outline"
                 className="border-primary/30 bg-primary/5 text-primary hover:bg-primary/10 mb-4 inline-flex cursor-default items-center gap-2 border px-4 py-2 font-mono text-sm font-bold transition-colors"
@@ -40,43 +26,37 @@ export function Hero() {
                   <span className="bg-primary absolute inline-flex h-full w-full animate-ping rounded-full opacity-75"></span>
                   <span className="bg-primary relative inline-flex h-2 w-2 rounded-full"></span>
                 </span>
-                <>Open source and agent ready</>
+                <>{t("d1b92e58e64e", "Open source and agent ready")}</>
               </Badge>
             </div>
 
             {/* Massive Headline */}
-            <h1
-              className={`text-foreground mb-6 transform text-5xl leading-[0.9] font-black tracking-tighter transition-all delay-100 duration-1000 sm:text-6xl lg:text-7xl xl:text-8xl ${mounted ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"}`}
-            >
-              <span className="block">SHIP YOUR</span>
+            <h1 className="text-foreground mb-6 text-5xl leading-[0.9] font-black tracking-tighter sm:text-6xl lg:text-7xl xl:text-8xl">
+              <span className="block">{t("707cc0b70ffa", "SHIP YOUR")}</span>
               <span className="from-foreground to-foreground/50 block bg-gradient-to-b bg-clip-text pr-1 text-transparent">
-                MICRO SaaS
+                {t("7a0aa6f9ac06", "MICRO SaaS")}
               </span>
             </h1>
 
             {/* Subtext */}
-            <p
-              className={`text-muted-foreground mb-10 max-w-xl transform text-lg leading-relaxed transition-all delay-200 duration-1000 sm:text-xl lg:text-2xl ${mounted ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"}`}
-            >
+            <p className="text-muted-foreground mb-10 max-w-xl text-lg leading-relaxed sm:text-xl lg:text-2xl">
               <>
-                Complete UllrAI SaaS starter with authentication, payments,
-                database, admin tooling, agent-ready APIs, and CLI device auth
-                for agent (OpenClaw, Codex, Claude Code, etc.) workflows.
-                Everything you need to go from idea to revenue.
+                {t(
+                  "a02860137099",
+                  "Complete UllrAI SaaS starter with authentication, payments, database, admin tooling, agent-ready APIs, and CLI device auth for agent (OpenClaw, Codex, Claude Code, etc.) workflows. Everything you need to go from idea to revenue.",
+                )}
               </>
             </p>
 
             {/* CTAs */}
-            <div
-              className={`flex transform flex-col gap-4 transition-all delay-300 duration-1000 sm:flex-row lg:gap-6 ${mounted ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"}`}
-            >
+            <div className="flex flex-col gap-4 sm:flex-row lg:gap-6">
               <Button
                 size="lg"
                 className="bg-primary text-primary-foreground hover:bg-primary/90 h-14 px-10 text-base font-bold shadow-md transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-lg active:translate-x-[8px] active:translate-y-[8px] lg:h-16 lg:px-12 lg:text-lg"
                 asChild
               >
                 <Link href="/signup">
-                  <>START NOW</>
+                  <>{t("207b6bbb9a5c", "START NOW")}</>
                   <Terminal className="ml-3 h-5 w-5" />
                 </Link>
               </Button>
@@ -89,16 +69,14 @@ export function Hero() {
               >
                 <Link href={GITHUB_URL} target="_blank">
                   <Github className="mr-2 h-5 w-5" />
-                  <>VIEW SOURCE</>
+                  <>{t("c96048b0e2f0", "VIEW SOURCE")}</>
                 </Link>
               </Button>
             </div>
           </div>
 
           {/* Right Side: Interface Preview */}
-          <div
-            className={`perspective-container relative w-full transform transition-all delay-500 duration-1000 ${mounted ? "translate-y-0 opacity-100" : "translate-y-20 opacity-0"}`}
-          >
+          <div className="perspective-container relative w-full">
             {/* Main Window Interface */}
             <div className="border-foreground bg-card interface-3d group relative border-2 shadow-[24px_24px_0px_0px_var(--primary)]">
               {/* Window Header */}
@@ -112,11 +90,11 @@ export function Hero() {
                   <div className="bg-foreground/20 mx-2 h-6 w-px" />
                   <span className="text-foreground flex items-center gap-2 font-mono text-sm font-bold">
                     <Terminal className="h-4 w-4" />
-                    developer-console
+                    {t("607820f62f8b", "developer-console")}
                   </span>
                 </div>
                 <div className="text-muted-foreground hidden font-mono text-xs font-bold sm:block">
-                  user@saas-starter:~/projects/my-app
+                  {t("18a5accc9655", "user@saas-starter:~/projects/my-app")}
                 </div>
               </div>
 
@@ -124,37 +102,22 @@ export function Hero() {
               <div className="bg-background grid min-h-[400px] grid-cols-1 lg:grid-cols-12">
                 {/* Left: Terminal Setup */}
                 <div className="border-border overflow-hidden border-b p-6 text-left font-mono text-xs sm:p-8 lg:col-span-7 lg:border-r lg:border-b-0">
-                  <div className="bg-secondary/30 border-border mb-6 flex items-center justify-between gap-4 border border-dashed p-4">
-                    <div className="flex items-center gap-3 overflow-hidden">
-                      <span className="text-primary font-bold" data-lingo-skip>
-                        ➜
-                      </span>
-                      <span className="text-foreground truncate font-bold">
-                        {command}
-                      </span>
-                    </div>
-                    <button
-                      onClick={handleCopy}
-                      className="text-muted-foreground hover:text-primary flex-shrink-0 transition-colors"
-                    >
-                      {copied ? (
-                        <Check className="h-5 w-5" />
-                      ) : (
-                        <Copy className="h-5 w-5" />
-                      )}
-                    </button>
-                  </div>
+                  <CopyCommand
+                    command={command}
+                    copyLabel={t("hero_copy_command", "Copy command")}
+                    copiedLabel={t("hero_command_copied", "Command copied")}
+                  />
 
-                  <div data-lingo-skip className="space-y-2 text-xs sm:text-xs">
+                  <div translate="no" className="space-y-2 text-xs sm:text-xs">
                     {/* Quick Start */}
                     <div className="text-muted-foreground/65">
-                      <span data-lingo-skip className="text-green-500">
+                      <span translate="no" className="text-green-500">
                         ➜
                       </span>{" "}
                       git clone https://github.com/UllrAI/SaaS-Starter.git
                     </div>
                     <div className="text-muted-foreground/65">
-                      <span data-lingo-skip className="text-green-500">
+                      <span translate="no" className="text-green-500">
                         ➜
                       </span>{" "}
                       cd saas-starter
@@ -163,13 +126,13 @@ export function Hero() {
                     <div className="h-4" />
 
                     <div className="text-muted-foreground/65">
-                      <span data-lingo-skip className="text-green-500">
+                      <span translate="no" className="text-green-500">
                         ➜
                       </span>{" "}
                       cp .env.example .env
                     </div>
                     <div className="text-muted-foreground/65">
-                      <span data-lingo-skip className="text-green-500">
+                      <span translate="no" className="text-green-500">
                         ➜
                       </span>{" "}
                       pnpm install
@@ -178,7 +141,7 @@ export function Hero() {
                     <div className="h-4" />
 
                     <div className="text-foreground font-bold">
-                      <span data-lingo-skip className="text-primary">
+                      <span translate="no" className="text-primary">
                         ➜
                       </span>{" "}
                       pnpm dev
@@ -188,15 +151,12 @@ export function Hero() {
 
                     {/* Output */}
                     <div className="text-muted-foreground/65 space-y-1 pl-2">
-                      <div data-lingo-skip className="text-green-500">
+                      <div translate="no" className="text-green-500">
                         ✓ Ready in 1.2s
                       </div>
-                      <div data-lingo-skip>
+                      <div translate="no">
                         ○ Local:{" "}
-                        <span
-                          data-lingo-skip
-                          className="text-primary underline"
-                        >
+                        <span translate="no" className="text-primary underline">
                           http://localhost:3000
                         </span>
                       </div>
@@ -204,7 +164,7 @@ export function Hero() {
 
                     <div className="text-primary mt-6 flex animate-pulse items-center gap-2">
                       <span
-                        data-lingo-skip
+                        translate="no"
                         className="bg-primary block h-4 w-2"
                       />
                       <span>
@@ -218,12 +178,12 @@ export function Hero() {
                 <div className="bg-secondary/5 flex flex-col p-6 text-left sm:p-8 lg:col-span-5">
                   <div className="mb-6 space-y-2">
                     <div className="text-muted-foreground text-xs font-bold tracking-widest uppercase">
-                      <>What&apos;s Included</>
+                      <>{t("245227079fc0", "What's Included")}</>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="bg-primary h-3 w-3 rounded-full" />
                       <span className="text-foreground font-bold">
-                        <>Production Ready</>
+                        <>{t("5d972ec0bd5e", "Production Ready")}</>
                       </span>
                     </div>
                   </div>
@@ -232,75 +192,75 @@ export function Hero() {
                   <div className="flex-1 space-y-4">
                     <div className="text-muted-foreground grid grid-cols-1 gap-3 pb-4 text-sm">
                       <div className="flex items-center gap-2">
-                        <span className="text-primary" data-lingo-skip>
+                        <span className="text-primary" translate="no">
                           ✓
                         </span>
                         <span>
-                          <>Authentication</>
+                          <>{t("fde1847f037b", "Authentication")}</>
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-primary" data-lingo-skip>
+                        <span className="text-primary" translate="no">
                           ✓
                         </span>
                         <span>
-                          <>Agent-ready APIs</>
+                          <>{t("f8eff329afe2", "Agent-ready APIs")}</>
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-primary" data-lingo-skip>
+                        <span className="text-primary" translate="no">
                           ✓
                         </span>
                         <span>
-                          <>CLI Device Auth</>
+                          <>{t("1dab3266e1e8", "CLI Device Auth")}</>
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-primary" data-lingo-skip>
+                        <span className="text-primary" translate="no">
                           ✓
                         </span>
                         <span>
-                          <>Database</>
+                          <>{t("3136f532621e", "Database")}</>
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-primary" data-lingo-skip>
+                        <span className="text-primary" translate="no">
                           ✓
                         </span>
                         <span>
-                          <>Payments</>
+                          <>{t("92391b2ca137", "Payments")}</>
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-primary" data-lingo-skip>
+                        <span className="text-primary" translate="no">
                           ✓
                         </span>
                         <span>
-                          <>File Upload</>
+                          <>{t("0c26b1411f5c", "File Upload")}</>
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-primary" data-lingo-skip>
+                        <span className="text-primary" translate="no">
                           ✓
                         </span>
                         <span>
-                          <>Admin Panel</>
+                          <>{t("7390868e0e2f", "Admin Panel")}</>
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-primary" data-lingo-skip>
+                        <span className="text-primary" translate="no">
                           ✓
                         </span>
                         <span>
-                          <>i18n Ready</>
+                          <>{t("4ce8f4673bdf", "i18n Ready")}</>
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-primary" data-lingo-skip>
+                        <span className="text-primary" translate="no">
                           ✓
                         </span>
                         <span>
-                          <>E2E Smoke Tests</>
+                          <>{t("6cbab8772e82", "E2E Smoke Tests")}</>
                         </span>
                       </div>
                     </div>
@@ -308,9 +268,11 @@ export function Hero() {
 
                   <div className="border-border mt-auto border-t pt-6">
                     <div className="text-muted-foreground text-xs">
-                      <span className="block">Built with</span>
+                      <span className="block">
+                        {t("7256293d5b60", "Built with")}
+                      </span>
                       <span
-                        data-lingo-skip
+                        translate="no"
                         className="text-primary block font-mono"
                       >
                         {UI_STACK_LABEL}

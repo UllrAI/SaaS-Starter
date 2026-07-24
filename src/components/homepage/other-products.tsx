@@ -1,3 +1,4 @@
+import { useTranslation } from "@/lib/i18n/translation/client";
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -12,14 +13,19 @@ import {
   TrendingUp,
   Zap,
 } from "lucide-react";
-
 export function OtherProducts() {
+  const { t } = useTranslation();
   const products = [
     {
       id: "pixmiller",
       name: "PixMiller",
       description: (
-        <>Remove backgrounds in seconds with AI-assisted image cleanup.</>
+        <>
+          {t(
+            "d6b8d375c5bc",
+            "Remove backgrounds in seconds with AI-assisted image cleanup.",
+          )}
+        </>
       ),
       url: "https://pixmiller.com/",
       icon: Image,
@@ -29,18 +35,26 @@ export function OtherProducts() {
       name: "HeadShots.fun",
       description: (
         <>
-          Generate polished headshots for team profiles, resumes, and listings.
+          {t(
+            "80cccd38ac5e",
+            "Generate polished headshots for team profiles, resumes, and listings.",
+          )}
         </>
       ),
       url: "https://headshots.fun/",
       icon: Sparkles,
-      badgeLabel: <>Open Source</>,
+      badgeLabel: <>{t("1d3868f3dfb7", "Open Source")}</>,
     },
     {
       id: "to-markdown",
       name: "To Markdown",
       description: (
-        <>Convert docs and web pages into Markdown you can actually edit.</>
+        <>
+          {t(
+            "8b941c177f1c",
+            "Convert docs and web pages into Markdown you can actually edit.",
+          )}
+        </>
       ),
       url: "https://to-markdown.com/",
       icon: FileText,
@@ -50,7 +64,10 @@ export function OtherProducts() {
       name: "Trend X Day",
       description: (
         <>
-          Track daily product and creator trends with a simpler research loop.
+          {t(
+            "52a5d9e108e5",
+            "Track daily product and creator trends with a simpler research loop.",
+          )}
         </>
       ),
       url: "https://trendxday.com/",
@@ -60,7 +77,12 @@ export function OtherProducts() {
       id: "ogimage-site",
       name: "OGimage.site",
       description: (
-        <>Generate open graph images for social cards and link previews.</>
+        <>
+          {t(
+            "f9982c7ba3a2",
+            "Generate open graph images for social cards and link previews.",
+          )}
+        </>
       ),
       url: "https://ogimage.site/",
       icon: Square,
@@ -69,28 +91,34 @@ export function OtherProducts() {
       id: "hipng",
       name: "HiPNG.com",
       description: (
-        <>Browse transparent PNG assets for quick mockups and landing pages.</>
+        <>
+          {t(
+            "ae618543bc04",
+            "Browse transparent PNG assets for quick mockups and landing pages.",
+          )}
+        </>
       ),
       url: "https://hipng.com/",
       icon: Zap,
     },
   ];
-
   return (
     <section className="bg-background border-border relative border-b py-24">
       <SectionContainer className="relative">
         <div className="mx-auto max-w-3xl text-center">
           <Badge variant="outline" className="border-primary text-primary mb-4">
             <FlaskConical className="mr-2 h-3 w-3" />
-            <>UllrAI Lab</>
+            <>{t("64645eb3fdf5", "UllrAI Lab")}</>
           </Badge>
           <h2 className="text-foreground text-3xl font-bold tracking-tight sm:text-4xl">
-            <>Explore the rest of the lab</>
+            <>{t("c55a15163bdf", "Explore the rest of the lab")}</>
           </h2>
           <p className="text-muted-foreground mt-4 text-lg leading-8">
             <>
-              Adjacent products from the same team, each focused on a narrower
-              workflow than the starter itself.
+              {t(
+                "9c0cb1bfe2e3",
+                "Adjacent products from the same team, each focused on a narrower workflow than the starter itself.",
+              )}
             </>
           </p>
         </div>
@@ -98,7 +126,6 @@ export function OtherProducts() {
         <div className="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-6 sm:mt-20 md:grid-cols-2 lg:mx-0 lg:max-w-none lg:grid-cols-3">
           {products.map((product) => {
             const IconComponent = product.icon;
-
             return (
               <Card
                 key={product.id}
@@ -142,12 +169,12 @@ export function OtherProducts() {
         </div>
 
         <p className="text-muted-foreground mt-10 text-center text-sm">
-          <>Have an idea for another tool?</>
+          <>{t("ef698bbd8a3d", "Have an idea for another tool?")}</>
           <a
             href="mailto:support@ullrai.com"
             className="text-primary ml-2 font-bold hover:underline"
           >
-            <>Let us know</>
+            <>{t("0cc3f6c614a0", "Let us know")}</>
           </a>
         </p>
       </SectionContainer>

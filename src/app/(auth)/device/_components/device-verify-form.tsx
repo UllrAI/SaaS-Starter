@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/lib/i18n/translation/client";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { Loader2, Monitor, ShieldCheck } from "lucide-react";
@@ -14,9 +15,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useSession } from "@/lib/auth/client";
-
 type ViewState = "idle" | "error" | "success";
-
 function normalizeDeviceCode(value: string): string {
   const stripped = value
     .toUpperCase()
@@ -25,10 +24,8 @@ function normalizeDeviceCode(value: string): string {
   if (stripped.length <= 4) {
     return stripped;
   }
-
   return `${stripped.slice(0, 4)}-${stripped.slice(4)}`;
 }
-
 export function DeviceVerifyForm({
   prefilledCode,
   initialIsSignedIn = false,
@@ -36,26 +33,23 @@ export function DeviceVerifyForm({
   prefilledCode?: string;
   initialIsSignedIn?: boolean;
 }) {
+  const { t } = useTranslation();
   const { data: session, isPending } = useSession();
   const [code, setCode] = useState(normalizeDeviceCode(prefilledCode ?? ""));
   const [viewState, setViewState] = useState<ViewState>("idle");
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-
   const normalizedCode = useMemo(() => normalizeDeviceCode(code), [code]);
   const isSignedIn = initialIsSignedIn || Boolean(session?.user);
   const canSubmit = /^[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(normalizedCode);
-
   async function authorizeDevice() {
     if (!canSubmit) {
       setErrorMessage("Please enter a valid 8-character code.");
       setViewState("error");
       return;
     }
-
     setIsSubmitting(true);
     setErrorMessage("");
-
     try {
       const response = await fetch("/api/v1/device/approve", {
         method: "POST",
@@ -66,12 +60,12 @@ export function DeviceVerifyForm({
           userCode: normalizedCode,
         }),
       });
-
       const payload = (await response.json()) as {
         success: boolean;
-        error?: { message?: string };
+        error?: {
+          message?: string;
+        };
       };
-
       if (!response.ok || !payload.success) {
         setErrorMessage(
           payload.error?.message ?? "Failed to authorize this device.",
@@ -79,7 +73,6 @@ export function DeviceVerifyForm({
         setViewState("error");
         return;
       }
-
       setViewState("success");
     } catch {
       setErrorMessage("Network error. Please try again.");
@@ -88,7 +81,6 @@ export function DeviceVerifyForm({
       setIsSubmitting(false);
     }
   }
-
   if (isPending && !initialIsSignedIn) {
     return (
       <Card className="w-full">
@@ -98,38 +90,43 @@ export function DeviceVerifyForm({
       </Card>
     );
   }
-
   if (viewState === "success") {
     return (
       <Card className="w-full">
         <CardContent className="flex flex-col items-center gap-4 py-12 text-center">
           <ShieldCheck className="h-12 w-12 text-green-600" />
           <div className="space-y-1">
-            <h2 className="text-lg font-semibold">Device authorized</h2>
+            <h2 className="text-lg font-semibold">
+              {t("775932c691fc", "Device authorized")}
+            </h2>
             <p className="text-muted-foreground text-sm">
-              You can close this tab and return to your terminal.
+              {t(
+                "4bbf81106ef2",
+                "You can close this tab and return to your terminal.",
+              )}
             </p>
           </div>
           <Button asChild variant="outline" size="sm">
             <Link href="/dashboard/developer#cli-sessions">
-              Review authorized devices
+              {t("de18a8adb35a", "Review authorized devices")}
             </Link>
           </Button>
         </CardContent>
       </Card>
     );
   }
-
   if (!isSignedIn) {
     const callbackUrl = `/device${normalizedCode ? `?code=${encodeURIComponent(normalizedCode)}` : ""}`;
-
     return (
       <Card className="w-full">
         <CardHeader className="text-center">
           <Monitor className="text-muted-foreground mx-auto h-10 w-10" />
-          <CardTitle>Authorize CLI Device</CardTitle>
+          <CardTitle>{t("ed941aa198fd", "Authorize CLI Device")}</CardTitle>
           <CardDescription>
-            Sign in to your account to approve this command-line session.
+            {t(
+              "d13099193545",
+              "Sign in to your account to approve this command-line session.",
+            )}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -139,20 +136,22 @@ export function DeviceVerifyForm({
               window.location.href = `/login?callbackUrl=${encodeURIComponent(callbackUrl)}`;
             }}
           >
-            Sign in to continue
+            {t("88602beb78a9", "Sign in to continue")}
           </Button>
         </CardContent>
       </Card>
     );
   }
-
   return (
     <Card className="w-full">
       <CardHeader className="text-center">
         <Monitor className="text-muted-foreground mx-auto h-10 w-10" />
-        <CardTitle>Authorize CLI Device</CardTitle>
+        <CardTitle>{t("ed941aa198fd", "Authorize CLI Device")}</CardTitle>
         <CardDescription>
-          Enter the code shown in your terminal to complete sign-in.
+          {t(
+            "e2ca793f3d45",
+            "Enter the code shown in your terminal to complete sign-in.",
+          )}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -162,14 +161,16 @@ export function DeviceVerifyForm({
           </div>
         ) : null}
         <div className="grid gap-2">
-          <Label htmlFor="device-code">Device code</Label>
+          <Label htmlFor="device-code">
+            {t("72f8e1cd5634", "Device code")}
+          </Label>
           <Input
             id="device-code"
             value={normalizedCode}
             onChange={(event) =>
               setCode(normalizeDeviceCode(event.target.value))
             }
-            placeholder="ABCD-EFGH"
+            placeholder={t("0c5580d504b6", "ABCD-EFGH")}
             className="text-center font-mono text-lg tracking-[0.2em]"
             maxLength={9}
             autoFocus
@@ -182,10 +183,11 @@ export function DeviceVerifyForm({
             void authorizeDevice();
           }}
         >
-          {isSubmitting ? (
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          ) : null}
-          Authorize
+          {t("129a1b275d19", "{expression0} Authorize", {
+            expression0: isSubmitting ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : null,
+          })}
         </Button>
       </CardContent>
     </Card>

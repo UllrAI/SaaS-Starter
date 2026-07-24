@@ -1,9 +1,9 @@
+import { useTranslation } from "@/lib/i18n/translation/client";
 import type { ReactNode } from "react";
 import { Badge } from "@/components/ui/badge";
 import { CalendarDays, Clock, Sparkles, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { resolveIntlLocale } from "@/lib/locale";
-
 interface BlogPostMetaProps {
   publishedDate?: string;
   featured?: boolean;
@@ -12,38 +12,33 @@ interface BlogPostMetaProps {
   author?: ReactNode;
   showBadge?: boolean;
   locale?: string;
-
   variant?: "overlay" | "default";
   className?: string;
 }
-
 export function BlogPostMeta({
   publishedDate,
   featured = false,
   tags = [],
   readTime,
-  author = <>Anonymous</>,
+  author,
   showBadge = true,
   locale,
-
   variant = "default",
   className,
 }: BlogPostMetaProps) {
+  const { t } = useTranslation();
+  const resolvedAuthor = author ?? <>{t("cd29aaf35997", "Anonymous")}</>;
   const isOverlay = variant === "overlay";
   const textColor = isOverlay ? "text-white/80" : "text-muted-foreground";
   const badgeVariant = featured ? "default" : "secondary";
   const isCenter = className?.includes("justify-center");
-
   const featuredBadgeClasses = isOverlay
     ? "bg-primary/90 text-primary-foreground border-primary/20 backdrop-blur-sm"
     : "bg-primary/10 text-primary border-primary/20";
-
   const articleBadgeClasses = isOverlay
     ? "bg-background/90 text-foreground border-border backdrop-blur-sm"
     : "bg-muted/50 text-muted-foreground border-muted";
-
   const intlLocale = resolveIntlLocale(locale);
-
   return (
     <div className={cn("space-y-4", className)}>
       {/* Badge */}
@@ -63,7 +58,7 @@ export function BlogPostMeta({
               )}
             >
               <Sparkles className="mr-1 h-3 w-3" />
-              Featured
+              {t("f0a8a5136f7a", "Featured")}
             </Badge>
           ) : (
             <Badge
@@ -73,7 +68,7 @@ export function BlogPostMeta({
                 articleBadgeClasses,
               )}
             >
-              Article
+              {t("80faf1421edb", "Article")}
             </Badge>
           )}
         </div>
@@ -111,10 +106,10 @@ export function BlogPostMeta({
               <span className="whitespace-nowrap">{readTime}</span>
             </div>
           )}
-          {author && (
+          {resolvedAuthor && (
             <div className="flex items-center gap-2">
               <User className="h-4 w-4 flex-shrink-0" />
-              <span className="whitespace-nowrap">{author}</span>
+              <span className="whitespace-nowrap">{resolvedAuthor}</span>
             </div>
           )}
         </div>

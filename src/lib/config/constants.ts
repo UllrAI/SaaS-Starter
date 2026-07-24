@@ -28,5 +28,5 @@ export const VERCEL_DEPLOY_URL =
 
 export const PAYMENT_PROVIDER = "creem" as const;
 // SEO
-export const OGIMAGE = "https://starter.ullrai.com/og.png";
+export const OGIMAGE = "/og.png";
 export const TWITTERACCOUNT = "@ullr_ai";

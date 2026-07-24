@@ -423,7 +423,8 @@ Docker 构建。
 
 1. 将通过审查的 commit 推送到 Git 仓库，并连接到 Zeabur 服务。
 2. 配置 `.env.example` 中的全部必需变量。构建前必须把 `NEXT_PUBLIC_APP_URL`
-   设置为最终 HTTPS Origin，因为 canonical URL 与客户端配置会在构建时写入。
+   设置为最终 HTTPS Origin，因为 canonical URL 与客户端配置会在构建时写入；同时设置
+   `R2_PUBLIC_URL`，让 Next.js 把存储域名加入图片优化白名单。
 3. 使用生产 `DATABASE_URL` 把 `pnpm db:migrate` 作为一次性发布命令执行；不要挂在
    每个 Web 进程的启动钩子上。
 4. 迁移成功后再部署应用。`/api/health` 用于存活检查，`/api/ready` 用于包含数据库

@@ -23,7 +23,9 @@ This directory contains Docker configuration for running the UllrAI Starter appl
    `RESEND_EMAIL_FROM` to an address on a domain verified in Resend. Set
    a second generated value in `UPLOAD_CLEANUP_SECRET`. Set
    `NEXT_PUBLIC_APP_URL` to the exact public origin used to access the build;
-   production SEO metadata is generated from this value at build time.
+   production SEO metadata is generated from this value at build time. Set
+   `R2_PUBLIC_URL` before building so the storage hostname is included in the
+   Next.js image optimization allowlist.
    `RATE_LIMIT_IP_HEADER` must name a client-IP header that your trusted
    ingress overwrites; never trust a header passed through directly from the
    public internet.

@@ -3,6 +3,11 @@
 This repository's production reference deployment uses a Git-backed Zeabur
 service and PostgreSQL.
 
+Zeabur is configured through `zbpack.json` to build `docker/Dockerfile`. Keep
+that file in place: the multi-stage image serves only the prepared Next.js
+standalone output instead of shipping the build toolchain and development
+dependencies in the Web runtime.
+
 ## Release order
 
 1. Merge only a reviewed commit with green CI.

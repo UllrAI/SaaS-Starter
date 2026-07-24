@@ -2,6 +2,14 @@ import { beforeEach, describe, expect, it, jest } from "@jest/globals";
 
 const mockGetAuthSessionFromHeaders = jest.fn();
 const mockAuthorizeDeviceCode = jest.fn();
+const mockEnv = {
+  NEXT_PUBLIC_APP_URL: "https://app.example.com",
+};
+
+jest.mock("@/env", () => ({
+  __esModule: true,
+  default: mockEnv,
+}));
 
 jest.mock("@/lib/auth/session", () => ({
   getAuthSessionFromHeaders: mockGetAuthSessionFromHeaders,
@@ -55,9 +63,7 @@ describe("POST /api/v1/device/approve", () => {
 
   it("requires a signed-in user", async () => {
     mockGetAuthSessionFromHeaders.mockResolvedValue(null);
-    const allowedOrigin = new URL(
-      process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000",
-    ).origin;
+    const allowedOrigin = new URL(mockEnv.NEXT_PUBLIC_APP_URL).origin;
 
     const { POST } = await import("./route");
     const response = await POST(
@@ -70,9 +76,7 @@ describe("POST /api/v1/device/approve", () => {
   });
 
   it("authorizes a device code", async () => {
-    const allowedOrigin = new URL(
-      process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000",
-    ).origin;
+    const allowedOrigin = new URL(mockEnv.NEXT_PUBLIC_APP_URL).origin;
     mockGetAuthSessionFromHeaders.mockResolvedValue({
       user: {
         id: "user-1",

@@ -1,24 +1,26 @@
 import { UPLOAD_CONFIG } from "@/lib/config/upload";
-import { FixedWindowRateLimiter } from "@/lib/fixed-window-rate-limit";
+import { checkRateLimit } from "@/lib/rate-limit";
 
-interface UploadRateLimitResult {
-  allowed: boolean;
-  limit: number;
-  remaining: number;
-  resetAt: number;
-  retryAfter: number;
-}
+export type UploadRateLimitScope = "complete" | "presign" | "server";
 
-const uploadRateLimiter = new FixedWindowRateLimiter();
-
-export function checkUploadRateLimit(userId: string): UploadRateLimitResult {
-  return uploadRateLimiter.check({
+export async function checkUploadRateLimit(
+  userId: string,
+  scope: UploadRateLimitScope,
+) {
+  const result = await checkRateLimit({
     key: userId,
     limit: UPLOAD_CONFIG.USER_UPLOAD_RATE_LIMIT_MAX_REQUESTS,
+    scope: `upload:${scope}`,
     windowMs: UPLOAD_CONFIG.USER_UPLOAD_RATE_LIMIT_WINDOW_MS,
   });
-}
+  const resetAtMs = result.info.resetAt * 1000;
 
-export function clearUploadRateLimitForTests(): void {
-  uploadRateLimiter.clear();
+  return {
+    ...result.info,
+    allowed: result.allowed,
+    resetAt: resetAtMs,
+    retryAfter: result.allowed
+      ? 0
+      : Math.max(Math.ceil((resetAtMs - Date.now()) / 1000), 1),
+  };
 }

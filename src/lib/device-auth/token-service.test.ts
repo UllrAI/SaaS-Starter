@@ -4,7 +4,10 @@ const mockInsertValues = jest.fn();
 const mockInsert = jest.fn(() => ({
   values: mockInsertValues,
 }));
-const mockUpdateWhere = jest.fn();
+const mockUpdateReturning = jest.fn();
+const mockUpdateWhere = jest.fn(() => ({
+  returning: mockUpdateReturning,
+}));
 const mockUpdateSet = jest.fn(() => ({
   where: mockUpdateWhere,
 }));
@@ -35,7 +38,7 @@ jest.mock("@/lib/machine-auth/user-access", () => ({
 describe("token-service", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockUpdateWhere.mockResolvedValue(undefined);
+    mockUpdateReturning.mockResolvedValue([{ id: "cli-1" }]);
     mockIsMachineAuthUserActive.mockResolvedValue(true);
   });
 
@@ -98,5 +101,29 @@ describe("token-service", () => {
       expiresIn: expect.any(Number),
     });
     expect(mockUpdate).toHaveBeenCalled();
+  });
+
+  it("does not issue credentials when a concurrent rotation wins the CAS", async () => {
+    mockFindFirst.mockResolvedValue({
+      id: "cli-1",
+      userId: "user-1",
+      isActive: true,
+      refreshExpiresAt: new Date(Date.now() + 60_000),
+    });
+    mockUpdateReturning.mockResolvedValue([]);
+
+    const { refreshCliToken } = await import("./token-service");
+
+    await expect(refreshCliToken("ssr_refresh_123")).resolves.toBeNull();
+  });
+
+  it("does not accept a previously rotated refresh token", async () => {
+    mockFindFirst.mockResolvedValue(null);
+
+    const { refreshCliToken } = await import("./token-service");
+
+    await expect(refreshCliToken("ssr_refresh_123")).resolves.toBeNull();
+    expect(mockFindFirst).toHaveBeenCalledTimes(1);
+    expect(mockUpdate).not.toHaveBeenCalled();
   });
 });

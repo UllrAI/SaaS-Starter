@@ -234,7 +234,6 @@
   "3f5b18c72fe6": "联系页面",
   "3f72daf5f969": "编辑用户",
   "3f7482df5e5e": "监控并管理所有支付交易",
-  "406e40715a42": "交易 ID：<code0></code0>",
   "407dedf29c3d": "发送魔法链接",
   "408fd6596c8b": "主要文件类型",
   "40b4715cf695": "隐私政策",
@@ -1006,5 +1005,6 @@
   "ffd1a6c2fa20": "计费",
   "ffde76f4a727": "已上传",
   "hero_command_copied": "命令已复制",
-  "hero_copy_command": "复制命令"
+  "hero_copy_command": "复制命令",
+  "payment_status_timeout": "支付验证耗时超出预期。请前往账单页面查看最新状态。"
 }

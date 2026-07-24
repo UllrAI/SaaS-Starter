@@ -1,82 +1,77 @@
-import type { SpyInstance } from "@/../jest.setup";
+type CheckoutResult = {
+  status?: string;
+  metadata?: Record<string, unknown>;
+};
 
-type CheckoutFunction = (checkoutId: string) => Promise<{ status?: string }>;
-
-const mockRetrieveCheckout = jest.fn() as jest.MockedFunction<CheckoutFunction>;
+const mockRetrieveCheckout = jest.fn<
+  Promise<CheckoutResult>,
+  [checkoutId: string]
+>();
 const mockCheckRateLimit = jest.fn();
 const mockGetClientRateLimitKey = jest.fn();
+const mockGetAuthSessionFromHeaders = jest.fn();
 
 beforeAll(() => {
   jest.resetModules();
-
   jest.doMock("@/lib/billing/creem/client", () => ({
-    __esModule: true,
     creemClient: {
       checkouts: {
         retrieve: mockRetrieveCheckout,
       },
     },
   }));
-
   jest.doMock("@/lib/rate-limit", () => ({
     checkRateLimit: mockCheckRateLimit,
     getClientRateLimitKey: mockGetClientRateLimitKey,
   }));
+  jest.doMock("@/lib/auth/session", () => ({
+    getAuthSessionFromHeaders: mockGetAuthSessionFromHeaders,
+  }));
 });
 
 describe("Payment Status API", () => {
-  let consoleErrorSpy: SpyInstance;
   let GET: (request: import("next/server").NextRequest) => Promise<Response>;
 
   beforeAll(async () => {
-    const routeModule = await import("./route");
-    GET = routeModule.GET;
+    ({ GET } = await import("./route"));
   });
-
-  const createMockRequest = (url: string) =>
-    ({
-      url,
-      headers: {
-        get: () => "",
-        has: () => false,
-        set: () => {},
-        entries: () => [],
-      },
-      cookies: { get: () => null, has: () => false },
-      nextUrl: new URL(url),
-    }) as unknown as import("next/server").NextRequest;
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockGetClientRateLimitKey.mockReturnValue("127.0.0.1:test");
+    mockGetClientRateLimitKey.mockReturnValue("127.0.0.1");
     mockCheckRateLimit.mockResolvedValue({
       allowed: true,
-      info: {
-        limit: 30,
-        remaining: 29,
-        resetAt: 1_800_000_000,
-      },
+      info: { limit: 30, remaining: 29, resetAt: 1_800_000_000 },
     });
-    consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+    mockGetAuthSessionFromHeaders.mockResolvedValue({
+      user: { id: "user-1" },
+    });
   });
 
-  afterEach(() => {
-    consoleErrorSpy.mockRestore();
-  });
+  function createRequest(url: string) {
+    return {
+      url,
+      headers: new Headers(),
+    } as import("next/server").NextRequest;
+  }
 
-  it("returns 400 when neither checkout id nor status is provided", async () => {
-    const response = await GET(
-      createMockRequest("http://localhost:3000/api/payment-status"),
+  it("requires a bounded checkout reference", async () => {
+    const missing = await GET(
+      createRequest("http://localhost:3000/api/payment-status"),
     );
-    const data = await response.json();
+    const oversized = await GET(
+      createRequest(
+        `http://localhost:3000/api/payment-status?checkout_id=${"x".repeat(256)}`,
+      ),
+    );
 
-    expect(response.status).toBe(400);
-    expect(data).toEqual({
-      error: "Checkout ID or status is required",
-    });
+    expect(missing.status).toBe(400);
+    expect(oversized.status).toBe(400);
+    expect(mockGetAuthSessionFromHeaders).not.toHaveBeenCalled();
+    expect(mockRetrieveCheckout).not.toHaveBeenCalled();
   });
 
-  it("rate limits payment status checks", async () => {
+  it("rate limits before authentication or provider calls", async () => {
     mockCheckRateLimit.mockResolvedValue({
       allowed: false,
       info: {
@@ -87,204 +82,103 @@ describe("Payment Status API", () => {
     });
 
     const response = await GET(
-      createMockRequest(
-        "http://localhost:3000/api/payment-status?checkout_id=checkout-123",
+      createRequest(
+        "http://localhost:3000/api/payment-status?checkout_id=checkout-1",
       ),
     );
-    const data = await response.json();
 
     expect(response.status).toBe(429);
     expect(response.headers.get("Retry-After")).toBeTruthy();
-    expect(data).toEqual({
-      error: "Too many status checks. Please try again later.",
+    expect(response.headers.get("Cache-Control")).toBe("private, no-store");
+    expect(mockGetAuthSessionFromHeaders).not.toHaveBeenCalled();
+    expect(mockRetrieveCheckout).not.toHaveBeenCalled();
+  });
+
+  it("requires an authenticated session", async () => {
+    mockGetAuthSessionFromHeaders.mockResolvedValue(null);
+
+    const response = await GET(
+      createRequest(
+        "http://localhost:3000/api/payment-status?checkout_id=checkout-1",
+      ),
+    );
+
+    expect(response.status).toBe(401);
+    expect(await response.json()).toEqual({
+      error: "Authentication required",
     });
     expect(mockRetrieveCheckout).not.toHaveBeenCalled();
   });
 
-  it("maps direct failed status without trusting success URLs", async () => {
-    const failedResponse = await GET(
-      createMockRequest(
-        "http://localhost:3000/api/payment-status?status=failed",
-      ),
-    );
-    const failedData = await failedResponse.json();
-
-    expect(failedResponse.status).toBe(200);
-    expect(failedData).toEqual({
-      status: "failed",
-      message: "Payment failed",
+  it("returns owned checkout status without exposing its identifier", async () => {
+    mockRetrieveCheckout.mockResolvedValue({
+      status: "completed",
+      metadata: { userId: "user-1" },
     });
-
-    const successResponse = await GET(
-      createMockRequest(
-        "http://localhost:3000/api/payment-status?status=success",
-      ),
-    );
-    const successData = await successResponse.json();
-
-    expect(successResponse.status).toBe(200);
-    expect(successData).toEqual({
-      status: "pending",
-      message:
-        "We received the checkout return, but still need the checkout reference to verify the payment.",
-    });
-  });
-
-  it("uses checkout_id to retrieve the authoritative payment state", async () => {
-    mockRetrieveCheckout.mockResolvedValue({ status: "completed" });
 
     const response = await GET(
-      createMockRequest(
-        "http://localhost:3000/api/payment-status?checkout_id=checkout-123&status=failed",
+      createRequest(
+        "http://localhost:3000/api/payment-status?checkout_id=checkout-1",
       ),
     );
     const data = await response.json();
 
-    expect(mockRetrieveCheckout).toHaveBeenCalledWith("checkout-123");
     expect(response.status).toBe(200);
+    expect(response.headers.get("Cache-Control")).toBe("private, no-store");
+    expect(mockRetrieveCheckout).toHaveBeenCalledWith("checkout-1");
     expect(data).toEqual({
       status: "success",
       message: "Payment completed successfully",
-      sessionId: "checkout-123",
     });
+    expect(data).not.toHaveProperty("sessionId");
   });
 
-  it("falls back to direct failure when checkout verification errors", async () => {
-    mockRetrieveCheckout.mockRejectedValue(new Error("Creem API error"));
+  it.each([
+    [{ status: "open", metadata: { userId: "user-1" } }, "pending"],
+    [{ status: "canceled", metadata: { userId: "user-1" } }, "cancelled"],
+    [{ status: "expired", metadata: { userId: "user-1" } }, "failed"],
+  ])("maps provider state %#", async (checkout, expectedStatus) => {
+    mockRetrieveCheckout.mockResolvedValue(checkout);
 
     const response = await GET(
-      createMockRequest(
-        "http://localhost:3000/api/payment-status?checkout_id=checkout-123&status=failed",
+      createRequest(
+        "http://localhost:3000/api/payment-status?session_id=checkout-1",
       ),
     );
-    const data = await response.json();
 
-    expect(response.status).toBe(200);
-    expect(data).toEqual({
-      status: "failed",
-      message: "Payment failed",
-      sessionId: "checkout-123",
-    });
-    expect(console.error).toHaveBeenCalledWith(
-      "Error checking Creem payment status:",
-      expect.any(Error),
+    expect(await response.json()).toEqual(
+      expect.objectContaining({ status: expectedStatus }),
     );
   });
 
-  it("treats unknown provider states as pending", async () => {
-    mockRetrieveCheckout.mockResolvedValue({ status: "unknown-status" });
+  it.each([
+    { status: "completed", metadata: { userId: "other-user" } },
+    { status: "completed" },
+  ])("hides foreign or unowned checkouts", async (checkout) => {
+    mockRetrieveCheckout.mockResolvedValue(checkout);
 
     const response = await GET(
-      createMockRequest(
-        "http://localhost:3000/api/payment-status?sessionId=test-session-id",
+      createRequest(
+        "http://localhost:3000/api/payment-status?checkout_id=checkout-1",
       ),
     );
-    const data = await response.json();
 
-    expect(response.status).toBe(200);
-    expect(data).toEqual({
-      status: "pending",
-      message: "Payment is being processed. This may take a few minutes.",
-      sessionId: "test-session-id",
-    });
+    expect(response.status).toBe(404);
+    expect(await response.json()).toEqual({ error: "Checkout not found" });
   });
 
-  it("accepts session_id as a checkout reference", async () => {
-    mockRetrieveCheckout.mockResolvedValue({ status: "succeeded" });
+  it("returns a controlled gateway error and ignores URL status claims", async () => {
+    mockRetrieveCheckout.mockRejectedValue(new Error("Creem unavailable"));
 
     const response = await GET(
-      createMockRequest(
-        "http://localhost:3000/api/payment-status?session_id=checkout-from-creem",
+      createRequest(
+        "http://localhost:3000/api/payment-status?checkout_id=checkout-1&status=success",
       ),
     );
-    const data = await response.json();
 
-    expect(mockRetrieveCheckout).toHaveBeenCalledWith("checkout-from-creem");
-    expect(response.status).toBe(200);
-    expect(data).toEqual({
-      status: "success",
-      message: "Payment completed successfully",
-      sessionId: "checkout-from-creem",
+    expect(response.status).toBe(502);
+    expect(await response.json()).toEqual({
+      error: "Unable to verify payment status",
     });
-  });
-
-  it("treats missing provider states as pending while preserving the checkout id", async () => {
-    mockRetrieveCheckout.mockResolvedValue({});
-
-    const response = await GET(
-      createMockRequest(
-        "http://localhost:3000/api/payment-status?checkout_id=checkout-456",
-      ),
-    );
-    const data = await response.json();
-
-    expect(response.status).toBe(200);
-    expect(data).toEqual({
-      status: "pending",
-      message: "Payment is being processed. This may take a few minutes.",
-      sessionId: "checkout-456",
-    });
-  });
-
-  it("maps provider statuses that alias to pending and cancelled", async () => {
-    mockRetrieveCheckout.mockResolvedValueOnce({ status: "processing" });
-
-    const processingResponse = await GET(
-      createMockRequest(
-        "http://localhost:3000/api/payment-status?checkout_id=checkout-processing",
-      ),
-    );
-    expect(await processingResponse.json()).toEqual({
-      status: "pending",
-      message: "Payment is being processed. This may take a few minutes.",
-      sessionId: "checkout-processing",
-    });
-
-    mockRetrieveCheckout.mockResolvedValueOnce({ status: "canceled" });
-
-    const cancelledResponse = await GET(
-      createMockRequest(
-        "http://localhost:3000/api/payment-status?checkout_id=checkout-cancelled",
-      ),
-    );
-    expect(await cancelledResponse.json()).toEqual({
-      status: "cancelled",
-      message: "Payment was cancelled",
-      sessionId: "checkout-cancelled",
-    });
-  });
-
-  it("falls back to url-cancelled state when checkout verification errors", async () => {
-    mockRetrieveCheckout.mockRejectedValue(new Error("Creem API error"));
-
-    const response = await GET(
-      createMockRequest(
-        "http://localhost:3000/api/payment-status?checkout_id=checkout-789&status=cancelled",
-      ),
-    );
-    const data = await response.json();
-
-    expect(response.status).toBe(200);
-    expect(data).toEqual({
-      status: "cancelled",
-      message: "Payment was cancelled",
-      sessionId: "checkout-789",
-    });
-  });
-
-  it("returns 500 when the request URL is malformed", async () => {
-    const response = await GET({ url: "not-a-valid-url" } as never);
-    const data = await response.json();
-
-    expect(response.status).toBe(500);
-    expect(data).toEqual({
-      error: "Failed to check payment status",
-    });
-    expect(console.error).toHaveBeenCalledWith(
-      "[Payment Status API Error]",
-      expect.objectContaining({
-        message: expect.stringContaining("Invalid URL"),
-      }),
-    );
   });
 });

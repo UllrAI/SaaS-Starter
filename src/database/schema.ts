@@ -8,6 +8,7 @@ import {
   index,
   uniqueIndex,
   pgEnum,
+  primaryKey,
 } from "drizzle-orm/pg-core";
 
 export const userRoleEnum = pgEnum("user_role", [
@@ -31,23 +32,29 @@ export const users = pgTable("users", {
   updatedAt: timestamp("updatedAt").notNull(),
 });
 
-export const sessions = pgTable("sessions", {
-  id: text("id").primaryKey(),
-  expiresAt: timestamp("expiresAt").notNull(),
-  token: text("token").notNull().unique(),
-  createdAt: timestamp("createdAt").notNull(),
-  updatedAt: timestamp("updatedAt").notNull(),
-  ipAddress: text("ipAddress"),
-  userAgent: text("userAgent"),
-  // Pre-parsed userAgent fields for performance optimization
-  os: text("os"),
-  browser: text("browser"),
-  deviceType: text("deviceType"),
-  impersonatedBy: text("impersonatedBy"),
-  userId: text("userId")
-    .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
-});
+export const sessions = pgTable(
+  "sessions",
+  {
+    id: text("id").primaryKey(),
+    expiresAt: timestamp("expiresAt").notNull(),
+    token: text("token").notNull().unique(),
+    createdAt: timestamp("createdAt").notNull(),
+    updatedAt: timestamp("updatedAt").notNull(),
+    ipAddress: text("ipAddress"),
+    userAgent: text("userAgent"),
+    // Pre-parsed userAgent fields for performance optimization
+    os: text("os"),
+    browser: text("browser"),
+    deviceType: text("deviceType"),
+    impersonatedBy: text("impersonatedBy"),
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+  },
+  (table) => ({
+    userIdx: index("sessions_userId_idx").on(table.userId),
+  }),
+);
 
 export const accounts = pgTable(
   "accounts",
@@ -97,7 +104,10 @@ export const apiKeys = pgTable(
   },
   (table) => {
     return {
-      userIdx: index("api_keys_userId_idx").on(table.userId),
+      userCreatedAtIdx: index("api_keys_userId_createdAt_idx").on(
+        table.userId,
+        table.createdAt.desc(),
+      ),
       keyHashIdx: index("api_keys_keyHash_idx").on(table.keyHash),
     };
   },
@@ -140,8 +150,6 @@ export const cliTokens = pgTable(
     tokenPrefix: text("tokenPrefix").notNull(),
     lastFourChars: text("lastFourChars").notNull(),
     refreshTokenHash: text("refreshTokenHash").notNull().unique(),
-    previousRefreshTokenHash: text("previousRefreshTokenHash"),
-    refreshRotatedAt: timestamp("refreshRotatedAt"),
     isActive: boolean("isActive").notNull().default(true),
     expiresAt: timestamp("expiresAt").notNull(),
     refreshExpiresAt: timestamp("refreshExpiresAt").notNull(),
@@ -154,19 +162,28 @@ export const cliTokens = pgTable(
   },
   (table) => {
     return {
-      userIdx: index("cli_tokens_userId_idx").on(table.userId),
+      userCreatedAtIdx: index("cli_tokens_userId_createdAt_idx").on(
+        table.userId,
+        table.createdAt.desc(),
+      ),
     };
   },
 );
 
-export const verifications = pgTable("verifications", {
-  id: text("id").primaryKey(),
-  identifier: text("identifier").notNull(),
-  value: text("value").notNull(),
-  expiresAt: timestamp("expiresAt").notNull(),
-  createdAt: timestamp("createdAt"),
-  updatedAt: timestamp("updatedAt"),
-});
+export const verifications = pgTable(
+  "verifications",
+  {
+    id: text("id").primaryKey(),
+    identifier: text("identifier").notNull(),
+    value: text("value").notNull(),
+    expiresAt: timestamp("expiresAt").notNull(),
+    createdAt: timestamp("createdAt"),
+    updatedAt: timestamp("updatedAt"),
+  },
+  (table) => ({
+    identifierIdx: index("verifications_identifier_idx").on(table.identifier),
+  }),
+);
 
 // Subscription table to store user subscription information
 export const subscriptions = pgTable(
@@ -189,7 +206,10 @@ export const subscriptions = pgTable(
   },
   (table) => {
     return {
-      userIdx: index("subscriptions_userId_idx").on(table.userId),
+      userCreatedAtIdx: index("subscriptions_userId_createdAt_idx").on(
+        table.userId,
+        table.createdAt.desc(),
+      ),
       customerIdIdx: index("subscriptions_customerId_idx").on(table.customerId),
     };
   },
@@ -216,7 +236,10 @@ export const payments = pgTable(
   },
   (table) => {
     return {
-      userIdx: index("payments_userId_idx").on(table.userId),
+      userCreatedAtIdx: index("payments_userId_createdAt_idx").on(
+        table.userId,
+        table.createdAt.desc(),
+      ),
     };
   },
 );
@@ -244,6 +267,23 @@ export const webhookEvents = pgTable(
   },
 );
 
+export const rateLimitBuckets = pgTable(
+  "rate_limit_buckets",
+  {
+    scope: text("scope").notNull(),
+    keyHash: text("keyHash").notNull(),
+    count: integer("count").notNull(),
+    resetAt: timestamp("resetAt", { withTimezone: true }).notNull(),
+    updatedAt: timestamp("updatedAt", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => ({
+    pk: primaryKey({ columns: [table.scope, table.keyHash] }),
+    resetAtIdx: index("rate_limit_buckets_resetAt_idx").on(table.resetAt),
+  }),
+);
+
 // File uploads table to store uploaded file metadata
 export const uploads = pgTable(
   "uploads",
@@ -261,7 +301,10 @@ export const uploads = pgTable(
   },
   (table) => {
     return {
-      userIdx: index("uploads_userId_idx").on(table.userId),
+      userCreatedAtIdx: index("uploads_userId_createdAt_idx").on(
+        table.userId,
+        table.createdAt.desc(),
+      ),
       fileKeyUnique: uniqueIndex("uploads_fileKey_unique").on(table.fileKey),
     };
   },

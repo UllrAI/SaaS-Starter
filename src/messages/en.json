@@ -234,7 +234,6 @@
   "3f5b18c72fe6": "Contact page",
   "3f72daf5f969": "Edit User",
   "3f7482df5e5e": "Monitor and manage all payment transactions",
-  "406e40715a42": "Transaction ID: <code0></code0>",
   "407dedf29c3d": "Send Magic Link",
   "408fd6596c8b": "Top File Type",
   "40b4715cf695": "Privacy Policy",
@@ -1006,5 +1005,6 @@
   "ffd1a6c2fa20": "Billing",
   "ffde76f4a727": "Uploaded",
   "hero_command_copied": "Command copied",
-  "hero_copy_command": "Copy command"
+  "hero_copy_command": "Copy command",
+  "payment_status_timeout": "Payment verification is taking longer than expected. Check your billing page for the latest status."
 }

@@ -51,11 +51,13 @@ LABEL "framework"="next.js"
 ENV NODE_ENV=production
 
 # Create non-root user
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+RUN apk add --no-cache su-exec \
+  && addgroup --system --gid 1001 nodejs \
+  && adduser --system --uid 1001 nextjs
 
 # Copy the self-contained application prepared by the build script
 COPY --from=builder /app/.next/standalone ./
+COPY --chmod=755 docker/entrypoint.sh /usr/local/bin/docker-entrypoint
 
 # Set correct permissions
 RUN chown -R nextjs:nodejs /app
@@ -69,4 +71,5 @@ ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
 # Start the application
+ENTRYPOINT ["docker-entrypoint"]
 CMD ["node", "server.js"]

@@ -5,6 +5,8 @@ This directory contains Docker configuration for running the UllrAI Starter appl
 ## Files
 
 - `Dockerfile` - Multi-stage build configuration for the Next.js application
+- `entrypoint.sh` - Drops root privileges when the hosting platform overrides
+  the image user
 - `docker-compose.yml` - Development environment with PostgreSQL
 - Root `.dockerignore` - Excludes secrets and build artifacts
 

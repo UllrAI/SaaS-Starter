@@ -38,6 +38,8 @@ Routine formatting and test-only maintenance are omitted.
   formatting contracts.
 - Configured Zeabur to use the existing multi-stage standalone Dockerfile
   instead of packaging the full Node.js build environment into the Web image.
+- Enforced an unprivileged Web process even when the hosting platform overrides
+  the Docker image user.
 - Updated English and Chinese project documentation and added Zeabur release
   guidance.
 

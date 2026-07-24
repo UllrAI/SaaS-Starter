@@ -8,6 +8,10 @@ that file in place: the multi-stage image serves only the prepared Next.js
 standalone output instead of shipping the build toolchain and development
 dependencies in the Web runtime.
 
+The runtime entrypoint also drops to the unprivileged `nextjs` user when a
+hosting security context starts the container as root. Verify PID 1 after
+deployment instead of assuming the Dockerfile `USER` directive was preserved.
+
 Both `NEXT_PUBLIC_APP_URL` and `R2_PUBLIC_URL` are required build arguments.
 Zeabur injects their service-variable values into the multi-stage Docker build;
 the build fails closed when either value is missing.

@@ -113,6 +113,15 @@ function IssueMessage({ issue }: { issue: FileUploadIssue }) {
           )}
         </>
       );
+    case "upload-quota-exceeded":
+      return (
+        <>
+          {t(
+            "uploadQuotaExceeded",
+            "Your upload quota has been reached. Remove files or try again later.",
+          )}
+        </>
+      );
     case "unsafe-upload-url":
       return (
         <>

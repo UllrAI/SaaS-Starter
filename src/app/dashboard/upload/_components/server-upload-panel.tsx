@@ -158,7 +158,7 @@ export function ServerUploadPanel() {
 
         <div className="flex flex-wrap gap-2">
           <Badge variant="secondary">
-            {t("ec3fbe6e72ea", "Streaming upload")}
+            {t("ec3fbe6e72ea", "Bounded request")}
           </Badge>
           <Badge variant="secondary">{t("c6502cf5c4d9", "Auth checked")}</Badge>
           <Badge variant="outline">

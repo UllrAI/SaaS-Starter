@@ -83,6 +83,33 @@ const env = createEnv({
     R2_SECRET_ACCESS_KEY: z.string(),
     R2_BUCKET_NAME: z.string(),
     R2_PUBLIC_URL: z.string().url(),
+    UPLOAD_CLEANUP_SECRET: z
+      .string()
+      .min(32, "UPLOAD_CLEANUP_SECRET must be at least 32 characters")
+      .refine(
+        (value) => value !== "replace-with-at-least-32-random-characters",
+        "UPLOAD_CLEANUP_SECRET must not use the example placeholder",
+      ),
+    UPLOAD_DAILY_QUOTA_BYTES: z.coerce
+      .number()
+      .int()
+      .positive()
+      .default(1024 * 1024 * 1024),
+    UPLOAD_TOTAL_QUOTA_BYTES: z.coerce
+      .number()
+      .int()
+      .positive()
+      .default(5 * 1024 * 1024 * 1024),
+    UPLOAD_LEGACY_COMPLETION_SINCE: z.preprocess(
+      (value) =>
+        typeof value === "string" && value.trim() === "" ? undefined : value,
+      z.iso.datetime().optional(),
+    ),
+    UPLOAD_LEGACY_COMPLETION_UNTIL: z.preprocess(
+      (value) =>
+        typeof value === "string" && value.trim() === "" ? undefined : value,
+      z.iso.datetime().optional(),
+    ),
 
     // Payments
     CREEM_API_KEY: z.string(),
@@ -131,6 +158,11 @@ const env = createEnv({
     R2_SECRET_ACCESS_KEY: process.env.R2_SECRET_ACCESS_KEY,
     R2_BUCKET_NAME: process.env.R2_BUCKET_NAME,
     R2_PUBLIC_URL: process.env.R2_PUBLIC_URL,
+    UPLOAD_CLEANUP_SECRET: process.env.UPLOAD_CLEANUP_SECRET,
+    UPLOAD_DAILY_QUOTA_BYTES: process.env.UPLOAD_DAILY_QUOTA_BYTES,
+    UPLOAD_TOTAL_QUOTA_BYTES: process.env.UPLOAD_TOTAL_QUOTA_BYTES,
+    UPLOAD_LEGACY_COMPLETION_SINCE: process.env.UPLOAD_LEGACY_COMPLETION_SINCE,
+    UPLOAD_LEGACY_COMPLETION_UNTIL: process.env.UPLOAD_LEGACY_COMPLETION_UNTIL,
 
     // Application settings
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
@@ -156,6 +188,26 @@ if (process.env.SKIP_ENV_VALIDATION !== "1") {
     if (Boolean(clientId) !== Boolean(clientSecret)) {
       throw new Error(
         `${provider} OAuth requires both its client ID and client secret.`,
+      );
+    }
+  }
+
+  const legacySince = env.UPLOAD_LEGACY_COMPLETION_SINCE;
+  const legacyUntil = env.UPLOAD_LEGACY_COMPLETION_UNTIL;
+  if (Boolean(legacySince) !== Boolean(legacyUntil)) {
+    throw new Error(
+      "Legacy upload compatibility requires both UPLOAD_LEGACY_COMPLETION_SINCE and UPLOAD_LEGACY_COMPLETION_UNTIL.",
+    );
+  }
+  if (legacySince && legacyUntil) {
+    const compatibilityDuration =
+      Date.parse(legacyUntil) - Date.parse(legacySince);
+    if (
+      compatibilityDuration <= 0 ||
+      compatibilityDuration > 24 * 60 * 60 * 1000
+    ) {
+      throw new Error(
+        "The legacy upload compatibility window must be longer than zero and no more than 24 hours.",
       );
     }
   }

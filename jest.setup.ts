@@ -776,6 +776,11 @@ type MockEnvironment = {
   DB_MAX_LIFETIME: number;
   DB_CONNECT_TIMEOUT: number;
   RATE_LIMIT_IP_HEADER: string;
+  UPLOAD_CLEANUP_SECRET: string;
+  UPLOAD_DAILY_QUOTA_BYTES: number;
+  UPLOAD_TOTAL_QUOTA_BYTES: number;
+  UPLOAD_LEGACY_COMPLETION_SINCE?: string;
+  UPLOAD_LEGACY_COMPLETION_UNTIL?: string;
 };
 
 const mockEnvConfig: MockEnvironment = {
@@ -799,6 +804,9 @@ const mockEnvConfig: MockEnvironment = {
   DB_MAX_LIFETIME: 14400,
   DB_CONNECT_TIMEOUT: 30,
   RATE_LIMIT_IP_HEADER: "x-forwarded-for",
+  UPLOAD_CLEANUP_SECRET: "mock-upload-cleanup-secret-at-least-32-chars",
+  UPLOAD_DAILY_QUOTA_BYTES: 1024 * 1024 * 1024,
+  UPLOAD_TOTAL_QUOTA_BYTES: 5 * 1024 * 1024 * 1024,
 };
 
 const mockCreateEnv = jest.fn(() => mockEnvConfig);
@@ -976,5 +984,10 @@ jest.mock("./env.js", () => ({
     DB_MAX_LIFETIME: 14400,
     DB_CONNECT_TIMEOUT: 30,
     RATE_LIMIT_IP_HEADER: "x-forwarded-for",
+    UPLOAD_CLEANUP_SECRET: "mock-upload-cleanup-secret-at-least-32-chars",
+    UPLOAD_DAILY_QUOTA_BYTES: 1024 * 1024 * 1024,
+    UPLOAD_TOTAL_QUOTA_BYTES: 5 * 1024 * 1024 * 1024,
+    UPLOAD_LEGACY_COMPLETION_SINCE: undefined,
+    UPLOAD_LEGACY_COMPLETION_UNTIL: undefined,
   },
 }));

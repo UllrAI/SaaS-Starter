@@ -42,6 +42,7 @@ jobs:
       R2_SECRET_ACCESS_KEY: ci-placeholder
       R2_BUCKET_NAME: ci-placeholder
       R2_PUBLIC_URL: https://cdn.example.com
+      UPLOAD_CLEANUP_SECRET: ci-only-upload-cleanup-secret-32-chars
       CREEM_API_KEY: creem_ci_placeholder
       CREEM_ENVIRONMENT: test_mode
       CREEM_WEBHOOK_SECRET: creem_ci_webhook_placeholder

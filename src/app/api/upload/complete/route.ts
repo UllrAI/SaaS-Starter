@@ -1,7 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { db } from "@/database";
-import { uploads } from "@/database/schema";
-import { and, eq } from "drizzle-orm";
 import {
   formatFileSize,
   isFileSizeAllowed,
@@ -10,9 +7,20 @@ import {
   UPLOAD_CONFIG,
   uploadCompleteRequestSchema,
 } from "@/lib/config/upload";
-import { buildR2PublicUrl, getObjectMetadata } from "@/lib/r2";
+import { getObjectMetadata } from "@/lib/r2";
 import { getAuthSessionFromHeaders } from "@/lib/auth/session";
 import { checkUploadRateLimit } from "@/lib/upload-rate-limit";
+import {
+  completeLegacyUpload,
+  completeUploadIntent,
+  UploadIntentUnavailableError,
+  UploadMetadataMismatchError,
+  UploadQuotaExceededError,
+} from "@/lib/uploads/upload-intents";
+import {
+  readJsonBodyWithLimit,
+  RequestBodyTooLargeError,
+} from "@/lib/http/request-body";
 
 export async function POST(request: NextRequest) {
   try {
@@ -37,7 +45,21 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const body = await request.json().catch(() => null);
+    let body: unknown;
+    try {
+      body = await readJsonBodyWithLimit(
+        request,
+        UPLOAD_CONFIG.MAX_JSON_BODY_SIZE,
+      );
+    } catch (error) {
+      if (error instanceof RequestBodyTooLargeError) {
+        return NextResponse.json(
+          { error: "Upload request is too large." },
+          { status: 413 },
+        );
+      }
+      body = null;
+    }
     const validation = uploadCompleteRequestSchema.safeParse(body);
 
     if (!validation.success) {
@@ -50,38 +72,30 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { fileName, key, size, url } = validation.data;
-    const contentType = normalizeContentType(validation.data.contentType);
-    const keyPrefix = `uploads/${session.user.id}/`;
-    const expectedUrl = buildR2PublicUrl(key);
+    const { intentId, fileName, key, size, url } = validation.data;
+    const declaredContentType = normalizeContentType(
+      validation.data.contentType,
+    );
 
-    if (!key.startsWith(keyPrefix)) {
+    if (!isFileTypeAllowed(declaredContentType)) {
       return NextResponse.json(
-        { error: "Upload key does not belong to the current user." },
-        { status: 403 },
-      );
-    }
-
-    if (url !== expectedUrl) {
-      return NextResponse.json(
-        { error: "Upload URL does not match the stored object key." },
+        { error: `File type '${declaredContentType}' is not allowed.` },
         { status: 400 },
       );
     }
-
-    if (!isFileTypeAllowed(contentType)) {
-      return NextResponse.json(
-        { error: `File type '${contentType}' is not allowed.` },
-        { status: 400 },
-      );
-    }
-
     if (!isFileSizeAllowed(size)) {
       return NextResponse.json(
         {
           error: `File size of ${formatFileSize(size)} exceeds the limit of ${formatFileSize(UPLOAD_CONFIG.MAX_FILE_SIZE)}.`,
         },
         { status: 400 },
+      );
+    }
+
+    if (!key.startsWith(`uploads/${session.user.id}/`)) {
+      return NextResponse.json(
+        { error: "Upload key does not belong to the current user." },
+        { status: 403 },
       );
     }
 
@@ -93,26 +107,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (metadata.contentLength !== size) {
+    const contentType = normalizeContentType(metadata.contentType);
+    if (!isFileTypeAllowed(contentType)) {
       return NextResponse.json(
-        { error: "Uploaded object size does not match the declared size." },
-        { status: 400 },
-      );
-    }
-
-    if (metadata.contentType !== contentType) {
-      return NextResponse.json(
-        {
-          error:
-            "Uploaded object content type does not match the declared content type.",
-        },
-        { status: 400 },
-      );
-    }
-
-    if (!isFileTypeAllowed(metadata.contentType)) {
-      return NextResponse.json(
-        { error: `File type '${metadata.contentType}' is not allowed.` },
+        { error: `File type '${contentType}' is not allowed.` },
         { status: 400 },
       );
     }
@@ -126,45 +124,56 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const inserted = await db
-      .insert(uploads)
-      .values({
-        userId: session.user.id,
-        fileKey: key,
-        url: expectedUrl,
+    const completionInput = {
+      userId: session.user.id,
+      key,
+      contentLength: metadata.contentLength,
+      contentType,
+      declaration: {
         fileName,
-        fileSize: metadata.contentLength,
-        contentType: metadata.contentType,
-      })
-      .onConflictDoNothing({ target: uploads.fileKey })
-      .returning();
-
-    const existing =
-      inserted[0] ??
-      (
-        await db
-          .select()
-          .from(uploads)
-          .where(
-            and(eq(uploads.userId, session.user.id), eq(uploads.fileKey, key)),
-          )
-          .limit(1)
-      )[0];
-
-    if (!existing) {
-      throw new Error("Upload record was not available after insert.");
+        fileSize: size,
+        contentType: declaredContentType,
+        url,
+      },
+    };
+    let upload;
+    try {
+      upload = await completeUploadIntent({ intentId, ...completionInput });
+    } catch (error) {
+      if (!(error instanceof UploadIntentUnavailableError) || intentId) {
+        throw error;
+      }
+      upload = await completeLegacyUpload(completionInput);
+      if (!upload) {
+        throw error;
+      }
     }
 
     return NextResponse.json({
       file: {
-        key: existing.fileKey,
-        url: existing.url,
-        fileName: existing.fileName,
-        size: existing.fileSize,
-        contentType: existing.contentType,
+        key: upload.fileKey,
+        url: upload.url,
+        fileName: upload.fileName,
+        size: upload.fileSize,
+        contentType: upload.contentType,
       },
     });
   } catch (error) {
+    if (error instanceof UploadIntentUnavailableError) {
+      return NextResponse.json({ error: error.message }, { status: 409 });
+    }
+    if (error instanceof UploadMetadataMismatchError) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
+    if (error instanceof UploadQuotaExceededError) {
+      return NextResponse.json(
+        {
+          code: "UPLOAD_QUOTA_EXCEEDED",
+          error: error.message,
+        },
+        { status: 403 },
+      );
+    }
     console.error("Error completing upload:", error);
     return NextResponse.json(
       { error: "Internal Server Error. Please try again later." },

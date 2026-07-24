@@ -1,0 +1,3 @@
+ALTER TABLE "upload_intents" ADD CONSTRAINT "upload_intents_fileSize_positive" CHECK ("upload_intents"."fileSize" > 0);--> statement-breakpoint
+ALTER TABLE "upload_intents" ADD CONSTRAINT "upload_intents_cleanupAttempts_non_negative" CHECK ("upload_intents"."cleanupAttempts" >= 0);--> statement-breakpoint
+ALTER TABLE "uploads" ADD CONSTRAINT "uploads_fileSize_positive" CHECK ("uploads"."fileSize" > 0);

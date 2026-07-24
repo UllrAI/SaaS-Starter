@@ -26,6 +26,26 @@ jest.mock("@/lib/r2", () => ({
   createPresignedUrl: mockCreatePresignedUrl,
 }));
 
+const mockCreateUploadIntent = jest.fn() as any;
+const mockReleaseUploadIntent = jest.fn() as any;
+class MockUploadQuotaExceededError extends Error {
+  constructor(readonly quota: "daily" | "total") {
+    super("quota");
+  }
+}
+jest.mock("@/lib/uploads/upload-intents", () => ({
+  createUploadIntent: mockCreateUploadIntent,
+  releaseUploadIntent: mockReleaseUploadIntent,
+  UploadQuotaExceededError: MockUploadQuotaExceededError,
+}));
+
+const mockReadJsonBodyWithLimit = jest.fn() as any;
+class MockRequestBodyTooLargeError extends Error {}
+jest.mock("@/lib/http/request-body", () => ({
+  readJsonBodyWithLimit: mockReadJsonBodyWithLimit,
+  RequestBodyTooLargeError: MockRequestBodyTooLargeError,
+}));
+
 const mockCheckUploadRateLimit = jest.fn() as any;
 jest.mock("@/lib/upload-rate-limit", () => ({
   checkUploadRateLimit: mockCheckUploadRateLimit,
@@ -43,6 +63,7 @@ jest.mock("@/lib/config/upload", () => ({
   isFileSizeAllowed: mockIsFileSizeAllowed,
   UPLOAD_CONFIG: {
     MAX_FILE_SIZE: 10485760,
+    MAX_JSON_BODY_SIZE: 4096,
   },
   formatFileSize: mockFormatFileSize,
   normalizeContentType: jest.fn((contentType: string) => contentType),
@@ -59,6 +80,14 @@ describe("Upload Presigned URL API", () => {
       resetAt: Date.now() + 60_000,
       retryAfter: 0,
     });
+    mockCreateUploadIntent.mockResolvedValue({
+      id: "11111111-1111-4111-8111-111111111111",
+      fileKey: "uploads/user-123/file.jpg",
+    });
+    mockReleaseUploadIntent.mockResolvedValue(undefined);
+    mockReadJsonBodyWithLimit.mockImplementation((request: NextRequest) =>
+      request.json(),
+    );
   });
 
   const createMockRequest = (body: unknown): NextRequest =>
@@ -84,6 +113,7 @@ describe("Upload Presigned URL API", () => {
   };
 
   const validRequestBody = {
+    protocolVersion: 2,
     fileName: "test-image.jpg",
     contentType: "image/jpeg",
     size: 1048576,
@@ -178,6 +208,10 @@ describe("Upload Presigned URL API", () => {
 
       expect(response.status).toBe(400);
       expect(data.error).toBe("S3 service unavailable");
+      expect(mockReleaseUploadIntent).toHaveBeenCalledWith(
+        "11111111-1111-4111-8111-111111111111",
+        "user-123",
+      );
     });
 
     it("should successfully create presigned URL without inserting upload metadata", async () => {
@@ -203,9 +237,20 @@ describe("Upload Presigned URL API", () => {
 
       expect(response.status).toBe(200);
       expect(data).toEqual({
+        intentId: "11111111-1111-4111-8111-111111111111",
+        protocolVersion: 2,
+        requiredHeaders: {
+          "Content-Type": "image/jpeg",
+          "If-None-Match": "*",
+        },
         presignedUrl: mockResult.presignedUrl,
         publicUrl: mockResult.publicUrl,
         key: mockResult.key,
+      });
+      expect(mockCreatePresignedUrl).toHaveBeenCalledWith({
+        key: "uploads/user-123/file.jpg",
+        contentType: "image/jpeg",
+        size: 1048576,
       });
     });
 
@@ -237,6 +282,43 @@ describe("Upload Presigned URL API", () => {
 
       expect(response.status).toBe(400);
       expect(data.error).toBe("Invalid request data");
+    });
+
+    it("should reject an oversized JSON request", async () => {
+      mockGetSession.mockResolvedValue(mockSession);
+      mockReadJsonBodyWithLimit.mockRejectedValue(
+        new MockRequestBodyTooLargeError(),
+      );
+
+      const { POST } = await import("./route");
+      const response = await POST(createMockRequest(validRequestBody));
+      const data = await response.json();
+
+      expect(response.status).toBe(413);
+      expect(data.error).toBe("Upload request is too large.");
+      expect(mockCreateUploadIntent).not.toHaveBeenCalled();
+    });
+
+    it("should return 403 when the account upload quota is exhausted", async () => {
+      mockGetSession.mockResolvedValue(mockSession);
+      mockPresignedUrlRequestSchema.safeParse.mockReturnValue({
+        success: true,
+        data: validRequestBody,
+      });
+      mockIsFileTypeAllowed.mockReturnValue(true);
+      mockIsFileSizeAllowed.mockReturnValue(true);
+      mockCreateUploadIntent.mockRejectedValue(
+        new MockUploadQuotaExceededError("daily"),
+      );
+
+      const { POST } = await import("./route");
+      const response = await POST(createMockRequest(validRequestBody));
+      const data = await response.json();
+
+      expect(response.status).toBe(403);
+      expect(data.error).toBe("Daily upload quota reached.");
+      expect(data.code).toBe("UPLOAD_QUOTA_EXCEEDED");
+      expect(mockCreatePresignedUrl).not.toHaveBeenCalled();
     });
   });
 });

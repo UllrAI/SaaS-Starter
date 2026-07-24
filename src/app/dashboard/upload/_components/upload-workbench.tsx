@@ -57,6 +57,15 @@ function HeadlessIssueMessage({ code }: { code: string }) {
           )}
         </>
       );
+    case "upload-quota-exceeded":
+      return (
+        <>
+          {t(
+            "uploadQuotaExceeded",
+            "Your upload quota has been reached. Remove files or try again later.",
+          )}
+        </>
+      );
     case "upload-preparation-failed":
       return (
         <>
@@ -214,13 +223,7 @@ function HeadlessUploadContent({
 function HeadlessUploadDemo() {
   return (
     <FileUploader
-      acceptedFileTypes={[
-        "image/jpeg",
-        "image/png",
-        "image/gif",
-        "image/webp",
-        "image/svg+xml",
-      ]}
+      acceptedFileTypes={["image/jpeg", "image/png", "image/gif", "image/webp"]}
       autoUpload
       maxFileSize={10 * 1024 * 1024}
       maxFiles={6}
@@ -247,7 +250,6 @@ export function UploadWorkbench() {
         "image/webp",
         "image/bmp",
         "image/tiff",
-        "image/svg+xml",
       ],
       description: (
         <>
@@ -283,7 +285,6 @@ export function UploadWorkbench() {
         "text/plain",
         "text/csv",
         "text/markdown",
-        "text/html",
       ],
       description: (
         <>

@@ -10,12 +10,15 @@ import {
   subscriptions,
   payments,
   webhookEvents,
+  uploadIntents,
+  uploadIntentStatusEnum,
   uploads,
   apiKeys,
   deviceCodes,
   cliTokens,
 } from "./schema";
 import { Table } from "drizzle-orm/table";
+import { getTableConfig } from "drizzle-orm/pg-core";
 
 const getIndexConfigs = (table: Record<string, unknown>) => {
   const builder = (table as any)[Table.Symbol.ExtraConfigBuilder];
@@ -27,10 +30,15 @@ const getIndexConfigs = (table: Record<string, unknown>) => {
     ? configResult
     : Object.values(configResult ?? {});
 
-  return builders.map(
-    (entry: { build: (table: unknown) => { config: unknown } }) =>
-      entry.build(table).config,
-  );
+  return builders
+    .map(
+      (entry: { build: (table: unknown) => { config?: unknown } }) =>
+        entry.build(table).config,
+    )
+    .filter(
+      (config): config is { name: string; columns: any[]; unique?: boolean } =>
+        Boolean(config),
+    );
 };
 
 describe("Database Schema", () => {
@@ -63,6 +71,12 @@ describe("Database Schema", () => {
       expect(subscriptions).toBeDefined();
       expect(payments).toBeDefined();
       expect(webhookEvents).toBeDefined();
+      expect(uploadIntents).toBeDefined();
+      expect(uploadIntentStatusEnum.enumValues).toEqual([
+        "pending",
+        "cleaning",
+        "completed",
+      ]);
       expect(uploads).toBeDefined();
       expect(apiKeys).toBeDefined();
       expect(deviceCodes).toBeDefined();
@@ -78,6 +92,7 @@ describe("Database Schema", () => {
         subscriptions,
         payments,
         webhookEvents,
+        uploadIntents,
         uploads,
         apiKeys,
         deviceCodes,
@@ -1514,12 +1529,40 @@ describe("Database Schema", () => {
       expect(indexNames).toEqual(
         expect.arrayContaining([
           "uploads_userId_createdAt_idx",
+          "uploads_uploadIntentId_unique",
           "uploads_fileKey_unique",
         ]),
       );
       expect(
         configs.find((cfg) => cfg.name === "uploads_fileKey_unique")?.unique,
       ).toBe(true);
+    });
+
+    it("upload intents index quota and cleanup lookups", () => {
+      const configs = getIndexConfigs(uploadIntents);
+      expect(configs.map((config) => config.name)).toEqual(
+        expect.arrayContaining([
+          "upload_intents_fileKey_unique",
+          "upload_intents_userId_status_expiresAt_idx",
+          "upload_intents_cleanup_queue_idx",
+        ]),
+      );
+    });
+
+    it("upload byte counts are constrained to valid values", () => {
+      expect(
+        getTableConfig(uploadIntents).checks.map(
+          (constraint) => constraint.name,
+        ),
+      ).toEqual(
+        expect.arrayContaining([
+          "upload_intents_fileSize_positive",
+          "upload_intents_cleanupAttempts_non_negative",
+        ]),
+      );
+      expect(
+        getTableConfig(uploads).checks.map((constraint) => constraint.name),
+      ).toContain("uploads_fileSize_positive");
     });
   });
 });

@@ -12,6 +12,7 @@ export type FileUploadIssueCode =
   | "file-type-not-supported"
   | "file-too-large"
   | "file-too-large-for-app"
+  | "upload-quota-exceeded"
   | "upload-preparation-failed"
   | "unsafe-upload-url"
   | "request-failed"

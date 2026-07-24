@@ -13,6 +13,7 @@ import {
   UPLOAD_CONFIG,
   isFileSizeAllowed,
   isFileTypeAllowed,
+  normalizeContentType,
 } from "@/lib/config/upload";
 import { createPresignedUploadTransport } from "./transport";
 import {
@@ -300,21 +301,22 @@ export function useFileUpload({
 
   const validateFile = useCallback(
     (file: File): FileUploadIssue | null => {
+      const contentType = normalizeContentType(file.type);
       if (
         acceptedFileTypes.length > 0 &&
-        !acceptedFileTypes.includes(file.type)
+        !acceptedFileTypes.includes(contentType)
       ) {
         return {
           code: "file-type-not-accepted",
-          contentType: file.type,
+          contentType,
           fileName: file.name,
         };
       }
 
-      if (!isFileTypeAllowed(file.type)) {
+      if (!isFileTypeAllowed(contentType)) {
         return {
           code: "file-type-not-supported",
-          contentType: file.type,
+          contentType,
           fileName: file.name,
         };
       }

@@ -1,33 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
-import { S3Client } from "@aws-sdk/client-s3";
 import { Upload } from "@aws-sdk/lib-storage";
-import { db } from "@/database";
-import { uploads } from "@/database/schema";
-import { randomUUID } from "crypto";
 import env from "@/env";
 import {
   UPLOAD_CONFIG,
   isFileTypeAllowed,
   isFileSizeAllowed,
-  getFileExtension,
   formatFileSize,
   normalizeContentType,
 } from "@/lib/config/upload";
 import { getAuthSessionFromHeaders } from "@/lib/auth/session";
 import { checkUploadRateLimit } from "@/lib/upload-rate-limit";
-import { buildR2PublicUrl, deleteFile } from "@/lib/r2";
+import { r2Client } from "@/lib/r2";
+import {
+  completeUploadIntent,
+  createUploadIntent,
+  releaseUploadIntent,
+  UploadQuotaExceededError,
+} from "@/lib/uploads/upload-intents";
 
 const MULTIPART_OVERHEAD_BYTES = 1024 * 1024;
-
-// Initialize S3 client for Cloudflare R2
-const r2Client = new S3Client({
-  region: "auto",
-  endpoint: env.R2_ENDPOINT,
-  credentials: {
-    accessKeyId: env.R2_ACCESS_KEY_ID,
-    secretAccessKey: env.R2_SECRET_ACCESS_KEY,
-  },
-});
 
 type ServerUploadResult =
   | {
@@ -194,7 +185,8 @@ export async function POST(request: NextRequest) {
 
     // Function to process a single file
     const processFile = async (file: File): Promise<ServerUploadResult> => {
-      let uploadedKey: string | null = null;
+      let intentId: string | null = null;
+      let uploadStarted = false;
 
       try {
         const normalizedContentType = normalizeContentType(file.type);
@@ -212,12 +204,19 @@ export async function POST(request: NextRequest) {
             `File size ${file.size} bytes exceeds maximum allowed size of ${UPLOAD_CONFIG.MAX_FILE_SIZE} bytes`,
           );
         }
+        if (file.size > UPLOAD_CONFIG.MAX_SERVER_UPLOAD_FILE_SIZE) {
+          throw new UploadValidationError(
+            `File size ${file.size} bytes exceeds the server upload limit of ${UPLOAD_CONFIG.MAX_SERVER_UPLOAD_FILE_SIZE} bytes`,
+          );
+        }
 
-        // Generate unique key for the file
-        const fileExtension = getFileExtension(normalizedContentType);
-        const timestamp = Date.now();
-        const uuid = randomUUID();
-        const key = `uploads/${session.user!.id}/${timestamp}-${uuid}.${fileExtension}`;
+        const intent = await createUploadIntent({
+          userId: session.user!.id,
+          fileName: file.name,
+          fileSize: file.size,
+          contentType: normalizedContentType,
+        });
+        intentId = intent.id;
 
         // Create file stream from the uploaded file
         const fileStream = file.stream();
@@ -227,7 +226,7 @@ export async function POST(request: NextRequest) {
           client: r2Client,
           params: {
             Bucket: env.R2_BUCKET_NAME,
-            Key: key,
+            Key: intent.fileKey,
             Body: fileStream,
             ContentType: normalizedContentType,
             ContentLength: file.size,
@@ -236,26 +235,21 @@ export async function POST(request: NextRequest) {
         });
 
         // Execute the upload
+        uploadStarted = true;
         await upload.done();
-        uploadedKey = key;
 
-        // Generate public URL
-        const publicUrl = buildR2PublicUrl(key);
-
-        // Store upload record in database
-        await db.insert(uploads).values({
+        const record = await completeUploadIntent({
+          intentId: intent.id,
           userId: session.user!.id,
-          fileKey: key,
-          url: publicUrl,
-          fileName: file.name,
-          fileSize: file.size,
+          key: intent.fileKey,
+          contentLength: file.size,
           contentType: normalizedContentType,
         });
 
         return {
           fileName: file.name,
-          url: publicUrl,
-          key: key,
+          url: record.url,
+          key: record.fileKey,
           size: file.size,
           contentType: normalizedContentType,
           success: true,
@@ -263,13 +257,19 @@ export async function POST(request: NextRequest) {
       } catch (error) {
         console.error(`Error uploading file ${file.name}:`, error);
 
-        if (uploadedKey) {
-          const cleanup = await deleteFile(uploadedKey);
-          if (!cleanup.success) {
-            console.error(
-              `Failed to clean up R2 object ${uploadedKey} after upload metadata error.`,
-            );
-          }
+        if (intentId && !uploadStarted) {
+          await releaseUploadIntent(intentId, session.user!.id).catch(
+            (releaseError) => {
+              console.error(
+                `Failed to release upload intent ${intentId}:`,
+                releaseError,
+              );
+            },
+          );
+        } else if (intentId) {
+          console.warn(
+            `Upload ${intentId} has an uncertain storage or database result; deferred cleanup will reconcile it.`,
+          );
         }
 
         return {
@@ -278,7 +278,9 @@ export async function POST(request: NextRequest) {
           error:
             error instanceof UploadValidationError
               ? error.message
-              : "Upload failed. Please try again.",
+              : error instanceof UploadQuotaExceededError
+                ? "Upload quota reached."
+                : "Upload failed. Please try again.",
         };
       }
     };

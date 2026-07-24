@@ -6,6 +6,7 @@ import {
   formatFileSize,
   getFileExtension,
   presignedUrlRequestSchema,
+  uploadCompleteRequestSchema,
 } from "./upload";
 
 describe("Upload Configuration", () => {
@@ -17,6 +18,9 @@ describe("Upload Configuration", () => {
 
     it("should have correct presigned URL expiration", () => {
       expect(UPLOAD_CONFIG.PRESIGNED_URL_EXPIRATION).toBe(15 * 60); // 15 minutes
+      expect(UPLOAD_CONFIG.UPLOAD_INTENT_EXPIRATION).toBe(24 * 60 * 60);
+      expect(UPLOAD_CONFIG.MAX_SERVER_UPLOAD_TOTAL_SIZE).toBe(20 * 1024 * 1024);
+      expect(UPLOAD_CONFIG.MAX_SERVER_UPLOAD_FILE_SIZE).toBe(10 * 1024 * 1024);
     });
 
     it("should have allowed file types array", () => {
@@ -197,6 +201,7 @@ describe("Upload Configuration", () => {
   describe("presignedUrlRequestSchema", () => {
     it("should validate correct input", () => {
       const validInput = {
+        protocolVersion: 2,
         fileName: "test.jpg",
         contentType: "image/jpeg",
         size: 1024,
@@ -209,8 +214,19 @@ describe("Upload Configuration", () => {
       }
     });
 
+    it("requires the conditional upload protocol version", () => {
+      expect(
+        presignedUrlRequestSchema.safeParse({
+          fileName: "test.jpg",
+          contentType: "image/jpeg",
+          size: 1024,
+        }).success,
+      ).toBe(false);
+    });
+
     it("should reject empty file name", () => {
       const invalidInput = {
+        protocolVersion: 2,
         fileName: "",
         contentType: "image/jpeg",
         size: 1024,
@@ -227,6 +243,7 @@ describe("Upload Configuration", () => {
 
     it("should reject very long file name", () => {
       const invalidInput = {
+        protocolVersion: 2,
         fileName: "a".repeat(256), // Too long
         contentType: "image/jpeg",
         size: 1024,
@@ -241,6 +258,7 @@ describe("Upload Configuration", () => {
 
     it("should reject empty content type", () => {
       const invalidInput = {
+        protocolVersion: 2,
         fileName: "test.jpg",
         contentType: "",
         size: 1024,
@@ -257,12 +275,14 @@ describe("Upload Configuration", () => {
 
     it("should reject negative or zero size", () => {
       const invalidInput1 = {
+        protocolVersion: 2,
         fileName: "test.jpg",
         contentType: "image/jpeg",
         size: 0,
       };
 
       const invalidInput2 = {
+        protocolVersion: 2,
         fileName: "test.jpg",
         contentType: "image/jpeg",
         size: -1,
@@ -288,6 +308,7 @@ describe("Upload Configuration", () => {
 
     it("should accept maximum valid file name length", () => {
       const validInput = {
+        protocolVersion: 2,
         fileName: "a".repeat(255), // Maximum length
         contentType: "image/jpeg",
         size: 1024,
@@ -299,6 +320,7 @@ describe("Upload Configuration", () => {
 
     it("should handle missing fields", () => {
       const incompleteInput = {
+        protocolVersion: 2,
         fileName: "test.jpg",
         // missing contentType and size
       };
@@ -323,6 +345,7 @@ describe("Upload Configuration", () => {
 
     it("should handle extremely large numbers", () => {
       const invalidInput = {
+        protocolVersion: 2,
         fileName: "test.jpg",
         contentType: "image/jpeg",
         size: Number.MAX_SAFE_INTEGER,
@@ -335,17 +358,29 @@ describe("Upload Configuration", () => {
     it("should handle special characters in file names", () => {
       const specialCharInputs = [
         {
+          protocolVersion: 2,
           fileName: "test file with spaces.jpg",
           contentType: "image/jpeg",
           size: 1024,
         },
         {
+          protocolVersion: 2,
           fileName: "test-file_with.special.chars.jpg",
           contentType: "image/jpeg",
           size: 1024,
         },
-        { fileName: "测试文件.jpg", contentType: "image/jpeg", size: 1024 },
-        { fileName: "файл.jpg", contentType: "image/jpeg", size: 1024 },
+        {
+          protocolVersion: 2,
+          fileName: "测试文件.jpg",
+          contentType: "image/jpeg",
+          size: 1024,
+        },
+        {
+          protocolVersion: 2,
+          fileName: "файл.jpg",
+          contentType: "image/jpeg",
+          size: 1024,
+        },
       ];
 
       specialCharInputs.forEach((input) => {
@@ -440,6 +475,44 @@ describe("Upload Configuration", () => {
       expect(getFileExtension("application/x-custom-format")).toBe(
         "x-custom-format",
       );
+    });
+  });
+
+  describe("uploadCompleteRequestSchema", () => {
+    const validInput = {
+      intentId: "11111111-1111-4111-8111-111111111111",
+      fileName: "test.jpg",
+      contentType: "image/jpeg",
+      size: 1024,
+      key: "uploads/user/test.jpg",
+      url: "https://cdn.example.com/uploads/user/test.jpg",
+    };
+
+    it("keeps the existing completion contract and accepts an intent ID", () => {
+      expect(uploadCompleteRequestSchema.safeParse(validInput).success).toBe(
+        true,
+      );
+      expect(
+        uploadCompleteRequestSchema.safeParse({
+          ...validInput,
+          intentId: undefined,
+        }).success,
+      ).toBe(true);
+    });
+
+    it("rejects malformed completion identifiers and URLs", () => {
+      expect(
+        uploadCompleteRequestSchema.safeParse({
+          ...validInput,
+          intentId: "not-a-uuid",
+        }).success,
+      ).toBe(false);
+      expect(
+        uploadCompleteRequestSchema.safeParse({
+          ...validInput,
+          url: "not-a-url",
+        }).success,
+      ).toBe(false);
     });
   });
 });

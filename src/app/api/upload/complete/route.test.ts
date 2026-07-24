@@ -1,38 +1,24 @@
 import { beforeEach, describe, expect, it, jest } from "@jest/globals";
 import type { NextRequest } from "next/server";
 
-process.env.R2_PUBLIC_URL = "https://cdn.example.com";
-
-jest.mock("@/env", () => ({
-  __esModule: true,
-  default: {
-    R2_PUBLIC_URL: "https://cdn.example.com",
-  },
-}));
-
 jest.mock("next/server", () => ({
   NextRequest: jest.fn(),
   NextResponse: {
     json: jest.fn((data: unknown, init: { status?: number } = {}) => ({
       json: () => Promise.resolve(data),
-      status: init?.status || 200,
-      ok: (init.status || 200) >= 200 && (init.status || 200) < 300,
+      status: init.status ?? 200,
+      ok: (init.status ?? 200) >= 200 && (init.status ?? 200) < 300,
     })),
   },
 }));
 
 const mockGetSession = jest.fn() as any;
 jest.mock("@/lib/auth/server", () => ({
-  auth: {
-    api: {
-      getSession: mockGetSession,
-    },
-  },
+  auth: { api: { getSession: mockGetSession } },
 }));
 
 const mockGetObjectMetadata = jest.fn() as any;
 jest.mock("@/lib/r2", () => ({
-  buildR2PublicUrl: (key: string) => `https://cdn.example.com/${key}`,
   getObjectMetadata: mockGetObjectMetadata,
 }));
 
@@ -41,184 +27,141 @@ jest.mock("@/lib/upload-rate-limit", () => ({
   checkUploadRateLimit: mockCheckUploadRateLimit,
 }));
 
-const mockSelectLimit = jest.fn().mockResolvedValue([]) as any;
-const mockSelectWhere = jest.fn().mockReturnValue({
-  limit: mockSelectLimit,
-}) as any;
-const mockSelectFrom = jest.fn().mockReturnValue({
-  where: mockSelectWhere,
-}) as any;
-const mockReturning = jest.fn() as any;
-const mockOnConflictDoNothing = jest.fn().mockReturnValue({
-  returning: mockReturning,
-}) as any;
-const mockInsertValues = jest.fn().mockReturnValue({
-  onConflictDoNothing: mockOnConflictDoNothing,
-}) as any;
-const mockDb = {
-  select: jest.fn().mockReturnValue({
-    from: mockSelectFrom,
-  }) as any,
-  insert: jest.fn().mockReturnValue({
-    values: mockInsertValues,
-  }) as any,
-};
-jest.mock("@/database", () => ({
-  db: mockDb,
+const mockCompleteUploadIntent = jest.fn() as any;
+const mockCompleteLegacyUpload = jest.fn() as any;
+class MockUploadIntentUnavailableError extends Error {}
+class MockUploadMetadataMismatchError extends Error {}
+class MockUploadQuotaExceededError extends Error {}
+jest.mock("@/lib/uploads/upload-intents", () => ({
+  completeLegacyUpload: mockCompleteLegacyUpload,
+  completeUploadIntent: mockCompleteUploadIntent,
+  UploadIntentUnavailableError: MockUploadIntentUnavailableError,
+  UploadMetadataMismatchError: MockUploadMetadataMismatchError,
+  UploadQuotaExceededError: MockUploadQuotaExceededError,
 }));
 
-jest.mock("@/database/schema", () => ({
-  uploads: {
-    __table: "uploads-table",
-    userId: "userId",
-    fileKey: "fileKey",
-  },
-}));
-
-jest.mock("drizzle-orm", () => ({
-  and: jest.fn((...conditions: unknown[]) => conditions),
-  eq: jest.fn((field: unknown, value: unknown) => ({ field, value })),
+const mockReadJsonBodyWithLimit = jest.fn() as any;
+class MockRequestBodyTooLargeError extends Error {}
+jest.mock("@/lib/http/request-body", () => ({
+  readJsonBodyWithLimit: mockReadJsonBodyWithLimit,
+  RequestBodyTooLargeError: MockRequestBodyTooLargeError,
 }));
 
 const mockIsFileTypeAllowed = jest.fn() as any;
 const mockIsFileSizeAllowed = jest.fn() as any;
-const mockFormatFileSize = jest.fn() as any;
-const mockUploadCompleteRequestSchema = {
-  safeParse: jest.fn() as any,
-};
-
+const mockUploadCompleteRequestSchema = { safeParse: jest.fn() as any };
 jest.mock("@/lib/config/upload", () => ({
   isFileTypeAllowed: mockIsFileTypeAllowed,
   isFileSizeAllowed: mockIsFileSizeAllowed,
   UPLOAD_CONFIG: {
-    MAX_FILE_SIZE: 10485760,
+    MAX_FILE_SIZE: 50 * 1024 * 1024,
+    MAX_JSON_BODY_SIZE: 4096,
   },
-  formatFileSize: mockFormatFileSize,
-  normalizeContentType: jest.fn((contentType: string) => contentType),
+  formatFileSize: jest.fn((size: number) => `${size} bytes`),
+  normalizeContentType: jest.fn((contentType: string) =>
+    contentType.toLowerCase(),
+  ),
   uploadCompleteRequestSchema: mockUploadCompleteRequestSchema,
 }));
+
+const validRequestBody = {
+  intentId: "11111111-1111-4111-8111-111111111111",
+  fileName: "test-image.jpg",
+  contentType: "image/jpeg",
+  size: 1024,
+  key: "uploads/user-123/test-image.jpg",
+  url: "https://cdn.example.com/uploads/user-123/test-image.jpg",
+};
+
+const createMockRequest = (body: unknown): NextRequest =>
+  ({
+    headers: new Headers(),
+    json: jest.fn().mockResolvedValue(body),
+  }) as unknown as NextRequest;
 
 describe("Upload Complete API", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockSelectLimit.mockResolvedValue([]);
-    mockSelectWhere.mockReturnValue({
-      limit: mockSelectLimit,
-    });
-    mockSelectFrom.mockReturnValue({
-      where: mockSelectWhere,
-    });
-    mockDb.select.mockReturnValue({
-      from: mockSelectFrom,
-    });
-    mockDb.insert.mockReturnValue({
-      values: mockInsertValues,
-    });
-    mockInsertValues.mockReturnValue({
-      onConflictDoNothing: mockOnConflictDoNothing,
-    });
-    mockOnConflictDoNothing.mockReturnValue({
-      returning: mockReturning,
-    });
-    mockReturning.mockResolvedValue([
-      {
-        fileKey: validRequestBody.key,
-        url: validRequestBody.url,
-        fileName: validRequestBody.fileName,
-        fileSize: validRequestBody.size,
-        contentType: validRequestBody.contentType,
-      },
-    ]);
-    mockCheckUploadRateLimit.mockReturnValue({
+    mockGetSession.mockResolvedValue({ user: { id: "user-123" } });
+    mockCheckUploadRateLimit.mockResolvedValue({
       allowed: true,
       limit: 30,
       remaining: 29,
       resetAt: Date.now() + 60_000,
       retryAfter: 0,
     });
+    mockReadJsonBodyWithLimit.mockImplementation((request: NextRequest) =>
+      request.json(),
+    );
+    mockUploadCompleteRequestSchema.safeParse.mockReturnValue({
+      success: true,
+      data: validRequestBody,
+    });
+    mockIsFileTypeAllowed.mockReturnValue(true);
+    mockIsFileSizeAllowed.mockReturnValue(true);
+    mockGetObjectMetadata.mockResolvedValue({
+      contentLength: 1024,
+      contentType: "image/jpeg",
+    });
+    mockCompleteUploadIntent.mockResolvedValue({
+      fileKey: validRequestBody.key,
+      url: validRequestBody.url,
+      fileName: validRequestBody.fileName,
+      fileSize: validRequestBody.size,
+      contentType: validRequestBody.contentType,
+    });
+    mockCompleteLegacyUpload.mockResolvedValue(null);
   });
 
-  const createMockRequest = (body: unknown): NextRequest =>
-    ({
-      headers: {
-        get: () => "",
-        has: () => false,
-        set: () => {},
-        entries: () => [],
-      },
-      json: jest.fn().mockResolvedValue(body) as any,
-      cookies: { get: () => null, has: () => false },
-      nextUrl: { pathname: "/api/upload/complete" },
-      url: "http://localhost:3000/api/upload/complete",
-    }) as any as NextRequest;
-
-  const mockSession = {
-    user: {
-      id: "user-123",
-    },
-  };
-
-  const validRequestBody = {
-    fileName: "test-image.jpg",
-    contentType: "image/jpeg",
-    size: 1048576,
-    key: "uploads/user-123/test-image.jpg",
-    url: "https://cdn.example.com/uploads/user-123/test-image.jpg",
-  };
-
-  it("should return 401 when user is not authenticated", async () => {
+  it("returns 401 when the user is not authenticated", async () => {
     mockGetSession.mockResolvedValue(null);
 
     const { POST } = await import("./route");
     const response = await POST(createMockRequest(validRequestBody));
-    const data = await response.json();
 
     expect(response.status).toBe(401);
-    expect(data.error).toBe("Unauthorized");
+    expect(mockGetObjectMetadata).not.toHaveBeenCalled();
   });
 
-  it("should return 400 for invalid request body", async () => {
-    mockGetSession.mockResolvedValue(mockSession);
+  it("rejects invalid request data", async () => {
     mockUploadCompleteRequestSchema.safeParse.mockReturnValue({
       success: false,
-      error: {
-        flatten: () => ({
-          fieldErrors: {
-            key: ["Required"],
-          },
-        }),
-      },
+      error: { flatten: () => ({ fieldErrors: { key: ["Required"] } }) },
     });
 
     const { POST } = await import("./route");
     const response = await POST(createMockRequest({}));
-    const data = await response.json();
 
     expect(response.status).toBe(400);
-    expect(data.error).toBe("Invalid request data");
+    await expect(response.json()).resolves.toEqual({
+      error: "Invalid request data",
+      details: { key: ["Required"] },
+    });
   });
 
-  it("should return 400 for malformed JSON", async () => {
-    mockGetSession.mockResolvedValue(mockSession);
-    mockUploadCompleteRequestSchema.safeParse.mockReturnValue({
-      success: false,
-      error: {
-        flatten: () => ({ fieldErrors: {} }),
-      },
-    });
-    const request = createMockRequest(validRequestBody);
-    (request.json as jest.Mock).mockRejectedValue(new Error("Invalid JSON"));
+  it("rejects oversized JSON before parsing", async () => {
+    mockReadJsonBodyWithLimit.mockRejectedValue(
+      new MockRequestBodyTooLargeError(),
+    );
 
     const { POST } = await import("./route");
-    const response = await POST(request);
-    const data = await response.json();
+    const response = await POST(createMockRequest(validRequestBody));
 
-    expect(response.status).toBe(400);
-    expect(data.error).toBe("Invalid request data");
+    expect(response.status).toBe(413);
+    expect(mockGetObjectMetadata).not.toHaveBeenCalled();
   });
 
-  it("should reject upload keys that do not belong to the current user", async () => {
-    mockGetSession.mockResolvedValue(mockSession);
+  it("returns 409 when the object is not available", async () => {
+    mockGetObjectMetadata.mockResolvedValue(null);
+
+    const { POST } = await import("./route");
+    const response = await POST(createMockRequest(validRequestBody));
+
+    expect(response.status).toBe(409);
+    expect(mockCompleteUploadIntent).not.toHaveBeenCalled();
+  });
+
+  it("rejects another user's key before querying object storage", async () => {
     mockUploadCompleteRequestSchema.safeParse.mockReturnValue({
       success: true,
       data: {
@@ -229,238 +172,140 @@ describe("Upload Complete API", () => {
 
     const { POST } = await import("./route");
     const response = await POST(createMockRequest(validRequestBody));
-    const data = await response.json();
 
     expect(response.status).toBe(403);
-    expect(data.error).toBe("Upload key does not belong to the current user.");
+    expect(mockGetObjectMetadata).not.toHaveBeenCalled();
   });
 
-  it("should reject when uploaded object cannot be verified", async () => {
-    mockGetSession.mockResolvedValue(mockSession);
-    mockUploadCompleteRequestSchema.safeParse.mockReturnValue({
-      success: true,
-      data: validRequestBody,
-    });
-    mockIsFileTypeAllowed.mockReturnValue(true);
-    mockIsFileSizeAllowed.mockReturnValue(true);
-    mockGetObjectMetadata.mockResolvedValue(null);
+  it("rejects an unsafe object type", async () => {
+    mockIsFileTypeAllowed.mockReturnValueOnce(true).mockReturnValueOnce(false);
 
     const { POST } = await import("./route");
     const response = await POST(createMockRequest(validRequestBody));
-    const data = await response.json();
 
-    expect(response.status).toBe(409);
-    expect(data.error).toBe("Uploaded object could not be verified.");
-    expect(mockDb.insert).not.toHaveBeenCalled();
+    expect(response.status).toBe(400);
+    expect(mockCompleteUploadIntent).not.toHaveBeenCalled();
   });
 
-  it("should return 500 when object storage metadata lookup fails", async () => {
-    mockGetSession.mockResolvedValue(mockSession);
-    mockUploadCompleteRequestSchema.safeParse.mockReturnValue({
-      success: true,
-      data: validRequestBody,
-    });
-    mockIsFileTypeAllowed.mockReturnValue(true);
-    mockIsFileSizeAllowed.mockReturnValue(true);
-    mockGetObjectMetadata.mockRejectedValue(new Error("R2 unavailable"));
-
+  it("completes the reserved upload using verified R2 metadata", async () => {
     const { POST } = await import("./route");
     const response = await POST(createMockRequest(validRequestBody));
-    const data = await response.json();
 
-    expect(response.status).toBe(500);
-    expect(data.error).toBe("Internal Server Error. Please try again later.");
-    expect(mockDb.insert).not.toHaveBeenCalled();
-  });
-
-  it("should reject upload urls that do not match the configured object key", async () => {
-    mockGetSession.mockResolvedValue(mockSession);
-    mockUploadCompleteRequestSchema.safeParse.mockReturnValue({
-      success: true,
-      data: {
-        ...validRequestBody,
-        url: "https://cdn.example.com/uploads/user-123/another-file.jpg",
+    expect(response.status).toBe(200);
+    expect(mockCompleteUploadIntent).toHaveBeenCalledWith({
+      intentId: validRequestBody.intentId,
+      userId: "user-123",
+      key: validRequestBody.key,
+      contentLength: 1024,
+      contentType: "image/jpeg",
+      declaration: {
+        fileName: validRequestBody.fileName,
+        fileSize: validRequestBody.size,
+        contentType: validRequestBody.contentType,
+        url: validRequestBody.url,
       },
     });
-
-    const { POST } = await import("./route");
-    const response = await POST(createMockRequest(validRequestBody));
-    const data = await response.json();
-
-    expect(response.status).toBe(400);
-    expect(data.error).toBe("Upload URL does not match the stored object key.");
+    await expect(response.json()).resolves.toEqual({
+      file: {
+        key: validRequestBody.key,
+        url: validRequestBody.url,
+        fileName: validRequestBody.fileName,
+        size: validRequestBody.size,
+        contentType: validRequestBody.contentType,
+      },
+    });
   });
 
-  it("should reject disallowed file types", async () => {
-    mockGetSession.mockResolvedValue(mockSession);
-    mockUploadCompleteRequestSchema.safeParse.mockReturnValue({
-      success: true,
-      data: validRequestBody,
-    });
-    mockIsFileTypeAllowed.mockReturnValue(false);
-
-    const { POST } = await import("./route");
-    const response = await POST(createMockRequest(validRequestBody));
-    const data = await response.json();
-
-    expect(response.status).toBe(400);
-    expect(data.error).toBe("File type 'image/jpeg' is not allowed.");
-  });
-
-  it("should reject files that exceed the configured size limit", async () => {
-    mockGetSession.mockResolvedValue(mockSession);
-    mockUploadCompleteRequestSchema.safeParse.mockReturnValue({
-      success: true,
-      data: validRequestBody,
-    });
-    mockIsFileTypeAllowed.mockReturnValue(true);
-    mockIsFileSizeAllowed.mockReturnValue(false);
-    mockFormatFileSize.mockImplementation((size: number) =>
-      size === validRequestBody.size ? "1 MB" : "10 MB",
+  it("returns 409 for an expired or consumed intent", async () => {
+    mockCompleteUploadIntent.mockRejectedValue(
+      new MockUploadIntentUnavailableError("Upload intent expired."),
     );
 
     const { POST } = await import("./route");
     const response = await POST(createMockRequest(validRequestBody));
-    const data = await response.json();
 
-    expect(response.status).toBe(400);
-    expect(data.error).toBe("File size of 1 MB exceeds the limit of 10 MB.");
+    expect(response.status).toBe(409);
   });
 
-  it("should return the existing upload record without inserting a duplicate", async () => {
-    mockGetSession.mockResolvedValue(mockSession);
-    mockUploadCompleteRequestSchema.safeParse.mockReturnValue({
-      success: true,
-      data: validRequestBody,
-    });
-    mockIsFileTypeAllowed.mockReturnValue(true);
-    mockIsFileSizeAllowed.mockReturnValue(true);
-    mockGetObjectMetadata.mockResolvedValue({
-      contentLength: validRequestBody.size,
-      contentType: validRequestBody.contentType,
-    });
-    const existingUpload = {
-      fileKey: validRequestBody.key,
-      url: validRequestBody.url,
-      fileName: validRequestBody.fileName,
-      fileSize: validRequestBody.size,
-      contentType: validRequestBody.contentType,
+  it("completes an in-flight legacy upload during the rollout window", async () => {
+    const legacyRequest = { ...validRequestBody, intentId: undefined };
+    const legacyUpload = {
+      fileKey: legacyRequest.key,
+      url: legacyRequest.url,
+      fileName: legacyRequest.fileName,
+      fileSize: legacyRequest.size,
+      contentType: legacyRequest.contentType,
     };
-    mockReturning.mockResolvedValue([]);
-    mockSelectLimit.mockResolvedValue([existingUpload]);
-
-    const { POST } = await import("./route");
-    const response = await POST(createMockRequest(validRequestBody));
-    const data = await response.json();
-
-    expect(response.status).toBe(200);
-    expect(mockDb.insert).toHaveBeenCalled();
-    expect(mockOnConflictDoNothing).toHaveBeenCalledWith({
-      target: "fileKey",
-    });
-    expect(data.file).toEqual({
-      key: existingUpload.fileKey,
-      url: existingUpload.url,
-      fileName: existingUpload.fileName,
-      size: existingUpload.fileSize,
-      contentType: existingUpload.contentType,
-    });
-  });
-
-  it("should return 500 when unexpected errors occur", async () => {
-    mockGetSession.mockRejectedValue(new Error("session exploded"));
-
-    const { POST } = await import("./route");
-    const response = await POST(createMockRequest(validRequestBody));
-    const data = await response.json();
-
-    expect(response.status).toBe(500);
-    expect(data.error).toBe("Internal Server Error. Please try again later.");
-  });
-
-  it("should persist upload metadata after object verification", async () => {
-    mockGetSession.mockResolvedValue(mockSession);
     mockUploadCompleteRequestSchema.safeParse.mockReturnValue({
       success: true,
-      data: validRequestBody,
+      data: legacyRequest,
     });
-    mockIsFileTypeAllowed.mockReturnValue(true);
-    mockIsFileSizeAllowed.mockReturnValue(true);
-    mockGetObjectMetadata.mockResolvedValue({
-      contentLength: validRequestBody.size,
-      contentType: validRequestBody.contentType,
-    });
+    mockCompleteUploadIntent.mockRejectedValue(
+      new MockUploadIntentUnavailableError("Upload intent unavailable."),
+    );
+    mockCompleteLegacyUpload.mockResolvedValue(legacyUpload);
 
     const { POST } = await import("./route");
-    const response = await POST(createMockRequest(validRequestBody));
-    const data = await response.json();
+    const response = await POST(createMockRequest(legacyRequest));
 
     expect(response.status).toBe(200);
-    expect(mockDb.insert).toHaveBeenCalledWith(
-      expect.objectContaining({ __table: "uploads-table" }),
-    );
-    expect(mockInsertValues).toHaveBeenCalledWith({
+    expect(mockCompleteLegacyUpload).toHaveBeenCalledWith({
       userId: "user-123",
-      fileKey: validRequestBody.key,
-      url: validRequestBody.url,
-      fileName: validRequestBody.fileName,
-      fileSize: validRequestBody.size,
-      contentType: validRequestBody.contentType,
-    });
-    expect(data.file).toEqual({
-      key: validRequestBody.key,
-      url: validRequestBody.url,
-      fileName: validRequestBody.fileName,
-      size: validRequestBody.size,
-      contentType: validRequestBody.contentType,
+      key: legacyRequest.key,
+      contentLength: 1024,
+      contentType: "image/jpeg",
+      declaration: {
+        fileName: legacyRequest.fileName,
+        fileSize: legacyRequest.size,
+        contentType: legacyRequest.contentType,
+        url: legacyRequest.url,
+      },
     });
   });
 
-  it("should reject when actual object size differs from the declared size", async () => {
-    mockGetSession.mockResolvedValue(mockSession);
-    mockUploadCompleteRequestSchema.safeParse.mockReturnValue({
-      success: true,
-      data: validRequestBody,
-    });
-    mockIsFileTypeAllowed.mockReturnValue(true);
-    mockIsFileSizeAllowed.mockReturnValue(true);
-    mockGetObjectMetadata.mockResolvedValue({
-      contentLength: validRequestBody.size + 1,
-      contentType: validRequestBody.contentType,
-    });
+  it("does not bypass a rejected v2 intent through legacy completion", async () => {
+    mockCompleteUploadIntent.mockRejectedValue(
+      new MockUploadIntentUnavailableError("Upload intent unavailable."),
+    );
 
     const { POST } = await import("./route");
     const response = await POST(createMockRequest(validRequestBody));
-    const data = await response.json();
 
-    expect(response.status).toBe(400);
-    expect(data.error).toBe(
-      "Uploaded object size does not match the declared size.",
-    );
-    expect(mockDb.insert).not.toHaveBeenCalled();
+    expect(response.status).toBe(409);
+    expect(mockCompleteLegacyUpload).not.toHaveBeenCalled();
   });
 
-  it("should reject when actual object content type differs from the declared type", async () => {
-    mockGetSession.mockResolvedValue(mockSession);
+  it("returns a controlled quota response for a legacy completion", async () => {
+    const legacyRequest = { ...validRequestBody, intentId: undefined };
     mockUploadCompleteRequestSchema.safeParse.mockReturnValue({
       success: true,
-      data: validRequestBody,
+      data: legacyRequest,
     });
-    mockIsFileTypeAllowed.mockReturnValue(true);
-    mockIsFileSizeAllowed.mockReturnValue(true);
-    mockGetObjectMetadata.mockResolvedValue({
-      contentLength: validRequestBody.size,
-      contentType: "image/png",
+    mockCompleteUploadIntent.mockRejectedValue(
+      new MockUploadIntentUnavailableError("Upload intent unavailable."),
+    );
+    mockCompleteLegacyUpload.mockRejectedValue(
+      new MockUploadQuotaExceededError("Daily upload quota reached."),
+    );
+
+    const { POST } = await import("./route");
+    const response = await POST(createMockRequest(legacyRequest));
+
+    expect(response.status).toBe(403);
+    await expect(response.json()).resolves.toEqual({
+      code: "UPLOAD_QUOTA_EXCEEDED",
+      error: "Daily upload quota reached.",
     });
+  });
+
+  it("returns 400 when the reservation metadata does not match", async () => {
+    mockCompleteUploadIntent.mockRejectedValue(
+      new MockUploadMetadataMismatchError("mismatch"),
+    );
 
     const { POST } = await import("./route");
     const response = await POST(createMockRequest(validRequestBody));
-    const data = await response.json();
 
     expect(response.status).toBe(400);
-    expect(data.error).toBe(
-      "Uploaded object content type does not match the declared content type.",
-    );
-    expect(mockDb.insert).not.toHaveBeenCalled();
   });
 });

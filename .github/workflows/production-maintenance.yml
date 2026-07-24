@@ -15,7 +15,7 @@ jobs:
   upload-cleanup:
     if: vars.PRODUCTION_MAINTENANCE_ENABLED == 'true'
     runs-on: ubuntu-24.04
-    timeout-minutes: 2
+    timeout-minutes: 5
     steps:
       - name: Drain expired upload intents
         env:
@@ -23,15 +23,40 @@ jobs:
           UPLOAD_CLEANUP_SECRET: ${{ secrets.UPLOAD_CLEANUP_SECRET }}
         run: |
           set -euo pipefail
-          test -n "${PRODUCTION_APP_URL}"
           test -n "${UPLOAD_CLEANUP_SECRET}"
-          curl \
-            --fail-with-body \
-            --silent \
-            --show-error \
-            --retry 2 \
-            --retry-all-errors \
-            --max-time 45 \
-            --request POST \
-            --header "Authorization: Bearer ${UPLOAD_CLEANUP_SECRET}" \
-            "${PRODUCTION_APP_URL%/}/api/internal/uploads/cleanup"
+          case "${PRODUCTION_APP_URL}" in
+            https://*) ;;
+            *)
+              echo "::error::PRODUCTION_APP_URL must use HTTPS"
+              exit 1
+              ;;
+          esac
+
+          cleanup_response="$(
+            curl \
+              --fail-with-body \
+              --silent \
+              --show-error \
+              --proto '=https' \
+              --connect-timeout 10 \
+              --max-time 240 \
+              --request POST \
+              --header "Authorization: Bearer ${UPLOAD_CLEANUP_SECRET}" \
+              --url "${PRODUCTION_APP_URL%/}/api/internal/uploads/cleanup"
+          )"
+          printf '%s\n' "${cleanup_response}"
+
+          if ! jq -e '
+            type == "object"
+            and (.batches | type == "number")
+            and (.scanned | type == "number")
+          ' >/dev/null <<<"${cleanup_response}"; then
+            echo "::error::Cleanup endpoint returned an invalid response"
+            exit 1
+          fi
+
+          if jq -e '.batches == 5 and .scanned == 500' \
+            >/dev/null <<<"${cleanup_response}"; then
+            echo "::error::Cleanup reached its 500-intent safety cap; run it again"
+            exit 1
+          fi

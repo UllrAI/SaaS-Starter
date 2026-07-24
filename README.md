@@ -348,7 +348,8 @@ legacy objects. New clients always require a database-backed v2 intent.
 
 Call the cleanup endpoint once per day from your deployment platform. It claims
 expired upload intents and deletes abandoned R2 objects. At this cadence,
-expired objects and second-stage tombstones may remain until the next run;
+expired objects may remain until a later daily run. A tombstone that becomes
+eligible just after the fixed run can wait through one additional daily cycle;
 quota accounting stops counting intents as soon as they expire.
 
 ```bash
@@ -451,6 +452,9 @@ repository also includes a standalone multi-stage Docker build.
 
 Docker Compose follows the same order with a one-shot `migrate` service. See
 [docker/README.md](docker/README.md) for local and self-hosted instructions.
+The optional GitHub maintenance schedule is best-effort and runs only from the
+default branch. Enable scheduled Actions explicitly in a fork, monitor its
+latest successful run, and use a platform scheduler when timing is an SLA.
 
 ## 📄 License
 

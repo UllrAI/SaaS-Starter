@@ -5,6 +5,7 @@ import { render, screen } from "@testing-library/react";
 const mockCreateMetadataDefaults = jest.fn();
 const mockRequireAuth = jest.fn();
 const mockGetUserSubscription = jest.fn();
+const mockGetUserProductEntitlement = jest.fn();
 const mockGetUserPayments = jest.fn();
 const mockGetRequestLocale = jest.fn();
 const mockDbSelect = jest.fn();
@@ -30,6 +31,7 @@ describe("Dashboard Home Page", () => {
       tierId: "pro",
       status: "active",
     });
+    mockGetUserProductEntitlement.mockResolvedValue(null);
     mockGetUserPayments.mockResolvedValue([
       {
         paymentId: "pay_1",
@@ -66,6 +68,7 @@ describe("Dashboard Home Page", () => {
     }));
     jest.doMock("@/lib/database/subscription", () => ({
       getUserSubscription: mockGetUserSubscription,
+      getUserProductEntitlement: mockGetUserProductEntitlement,
       getUserPayments: mockGetUserPayments,
     }));
     jest.doMock("@/lib/i18n/server-locale", () => ({
@@ -229,5 +232,22 @@ describe("Dashboard Home Page", () => {
         "No payment history yet. Visit billing when you are ready to test checkout.",
       ),
     ).toBeInTheDocument();
+  });
+
+  it("shows lifetime access instead of an expired subscription", async () => {
+    mockGetUserSubscription.mockResolvedValue({
+      tierId: "plus",
+      status: "expired",
+    });
+    mockGetUserProductEntitlement.mockResolvedValue({
+      productId: "team",
+    });
+
+    const { default: HomeRoute } = loadPageModule();
+    render(await HomeRoute());
+
+    expect(screen.getAllByText("Team")).not.toHaveLength(0);
+    expect(screen.getByText("Lifetime access")).toBeInTheDocument();
+    expect(screen.queryByText("expired")).not.toBeInTheDocument();
   });
 });

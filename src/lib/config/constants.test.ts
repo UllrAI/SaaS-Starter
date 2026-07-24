@@ -85,14 +85,12 @@ describe("Constants Configuration", () => {
       expect(constants.CONTACT_EMAIL).toBe("support@ullrai.com");
       expect(constants.LEGAL_EMAIL).toBe("legal@ullrai.com");
       expect(constants.PRIVACY_EMAIL).toBe("privacy@ullrai.com");
-      expect(constants.RESEND_EMAIL_FROM).toBe("noreply@mail.ullrai.com");
 
       // Validate email format
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       expect(emailRegex.test(constants.CONTACT_EMAIL)).toBe(true);
       expect(emailRegex.test(constants.LEGAL_EMAIL)).toBe(true);
       expect(emailRegex.test(constants.PRIVACY_EMAIL)).toBe(true);
-      expect(emailRegex.test(constants.RESEND_EMAIL_FROM)).toBe(true);
     });
 
     it("should export correct external links", async () => {
@@ -142,7 +140,6 @@ describe("Constants Configuration", () => {
       expect(typeof constants.CONTACT_EMAIL).toBe("string");
       expect(typeof constants.LEGAL_EMAIL).toBe("string");
       expect(typeof constants.PRIVACY_EMAIL).toBe("string");
-      expect(typeof constants.RESEND_EMAIL_FROM).toBe("string");
       expect(typeof constants.GITHUB_URL).toBe("string");
       expect(typeof constants.VERCEL_DEPLOY_URL).toBe("string");
       expect(typeof constants.PAYMENT_PROVIDER).toBe("string");
@@ -160,7 +157,6 @@ describe("Constants Configuration", () => {
         constants.CONTACT_EMAIL,
         constants.LEGAL_EMAIL,
         constants.PRIVACY_EMAIL,
-        constants.RESEND_EMAIL_FROM,
         constants.GITHUB_URL,
         constants.VERCEL_DEPLOY_URL,
         constants.PAYMENT_PROVIDER,
@@ -216,7 +212,6 @@ describe("Constants Configuration", () => {
       expect(constants.CONTACT_EMAIL).toContain("ullrai.com");
       expect(constants.LEGAL_EMAIL).toContain("ullrai.com");
       expect(constants.PRIVACY_EMAIL).toContain("ullrai.com");
-      expect(constants.RESEND_EMAIL_FROM).toContain("ullrai.com");
 
       // Company name should be consistent with domain
       expect(constants.COMPANY_NAME).toContain("UllrAI");

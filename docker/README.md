@@ -6,31 +6,34 @@ This directory contains Docker configuration for running the UllrAI Starter appl
 
 - `Dockerfile` - Multi-stage build configuration for the Next.js application
 - `docker-compose.yml` - Complete development environment with PostgreSQL and Redis
-- `.dockerignore` - Excludes unnecessary files from Docker builds
+- Root `.dockerignore` - Excludes secrets and build artifacts
 
 ## Quick Start
 
 1. **Configure Environment Variables**
 
-   Before running, update the environment variables in `docker-compose.yml`:
+   Copy the root environment template and fill in every required value:
 
-   ```yaml
-   # Required for development
-   BETTER_AUTH_SECRET: "your-development-secret-key-here"
-   RESEND_API_KEY: "your-resend-api-key-here"
-
-   # Configure R2 storage
-   R2_ENDPOINT: "your-r2-endpoint"
-   R2_ACCESS_KEY_ID: "your-r2-access-key"
-   # ... etc
+   ```bash
+   cp .env.example .env
+   openssl rand -base64 32
    ```
+
+   Store the generated value in `BETTER_AUTH_SECRET`. Set
+   `RESEND_EMAIL_FROM` to an address on a domain verified in Resend. Set
+   `NEXT_PUBLIC_APP_URL` to the exact public origin used to access the build;
+   production SEO metadata is generated from this value at build time.
 
 2. **Run the application**
 
    ```bash
    cd docker
-   docker-compose up --build
+   docker compose --env-file ../.env up --build
    ```
+
+   Compose waits for PostgreSQL, applies every committed migration with the
+   one-shot `migrate` service, and starts the application only after migration
+   succeeds.
 
 3. **Access the application**
    - Application: http://localhost:3000
@@ -45,6 +48,11 @@ This directory contains Docker configuration for running the UllrAI Starter appl
 - **Dependencies**: PostgreSQL
 - **Health check**: Next.js application readiness
 
+### migrate
+
+- **Purpose**: Applies committed Drizzle migrations before `app` starts
+- **Lifecycle**: Exits successfully after migrations complete
+
 ### postgres
 
 - **Port**: 5432
@@ -57,37 +65,35 @@ This directory contains Docker configuration for running the UllrAI Starter appl
 - **Port**: 6379
 - **Persistence**: Docker volume `redis_data`
 - **Use case**: Caching and session storage
+- **Start**: `docker compose --env-file ../.env --profile cache up --build`
 
 ## Development Workflow
 
 1. **Database Migrations**
 
    ```bash
-   # Apply committed migrations inside the container
-   docker-compose exec app pnpm db:migrate
+   # Re-run the one-shot committed migration service
+   docker compose --env-file ../.env run --rm migrate
 
-   # For disposable local iteration only
-   docker-compose exec app pnpm db:push
+   # Generate migrations on the host after changing the schema
+   pnpm db:generate
    ```
 
 2. **Logs**
 
    ```bash
    # View application logs
-   docker-compose logs -f app
+   docker compose logs -f app
 
    # View all services
-   docker-compose logs -f
+   docker compose logs -f
    ```
 
 3. **Shell Access**
 
    ```bash
-   # Access application container
-   docker-compose exec app sh
-
    # Access database
-   docker-compose exec postgres psql -U postgres -d ullrai_starter
+   docker compose exec postgres psql -U postgres -d ullrai_starter
    ```
 
 ## Production Considerations
@@ -107,18 +113,18 @@ For production deployment:
 
 ```bash
 # Check if PostgreSQL is ready
-docker-compose exec postgres pg_isready -U postgres
+docker compose exec postgres pg_isready -U postgres
 
 # Reset database
-docker-compose down -v
-docker-compose up --build
+docker compose down -v
+docker compose --env-file ../.env up --build
 ```
 
 ### Build Issues
 
 ```bash
 # Clean build
-docker-compose down
+docker compose down
 docker system prune -f
-docker-compose up --build
+docker compose --env-file ../.env up --build
 ```

@@ -12,12 +12,14 @@ jest.mock("resend", () => {
 
 jest.mock("@/env", () => ({
   __esModule: true,
-  default: { RESEND_API_KEY: "test-api-key" },
+  default: {
+    RESEND_API_KEY: "test-api-key",
+    RESEND_EMAIL_FROM: "test@example.com",
+  },
 }));
 
 jest.mock("@/lib/config/constants", () => ({
   APP_NAME: "Test App",
-  RESEND_EMAIL_FROM: "test@example.com",
 }));
 
 import { sendEmail } from "./email";

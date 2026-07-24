@@ -1,15 +1,32 @@
 import { NextRequest, NextResponse } from "next/server";
 import { billing } from "@/lib/billing";
 import { z } from "zod";
-import { getUserSubscription } from "@/lib/database/subscription";
+import {
+  getUserSubscription,
+  hasUserProductEntitlement,
+} from "@/lib/database/subscription";
 import { assertTrustedBillingUrl } from "@/lib/billing/url";
 import { getAuthSessionFromHeaders } from "@/lib/auth/session";
+import { getProductTierById } from "@/lib/config/products";
+import { hasCurrentSubscriptionAccess } from "@/lib/billing/access";
 
-const checkoutSchema = z.object({
-  tierId: z.string(),
-  paymentMode: z.enum(["subscription", "one_time"]),
-  billingCycle: z.enum(["monthly", "yearly"]).optional(),
-});
+const tierIdSchema = z
+  .string()
+  .refine((tierId) => Boolean(getProductTierById(tierId)), {
+    message: "Unknown product tier",
+  });
+const checkoutSchema = z.discriminatedUnion("paymentMode", [
+  z.object({
+    tierId: tierIdSchema,
+    paymentMode: z.literal("subscription"),
+    billingCycle: z.enum(["monthly", "yearly"]),
+  }),
+  z.object({
+    tierId: tierIdSchema,
+    paymentMode: z.literal("one_time"),
+    billingCycle: z.never().optional(),
+  }),
+]);
 
 export async function POST(request: NextRequest) {
   let session = null;
@@ -41,11 +58,7 @@ export async function POST(request: NextRequest) {
     if (paymentMode === "subscription") {
       const existingSubscription = await getUserSubscription(session.user.id);
 
-      if (
-        existingSubscription &&
-        (existingSubscription.status === "active" ||
-          existingSubscription.status === "trialing")
-      ) {
+      if (hasCurrentSubscriptionAccess(existingSubscription)) {
         const { portalUrl } = await billing.createCustomerPortalUrl(
           existingSubscription.customerId,
         );
@@ -64,6 +77,14 @@ export async function POST(request: NextRequest) {
           { status: 409 },
         );
       }
+    } else if (await hasUserProductEntitlement(session.user.id, tierId)) {
+      return NextResponse.json(
+        {
+          code: "product_owned",
+          error: "You already own this product.",
+        },
+        { status: 409 },
+      );
     }
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL;

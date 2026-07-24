@@ -760,6 +760,7 @@ type MockEnvironment = {
   BETTER_AUTH_SECRET: string;
   NEXT_PUBLIC_APP_URL: string;
   RESEND_API_KEY: string;
+  RESEND_EMAIL_FROM: string;
   AWS_S3_BUCKET: string;
   AWS_S3_REGION: string;
   AWS_ACCESS_KEY_ID: string;
@@ -779,7 +780,8 @@ type MockEnvironment = {
 
 const mockEnvConfig: MockEnvironment = {
   DATABASE_URL: "postgresql://test:test@localhost:5432/test_db",
-  BETTER_AUTH_SECRET: "mock-secret",
+  BETTER_AUTH_SECRET: "mock-secret-at-least-32-characters",
+  RESEND_EMAIL_FROM: "noreply@example.com",
   NEXT_PUBLIC_APP_URL: "http://localhost:3000",
   RESEND_API_KEY: "mock-resend-key",
   AWS_S3_BUCKET: "mock-bucket",
@@ -957,7 +959,8 @@ jest.mock("./env.js", () => ({
   __esModule: true,
   default: {
     DATABASE_URL: "postgresql://test:test@localhost:5432/test_db",
-    BETTER_AUTH_SECRET: "mock-secret",
+    BETTER_AUTH_SECRET: "mock-secret-at-least-32-characters",
+    RESEND_EMAIL_FROM: "noreply@example.com",
     NEXT_PUBLIC_APP_URL: "http://localhost:3000",
     RESEND_API_KEY: "mock-resend-key",
     R2_ENDPOINT: "https://mock-endpoint.r2.cloudflarestorage.com",

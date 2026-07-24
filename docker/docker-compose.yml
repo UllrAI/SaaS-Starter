@@ -1,10 +1,7 @@
-version: "3.8"
-
 services:
   # PostgreSQL Database
   postgres:
     image: postgres:16-alpine
-    container_name: ullrai-postgres
     restart: unless-stopped
     environment:
       POSTGRES_DB: ullrai_starter
@@ -14,7 +11,6 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./init:/docker-entrypoint-initdb.d
     networks:
       - ullrai-network
     healthcheck:
@@ -23,12 +19,28 @@ services:
       timeout: 10s
       retries: 3
 
+  migrate:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: migrator
+    restart: "no"
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/ullrai_starter
+      SKIP_ENV_VALIDATION: "1"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - ullrai-network
+
   # Next.js Application
   app:
     build:
       context: ..
       dockerfile: docker/Dockerfile
-    container_name: ullrai-app
+      args:
+        NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:?Set NEXT_PUBLIC_APP_URL to the public deployment origin}
     restart: unless-stopped
     ports:
       - "3000:3000"
@@ -41,48 +53,60 @@ services:
       DB_IDLE_TIMEOUT: 300
       DB_MAX_LIFETIME: 14400
       DB_CONNECT_TIMEOUT: 30
+      RATE_LIMIT_IP_HEADER: ${RATE_LIMIT_IP_HEADER:-x-forwarded-for}
 
       # Application URL
-      NEXT_PUBLIC_APP_URL: http://localhost:3000
+      NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:?Set NEXT_PUBLIC_APP_URL}
 
       # Auth Secret (generate a new one for production)
-      BETTER_AUTH_SECRET: your-development-secret-key-here
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:?Set BETTER_AUTH_SECRET}
 
       # OAuth (optional - configure as needed)
-      # GOOGLE_CLIENT_ID:
-      # GOOGLE_CLIENT_SECRET:
-      # GITHUB_CLIENT_ID:
-      # GITHUB_CLIENT_SECRET:
-      # LINKEDIN_CLIENT_ID:
-      # LINKEDIN_CLIENT_SECRET:
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID:-}
+      GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET:-}
+      LINKEDIN_CLIENT_ID: ${LINKEDIN_CLIENT_ID:-}
+      LINKEDIN_CLIENT_SECRET: ${LINKEDIN_CLIENT_SECRET:-}
 
       # Email service (configure with your Resend API key)
-      RESEND_API_KEY: your-resend-api-key-here
+      RESEND_API_KEY: ${RESEND_API_KEY:?Set RESEND_API_KEY}
+      RESEND_EMAIL_FROM: ${RESEND_EMAIL_FROM:?Set RESEND_EMAIL_FROM}
 
       # Cloudflare R2 Storage (configure with your credentials)
-      R2_ENDPOINT: your-r2-endpoint
-      R2_ACCESS_KEY_ID: your-r2-access-key
-      R2_SECRET_ACCESS_KEY: your-r2-secret-key
-      R2_BUCKET_NAME: your-bucket-name
-      R2_PUBLIC_URL: your-r2-public-url
+      R2_ENDPOINT: ${R2_ENDPOINT:?Set R2_ENDPOINT}
+      R2_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID:?Set R2_ACCESS_KEY_ID}
+      R2_SECRET_ACCESS_KEY: ${R2_SECRET_ACCESS_KEY:?Set R2_SECRET_ACCESS_KEY}
+      R2_BUCKET_NAME: ${R2_BUCKET_NAME:?Set R2_BUCKET_NAME}
+      R2_PUBLIC_URL: ${R2_PUBLIC_URL:?Set R2_PUBLIC_URL}
 
       # Payment provider (configure with your Creem credentials)
-      CREEM_API_KEY: your-creem-api-key
-      CREEM_ENVIRONMENT: test_mode
-      CREEM_WEBHOOK_SECRET: your-creem-webhook-secret
+      CREEM_API_KEY: ${CREEM_API_KEY:?Set CREEM_API_KEY}
+      CREEM_ENVIRONMENT: ${CREEM_ENVIRONMENT:-test_mode}
+      CREEM_WEBHOOK_SECRET: ${CREEM_WEBHOOK_SECRET:?Set CREEM_WEBHOOK_SECRET}
     depends_on:
-      postgres:
-        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
     networks:
       - ullrai-network
-    volumes:
-      - ../src:/app/src:ro
-      - ../public:/app/public:ro
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--quiet",
+          "--spider",
+          "http://127.0.0.1:3000/api/health",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
 
   # Redis (optional - for caching and sessions)
   redis:
     image: redis:7-alpine
-    container_name: ullrai-redis
+    profiles: ["cache"]
     restart: unless-stopped
     ports:
       - "6379:6379"

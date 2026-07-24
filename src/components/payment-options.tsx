@@ -336,7 +336,7 @@ export function PricingSection({ className }: { className?: string }) {
         body: JSON.stringify({
           tierId: tier.id,
           paymentMode: mode,
-          billingCycle: cycle,
+          billingCycle: mode === "subscription" ? cycle : undefined,
         }),
       });
       const data = (await response.json()) as CheckoutResponse;

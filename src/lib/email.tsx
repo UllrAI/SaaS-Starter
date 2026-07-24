@@ -2,7 +2,7 @@ import { Resend } from "resend";
 
 import env from "@/env";
 import type { ReactNode } from "react";
-import { APP_NAME, RESEND_EMAIL_FROM } from "@/lib/config/constants";
+import { APP_NAME } from "@/lib/config/constants";
 const resend = new Resend(env.RESEND_API_KEY);
 
 const DEFAULT_SENDER_NAME = APP_NAME;
@@ -28,7 +28,7 @@ export async function sendEmail(
         };
 
   const { error } = await resend.emails.send({
-    from: `${DEFAULT_SENDER_NAME} <${RESEND_EMAIL_FROM}>`,
+    from: `${DEFAULT_SENDER_NAME} <${env.RESEND_EMAIL_FROM}>`,
     to: email,
     subject,
     ...payload,

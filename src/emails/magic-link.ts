@@ -17,6 +17,7 @@ import {
   type MagicLinkEmailDeviceInfo,
   renderMagicLinkEmail,
 } from "@/emails/magic-link-email";
+import { MAGIC_LINK_TTL_SECONDS } from "@/lib/auth/constants";
 
 type DeviceInfo = MagicLinkEmailDeviceInfo;
 
@@ -194,9 +195,12 @@ async function createMagicLinkEmailCopy({
     greeting: t("c1e7f10203d5", "Hello,"),
     requestDetails,
     cta: t("41a27364d337", "Open sign-in link"),
-    securityReminder: t(
-      "5b8eb59cbe7a",
-      "Security reminder: This link expires in 15 minutes. If you did not request it, you can safely ignore this message.",
+    securityReminder: await resolveText(
+      t(
+        "5b8eb59cbe7a",
+        "Security reminder: This link expires in {minutes} minutes. If you did not request it, you can safely ignore this message.",
+        { minutes: MAGIC_LINK_TTL_SECONDS / 60 },
+      ),
     ),
     fallback: t(
       "79f9112819d8",

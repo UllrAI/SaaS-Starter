@@ -11,6 +11,7 @@ import {
 const mockDb = {
   select: jest.fn(),
   insert: jest.fn(),
+  update: jest.fn(),
 };
 
 const mockSubscriptions = {
@@ -38,6 +39,16 @@ const mockPayments = {
   paymentType: "payments.paymentType",
   createdAt: "payments.createdAt",
   updatedAt: "payments.updatedAt",
+};
+
+const mockProductEntitlements = {
+  id: "productEntitlements.id",
+  userId: "productEntitlements.userId",
+  productId: "productEntitlements.productId",
+  sourcePaymentId: "productEntitlements.sourcePaymentId",
+  revokedAt: "productEntitlements.revokedAt",
+  revocationReason: "productEntitlements.revocationReason",
+  createdAt: "productEntitlements.createdAt",
 };
 
 const mockUsers = {
@@ -74,13 +85,16 @@ jest.mock("@/database", () => ({
 jest.mock("@/database/tables", () => ({
   subscriptions: mockSubscriptions,
   payments: mockPayments,
+  productEntitlements: mockProductEntitlements,
   users: mockUsers,
   webhookEvents: mockWebhookEvents,
 }));
 
 jest.mock("drizzle-orm", () => ({
+  and: jest.fn((...conditions: unknown[]) => conditions),
   eq: mockEq,
   desc: mockDesc,
+  isNull: jest.fn((value: unknown) => ["isNull", value]),
   sql: mockSql,
 }));
 
@@ -290,7 +304,12 @@ describe("Database Subscription Functions", () => {
       };
 
       const mockOnConflictDoUpdate = jest.fn().mockReturnValue({
-        returning: jest.fn().mockResolvedValue([]),
+        returning: jest.fn().mockResolvedValue([
+          {
+            ...paymentData,
+            subscriptionId: null,
+          },
+        ]),
       });
 
       mockDb.insert.mockReturnValue({
@@ -306,10 +325,11 @@ describe("Database Subscription Functions", () => {
       expect(mockOnConflictDoUpdate).toHaveBeenCalledWith({
         target: mockPayments.paymentId,
         set: expect.objectContaining({
-          status: "failed",
+          status: expect.anything(),
           updatedAt: expect.any(Date),
         }),
       });
+      expect(mockSql).toHaveBeenCalled();
     });
 
     it("should handle nullable subscriptionId", async () => {
@@ -326,10 +346,265 @@ describe("Database Subscription Functions", () => {
       };
 
       const { upsertPayment } = await import("./subscription");
+      mockDb.insert.mockReturnValue({
+        values: jest.fn().mockReturnValue({
+          onConflictDoUpdate: jest.fn().mockReturnValue({
+            returning: jest.fn().mockResolvedValue([paymentData]),
+          }),
+        }),
+      });
 
       await upsertPayment(paymentData);
 
       expect(mockDb.insert).toHaveBeenCalled();
+    });
+
+    it("rejects a conflicting payment owner or product", async () => {
+      const paymentData = {
+        userId: "user-123",
+        customerId: "customer-123",
+        subscriptionId: null,
+        productId: "product-123",
+        paymentId: "payment-123",
+        amount: 1000,
+        currency: "usd",
+        status: "succeeded",
+        paymentType: "one_time",
+      };
+      mockDb.insert.mockReturnValue({
+        values: jest.fn().mockReturnValue({
+          onConflictDoUpdate: jest.fn().mockReturnValue({
+            returning: jest.fn().mockResolvedValue([
+              {
+                ...paymentData,
+                userId: "different-user",
+              },
+            ]),
+          }),
+        }),
+      });
+      const { upsertPayment } = await import("./subscription");
+
+      await expect(upsertPayment(paymentData)).rejects.toThrow(
+        "conflicts with an existing payment owner or product",
+      );
+    });
+  });
+
+  describe("product entitlements", () => {
+    it("grants or reactivates an entitlement for one user and product", async () => {
+      const returning = jest.fn().mockResolvedValue([{ id: "entitlement-1" }]);
+      const onConflictDoUpdate = jest.fn().mockReturnValue({ returning });
+      mockDb.insert.mockReturnValue({
+        values: jest.fn().mockReturnValue({ onConflictDoUpdate }),
+      });
+      const { grantProductEntitlement } = await import("./subscription");
+
+      await grantProductEntitlement({
+        userId: "user-1",
+        productId: "pro",
+        sourcePaymentId: "payment-1",
+      });
+
+      expect(onConflictDoUpdate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          target: [
+            mockProductEntitlements.userId,
+            mockProductEntitlements.productId,
+          ],
+          set: expect.objectContaining({
+            sourcePaymentId: "payment-1",
+            revokedAt: null,
+            revocationReason: null,
+          }),
+        }),
+      );
+    });
+
+    it("checks only active entitlements for the requested user and product", async () => {
+      const limit = jest.fn().mockResolvedValue([{ id: "entitlement-1" }]);
+      const where = jest.fn().mockReturnValue({ limit });
+      mockDb.select.mockReturnValue({
+        from: jest.fn().mockReturnValue({ where }),
+      });
+      const { hasUserProductEntitlement } = await import("./subscription");
+
+      await expect(hasUserProductEntitlement("user-1", "pro")).resolves.toBe(
+        true,
+      );
+      expect(where).toHaveBeenCalled();
+    });
+
+    it("selects the highest known active lifetime tier", async () => {
+      mockGetProductTierById.mockImplementation((id: string) => {
+        const prices = { plus: 20, pro: 30, team: 60 };
+        const price = prices[id as keyof typeof prices];
+        return price ? { id, prices: { oneTime: price } } : undefined;
+      });
+      const rows = [
+        { id: "unknown", productId: "legacy" },
+        { id: "plus", productId: "plus" },
+        { id: "team", productId: "team" },
+      ];
+      mockDb.select.mockReturnValue({
+        from: jest.fn().mockReturnValue({
+          where: jest.fn().mockResolvedValue(rows),
+        }),
+      });
+      const { getUserProductEntitlement } = await import("./subscription");
+
+      await expect(getUserProductEntitlement("user-1")).resolves.toEqual(
+        rows[2],
+      );
+    });
+
+    it("falls back to another successful purchase when the source is revoked", async () => {
+      const firstWhere = jest.fn().mockReturnValue({
+        returning: jest.fn().mockResolvedValue([
+          {
+            id: "entitlement-1",
+            userId: "user-1",
+            productId: "pro",
+          },
+        ]),
+      });
+      const firstSet = jest.fn().mockReturnValue({ where: firstWhere });
+      const secondWhere = jest.fn().mockResolvedValue([]);
+      const secondSet = jest.fn().mockReturnValue({ where: secondWhere });
+      mockDb.update
+        .mockReturnValueOnce({ set: firstSet })
+        .mockReturnValueOnce({ set: secondSet });
+      mockDb.select.mockReturnValue({
+        from: jest.fn().mockReturnValue({
+          where: jest.fn().mockReturnValue({
+            orderBy: jest.fn().mockReturnValue({
+              limit: jest
+                .fn()
+                .mockResolvedValue([{ paymentId: "payment-fallback" }]),
+            }),
+          }),
+        }),
+      });
+      const { revokeProductEntitlementByPaymentId } =
+        await import("./subscription");
+
+      await revokeProductEntitlementByPaymentId("payment-refunded", "refunded");
+
+      expect(secondSet).toHaveBeenCalledWith({
+        sourcePaymentId: "payment-fallback",
+        revokedAt: null,
+        revocationReason: null,
+      });
+    });
+
+    it("rejects an adjustment before its payment exists", async () => {
+      mockDb.update.mockReturnValue({
+        set: jest.fn().mockReturnValue({
+          where: jest.fn().mockReturnValue({
+            returning: jest.fn().mockResolvedValue([]),
+          }),
+        }),
+      });
+      const { updatePaymentStatus } = await import("./subscription");
+
+      await expect(
+        updatePaymentStatus("payment-missing", "disputed"),
+      ).rejects.toThrow("not available for a billing adjustment yet");
+    });
+
+    it("uses a monotonic status expression for payment adjustments", async () => {
+      const returning = jest.fn().mockResolvedValue([{ id: "payment-1" }]);
+      const where = jest.fn().mockReturnValue({ returning });
+      const set = jest.fn().mockReturnValue({ where });
+      mockDb.update.mockReturnValue({ set });
+      const { updatePaymentStatus } = await import("./subscription");
+
+      await updatePaymentStatus("payment-1", "partially_refunded");
+
+      expect(set).toHaveBeenCalledWith(
+        expect.objectContaining({ status: expect.anything() }),
+      );
+      expect(mockSql).toHaveBeenCalled();
+    });
+  });
+
+  describe("suspendSubscriptionAccess", () => {
+    it("marks only non-newer subscription state as unpaid", async () => {
+      const returning = jest.fn().mockResolvedValue([{ id: "subscription-1" }]);
+      const where = jest.fn().mockReturnValue({ returning });
+      const set = jest.fn().mockReturnValue({ where });
+      mockDb.update.mockReturnValue({ set });
+      const { suspendSubscriptionAccess } = await import("./subscription");
+      const eventCreatedAt = new Date("2026-07-24T00:00:00Z");
+
+      await suspendSubscriptionAccess("subscription-1", eventCreatedAt);
+
+      expect(set).toHaveBeenCalledWith(
+        expect.objectContaining({
+          status: "unpaid",
+          lastWebhookCreatedAt: eventCreatedAt,
+        }),
+      );
+      expect(mockSql).toHaveBeenCalled();
+    });
+
+    it("retries when the subscription record has not arrived yet", async () => {
+      const returning = jest.fn().mockResolvedValue([]);
+      mockDb.update.mockReturnValue({
+        set: jest.fn().mockReturnValue({
+          where: jest.fn().mockReturnValue({ returning }),
+        }),
+      });
+      mockDb.select.mockReturnValue({
+        from: jest.fn().mockReturnValue({
+          where: jest.fn().mockReturnValue({
+            limit: jest.fn().mockResolvedValue([]),
+          }),
+        }),
+      });
+      const { suspendSubscriptionAccess } = await import("./subscription");
+
+      await expect(
+        suspendSubscriptionAccess(
+          "subscription-missing",
+          new Date("2026-07-24T00:00:00Z"),
+        ),
+      ).rejects.toThrow("not available for a billing adjustment yet");
+    });
+  });
+
+  describe("lockPaymentAdjustmentScope", () => {
+    it("takes the product transaction lock before locking the payment", async () => {
+      const paymentLimit = jest
+        .fn()
+        .mockResolvedValue([{ userId: "user-1", productId: "pro" }]);
+      const paymentForUpdate = jest
+        .fn()
+        .mockResolvedValue([{ id: "payment-row" }]);
+      const execute = jest.fn().mockResolvedValue([]);
+      const select = jest
+        .fn()
+        .mockReturnValueOnce({
+          from: jest.fn().mockReturnValue({
+            where: jest.fn().mockReturnValue({ limit: paymentLimit }),
+          }),
+        })
+        .mockReturnValueOnce({
+          from: jest.fn().mockReturnValue({
+            where: jest.fn().mockReturnValue({ for: paymentForUpdate }),
+          }),
+        });
+      const tx = { execute, select };
+      const { lockPaymentAdjustmentScope } = await import("./subscription");
+
+      await lockPaymentAdjustmentScope("payment-1", tx as any);
+
+      expect(paymentLimit).toHaveBeenCalledWith(1);
+      expect(execute).toHaveBeenCalled();
+      expect(paymentForUpdate).toHaveBeenCalledWith("update");
+      expect(execute.mock.invocationCallOrder[0]).toBeLessThan(
+        paymentForUpdate.mock.invocationCallOrder[0]!,
+      );
     });
   });
 

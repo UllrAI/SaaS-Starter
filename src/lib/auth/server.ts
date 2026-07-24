@@ -7,7 +7,9 @@ import { db } from "@/database";
 import { sendMagicLink } from "@/emails/magic-link";
 import { APP_NAME } from "@/lib/config/constants";
 import { AUTH_BANNED_MESSAGE } from "./feedback";
+import { MAGIC_LINK_TTL_SECONDS } from "./constants";
 import { providerConfigs } from "./providers";
+import { authSchema } from "@/schemas/auth.schema";
 
 // Dynamically build social providers based on environment variables
 const socialProviders: Record<
@@ -72,7 +74,10 @@ export const auth = betterAuth({
   },
   plugins: [
     magicLink({
+      expiresIn: MAGIC_LINK_TTL_SECONDS,
+      storeToken: "hashed",
       sendMagicLink: async ({ email, url }, context) => {
+        authSchema.parse({ email });
         if (process.env.NODE_ENV === "development") {
           console.log("✨ Magic link: " + url);
         }

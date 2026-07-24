@@ -203,6 +203,18 @@ describe("R2 storage", () => {
       expect(mockSend).toHaveBeenCalledTimes(1);
     });
 
+    it("reports per-object failures from batch deletion", async () => {
+      const { deleteFiles } = await import("./r2");
+      mockSend.mockResolvedValueOnce({
+        Errors: [{ Key: "key-2", Code: "AccessDenied" }],
+      });
+
+      await expect(deleteFiles(["key-1", "key-2"])).resolves.toEqual({
+        success: false,
+        error: "Failed to delete 1 object(s): key-2",
+      });
+    });
+
     it("returns controlled deletion errors", async () => {
       const { deleteFile, deleteFiles } = await import("./r2");
       mockSend

@@ -83,6 +83,20 @@ function getCheckoutOwnerId(checkout: { metadata?: unknown }): string | null {
   return typeof userId === "string" ? userId : null;
 }
 
+function getCheckoutPaymentMode(checkout: {
+  metadata?: unknown;
+}): "subscription" | "one_time" | null {
+  if (!checkout.metadata || typeof checkout.metadata !== "object") {
+    return null;
+  }
+
+  const paymentMode = (checkout.metadata as Record<string, unknown>)
+    .paymentMode;
+  return paymentMode === "subscription" || paymentMode === "one_time"
+    ? paymentMode
+    : null;
+}
+
 export async function GET(request: NextRequest) {
   try {
     const rateLimit = await checkRateLimit({
@@ -140,6 +154,7 @@ export async function GET(request: NextRequest) {
       return privateJson({
         status: resolvedStatus.status,
         message: resolvedStatus.message,
+        paymentMode: getCheckoutPaymentMode(checkoutResponse),
       });
     } catch (error) {
       console.error("Error checking Creem payment status:", error);

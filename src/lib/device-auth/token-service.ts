@@ -12,6 +12,8 @@ import { hashToken } from "@/lib/machine-auth/hash";
 import { isMachineAuthUserActive } from "@/lib/machine-auth/user-access";
 import type { CliTokenPublic } from "@/lib/machine-auth/types";
 
+type TokenInsertExecutor = Pick<typeof db, "insert">;
+
 function toPublic(
   row: typeof cliTokens.$inferSelect,
   now = new Date(),
@@ -50,18 +52,25 @@ function createRefreshToken() {
   };
 }
 
-export async function createCliToken(params: {
-  userId: string;
-  name: string;
-  deviceOs?: string;
-  deviceHostname?: string;
-  cliVersion?: string;
-}): Promise<{ accessToken: string; refreshToken: string; expiresIn: number }> {
+export async function createCliToken(
+  params: {
+    userId: string;
+    name: string;
+    deviceOs?: string;
+    deviceHostname?: string;
+    cliVersion?: string;
+  },
+  executor: TokenInsertExecutor = db,
+): Promise<{
+  accessToken: string;
+  refreshToken: string;
+  expiresIn: number;
+}> {
   const accessToken = createAccessToken();
   const refreshToken = createRefreshToken();
   const now = new Date();
 
-  await db.insert(cliTokens).values({
+  await executor.insert(cliTokens).values({
     userId: params.userId,
     name: params.name,
     tokenHash: accessToken.hash,

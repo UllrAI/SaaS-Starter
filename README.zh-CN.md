@@ -98,8 +98,9 @@ cp .env.example .env
 | `DATABASE_URL`           | **必需。** PostgreSQL 连接字符串。              | `postgresql://user:password@localhost:5432/db_name` |
 | `RATE_LIMIT_IP_HEADER`   | 共享限流读取的可信反向代理 IP 请求头。          | `x-forwarded-for`                                   |
 | `NEXT_PUBLIC_APP_URL`    | **必需。** 您应用部署后的公开 URL。             | `http://localhost:3000` 或 `https://yourdomain.com` |
-| `BETTER_AUTH_SECRET`     | **必需。** 用于加密会话的密钥，必须是32个字符。 | `a_very_secure_random_32_char_string`               |
+| `BETTER_AUTH_SECRET`     | **必需。** 至少 32 个字符的随机会话密钥。       | 使用 `openssl rand -base64 32` 生成                 |
 | `RESEND_API_KEY`         | **必需。** 用于发送邮件的 Resend API Key。      | `re_xxxxxxxxxxxxxxxx`                               |
+| `RESEND_EMAIL_FROM`      | **必需。** Resend 中已验证域名下的发件地址。    | `noreply@your-verified-domain.com`                  |
 | `CREEM_API_KEY`          | **必需。** Creem 的 API Key。                   | `your_creem_api_key`                                |
 | `CREEM_ENVIRONMENT`      | **必需。** Creem 环境模式。                     | `test_mode` 或 `live_mode`                          |
 | `CREEM_WEBHOOK_SECRET`   | **必需。** Creem Webhook 密钥。                 | `whsec_your_webhook_secret`                         |

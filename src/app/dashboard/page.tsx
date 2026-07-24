@@ -15,8 +15,10 @@ import { Button } from "@/components/ui/button";
 import { requireAuth } from "@/lib/auth/permissions";
 import {
   getUserPayments,
+  getUserProductEntitlement,
   getUserSubscription,
 } from "@/lib/database/subscription";
+import { resolveBillingAccess } from "@/lib/billing/access";
 import { db } from "@/database";
 import { uploads } from "@/database/schema";
 import { formatCurrency } from "@/lib/utils";
@@ -62,23 +64,32 @@ export async function generateMetadata() {
 export default async function HomeRoute() {
   const { t } = await getServerTranslations();
   const user = await requireAuth();
-  const [locale, subscription, payments, [uploadSummary]] = await Promise.all([
-    getRequestLocale(),
-    getUserSubscription(user.id),
-    getUserPayments(user.id, 5),
-    db
-      .select({
-        count: count(),
-        totalSize: sum(uploads.fileSize),
-      })
-      .from(uploads)
-      .where(eq(uploads.userId, user.id)),
-  ]);
+  const [locale, subscription, entitlement, payments, [uploadSummary]] =
+    await Promise.all([
+      getRequestLocale(),
+      getUserSubscription(user.id),
+      getUserProductEntitlement(user.id),
+      getUserPayments(user.id, 5),
+      db
+        .select({
+          count: count(),
+          totalSize: sum(uploads.fileSize),
+        })
+        .from(uploads)
+        .where(eq(uploads.userId, user.id)),
+    ]);
   const latestPayment = payments[0] ?? null;
   const uploadedFileCount = uploadSummary?.count ?? 0;
   const uploadedFileSize = Number(uploadSummary?.totalSize ?? 0);
-  const subscriptionLabel = subscription
-    ? `${subscription.tierId.charAt(0).toUpperCase()}${subscription.tierId.slice(1)}`
+  const billingAccess = resolveBillingAccess(subscription, entitlement);
+  const currentPlanId =
+    billingAccess.kind === "subscription"
+      ? billingAccess.subscription.tierId
+      : billingAccess.kind === "lifetime"
+        ? billingAccess.entitlement.productId
+        : null;
+  const subscriptionLabel = currentPlanId
+    ? `${currentPlanId.charAt(0).toUpperCase()}${currentPlanId.slice(1)}`
     : "Free";
   const checklistLinks = [
     {
@@ -156,13 +167,14 @@ export default async function HomeRoute() {
               <Badge
                 className="capitalize"
                 variant={
-                  subscription &&
-                  ["active", "trialing"].includes(subscription.status)
-                    ? "default"
-                    : "secondary"
+                  billingAccess.kind !== "free" ? "default" : "secondary"
                 }
               >
-                {subscription?.status ?? (
+                {billingAccess.kind === "subscription" ? (
+                  billingAccess.subscription.status
+                ) : billingAccess.kind === "lifetime" ? (
+                  <>{t("billing_lifetime_access", "Lifetime access")}</>
+                ) : (
                   <>{t("4269fcc20a1d", "No active subscription")}</>
                 )}
               </Badge>

@@ -42,6 +42,14 @@ function SubscriptionStatusLabel({ status }: { status: string }) {
       return <>{t("c3edc911fa1d", "Trialing")}</>;
     case "canceled":
       return <>{t("814b0f3e70ac", "Canceled")}</>;
+    case "expired":
+      return <>{t("subscription_status_expired", "Expired")}</>;
+    case "paused":
+      return <>{t("subscription_status_paused", "Paused")}</>;
+    case "scheduled_cancel":
+      return (
+        <>{t("subscription_status_scheduled_cancel", "Scheduled to cancel")}</>
+      );
     case "past_due":
       return <>{t("64f180e9fb46", "Past Due")}</>;
     case "incomplete":
@@ -108,7 +116,6 @@ export function SubscriptionManagementTable({
         subscriptionId: cancellingSubscription.subscriptionId,
       });
 
-      // FIX: Correctly handle next-safe-action result
       if (result.data) {
         toast.success(result.data.message);
         setCancellingSubscription(null);
@@ -125,6 +132,9 @@ export function SubscriptionManagementTable({
       active: "default",
       trialing: "secondary",
       canceled: "outline",
+      expired: "outline",
+      paused: "secondary",
+      scheduled_cancel: "secondary",
       past_due: "destructive",
       incomplete: "destructive",
       unpaid: "destructive",
@@ -193,10 +203,10 @@ export function SubscriptionManagementTable({
           variant="outline"
           size="sm"
           onClick={() => handleCancelClick(sub)}
-          disabled={sub.status === "canceled" || isPending}
+          disabled={!["active", "trialing"].includes(sub.status) || isPending}
         >
           <X className="mr-1 h-4 w-4" />
-          Cancel
+          {t("subscription_action_cancel", "Cancel")}
         </Button>
       ),
     },
@@ -221,6 +231,20 @@ export function SubscriptionManagementTable({
     {
       value: "past_due",
       label: <>{t("493ace466900", "Past Due")}</>,
+    },
+    {
+      value: "scheduled_cancel",
+      label: (
+        <>{t("subscription_status_scheduled_cancel", "Scheduled to cancel")}</>
+      ),
+    },
+    {
+      value: "paused",
+      label: <>{t("subscription_status_paused", "Paused")}</>,
+    },
+    {
+      value: "expired",
+      label: <>{t("subscription_status_expired", "Expired")}</>,
     },
   ];
   return (

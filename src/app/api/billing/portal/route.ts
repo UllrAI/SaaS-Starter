@@ -3,6 +3,7 @@ import { billing } from "@/lib/billing";
 import { getUserSubscription } from "@/lib/database/subscription";
 import { assertTrustedBillingUrl } from "@/lib/billing/url";
 import { getAuthSessionFromHeaders } from "@/lib/auth/session";
+import { canManageSubscription } from "@/lib/billing/access";
 
 export async function GET(request: NextRequest) {
   try {
@@ -12,7 +13,7 @@ export async function GET(request: NextRequest) {
     }
 
     const subscription = await getUserSubscription(session.user.id);
-    if (!subscription?.customerId) {
+    if (!canManageSubscription(subscription) || !subscription.customerId) {
       return NextResponse.json(
         { error: "No active subscription found for this user." },
         { status: 404 },

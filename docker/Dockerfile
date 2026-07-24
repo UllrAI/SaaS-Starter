@@ -1,8 +1,8 @@
 # Use official Node.js runtime as base image
-FROM node:20-alpine AS base
+FROM node:22-alpine AS base
 
 # Install pnpm
-RUN npm install -g pnpm
+RUN npm install -g pnpm@10.33.0
 
 # Set working directory
 WORKDIR /app
@@ -20,17 +20,25 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 # Set environment to production for build
+ARG NEXT_PUBLIC_APP_URL
 ENV NODE_ENV=production
+ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
+ENV SKIP_ENV_VALIDATION=1
 
 # Build the Next.js application
-RUN pnpm run build
+RUN test -n "$NEXT_PUBLIC_APP_URL" && pnpm run build
+
+# One-shot database migration image. It intentionally contains development
+# dependencies and source files, but is never used to serve application traffic.
+FROM base AS migrator
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+ENV NODE_ENV=production
+CMD ["pnpm", "db:migrate"]
 
 # Production image
-FROM node:20-alpine AS runner
+FROM node:22-alpine AS runner
 WORKDIR /app
-
-# Install pnpm
-RUN npm install -g pnpm
 
 ENV NODE_ENV=production
 

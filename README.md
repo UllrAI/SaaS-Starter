@@ -346,9 +346,11 @@ legacy objects. New clients always require a database-backed v2 intent.
 
 ### 2. Schedule Upload Cleanup
 
-Call the cleanup endpoint at least every five minutes from your deployment
-platform. It claims expired upload intents and deletes abandoned R2 objects.
-Failed object deletions are deferred until the next five-minute retry window.
+Call the cleanup endpoint once per day from your deployment platform. It claims
+expired upload intents and deletes abandoned R2 objects. At this cadence,
+expired objects may remain until a later daily run. A tombstone that becomes
+eligible just after the fixed run can wait through one additional daily cycle;
+quota accounting stops counting intents as soon as they expire.
 
 ```bash
 curl -fsS -X POST \
@@ -357,12 +359,10 @@ curl -fsS -X POST \
 ```
 
 The endpoint processes up to five batches of 100 intents per run and recovers
-stale cleanup claims automatically. This capacity covers the five-minute
-arrival window allowed by the per-user cancellation limit, including both
-tombstone deletion stages. If a run reports five full batches, schedule it more
-frequently until the queue is drained. R2 lifecycle rules may additionally
-abort incomplete multipart uploads after one day, but they do not replace this
-database-aware cleanup.
+stale cleanup claims automatically. If a run reports five full batches,
+invoke it again or schedule it more frequently until the queue is drained. R2
+lifecycle rules may additionally abort incomplete multipart uploads after one
+day, but they do not replace this database-aware cleanup.
 
 ### 3. Using the `FileUploader` Component
 
@@ -446,13 +446,15 @@ repository also includes a standalone multi-stage Docker build.
    startup.
 4. Deploy the application only after the migration succeeds. Use
    `/api/health` for liveness and `/api/ready` for database-backed readiness.
-5. Schedule an authenticated `POST /api/internal/uploads/cleanup` at least
-   every five minutes.
+5. Schedule an authenticated `POST /api/internal/uploads/cleanup` once per day.
 6. Verify the public origin, both locale URL variants, authentication redirects,
    Dashboard access, `robots.txt`, `sitemap.xml`, and application logs.
 
 Docker Compose follows the same order with a one-shot `migrate` service. See
 [docker/README.md](docker/README.md) for local and self-hosted instructions.
+The optional GitHub maintenance schedule is best-effort and runs only from the
+default branch. Enable scheduled Actions explicitly in a fork, monitor its
+latest successful run, and use a platform scheduler when timing is an SLA.
 
 ## 📄 License
 

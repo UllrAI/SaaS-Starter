@@ -13,7 +13,7 @@
     "start": "node .next/standalone/server.js",
     "saas-cli": "node --import tsx packages/cli/src/index.ts",
     "lint": "eslint .",
-    "dead-code:check": "SKIP_ENV_VALIDATION=1 knip",
+    "dead-code:check": "pnpm content:build && SKIP_ENV_VALIDATION=1 knip",
     "type-check": "pnpm content:build && node scripts/clean-next-types.mjs && tsc --noEmit",
     "test": "pnpm content:build && SKIP_ENV_VALIDATION=1 jest",
     "test:watch": "pnpm content:build && SKIP_ENV_VALIDATION=1 jest --watch",

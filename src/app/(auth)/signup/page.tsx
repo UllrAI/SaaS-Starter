@@ -5,7 +5,9 @@ import {
   DEFAULT_CALLBACK_URL,
   normalizeCallbackUrl,
 } from "@/lib/auth/callback-url";
+import { requireGuest } from "@/lib/auth/permissions";
 import { createMetadataDefaults } from "@/lib/metadata";
+
 export async function generateMetadata() {
   const { locale, t } = await getServerTranslations();
   const metadata = createMetadataDefaults({ locale });
@@ -31,6 +33,8 @@ interface SignUpPageProps {
   }>;
 }
 export default async function SignUpPage({ searchParams }: SignUpPageProps) {
+  await requireGuest();
+
   const availableProviders = getAvailableSocialProviders();
   const resolvedSearchParams = searchParams ? await searchParams : {};
   const rawCallbackUrl = resolvedSearchParams.callbackUrl;

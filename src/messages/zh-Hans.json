@@ -1141,5 +1141,6 @@
   "upload_batch_delete_error": "所选上传记录删除失败，请重试。",
   "upload_batch_delete_success": "所选上传记录已删除。",
   "upload_delete_error": "上传记录删除失败，请重试。",
-  "upload_delete_success": "上传记录已删除。"
+  "upload_delete_success": "上传记录已删除。",
+  "header_dashboard": "控制台"
 }

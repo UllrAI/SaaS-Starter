@@ -7,6 +7,8 @@ import {
 } from "@/lib/auth/callback-url";
 import { createMetadataDefaults } from "@/lib/metadata";
 import { resolveAuthFeedback } from "@/lib/auth/feedback";
+import { requireGuest } from "@/lib/auth/permissions";
+
 export async function generateMetadata() {
   const { locale, t } = await getServerTranslations();
   const metadata = createMetadataDefaults({ locale });
@@ -35,6 +37,8 @@ interface LoginPageProps {
   }>;
 }
 export default async function LoginPage({ searchParams }: LoginPageProps) {
+  await requireGuest();
+
   const availableProviders = getAvailableSocialProviders();
   const resolvedSearchParams: Awaited<
     NonNullable<LoginPageProps["searchParams"]>

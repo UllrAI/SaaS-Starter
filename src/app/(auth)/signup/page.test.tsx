@@ -32,6 +32,11 @@ jest.mock("@/lib/auth/providers", () => ({
   getAvailableSocialProviders: () => mockGetAvailableSocialProviders(),
 }));
 
+const mockRequireGuest = jest.fn(async () => undefined);
+jest.mock("@/lib/auth/permissions", () => ({
+  requireGuest: () => mockRequireGuest(),
+}));
+
 const mockCreateMetadataDefaults = jest.fn(() => ({}));
 jest.mock("@/lib/metadata", () => ({
   createMetadataDefaults: () => mockCreateMetadataDefaults(),
@@ -76,6 +81,7 @@ describe("SignUpPage", () => {
       }),
     );
     expect(mockGetAvailableSocialProviders).toHaveBeenCalledTimes(1);
+    expect(mockRequireGuest).toHaveBeenCalledTimes(1);
   });
 
   it("passes callbackUrl from search params to signup AuthForm", async () => {

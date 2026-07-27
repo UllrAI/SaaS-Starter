@@ -82,6 +82,7 @@ export function Header({
           <HeaderActions
             navigationItems={navigationItems}
             labels={{
+              dashboard: t("header_dashboard", "Dashboard"),
               getStarted: t("3dd52b8e342a", "Get Started"),
               navigationMenu: t("2924b40503f8", "Navigation Menu"),
               signIn: t("6639ec6351f1", "Sign In"),

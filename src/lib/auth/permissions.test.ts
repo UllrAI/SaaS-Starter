@@ -127,6 +127,35 @@ describe("Auth Permissions", () => {
     });
   });
 
+  describe("requireGuest", () => {
+    it("should redirect authenticated users to dashboard", async () => {
+      mockAuth.api.getSession.mockResolvedValue({
+        session: { userId: "user-123" },
+        user: {
+          id: "user-123",
+          email: "user@example.com",
+          role: "user",
+          name: "Test User",
+          image: null,
+        },
+      });
+
+      const { requireGuest } = await import("./permissions");
+
+      await expect(requireGuest()).rejects.toThrow("NEXT_REDIRECT: /dashboard");
+      expect(mockRedirect).toHaveBeenCalledWith("/dashboard");
+    });
+
+    it("should allow unauthenticated users", async () => {
+      mockAuth.api.getSession.mockResolvedValue({ session: null, user: null });
+
+      const { requireGuest } = await import("./permissions");
+
+      await expect(requireGuest()).resolves.toBeUndefined();
+      expect(mockRedirect).not.toHaveBeenCalled();
+    });
+  });
+
   describe("requireAdmin", () => {
     it("should return admin user when authenticated with admin role", async () => {
       const mockAdmin = {

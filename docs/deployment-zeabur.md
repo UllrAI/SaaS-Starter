@@ -79,9 +79,9 @@ it manually. Publish production changes only through `release/*` tags.
 9. Exercise English and Simplified Chinese marketing URLs, authentication
    redirects, and an authenticated Dashboard session.
 
-`RATE_LIMIT_IP_HEADER` must be the single-value client-IP header overwritten by
-the active Zeabur ingress. Verify the header behavior for the selected region
-before release; do not assume a generic `X-Forwarded-For` value is trustworthy.
+`RATE_LIMIT_IP_HEADER` is optional and defaults to `x-forwarded-for`, the client
+IP header documented by Zeabur. Override it only when another trusted ingress
+uses a different supported header.
 
 Migrations are a release step, not an application startup hook. This prevents
 multiple replicas from racing on schema changes. The Web service must start

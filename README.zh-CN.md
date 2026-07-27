@@ -90,7 +90,7 @@ cp .env.example .env
 | 变量名                           | 描述                                                  | 示例                                                |
 | :------------------------------- | :---------------------------------------------------- | :-------------------------------------------------- |
 | `DATABASE_URL`                   | **必需。** PostgreSQL 连接字符串。                    | `postgresql://user:password@localhost:5432/db_name` |
-| `RATE_LIMIT_IP_HEADER`           | 由可信入口覆盖写入的客户端 IP 请求头。                | 以部署平台为准                                      |
+| `RATE_LIMIT_IP_HEADER`           | **选填。** 可信客户端 IP 请求头，默认适配 Zeabur。    | `x-forwarded-for`                                   |
 | `NEXT_PUBLIC_APP_URL`            | **必需。** 您应用部署后的公开 URL。                   | `http://localhost:3000` 或 `https://yourdomain.com` |
 | `BETTER_AUTH_SECRET`             | **必需。** 至少 32 个字符的随机会话密钥。             | 使用 `openssl rand -base64 32` 生成                 |
 | `RESEND_API_KEY`                 | **必需。** 用于发送邮件的 Resend API Key。            | `re_xxxxxxxxxxxxxxxx`                               |

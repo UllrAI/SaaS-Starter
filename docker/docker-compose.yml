@@ -54,7 +54,7 @@ services:
       DB_IDLE_TIMEOUT: 300
       DB_MAX_LIFETIME: 14400
       DB_CONNECT_TIMEOUT: 4
-      RATE_LIMIT_IP_HEADER: ${RATE_LIMIT_IP_HEADER:?Set the client IP header overwritten by your trusted reverse proxy}
+      RATE_LIMIT_IP_HEADER: ${RATE_LIMIT_IP_HEADER:-x-forwarded-for}
 
       # Application URL
       NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:?Set NEXT_PUBLIC_APP_URL}

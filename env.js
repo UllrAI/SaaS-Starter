@@ -64,12 +64,14 @@ const env = createEnv({
     DB_IDLE_TIMEOUT: z.coerce.number().int().nonnegative().default(300),
     DB_MAX_LIFETIME: z.coerce.number().int().nonnegative().default(14400),
     DB_CONNECT_TIMEOUT: z.coerce.number().int().positive().max(4).default(4),
-    RATE_LIMIT_IP_HEADER: z.enum([
-      "cf-connecting-ip",
-      "x-vercel-forwarded-for",
-      "x-real-ip",
-      "x-forwarded-for",
-    ]),
+    RATE_LIMIT_IP_HEADER: z
+      .enum([
+        "cf-connecting-ip",
+        "x-vercel-forwarded-for",
+        "x-real-ip",
+        "x-forwarded-for",
+      ])
+      .default("x-forwarded-for"),
 
     // Authentication credentials
     GOOGLE_CLIENT_ID: optionalCredentialSchema,

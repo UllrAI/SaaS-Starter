@@ -28,9 +28,9 @@ This directory contains Docker configuration for running the UllrAI Starter appl
    production SEO metadata is generated from this value at build time. Set
    `R2_PUBLIC_URL` before building so the storage hostname is included in the
    Next.js image optimization allowlist.
-   `RATE_LIMIT_IP_HEADER` must name a client-IP header that your trusted
-   ingress overwrites; never trust a header passed through directly from the
-   public internet.
+   `RATE_LIMIT_IP_HEADER` defaults to Zeabur's `x-forwarded-for`. Override it
+   only when your trusted ingress uses a different supported header; never
+   trust a header passed through directly from the public internet.
 
 2. **Run the application**
 

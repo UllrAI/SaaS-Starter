@@ -90,7 +90,7 @@ Then edit the `.env` file and fill in all required values.
 | Variable Name                    | Description                                                     | Example                                             |
 | :------------------------------- | :-------------------------------------------------------------- | :-------------------------------------------------- |
 | `DATABASE_URL`                   | **Required.** PostgreSQL connection string.                     | `postgresql://user:password@localhost:5432/db_name` |
-| `RATE_LIMIT_IP_HEADER`           | Client-IP header overwritten by your trusted ingress.           | Platform-specific                                   |
+| `RATE_LIMIT_IP_HEADER`           | Optional trusted client-IP header; defaults to Zeabur.          | `x-forwarded-for`                                   |
 | `NEXT_PUBLIC_APP_URL`            | **Required.** Public URL of your deployed app.                  | `http://localhost:3000` or `https://yourdomain.com` |
 | `BETTER_AUTH_SECRET`             | **Required.** Random session secret, at least 32 characters.    | Generate with `openssl rand -base64 32`             |
 | `RESEND_API_KEY`                 | **Required.** Resend API Key for sending emails.                | `re_xxxxxxxxxxxxxxxx`                               |

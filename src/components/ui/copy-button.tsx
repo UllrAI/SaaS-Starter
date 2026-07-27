@@ -1,3 +1,5 @@
+"use client";
+
 import { useTranslation } from "@/lib/i18n/translation/client";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";

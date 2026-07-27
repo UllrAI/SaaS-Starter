@@ -33,7 +33,6 @@ jobs:
           --health-retries 10
     env:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/saas_ci
-      RATE_LIMIT_IP_HEADER: x-forwarded-for
       BETTER_AUTH_SECRET: ci-only-secret-at-least-32-characters
       RESEND_API_KEY: re_ci_placeholder
       RESEND_EMAIL_FROM: noreply@example.com

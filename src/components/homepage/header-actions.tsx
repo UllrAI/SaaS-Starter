@@ -10,18 +10,41 @@ import { Logo } from "@/components/logo";
 import { ModeToggle } from "@/components/mode-toggle";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
+import { useSession } from "@/lib/auth/client";
 import { APP_NAME } from "@/lib/config/constants";
 
 type HeaderLabels = {
+  dashboard: string;
   getStarted: string;
   navigationMenu: string;
   signIn: string;
   toggleMenu: string;
 };
 
-function AuthButtons({ labels }: { labels: HeaderLabels }) {
+function AuthButtons({
+  isAuthenticated,
+  isPending,
+  labels,
+}: {
+  isAuthenticated: boolean;
+  isPending: boolean;
+  labels: HeaderLabels;
+}) {
+  if (isAuthenticated) {
+    return (
+      <div className="hidden items-center md:flex">
+        <Button asChild size="sm">
+          <Link href="/dashboard">{labels.dashboard}</Link>
+        </Button>
+      </div>
+    );
+  }
+
   return (
-    <div className="hidden items-center gap-2 md:flex">
+    <div
+      aria-hidden={isPending}
+      className={`hidden items-center gap-2 md:flex ${isPending ? "invisible" : ""}`}
+    >
       <Button asChild variant="ghost" size="sm">
         <Link href="/login">{labels.signIn}</Link>
       </Button>
@@ -32,9 +55,30 @@ function AuthButtons({ labels }: { labels: HeaderLabels }) {
   );
 }
 
-function MobileAuthButtons({ labels }: { labels: HeaderLabels }) {
+function MobileAuthButtons({
+  isAuthenticated,
+  isPending,
+  labels,
+}: {
+  isAuthenticated: boolean;
+  isPending: boolean;
+  labels: HeaderLabels;
+}) {
+  if (isAuthenticated) {
+    return (
+      <div className="mt-8">
+        <Button asChild className="w-full">
+          <Link href="/dashboard">{labels.dashboard}</Link>
+        </Button>
+      </div>
+    );
+  }
+
   return (
-    <div className="mt-8 space-y-3">
+    <div
+      aria-hidden={isPending}
+      className={`mt-8 space-y-3 ${isPending ? "invisible" : ""}`}
+    >
       <Button asChild className="w-full">
         <Link href="/login">{labels.signIn}</Link>
       </Button>
@@ -53,12 +97,18 @@ export function HeaderActions({
   navigationItems: MarketingNavItem[];
 }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { data: session, isPending } = useSession();
+  const isAuthenticated = Boolean(session?.user);
 
   return (
     <div className="flex items-center gap-3">
       <LocaleSwitcher variant="ghost" size="icon" />
       <ModeToggle variant="ghost" size="icon" />
-      <AuthButtons labels={labels} />
+      <AuthButtons
+        isAuthenticated={isAuthenticated}
+        isPending={isPending}
+        labels={labels}
+      />
 
       <Button
         variant="ghost"
@@ -92,7 +142,11 @@ export function HeaderActions({
               ))}
             </nav>
 
-            <MobileAuthButtons labels={labels} />
+            <MobileAuthButtons
+              isAuthenticated={isAuthenticated}
+              isPending={isPending}
+              labels={labels}
+            />
           </div>
         </SheetContent>
       </Sheet>

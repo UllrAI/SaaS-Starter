@@ -1141,5 +1141,6 @@
   "upload_batch_delete_error": "We couldn't delete the selected uploads. Please try again.",
   "upload_batch_delete_success": "The selected uploads were deleted.",
   "upload_delete_error": "We couldn't delete the upload. Please try again.",
-  "upload_delete_success": "The upload has been deleted."
+  "upload_delete_success": "The upload has been deleted.",
+  "header_dashboard": "Dashboard"
 }

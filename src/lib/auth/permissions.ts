@@ -66,6 +66,17 @@ export async function requireAuth(requiredRole?: UserRole): Promise<AuthUser> {
 }
 
 /**
+ * Redirect authenticated users away from guest-only pages.
+ */
+export async function requireGuest(): Promise<void> {
+  const user = await getCurrentUser();
+
+  if (user) {
+    redirect("/dashboard");
+  }
+}
+
+/**
  * Require admin role
  */
 export async function requireAdmin(): Promise<AuthUser> {

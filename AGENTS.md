@@ -174,8 +174,8 @@ pnpm creem:sync-products
 
 - The production Zeabur service tracks `prod`, not the default development
   branch.
-- Publish production changes by pushing a `release/*` tag on a reviewed commit
-  from the repository's default branch.
+- Publish production changes by pushing a `release/vX.Y.Z` tag that matches
+  `package.json` on a reviewed commit from the repository's default branch.
 - `.github/workflows/promote-release-to-prod.yml` validates the tag ancestry and
   updates `prod`. Do not push or merge directly into `prod`.
 - Resolve the default branch dynamically in release automation. The current

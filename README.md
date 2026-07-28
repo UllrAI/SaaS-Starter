@@ -439,7 +439,7 @@ repository also includes a standalone multi-stage Docker build.
 
 Configure the production Zeabur service to deploy the `prod` branch, not
 the default development branch (`main` in this repository). Pushing a
-`release/*` tag runs
+`release/vX.Y.Z` tag matching the version in `package.json` runs
 [`promote-release-to-prod.yml`](.github/workflows/promote-release-to-prod.yml),
 which verifies that the tagged commit belongs to the repository's default
 branch (`main` at present) before moving `prod` to that commit. Zeabur deploys
@@ -456,7 +456,8 @@ see [the Zeabur deployment guide](docs/deployment-zeabur.md#using-the-workflow-i
 3. Run `pnpm db:migrate` once as a dedicated release command against the
    production `DATABASE_URL`. Do not attach migrations to every web process
    startup.
-4. Tag that commit with an annotated `release/*` tag and push the tag:
+4. Update the version in `package.json`, then tag that commit with an annotated
+   `release/vX.Y.Z` tag using the same version and push it:
 
    ```bash
    git tag -a release/v1.2.3 -m "Release v1.2.3"

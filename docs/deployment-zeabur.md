@@ -24,7 +24,7 @@ the build fails closed when either value is missing.
 Configure the production Zeabur service to deploy the `prod` branch. It must not
 deploy direct pushes to the default development branch.
 
-Pushing a `release/*` tag triggers
+Pushing a `release/vX.Y.Z` tag matching the version in `package.json` triggers
 [`promote-release-to-prod.yml`](../.github/workflows/promote-release-to-prod.yml).
 The workflow reads the repository's default branch from GitHub instead of
 hardcoding its name, verifies that the tagged commit is reachable from that
@@ -58,14 +58,15 @@ named `main` or `master`:
    allow this workflow to update it with a force-with-lease push.
 
 Treat `prod` as workflow-owned state: do not merge pull requests into it or push
-it manually. Publish production changes only through `release/*` tags.
+it manually. Publish production changes only through `release/vX.Y.Z` tags.
 
 ## Release order
 
 1. Merge only a reviewed commit into the default branch with green CI.
 2. Confirm the service variables match `.env.example`.
 3. Run `pnpm db:migrate` once against the production `DATABASE_URL`.
-4. Create an annotated `release/*` tag on that commit and push it:
+4. Update the version in `package.json`, then create an annotated
+   `release/vX.Y.Z` tag using the same version on that commit and push it:
 
    ```bash
    git tag -a release/v1.2.3 -m "Release v1.2.3"

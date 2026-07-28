@@ -426,7 +426,7 @@ Docker 构建。
 > 结账时输入推荐码 `visoar`，即可享受 10% 折扣。
 
 将生产环境 Zeabur 服务的部署分支设为 `prod`，不要监听日常开发使用的默认分支（本仓库
-为 `main`）。推送 `release/*` tag 后，
+为 `main`）。推送与 `package.json` 版本一致的 `release/vX.Y.Z` tag 后，
 [`promote-release-to-prod.yml`](.github/workflows/promote-release-to-prod.yml)
 会先确认对应 commit 位于仓库默认分支的历史中，再将 `prod` 指向该 commit；只有分支
 更新成功后，Zeabur 才会开始部署。fork 后可沿用同一方案，详见
@@ -438,7 +438,8 @@ Docker 构建。
    `R2_PUBLIC_URL`，让 Next.js 把存储域名加入图片优化白名单。
 3. 使用生产 `DATABASE_URL` 把 `pnpm db:migrate` 作为一次性发布命令执行；不要挂在
    每个 Web 进程的启动钩子上。
-4. 在该 commit 上创建 `release/*` 附注标签（annotated tag）并推送：
+4. 更新 `package.json` 中的版本，然后在该 commit 上创建版本一致的
+   `release/vX.Y.Z` 附注标签（annotated tag）并推送：
 
    ```bash
    git tag -a release/v1.2.3 -m "Release v1.2.3"

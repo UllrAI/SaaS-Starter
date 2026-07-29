@@ -173,7 +173,7 @@ describe("Billing Index", () => {
 
       const payload = '{"test": "webhook"}';
       const signature = "signature123";
-      const expectedResult = { received: true, message: "Success" };
+      const expectedResult = { received: true } as const;
       (
         mockCreemProvider.handleWebhook as jest.MockedFunction<
           typeof mockCreemProvider.handleWebhook

@@ -131,6 +131,9 @@ cp .env.example .env
 该命令会复用或创建产品，并且只更新当前环境的命名空间。部署前请审查并提交这次配置
 变更；如果当前环境没有产品 ID，checkout 会安全失败，不会误用另一环境的产品。
 
+Webhook 的重试、幂等和人工重放语义见
+[计费 Webhook 运维说明](docs/webhooks.zh-CN.md)。
+
 ### 4. 数据库设置
 
 本项目使用单一 Drizzle 配置文件 `src/database/config.ts`，并维护一套提交到仓库的迁移历史 `src/database/migrations/`。目标数据库仅由 `DATABASE_URL` 决定。

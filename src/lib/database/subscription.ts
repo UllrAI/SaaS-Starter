@@ -484,19 +484,13 @@ export async function getUserPayments(userId: string, limit: number = 10) {
 }
 
 /**
- * Record a webhook event as processed to ensure idempotency
- * @param eventId - Unique identifier from the webhook provider
- * @param eventType - Type of the webhook event
- * @param provider - Webhook provider name (default: 'creem')
- * @param payload - Original webhook payload for debugging
- * @param tx - Optional transaction
- * @returns true when this request claimed the event, false on conflict
+ * Claim a provider event in the same transaction as its business changes.
+ * A committed row means the event completed successfully.
  */
-export async function recordWebhookEvent(
+export async function claimWebhookEvent(
   eventId: string,
   eventType: string,
   provider: string = "creem",
-  payload?: string,
   tx?: Tx,
 ): Promise<boolean> {
   const dbase = getDb(tx);
@@ -506,9 +500,6 @@ export async function recordWebhookEvent(
       eventId,
       eventType,
       provider,
-      payload,
-      processed: true,
-      processedAt: new Date(),
     })
     .onConflictDoNothing({
       target: [webhookEvents.provider, webhookEvents.eventId],

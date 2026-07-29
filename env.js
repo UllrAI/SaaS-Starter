@@ -132,6 +132,7 @@ const env = createEnv({
     CREEM_WEBHOOK_SECRET: requiredCredentialSchema,
 
     // E2E testing
+    E2E_DATABASE_URL: databaseUrlSchema.optional(),
     E2E_TEST_MODE: z.enum(["true", "false"]).optional(),
     E2E_TEST_SECRET: z.string().optional(),
   },
@@ -187,6 +188,7 @@ const env = createEnv({
     CREEM_WEBHOOK_SECRET: process.env.CREEM_WEBHOOK_SECRET,
 
     // E2E testing
+    E2E_DATABASE_URL: process.env.E2E_DATABASE_URL,
     E2E_TEST_MODE: process.env.E2E_TEST_MODE,
     E2E_TEST_SECRET: process.env.E2E_TEST_SECRET,
   },

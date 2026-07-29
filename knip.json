@@ -2,6 +2,15 @@
   "$schema": "https://unpkg.com/knip@6/schema.json",
   "ignoreBinaries": ["xdg-open"],
   "ignoreFiles": ["content-collections.ts"],
+  "playwright": {
+    "config": [],
+    "entry": [
+      "playwright.config.ts",
+      "e2e/**/*.spec.ts",
+      "e2e/global-setup.ts",
+      "e2e/global-teardown.ts"
+    ]
+  },
   "ignoreIssues": {
     "src/database/tables.ts": ["exports"]
   }

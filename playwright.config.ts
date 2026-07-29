@@ -1,15 +1,19 @@
 import { defineConfig, devices } from "@playwright/test";
 import { randomBytes } from "node:crypto";
+import { resolveE2EEnvironment } from "./e2e/environment";
 
-const port = 3100;
-const baseURL = `http://127.0.0.1:${port}`;
+const { databaseUrl, origin: baseURL, port } = resolveE2EEnvironment();
 const e2eTestSecret =
   process.env.E2E_TEST_SECRET ?? randomBytes(32).toString("hex");
 
+process.env.DATABASE_URL = databaseUrl;
 process.env.E2E_TEST_SECRET = e2eTestSecret;
+process.env.NEXT_PUBLIC_APP_URL = baseURL;
 
 export default defineConfig({
   testDir: "./e2e",
+  globalSetup: "./e2e/global-setup.ts",
+  globalTeardown: "./e2e/global-teardown.ts",
   fullyParallel: false,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 2 : 0,
@@ -22,7 +26,16 @@ export default defineConfig({
     video: "retain-on-failure",
   },
   webServer: {
-    command: `PORT=${port} NEXT_PUBLIC_APP_URL=${baseURL} E2E_TEST_MODE=true PLAYWRIGHT=true E2E_TEST_SECRET=${e2eTestSecret} pnpm start`,
+    command: "pnpm start",
+    env: {
+      DATABASE_URL: databaseUrl,
+      E2E_DATABASE_URL: databaseUrl,
+      E2E_TEST_MODE: "true",
+      E2E_TEST_SECRET: e2eTestSecret,
+      NEXT_PUBLIC_APP_URL: baseURL,
+      PLAYWRIGHT: "true",
+      PORT: String(port),
+    },
     url: baseURL,
     reuseExistingServer: false,
     timeout: 120 * 1000,

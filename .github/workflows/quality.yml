@@ -21,18 +21,19 @@ jobs:
       postgres:
         image: postgres:16-alpine
         env:
-          POSTGRES_DB: saas_ci
+          POSTGRES_DB: saas_e2e
           POSTGRES_PASSWORD: postgres
           POSTGRES_USER: postgres
         ports:
           - 5432:5432
         options: >-
-          --health-cmd "pg_isready -U postgres -d saas_ci"
+          --health-cmd "pg_isready -U postgres -d saas_e2e"
           --health-interval 5s
           --health-timeout 5s
           --health-retries 10
     env:
-      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/saas_ci
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/saas_e2e
+      E2E_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/saas_e2e
       BETTER_AUTH_SECRET: ci-only-secret-at-least-32-characters
       RESEND_API_KEY: re_ci_placeholder
       RESEND_EMAIL_FROM: noreply@example.com
@@ -73,8 +74,5 @@ jobs:
       - run: pnpm dead-code:check
       - run: pnpm type-check
       - run: pnpm test --runInBand
-      - run: pnpm build
-        env:
-          NEXT_PUBLIC_APP_URL: http://127.0.0.1:3100
       - run: pnpm exec playwright install --with-deps chromium
-      - run: pnpm exec playwright test
+      - run: pnpm test:e2e

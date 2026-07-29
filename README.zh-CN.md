@@ -277,10 +277,14 @@ pnpm set:admin --email=your-email@example.com
 运行方式：
 
 ```bash
+createdb saas_e2e
+# 在 .env 中添加 E2E_DATABASE_URL=postgresql://.../saas_e2e
 pnpm test:e2e
 ```
 
-Playwright 会通过 `pnpm start` 启动生产服务，并在测试期间启用仅供测试使用的会话入口：`E2E_TEST_MODE=true`。该入口要求显式配置至少 32 个字符的 `E2E_TEST_SECRET`，测试 cookie 会用该密钥签名，且非本机生产部署会禁用该入口。CI 未提供密钥时，Playwright 会为每次运行生成临时密钥。
+`E2E_DATABASE_URL` 为必填项，必须指向专用的本地 PostgreSQL 数据库，且数据库名需包含独立的 `e2e` 或 `test` 片段。CI 之外，runner 会拒绝使用常规 `DATABASE_URL`，防止测试用户、API Key、CLI token、device code 与限流状态写入开发库或共享库。它会统一执行迁移、构建、启动生产服务，并在测试前后清理 E2E 数据。
+
+测试会话入口仅在 Playwright 连接到声明的 E2E 数据库时启用。该入口还要求显式配置至少 32 个字符的 `E2E_TEST_SECRET`，且会在非本机生产部署中禁用。CI 未提供密钥时，Playwright 会为每次运行生成临时密钥。
 
 #### 包体积分析脚本
 

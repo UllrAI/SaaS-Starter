@@ -64,6 +64,20 @@ function isProductionDeployment(): boolean {
   return process.env.NODE_ENV === "production" && !isLocalAppUrl();
 }
 
+function usesDedicatedE2EDatabase(): boolean {
+  const databaseUrl = process.env.DATABASE_URL;
+  const e2eDatabaseUrl = process.env.E2E_DATABASE_URL;
+  if (!databaseUrl || !e2eDatabaseUrl) {
+    return false;
+  }
+
+  try {
+    return new URL(databaseUrl).href === new URL(e2eDatabaseUrl).href;
+  } catch {
+    return false;
+  }
+}
+
 export function getE2ETestSecret(): string | null {
   const secret = process.env.E2E_TEST_SECRET?.trim();
   if (!secret) {
@@ -84,6 +98,7 @@ function isE2ETestModeEnabled(): boolean {
   return (
     process.env.E2E_TEST_MODE === "true" &&
     process.env.PLAYWRIGHT === "true" &&
+    usesDedicatedE2EDatabase() &&
     !isProductionDeployment() &&
     getE2ETestSecret() !== null
   );

@@ -3,6 +3,7 @@ import React from "react";
 import { headers } from "next/headers";
 import { DashboardPageWrapper } from "../_components/dashboard-page-wrapper";
 import {
+  getUserPaymentSummary,
   getUserPayments,
   getUserProductEntitlement,
   getUserSubscription,
@@ -48,17 +49,21 @@ export default async function DashboardBillingPage() {
   const { t } = await getServerTranslations();
   const requestHeaders = await headers();
   const session = await getAuthSessionFromHeaders(requestHeaders);
-  const [subscription, entitlement, payments] = await Promise.all([
-    session?.user?.id
-      ? getUserSubscription(session.user.id)
-      : Promise.resolve(null),
-    session?.user?.id
-      ? getUserProductEntitlement(session.user.id)
-      : Promise.resolve(null),
-    session?.user?.id
-      ? getUserPayments(session.user.id, 20)
-      : Promise.resolve([]),
-  ]);
+  const [subscription, entitlement, payments, successfulPaymentSummary] =
+    await Promise.all([
+      session?.user?.id
+        ? getUserSubscription(session.user.id)
+        : Promise.resolve(null),
+      session?.user?.id
+        ? getUserProductEntitlement(session.user.id)
+        : Promise.resolve(null),
+      session?.user?.id
+        ? getUserPayments(session.user.id, 20)
+        : Promise.resolve([]),
+      session?.user?.id
+        ? getUserPaymentSummary(session.user.id, "succeeded")
+        : Promise.resolve({ count: 0, latestCreatedAt: null }),
+    ]);
   return (
     <DashboardPageWrapper
       title={<>{t("ffd1a6c2fa20", "Billing")}</>}
@@ -75,6 +80,8 @@ export default async function DashboardBillingPage() {
         subscription={subscription}
         entitlement={entitlement}
         payments={payments}
+        successfulPaymentCount={successfulPaymentSummary.count}
+        latestSuccessfulPaymentAt={successfulPaymentSummary.latestCreatedAt}
       />
     </DashboardPageWrapper>
   );

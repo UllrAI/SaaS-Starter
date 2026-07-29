@@ -7,7 +7,7 @@ import {
   users,
   webhookEvents,
 } from "@/database/tables";
-import { and, desc, eq, isNull, sql } from "drizzle-orm";
+import { and, count, desc, eq, isNull, max, sql } from "drizzle-orm";
 import type { PgTransaction } from "drizzle-orm/pg-core";
 import type { PostgresJsQueryResultHKT } from "drizzle-orm/postgres-js";
 import type { Subscription, SubscriptionStatus } from "@/types/billing";
@@ -481,6 +481,32 @@ export async function getUserPayments(userId: string, limit: number = 10) {
       // Keep amount in cents (original database value)
     };
   });
+}
+
+export async function getUserPaymentCount(
+  userId: string,
+  status?: string,
+): Promise<number> {
+  return (await getUserPaymentSummary(userId, status)).count;
+}
+
+export async function getUserPaymentSummary(userId: string, status?: string) {
+  const [result] = await db
+    .select({
+      count: count(),
+      latestCreatedAt: max(payments.createdAt),
+    })
+    .from(payments)
+    .where(
+      status
+        ? and(eq(payments.userId, userId), eq(payments.status, status))
+        : eq(payments.userId, userId),
+    );
+
+  return {
+    count: result?.count ?? 0,
+    latestCreatedAt: result?.latestCreatedAt ?? null,
+  };
 }
 
 /**

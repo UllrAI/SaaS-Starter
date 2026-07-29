@@ -33,6 +33,8 @@ describe("BillingOverview", () => {
         subscription={expiredSubscription}
         entitlement={lifetimeEntitlement}
         payments={[]}
+        successfulPaymentCount={0}
+        latestSuccessfulPaymentAt={null}
       />,
     );
 
@@ -42,5 +44,20 @@ describe("BillingOverview", () => {
     expect(
       screen.queryByRole("button", { name: /Manage Subscription/i }),
     ).not.toBeInTheDocument();
+  });
+
+  it("shows the all-time successful payment count independently of recent history", () => {
+    render(
+      <BillingOverview
+        subscription={null}
+        entitlement={null}
+        payments={[]}
+        successfulPaymentCount={27}
+        latestSuccessfulPaymentAt={new Date("2026-02-03T00:00:00Z")}
+      />,
+    );
+
+    expect(screen.getByText("27")).toBeInTheDocument();
+    expect(screen.getByText(/Latest:/)).toHaveTextContent("2/3/2026");
   });
 });

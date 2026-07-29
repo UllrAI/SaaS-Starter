@@ -7,6 +7,7 @@ const mockRequireAuth = jest.fn();
 const mockGetUserSubscription = jest.fn();
 const mockGetUserProductEntitlement = jest.fn();
 const mockGetUserPayments = jest.fn();
+const mockGetUserPaymentCount = jest.fn();
 const mockGetRequestLocale = jest.fn();
 const mockDbSelect = jest.fn();
 const mockCount = jest.fn();
@@ -43,6 +44,7 @@ describe("Dashboard Home Page", () => {
         createdAt: "2026-03-06T00:00:00.000Z",
       },
     ]);
+    mockGetUserPaymentCount.mockResolvedValue(12);
     mockGetRequestLocale.mockResolvedValue("en-US");
     mockDbSelect.mockReturnValue({
       from: jest.fn().mockReturnValue({
@@ -70,6 +72,7 @@ describe("Dashboard Home Page", () => {
       getUserSubscription: mockGetUserSubscription,
       getUserProductEntitlement: mockGetUserProductEntitlement,
       getUserPayments: mockGetUserPayments,
+      getUserPaymentCount: mockGetUserPaymentCount,
     }));
     jest.doMock("@/lib/i18n/server-locale", () => ({
       getRequestLocale: mockGetRequestLocale,
@@ -195,7 +198,8 @@ describe("Dashboard Home Page", () => {
       ),
     ).toBeInTheDocument();
     expect(screen.getAllByText("Pro")).toHaveLength(2);
-    expect(screen.getByText("active")).toBeInTheDocument();
+    expect(screen.getByText("Active")).toBeInTheDocument();
+    expect(screen.getByText("12")).toBeInTheDocument();
     expect(screen.getByText("4096 bytes stored")).toBeInTheDocument();
     expect(screen.getAllByText("1200-usd-en-US")).toHaveLength(2);
     expect(screen.getByText("Test User")).toBeInTheDocument();
@@ -208,11 +212,13 @@ describe("Dashboard Home Page", () => {
     expect(screen.getByText(/succeeded/i)).toBeInTheDocument();
     expect(mockGetUserSubscription).toHaveBeenCalledWith("user-123");
     expect(mockGetUserPayments).toHaveBeenCalledWith("user-123", 5);
+    expect(mockGetUserPaymentCount).toHaveBeenCalledWith("user-123");
   });
 
   it("renders free-state fallbacks when the account has no subscription or payments", async () => {
     mockGetUserSubscription.mockResolvedValue(null);
     mockGetUserPayments.mockResolvedValue([]);
+    mockGetUserPaymentCount.mockResolvedValue(0);
     mockDbSelect.mockReturnValue({
       from: jest.fn().mockReturnValue({
         where: jest.fn().mockResolvedValue([{ count: 0, totalSize: null }]),

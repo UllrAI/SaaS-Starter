@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslation } from "@/lib/i18n/translation/client";
-import { useState, useEffect, ReactNode } from "react";
+import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -20,6 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { AlertTriangle, Search, ChevronLeft, ChevronRight } from "lucide-react";
+import { getVisiblePageNumbers } from "./pagination";
 interface TableColumn<T> {
   key: string;
   label: string | ReactNode;
@@ -96,7 +97,6 @@ export function AdminTableBase<
   const resolvedEmptyMessage = emptyMessage ?? (
     <>{t("e833227881b2", "No data found")}</>
   );
-  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm);
   const resolvedFilterPlaceholder = extractTextContent(
     filterPlaceholder ?? t("admin_table_filter_placeholder", "Filter..."),
   );
@@ -104,16 +104,6 @@ export function AdminTableBase<
     searchPlaceholder ?? t("admin_table_search_placeholder", "Search..."),
   );
 
-  // Debounce search input
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      onSearchChange(debouncedSearchTerm);
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [debouncedSearchTerm, onSearchChange]);
-  const handleSearch = (value: string) => {
-    setDebouncedSearchTerm(value);
-  };
   if (error) {
     return (
       <div className="flex items-center justify-center p-8">
@@ -137,8 +127,8 @@ export function AdminTableBase<
           <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
           <Input
             placeholder={resolvedSearchPlaceholder}
-            value={debouncedSearchTerm}
-            onChange={(e) => handleSearch(e.target.value)}
+            value={searchTerm}
+            onChange={(event) => onSearchChange(event.target.value)}
             className="pl-9"
           />
         </div>
@@ -241,27 +231,22 @@ export function AdminTableBase<
               {t("4353d18ed90b", "Previous")}
             </Button>
             <div className="flex items-center space-x-1">
-              {Array.from(
-                {
-                  length: Math.min(5, pagination.totalPages),
-                },
-                (_, i) => {
-                  const pageNumber = i + 1;
-                  return (
-                    <Button
-                      key={pageNumber}
-                      variant={
-                        pagination.page === pageNumber ? "default" : "outline"
-                      }
-                      size="sm"
-                      onClick={() => onPageChange(pageNumber)}
-                      disabled={loading}
-                    >
-                      {pageNumber}
-                    </Button>
-                  );
-                },
-              )}
+              {getVisiblePageNumbers(
+                pagination.page,
+                pagination.totalPages,
+              ).map((pageNumber) => (
+                <Button
+                  key={pageNumber}
+                  variant={
+                    pagination.page === pageNumber ? "default" : "outline"
+                  }
+                  size="sm"
+                  onClick={() => onPageChange(pageNumber)}
+                  disabled={loading}
+                >
+                  {pageNumber}
+                </Button>
+              ))}
             </div>
             <Button
               variant="outline"

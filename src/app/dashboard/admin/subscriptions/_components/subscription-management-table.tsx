@@ -24,6 +24,7 @@ import {
 } from "@/lib/actions/admin/subscriptions";
 import { SubscriptionStatus } from "@/types/billing";
 import { useIntlLocale } from "@/hooks/use-intl-locale";
+import { getSubscriptionStatusLabel } from "@/lib/billing/labels";
 interface SubscriptionManagementTableProps {
   initialData: SubscriptionWithUser[];
   initialPagination: {
@@ -32,33 +33,6 @@ interface SubscriptionManagementTableProps {
     total: number;
     totalPages: number;
   };
-}
-function SubscriptionStatusLabel({ status }: { status: string }) {
-  const { t } = useTranslation();
-  switch (status) {
-    case "active":
-      return <>{t("2c465f05d500", "Active")}</>;
-    case "trialing":
-      return <>{t("c3edc911fa1d", "Trialing")}</>;
-    case "canceled":
-      return <>{t("814b0f3e70ac", "Canceled")}</>;
-    case "expired":
-      return <>{t("subscription_status_expired", "Expired")}</>;
-    case "paused":
-      return <>{t("subscription_status_paused", "Paused")}</>;
-    case "scheduled_cancel":
-      return (
-        <>{t("subscription_status_scheduled_cancel", "Scheduled to cancel")}</>
-      );
-    case "past_due":
-      return <>{t("64f180e9fb46", "Past Due")}</>;
-    case "incomplete":
-      return <>{t("4704260a99f1", "Incomplete")}</>;
-    case "unpaid":
-      return <>{t("685a7728149e", "Unpaid")}</>;
-    default:
-      return <>{t("7ffb1c89fbde", "Unknown")}</>;
-  }
 }
 export function SubscriptionManagementTable({
   initialData,
@@ -188,7 +162,7 @@ export function SubscriptionManagementTable({
           variant={getStatusBadgeVariant(sub.status)}
           className="capitalize"
         >
-          <SubscriptionStatusLabel status={sub.status} />
+          {getSubscriptionStatusLabel(sub.status, t)}
         </Badge>
       ),
     },
@@ -228,33 +202,31 @@ export function SubscriptionManagementTable({
     },
     {
       value: "active",
-      label: <>{t("a91043bb2ef9", "Active")}</>,
+      label: <>{getSubscriptionStatusLabel("active", t)}</>,
     },
     {
       value: "trialing",
-      label: <>{t("8c6eb5ed9f62", "Trialing")}</>,
+      label: <>{getSubscriptionStatusLabel("trialing", t)}</>,
     },
     {
       value: "canceled",
-      label: <>{t("c9f42d0e6f6f", "Canceled")}</>,
+      label: <>{getSubscriptionStatusLabel("canceled", t)}</>,
     },
     {
       value: "past_due",
-      label: <>{t("493ace466900", "Past Due")}</>,
+      label: <>{getSubscriptionStatusLabel("past_due", t)}</>,
     },
     {
       value: "scheduled_cancel",
-      label: (
-        <>{t("subscription_status_scheduled_cancel", "Scheduled to cancel")}</>
-      ),
+      label: <>{getSubscriptionStatusLabel("scheduled_cancel", t)}</>,
     },
     {
       value: "paused",
-      label: <>{t("subscription_status_paused", "Paused")}</>,
+      label: <>{getSubscriptionStatusLabel("paused", t)}</>,
     },
     {
       value: "expired",
-      label: <>{t("subscription_status_expired", "Expired")}</>,
+      label: <>{getSubscriptionStatusLabel("expired", t)}</>,
     },
   ];
   return (

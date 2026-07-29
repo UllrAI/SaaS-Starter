@@ -49,7 +49,7 @@ function ServerUploadWarningToast({
   return (
     <>
       {t(
-        "b1dc545d7aa6",
+        "uploads_file_s_uploaded_need_attention",
         "{success} file(s) uploaded and {failed} file(s) need attention.",
         {
           success,
@@ -61,7 +61,14 @@ function ServerUploadWarningToast({
 }
 function ServerUploadFailureToast() {
   const { t } = useTranslation();
-  return <>{t("ae0459f95b24", "The server upload did not complete.")}</>;
+  return (
+    <>
+      {t(
+        "uploads_server_upload_did_not_complete",
+        "The server upload did not complete.",
+      )}
+    </>
+  );
 }
 export function ServerUploadPanel() {
   const { t } = useTranslation();
@@ -151,11 +158,13 @@ export function ServerUploadPanel() {
         <div className="space-y-1">
           <div className="flex items-center gap-2 text-sm font-medium">
             <Server className="h-4 w-4" />
-            <span>{t("5dd19b25af8a", "Upload through the server")}</span>
+            <span>
+              {t("uploads_upload_through_server", "Upload through the server")}
+            </span>
           </div>
           <p className="text-muted-foreground text-sm">
             {t(
-              "1a6174bb1602",
+              "uploads_use_path_when_backend_needs_validate",
               "Use this path when the backend needs to validate or transform files before storage.",
             )}
           </p>
@@ -163,11 +172,13 @@ export function ServerUploadPanel() {
 
         <div className="flex flex-wrap gap-2">
           <Badge variant="secondary">
-            {t("ec3fbe6e72ea", "Bounded request")}
+            {t("uploads_bounded_request", "Bounded request")}
           </Badge>
-          <Badge variant="secondary">{t("c6502cf5c4d9", "Auth checked")}</Badge>
+          <Badge variant="secondary">
+            {t("uploads_auth_checked", "Auth checked")}
+          </Badge>
           <Badge variant="outline">
-            {t("4c49ff5d676b", "Parallel processing")}
+            {t("uploads_parallel_processing", "Parallel processing")}
           </Badge>
         </div>
       </div>
@@ -199,14 +210,24 @@ export function ServerUploadPanel() {
           <div className="space-y-2">
             <p className="text-sm font-medium">
               {isUploading ? (
-                <>{t("c4ddc0b77d12", "Uploading through the server\u2026")}</>
+                <>
+                  {t(
+                    "uploads_uploading_through_server",
+                    "Uploading through the server\u2026",
+                  )}
+                </>
               ) : (
-                <>{t("bd91f9d34131", "Select files for server processing")}</>
+                <>
+                  {t(
+                    "uploads_select_files_server_processing",
+                    "Select files for server processing",
+                  )}
+                </>
               )}
             </p>
             <p className="text-muted-foreground text-sm">
               {t(
-                "b04c54dc22b6",
+                "uploads_request_stays_inside_application_boundary_before",
                 "The request stays inside your application boundary before landing in storage.",
               )}
             </p>
@@ -214,9 +235,9 @@ export function ServerUploadPanel() {
 
           <span className="text-muted-foreground group-hover:text-foreground text-sm transition">
             {isUploading ? (
-              <>{t("e4ce2f9573fe", "Working\u2026")}</>
+              <>{t("uploads_working", "Working\u2026")}</>
             ) : (
-              <>{t("bb5859e3a5fc", "Browse files")}</>
+              <>{t("uploads_browse_files", "Browse files")}</>
             )}
           </span>
         </div>
@@ -225,9 +246,9 @@ export function ServerUploadPanel() {
       {isUploading ? (
         <div className="bg-background space-y-2 rounded-lg border p-3">
           <div className="flex items-center justify-between text-sm">
-            <span>{t("0e93b7a482a9", "Pipeline progress")}</span>
+            <span>{t("uploads_pipeline_progress", "Pipeline progress")}</span>
             <span>
-              {t("42b3855d0f95", "{progress}%", {
+              {t("uploads_server_progress_percent", "{progress}%", {
                 progress,
               })}
             </span>
@@ -240,15 +261,15 @@ export function ServerUploadPanel() {
         <div className="flex flex-wrap items-center gap-4">
           <span className="inline-flex items-center gap-2">
             <ShieldCheck className="h-4 w-4" />
-            {t("be4eff358729", "Validation")}
+            {t("uploads_validation", "Validation")}
           </span>
           <span className="inline-flex items-center gap-2">
             <Sparkles className="h-4 w-4" />
-            {t("c54161b505a7", "Enrichment")}
+            {t("uploads_enrichment", "Enrichment")}
           </span>
           <span className="inline-flex items-center gap-2">
             <Workflow className="h-4 w-4" />
-            {t("4c49ff5d676b", "Parallel processing")}
+            {t("uploads_parallel_processing", "Parallel processing")}
           </span>
         </div>
       </div>

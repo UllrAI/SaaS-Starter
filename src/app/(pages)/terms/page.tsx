@@ -27,24 +27,24 @@ export async function buildTermsMetadata(locale: SupportedLocale) {
   });
   return {
     ...metadata,
-    title: t("efcc00a70da5", "Terms of Service"),
+    title: t("legal_terms_service", "Terms of Service"),
     description: t(
-      "159f0e052104",
+      "legal_read_terms_service_understand_rights_responsibilities",
       "Read our terms of service to understand your rights and responsibilities when using the product.",
     ),
     openGraph: {
       ...metadata.openGraph,
-      title: t("d9707f7bff59", "Terms of Service"),
+      title: t("legal_terms_service", "Terms of Service"),
       description: t(
-        "763b0e3e7565",
+        "legal_read_terms_service_understand_rights_responsibilities",
         "Read our terms of service to understand your rights and responsibilities when using the product.",
       ),
     },
     twitter: {
       ...metadata.twitter,
-      title: t("899a851d2706", "Terms of Service"),
+      title: t("legal_terms_service", "Terms of Service"),
       description: t(
-        "dd8e42a4774c",
+        "legal_read_terms_service_understand_rights_responsibilities",
         "Read our terms of service to understand your rights and responsibilities when using the product.",
       ),
     },
@@ -62,11 +62,11 @@ export default function TermsPage({
   const termsSections = [
     {
       id: "acceptance",
-      title: <>{t("58e4e955c834", "Acceptance of Terms")}</>,
+      title: <>{t("legal_acceptance_terms", "Acceptance of Terms")}</>,
       items: [
         <>
           {t(
-            "69f52bb1f232",
+            "legal_accessing_using_you_agree_bound_these",
             "By accessing or using {COMPANY_NAME}, you agree to be bound by these Terms of Service",
             {
               COMPANY_NAME,
@@ -75,19 +75,19 @@ export default function TermsPage({
         </>,
         <>
           {t(
-            "bd2ff13de74f",
+            "legal_if_you_disagree_any_part_these",
             "If you disagree with any part of these terms, you may not access the service",
           )}
         </>,
         <>
           {t(
-            "6246b5f6e714",
+            "legal_these_terms_apply_all_visitors_users",
             "These terms apply to all visitors, users, and others who access the service",
           )}
         </>,
         <>
           {t(
-            "6b3f61b14322",
+            "legal_we_may_update_these_terms_time",
             "We may update these terms from time to time without prior notice",
           )}
         </>,
@@ -95,35 +95,35 @@ export default function TermsPage({
     },
     {
       id: "user-accounts",
-      title: <>{t("f3ac6076e9f2", "User Accounts")}</>,
+      title: <>{t("legal_user_accounts", "User Accounts")}</>,
       items: [
         <>
           {t(
-            "7ec96d702d2d",
+            "legal_you_must_provide_accurate_complete_information",
             "You must provide accurate and complete information when creating an account",
           )}
         </>,
         <>
           {t(
-            "71d517040643",
+            "legal_you_responsible_maintaining_security_account",
             "You are responsible for maintaining the security of your account",
           )}
         </>,
         <>
           {t(
-            "a2cb2b16110b",
+            "legal_you_must_notify_us_immediately_any",
             "You must notify us immediately of any unauthorized use of your account",
           )}
         </>,
         <>
           {t(
-            "a62b460c7c5c",
+            "legal_one_person_legal_entity_may_not",
             "One person or legal entity may not maintain more than one free account",
           )}
         </>,
         <>
           {t(
-            "f3e7af32e6cb",
+            "legal_accounts_registered_bots_automated_methods_not",
             "Accounts registered by bots or automated methods are not permitted",
           )}
         </>,
@@ -131,35 +131,35 @@ export default function TermsPage({
     },
     {
       id: "acceptable-use",
-      title: <>{t("c41558e56090", "Acceptable Use")}</>,
+      title: <>{t("legal_acceptable_use", "Acceptable Use")}</>,
       items: [
         <>
           {t(
-            "1de95508a310",
+            "legal_use_service_only_lawful_purposes_in",
             "Use the service only for lawful purposes and in accordance with these terms",
           )}
         </>,
         <>
           {t(
-            "140e310fa122",
+            "legal_do_not_use_service_transmit_harmful",
             "Do not use the service to transmit harmful, offensive, or illegal content",
           )}
         </>,
         <>
           {t(
-            "3ebb8520ffa7",
+            "legal_do_not_attempt_gain_unauthorized_access",
             "Do not attempt to gain unauthorized access to our systems or networks",
           )}
         </>,
         <>
           {t(
-            "5f12620977b0",
+            "legal_do_not_interfere_disrupt_service_servers",
             "Do not interfere with or disrupt the service or servers",
           )}
         </>,
         <>
           {t(
-            "be031b76945f",
+            "legal_do_not_use_service_compete_replicate",
             "Do not use the service to compete with or replicate our business model",
           )}
         </>,
@@ -167,35 +167,35 @@ export default function TermsPage({
     },
     {
       id: "payment-terms",
-      title: <>{t("5a39c9e8d369", "Payment and Billing")}</>,
+      title: <>{t("legal_payment_billing", "Payment and Billing")}</>,
       items: [
         <>
           {t(
-            "e1ddd5b8244a",
+            "legal_paid_plans_billed_in_advance_monthly",
             "Paid plans are billed in advance on a monthly or annual basis",
           )}
         </>,
         <>
           {t(
-            "5e3ff8c4ff33",
+            "legal_all_fees_non_refundable_except_as",
             "All fees are non-refundable except as required by law",
           )}
         </>,
         <>
           {t(
-            "a2e4882d70e6",
+            "legal_you_authorize_us_charge_payment_method",
             "You authorize us to charge your payment method for all fees",
           )}
         </>,
         <>
           {t(
-            "f12bb9650dd1",
+            "legal_price_changes_will_communicated_30_days",
             "Price changes will be communicated with 30 days notice",
           )}
         </>,
         <>
           {t(
-            "540bbf8e1f22",
+            "legal_failure_pay_may_result_in_service",
             "Failure to pay may result in service suspension or termination",
           )}
         </>,
@@ -203,35 +203,35 @@ export default function TermsPage({
     },
     {
       id: "intellectual-property",
-      title: <>{t("e758b701b481", "Intellectual Property")}</>,
+      title: <>{t("legal_intellectual_property", "Intellectual Property")}</>,
       items: [
         <>
           {t(
-            "c3c569d3b57c",
+            "legal_service_its_content_protected_copyright_other",
             "The service and its content are protected by copyright and other laws",
           )}
         </>,
         <>
           {t(
-            "cdbbe76b0b98",
+            "legal_you_retain_ownership_content_create_using",
             "You retain ownership of content you create using our service",
           )}
         </>,
         <>
           {t(
-            "68a8d2397358",
+            "legal_you_grant_us_license_use_content",
             "You grant us a license to use your content to provide the service",
           )}
         </>,
         <>
           {t(
-            "06709e943aad",
+            "legal_you_may_not_copy_modify_distribute",
             "You may not copy, modify, or distribute our proprietary content",
           )}
         </>,
         <>
           {t(
-            "3e51aab5c054",
+            "legal_respect_intellectual_property_rights_others",
             "Respect the intellectual property rights of others",
           )}
         </>,
@@ -239,35 +239,35 @@ export default function TermsPage({
     },
     {
       id: "service-availability",
-      title: <>{t("b52dc2c3bd37", "Service Availability")}</>,
+      title: <>{t("legal_service_availability", "Service Availability")}</>,
       items: [
         <>
           {t(
-            "520b24d706c4",
+            "legal_we_strive_maintain_high_service_availability",
             "We strive to maintain high service availability but cannot guarantee 100% uptime",
           )}
         </>,
         <>
           {t(
-            "4377d57ff26f",
+            "legal_scheduled_maintenance_will_announced_in_advance",
             "Scheduled maintenance will be announced in advance when possible",
           )}
         </>,
         <>
           {t(
-            "0c615d8df8fa",
+            "legal_we_may_modify_discontinue_features_reasonable",
             "We may modify or discontinue features with reasonable notice",
           )}
         </>,
         <>
           {t(
-            "d33f5de8f32f",
+            "legal_emergency_maintenance_may_occur_without_prior",
             "Emergency maintenance may occur without prior notice",
           )}
         </>,
         <>
           {t(
-            "daffbd099aa5",
+            "legal_service_level_agreements_specified_in_subscription",
             "Service level agreements are specified in your subscription plan",
           )}
         </>,
@@ -275,35 +275,35 @@ export default function TermsPage({
     },
     {
       id: "termination",
-      title: <>{t("fcd94f03402d", "Termination")}</>,
+      title: <>{t("legal_termination", "Termination")}</>,
       items: [
         <>
           {t(
-            "b9ef75368350",
+            "legal_you_may_terminate_account_at_any",
             "You may terminate your account at any time through your account settings",
           )}
         </>,
         <>
           {t(
-            "514b6948a14e",
+            "legal_we_may_terminate_accounts_violate_these",
             "We may terminate accounts that violate these terms",
           )}
         </>,
         <>
           {t(
-            "8c6d56781485",
+            "legal_upon_termination_right_use_service_ceases",
             "Upon termination, your right to use the service ceases immediately",
           )}
         </>,
         <>
           {t(
-            "b5a461f7d146",
+            "legal_we_will_provide_reasonable_notice_before",
             "We will provide reasonable notice before terminating paid accounts",
           )}
         </>,
         <>
           {t(
-            "302f80d766ed",
+            "legal_data_export_options_available_before_account",
             "Data export options are available before account termination",
           )}
         </>,
@@ -311,35 +311,37 @@ export default function TermsPage({
     },
     {
       id: "disclaimers",
-      title: <>{t("05aecbcb02ee", "Disclaimers and Limitations")}</>,
+      title: (
+        <>{t("legal_disclaimers_limitations", "Disclaimers and Limitations")}</>
+      ),
       items: [
         <>
           {t(
-            "29d7aaf3e97d",
+            "legal_service_provided_as_without_warranties_any",
             "The service is provided 'as is' without warranties of any kind",
           )}
         </>,
         <>
           {t(
-            "94f86f086d83",
+            "legal_we_disclaim_all_warranties_express_implied",
             "We disclaim all warranties, express or implied, including merchantability",
           )}
         </>,
         <>
           {t(
-            "2bbba37cf847",
+            "legal_we_not_liable_indirect_incidental_consequential",
             "We are not liable for indirect, incidental, or consequential damages",
           )}
         </>,
         <>
           {t(
-            "fc64b703e345",
+            "legal_total_liability_limited_amount_you_paid",
             "Our total liability is limited to the amount you paid in the last 12 months",
           )}
         </>,
         <>
           {t(
-            "cdb9bbd50344",
+            "legal_some_jurisdictions_do_not_allow_these",
             "Some jurisdictions do not allow these limitations",
           )}
         </>,
@@ -355,17 +357,17 @@ export default function TermsPage({
             <Badge className="border-border bg-background/50 inline-flex items-center border px-3 py-1 text-sm backdrop-blur-sm">
               <FileText className="text-muted-foreground mr-2 h-3 w-3" />
               <span className="text-muted-foreground font-mono">
-                {t("d9e77b08ea7d", "TERMS.md")}
+                {t("legal_terms_md", "TERMS.md")}
               </span>
             </Badge>
           }
         >
           <PageIntroHeading>
-            {t("5213e484bad3", "Terms of Service")}
+            {t("legal_terms_service", "Terms of Service")}
           </PageIntroHeading>
           <PageIntroDescription className="mb-10">
             {t(
-              "7e20b9a8480d",
+              "legal_these_terms_govern_use_outline_rights",
               "These terms govern your use of {COMPANY_NAME} and outline the rights and responsibilities of both you and us. Please read them carefully.",
               {
                 COMPANY_NAME,
@@ -373,8 +375,18 @@ export default function TermsPage({
             )}
           </PageIntroDescription>
           <div className="text-muted-foreground text-sm">
-            <p>{t("25d1aaa63fd9", "Last updated: December 2024")}</p>
-            <p>{t("a6af1b29f56c", "Effective: December 1, 2024")}</p>
+            <p>
+              {t(
+                "legal_last_updated_december_2024",
+                "Last updated: December 2024",
+              )}
+            </p>
+            <p>
+              {t(
+                "legal_effective_december_1_2024",
+                "Effective: December 1, 2024",
+              )}
+            </p>
           </div>
         </PageIntro>
 
@@ -400,37 +412,40 @@ export default function TermsPage({
 
         <div className="mt-12">
           <h2 className="mb-4 text-2xl font-semibold">
-            {t("7602c9d869e0", "Questions About These Terms?")}
+            {t(
+              "legal_questions_about_these_terms",
+              "Questions About These Terms?",
+            )}
           </h2>
           <p className="text-muted-foreground mb-4">
             {t(
-              "504c623646d9",
+              "legal_if_you_have_any_questions_about",
               "If you have any questions about these Terms of Service, please contact our legal team.",
             )}
           </p>
           <div className="text-muted-foreground space-y-2 text-sm">
             <p>
-              <strong>{t("556b2798daa9", "Email:")}</strong> {LEGAL_EMAIL}
+              <strong>{t("legal_email", "Email:")}</strong> {LEGAL_EMAIL}
             </p>
             <p>
-              <strong>{t("cb7a3f78f46f", "Support:")}</strong>{" "}
+              <strong>{t("legal_support_terms", "Support:")}</strong>{" "}
               <Link
                 href="/contact"
                 locale={locale}
                 className="underline underline-offset-4"
               >
-                {t("f675139b980f", "Contact page")}
+                {t("legal_contact_page", "Contact page")}
               </Link>
             </p>
             <p>
-              <strong>{t("0966bfddd08d", "Community:")}</strong>{" "}
+              <strong>{t("legal_community", "Community:")}</strong>{" "}
               <a
                 href={GITHUB_DISCUSSIONS_URL}
                 target="_blank"
                 rel="noreferrer"
                 className="underline underline-offset-4"
               >
-                {t("3b1ce74297f7", "GitHub Discussions")}
+                {t("legal_git_hub_discussions", "GitHub Discussions")}
               </a>
             </p>
           </div>
@@ -439,7 +454,7 @@ export default function TermsPage({
         <div className="text-muted-foreground mt-12 border-t pt-8 text-center text-sm">
           <p>
             {t(
-              "7de7d0471c2b",
+              "legal_these_terms_interpreted_under_laws_apply",
               "These Terms are interpreted under the laws that apply to the contracting entity operating {COMPANY_NAME}, unless mandatory local law requires otherwise. If any provision is unenforceable, the remaining provisions will remain in effect.",
               {
                 COMPANY_NAME,

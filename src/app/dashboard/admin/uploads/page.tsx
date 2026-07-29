@@ -21,24 +21,24 @@ export async function generateMetadata() {
   const metadata = createMetadataDefaults({ locale });
   return {
     ...metadata,
-    title: t("86afaf3ae958", "Upload Management"),
+    title: t("admin_upload_management", "Upload Management"),
     description: t(
-      "40e567e43147",
+      "admin_manage_user_uploads_file_storage_content",
       "Manage user uploads, file storage, and content moderation",
     ),
     openGraph: {
       ...metadata.openGraph,
-      title: t("8b82d1125201", "Upload Management"),
+      title: t("admin_upload_management", "Upload Management"),
       description: t(
-        "95284ac7bc0d",
+        "admin_manage_user_uploads_file_storage_content",
         "Manage user uploads, file storage, and content moderation",
       ),
     },
     twitter: {
       ...metadata.twitter,
-      title: t("1d06614da7b2", "Upload Management"),
+      title: t("admin_upload_management", "Upload Management"),
       description: t(
-        "d6a0444d110a",
+        "admin_manage_user_uploads_file_storage_content",
         "Manage user uploads, file storage, and content moderation",
       ),
     },
@@ -54,8 +54,8 @@ export default async function UploadManagementPage() {
   const initialTableData = await getUploads({});
   return (
     <DashboardPageWrapper
-      title={<>{t("4b7c277d7906", "Upload Management")}</>}
-      parentTitle={<>{t("a300aa3b45a3", "Admin Dashboard")}</>}
+      title={<>{t("admin_upload_management", "Upload Management")}</>}
+      parentTitle={<>{t("admin_dashboard", "Admin Dashboard")}</>}
       parentUrl="/dashboard/admin"
     >
       <Suspense fallback={<StatsCardsSkeleton />}>
@@ -64,10 +64,10 @@ export default async function UploadManagementPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>{t("4b58cdbd80a9", "All Uploads")}</CardTitle>
+          <CardTitle>{t("admin_all_uploads", "All Uploads")}</CardTitle>
           <CardDescription>
             {t(
-              "1c54edf95a81",
+              "admin_manage_user_uploads_monitor_storage_usage",
               "Manage user uploads, monitor storage usage, and moderate content",
             )}
           </CardDescription>

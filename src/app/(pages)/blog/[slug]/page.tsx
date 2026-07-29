@@ -237,11 +237,11 @@ export async function BlogPostPageContent({
         <ReadingContainer>
           <div className="text-center">
             <h2 className="text-foreground mb-4 text-xl font-bold sm:text-2xl">
-              {t("77a15560ce8c", "Thanks for reading!")}
+              {t("blog_thanks_reading", "Thanks for reading!")}
             </h2>
             <p className="text-muted-foreground mb-6 text-sm sm:mb-8 sm:text-base">
               {t(
-                "b3d935a413da",
+                "blog_want_read_more_articles_check_out",
                 "Want to read more articles? Check out our blog for the latest insights and updates.",
               )}
             </p>
@@ -250,7 +250,7 @@ export async function BlogPostPageContent({
                 size="lg"
                 className="bg-primary hover:bg-primary/90 text-primary-foreground transition-colors"
               >
-                {t("251fa22c9d79", "Explore More Articles")}
+                {t("blog_explore_more_articles", "Explore More Articles")}
               </Button>
             </Link>
           </div>

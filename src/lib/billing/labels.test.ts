@@ -29,7 +29,7 @@ describe("billing labels", () => {
       "billing_payment_status_unknown:Unknown",
     );
     expect(getPaymentTypeLabel("unexpected", translate)).toBe(
-      "508d3b02ab09:Unknown",
+      "billing_unknown:Unknown",
     );
   });
 });

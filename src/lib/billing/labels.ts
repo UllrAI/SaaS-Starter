@@ -10,15 +10,15 @@ const SUBSCRIPTION_STATUS_LABELS: Record<SubscriptionStatus, BillingLabel> = {
   active: { key: "billing_status_active", fallback: "Active" },
   canceled: { key: "billing_status_canceled", fallback: "Canceled" },
   expired: { key: "subscription_status_expired", fallback: "Expired" },
-  past_due: { key: "64f180e9fb46", fallback: "Past Due" },
-  unpaid: { key: "685a7728149e", fallback: "Unpaid" },
+  past_due: { key: "billing_past_due", fallback: "Past Due" },
+  unpaid: { key: "billing_unpaid", fallback: "Unpaid" },
   paused: { key: "subscription_status_paused", fallback: "Paused" },
   scheduled_cancel: {
     key: "subscription_status_scheduled_cancel",
     fallback: "Scheduled to cancel",
   },
   trialing: { key: "billing_status_trialing", fallback: "Trialing" },
-  incomplete: { key: "4704260a99f1", fallback: "Incomplete" },
+  incomplete: { key: "billing_incomplete", fallback: "Incomplete" },
 };
 
 const PAYMENT_STATUS_LABELS = {
@@ -46,9 +46,9 @@ const PAYMENT_TYPE_LABELS = {
     key: "billing_payment_type_one_time",
     fallback: "One-time purchase",
   },
-  card: { key: "161489760794", fallback: "Credit Card" },
-  bank_transfer: { key: "39a38e00159d", fallback: "Bank Transfer" },
-  paypal: { key: "bb6bd6003b71", fallback: "PayPal" },
+  card: { key: "billing_credit_card", fallback: "Credit Card" },
+  bank_transfer: { key: "billing_bank_transfer", fallback: "Bank Transfer" },
+  paypal: { key: "billing_paypal", fallback: "PayPal" },
 } as const satisfies Record<string, BillingLabel>;
 
 const UNKNOWN_PAYMENT_STATUS: BillingLabel = {
@@ -56,7 +56,7 @@ const UNKNOWN_PAYMENT_STATUS: BillingLabel = {
   fallback: "Unknown",
 };
 const UNKNOWN_PAYMENT_TYPE: BillingLabel = {
-  key: "508d3b02ab09",
+  key: "billing_unknown",
   fallback: "Unknown",
 };
 

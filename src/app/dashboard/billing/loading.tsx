@@ -3,14 +3,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { DashboardPageWrapper } from "../_components/dashboard-page-wrapper";
 function BillingPageTitle() {
   const { t } = useTranslation();
-  return <>{t("145ac461288f", "Billing")}</>;
+  return <>{t("billing_title_page", "Billing")}</>;
 }
 function BillingPageDescription() {
   const { t } = useTranslation();
   return (
     <>
       {t(
-        "fe344fa8fd53",
+        "billing_manage_subscription_plan_status_payment_history",
         "Manage your subscription, plan status, and payment history.",
       )}
     </>

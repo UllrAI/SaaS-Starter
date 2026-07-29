@@ -18,8 +18,15 @@ export function ContactMethods({
   const contactMethods = [
     {
       icon: Mail,
-      title: <>{t("97cf6b64f238", "Email Support")}</>,
-      description: <>{t("27f27aad58ab", "Technical support via email")}</>,
+      title: <>{t("contact_email_support", "Email Support")}</>,
+      description: (
+        <>
+          {t(
+            "contact_technical_support_via_email",
+            "Technical support via email",
+          )}
+        </>
+      ),
       action: CONTACT_EMAIL,
       href: `mailto:${CONTACT_EMAIL}`,
       label: <>{t("contactEmailGateway", "Email gateway")}</>,
@@ -27,10 +34,13 @@ export function ContactMethods({
     },
     {
       icon: MessageSquare,
-      title: <>{t("4cbfb21b1f5e", "Community Discussions")}</>,
+      title: <>{t("contact_community_discussions", "Community Discussions")}</>,
       description: (
         <>
-          {t("202cdce01ea9", "Ask product and integration questions in public")}
+          {t(
+            "contact_ask_product_integration_questions_in_public",
+            "Ask product and integration questions in public",
+          )}
         </>
       ),
       action: <>{t("contactOpenDiscussions", "Open discussions")}</>,
@@ -40,11 +50,11 @@ export function ContactMethods({
     },
     {
       icon: Bug,
-      title: <>{t("77fffae104d0", "Bug Reports")}</>,
+      title: <>{t("contact_bug_reports", "Bug Reports")}</>,
       description: (
         <>
           {t(
-            "862aa9e582a9",
+            "contact_report_reproducible_bugs_integration_failures",
             "Report reproducible bugs and integration failures",
           )}
         </>
@@ -56,11 +66,11 @@ export function ContactMethods({
     },
     {
       icon: BookOpen,
-      title: <>{t("3699b19f764e", "Documentation")}</>,
+      title: <>{t("contact_documentation", "Documentation")}</>,
       description: (
         <>
           {t(
-            "eeaabc2cfd8d",
+            "contact_setup_guides_billing_flow_notes_deployment",
             "Setup guides, billing flow notes, and deployment docs",
           )}
         </>

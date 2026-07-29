@@ -14,7 +14,7 @@ export async function UploadStatsCards() {
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       <StatCard
-        title={t("7040e675fbcb", "Total Uploads")}
+        title={t("admin_total_uploads", "Total Uploads")}
         value={stats.total}
         description={t("upload_recent_count", "{count} in the last 24 hours", {
           count: stats.recentUploads,
@@ -23,7 +23,7 @@ export async function UploadStatsCards() {
         locale={locale}
       />
       <StatCard
-        title={t("f8cf89aa44c7", "Storage Used")}
+        title={t("admin_storage_used", "Storage Used")}
         value={stats.totalSizeFormatted}
         description={t("upload_average_size", "Average: {size}", {
           size: stats.averageSizeFormatted,
@@ -32,7 +32,7 @@ export async function UploadStatsCards() {
         locale={locale}
       />
       <StatCard
-        title={t("408fd6596c8b", "Top File Type")}
+        title={t("admin_top_file_type", "Top File Type")}
         value={
           stats.topFileTypes?.[0]?.type ??
           t("common_not_available", "Not available")
@@ -46,7 +46,7 @@ export async function UploadStatsCards() {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
           <CardTitle className="text-sm font-medium">
-            {t("1f28c9e00994", "File Types")}
+            {t("admin_file_types", "File Types")}
           </CardTitle>
           <FileText className="text-muted-foreground h-4 w-4" />
         </CardHeader>

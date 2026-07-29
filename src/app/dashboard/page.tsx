@@ -58,11 +58,11 @@ function getPlanLabel(planId: string | null, t: AppTranslate) {
 function getRoleLabel(role: string, t: AppTranslate) {
   switch (role) {
     case "admin":
-      return t("8881841729d7", role);
+      return t("common_admin", role);
     case "super_admin":
-      return t("9d7302206bac", role.replace("_", " "));
+      return t("common_super_admin", role.replace("_", " "));
     default:
-      return t("6ccd40cf07d2", role);
+      return t("common_user", role);
   }
 }
 
@@ -71,24 +71,24 @@ export async function generateMetadata() {
   const metadata = createMetadataDefaults({ locale });
   return {
     ...metadata,
-    title: t("268278a36d91", "Dashboard"),
+    title: t("dashboard_title", "Dashboard"),
     description: t(
-      "045b5a0161f5",
+      "dashboard_account_overview_billing_status_starter_setup",
       "Account overview, billing status, and starter setup progress.",
     ),
     openGraph: {
       ...metadata.openGraph,
-      title: t("2e5e078f6788", "Dashboard"),
+      title: t("dashboard_title", "Dashboard"),
       description: t(
-        "549ad5b172bb",
+        "dashboard_account_overview_billing_status_starter_setup",
         "Account overview, billing status, and starter setup progress.",
       ),
     },
     twitter: {
       ...metadata.twitter,
-      title: t("cb58fa7417a6", "Dashboard"),
+      title: t("dashboard_title", "Dashboard"),
       description: t(
-        "c4a28414dd48",
+        "dashboard_account_overview_billing_status_starter_setup_description",
         "Account overview, billing status, and starter setup progress.",
       ),
     },
@@ -142,11 +142,11 @@ export default async function HomeRoute() {
   const checklistLinks = [
     {
       id: "billing",
-      title: <>{t("c073a40a7e0b", "Review billing flow")}</>,
+      title: <>{t("dashboard_review_billing_flow", "Review billing flow")}</>,
       description: (
         <>
           {t(
-            "c6e1e570d858",
+            "dashboard_check_plan_selection_checkout_portal_access",
             "Check plan selection, checkout, and portal access.",
           )}
         </>
@@ -155,11 +155,11 @@ export default async function HomeRoute() {
     },
     {
       id: "upload",
-      title: <>{t("e1e660cf23a9", "Verify uploads")}</>,
+      title: <>{t("dashboard_verify_uploads", "Verify uploads")}</>,
       description: (
         <>
           {t(
-            "f648e7207015",
+            "dashboard_test_client_server_uploads_against_storage",
             "Test client and server uploads against your storage config.",
           )}
         </>
@@ -168,11 +168,11 @@ export default async function HomeRoute() {
     },
     {
       id: "settings",
-      title: <>{t("fe6f44def372", "Finish account setup")}</>,
+      title: <>{t("dashboard_finish_account_setup", "Finish account setup")}</>,
       description: (
         <>
           {t(
-            "a70035543f9a",
+            "dashboard_update_profile_validate_theme_locale_preferences",
             "Update your profile and validate theme and locale preferences.",
           )}
         </>
@@ -186,11 +186,11 @@ export default async function HomeRoute() {
   );
   return (
     <DashboardPageWrapper
-      title={<>{t("f33256a53736", "Dashboard")}</>}
+      title={<>{t("dashboard_title", "Dashboard")}</>}
       description={
         <>
           {t(
-            "8a325ee3005b",
+            "dashboard_account_overview_billing_status_starter_setup",
             "Account overview, billing status, and starter setup progress.",
           )}
         </>
@@ -201,11 +201,11 @@ export default async function HomeRoute() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <UserCircle2 className="text-primary h-5 w-5" />
-              {t("03b04b82b57a", "Account overview")}
+              {t("dashboard_account_overview", "Account overview")}
             </CardTitle>
             <CardDescription>
               {t(
-                "c2b5a91643a5",
+                "dashboard_summary_account_starter_modules_currently_in",
                 "A summary of the account and starter modules currently in use.",
               )}
             </CardDescription>
@@ -214,7 +214,7 @@ export default async function HomeRoute() {
             {SITE_CONFIG.features.billing && (
               <div className="border-border space-y-2 border p-4">
                 <p className="text-muted-foreground text-xs uppercase">
-                  {t("371bd6f449f6", "Plan")}
+                  {t("dashboard_plan", "Plan")}
                 </p>
                 <p className="text-lg font-semibold">{subscriptionLabel}</p>
                 <Badge
@@ -231,7 +231,12 @@ export default async function HomeRoute() {
                   ) : billingAccess.kind === "lifetime" ? (
                     <>{t("billing_lifetime_access", "Lifetime access")}</>
                   ) : (
-                    <>{t("4269fcc20a1d", "No active subscription")}</>
+                    <>
+                      {t(
+                        "dashboard_no_active_subscription",
+                        "No active subscription",
+                      )}
+                    </>
                   )}
                 </Badge>
               </div>
@@ -239,11 +244,11 @@ export default async function HomeRoute() {
             {SITE_CONFIG.features.uploads && (
               <div className="border-border space-y-2 border p-4">
                 <p className="text-muted-foreground text-xs uppercase">
-                  {t("8a69847fa5c4", "Uploads")}
+                  {t("dashboard_uploads", "Uploads")}
                 </p>
                 <p className="text-lg font-semibold">{uploadedFileCount}</p>
                 <p className="text-muted-foreground text-sm">
-                  {t("1639540e6c5b", "{expression0} stored", {
+                  {t("dashboard_stored", "{expression0} stored", {
                     expression0: formatFileSize(uploadedFileSize),
                   })}
                 </p>
@@ -252,7 +257,7 @@ export default async function HomeRoute() {
             {SITE_CONFIG.features.billing && (
               <div className="border-border space-y-2 border p-4">
                 <p className="text-muted-foreground text-xs uppercase">
-                  {t("e6dc7b2a7611", "Payments")}
+                  {t("dashboard_payments", "Payments")}
                 </p>
                 <p className="text-lg font-semibold">{paymentCount}</p>
                 <p className="text-muted-foreground text-sm">
@@ -263,7 +268,12 @@ export default async function HomeRoute() {
                       locale,
                     )
                   ) : (
-                    <>{t("e0ad3db6609c", "No payment records yet")}</>
+                    <>
+                      {t(
+                        "dashboard_no_payment_records_yet",
+                        "No payment records yet",
+                      )}
+                    </>
                   )}
                 </p>
               </div>
@@ -275,25 +285,25 @@ export default async function HomeRoute() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <ShieldCheck className="text-primary h-5 w-5" />
-              {t("ed775b2ca635", "Current account")}
+              {t("dashboard_current_account", "Current account")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4 text-sm">
             <div className="border-border border p-4">
               <p className="text-muted-foreground">
-                {t("71579b491980", "Name")}
+                {t("dashboard_name", "Name")}
               </p>
               <p className="font-medium">{user.name}</p>
             </div>
             <div className="border-border border p-4">
               <p className="text-muted-foreground">
-                {t("9c1b07e30177", "Email")}
+                {t("dashboard_email", "Email")}
               </p>
               <p className="font-medium">{user.email}</p>
             </div>
             <div className="border-border border p-4">
               <p className="text-muted-foreground">
-                {t("666a2a3f4ded", "Role")}
+                {t("dashboard_role", "Role")}
               </p>
               <p className="font-medium capitalize">
                 {getRoleLabel(user.role, t)}
@@ -308,11 +318,11 @@ export default async function HomeRoute() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Sparkles className="text-primary h-5 w-5" />
-              {t("971aa604f9c3", "Setup checklist")}
+              {t("dashboard_setup_checklist", "Setup checklist")}
             </CardTitle>
             <CardDescription>
               {t(
-                "b4f335c74f5b",
+                "dashboard_starter_already_wired_up_these_next",
                 "The starter is already wired up. These are the next places to make it match your product.",
               )}
             </CardDescription>
@@ -344,11 +354,14 @@ export default async function HomeRoute() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <CreditCard className="text-primary h-5 w-5" />
-                {t("c595dd7db3ee", "Recent billing activity")}
+                {t(
+                  "dashboard_recent_billing_activity",
+                  "Recent billing activity",
+                )}
               </CardTitle>
               <CardDescription>
                 {t(
-                  "dfcc3bcdf4eb",
+                  "dashboard_recent_payment_records_attached_current_account",
                   "Recent payment records attached to your current account.",
                 )}
               </CardDescription>
@@ -390,7 +403,7 @@ export default async function HomeRoute() {
                   <Files className="text-primary h-4 w-4" />
                   <span className="text-muted-foreground">
                     {t(
-                      "5ed90e574285",
+                      "dashboard_no_payment_history_yet_visit_billing",
                       "No payment history yet. Visit billing when you are ready to test checkout.",
                     )}
                   </span>

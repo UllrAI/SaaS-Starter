@@ -20,15 +20,15 @@ export default function Error({
     <main className="flex min-h-screen items-center justify-center p-6">
       <div className="max-w-md space-y-4 text-center">
         <h1 className="text-2xl font-semibold">
-          {t("7b0c2ef95924", "Something went wrong")}
+          {t("common_something_went_wrong", "Something went wrong")}
         </h1>
         <p className="text-muted-foreground text-sm">
           {t(
-            "2b35c90beb98",
+            "common_unexpected_error_occurred_while_loading_page",
             "An unexpected error occurred while loading this page.",
           )}
         </p>
-        <Button onClick={reset}>{t("26fd1c86db66", "Try again")}</Button>
+        <Button onClick={reset}>{t("common_try_again", "Try again")}</Button>
       </div>
     </main>
   );

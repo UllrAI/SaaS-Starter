@@ -56,9 +56,9 @@ function PaymentModeLabel({ mode }: { mode: PaymentMode }) {
   const { t } = useTranslation();
   switch (mode) {
     case "subscription":
-      return <>{t("ef377f617c2e", "Subscription")}</>;
+      return <>{t("billing_subscription", "Subscription")}</>;
     case "one_time":
-      return <>{t("7b9f92682d8a", "One-Time")}</>;
+      return <>{t("billing_one_time", "One-Time")}</>;
     default:
       return null;
   }
@@ -67,9 +67,9 @@ function BillingCycleLabel({ cycle }: { cycle: BillingCycle }) {
   const { t } = useTranslation();
   switch (cycle) {
     case "monthly":
-      return <>{t("187728ec629b", "Monthly")}</>;
+      return <>{t("billing_monthly", "Monthly")}</>;
     case "yearly":
-      return <>{t("7e654802f9b7", "Yearly")}</>;
+      return <>{t("billing_yearly", "Yearly")}</>;
     default:
       return null;
   }
@@ -83,12 +83,19 @@ function TierBillingLabel({
 }) {
   const { t } = useTranslation();
   if (paymentMode === "one_time") {
-    return <>{t("d5f143a73e5c", "One-time purchase, no automatic renewal")}</>;
+    return (
+      <>
+        {t(
+          "billing_one_time_purchase_no_automatic_renewal",
+          "One-time purchase, no automatic renewal",
+        )}
+      </>
+    );
   }
   return billingCycle === "yearly" ? (
-    <>{t("c2c035aeeda0", "Billed annually")}</>
+    <>{t("billing_billed_annually", "Billed annually")}</>
   ) : (
-    <>{t("c8a372da047c", "Billed monthly")}</>
+    <>{t("billing_billed_monthly", "Billed monthly")}</>
   );
 }
 function CheckoutMessage({ code }: { code: CheckoutMessageCode }) {
@@ -98,39 +105,65 @@ function CheckoutMessage({ code }: { code: CheckoutMessageCode }) {
       return (
         <>
           {t(
-            "763354d42ebf",
+            "billing_failed_create_checkout_session_please_try",
             "Failed to create checkout session. Please try again later.",
           )}
         </>
       );
     case "initializing_checkout":
       return (
-        <>{t("29e8db45989c", "Initializing secure checkout sequence...")}</>
+        <>
+          {t(
+            "billing_initializing_secure_checkout_sequence",
+            "Initializing secure checkout sequence...",
+          )}
+        </>
       );
     case "invalid_request":
       return (
         <>
           {t(
-            "540b59043028",
+            "billing_unable_start_checkout_current_selection",
             "Unable to start checkout with the current selection.",
           )}
         </>
       );
     case "login_required":
-      return <>{t("44589d849dec", "Please log in to continue purchase.")}</>;
+      return (
+        <>
+          {t(
+            "billing_please_log_in_continue_purchase",
+            "Please log in to continue purchase.",
+          )}
+        </>
+      );
     case "subscription_active":
-      return <>{t("dca05cf29a13", "Subscription already active.")}</>;
+      return (
+        <>
+          {t(
+            "billing_subscription_already_active",
+            "Subscription already active.",
+          )}
+        </>
+      );
     case "unsafe_checkout_url":
       return (
         <>
           {t(
-            "293787595c45",
+            "billing_checkout_link_was_blocked_because_it",
             "The checkout link was blocked because it looked unsafe.",
           )}
         </>
       );
     case "unexpected_checkout_error":
-      return <>{t("37f2e9365f7a", "An unexpected error occurred.")}</>;
+      return (
+        <>
+          {t(
+            "billing_unexpected_error_occurred",
+            "An unexpected error occurred.",
+          )}
+        </>
+      );
     default:
       return null;
   }
@@ -139,7 +172,7 @@ function TierActionGetLabel({ tierName }: { tierName: string }) {
   const { t } = useTranslation();
   return (
     <>
-      {t("a6e1af30b960", "GET {expression0}", {
+      {t("billing_get_tier", "GET {expression0}", {
         expression0: tierName.toUpperCase(),
       })}
     </>
@@ -149,7 +182,7 @@ function TierBadgeLabel({ badge }: { badge: "recommended" }) {
   const { t } = useTranslation();
   switch (badge) {
     case "recommended":
-      return <>{t("1cc344db3b2b", "Recommended")}</>;
+      return <>{t("billing_recommended", "Recommended")}</>;
     default:
       return null;
   }
@@ -162,9 +195,9 @@ function CheckoutButtonStatusLabel({
   const { t } = useTranslation();
   switch (status) {
     case "processing":
-      return <>{t("42de003b5354", "Processing")}</>;
+      return <>{t("billing_processing", "Processing")}</>;
     case "login_required":
-      return <>{t("312da6104ab4", "Login to buy")}</>;
+      return <>{t("billing_login_buy", "Login to buy")}</>;
     default:
       return null;
   }
@@ -221,31 +254,63 @@ export function PricingSection({ className }: { className?: string }) {
   const featureDefinitions = [
     {
       id: "marketing-foundation",
-      label: <>{t("1a88dd2e4d44", "Marketing pages and blog foundation")}</>,
+      label: (
+        <>
+          {t(
+            "billing_marketing_pages_blog_foundation",
+            "Marketing pages and blog foundation",
+          )}
+        </>
+      ),
     },
     {
       id: "auth-dashboard",
-      label: <>{t("bc0861ad819b", "Authentication and protected dashboard")}</>,
+      label: (
+        <>
+          {t(
+            "billing_authentication_protected_dashboard",
+            "Authentication and protected dashboard",
+          )}
+        </>
+      ),
     },
     {
       id: "billing-flow",
-      label: <>{t("ea6618cd547e", "Creem checkout and billing portal flow")}</>,
+      label: (
+        <>
+          {t(
+            "billing_creem_checkout_billing_portal_flow",
+            "Creem checkout and billing portal flow",
+          )}
+        </>
+      ),
     },
     {
       id: "admin-operations",
-      label: <>{t("e0ed86da986c", "Admin operations screens")}</>,
+      label: (
+        <>{t("billing_admin_operations_screens", "Admin operations screens")}</>
+      ),
     },
     {
       id: "r2-uploads",
-      label: <>{t("d6efefcd2a41", "Cloudflare R2 upload workflows")}</>,
+      label: (
+        <>
+          {t(
+            "billing_cloudflare_r2_upload_workflows",
+            "Cloudflare R2 upload workflows",
+          )}
+        </>
+      ),
     },
     {
       id: "localization-setup",
-      label: <>{t("4695d02fe97f", "Localization setup")}</>,
+      label: <>{t("billing_localization_setup", "Localization setup")}</>,
     },
     {
       id: "implementation-guidance",
-      label: <>{t("8f131b81c3a2", "Implementation guidance")}</>,
+      label: (
+        <>{t("billing_implementation_guidance", "Implementation guidance")}</>
+      ),
     },
   ] as const satisfies ReadonlyArray<{
     id: string;
@@ -266,7 +331,7 @@ export function PricingSection({ className }: { className?: string }) {
       description: (
         <>
           {t(
-            "16e1cecef2be",
+            "billing_core_starter_package_solo_builders_shipping",
             "Core starter package for solo builders shipping the basics",
           )}
         </>
@@ -281,7 +346,7 @@ export function PricingSection({ className }: { className?: string }) {
       description: (
         <>
           {t(
-            "9274ad8909ea",
+            "billing_full_featured_starter_package_teams_shipping",
             "Full-featured starter package for teams shipping a real MVP",
           )}
         </>
@@ -299,7 +364,7 @@ export function PricingSection({ className }: { className?: string }) {
       description: (
         <>
           {t(
-            "ccea6b5e420c",
+            "billing_everything_in_professional_plus_rollout_support",
             "Everything in Professional plus rollout support for teams",
           )}
         </>
@@ -490,7 +555,7 @@ export function PricingSection({ className }: { className?: string }) {
                 className="animate-in fade-in-0 border-emerald-500/30 bg-emerald-500/10 text-emerald-600 duration-300 dark:text-emerald-400"
               >
                 <Zap className="mr-1.5 h-3 w-3" />
-                <>{t("67c5d9896269", "Save 17%")}</>
+                <>{t("billing_save_17", "Save 17%")}</>
               </Badge>
             )}
           </div>

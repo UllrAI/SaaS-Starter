@@ -54,10 +54,10 @@ export function ApiKeysSection({
       <CardHeader>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="space-y-1.5">
-            <CardTitle>{t("808cf1a5b1ad", "API Keys")}</CardTitle>
+            <CardTitle>{t("device_api_keys", "API Keys")}</CardTitle>
             <CardDescription>
               {t(
-                "6f34c9c7057b",
+                "device_create_long_lived_keys_servers_ci",
                 "Create long-lived keys for servers, CI jobs, and other non-interactive API clients.",
               )}
             </CardDescription>
@@ -71,7 +71,7 @@ export function ApiKeysSection({
             <KeyRound className="text-muted-foreground h-8 w-8" />
             <p className="text-muted-foreground text-sm">
               {t(
-                "61ca6f8370af",
+                "device_no_api_keys_yet_create_one",
                 "No API keys yet. Create one when you need server-to-server access.",
               )}
             </p>
@@ -126,9 +126,9 @@ function ApiKeyRow({
           </p>
           <Badge variant={apiKey.isActive ? "secondary" : "outline"}>
             {apiKey.isActive ? (
-              <>{t("4d6a56ae284d", "Active")}</>
+              <>{t("device_active", "Active")}</>
             ) : (
-              <>{t("50b644b2415a", "Revoked")}</>
+              <>{t("device_revoked", "Revoked")}</>
             )}
           </Badge>
         </div>
@@ -137,12 +137,12 @@ function ApiKeyRow({
         </p>
         <div className="text-muted-foreground flex flex-wrap gap-3 text-xs">
           <span>
-            {t("cdba25e3ba82", "Rate limit <span0></span0>/min", {
+            {t("device_rate_limit_min", "Rate limit <span0></span0>/min", {
               span0: () => <span translate="no">{apiKey.rateLimit}</span>,
             })}
           </span>
           <span>
-            {t("30e9afa24d8d", "Created <span0></span0>", {
+            {t("device_created", "Created <span0></span0>", {
               span0: () => (
                 <span translate="no">
                   {new Date(apiKey.createdAt).toLocaleDateString()}
@@ -152,7 +152,7 @@ function ApiKeyRow({
           </span>
           {apiKey.lastUsedAt ? (
             <span>
-              {t("e7bdd97d16d9", "Last used <span0></span0>", {
+              {t("device_last_used", "Last used <span0></span0>", {
                 span0: () => (
                   <span translate="no">
                     {new Date(apiKey.lastUsedAt!).toLocaleDateString()}
@@ -161,7 +161,7 @@ function ApiKeyRow({
               })}
             </span>
           ) : (
-            <span>{t("6c7815348a0f", "Never used")}</span>
+            <span>{t("device_never_used", "Never used")}</span>
           )}
         </div>
       </div>
@@ -173,7 +173,7 @@ function ApiKeyRow({
           void handleRevoke();
         }}
       >
-        {t("20fb1816e98e", "{expression0} Revoke", {
+        {t("device_revoke", "{expression0} Revoke", {
           expression0: isRevoking ? (
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
           ) : (
@@ -207,17 +207,19 @@ function CreateApiKeyDialog({ onCreated }: { onCreated: () => void }) {
       <DialogTrigger asChild>
         <Button size="sm" variant="secondary">
           <Plus className="mr-2 h-4 w-4" />
-          {t("026500c40ae6", "Create Key")}
+          {t("device_create_key", "Create Key")}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[440px]">
         {createdKey ? (
           <>
             <DialogHeader>
-              <DialogTitle>{t("d4a9b038617b", "API Key Created")}</DialogTitle>
+              <DialogTitle>
+                {t("device_api_key_created", "API Key Created")}
+              </DialogTitle>
               <DialogDescription>
                 {t(
-                  "ce68b6e9b6ef",
+                  "device_copy_key_now_it_will_not",
                   "Copy this key now. It will not be shown again.",
                 )}
               </DialogDescription>
@@ -234,28 +236,30 @@ function CreateApiKeyDialog({ onCreated }: { onCreated: () => void }) {
                   setOpen(false);
                 }}
               >
-                {t("69a562e2e6ee", "Done")}
+                {t("device_done", "Done")}
               </Button>
             </DialogFooter>
           </>
         ) : (
           <>
             <DialogHeader>
-              <DialogTitle>{t("555efac3a16b", "Create API Key")}</DialogTitle>
+              <DialogTitle>
+                {t("device_create_api_key", "Create API Key")}
+              </DialogTitle>
               <DialogDescription>
                 {t(
-                  "cdd513394b6d",
+                  "device_use_descriptive_name_so_you_can",
                   "Use a descriptive name so you can identify this key later.",
                 )}
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-2 py-2">
-              <Label htmlFor="api-key-name">{t("0f3cfdaa1842", "Name")}</Label>
+              <Label htmlFor="api-key-name">{t("device_name", "Name")}</Label>
               <Input
                 id="api-key-name"
                 value={name}
                 onChange={(event) => setName(event.target.value)}
-                placeholder={t("52f00a1d717f", "Production server")}
+                placeholder={t("device_production_server", "Production server")}
               />
             </div>
             <DialogFooter>
@@ -296,7 +300,7 @@ function CreateApiKeyDialog({ onCreated }: { onCreated: () => void }) {
                   }
                 }}
               >
-                {t("ee4a496d98ec", "{expression0} Create Key", {
+                {t("device_create_key_api", "{expression0} Create Key", {
                   expression0: isCreating ? (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   ) : null,

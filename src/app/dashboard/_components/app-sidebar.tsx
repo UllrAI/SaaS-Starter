@@ -128,35 +128,35 @@ export function AppSidebar() {
     [
       {
         id: "home",
-        label: <>{t("f46e0c79923e", "Home")}</>,
+        label: <>{t("dashboard_home", "Home")}</>,
         url: "/dashboard",
         icon: Home,
         matchMode: "exact",
       },
       {
         id: "upload",
-        label: <>{t("feaff8adafd7", "Upload")}</>,
+        label: <>{t("dashboard_upload", "Upload")}</>,
         url: "/dashboard/upload",
         icon: Upload,
         matchMode: "exact",
       },
       {
         id: "billing",
-        label: <>{t("427f56136131", "Billing")}</>,
+        label: <>{t("dashboard_billing", "Billing")}</>,
         url: "/dashboard/billing",
         icon: Wallet,
         matchMode: "exact",
       },
       {
         id: "developer-access",
-        label: <>{t("498f27b35f6a", "Developer Access")}</>,
+        label: <>{t("dashboard_developer_access", "Developer Access")}</>,
         url: "/dashboard/developer",
         icon: KeyRound,
         matchMode: "exact",
       },
       {
         id: "settings",
-        label: <>{t("f907fab40310", "Settings")}</>,
+        label: <>{t("dashboard_settings", "Settings")}</>,
         url: "/dashboard/settings",
         icon: Settings,
         matchMode: "exact",
@@ -171,35 +171,42 @@ export function AppSidebar() {
     [
       {
         id: "admin-dashboard",
-        label: <>{t("5a5314407bc8", "Admin Dashboard")}</>,
+        label: <>{t("dashboard_admin_dashboard", "Admin Dashboard")}</>,
         url: "/dashboard/admin",
         icon: BarChart3,
         matchMode: "exact",
       },
       {
         id: "user-management",
-        label: <>{t("cd3ae754b513", "User Management")}</>,
+        label: <>{t("dashboard_user_management", "User Management")}</>,
         url: "/dashboard/admin/users",
         icon: Users,
         matchMode: "exact",
       },
       {
         id: "payments",
-        label: <>{t("f9c91c2390bf", "Payments Management")}</>,
+        label: <>{t("dashboard_payments_management", "Payments Management")}</>,
         url: "/dashboard/admin/payments",
         icon: CreditCard,
         matchMode: "exact",
       },
       {
         id: "subscriptions",
-        label: <>{t("15aad5874a7c", "Subscriptions Management")}</>,
+        label: (
+          <>
+            {t(
+              "dashboard_subscriptions_management",
+              "Subscriptions Management",
+            )}
+          </>
+        ),
         url: "/dashboard/admin/subscriptions",
         icon: Shield,
         matchMode: "exact",
       },
       {
         id: "uploads-management",
-        label: <>{t("ee57d04297c6", "Uploads Management")}</>,
+        label: <>{t("dashboard_uploads_management", "Uploads Management")}</>,
         url: "/dashboard/admin/uploads",
         icon: Upload,
         matchMode: "exact",
@@ -233,7 +240,7 @@ export function AppSidebar() {
 
         {showAdminSections && (
           <SidebarSection
-            title={open ? <>{t("358b062130d2", "Admin")}</> : undefined}
+            title={open ? <>{t("dashboard_admin", "Admin")}</> : undefined}
             items={adminNavigation}
             pathname={pathname}
           />

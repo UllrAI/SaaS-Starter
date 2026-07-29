@@ -21,11 +21,11 @@ function ThemeLabel({ theme }: { theme: ThemeKey }) {
   const { t } = useTranslation();
   switch (theme) {
     case "light":
-      return <>{t("a6004ced2373", "Light")}</>;
+      return <>{t("common_light", "Light")}</>;
     case "dark":
-      return <>{t("992711608c27", "Dark")}</>;
+      return <>{t("common_dark", "Dark")}</>;
     case "system":
-      return <>{t("054cfb234633", "System")}</>;
+      return <>{t("common_system", "System")}</>;
     default:
       return null;
   }
@@ -83,7 +83,9 @@ export function ModeToggle({
           <ThemeLabel theme={activeTheme} />
         </span>
       )}
-      <span className="sr-only">{t("02cda586643c", "Toggle theme")}</span>
+      <span className="sr-only">
+        {t("common_toggle_theme", "Toggle theme")}
+      </span>
     </Button>
   );
 }

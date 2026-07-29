@@ -3,14 +3,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { DashboardPageWrapper } from "../_components/dashboard-page-wrapper";
 function DeveloperAccessPageTitle() {
   const { t } = useTranslation();
-  return <>{t("5ec8aa48aae2", "Developer Access")}</>;
+  return <>{t("device_developer_access", "Developer Access")}</>;
 }
 function DeveloperAccessPageDescription() {
   const { t } = useTranslation();
   return (
     <>
       {t(
-        "9db4b59fc7ce",
+        "device_manage_api_keys_cli_sessions_agent",
         "Manage API keys, CLI sessions, and agent-friendly access from one place.",
       )}
     </>

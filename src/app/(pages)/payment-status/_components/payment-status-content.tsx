@@ -178,13 +178,20 @@ function PaymentStatusErrorMessage({ code }: { code: PaymentStatusErrorCode }) {
       return (
         <>
           {t(
-            "339aaf4ddc46",
+            "billing_we_received_checkout_return_but_reference",
             "We received the checkout return, but the checkout reference is missing. Check your billing page in a few minutes or contact support if access does not update.",
           )}
         </>
       );
     case "status_check_failed":
-      return <>{t("0b075846d479", "Failed to check payment status.")}</>;
+      return (
+        <>
+          {t(
+            "billing_failed_check_payment_status",
+            "Failed to check payment status.",
+          )}
+        </>
+      );
     case "status_check_timeout":
       return (
         <>
@@ -328,18 +335,23 @@ export function PaymentStatusContent() {
               <div className="mb-4 flex justify-center">
                 <Badge variant="secondary" className="gap-2">
                   <Clock className="h-3 w-3" />
-                  <>{t("95644d062359", "Verifying Payment")}</>
+                  <>{t("billing_verifying_payment", "Verifying Payment")}</>
                 </Badge>
               </div>
 
               <h1 className="mb-3 text-xl font-semibold">
-                <>{t("5e3803d0e6ec", "Checking Payment Status")}</>
+                <>
+                  {t(
+                    "billing_checking_payment_status",
+                    "Checking Payment Status",
+                  )}
+                </>
               </h1>
 
               <p className="text-muted-foreground text-sm leading-relaxed">
                 <>
                   {t(
-                    "278de7e66247",
+                    "billing_please_wait_while_we_confirm_payment",
                     "Please wait while we confirm your payment...",
                   )}
                 </>

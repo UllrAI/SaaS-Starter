@@ -9,24 +9,24 @@ export async function generateMetadata() {
   const metadata = createMetadataDefaults({ locale });
   return {
     ...metadata,
-    title: t("b32fd3f9981d", "Developer Access"),
+    title: t("device_developer_access", "Developer Access"),
     description: t(
-      "7e48f78cb7d5",
+      "device_manage_api_keys_cli_sessions_agent_description",
       "Manage API keys, CLI sessions, and agent-friendly access to your SaaS app.",
     ),
     openGraph: {
       ...metadata.openGraph,
-      title: t("ac251bc0bd5f", "Developer Access"),
+      title: t("device_developer_access", "Developer Access"),
       description: t(
-        "e70df347d6ca",
+        "device_manage_api_keys_cli_sessions_agent_description",
         "Manage API keys, CLI sessions, and agent-friendly access to your SaaS app.",
       ),
     },
     twitter: {
       ...metadata.twitter,
-      title: t("cdbd24f211b6", "Developer Access"),
+      title: t("device_developer_access", "Developer Access"),
       description: t(
-        "7ba4dcfc025b",
+        "device_manage_api_keys_cli_sessions_agent_description",
         "Manage API keys, CLI sessions, and agent-friendly access to your SaaS app.",
       ),
     },
@@ -36,11 +36,11 @@ export default function DeveloperAccessPage() {
   const { t } = useTranslation();
   return (
     <DashboardPageWrapper
-      title={<>{t("80f8b0b042b8", "Developer Access")}</>}
+      title={<>{t("device_developer_access", "Developer Access")}</>}
       description={
         <>
           {t(
-            "41ca99b17070",
+            "device_manage_api_keys_cli_sessions_agent",
             "Manage API keys, CLI sessions, and agent-friendly access from one place.",
           )}
         </>

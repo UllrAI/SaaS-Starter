@@ -95,7 +95,7 @@ export function LocaleSwitcher({
             </span>
           )}
           <span className="sr-only">
-            {t("d5406e61d01d", "Select language")}
+            {t("common_select_language", "Select language")}
           </span>
         </Button>
       </DropdownMenuTrigger>
@@ -104,7 +104,9 @@ export function LocaleSwitcher({
         sideOffset={8}
         className="min-w-[12rem]"
       >
-        <DropdownMenuLabel>{t("33911e975b6d", "Language")}</DropdownMenuLabel>
+        <DropdownMenuLabel>
+          {t("common_language", "Language")}
+        </DropdownMenuLabel>
         <DropdownMenuSeparator />
         {availableLocales.map((locale) => {
           const details = getLocaleDisplayInfo(locale);

@@ -65,7 +65,7 @@ export function BlogPostHeader({
                 <Link href={backHref}>
                   <ArrowLeft className="mr-2 h-4 w-4" />
                   <span className="hidden sm:inline">{resolvedBackText}</span>
-                  <span className="sm:hidden">{t("9da9a1670f77", "Back")}</span>
+                  <span className="sm:hidden">{t("blog_back", "Back")}</span>
                 </Link>
               </Button>
             </div>
@@ -137,7 +137,7 @@ export function BlogPostHeader({
               <Link href={backHref}>
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 <span className="hidden sm:inline">{resolvedBackText}</span>
-                <span className="sm:hidden">{t("9da9a1670f77", "Back")}</span>
+                <span className="sm:hidden">{t("blog_back", "Back")}</span>
               </Link>
             </Button>
           </div>

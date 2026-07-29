@@ -18,15 +18,15 @@ export async function buildPaymentStatusMetadata(
       index: false,
       follow: false,
     },
-    title: t("a508b20394f7", "Payment Status"),
+    title: t("billing_payment_status", "Payment Status"),
     description: t(
-      "f463a3cfcba4",
+      "billing_check_payment_status_next_steps_subscription_description",
       "Check your payment status and next steps for your subscription.",
     ),
     openGraph: {
-      title: t("da5b22c0e841", "Payment Status"),
+      title: t("billing_payment_status", "Payment Status"),
       description: t(
-        "8f8029a1177c",
+        "billing_check_payment_status_next_steps_subscription",
         "Check your payment status and next steps for your subscription.",
       ),
       images: [{ url: OGIMAGE, width: 1480, height: 777, alt: APP_NAME }],
@@ -40,9 +40,9 @@ export async function buildPaymentStatusMetadata(
     twitter: {
       card: "summary_large_image",
       creator: TWITTERACCOUNT,
-      title: t("eb81c62b0ebb", "Payment Status"),
+      title: t("billing_payment_status", "Payment Status"),
       description: t(
-        "fc23ed777341",
+        "billing_check_payment_status_next_steps_subscription_description",
         "Check your payment status and next steps for your subscription.",
       ),
       images: [{ url: OGIMAGE, width: 1480, height: 777, alt: APP_NAME }],

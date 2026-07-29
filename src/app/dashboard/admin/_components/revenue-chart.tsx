@@ -48,7 +48,9 @@ export function RevenueChart({ chartData }: RevenueChartProps) {
       <div className="flex h-[400px] items-center justify-center">
         <div className="text-muted-foreground flex items-center space-x-2">
           <AlertTriangle className="h-4 w-4" />
-          <span>{t("6eb5f3635950", "No revenue data available")}</span>
+          <span>
+            {t("admin_no_revenue_data_available", "No revenue data available")}
+          </span>
         </div>
       </div>
     );

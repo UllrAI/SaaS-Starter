@@ -18,7 +18,7 @@ export function AuthShell({ children }: { children: React.ReactNode }) {
         <Button asChild variant="ghost" size="sm">
           <Link href="/" className="flex items-center gap-2">
             <ArrowLeft className="h-4 w-4" />
-            {t("ccee066905d2", "Back to Home")}
+            {t("auth_back_home", "Back to Home")}
           </Link>
         </Button>
       </div>

@@ -21,21 +21,24 @@ export async function generateMetadata() {
   const metadata = createMetadataDefaults({ locale });
   return {
     ...metadata,
-    title: t("c844cc919bcd", "Subscription Management"),
-    description: t("a8c659f66456", "Monitor and manage all user subscriptions"),
+    title: t("admin_subscription_management", "Subscription Management"),
+    description: t(
+      "admin_monitor_manage_all_user_subscriptions_description",
+      "Monitor and manage all user subscriptions",
+    ),
     openGraph: {
       ...metadata.openGraph,
-      title: t("e8c1fbee141d", "Subscription Management"),
+      title: t("admin_subscription_management", "Subscription Management"),
       description: t(
-        "04705fda0cbf",
+        "admin_monitor_manage_all_user_subscriptions",
         "Monitor and manage all user subscriptions",
       ),
     },
     twitter: {
       ...metadata.twitter,
-      title: t("feac3ec25b7a", "Subscription Management"),
+      title: t("admin_subscription_management", "Subscription Management"),
       description: t(
-        "25d0e638c25c",
+        "admin_monitor_manage_all_user_subscriptions",
         "Monitor and manage all user subscriptions",
       ),
     },
@@ -51,8 +54,10 @@ export default async function SubscriptionsPage() {
   const initialTableData = await getSubscriptions({});
   return (
     <DashboardPageWrapper
-      title={<>{t("1282ce5222ea", "Subscription Management")}</>}
-      parentTitle={<>{t("04698bc5e784", "Admin Dashboard")}</>}
+      title={
+        <>{t("admin_subscription_management", "Subscription Management")}</>
+      }
+      parentTitle={<>{t("admin_dashboard", "Admin Dashboard")}</>}
       parentUrl="/dashboard/admin"
     >
       <Suspense fallback={<StatsCardsSkeleton />}>
@@ -61,9 +66,14 @@ export default async function SubscriptionsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>{t("871178931506", "All Subscriptions")}</CardTitle>
+          <CardTitle>
+            {t("admin_all_subscriptions", "All Subscriptions")}
+          </CardTitle>
           <CardDescription>
-            {t("d8d425f405d7", "View and manage user subscriptions")}
+            {t(
+              "admin_view_manage_user_subscriptions",
+              "View and manage user subscriptions",
+            )}
           </CardDescription>
         </CardHeader>
         <CardContent>

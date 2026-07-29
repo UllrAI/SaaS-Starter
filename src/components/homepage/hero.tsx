@@ -31,15 +31,20 @@ export function Hero({
                   <span className="bg-primary absolute inline-flex h-full w-full animate-ping rounded-full opacity-75"></span>
                   <span className="bg-primary relative inline-flex h-2 w-2 rounded-full"></span>
                 </span>
-                <>{t("d1b92e58e64e", "Open source and agent ready")}</>
+                <>
+                  {t(
+                    "home_open_source_agent_ready",
+                    "Open source and agent ready",
+                  )}
+                </>
               </Badge>
             </div>
 
             {/* Massive Headline */}
             <h1 className="text-foreground mb-6 text-5xl leading-[0.9] font-black tracking-tighter sm:text-6xl lg:text-7xl xl:text-8xl">
-              <span className="block">{t("707cc0b70ffa", "SHIP YOUR")}</span>
+              <span className="block">{t("home_ship", "SHIP YOUR")}</span>
               <span className="from-foreground to-foreground/50 block bg-gradient-to-b bg-clip-text pr-1 text-transparent">
-                {t("7a0aa6f9ac06", "MICRO SaaS")}
+                {t("home_micro_saas", "MICRO SaaS")}
               </span>
             </h1>
 
@@ -47,7 +52,7 @@ export function Hero({
             <p className="text-muted-foreground mb-10 max-w-xl text-lg leading-relaxed sm:text-xl lg:text-2xl">
               <>
                 {t(
-                  "a02860137099",
+                  "home_complete_ullrai_saas_starter",
                   "Complete UllrAI SaaS starter with authentication, payments, database, admin tooling, agent-ready APIs, and CLI device auth for agent (OpenClaw, Codex, Claude Code, etc.) workflows. Everything you need to go from idea to revenue.",
                 )}
               </>
@@ -61,7 +66,7 @@ export function Hero({
                 asChild
               >
                 <Link href="/signup">
-                  <>{t("207b6bbb9a5c", "START NOW")}</>
+                  <>{t("home_start_now", "START NOW")}</>
                   <Terminal className="ml-3 h-5 w-5" />
                 </Link>
               </Button>
@@ -74,7 +79,7 @@ export function Hero({
               >
                 <Link href={GITHUB_URL} target="_blank">
                   <Github className="mr-2 h-5 w-5" />
-                  <>{t("c96048b0e2f0", "VIEW SOURCE")}</>
+                  <>{t("home_view_source", "VIEW SOURCE")}</>
                 </Link>
               </Button>
             </div>
@@ -95,11 +100,14 @@ export function Hero({
                   <div className="bg-foreground/20 mx-2 h-6 w-px" />
                   <span className="text-foreground flex items-center gap-2 font-mono text-sm font-bold">
                     <Terminal className="h-4 w-4" />
-                    {t("607820f62f8b", "developer-console")}
+                    {t("home_developer_console", "developer-console")}
                   </span>
                 </div>
                 <div className="text-muted-foreground hidden font-mono text-xs font-bold sm:block">
-                  {t("18a5accc9655", "user@saas-starter:~/projects/my-app")}
+                  {t(
+                    "home_user_saas_starter_projects_my_app",
+                    "user@saas-starter:~/projects/my-app",
+                  )}
                 </div>
               </div>
 
@@ -183,12 +191,12 @@ export function Hero({
                 <div className="bg-secondary/5 flex flex-col p-6 text-left sm:p-8 lg:col-span-5">
                   <div className="mb-6 space-y-2">
                     <div className="text-muted-foreground text-xs font-bold tracking-widest uppercase">
-                      <>{t("245227079fc0", "What's Included")}</>
+                      <>{t("home_whats_included", "What's Included")}</>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="bg-primary h-3 w-3 rounded-full" />
                       <span className="text-foreground font-bold">
-                        <>{t("5d972ec0bd5e", "Production Ready")}</>
+                        <>{t("home_production_ready", "Production Ready")}</>
                       </span>
                     </div>
                   </div>
@@ -201,7 +209,7 @@ export function Hero({
                           ✓
                         </span>
                         <span>
-                          <>{t("fde1847f037b", "Authentication")}</>
+                          <>{t("home_authentication", "Authentication")}</>
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
@@ -209,7 +217,7 @@ export function Hero({
                           ✓
                         </span>
                         <span>
-                          <>{t("f8eff329afe2", "Agent-ready APIs")}</>
+                          <>{t("home_agent_ready_apis", "Agent-ready APIs")}</>
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
@@ -217,7 +225,7 @@ export function Hero({
                           ✓
                         </span>
                         <span>
-                          <>{t("1dab3266e1e8", "CLI Device Auth")}</>
+                          <>{t("home_cli_device_auth", "CLI Device Auth")}</>
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
@@ -225,7 +233,7 @@ export function Hero({
                           ✓
                         </span>
                         <span>
-                          <>{t("3136f532621e", "Database")}</>
+                          <>{t("home_database", "Database")}</>
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
@@ -233,7 +241,7 @@ export function Hero({
                           ✓
                         </span>
                         <span>
-                          <>{t("92391b2ca137", "Payments")}</>
+                          <>{t("home_payments", "Payments")}</>
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
@@ -241,7 +249,7 @@ export function Hero({
                           ✓
                         </span>
                         <span>
-                          <>{t("0c26b1411f5c", "File Upload")}</>
+                          <>{t("home_file_upload", "File Upload")}</>
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
@@ -249,7 +257,7 @@ export function Hero({
                           ✓
                         </span>
                         <span>
-                          <>{t("7390868e0e2f", "Admin Panel")}</>
+                          <>{t("home_admin_panel", "Admin Panel")}</>
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
@@ -257,7 +265,7 @@ export function Hero({
                           ✓
                         </span>
                         <span>
-                          <>{t("4ce8f4673bdf", "i18n Ready")}</>
+                          <>{t("home_i18n_ready", "i18n Ready")}</>
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
@@ -265,7 +273,7 @@ export function Hero({
                           ✓
                         </span>
                         <span>
-                          <>{t("6cbab8772e82", "E2E Smoke Tests")}</>
+                          <>{t("home_e2_e_smoke_tests", "E2E Smoke Tests")}</>
                         </span>
                       </div>
                     </div>
@@ -274,7 +282,7 @@ export function Hero({
                   <div className="border-border mt-auto border-t pt-6">
                     <div className="text-muted-foreground text-xs">
                       <span className="block">
-                        {t("7256293d5b60", "Built with")}
+                        {t("home_built", "Built with")}
                       </span>
                       <span
                         translate="no"

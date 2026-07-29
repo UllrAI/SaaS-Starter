@@ -153,18 +153,21 @@ export function DeviceVerifyForm({
           <ShieldCheck className="h-12 w-12 text-green-600" />
           <div className="space-y-1">
             <h2 className="text-lg font-semibold">
-              {t("775932c691fc", "Device authorized")}
+              {t("device_authorized", "Device authorized")}
             </h2>
             <p className="text-muted-foreground text-sm">
               {t(
-                "4bbf81106ef2",
+                "device_you_can_close_tab_return_terminal",
                 "You can close this tab and return to your terminal.",
               )}
             </p>
           </div>
           <Button asChild variant="outline" size="sm">
             <Link href="/dashboard/developer#cli-sessions">
-              {t("de18a8adb35a", "Review authorized devices")}
+              {t(
+                "device_review_authorized_devices",
+                "Review authorized devices",
+              )}
             </Link>
           </Button>
         </CardContent>
@@ -177,10 +180,12 @@ export function DeviceVerifyForm({
       <Card className="w-full">
         <CardHeader className="text-center">
           <Monitor className="text-muted-foreground mx-auto h-10 w-10" />
-          <CardTitle>{t("ed941aa198fd", "Authorize CLI Device")}</CardTitle>
+          <CardTitle>
+            {t("device_authorize_cli_device", "Authorize CLI Device")}
+          </CardTitle>
           <CardDescription>
             {t(
-              "d13099193545",
+              "device_sign_in_account_approve_command_line",
               "Sign in to your account to approve this command-line session.",
             )}
           </CardDescription>
@@ -192,7 +197,7 @@ export function DeviceVerifyForm({
               window.location.href = `/login?callbackUrl=${encodeURIComponent(callbackUrl)}`;
             }}
           >
-            {t("88602beb78a9", "Sign in to continue")}
+            {t("device_sign_in_continue", "Sign in to continue")}
           </Button>
         </CardContent>
       </Card>
@@ -202,10 +207,12 @@ export function DeviceVerifyForm({
     <Card className="w-full">
       <CardHeader className="text-center">
         <Monitor className="text-muted-foreground mx-auto h-10 w-10" />
-        <CardTitle>{t("ed941aa198fd", "Authorize CLI Device")}</CardTitle>
+        <CardTitle>
+          {t("device_authorize_cli_device", "Authorize CLI Device")}
+        </CardTitle>
         <CardDescription>
           {t(
-            "e2ca793f3d45",
+            "device_enter_code_shown_in_terminal_complete",
             "Enter the code shown in your terminal to complete sign-in.",
           )}
         </CardDescription>
@@ -217,9 +224,7 @@ export function DeviceVerifyForm({
           </div>
         ) : null}
         <div className="grid gap-2">
-          <Label htmlFor="device-code">
-            {t("72f8e1cd5634", "Device code")}
-          </Label>
+          <Label htmlFor="device-code">{t("device_code", "Device code")}</Label>
           <Input
             id="device-code"
             value={normalizedCode}
@@ -227,7 +232,7 @@ export function DeviceVerifyForm({
               setCode(normalizeDeviceCode(event.target.value));
               setPendingDevice(null);
             }}
-            placeholder={t("0c5580d504b6", "ABCD-EFGH")}
+            placeholder={t("device_abcd_efgh", "ABCD-EFGH")}
             className="text-center font-mono text-lg tracking-[0.2em]"
             maxLength={9}
             autoFocus

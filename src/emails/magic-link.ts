@@ -147,21 +147,21 @@ async function createMagicLinkEmailCopy({
 
   const preview = await resolveText(
     t(
-      "80b889e83a0f",
+      "email_click_secure_button_below_complete_sign",
       "Click the secure button below to complete your sign-in process. Your secure sign-in link for {appName}",
       { appName },
     ),
   );
   const requestDetails = await resolveText(
     t(
-      "414469cce093",
+      "email_we_received_request_sign_in_account",
       "We received a request to sign in to your {appName} account. Select the button below to continue.",
       { appName },
     ),
   );
   const footer = await resolveText(
     t(
-      "c99d7d8ebb54",
+      "email_all_rights_reserved",
       "© {currentYear}{appName}, {companyName}. All rights reserved. | {formattedDate}",
       {
         currentYear,
@@ -174,7 +174,7 @@ async function createMagicLinkEmailCopy({
   const deviceLine =
     deviceInfo?.browser && deviceInfo.os
       ? await resolveText(
-          t("5b8ceb90d76a", "Device: {browser} on {os}", {
+          t("email_device", "Device: {browser} on {os}", {
             browser: deviceInfo.browser,
             os: deviceInfo.os,
           }),
@@ -182,7 +182,7 @@ async function createMagicLinkEmailCopy({
       : "";
   const locationLine = deviceInfo?.location
     ? await resolveText(
-        t("78a42b99e1c7", "Location: {location} (approximate)", {
+        t("email_location_approximate", "Location: {location} (approximate)", {
           location: deviceInfo.location,
         }),
       )
@@ -190,27 +190,30 @@ async function createMagicLinkEmailCopy({
 
   return {
     preview,
-    heading: t("e0193ab6916d", "Access your account securely"),
-    intro: t("580361ef9c77", "Use the link below to finish signing in."),
-    greeting: t("c1e7f10203d5", "Hello,"),
+    heading: t("email_access_account_securely", "Access your account securely"),
+    intro: t(
+      "email_use_link_below_finish_signing_in",
+      "Use the link below to finish signing in.",
+    ),
+    greeting: t("email_hello", "Hello,"),
     requestDetails,
-    cta: t("41a27364d337", "Open sign-in link"),
+    cta: t("email_open_sign_in_link", "Open sign-in link"),
     securityReminder: await resolveText(
       t(
-        "5b8eb59cbe7a",
+        "email_security_reminder_link_expires_in_minutes",
         "Security reminder: This link expires in {minutes} minutes. If you did not request it, you can safely ignore this message.",
         { minutes: MAGIC_LINK_TTL_SECONDS / 60 },
       ),
     ),
     fallback: t(
-      "79f9112819d8",
+      "email_if_button_doesnt_work_you_can",
       "If the button doesn't work, you can copy and paste this link into your browser:",
     ),
-    sentToLabel: t("47e283e92be3", "Sent to"),
+    sentToLabel: t("email_sent", "Sent to"),
     footer,
     deviceDetailsTitle:
       deviceInfo?.browser || deviceInfo?.location
-        ? t("eef4d90780f4", "Sign-in request details")
+        ? t("email_sign_in_request_details", "Sign-in request details")
         : undefined,
     deviceLine: deviceLine || undefined,
     locationLine: locationLine || undefined,
@@ -244,7 +247,7 @@ export async function sendMagicLink(
       }),
     ]);
     const subject = await resolveText(
-      t("7f6896e52a0f", "Your secure sign-in link for {appName}", {
+      t("email_secure_sign_in_link", "Your secure sign-in link for {appName}", {
         appName: APP_NAME,
       }),
     );

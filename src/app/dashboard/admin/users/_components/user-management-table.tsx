@@ -48,11 +48,11 @@ function RoleLabel({ role }: { role: UserRole }) {
   const { t } = useTranslation();
   switch (role) {
     case "user":
-      return <>{t("6ccd40cf07d2", "User")}</>;
+      return <>{t("common_user", "User")}</>;
     case "admin":
-      return <>{t("8881841729d7", "Admin")}</>;
+      return <>{t("common_admin", "Admin")}</>;
     case "super_admin":
-      return <>{t("9d7302206bac", "Super Admin")}</>;
+      return <>{t("common_super_admin", "Super Admin")}</>;
     default:
       return null;
   }
@@ -191,7 +191,7 @@ export function UserManagementTable({
   }> = [
     {
       key: "user",
-      label: <>{t("b13c2002ce98", "User")}</>,
+      label: <>{t("admin_user", "User")}</>,
       render: (user) => (
         <UserAvatarCell
           name={user.name}
@@ -202,7 +202,7 @@ export function UserManagementTable({
     },
     {
       key: "role",
-      label: <>{t("7c471349e453", "Role")}</>,
+      label: <>{t("admin_role", "Role")}</>,
       render: (user) => (
         <Badge
           className="capitalize"
@@ -218,7 +218,7 @@ export function UserManagementTable({
     },
     {
       key: "emailStatus",
-      label: <>{t("d2d35a96df12", "Email Status")}</>,
+      label: <>{t("admin_email_status", "Email Status")}</>,
       render: (user) => (
         <Badge variant={user.emailVerified ? "outline" : "default"}>
           <EmailStatusLabel verified={user.emailVerified} />
@@ -227,7 +227,7 @@ export function UserManagementTable({
     },
     {
       key: "access",
-      label: <>{t("150cb0cd9a70", "Access")}</>,
+      label: <>{t("admin_access", "Access")}</>,
       render: (user) => (
         <Badge variant={user.banned ? "destructive" : "outline"}>
           <AccessStatusLabel banned={user.banned} />
@@ -236,12 +236,12 @@ export function UserManagementTable({
     },
     {
       key: "createdAt",
-      label: <>{t("a90ad802d086", "Joined")}</>,
+      label: <>{t("admin_joined", "Joined")}</>,
       render: (user) => formatDate(user.createdAt),
     },
     {
       key: "actions",
-      label: <>{t("f97a37a5f4b9", "Actions")}</>,
+      label: <>{t("admin_actions", "Actions")}</>,
       render: (user) => (
         <Button variant="ghost" size="sm" onClick={() => handleEditUser(user)}>
           <Edit className="h-4 w-4" />
@@ -252,7 +252,7 @@ export function UserManagementTable({
   const roleFilterOptions = [
     {
       value: "all",
-      label: <>{t("6417d4cefe2a", "All Roles")}</>,
+      label: <>{t("admin_all_roles", "All Roles")}</>,
     },
     ...userRoleEnum.enumValues.map((role) => ({
       value: role,
@@ -271,13 +271,18 @@ export function UserManagementTable({
         filterValue={roleFilter}
         onFilterChange={handleRoleFilter}
         filterOptions={roleFilterOptions}
-        filterPlaceholder={<>{t("e1f6bb9bc5e7", "Filter by role")}</>}
+        filterPlaceholder={<>{t("admin_filter_role", "Filter by role")}</>}
         pagination={pagination}
         onPageChange={handlePageChange}
         searchPlaceholder={
-          <>{t("b7b2eb172b0e", "Search users by name or email...")}</>
+          <>
+            {t(
+              "admin_search_users_name_email",
+              "Search users by name or email...",
+            )}
+          </>
         }
-        emptyMessage={<>{t("dc923d92538d", "No users found")}</>}
+        emptyMessage={<>{t("admin_no_users_found", "No users found")}</>}
       />
       <Dialog
         open={!!editingUser}
@@ -285,10 +290,10 @@ export function UserManagementTable({
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{t("3f72daf5f969", "Edit User")}</DialogTitle>
+            <DialogTitle>{t("admin_edit_user", "Edit User")}</DialogTitle>
             <DialogDescription>
               {t(
-                "f0f4e1a0a928",
+                "admin_modify_user_details_role_access_status",
                 "Modify user details, role, and access status.",
               )}
             </DialogDescription>
@@ -297,7 +302,7 @@ export function UserManagementTable({
             <div className="grid gap-4 py-4">
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="name" className="text-right">
-                  {t("21f727133895", "Name")}
+                  {t("admin_name", "Name")}
                 </Label>
                 <Input
                   id="name"
@@ -313,7 +318,7 @@ export function UserManagementTable({
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="role" className="text-right">
-                  {t("7c471349e453", "Role")}
+                  {t("admin_role", "Role")}
                 </Label>
                 <Select
                   value={editingUser.role}
@@ -338,7 +343,7 @@ export function UserManagementTable({
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label className="text-right">
-                  {t("150cb0cd9a70", "Access")}
+                  {t("admin_access", "Access")}
                 </Label>
                 <div className="col-span-3 flex items-center gap-3">
                   <Badge
@@ -364,9 +369,9 @@ export function UserManagementTable({
               >
                 {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 {editingUser.banned ? (
-                  <>{t("499435f34ebc", "Enable User")}</>
+                  <>{t("admin_enable_user", "Enable User")}</>
                 ) : (
-                  <>{t("db302291fb48", "Disable User")}</>
+                  <>{t("admin_disable_user", "Disable User")}</>
                 )}
               </Button>
             )}
@@ -375,10 +380,10 @@ export function UserManagementTable({
               onClick={() => setEditingUser(null)}
               disabled={isPending}
             >
-              {t("092e223f8cee", "Cancel")}
+              {t("admin_cancel", "Cancel")}
             </Button>
             <Button onClick={handleUpdateUser} disabled={isPending}>
-              {t("0e370f9af63b", "{expression0} Save Changes", {
+              {t("admin_save_changes", "{expression0} Save Changes", {
                 expression0: isPending && (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ),

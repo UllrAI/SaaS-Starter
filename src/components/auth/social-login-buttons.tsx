@@ -155,7 +155,7 @@ function SocialLoginPendingLabel({
     <span className="flex items-center gap-2">
       <Loader2 className="h-4 w-4 animate-spin" />
       <span>
-        {t("500f8b068867", "Redirecting to {expression0}...", {
+        {t("auth_redirecting", "Redirecting to {expression0}...", {
           expression0: provider.name,
         })}
       </span>
@@ -174,7 +174,7 @@ function SocialLoginDefaultLabel({
     <span className="flex items-center gap-3">
       <IconComponent className="h-5 w-5" />
       <span className="font-medium">
-        {t("6233922e4f71", "Continue with {expression0}", {
+        {t("auth_continue", "Continue with {expression0}", {
           expression0: provider.name,
         })}
       </span>

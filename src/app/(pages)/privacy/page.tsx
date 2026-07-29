@@ -23,24 +23,24 @@ export async function buildPrivacyMetadata(locale: SupportedLocale) {
   });
   return {
     ...metadata,
-    title: t("3241be1d593e", "Privacy Policy"),
+    title: t("legal_privacy_policy", "Privacy Policy"),
     description: t(
-      "f246eba3dfa3",
+      "legal_learn_how_we_collect_use_protect",
       "Learn how we collect, use, and protect your personal information.",
     ),
     openGraph: {
       ...metadata.openGraph,
-      title: t("fada1f837d85", "Privacy Policy"),
+      title: t("legal_privacy_policy", "Privacy Policy"),
       description: t(
-        "b4f31d63dabc",
+        "legal_learn_how_we_collect_use_protect",
         "Learn how we collect, use, and protect your personal information.",
       ),
     },
     twitter: {
       ...metadata.twitter,
-      title: t("80b31617d830", "Privacy Policy"),
+      title: t("legal_privacy_policy", "Privacy Policy"),
       description: t(
-        "b80322b6f433",
+        "legal_learn_how_we_collect_use_protect",
         "Learn how we collect, use, and protect your personal information.",
       ),
     },
@@ -58,106 +58,194 @@ export default function PrivacyPage({
   const privacySections = [
     {
       id: "information-collection",
-      title: <>{t("938df6ba7b69", "Information We Collect")}</>,
+      title: <>{t("legal_information_we_collect", "Information We Collect")}</>,
       items: [
-        <>{t("23dfa7edf67f", "Account information (name, email, password)")}</>,
-        <>{t("e62f1fc1725b", "Usage data and analytics")}</>,
-        <>{t("54db075a234c", "Device and browser information")}</>,
         <>
           {t(
-            "a794f7530555",
+            "legal_account_information_name_email_password",
+            "Account information (name, email, password)",
+          )}
+        </>,
+        <>{t("legal_usage_data_analytics", "Usage data and analytics")}</>,
+        <>
+          {t(
+            "legal_device_browser_information",
+            "Device and browser information",
+          )}
+        </>,
+        <>
+          {t(
+            "legal_payment_information_processed_securely_providers",
             "Payment information (processed securely by our payment providers)",
           )}
         </>,
-        <>{t("648d61af9dc8", "Communications with our support team")}</>,
+        <>
+          {t(
+            "legal_communications_support_team",
+            "Communications with our support team",
+          )}
+        </>,
       ],
     },
     {
       id: "information-use",
-      title: <>{t("04137d52bcda", "How We Use Your Information")}</>,
+      title: (
+        <>{t("legal_how_we_use_information", "How We Use Your Information")}</>
+      ),
       items: [
-        <>{t("f3e181d15d2a", "Provide and maintain our services")}</>,
         <>
           {t(
-            "1f516ca4ec6e",
+            "legal_provide_maintain_services",
+            "Provide and maintain our services",
+          )}
+        </>,
+        <>
+          {t(
+            "legal_process_transactions_send_related_information",
             "Process transactions and send related information",
           )}
         </>,
-        <>{t("24a062f61a1b", "Send technical notices and support messages")}</>,
         <>
-          {t("00c1cd3bf46e", "Improve our services and develop new features")}
+          {t(
+            "legal_send_technical_notices_support_messages",
+            "Send technical notices and support messages",
+          )}
         </>,
-        <>{t("f69042a96f8b", "Comply with legal obligations")}</>,
+        <>
+          {t(
+            "legal_improve_services_develop_new_features",
+            "Improve our services and develop new features",
+          )}
+        </>,
+        <>
+          {t("legal_comply_legal_obligations", "Comply with legal obligations")}
+        </>,
       ],
     },
     {
       id: "information-sharing",
-      title: <>{t("1062bfa4f0ab", "Information Sharing")}</>,
+      title: <>{t("legal_information_sharing", "Information Sharing")}</>,
       items: [
-        <>{t("b1c94c5e73dc", "We do not sell your personal information")}</>,
         <>
-          {t("f796b939ddff", "Service providers who assist in our operations")}
+          {t(
+            "legal_we_do_not_sell_personal_information",
+            "We do not sell your personal information",
+          )}
         </>,
-        <>{t("aa6fa6a5315e", "Legal compliance when required by law")}</>,
-        <>{t("553f1c5bc60d", "Business transfers (mergers, acquisitions)")}</>,
-        <>{t("ceb4a569a23b", "With your explicit consent")}</>,
+        <>
+          {t(
+            "legal_service_providers_who_assist_in_operations",
+            "Service providers who assist in our operations",
+          )}
+        </>,
+        <>
+          {t(
+            "legal_compliance_when_required_law",
+            "Legal compliance when required by law",
+          )}
+        </>,
+        <>
+          {t(
+            "legal_business_transfers_mergers_acquisitions",
+            "Business transfers (mergers, acquisitions)",
+          )}
+        </>,
+        <>{t("legal_explicit_consent", "With your explicit consent")}</>,
       ],
     },
     {
       id: "data-security",
-      title: <>{t("be7b4656abf0", "Data Security")}</>,
+      title: <>{t("legal_data_security", "Data Security")}</>,
       items: [
         <>
           {t(
-            "a2927f0b5927",
+            "legal_industry_standard_encryption_data_in_transit",
             "Industry-standard encryption for data in transit and at rest",
           )}
         </>,
-        <>{t("d2b19d96c5e2", "Regular security audits and assessments")}</>,
-        <>{t("949d2a3a6370", "Access controls and authentication measures")}</>,
-        <>{t("495f2e0bd665", "Secure data centers with physical security")}</>,
-        <>{t("bd0e1a550839", "Employee training on data protection")}</>,
+        <>
+          {t(
+            "legal_regular_security_audits_assessments",
+            "Regular security audits and assessments",
+          )}
+        </>,
+        <>
+          {t(
+            "legal_access_controls_authentication_measures",
+            "Access controls and authentication measures",
+          )}
+        </>,
+        <>
+          {t(
+            "legal_secure_data_centers_physical_security",
+            "Secure data centers with physical security",
+          )}
+        </>,
+        <>
+          {t(
+            "legal_employee_training_data_protection",
+            "Employee training on data protection",
+          )}
+        </>,
       ],
     },
     {
       id: "your-rights",
-      title: <>{t("4e394d5a10fb", "Your Rights")}</>,
+      title: <>{t("legal_rights", "Your Rights")}</>,
       items: [
-        <>{t("328c643c1ef7", "Access your personal information")}</>,
-        <>{t("4bb8bf12a89e", "Correct inaccurate information")}</>,
-        <>{t("d1a9241a8d89", "Delete your account and data")}</>,
-        <>{t("741c4509b2de", "Export your data")}</>,
-        <>{t("9bf75005d1be", "Opt-out of marketing communications")}</>,
+        <>
+          {t(
+            "legal_access_personal_information",
+            "Access your personal information",
+          )}
+        </>,
+        <>
+          {t(
+            "legal_correct_inaccurate_information",
+            "Correct inaccurate information",
+          )}
+        </>,
+        <>{t("legal_delete_account_data", "Delete your account and data")}</>,
+        <>{t("legal_export_data", "Export your data")}</>,
+        <>
+          {t(
+            "legal_opt_out_marketing_communications",
+            "Opt-out of marketing communications",
+          )}
+        </>,
       ],
     },
     {
       id: "data-retention",
-      title: <>{t("4ba8a78738cc", "Data Retention")}</>,
+      title: <>{t("legal_data_retention", "Data Retention")}</>,
       items: [
         <>
           {t(
-            "8a6dede22cd7",
+            "legal_account_data_retained_while_active",
             "Account data: Retained while your account is active",
           )}
         </>,
         <>
           {t(
-            "dc7e3e511c0f",
+            "legal_usage_data_retained_up_2_years",
             "Usage data: Retained for up to 2 years for analytics",
           )}
         </>,
         <>
-          {t("c4285857175a", "Support communications: Retained for 3 years")}
+          {t(
+            "legal_support_communications_retained_3_years",
+            "Support communications: Retained for 3 years",
+          )}
         </>,
         <>
           {t(
-            "01f5582e89f0",
+            "legal_compliance_as_required_applicable_laws",
             "Legal compliance: As required by applicable laws",
           )}
         </>,
         <>
           {t(
-            "f1c3b9a31f33",
+            "legal_deleted_data_permanently_removed_within_30",
             "Deleted data: Permanently removed within 30 days",
           )}
         </>,
@@ -173,23 +261,33 @@ export default function PrivacyPage({
             <Badge className="border-border bg-background/50 inline-flex items-center border px-3 py-1 text-sm backdrop-blur-sm">
               <Shield className="text-muted-foreground mr-2 h-3 w-3" />
               <span className="text-muted-foreground font-mono">
-                {t("abf77699d9da", "PRIVACY.md")}
+                {t("legal_privacy_md", "PRIVACY.md")}
               </span>
             </Badge>
           }
         >
           <PageIntroHeading>
-            {t("40b4715cf695", "Privacy Policy")}
+            {t("legal_privacy_policy", "Privacy Policy")}
           </PageIntroHeading>
           <PageIntroDescription className="mb-10">
             {t(
-              "4a613b579c0b",
+              "legal_we_committed_protecting_privacy_ensuring_security",
               "We are committed to protecting your privacy and ensuring the security of your personal information. This policy explains how we collect, use, and safeguard your data.",
             )}
           </PageIntroDescription>
           <div className="text-muted-foreground text-sm">
-            <p>{t("3f11649275f6", "Last updated: December 2024")}</p>
-            <p>{t("67dd0961970d", "Effective: December 1, 2024")}</p>
+            <p>
+              {t(
+                "legal_last_updated_december_2024",
+                "Last updated: December 2024",
+              )}
+            </p>
+            <p>
+              {t(
+                "legal_effective_december_1_2024",
+                "Effective: December 1, 2024",
+              )}
+            </p>
           </div>
         </PageIntro>
 
@@ -215,37 +313,37 @@ export default function PrivacyPage({
 
         <div className="mt-12">
           <h2 className="mb-4 text-2xl font-semibold">
-            {t("91ccd992e4c7", "Questions About This Policy?")}
+            {t("legal_questions_about_policy", "Questions About This Policy?")}
           </h2>
           <p className="text-muted-foreground mb-4">
             {t(
-              "b90889e8adc8",
+              "legal_if_you_have_any_questions_about_privacy",
               "If you have any questions about this Privacy Policy or our data practices, please don't hesitate to contact us.",
             )}
           </p>
           <div className="text-muted-foreground space-y-2 text-sm">
             <p>
-              <strong>{t("2318e79598d2", "Email:")}</strong> {PRIVACY_EMAIL}
+              <strong>{t("legal_email", "Email:")}</strong> {PRIVACY_EMAIL}
             </p>
             <p>
-              <strong>{t("7ba1a8e44572", "Support:")}</strong>{" "}
+              <strong>{t("legal_support", "Support:")}</strong>{" "}
               <Link
                 href="/contact"
                 locale={locale}
                 className="underline underline-offset-4"
               >
-                {t("3f5b18c72fe6", "Contact page")}
+                {t("legal_contact_page", "Contact page")}
               </Link>
             </p>
             <p>
-              <strong>{t("8ff6377c16e1", "Community:")}</strong>{" "}
+              <strong>{t("legal_community", "Community:")}</strong>{" "}
               <a
                 href={GITHUB_DISCUSSIONS_URL}
                 target="_blank"
                 rel="noreferrer"
                 className="underline underline-offset-4"
               >
-                {t("b81153d4b0b3", "GitHub Discussions")}
+                {t("legal_git_hub_discussions", "GitHub Discussions")}
               </a>
             </p>
           </div>
@@ -254,7 +352,7 @@ export default function PrivacyPage({
         <div className="text-muted-foreground mt-12 border-t pt-8 text-center text-sm">
           <p>
             {t(
-              "d3eff3488090",
+              "legal_privacy_policy_governed_laws_united_states",
               "This Privacy Policy is governed by the laws of the United States. We reserve the right to update this policy at any time. Material changes will be communicated via email or through our service.",
             )}
           </p>

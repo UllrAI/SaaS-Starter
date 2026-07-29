@@ -140,7 +140,7 @@ export function SubscriptionManagementTable({
   }> = [
     {
       key: "user",
-      label: <>{t("2fd5139478b6", "User")}</>,
+      label: <>{t("admin_user", "User")}</>,
       render: (sub) => (
         <UserAvatarCell
           name={sub.user?.name}
@@ -151,12 +151,12 @@ export function SubscriptionManagementTable({
     },
     {
       key: "plan",
-      label: <>{t("26c0caae43e2", "Plan")}</>,
+      label: <>{t("admin_plan", "Plan")}</>,
       render: (sub) => <div className="font-medium">{sub.planName}</div>,
     },
     {
       key: "status",
-      label: <>{t("9b86c85c7bea", "Status")}</>,
+      label: <>{t("admin_status", "Status")}</>,
       render: (sub) => (
         <Badge
           variant={getStatusBadgeVariant(sub.status)}
@@ -168,7 +168,7 @@ export function SubscriptionManagementTable({
     },
     {
       key: "period",
-      label: <>{t("075acad5a68c", "Current Period")}</>,
+      label: <>{t("admin_current_period", "Current Period")}</>,
       render: (sub) => (
         <div className="flex items-center gap-1 text-sm">
           <Calendar className="h-3 w-3" />
@@ -181,7 +181,7 @@ export function SubscriptionManagementTable({
     },
     {
       key: "actions",
-      label: <>{t("37af94806549", "Actions")}</>,
+      label: <>{t("admin_actions", "Actions")}</>,
       render: (sub) => (
         <Button
           variant="outline"
@@ -198,7 +198,7 @@ export function SubscriptionManagementTable({
   const statusFilterOptions = [
     {
       value: "all",
-      label: <>{t("635fd8dd282f", "All Statuses")}</>,
+      label: <>{t("admin_all_statuses", "All Statuses")}</>,
     },
     {
       value: "active",
@@ -241,7 +241,7 @@ export function SubscriptionManagementTable({
         searchPlaceholder={
           <>
             {t(
-              "95762e04faa9",
+              "admin_search_user_name_email_subscription_id",
               "Search by user name, email, or subscription ID...",
             )}
           </>
@@ -249,10 +249,12 @@ export function SubscriptionManagementTable({
         filterValue={statusFilter}
         onFilterChange={handleStatusFilter}
         filterOptions={statusFilterOptions}
-        filterPlaceholder={<>{t("a16185256691", "Filter by status")}</>}
+        filterPlaceholder={<>{t("admin_filter_status", "Filter by status")}</>}
         pagination={pagination}
         onPageChange={handlePageChange}
-        emptyMessage={<>{t("bfa63c6ce393", "No subscriptions found")}</>}
+        emptyMessage={
+          <>{t("admin_no_subscriptions_found", "No subscriptions found")}</>
+        }
       />
       <Dialog
         open={!!cancellingSubscription}
@@ -261,11 +263,11 @@ export function SubscriptionManagementTable({
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {t("4f1689f83c9f", "Cancel Subscription")}
+              {t("admin_cancel_subscription", "Cancel Subscription")}
             </DialogTitle>
             <DialogDescription>
               {t(
-                "d6873b62f007",
+                "admin_you_sure_want_cancel_subscription_action",
                 "Are you sure you want to cancel the subscription for <strong0>{expression0}</strong0>? This action is irreversible.",
                 {
                   expression0:
@@ -284,18 +286,22 @@ export function SubscriptionManagementTable({
               onClick={() => setCancellingSubscription(null)}
               disabled={isPending}
             >
-              {t("be6fb3171b20", "Back")}
+              {t("admin_back", "Back")}
             </Button>
             <Button
               variant="destructive"
               onClick={confirmCancelSubscription}
               disabled={isPending}
             >
-              {t("063b2e3c90d9", "{expression0} Confirm Cancellation", {
-                expression0: isPending && (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ),
-              })}
+              {t(
+                "admin_confirm_cancellation",
+                "{expression0} Confirm Cancellation",
+                {
+                  expression0: isPending && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ),
+                },
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>

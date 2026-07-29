@@ -5,24 +5,33 @@ export async function generateMetadata() {
   const metadata = createMetadataDefaults({ locale });
   return {
     ...metadata,
-    title: t("e314d9b15e50", "Check Your Email - Magic Link Sent"),
+    title: t(
+      "auth_check_email_magic_link_sent_title",
+      "Check Your Email - Magic Link Sent",
+    ),
     description: t(
-      "b4132032f9d3",
+      "auth_weve_sent_you_secure_magic_link_description",
       "We've sent you a secure magic link to access your account",
     ),
     openGraph: {
       ...metadata.openGraph,
-      title: t("41a7e211067d", "Check Your Email - Magic Link Sent"),
+      title: t(
+        "auth_check_email_magic_link_sent",
+        "Check Your Email - Magic Link Sent",
+      ),
       description: t(
-        "7902b7da7743",
+        "auth_weve_sent_you_secure_magic_link",
         "We've sent you a secure magic link to access your account",
       ),
     },
     twitter: {
       ...metadata.twitter,
-      title: t("a1604782a623", "Check Your Email - Magic Link Sent"),
+      title: t(
+        "auth_check_email_magic_link_sent",
+        "Check Your Email - Magic Link Sent",
+      ),
       description: t(
-        "18eba6f4493c",
+        "auth_weve_sent_you_secure_magic_link",
         "We've sent you a secure magic link to access your account",
       ),
     },

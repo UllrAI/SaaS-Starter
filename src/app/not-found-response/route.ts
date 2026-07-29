@@ -20,9 +20,11 @@ function escapeHtml(value: string): string {
 }
 
 export function GET() {
-  const title = escapeHtml(enMessages["20cd73fb1bec"]);
-  const description = escapeHtml(enMessages["b1c2f0f90a10"]);
-  const homeLabel = escapeHtml(enMessages["12b611abe60d"]);
+  const title = escapeHtml(enMessages["common_page_not_found"]);
+  const description = escapeHtml(
+    enMessages["common_page_youre_looking_doesnt_exist_has"],
+  );
+  const homeLabel = escapeHtml(enMessages["common_back_home"]);
   const appName = escapeHtml(APP_NAME);
   const html = `<!doctype html>
 <html lang="en">

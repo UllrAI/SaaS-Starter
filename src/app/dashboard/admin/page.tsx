@@ -14,24 +14,24 @@ export async function generateMetadata() {
   const metadata = createMetadataDefaults({ locale });
   return {
     ...metadata,
-    title: t("37d73939b141", "Admin Dashboard"),
+    title: t("admin_dashboard", "Admin Dashboard"),
     description: t(
-      "12651cacfe25",
+      "admin_administrative_dashboard_managing_users_payments_system",
       "Administrative dashboard for managing users, payments, and system overview",
     ),
     openGraph: {
       ...metadata.openGraph,
-      title: t("3048738f6fa1", "Admin Dashboard"),
+      title: t("admin_dashboard", "Admin Dashboard"),
       description: t(
-        "0585a9e57284",
+        "admin_administrative_dashboard_managing_users_payments_system",
         "Administrative dashboard for managing users, payments, and system overview",
       ),
     },
     twitter: {
       ...metadata.twitter,
-      title: t("279d4eb24790", "Admin Dashboard"),
+      title: t("admin_dashboard", "Admin Dashboard"),
       description: t(
-        "0cc09ff244d3",
+        "admin_administrative_dashboard_managing_users_payments_system",
         "Administrative dashboard for managing users, payments, and system overview",
       ),
     },
@@ -46,7 +46,9 @@ export default async function AdminDashboardPage() {
   ]);
   const { charts, ...summaryStats } = statsWithCharts as AdminStatsWithCharts;
   return (
-    <DashboardPageWrapper title={<>{t("c9620383eb1a", "Admin Dashboard")}</>}>
+    <DashboardPageWrapper
+      title={<>{t("admin_dashboard_page", "Admin Dashboard")}</>}
+    >
       <AdminStatsCards stats={summaryStats} locale={locale} />
       <AdminDashboardCharts charts={charts} />
     </DashboardPageWrapper>

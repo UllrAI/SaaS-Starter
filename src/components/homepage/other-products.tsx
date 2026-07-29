@@ -27,7 +27,7 @@ export function OtherProducts({
       description: (
         <>
           {t(
-            "d6b8d375c5bc",
+            "home_remove_backgrounds_in_seconds_ai_assisted",
             "Remove backgrounds in seconds with AI-assisted image cleanup.",
           )}
         </>
@@ -41,14 +41,14 @@ export function OtherProducts({
       description: (
         <>
           {t(
-            "80cccd38ac5e",
+            "home_generate_polished_headshots_team_profiles_resumes",
             "Generate polished headshots for team profiles, resumes, and listings.",
           )}
         </>
       ),
       url: "https://headshots.fun/",
       icon: Sparkles,
-      badgeLabel: <>{t("1d3868f3dfb7", "Open Source")}</>,
+      badgeLabel: <>{t("home_open_source", "Open Source")}</>,
     },
     {
       id: "to-markdown",
@@ -56,7 +56,7 @@ export function OtherProducts({
       description: (
         <>
           {t(
-            "8b941c177f1c",
+            "home_convert_docs_web_pages_into_markdown",
             "Convert docs and web pages into Markdown you can actually edit.",
           )}
         </>
@@ -70,7 +70,7 @@ export function OtherProducts({
       description: (
         <>
           {t(
-            "52a5d9e108e5",
+            "home_track_daily_product_creator_trends_simpler",
             "Track daily product and creator trends with a simpler research loop.",
           )}
         </>
@@ -84,7 +84,7 @@ export function OtherProducts({
       description: (
         <>
           {t(
-            "f9982c7ba3a2",
+            "home_generate_open_graph_images_social_cards",
             "Generate open graph images for social cards and link previews.",
           )}
         </>
@@ -98,7 +98,7 @@ export function OtherProducts({
       description: (
         <>
           {t(
-            "ae618543bc04",
+            "home_browse_transparent_png_assets_quick_mockups",
             "Browse transparent PNG assets for quick mockups and landing pages.",
           )}
         </>
@@ -113,15 +113,15 @@ export function OtherProducts({
         <div className="mx-auto max-w-3xl text-center">
           <Badge variant="outline" className="border-primary text-primary mb-4">
             <FlaskConical className="mr-2 h-3 w-3" />
-            <>{t("64645eb3fdf5", "UllrAI Lab")}</>
+            <>{t("home_ullrai_lab", "UllrAI Lab")}</>
           </Badge>
           <h2 className="text-foreground text-3xl font-bold tracking-tight sm:text-4xl">
-            <>{t("c55a15163bdf", "Explore the rest of the lab")}</>
+            <>{t("home_explore_rest_lab", "Explore the rest of the lab")}</>
           </h2>
           <p className="text-muted-foreground mt-4 text-lg leading-8">
             <>
               {t(
-                "9c0cb1bfe2e3",
+                "home_adjacent_products_same_team_each_focused",
                 "Adjacent products from the same team, each focused on a narrower workflow than the starter itself.",
               )}
             </>
@@ -178,12 +178,14 @@ export function OtherProducts({
         </div>
 
         <p className="text-muted-foreground mt-10 text-center text-sm">
-          <>{t("ef698bbd8a3d", "Have an idea for another tool?")}</>
+          <>
+            {t("home_have_idea_another_tool", "Have an idea for another tool?")}
+          </>
           <a
             href="mailto:support@ullrai.com"
             className="text-primary ml-2 font-bold hover:underline"
           >
-            <>{t("0cc3f6c614a0", "Let us know")}</>
+            <>{t("home_let_us_know", "Let us know")}</>
           </a>
         </p>
       </SectionContainer>

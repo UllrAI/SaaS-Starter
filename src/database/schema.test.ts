@@ -152,11 +152,11 @@ describe("Database Schema", () => {
       expect(sessions).toHaveProperty("updatedAt");
       expect(sessions).toHaveProperty("ipAddress");
       expect(sessions).toHaveProperty("userAgent");
-      expect(sessions).toHaveProperty("os");
-      expect(sessions).toHaveProperty("browser");
-      expect(sessions).toHaveProperty("deviceType");
       expect(sessions).toHaveProperty("impersonatedBy");
       expect(sessions).toHaveProperty("userId");
+      expect(sessions).not.toHaveProperty("os");
+      expect(sessions).not.toHaveProperty("browser");
+      expect(sessions).not.toHaveProperty("deviceType");
     });
 
     it("should have proper column constraints", () => {
@@ -1279,9 +1279,6 @@ describe("Database Schema", () => {
       expect(sessions.updatedAt).toBeDefined();
       expect(sessions.ipAddress).toBeDefined();
       expect(sessions.userAgent).toBeDefined();
-      expect(sessions.os).toBeDefined();
-      expect(sessions.browser).toBeDefined();
-      expect(sessions.deviceType).toBeDefined();
       expect(sessions.userId).toBeDefined();
 
       // Test verifications table creation (line 74-81)

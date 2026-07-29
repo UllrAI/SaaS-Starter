@@ -52,10 +52,6 @@ export const sessions = pgTable(
     updatedAt: timestamp("updatedAt").notNull(),
     ipAddress: text("ipAddress"),
     userAgent: text("userAgent"),
-    // Pre-parsed userAgent fields for performance optimization
-    os: text("os"),
-    browser: text("browser"),
-    deviceType: text("deviceType"),
     impersonatedBy: text("impersonatedBy"),
     userId: text("userId")
       .notNull()

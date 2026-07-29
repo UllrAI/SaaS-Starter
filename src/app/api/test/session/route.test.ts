@@ -85,6 +85,8 @@ const originalEnv = {
   E2E_TEST_MODE: process.env.E2E_TEST_MODE,
   E2E_TEST_SECRET: process.env.E2E_TEST_SECRET,
   PLAYWRIGHT: process.env.PLAYWRIGHT,
+  DATABASE_URL: process.env.DATABASE_URL,
+  E2E_DATABASE_URL: process.env.E2E_DATABASE_URL,
   NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
   NODE_ENV: process.env.NODE_ENV,
   VERCEL_ENV: process.env.VERCEL_ENV,
@@ -133,6 +135,9 @@ describe("POST /api/test/session", () => {
     process.env.E2E_TEST_MODE = "true";
     process.env.E2E_TEST_SECRET = VALID_SECRET;
     process.env.PLAYWRIGHT = "true";
+    process.env.DATABASE_URL =
+      "postgresql://postgres:postgres@localhost:5432/saas_e2e";
+    process.env.E2E_DATABASE_URL = process.env.DATABASE_URL;
     process.env.NEXT_PUBLIC_APP_URL = "http://127.0.0.1:3100";
     delete process.env.VERCEL_ENV;
     setNodeEnv("test");
@@ -144,6 +149,8 @@ describe("POST /api/test/session", () => {
     restoreEnvValue("E2E_TEST_MODE");
     restoreEnvValue("E2E_TEST_SECRET");
     restoreEnvValue("PLAYWRIGHT");
+    restoreEnvValue("DATABASE_URL");
+    restoreEnvValue("E2E_DATABASE_URL");
     restoreEnvValue("NEXT_PUBLIC_APP_URL");
     restoreEnvValue("VERCEL_ENV");
     if (originalEnv.NODE_ENV === undefined) {

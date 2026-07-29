@@ -279,10 +279,14 @@ This repository includes a Playwright smoke test suite in `e2e/` for the most im
 Run the suite with:
 
 ```bash
+createdb saas_e2e
+# Add E2E_DATABASE_URL=postgresql://.../saas_e2e to .env
 pnpm test:e2e
 ```
 
-The Playwright runner starts the production server through `pnpm start` and enables a test-only session route with `E2E_TEST_MODE=true`. That route requires an explicit `E2E_TEST_SECRET` of at least 32 characters, signs the test cookie with that secret, and is disabled for non-local production deployments. Playwright generates a per-run secret when one is not provided by CI.
+`E2E_DATABASE_URL` is mandatory and must point to a dedicated local PostgreSQL database whose name contains a standalone `e2e` or `test` segment. Outside CI, the runner rejects the regular `DATABASE_URL` to prevent test users, API keys, CLI tokens, device codes, and rate-limit state from reaching a development or shared database. It applies migrations, builds the app, starts the production server, and cleans E2E fixtures before and after the suite.
+
+The test-only session route is enabled only while Playwright is running against the declared E2E database. It also requires an explicit `E2E_TEST_SECRET` of at least 32 characters and is disabled for non-local production deployments. Playwright generates a per-run secret when CI does not provide one.
 
 #### Bundle Analysis Scripts
 

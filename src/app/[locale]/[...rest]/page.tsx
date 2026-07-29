@@ -18,9 +18,9 @@ export async function generateMetadata({
   const { t } = getStaticTranslations(locale);
 
   return {
-    title: t("20cd73fb1bec", "Page Not Found"),
+    title: t("common_page_not_found", "Page Not Found"),
     description: t(
-      "b1c2f0f90a10",
+      "common_page_youre_looking_doesnt_exist_has",
       "The page you're looking for doesn't exist or has been moved. Let's get you back on track.",
     ),
     robots: {

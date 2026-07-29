@@ -21,12 +21,12 @@ export default function GlobalError({
         <main className="flex min-h-screen items-center justify-center p-6">
           <div className="max-w-md space-y-4 text-center">
             <h1 className="text-2xl font-semibold">
-              {messages["8af07acd4b9c"]}
+              {messages["common_application_error"]}
             </h1>
             <p className="text-muted-foreground text-sm">
-              {messages["7c992548946c"]}
+              {messages["common_app_encountered_fatal_error_please_retry"]}
             </p>
-            <Button onClick={reset}>{messages["06fe531548c7"]}</Button>
+            <Button onClick={reset}>{messages["common_reload"]}</Button>
           </div>
         </main>
       </body>

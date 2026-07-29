@@ -71,34 +71,34 @@ export function Footer({
   const sections: FooterSection[] = [
     {
       id: "product",
-      title: t("fd84b85a910b", "Product"),
+      title: t("home_product", "Product"),
       links: [
         {
           id: "features",
           href: withLocalePrefix("/features", locale),
-          label: t("9115d6ccbd95", "Features"),
+          label: t("home_features", "Features"),
         },
         {
           id: "pricing",
           href: withLocalePrefix("/pricing", locale),
-          label: t("5c4bdfc16060", "Pricing"),
+          label: t("home_pricing", "Pricing"),
         },
         {
           id: "blog",
           href: withLocalePrefix("/blog", locale),
-          label: t("6bb7a2815ca5", "Blog"),
+          label: t("home_blog", "Blog"),
         },
         {
           id: "changelog",
           href: GITHUB_RELEASES_URL,
-          label: t("9968bdb69216", "Changelog"),
+          label: t("home_changelog", "Changelog"),
           external: true,
         },
       ].filter((link) => SITE_CONFIG.features.billing || link.id !== "pricing"),
     },
     {
       id: "other-products",
-      title: t("094b7c067d00", "Other Products"),
+      title: t("home_other_products", "Other Products"),
       links: [
         {
           id: "pixmiller",
@@ -128,57 +128,57 @@ export function Footer({
     },
     {
       id: "project",
-      title: t("41f1cb8601d7", "Project"),
+      title: t("home_project", "Project"),
       links: [
         {
           id: "about",
           href: withLocalePrefix("/about", locale),
-          label: t("ee7f2113f9d0", "About"),
+          label: t("home_about", "About"),
         },
         {
           id: "contact",
           href: withLocalePrefix("/contact", locale),
-          label: t("e29355b65365", "Contact"),
+          label: t("home_contact", "Contact"),
         },
         {
           id: "github",
           href: GITHUB_URL,
-          label: t("95ace8ef0b29", "GitHub"),
+          label: t("home_git_hub", "GitHub"),
           external: true,
         },
       ],
     },
     {
       id: "support",
-      title: t("9affa2022fbb", "Support"),
+      title: t("home_support", "Support"),
       links: [
         {
           id: "issues",
           href: GITHUB_ISSUES_URL,
-          label: t("649fe5b20440", "Issue Tracker"),
+          label: t("home_issue_tracker", "Issue Tracker"),
           external: true,
         },
         {
           id: "discussions",
           href: GITHUB_DISCUSSIONS_URL,
-          label: t("beece701c3b7", "Discussions"),
+          label: t("home_discussions", "Discussions"),
           external: true,
         },
       ],
     },
     {
       id: "legal",
-      title: t("f9ecf779b2a9", "Legal"),
+      title: t("home_legal", "Legal"),
       links: [
         {
           id: "privacy",
           href: withLocalePrefix("/privacy", locale),
-          label: t("9dd30e101b6b", "Privacy"),
+          label: t("home_privacy", "Privacy"),
         },
         {
           id: "terms",
           href: withLocalePrefix("/terms", locale),
-          label: t("9c45ba092e34", "Terms"),
+          label: t("home_terms", "Terms"),
         },
       ],
     },
@@ -207,7 +207,7 @@ export function Footer({
               </div>
               <p className="text-muted-foreground mb-6 max-w-md text-sm">
                 {t(
-                  "f0716043de5a",
+                  "home_practical_saas_starter_teams_want",
                   "A practical SaaS starter for teams that want auth, billing, admin, upload, and content foundations without fake enterprise promises.",
                 )}
               </p>
@@ -261,14 +261,14 @@ export function Footer({
         <div className="flex flex-col items-center justify-between gap-4 py-8 sm:flex-row">
           <span className="text-muted-foreground text-sm">
             {t(
-              "a5a8fd938f3c",
+              "home_all_rights_reserved",
               "\xA9 {currentYear}{COMPANY_NAME}. All rights reserved.",
               { currentYear, COMPANY_NAME },
             )}
           </span>
           <span className="text-muted-foreground flex items-center gap-2 text-sm">
             <Heart className="h-4 w-4 text-red-500" />
-            {t("511db36235ad", "by UllrAI, for developers")}
+            {t("home_ullrai_developers", "by UllrAI, for developers")}
           </span>
         </div>
       </ShellContainer>

@@ -44,7 +44,7 @@ export function AdminStatsCards({ stats, locale }: AdminStatsCardsProps) {
       <Card className="relative overflow-hidden">
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
           <CardTitle className="text-sm font-medium">
-            {t("802fcb9aa4ff", "Total Users")}
+            {t("admin_total_users", "Total Users")}
           </CardTitle>
           <Users className="text-muted-foreground h-4 w-4" />
         </CardHeader>
@@ -54,12 +54,12 @@ export function AdminStatsCards({ stats, locale }: AdminStatsCardsProps) {
           </div>
           <div className="mt-1 flex items-center gap-2">
             <Badge variant="secondary" className="text-xs">
-              {t("6a1363cfb29f", "{expression0} verified", {
+              {t("admin_verified", "{expression0} verified", {
                 expression0: stats.users.verified,
               })}
             </Badge>
             <Badge variant="outline" className="text-xs">
-              {t("99b079005c88", "{expression0} admins", {
+              {t("admin_admins", "{expression0} admins", {
                 expression0: stats.users.admins,
               })}
             </Badge>
@@ -71,7 +71,7 @@ export function AdminStatsCards({ stats, locale }: AdminStatsCardsProps) {
         <Card className="relative overflow-hidden">
           <CardHeader className="flex flex-row items-center justify-between space-y-0">
             <CardTitle className="text-sm font-medium">
-              {t("dcefef9c76ad", "Active Subscriptions")}
+              {t("admin_active_subscriptions_stats", "Active Subscriptions")}
             </CardTitle>
             <Shield className="text-muted-foreground h-4 w-4" />
           </CardHeader>
@@ -81,7 +81,7 @@ export function AdminStatsCards({ stats, locale }: AdminStatsCardsProps) {
             </div>
             <p className="text-muted-foreground flex items-center gap-1 text-xs">
               {t(
-                "cda1c85c48d8",
+                "admin_total_canceled",
                 "<TrendingUp0></TrendingUp0>{expression0} total \u2022 {expression1} canceled",
                 {
                   expression0: stats.subscriptions.total,
@@ -110,7 +110,7 @@ export function AdminStatsCards({ stats, locale }: AdminStatsCardsProps) {
             </div>
             <p className="text-muted-foreground flex items-center gap-1 text-xs">
               {t(
-                "ff4e54d1b22b",
+                "admin_successful_payments_stats",
                 "<TrendingUp0></TrendingUp0>{expression0} successful payments",
                 {
                   expression0: stats.payments.successful,
@@ -128,7 +128,7 @@ export function AdminStatsCards({ stats, locale }: AdminStatsCardsProps) {
         <Card className="relative overflow-hidden">
           <CardHeader className="flex flex-row items-center justify-between space-y-0">
             <CardTitle className="text-sm font-medium">
-              {t("0445c5d97978", "File Uploads")}
+              {t("admin_file_uploads", "File Uploads")}
             </CardTitle>
             <Upload className="text-muted-foreground h-4 w-4" />
           </CardHeader>
@@ -137,7 +137,7 @@ export function AdminStatsCards({ stats, locale }: AdminStatsCardsProps) {
               {stats.uploads.total.toLocaleString(intlLocale)}
             </div>
             <p className="text-muted-foreground text-xs">
-              {t("260455ef1aa8", "{expression0} total", {
+              {t("admin_total", "{expression0} total", {
                 expression0: formatFileSize(stats.uploads.totalSize),
               })}
             </p>

@@ -33,7 +33,14 @@ interface EditableSession {
 
 function ProfileUpdatedToast() {
   const { t } = useTranslation();
-  return <>{t("119e58d8b4fc", "Profile updated successfully")}</>;
+  return (
+    <>
+      {t(
+        "settings_profile_updated_successfully",
+        "Profile updated successfully",
+      )}
+    </>
+  );
 }
 
 function ProfileUpdateFailedToast() {
@@ -47,7 +54,9 @@ export function AccountPage() {
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle>{t("cd253ef38d3e", "Account Information")}</CardTitle>
+        <CardTitle>
+          {t("settings_account_information", "Account Information")}
+        </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="flex flex-col items-start justify-between gap-4 sm:flex-row">
@@ -115,19 +124,21 @@ function EditUserDialog({
       <DialogTrigger asChild>
         <Button size="sm" variant="secondary" className="gap-2">
           <Edit size={16} />
-          {t("3a1df89dfa18", "Edit Profile")}
+          {t("settings_edit_profile", "Edit Profile")}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>{t("3c698fc5fdb8", "Edit Your Profile")}</DialogTitle>
+          <DialogTitle>
+            {t("settings_edit_profile_user", "Edit Your Profile")}
+          </DialogTitle>
           <DialogDescription>
-            {t("becd198609cc", "Change your display name")}
+            {t("settings_change_display_name", "Change your display name")}
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid gap-2">
-            <Label htmlFor="name">{t("c016235dc4f0", "Full Name")}</Label>
+            <Label htmlFor="name">{t("settings_full_name", "Full Name")}</Label>
             <Input
               id="name"
               value={name}
@@ -136,7 +147,7 @@ function EditUserDialog({
             />
           </div>
           <div className="grid gap-2">
-            <Label>{t("ec6fe33b24a4", "Profile Picture")}</Label>
+            <Label>{t("settings_profile_picture", "Profile Picture")}</Label>
             <div className="flex items-center gap-4">
               {isPending ? (
                 <Skeleton className="h-16 w-16 rounded-full" />
@@ -156,7 +167,7 @@ function EditUserDialog({
               <div className="flex-1">
                 <p className="text-muted-foreground text-sm">
                   {t(
-                    "90b3f2ab1933",
+                    "settings_profile_pictures_automatically_generated_using_dice",
                     "Profile pictures are automatically generated using DiceBear avatars based on your email address.",
                   )}
                 </p>
@@ -200,7 +211,7 @@ function EditUserDialog({
               }
             }}
           >
-            {t("63b43f92aa70", "{expression0} Update Profile", {
+            {t("settings_update_profile", "{expression0} Update Profile", {
               expression0: isLoading ? (
                 <Loader2 size={15} className="mr-2 animate-spin" />
               ) : null,

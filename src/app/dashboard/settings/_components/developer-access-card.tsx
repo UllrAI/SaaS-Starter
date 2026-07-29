@@ -19,10 +19,12 @@ export function DeveloperAccessCard() {
             <KeyRound className="h-5 w-5" />
           </div>
           <div className="space-y-1.5">
-            <CardTitle>{t("e3f851e9e431", "Developer Access")}</CardTitle>
+            <CardTitle>
+              {t("settings_developer_access", "Developer Access")}
+            </CardTitle>
             <CardDescription>
               {t(
-                "1d5550bcb9e5",
+                "settings_manage_api_keys_cli_sessions_agent",
                 "Manage API keys, CLI sessions, and agent-friendly access from one dedicated page.",
               )}
             </CardDescription>
@@ -32,13 +34,13 @@ export function DeveloperAccessCard() {
       <CardContent className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-muted-foreground text-sm">
           {t(
-            "45158cce5ffb",
+            "settings_open_developer_access_workspace_review_api",
             "Open the developer access workspace to review API credentials and authorized command-line devices.",
           )}
         </p>
         <Button asChild variant="outline">
           <Link href="/dashboard/developer">
-            {t("4865d88a88cb", "Open developer access")}
+            {t("settings_open_developer_access", "Open developer access")}
             <ArrowRight className="ml-2 h-4 w-4" />
           </Link>
         </Button>

@@ -3,14 +3,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { DashboardPageWrapper } from "../_components/dashboard-page-wrapper";
 function SettingsPageTitle() {
   const { t } = useTranslation();
-  return <>{t("6f5eb075c7ea", "Settings")}</>;
+  return <>{t("settings_title", "Settings")}</>;
 }
 function SettingsPageDescription() {
   const { t } = useTranslation();
   return (
     <>
       {t(
-        "95ebba96b384",
+        "settings_manage_account_profile_personalize_dashboard_appearance",
         "Manage your account profile and personalize dashboard appearance.",
       )}
     </>

@@ -41,24 +41,24 @@ export async function buildContactMetadata(locale: SupportedLocale) {
   });
   return {
     ...metadata,
-    title: t("1ca0f1f7049a", "Contact Us"),
+    title: t("contact_us", "Contact Us"),
     description: t(
-      "6067860f97f1",
+      "contact_get_in_touch_team_we_here",
       "Get in touch with our team. We are here to help with any product or integration questions.",
     ),
     openGraph: {
       ...metadata.openGraph,
-      title: t("c88a23677841", "Contact Us"),
+      title: t("contact_us", "Contact Us"),
       description: t(
-        "7e61b4df381e",
+        "contact_get_in_touch_team_we_here",
         "Get in touch with our team. We are here to help with any product or integration questions.",
       ),
     },
     twitter: {
       ...metadata.twitter,
-      title: t("aea6eac1e07d", "Contact Us"),
+      title: t("contact_us", "Contact Us"),
       description: t(
-        "a30770a96b8d",
+        "contact_get_in_touch_team_we_here",
         "Get in touch with our team. We are here to help with any product or integration questions.",
       ),
     },
@@ -82,17 +82,17 @@ export default function ContactPage({
             <Badge className="border-border bg-background/50 inline-flex items-center border px-3 py-1 text-sm backdrop-blur-sm">
               <Mail className="text-muted-foreground mr-2 h-3 w-3" />
               <span className="text-muted-foreground font-mono">
-                {t("673f84099b6d", "CONTACT.md")}
+                {t("contact_md", "CONTACT.md")}
               </span>
             </Badge>
           }
         >
           <PageIntroHeading>
-            {t("b828357c0eda", "Get in Touch")}
+            {t("contact_get_in_touch", "Get in Touch")}
           </PageIntroHeading>
           <PageIntroDescription>
             {t(
-              "170b79772e4d",
+              "contact_have_questions_need_support_want_collaborate",
               "Have questions? Need support? Want to collaborate? We're here to help. Choose your preferred channel below.",
             )}
           </PageIntroDescription>
@@ -100,7 +100,7 @@ export default function ContactPage({
 
         <div className="mb-24">
           <PageSectionHeading icon={<Send className="text-primary h-6 w-6" />}>
-            {t("1c0a7a57a7ca", "Contact Channels")}
+            {t("contact_channels", "Contact Channels")}
           </PageSectionHeading>
 
           <ContactMethods locale={locale} />
@@ -108,21 +108,26 @@ export default function ContactPage({
 
         <div className="mb-24">
           <PageSectionHeading icon={<Clock className="text-primary h-6 w-6" />}>
-            {t("eb0600bded40", "Support Hours")}
+            {t("contact_support_hours", "Support Hours")}
           </PageSectionHeading>
 
           <div className="grid gap-6 md:grid-cols-2">
             <Card className="shadow-sm">
               <CardHeader>
-                <CardTitle>{t("e2d72b96e410", "Standard Support")}</CardTitle>
+                <CardTitle>
+                  {t("contact_standard_support", "Standard Support")}
+                </CardTitle>
                 <CardDescription>
-                  {t("2e0e2f0b91ac", "Available for all users and customers")}
+                  {t(
+                    "contact_available_all_users_customers",
+                    "Available for all users and customers",
+                  )}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-2">
                 <div className="flex justify-between border-b pb-2">
                   <span className="text-muted-foreground text-sm">
-                    {t("e2fc8a8fe729", "Monday - Friday")}
+                    {t("contact_monday_friday", "Monday - Friday")}
                   </span>
                   <span className="font-mono text-sm" translate="no">
                     9:00 - 18:00
@@ -130,7 +135,7 @@ export default function ContactPage({
                 </div>
                 <div className="flex justify-between border-b pb-2">
                   <span className="text-muted-foreground text-sm">
-                    {t("f66c6362097f", "Saturday")}
+                    {t("contact_saturday", "Saturday")}
                   </span>
                   <span className="font-mono text-sm" translate="no">
                     10:00 - 16:00
@@ -138,10 +143,10 @@ export default function ContactPage({
                 </div>
                 <div className="flex justify-between pb-2">
                   <span className="text-muted-foreground text-sm">
-                    {t("9be255da6ce5", "Sunday")}
+                    {t("contact_sunday", "Sunday")}
                   </span>
                   <span className="font-mono text-sm">
-                    {t("6ab2b183dfb9", "Closed")}
+                    {t("contact_closed", "Closed")}
                   </span>
                 </div>
               </CardContent>
@@ -149,10 +154,12 @@ export default function ContactPage({
 
             <Card className="shadow-sm">
               <CardHeader>
-                <CardTitle>{t("0c59e76ca987", "Premium Support")}</CardTitle>
+                <CardTitle>
+                  {t("contact_premium_support", "Premium Support")}
+                </CardTitle>
                 <CardDescription>
                   {t(
-                    "7e35a416a6d2",
+                    "contact_enterprise_customers_sla_guarantees",
                     "Enterprise customers with SLA guarantees",
                   )}
                 </CardDescription>
@@ -160,7 +167,7 @@ export default function ContactPage({
               <CardContent className="space-y-2">
                 <div className="flex justify-between border-b pb-2">
                   <span className="text-muted-foreground text-sm">
-                    {t("3260515a2229", "Availability")}
+                    {t("contact_availability", "Availability")}
                   </span>
                   <span className="font-mono text-sm" translate="no">
                     24/7/365
@@ -168,18 +175,18 @@ export default function ContactPage({
                 </div>
                 <div className="flex justify-between border-b pb-2">
                   <span className="text-muted-foreground text-sm">
-                    {t("30f2a945f51b", "Response Time")}
+                    {t("contact_response_time", "Response Time")}
                   </span>
                   <span className="font-mono text-sm">
-                    {t("5bd5a93c0305", "Under 1 hour")}
+                    {t("contact_under_1_hour", "Under 1 hour")}
                   </span>
                 </div>
                 <div className="flex justify-between pb-2">
                   <span className="text-muted-foreground text-sm">
-                    {t("c6ddb0a604dc", "Priority")}
+                    {t("contact_priority", "Priority")}
                   </span>
                   <span className="font-mono text-sm">
-                    {t("1456e9d32e79", "Critical Priority")}
+                    {t("contact_critical_priority", "Critical Priority")}
                   </span>
                 </div>
               </CardContent>
@@ -191,20 +198,23 @@ export default function ContactPage({
           <PageSectionHeading
             icon={<HelpCircle className="text-primary h-6 w-6" />}
           >
-            {t("d58c5464a5ce", "Quick Answers")}
+            {t("contact_quick_answers", "Quick Answers")}
           </PageSectionHeading>
 
           <div className="grid gap-6 md:grid-cols-2">
             <Card className="shadow-sm">
               <CardHeader>
                 <CardTitle className="text-lg">
-                  {t("b2e57fa4236b", "What is the average response time?")}
+                  {t(
+                    "contact_what_average_response_time",
+                    "What is the average response time?",
+                  )}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground text-sm leading-relaxed">
                   {t(
-                    "0e6d4a5299d0",
+                    "contact_we_typically_respond_all_inquiries_within",
                     "We typically respond to all inquiries within 24 hours during business days. Premium customers receive responses in under 1 hour.",
                   )}
                 </p>
@@ -214,13 +224,16 @@ export default function ContactPage({
             <Card className="shadow-sm">
               <CardHeader>
                 <CardTitle className="text-lg">
-                  {t("b77121d2ce42", "Do you offer enterprise support?")}
+                  {t(
+                    "contact_do_you_offer_enterprise_support",
+                    "Do you offer enterprise support?",
+                  )}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground text-sm leading-relaxed">
                   {t(
-                    "0c6b490942ab",
+                    "contact_yes_enterprise_support_handled_through_dedicated",
                     "Yes. Enterprise support is handled through dedicated email workflows and structured issue triage so requests stay traceable from report to resolution.",
                   )}
                 </p>
@@ -230,13 +243,13 @@ export default function ContactPage({
             <Card className="shadow-sm">
               <CardHeader>
                 <CardTitle className="text-lg">
-                  {t("03225f2f6fbc", "Can I schedule a demo?")}
+                  {t("contact_can_i_schedule_demo", "Can I schedule a demo?")}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground text-sm leading-relaxed">
                   {t(
-                    "773e2c0904c7",
+                    "contact_yes_send_use_case_include_product",
                     "Yes. Send your use case to {CONTACT_EMAIL} and include the product area you want to review so we can route it correctly.",
                     {
                       CONTACT_EMAIL,
@@ -249,13 +262,16 @@ export default function ContactPage({
             <Card className="shadow-sm">
               <CardHeader>
                 <CardTitle className="text-lg">
-                  {t("df23d2a1b7b3", "Where can I find documentation?")}
+                  {t(
+                    "contact_where_can_i_find_documentation",
+                    "Where can I find documentation?",
+                  )}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground mb-3 text-sm leading-relaxed">
                   {t(
-                    "b7d55d1f18eb",
+                    "contact_comprehensive_documentation_covers_all_features_apis",
                     "Our comprehensive documentation covers all features, APIs, and integrations.",
                   )}
                 </p>
@@ -267,7 +283,7 @@ export default function ContactPage({
                     rel="noreferrer"
                   >
                     <span className="text-xs">
-                      {t("74efe36eb3bc", "View Docs")}
+                      {t("contact_view_docs", "View Docs")}
                     </span>
                     <ExternalLink className="h-3 w-3" />
                   </a>
@@ -281,23 +297,26 @@ export default function ContactPage({
           <PageSectionHeading
             icon={<ExternalLink className="text-primary h-6 w-6" />}
           >
-            {t("b96158ba1d06", "Helpful Resources")}
+            {t("contact_helpful_resources", "Helpful Resources")}
           </PageSectionHeading>
 
           <div className="grid gap-4 md:grid-cols-3">
             <Card className="shadow-sm transition-all hover:shadow-md">
               <CardHeader>
                 <CardTitle className="text-base">
-                  {t("52cc03dc88c8", "Documentation")}
+                  {t("contact_documentation", "Documentation")}
                 </CardTitle>
                 <CardDescription className="text-xs">
-                  {t("b31cd3cd97b0", "Complete guides and API references")}
+                  {t(
+                    "contact_complete_guides_api_references",
+                    "Complete guides and API references",
+                  )}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <Button variant="outline" size="sm" asChild>
                   <a href={DOCS_URL} target="_blank" rel="noreferrer">
-                    {t("cfe6da918ed0", "Open Docs")}
+                    {t("contact_open_docs", "Open Docs")}
                   </a>
                 </Button>
               </CardContent>
@@ -306,10 +325,13 @@ export default function ContactPage({
             <Card className="shadow-sm transition-all hover:shadow-md">
               <CardHeader>
                 <CardTitle className="text-base">
-                  {t("05cef02f4c5c", "Community Forum")}
+                  {t("contact_community_forum", "Community Forum")}
                 </CardTitle>
                 <CardDescription className="text-xs">
-                  {t("674809a82d76", "Connect with other developers")}
+                  {t(
+                    "contact_connect_other_developers",
+                    "Connect with other developers",
+                  )}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -319,7 +341,7 @@ export default function ContactPage({
                     target="_blank"
                     rel="noreferrer"
                   >
-                    {t("f2e408c28059", "Join Discussions")}
+                    {t("contact_join_discussions", "Join Discussions")}
                   </a>
                 </Button>
               </CardContent>
@@ -328,11 +350,11 @@ export default function ContactPage({
             <Card className="shadow-sm transition-all hover:shadow-md">
               <CardHeader>
                 <CardTitle className="text-base">
-                  {t("badd051fb07b", "Release Notes")}
+                  {t("contact_release_notes", "Release Notes")}
                 </CardTitle>
                 <CardDescription className="text-xs">
                   {t(
-                    "a3df56389b89",
+                    "contact_track_shipping_history_starter_changes",
                     "Track shipping history and starter changes",
                   )}
                 </CardDescription>
@@ -344,7 +366,7 @@ export default function ContactPage({
                     target="_blank"
                     rel="noreferrer"
                   >
-                    {t("1227c5b717da", "View Releases")}
+                    {t("contact_view_releases", "View Releases")}
                   </a>
                 </Button>
               </CardContent>
@@ -357,11 +379,11 @@ export default function ContactPage({
         <SectionContainer>
           <PageIntro>
             <PageIntroHeading as="h2" className="mb-4 text-3xl">
-              {t("48350e7c8d9a", "Ready to Get Started?")}
+              {t("contact_ready_get_started", "Ready to Get Started?")}
             </PageIntroHeading>
             <PageIntroDescription className="mb-8 text-lg">
               {t(
-                "cc3b46bbd623",
+                "contact_join_thousands_developers_building_amazing_products",
                 "Join thousands of developers building amazing products with {COMPANY_NAME}.",
                 {
                   COMPANY_NAME,
@@ -372,13 +394,13 @@ export default function ContactPage({
               {SITE_CONFIG.features.billing && (
                 <Button asChild size="lg">
                   <Link href="/pricing" locale={locale}>
-                    {t("b32e51fc5358", "View Pricing")}
+                    {t("contact_view_pricing", "View Pricing")}
                   </Link>
                 </Button>
               )}
               <Button variant="outline" size="lg" asChild>
                 <Link href="/about" locale={locale}>
-                  {t("5c315fc2d27e", "Learn More")}
+                  {t("contact_learn_more", "Learn More")}
                 </Link>
               </Button>
             </div>

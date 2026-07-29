@@ -10,7 +10,7 @@ function Breadcrumb(props: React.ComponentProps<"nav">) {
   const { t } = useTranslation();
   return (
     <nav
-      aria-label={t("21bc82f74e6d", "breadcrumb")}
+      aria-label={t("common_breadcrumb", "breadcrumb")}
       data-slot="breadcrumb"
       {...props}
     />

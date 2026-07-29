@@ -14,17 +14,26 @@ export async function generateMetadata() {
   const metadata = createMetadataDefaults({ locale });
   return {
     ...metadata,
-    title: t("281732b255a5", "Sign Up"),
-    description: t("5e3cc88e6fbe", "Create your account with magic link"),
+    title: t("auth_sign_up", "Sign Up"),
+    description: t(
+      "auth_create_account_magic_link",
+      "Create your account with magic link",
+    ),
     openGraph: {
       ...metadata.openGraph,
-      title: t("c4df71e2debe", "Sign Up"),
-      description: t("5f7b695a3008", "Create your account with magic link"),
+      title: t("auth_sign_up", "Sign Up"),
+      description: t(
+        "auth_create_account_magic_link",
+        "Create your account with magic link",
+      ),
     },
     twitter: {
       ...metadata.twitter,
-      title: t("b80aefc6fb62", "Sign Up"),
-      description: t("ea0e05b8ca7a", "Create your account with magic link"),
+      title: t("auth_sign_up", "Sign Up"),
+      description: t(
+        "auth_create_account_magic_link",
+        "Create your account with magic link",
+      ),
     },
   };
 }

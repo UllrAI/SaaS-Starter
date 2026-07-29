@@ -15,17 +15,26 @@ export async function generateMetadata() {
   const metadata = createMetadataDefaults({ locale });
   return {
     ...metadata,
-    title: t("111d958bf0a6", "Sign In"),
-    description: t("1e71a537208b", "Sign in to your account with magic link"),
+    title: t("auth_sign_in", "Sign In"),
+    description: t(
+      "auth_sign_in_account_magic_link",
+      "Sign in to your account with magic link",
+    ),
     openGraph: {
       ...metadata.openGraph,
-      title: t("05b393ebf2a7", "Sign In"),
-      description: t("8f7769766bfe", "Sign in to your account with magic link"),
+      title: t("auth_sign_in", "Sign In"),
+      description: t(
+        "auth_sign_in_account_magic_link",
+        "Sign in to your account with magic link",
+      ),
     },
     twitter: {
       ...metadata.twitter,
-      title: t("75f312462374", "Sign In"),
-      description: t("fa4d2b7413ea", "Sign in to your account with magic link"),
+      title: t("auth_sign_in", "Sign In"),
+      description: t(
+        "auth_sign_in_account_magic_link",
+        "Sign in to your account with magic link",
+      ),
     },
   };
 }

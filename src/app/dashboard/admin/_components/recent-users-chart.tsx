@@ -39,7 +39,9 @@ export function RecentUsersChart({ chartData }: RecentUsersChartProps) {
       <div className="flex h-[300px] items-center justify-center">
         <div className="text-muted-foreground flex items-center space-x-2">
           <AlertTriangle className="h-4 w-4" />
-          <span>{t("6404b685c7dd", "No user data available")}</span>
+          <span>
+            {t("admin_no_user_data_available", "No user data available")}
+          </span>
         </div>
       </div>
     );

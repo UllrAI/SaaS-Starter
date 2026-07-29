@@ -181,15 +181,20 @@ export function PaymentManagementTable({
       searchTerm={searchTerm}
       onSearchChange={handleSearch}
       searchPlaceholder={
-        <>{t("989cf2a31a4f", "Search by user name, email, or payment ID...")}</>
+        <>
+          {t(
+            "admin_search_user_name_email_payment_id",
+            "Search by user name, email, or payment ID...",
+          )}
+        </>
       }
       filterValue={statusFilter}
       onFilterChange={handleStatusFilter}
       filterOptions={statusFilterOptions}
-      filterPlaceholder={<>{t("0959bb05ac4b", "Filter by status")}</>}
+      filterPlaceholder={<>{t("admin_filter_status", "Filter by status")}</>}
       pagination={pagination}
       onPageChange={handlePageChange}
-      emptyMessage={<>{t("872b4e8bd590", "No payments found")}</>}
+      emptyMessage={<>{t("admin_no_payments_found", "No payments found")}</>}
     />
   );
 }

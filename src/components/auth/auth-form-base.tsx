@@ -142,7 +142,10 @@ export function AuthFormBase<T extends FieldValues>({
                     </div>
                     <div className="relative flex justify-center text-xs uppercase">
                       <span className="bg-background text-muted-foreground px-3 font-medium">
-                        {t("a47fb0abca67", "Or continue with magic link")}
+                        {t(
+                          "auth_continue_magic_link",
+                          "Or continue with magic link",
+                        )}
                       </span>
                     </div>
                   </div>
@@ -217,7 +220,7 @@ export function AuthFormBase<T extends FieldValues>({
           <div className="border-border/50 border-t pt-4">
             <p className="text-muted-foreground/70 text-center text-xs leading-relaxed">
               {t(
-                "134da1decd2b",
+                "auth_creating_account_you_agree_terms_service",
                 "By creating an account, you agree to our <Link0>Terms of Service </Link0> and <Link1>Privacy Policy </Link1> .",
                 {
                   Link0: (chunks) => (

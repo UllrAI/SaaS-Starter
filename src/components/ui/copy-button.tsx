@@ -15,11 +15,11 @@ interface CopyButtonProps {
 }
 function CopyToClipboardLabel() {
   const { t } = useTranslation();
-  return <>{t("9c48729e765d", "Copy to clipboard")}</>;
+  return <>{t("common_copy_clipboard", "Copy to clipboard")}</>;
 }
 function CopiedLabel() {
   const { t } = useTranslation();
-  return <>{t("cc17c10cef9c", "Copied!")}</>;
+  return <>{t("common_copied", "Copied!")}</>;
 }
 export default function CopyButton({ textToCopy }: CopyButtonProps) {
   const [isCopied, setIsCopied] = useState(false);

@@ -18,7 +18,7 @@ export default function PagesNotFound() {
         <Badge className="border-border bg-background/50 mb-8 inline-flex items-center border px-3 py-1 text-sm backdrop-blur-sm">
           <Sparkles className="text-muted-foreground mr-2 h-3 w-3" />
           <span className="text-muted-foreground font-mono">
-            {t("14845f8bee6d", "ERROR_404")}
+            {t("blog_error_404", "ERROR_404")}
           </span>
         </Badge>
 
@@ -35,11 +35,11 @@ export default function PagesNotFound() {
         {/* Main Message */}
         <div className="mb-8 space-y-4">
           <h2 className="text-foreground text-2xl font-bold tracking-tight sm:text-3xl">
-            {t("60477e09907e", "Page Not Found")}
+            {t("blog_page_not_found", "Page Not Found")}
           </h2>
           <p className="text-muted-foreground text-base leading-relaxed">
             {t(
-              "26bb01a0c1db",
+              "blog_page_youre_looking_doesnt_exist_has",
               "The page you're looking for doesn't exist or has been moved. Let's get you back on track.",
             )}
           </p>
@@ -50,14 +50,14 @@ export default function PagesNotFound() {
           <Button asChild size="lg" className="min-w-[160px]">
             <Link href="/blog" prefetch={true}>
               <ArrowLeft className="mr-2 h-4 w-4" />
-              {t("b8f4252b89e2", "Back to Blog")}
+              {t("blog_back_blog", "Back to Blog")}
             </Link>
           </Button>
 
           <Button asChild variant="outline" size="lg" className="min-w-[160px]">
             <Link href="/" prefetch={true}>
               <Home className="mr-2 h-4 w-4" />
-              {t("e79407a4caeb", "Back to Home")}
+              {t("blog_back_home", "Back to Home")}
             </Link>
           </Button>
         </div>
@@ -66,7 +66,7 @@ export default function PagesNotFound() {
         <div className="text-muted-foreground mt-8 text-sm">
           <p>
             {t(
-              "65533dcf4703",
+              "blog_need_help_contact_support_team",
               "Need help? <Link0>Contact our support team </Link0>",
               {
                 Link0: (chunks) => (

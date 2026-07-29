@@ -54,7 +54,7 @@ function IssueMessage({ issue }: { issue: FileUploadIssue }) {
       return (
         <>
           {t(
-            "d666b4ae8dee",
+            "uploads_you_can_upload_up_file_s",
             "You can upload up to {expression0} file(s) at a time.",
             {
               expression0: issue.maxFiles,
@@ -66,7 +66,7 @@ function IssueMessage({ issue }: { issue: FileUploadIssue }) {
       return (
         <>
           {t(
-            "0d1e07a822f3",
+            "uploads_does_not_match_allowed_upload_preset",
             "{expression0} does not match the allowed upload preset for this section.",
             {
               expression0: issue.fileName,
@@ -78,7 +78,7 @@ function IssueMessage({ issue }: { issue: FileUploadIssue }) {
       return (
         <>
           {t(
-            "5f4fd6cfd1ca",
+            "uploads_app_does_not_support_uploads",
             "This app does not support {expression0} uploads.",
             {
               expression0: issue.contentType,
@@ -90,7 +90,7 @@ function IssueMessage({ issue }: { issue: FileUploadIssue }) {
       return (
         <>
           {t(
-            "dd1645efa849",
+            "uploads_preset_limit",
             "{expression0} is {expression1}. The preset limit is {expression2}.",
             {
               expression0: issue.fileName,
@@ -104,7 +104,7 @@ function IssueMessage({ issue }: { issue: FileUploadIssue }) {
       return (
         <>
           {t(
-            "813c9ca81612",
+            "uploads_exceeds_app_wide_limit",
             "{expression0} exceeds the app-wide limit of {expression1}.",
             {
               expression0: issue.fileName,
@@ -126,7 +126,7 @@ function IssueMessage({ issue }: { issue: FileUploadIssue }) {
       return (
         <>
           {t(
-            "2ad00125294d",
+            "uploads_upload_destination_was_rejected_client_safety",
             "The upload destination was rejected by the client safety checks.",
           )}
         </>
@@ -135,7 +135,7 @@ function IssueMessage({ issue }: { issue: FileUploadIssue }) {
       return (
         <>
           {t(
-            "36443a7c5631",
+            "uploads_upload_request_could_not_completed_please",
             "The upload request could not be completed. Please try again.",
           )}
         </>
@@ -143,69 +143,89 @@ function IssueMessage({ issue }: { issue: FileUploadIssue }) {
     case "network-error":
       return (
         <>
-          {t("d4efb0956981", "The network connection dropped during upload.")}
+          {t(
+            "uploads_network_connection_dropped_during_upload",
+            "The network connection dropped during upload.",
+          )}
         </>
       );
     case "upload-aborted":
       return (
-        <>{t("e0a0c121384e", "The upload was canceled before it finished.")}</>
+        <>
+          {t(
+            "uploads_upload_was_canceled_before_it_finished",
+            "The upload was canceled before it finished.",
+          )}
+        </>
       );
     case "upload-preparation-failed":
       return (
-        <>{t("bf902011e250", "The file could not be prepared for upload.")}</>
+        <>
+          {t(
+            "uploads_file_could_not_prepared_upload",
+            "The file could not be prepared for upload.",
+          )}
+        </>
       );
     case "upload-failed":
       return (
-        <>{t("26f5a55d6d06", "The file upload failed before completion.")}</>
+        <>
+          {t(
+            "uploads_file_upload_failed_before_completion",
+            "The file upload failed before completion.",
+          )}
+        </>
       );
   }
 }
 function QueueStatusBadge({ item }: { item: FileUploadItem }) {
   const { t } = useTranslation();
   if (item.status === "success") {
-    return <Badge variant="secondary">{t("da8f2ecc6829", "Uploaded")}</Badge>;
+    return (
+      <Badge variant="secondary">{t("uploads_uploaded", "Uploaded")}</Badge>
+    );
   }
   if (item.status === "uploading") {
     return (
       <Badge variant="outline" className="gap-1">
         <Loader2 className="h-3 w-3 animate-spin" />
-        {t("8908b85bafa7", "Uploading")}
+        {t("uploads_uploading", "Uploading")}
       </Badge>
     );
   }
   if (item.status === "error") {
     return (
       <Badge variant="destructive">
-        {t("91e86dda4fde", "Needs attention")}
+        {t("uploads_needs_attention", "Needs attention")}
       </Badge>
     );
   }
   if (item.status === "canceled") {
-    return <Badge variant="outline">{t("23e49bb9d683", "Canceled")}</Badge>;
+    return <Badge variant="outline">{t("uploads_canceled", "Canceled")}</Badge>;
   }
-  return <Badge variant="outline">{t("2f449662f8be", "Queued")}</Badge>;
+  return <Badge variant="outline">{t("uploads_queued", "Queued")}</Badge>;
 }
 function QueueStatusText({ item }: { item: FileUploadItem }) {
   const { t } = useTranslation();
   if (item.status === "success") {
-    return <>{t("dc604786445b", "Uploaded")}</>;
+    return <>{t("uploads_uploaded", "Uploaded")}</>;
   }
   if (item.status === "uploading") {
     return (
       <>
-        {t("417ed0f83446", "{expression0}%", {
+        {t("uploads_progress_percent", "{expression0}%", {
           expression0: item.progress,
         })}
       </>
     );
   }
   if (item.status === "error") {
-    return <>{t("4b3884a9f0b2", "Needs attention")}</>;
+    return <>{t("uploads_needs_attention", "Needs attention")}</>;
   }
   if (item.status === "canceled") {
-    return <>{t("59a74efd432b", "Canceled")}</>;
+    return <>{t("uploads_canceled", "Canceled")}</>;
   }
-  return <>{t("13ba0ad725bc", "Queued")}</>;
+  return <>{t("uploads_queued", "Queued")}</>;
 }
 function FilePreview({ item }: { item: FileUploadItem }) {
   if (!item.previewUrl) {
@@ -257,7 +277,7 @@ function ImageQueueTile({
           </div>
 
           {item.status === "success" ? (
-            <Badge variant="secondary">{t("f08ec26ccfc0", "Done")}</Badge>
+            <Badge variant="secondary">{t("uploads_done", "Done")}</Badge>
           ) : null}
         </div>
 
@@ -273,7 +293,7 @@ function ImageQueueTile({
             size="icon"
             className="h-8 w-8 rounded-full"
             onClick={onCancel}
-            aria-label={t("4d9d396c901b", "Cancel upload")}
+            aria-label={t("uploads_cancel_upload", "Cancel upload")}
           >
             <X className="h-4 w-4" />
           </Button>
@@ -285,7 +305,7 @@ function ImageQueueTile({
             size="icon"
             className="h-8 w-8 rounded-full"
             onClick={onRetry}
-            aria-label={t("e830b539c500", "Retry upload")}
+            aria-label={t("uploads_retry_upload", "Retry upload")}
           >
             <RefreshCcw className="h-4 w-4" />
           </Button>
@@ -296,7 +316,7 @@ function ImageQueueTile({
           size="icon"
           className="h-8 w-8 rounded-full"
           onClick={onRemove}
-          aria-label={t("78ab1b75517f", "Remove file")}
+          aria-label={t("uploads_remove_file", "Remove file")}
         >
           <X className="h-4 w-4" />
         </Button>
@@ -336,7 +356,7 @@ function FileQueueItem({
 
         <div className="text-muted-foreground flex flex-wrap items-center gap-2 text-xs">
           <span>{formatFileSize(item.file.size)}</span>
-          <span>{t("7a0ed5b4d738", "\u2022")}</span>
+          <span>{t("uploads_file_metadata_separator", "\u2022")}</span>
           <span className="truncate">{item.file.type}</span>
         </div>
 
@@ -344,9 +364,9 @@ function FileQueueItem({
           <div className="space-y-1">
             <Progress value={item.progress} className="h-2" />
             <div className="text-muted-foreground flex justify-between text-xs">
-              <span>{t("6c889bf8964e", "Uploading now")}</span>
+              <span>{t("uploads_uploading_now", "Uploading now")}</span>
               <span>
-                {t("af3417bcc17b", "{expression0}%", {
+                {t("uploads_progress_percent", "{expression0}%", {
                   expression0: item.progress,
                 })}
               </span>
@@ -367,7 +387,7 @@ function FileQueueItem({
             variant="ghost"
             size="sm"
             onClick={onCancel}
-            aria-label={t("905670e48293", "Cancel upload")}
+            aria-label={t("uploads_cancel_upload", "Cancel upload")}
           >
             <X className="h-4 w-4" />
           </Button>
@@ -378,7 +398,7 @@ function FileQueueItem({
             variant="ghost"
             size="sm"
             onClick={onRetry}
-            aria-label={t("521f47e10724", "Retry upload")}
+            aria-label={t("uploads_retry_upload", "Retry upload")}
           >
             <RefreshCcw className="h-4 w-4" />
           </Button>
@@ -388,7 +408,7 @@ function FileQueueItem({
           variant="ghost"
           size="sm"
           onClick={onRemove}
-          aria-label={t("9b6759861929", "Remove file")}
+          aria-label={t("uploads_remove_file", "Remove file")}
         >
           <X className="h-4 w-4" />
         </Button>
@@ -443,12 +463,15 @@ export function FileUploader({
                 <div className="flex items-center gap-2 text-sm font-medium">
                   <Upload className="h-4 w-4" />
                   <span>
-                    {t("1f7626a0d29a", "Drop files here or click to browse")}
+                    {t(
+                      "uploads_drop_files_here_click_browse",
+                      "Drop files here or click to browse",
+                    )}
                   </span>
                 </div>
                 <p className="text-muted-foreground text-xs">
                   {t(
-                    "152777e6bb3c",
+                    "uploads_up_file_s_max",
                     "Up to {expression0} file(s), max {expression1} . {expression2}",
                     {
                       expression0: options.maxFiles ?? 1,
@@ -487,9 +510,9 @@ export function FileUploader({
                 >
                   <Upload className="h-4 w-4" />
                   {uploader.items.length > 0 ? (
-                    <>{t("838e02ccc51a", "Add files")}</>
+                    <>{t("uploads_add_files", "Add files")}</>
                   ) : (
-                    <>{t("3280ea8b83dc", "Select files")}</>
+                    <>{t("uploads_select_files", "Select files")}</>
                   )}
                 </Button>
 
@@ -503,7 +526,7 @@ export function FileUploader({
                       void uploader.uploadAll();
                     }}
                   >
-                    {t("ee521d6bd908", "Start upload")}
+                    {t("uploads_start_upload", "Start upload")}
                   </Button>
                 ) : null}
 
@@ -517,7 +540,7 @@ export function FileUploader({
                       uploader.clearCompleted();
                     }}
                   >
-                    {t("53afa8ae2618", "Clear completed")}
+                    {t("uploads_clear_completed", "Clear completed")}
                   </Button>
                 ) : null}
               </div>
@@ -550,10 +573,10 @@ export function FileUploader({
               >
                 <Upload className="mb-2 h-5 w-5" />
                 <p className="text-sm font-medium">
-                  {t("700d33112f6e", "Upload")}
+                  {t("uploads_upload", "Upload")}
                 </p>
                 <p className="mt-1 text-xs">
-                  {t("e05962b1488c", "{expression0}- {expression1}", {
+                  {t("uploads_slot_range", "{expression0}- {expression1}", {
                     expression0: uploader.items.length + 1,
                     expression1: Math.max(
                       options.maxFiles ?? 1,
@@ -575,7 +598,7 @@ export function FileUploader({
                   void uploader.uploadAll();
                 }}
               >
-                {t("ee521d6bd908", "Start upload")}
+                {t("uploads_start_upload", "Start upload")}
               </Button>
             ) : null}
 
@@ -588,7 +611,7 @@ export function FileUploader({
                   uploader.clearCompleted();
                 }}
               >
-                {t("53afa8ae2618", "Clear completed")}
+                {t("uploads_clear_completed", "Clear completed")}
               </Button>
             ) : null}
           </div>

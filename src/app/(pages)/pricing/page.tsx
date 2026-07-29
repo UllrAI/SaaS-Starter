@@ -42,9 +42,9 @@ export async function buildPricingMetadata(locale: SupportedLocale) {
   });
   return {
     ...metadata,
-    title: t("0f6aee7772a1", "Pricing"),
+    title: t("pricing_title", "Pricing"),
     description: t(
-      "1b1610e6ec50",
+      "pricing_saas_starter_codebase_review",
       "Pricing for the SaaS Starter codebase. Review the current package structure, verification stack, and what is included before checkout.",
     ),
     keywords: [
@@ -56,17 +56,17 @@ export async function buildPricingMetadata(locale: SupportedLocale) {
     ],
     openGraph: {
       ...metadata.openGraph,
-      title: t("faf8cbd01ed8", "Pricing"),
+      title: t("pricing_title", "Pricing"),
       description: t(
-        "fd9e4f058bc7",
+        "pricing_saas_starter_codebase_review",
         "Pricing for the SaaS Starter codebase. Review the current package structure, verification stack, and what is included before checkout.",
       ),
     },
     twitter: {
       ...metadata.twitter,
-      title: t("b6e81f7c5d90", "Pricing"),
+      title: t("pricing_title", "Pricing"),
       description: t(
-        "eccca2ef193a",
+        "pricing_saas_starter_codebase_review",
         "Pricing for the SaaS Starter codebase. Review the current package structure, verification stack, and what is included before checkout.",
       ),
     },
@@ -89,11 +89,11 @@ export default function PricingPage({
     {
       id: "auth",
       icon: LockKeyhole,
-      title: <>{t("e3209482e6a1", "Auth and permissions")}</>,
+      title: <>{t("pricing_auth_permissions", "Auth and permissions")}</>,
       description: (
         <>
           {t(
-            "f94e2026f177",
+            "pricing_login_signup_session_handling_protected_routes",
             "Login, signup, session handling, protected routes, and admin gating are already implemented.",
           )}
         </>
@@ -102,11 +102,11 @@ export default function PricingPage({
     {
       id: "billing",
       icon: CreditCard,
-      title: <>{t("0d890cf52427", "Billing workflow")}</>,
+      title: <>{t("pricing_billing_workflow", "Billing workflow")}</>,
       description: (
         <>
           {t(
-            "b675a07e329c",
+            "pricing_checkout_portal_access_webhooks_subscription_records",
             "Checkout, portal access, webhooks, subscription records, and billing screens are part of the starter.",
           )}
         </>
@@ -115,11 +115,11 @@ export default function PricingPage({
     {
       id: "data",
       icon: Database,
-      title: <>{t("2681dfbf4a36", "Data and admin")}</>,
+      title: <>{t("pricing_data_admin", "Data and admin")}</>,
       description: (
         <>
           {t(
-            "9b6b5706587f",
+            "pricing_drizzle_backed_data_access_admin_pages",
             "Drizzle-backed data access and admin pages for users, payments, subscriptions, and uploads ship together.",
           )}
         </>
@@ -128,11 +128,11 @@ export default function PricingPage({
     {
       id: "uploads",
       icon: Upload,
-      title: <>{t("d77385e365ae", "Uploads and storage")}</>,
+      title: <>{t("pricing_uploads_storage", "Uploads and storage")}</>,
       description: (
         <>
           {t(
-            "fb83a03eb23c",
+            "pricing_browser_uploads_server_cloudflare_r2_integration",
             "Browser uploads, server uploads, and Cloudflare R2 integration are included for file-heavy products.",
           )}
         </>
@@ -142,25 +142,25 @@ export default function PricingPage({
   const notes = [
     <>
       {t(
-        "a99b87e56faa",
+        "pricing_project_self_hosted_starter_hosting_secrets",
         "This project is a self-hosted starter. Hosting, secrets, observability, and production operations stay with you.",
       )}
     </>,
     <>
       {t(
-        "ace7b7f71bad",
+        "pricing_payment_flow_in_repo_currently_wired",
         "The payment flow in this repo is currently wired to Creem. Replace or extend it if your business uses another provider.",
       )}
     </>,
     <>
       {t(
-        "e2541d37fc74",
+        "pricing_plan_definitions_feature_entitlements_lifecycle_messaging",
         "Plan definitions, feature entitlements, and lifecycle messaging should be updated to reflect your real commercial offer before launch.",
       )}
     </>,
     <>
       {t(
-        "da3415c49b3e",
+        "pricing_current_verification_stack_includes_jest_coverage",
         "The current verification stack includes Jest coverage plus Playwright smoke tests for auth, admin, and locale routing. Extend browser coverage before relying on custom billing or upload flows in production.",
       )}
     </>,
@@ -173,17 +173,20 @@ export default function PricingPage({
           <Badge className="border-border bg-background/50 inline-flex items-center border px-3 py-1 text-sm backdrop-blur-sm">
             <Boxes className="text-muted-foreground mr-2 h-3 w-3" />
             <span className="text-muted-foreground font-mono">
-              {t("09c302a391a9", "STARTER_PRICING")}
+              {t("pricing_starter_pricing", "STARTER_PRICING")}
             </span>
           </Badge>
         }
       >
         <PageIntroHeading>
-          {t("c47f84c7ff49", "Simple, transparent pricing")}
+          {t(
+            "pricing_simple_transparent_pricing",
+            "Simple, transparent pricing",
+          )}
         </PageIntroHeading>
         <PageIntroDescription className="mx-auto max-w-3xl">
           {t(
-            "7bf637ae804a",
+            "pricing_choose_plan_fits_you_no_hidden",
             "Choose the plan that fits you. No hidden fees, no surprises.",
           )}
         </PageIntroDescription>
@@ -195,7 +198,10 @@ export default function PricingPage({
 
       <div className="mb-24">
         <PageSectionHeading icon={<Boxes className="text-primary h-6 w-6" />}>
-          {t("1acf75608dba", "What the starter already includes")}
+          {t(
+            "pricing_what_starter_already_includes",
+            "What the starter already includes",
+          )}
         </PageSectionHeading>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
@@ -225,11 +231,14 @@ export default function PricingPage({
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Info className="text-primary h-5 w-5" />
-              {t("cdd8afd6d7fe", "Important notes before you buy")}
+              {t(
+                "pricing_important_notes_before_you_buy",
+                "Important notes before you buy",
+              )}
             </CardTitle>
             <CardDescription>
               {t(
-                "243a81cf7dfd",
+                "pricing_repo_already_contains_real_billing_code",
                 "The repo already contains real billing code, but your commercial packaging still needs to match your business.",
               )}
             </CardDescription>
@@ -246,11 +255,14 @@ export default function PricingPage({
         <Card className="shadow-sm">
           <CardHeader>
             <CardTitle>
-              {t("7883eb326bcc", "Current payment provider")}
+              {t(
+                "pricing_current_payment_provider",
+                "Current payment provider",
+              )}
             </CardTitle>
             <CardDescription>
               {t(
-                "467f2b02e948",
+                "pricing_checkout_billing_portal_routes_configured_provider",
                 "Checkout and billing portal routes are configured for the provider below.",
               )}
             </CardDescription>
@@ -258,7 +270,7 @@ export default function PricingPage({
           <CardContent className="space-y-6">
             <div className="border-border bg-muted/30 border p-5">
               <p className="text-muted-foreground text-sm uppercase">
-                {t("55acc893dd3a", "Provider")}
+                {t("pricing_provider", "Provider")}
               </p>
               <p className="text-foreground mt-2 font-mono text-2xl font-bold uppercase">
                 {PAYMENT_PROVIDER}
@@ -268,12 +280,15 @@ export default function PricingPage({
             <div className="space-y-3">
               <Button asChild className="w-full">
                 <Link href="/features" locale={locale}>
-                  {t("5e7e631987bc", "Review included modules")}
+                  {t(
+                    "pricing_review_included_modules",
+                    "Review included modules",
+                  )}
                 </Link>
               </Button>
               <Button asChild variant="outline" className="w-full">
                 <Link href="/contact" locale={locale}>
-                  {t("fed723d3bdb1", "Talk through fit")}
+                  {t("pricing_talk_through_fit", "Talk through fit")}
                 </Link>
               </Button>
             </div>

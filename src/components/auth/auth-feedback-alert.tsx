@@ -16,7 +16,7 @@ export function AuthFeedbackAlert({
       description = feedback.banReason ? (
         <>
           {t(
-            "ef988f570010",
+            "auth_account_disabled_contact_support_reason",
             "This account is disabled. Contact support. Reason: {expression0}",
             {
               expression0: feedback.banReason,
@@ -24,13 +24,21 @@ export function AuthFeedbackAlert({
           )}
         </>
       ) : (
-        <>{t("9a5d9e78c172", "This account is disabled. Contact support.")}</>
+        <>
+          {t(
+            "auth_account_disabled_contact_support",
+            "This account is disabled. Contact support.",
+          )}
+        </>
       );
       break;
     case "session_expired":
       description = (
         <>
-          {t("228c32b12331", "Your session ended. Sign in again to continue.")}
+          {t(
+            "auth_session_ended_sign_in_again_continue",
+            "Your session ended. Sign in again to continue.",
+          )}
         </>
       );
       break;
@@ -38,7 +46,7 @@ export function AuthFeedbackAlert({
       description = (
         <>
           {t(
-            "afc9de29bb06",
+            "auth_sign_in_link_invalid_request_new",
             "This sign-in link is invalid. Request a new one.",
           )}
         </>
@@ -47,7 +55,10 @@ export function AuthFeedbackAlert({
     case "EXPIRED_TOKEN":
       description = (
         <>
-          {t("ee277c409ae6", "This sign-in link expired. Request a new one.")}
+          {t(
+            "auth_sign_in_link_expired_request_new",
+            "This sign-in link expired. Request a new one.",
+          )}
         </>
       );
       break;
@@ -55,7 +66,7 @@ export function AuthFeedbackAlert({
       description = (
         <>
           {t(
-            "97b615e0adc4",
+            "auth_sign_in_link_was_already_used",
             "This sign-in link was already used. Request a new one.",
           )}
         </>
@@ -65,14 +76,18 @@ export function AuthFeedbackAlert({
       description = (
         <>
           {t(
-            "76a5d38b7ad6",
+            "auth_sign_in_process_was_interrupted_start",
             "The sign-in process was interrupted. Start again.",
           )}
         </>
       );
       break;
     case "sign_in_failed":
-      description = <>{t("336f0e3003df", "Unable to sign in. Try again.")}</>;
+      description = (
+        <>
+          {t("auth_unable_sign_in_try_again", "Unable to sign in. Try again.")}
+        </>
+      );
       break;
     default:
       return null;

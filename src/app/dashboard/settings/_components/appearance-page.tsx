@@ -110,11 +110,11 @@ export function AppearancePage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Monitor className="text-primary h-5 w-5" />
-            {t("ae98430157b2", "Theme Preferences")}
+            {t("settings_theme_preferences", "Theme Preferences")}
           </CardTitle>
           <CardDescription>
             {t(
-              "f95d1442a9e2",
+              "settings_choose_preferred_theme_dashboard_interface",
               "Choose your preferred theme for the dashboard interface",
             )}
           </CardDescription>

@@ -27,27 +27,27 @@ export function Header({
     {
       id: "nav-features",
       href: withLocalePrefix("/features", locale),
-      title: t("cfdb02905783", "Features"),
+      title: t("home_features", "Features"),
     },
     {
       id: "nav-pricing",
       href: withLocalePrefix("/pricing", locale),
-      title: t("636e74a41e80", "Pricing"),
+      title: t("home_pricing_title", "Pricing"),
     },
     {
       id: "nav-about",
       href: withLocalePrefix("/about", locale),
-      title: t("9310e918931e", "About"),
+      title: t("home_about", "About"),
     },
     {
       id: "nav-blog",
       href: withLocalePrefix("/blog", locale),
-      title: t("3d3e4c83a046", "Blog"),
+      title: t("home_blog", "Blog"),
     },
     {
       id: "nav-contact",
       href: withLocalePrefix("/contact", locale),
-      title: t("1a5e08adf49a", "Contact"),
+      title: t("home_contact", "Contact"),
     },
   ].filter((item) => SITE_CONFIG.features.billing || item.id !== "nav-pricing");
 
@@ -84,10 +84,10 @@ export function Header({
             navigationItems={navigationItems}
             labels={{
               dashboard: t("header_dashboard", "Dashboard"),
-              getStarted: t("3dd52b8e342a", "Get Started"),
-              navigationMenu: t("2924b40503f8", "Navigation Menu"),
-              signIn: t("6639ec6351f1", "Sign In"),
-              toggleMenu: t("56980d19e13c", "Toggle menu"),
+              getStarted: t("home_get_started", "Get Started"),
+              navigationMenu: t("home_navigation_menu", "Navigation Menu"),
+              signIn: t("home_sign_in", "Sign In"),
+              toggleMenu: t("home_toggle_menu", "Toggle menu"),
             }}
           />
         </div>

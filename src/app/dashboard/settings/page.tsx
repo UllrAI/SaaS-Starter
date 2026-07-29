@@ -11,24 +11,24 @@ export async function generateMetadata() {
   const metadata = createMetadataDefaults({ locale });
   return {
     ...metadata,
-    title: t("1d469220fba5", "Settings"),
+    title: t("settings_title", "Settings"),
     description: t(
-      "690d7a2763db",
+      "settings_manage_account_profile_dashboard_appearance",
       "Manage your account profile and dashboard appearance.",
     ),
     openGraph: {
       ...metadata.openGraph,
-      title: t("15a359ec2f5c", "Settings"),
+      title: t("settings_title", "Settings"),
       description: t(
-        "e417153fb3ac",
+        "settings_manage_account_profile_dashboard_appearance_description",
         "Manage your account profile and dashboard appearance.",
       ),
     },
     twitter: {
       ...metadata.twitter,
-      title: t("036cfbaf7a0e", "Settings"),
+      title: t("settings_title", "Settings"),
       description: t(
-        "05b8e29457ac",
+        "settings_manage_account_profile_dashboard_appearance",
         "Manage your account profile and dashboard appearance.",
       ),
     },
@@ -38,11 +38,11 @@ export default function SettingsPage() {
   const { t } = useTranslation();
   return (
     <DashboardPageWrapper
-      title={<>{t("6c942331684c", "Settings")}</>}
+      title={<>{t("settings_title", "Settings")}</>}
       description={
         <>
           {t(
-            "40cffcff801b",
+            "settings_manage_account_profile_dashboard_appearance",
             "Manage your account profile and dashboard appearance.",
           )}
         </>

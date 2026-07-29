@@ -21,24 +21,24 @@ export async function generateMetadata() {
   const metadata = createMetadataDefaults({ locale });
   return {
     ...metadata,
-    title: t("4630c4ba4580", "Payment Management"),
+    title: t("admin_payment_management", "Payment Management"),
     description: t(
-      "3f7482df5e5e",
+      "admin_monitor_manage_all_payment_transactions",
       "Monitor and manage all payment transactions",
     ),
     openGraph: {
       ...metadata.openGraph,
-      title: t("23064ec7ab3e", "Payment Management"),
+      title: t("admin_payment_management", "Payment Management"),
       description: t(
-        "18201868f4b1",
+        "admin_monitor_manage_all_payment_transactions",
         "Monitor and manage all payment transactions",
       ),
     },
     twitter: {
       ...metadata.twitter,
-      title: t("91c58a8dbf69", "Payment Management"),
+      title: t("admin_payment_management", "Payment Management"),
       description: t(
-        "d30ce9379d2d",
+        "admin_monitor_manage_all_payment_transactions_description",
         "Monitor and manage all payment transactions",
       ),
     },
@@ -54,8 +54,8 @@ export default async function PaymentsPage() {
   const initialTableData = await getPayments({});
   return (
     <DashboardPageWrapper
-      title={<>{t("886ed7928313", "Payment Management")}</>}
-      parentTitle={<>{t("7a0af3ad335d", "Admin Dashboard")}</>}
+      title={<>{t("admin_payment_management", "Payment Management")}</>}
+      parentTitle={<>{t("admin_dashboard", "Admin Dashboard")}</>}
       parentUrl="/dashboard/admin"
     >
       <Suspense fallback={<StatsCardsSkeleton />}>
@@ -64,9 +64,12 @@ export default async function PaymentsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>{t("0e3e5ecfea61", "All Payments")}</CardTitle>
+          <CardTitle>{t("admin_all_payments", "All Payments")}</CardTitle>
           <CardDescription>
-            {t("085a2670c1b2", "View and manage payment transactions")}
+            {t(
+              "admin_view_manage_payment_transactions",
+              "View and manage payment transactions",
+            )}
           </CardDescription>
         </CardHeader>
         <CardContent>

@@ -84,14 +84,14 @@ export function BlogPostCard({
                 className="bg-primary/90 text-primary-foreground border-primary/20 hover:bg-primary backdrop-blur-sm transition-colors"
               >
                 <Sparkles className="mr-1 h-3 w-3" />
-                {t("82cc9cd0a5e8", "Featured")}
+                {t("blog_featured", "Featured")}
               </Badge>
             ) : (
               <Badge
                 variant="secondary"
                 className="bg-background/90 text-foreground border-border hover:bg-background backdrop-blur-sm transition-colors"
               >
-                {t("296b6f037924", "Article")}
+                {t("blog_article", "Article")}
               </Badge>
             )}
           </div>
@@ -108,14 +108,14 @@ export function BlogPostCard({
                 className="bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 transition-colors"
               >
                 <Sparkles className="mr-1 h-3 w-3" />
-                {t("82cc9cd0a5e8", "Featured")}
+                {t("blog_featured", "Featured")}
               </Badge>
             ) : (
               <Badge
                 variant="secondary"
                 className="bg-muted/50 text-muted-foreground border-muted hover:bg-muted transition-colors"
               >
-                {t("296b6f037924", "Article")}
+                {t("blog_article", "Article")}
               </Badge>
             )}
           </div>

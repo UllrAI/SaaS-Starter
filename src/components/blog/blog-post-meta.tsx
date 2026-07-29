@@ -29,7 +29,7 @@ export function BlogPostMeta({
 }: BlogPostMetaProps) {
   const supportedLocale = locale ?? SOURCE_LOCALE;
   const { t } = getStaticTranslations(supportedLocale);
-  const resolvedAuthor = author ?? <>{t("cd29aaf35997", "Anonymous")}</>;
+  const resolvedAuthor = author ?? <>{t("blog_anonymous", "Anonymous")}</>;
   const isOverlay = variant === "overlay";
   const textColor = isOverlay ? "text-white/80" : "text-muted-foreground";
   const badgeVariant = featured ? "default" : "secondary";
@@ -60,7 +60,7 @@ export function BlogPostMeta({
               )}
             >
               <Sparkles className="mr-1 h-3 w-3" />
-              {t("f0a8a5136f7a", "Featured")}
+              {t("blog_featured", "Featured")}
             </Badge>
           ) : (
             <Badge
@@ -70,7 +70,7 @@ export function BlogPostMeta({
                 articleBadgeClasses,
               )}
             >
-              {t("80faf1421edb", "Article")}
+              {t("blog_article", "Article")}
             </Badge>
           )}
         </div>

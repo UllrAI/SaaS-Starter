@@ -14,31 +14,40 @@ export async function SubscriptionStatsCards() {
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       <StatCard
-        title={t("687ec1f6703c", "Total Subscriptions")}
+        title={t("admin_total_subscriptions", "Total Subscriptions")}
         value={stats.total}
-        description={t("b92d1f928be4", "All-time subscriptions")}
+        description={t(
+          "admin_all_time_subscriptions",
+          "All-time subscriptions",
+        )}
         icon={Users}
         locale={locale}
       />
       <StatCard
-        title={t("900768ed39ea", "Active Subscriptions")}
+        title={t("admin_active_subscriptions", "Active Subscriptions")}
         value={stats.active}
-        description={t("53368a6ea5de", "Currently active plans")}
+        description={t(
+          "admin_currently_active_plans",
+          "Currently active plans",
+        )}
         icon={UserCheck}
         locale={locale}
       />
       <StatCard
-        title={t("81777d2ec394", "Canceled Subscriptions")}
+        title={t("admin_canceled_subscriptions", "Canceled Subscriptions")}
         value={stats.canceled}
-        description={t("c72d5f99932f", "Subscriptions marked for cancellation")}
+        description={t(
+          "admin_subscriptions_marked_cancellation",
+          "Subscriptions marked for cancellation",
+        )}
         icon={UserX}
         locale={locale}
       />
       <StatCard
-        title={t("8eeccb8c3a30", "Activation Rate")}
+        title={t("admin_activation_rate", "Activation Rate")}
         value={`${activationRate}%`}
         description={t(
-          "f4561fcfdbf1",
+          "admin_share_subscriptions_currently_active",
           "Share of subscriptions currently active",
         )}
         icon={TrendingUp}

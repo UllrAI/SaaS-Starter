@@ -48,7 +48,14 @@ interface BillingOverviewProps {
 }
 function RedirectingToSubscriptionManagementToast() {
   const { t } = useTranslation();
-  return <>{t("747a00e98aeb", "Redirecting to subscription management...")}</>;
+  return (
+    <>
+      {t(
+        "billing_redirecting_subscription_management",
+        "Redirecting to subscription management...",
+      )}
+    </>
+  );
 }
 function BillingPortalErrorToast() {
   const { t } = useTranslation();
@@ -63,17 +70,17 @@ function BillingPortalErrorToast() {
 }
 function NoActiveSubscriptionLabel() {
   const { t } = useTranslation();
-  return <>{t("596a916936d4", "No active subscription")}</>;
+  return <>{t("billing_no_active_subscription", "No active subscription")}</>;
 }
 function NotScheduledLabel() {
   const { t } = useTranslation();
-  return <>{t("fc0eb782d580", "Not scheduled")}</>;
+  return <>{t("billing_not_scheduled", "Not scheduled")}</>;
 }
 function LatestPaymentDateLabel({ date }: { date: string }) {
   const { t } = useTranslation();
   return (
     <>
-      {t("c2bd30cfc54c", "Latest: {date}", {
+      {t("billing_latest", "Latest: {date}", {
         date,
       })}
     </>
@@ -81,7 +88,7 @@ function LatestPaymentDateLabel({ date }: { date: string }) {
 }
 function NoPaymentRecordsLabel() {
   const { t } = useTranslation();
-  return <>{t("fe7244137ccf", "No records yet")}</>;
+  return <>{t("billing_no_records_yet", "No records yet")}</>;
 }
 export function BillingOverview({
   subscription,
@@ -136,13 +143,13 @@ export function BillingOverview({
         <Card>
           <CardHeader>
             <CardDescription>
-              {t("ba99902b6481", "Current Plan")}
+              {t("billing_current_plan", "Current Plan")}
             </CardDescription>
             <CardTitle className="text-base">
               {currentTierId ? (
                 `${currentTierId.charAt(0).toUpperCase()}${currentTierId.slice(1)}`
               ) : (
-                <>{t("d4b2857ce5d2", "Free")}</>
+                <>{t("billing_free", "Free")}</>
               )}
             </CardTitle>
           </CardHeader>
@@ -176,7 +183,7 @@ export function BillingOverview({
             <CardDescription>
               {hasLifetimeAccess
                 ? t("billing_access_term", "Access Term")
-                : t("b620b54bfdec", "Next Billing Date")}
+                : t("billing_next_billing_date", "Next Billing Date")}
             </CardDescription>
             <CardTitle className="text-base">
               {hasLifetimeAccess
@@ -194,9 +201,19 @@ export function BillingOverview({
                 )}
               </>
             ) : currentSubscription?.canceledAt ? (
-              <>{t("141680a4d3e7", "Subscription ends at period close")}</>
+              <>
+                {t(
+                  "billing_subscription_ends_at_period_close",
+                  "Subscription ends at period close",
+                )}
+              </>
             ) : (
-              <>{t("393e806b8041", "Based on your current billing cycle")}</>
+              <>
+                {t(
+                  "billing_based_current_billing_cycle",
+                  "Based on your current billing cycle",
+                )}
+              </>
             )}
           </CardContent>
         </Card>
@@ -204,7 +221,7 @@ export function BillingOverview({
         <Card>
           <CardHeader>
             <CardDescription>
-              {t("7534811de973", "Successful Payments")}
+              {t("billing_successful_payments", "Successful Payments")}
             </CardDescription>
             <CardTitle className="text-base">
               {successfulPaymentCount}
@@ -227,10 +244,12 @@ export function BillingOverview({
 
       <Card>
         <CardHeader>
-          <CardTitle>{t("5912dc0d4006", "Subscription Management")}</CardTitle>
+          <CardTitle>
+            {t("billing_subscription_management", "Subscription Management")}
+          </CardTitle>
           <CardDescription>
             {t(
-              "45011971a8f8",
+              "billing_use_billing_portal_update_payment_method",
               "Use the billing portal to update your payment method, invoices, and subscription status.",
             )}
           </CardDescription>
@@ -241,16 +260,20 @@ export function BillingOverview({
               onClick={handleManageSubscription}
               disabled={isPortalLoading}
             >
-              {t("f3d6ee9e6c3e", "{expression0} Manage Subscription", {
-                expression0: isPortalLoading && (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ),
-              })}
+              {t(
+                "billing_manage_subscription",
+                "{expression0} Manage Subscription",
+                {
+                  expression0: isPortalLoading && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ),
+                },
+              )}
             </Button>
           ) : (
             <Button asChild>
               <LocalizedLink href="/pricing">
-                {t("dd7d10cbc338", "View Plans")}
+                {t("billing_view_plans", "View Plans")}
               </LocalizedLink>
             </Button>
           )}
@@ -259,10 +282,12 @@ export function BillingOverview({
 
       <Card>
         <CardHeader>
-          <CardTitle>{t("31a6950109ab", "Payment History")}</CardTitle>
+          <CardTitle>
+            {t("billing_payment_history", "Payment History")}
+          </CardTitle>
           <CardDescription>
             {t(
-              "9e52dd2f01df",
+              "billing_review_recent_subscription_one_time_payment",
               "Review your recent subscription and one-time payment records.",
             )}
           </CardDescription>
@@ -272,11 +297,11 @@ export function BillingOverview({
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>{t("7f2bf0739bb0", "Date")}</TableHead>
-                  <TableHead>{t("b02f3639bc71", "Product")}</TableHead>
-                  <TableHead>{t("740b64b79003", "Type")}</TableHead>
-                  <TableHead>{t("baf1b8816ca2", "Amount")}</TableHead>
-                  <TableHead>{t("383b7246808d", "Status")}</TableHead>
+                  <TableHead>{t("billing_date", "Date")}</TableHead>
+                  <TableHead>{t("billing_product", "Product")}</TableHead>
+                  <TableHead>{t("billing_type", "Type")}</TableHead>
+                  <TableHead>{t("billing_amount", "Amount")}</TableHead>
+                  <TableHead>{t("billing_status", "Status")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -326,7 +351,10 @@ export function BillingOverview({
             </Table>
           ) : (
             <p className="text-muted-foreground text-sm">
-              {t("294bb5d0dca3", "No payment history found.")}
+              {t(
+                "billing_no_payment_history_found",
+                "No payment history found.",
+              )}
             </p>
           )}
         </CardContent>

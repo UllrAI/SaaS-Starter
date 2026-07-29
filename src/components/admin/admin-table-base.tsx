@@ -95,7 +95,7 @@ export function AdminTableBase<
 }: AdminTableBaseProps<T>) {
   const { t } = useTranslation();
   const resolvedEmptyMessage = emptyMessage ?? (
-    <>{t("e833227881b2", "No data found")}</>
+    <>{t("common_no_data_found", "No data found")}</>
   );
   const resolvedFilterPlaceholder = extractTextContent(
     filterPlaceholder ?? t("admin_table_filter_placeholder", "Filter..."),
@@ -208,7 +208,7 @@ export function AdminTableBase<
         <div className="flex items-center justify-between">
           <div className="text-muted-foreground text-sm">
             {t(
-              "f26407c46b2a",
+              "common_showing_results",
               "Showing {expression0} to {expression1} of {expression2} results",
               {
                 expression0: (pagination.page - 1) * pagination.limit + 1,
@@ -228,7 +228,7 @@ export function AdminTableBase<
               disabled={pagination.page <= 1 || loading}
             >
               <ChevronLeft className="h-4 w-4" />
-              {t("4353d18ed90b", "Previous")}
+              {t("common_previous", "Previous")}
             </Button>
             <div className="flex items-center space-x-1">
               {getVisiblePageNumbers(
@@ -254,7 +254,7 @@ export function AdminTableBase<
               onClick={() => onPageChange(pagination.page + 1)}
               disabled={pagination.page >= pagination.totalPages || loading}
             >
-              {t("e500d700b2f2", "Next")}
+              {t("common_next_admin", "Next")}
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>

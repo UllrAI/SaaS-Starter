@@ -182,9 +182,12 @@ function Sidebar({
           side={side}
         >
           <SheetHeader className="sr-only">
-            <SheetTitle>{t("e1d111912db3", "Sidebar")}</SheetTitle>
+            <SheetTitle>{t("common_sidebar", "Sidebar")}</SheetTitle>
             <SheetDescription>
-              {t("f9cb8348e85b", "Displays the mobile sidebar.")}
+              {t(
+                "common_displays_mobile_sidebar",
+                "Displays the mobile sidebar.",
+              )}
             </SheetDescription>
           </SheetHeader>
           <div className="flex h-full w-full flex-col">{children}</div>
@@ -260,7 +263,9 @@ function SidebarTrigger({
       {...props}
     >
       <PanelLeftIcon />
-      <span className="sr-only">{t("2f1ee9c42709", "Toggle Sidebar")}</span>
+      <span className="sr-only">
+        {t("common_toggle_sidebar", "Toggle Sidebar")}
+      </span>
     </Button>
   );
 }
@@ -271,10 +276,10 @@ function SidebarRail({ className, ...props }: React.ComponentProps<"button">) {
     <button
       data-sidebar="rail"
       data-slot="sidebar-rail"
-      aria-label={t("10be69dd0ade", "Toggle Sidebar")}
+      aria-label={t("common_toggle_sidebar", "Toggle Sidebar")}
       tabIndex={-1}
       onClick={toggleSidebar}
-      title={t("41de8216f2b7", "Toggle Sidebar")}
+      title={t("common_toggle_sidebar", "Toggle Sidebar")}
       className={cn(
         "hover:after:bg-sidebar-border absolute inset-y-0 z-20 hidden w-4 -translate-x-1/2 transition-all ease-linear group-data-[side=left]:-right-4 group-data-[side=right]:left-0 after:absolute after:inset-y-0 after:left-1/2 after:w-[2px] sm:flex",
         "in-data-[side=left]:cursor-w-resize in-data-[side=right]:cursor-e-resize",

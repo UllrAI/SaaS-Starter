@@ -15,14 +15,14 @@ export async function UserStatsCards() {
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       <StatCard
-        title={t("fd620fc522e1", "Total Users")}
+        title={t("admin_total_users", "Total Users")}
         value={stats.total}
-        description={t("b13bed21761c", "All registered users")}
+        description={t("admin_all_registered_users", "All registered users")}
         icon={Users}
         locale={locale}
       />
       <StatCard
-        title={t("c0970292b61e", "Verified Users")}
+        title={t("admin_verified_users", "Verified Users")}
         value={stats.verified}
         description={t("user_verification_rate", "{rate}% verification rate", {
           rate: verificationRate,
@@ -31,16 +31,19 @@ export async function UserStatsCards() {
         locale={locale}
       />
       <StatCard
-        title={t("5cfb12032149", "Admin Users")}
+        title={t("admin_users", "Admin Users")}
         value={stats.admins}
-        description={t("252a9d353b11", "Admin and super admin users")}
+        description={t("admin_super_users", "Admin and super admin users")}
         icon={Shield}
         locale={locale}
       />
       <StatCard
-        title={t("b66f53732c43", "Unverified Users")}
+        title={t("admin_unverified_users", "Unverified Users")}
         value={unverified}
-        description={t("26933cd62470", "Require email verification")}
+        description={t(
+          "admin_require_email_verification",
+          "Require email verification",
+        )}
         icon={UserX}
         locale={locale}
       />

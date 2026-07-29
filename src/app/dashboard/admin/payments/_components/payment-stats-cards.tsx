@@ -34,16 +34,22 @@ export async function PaymentStatsCards() {
         locale={locale}
       />
       <StatCard
-        title={t("dcf3044f6d5a", "Total Payments")}
+        title={t("admin_total_payments", "Total Payments")}
         value={stats.total}
-        description={t("49a1f144a83d", "All-time payment transactions")}
+        description={t(
+          "admin_all_time_payment_transactions",
+          "All-time payment transactions",
+        )}
         icon={CreditCard}
         locale={locale}
       />
       <StatCard
-        title={t("6bb4a14cf9ec", "Successful Payments")}
+        title={t("admin_successful_payments", "Successful Payments")}
         value={stats.successful}
-        description={t("1ff3b41295ff", "Completed transactions")}
+        description={t(
+          "admin_completed_transactions",
+          "Completed transactions",
+        )}
         icon={TrendingUp}
         locale={locale}
       />

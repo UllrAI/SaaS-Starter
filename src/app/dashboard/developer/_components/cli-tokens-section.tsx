@@ -40,10 +40,10 @@ export function CliTokensSection({
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle>{t("c110440cd580", "CLI Sessions")}</CardTitle>
+        <CardTitle>{t("device_cli_sessions", "CLI Sessions")}</CardTitle>
         <CardDescription>
           {t(
-            "b7ce584cbc83",
+            "device_review_active_command_line_sessions_created",
             "Review active command-line sessions created via browser login and revoke any device instantly.",
           )}
         </CardDescription>
@@ -54,7 +54,7 @@ export function CliTokensSection({
             <Terminal className="text-muted-foreground h-8 w-8" />
             <p className="text-muted-foreground text-sm">
               {t(
-                "8a6958ceb6b2",
+                "device_no_cli_sessions_yet_run_authorize",
                 "No CLI sessions yet. Run <code0></code0> to authorize a device.",
                 {
                   code0: () => (
@@ -124,11 +124,11 @@ function CliTokenRow({
             }
           >
             {!token.isActive ? (
-              <>{t("d62ae0790082", "Revoked")}</>
+              <>{t("device_revoked", "Revoked")}</>
             ) : token.isExpired ? (
-              <>{t("34777eb178ac", "Expired")}</>
+              <>{t("device_expired", "Expired")}</>
             ) : (
-              <>{t("de73a11c661e", "Active")}</>
+              <>{t("device_active", "Active")}</>
             )}
           </Badge>
         </div>
@@ -144,7 +144,7 @@ function CliTokenRow({
             <span translate="no">{token.cliVersion}</span>
           ) : null}
           <span>
-            {t("20c6ef263585", "Created <span0></span0>", {
+            {t("device_created", "Created <span0></span0>", {
               span0: () => (
                 <span translate="no">
                   {new Date(token.createdAt).toLocaleDateString()}
@@ -154,7 +154,7 @@ function CliTokenRow({
           </span>
           {token.lastUsedAt ? (
             <span>
-              {t("fa54e288859b", "Last used <span0></span0>", {
+              {t("device_last_used", "Last used <span0></span0>", {
                 span0: () => (
                   <span translate="no">
                     {new Date(token.lastUsedAt!).toLocaleDateString()}
@@ -163,7 +163,7 @@ function CliTokenRow({
               })}
             </span>
           ) : (
-            <span>{t("9820b8925dca", "Never used")}</span>
+            <span>{t("device_never_used", "Never used")}</span>
           )}
         </div>
       </div>
@@ -175,7 +175,7 @@ function CliTokenRow({
           void handleRevoke();
         }}
       >
-        {t("7b54ec5999fa", "{expression0} Revoke", {
+        {t("device_revoke", "{expression0} Revoke", {
           expression0: isRevoking ? (
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
           ) : (

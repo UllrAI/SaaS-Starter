@@ -44,15 +44,29 @@ function HeadlessIssueMessage({ code }: { code: string }) {
   const { t } = useTranslation();
   switch (code) {
     case "too-many-files":
-      return <>{t("bf52a4ed08a8", "Too many files selected for this demo.")}</>;
+      return (
+        <>
+          {t(
+            "uploads_too_many_files_selected_demo",
+            "Too many files selected for this demo.",
+          )}
+        </>
+      );
     case "file-type-not-accepted":
-      return <>{t("f494964c8306", "This demo only accepts image files.")}</>;
+      return (
+        <>
+          {t(
+            "uploads_demo_only_accepts_image_files",
+            "This demo only accepts image files.",
+          )}
+        </>
+      );
     case "file-too-large":
     case "file-too-large-for-app":
       return (
         <>
           {t(
-            "052cfb5d5952",
+            "uploads_one_files_larger_than_allowed_limit",
             "One of the files is larger than the allowed limit.",
           )}
         </>
@@ -69,21 +83,43 @@ function HeadlessIssueMessage({ code }: { code: string }) {
     case "upload-preparation-failed":
       return (
         <>
-          {t("9587f0d021fb", "The file could not be prepared before upload.")}
+          {t(
+            "uploads_file_could_not_prepared_before_upload",
+            "The file could not be prepared before upload.",
+          )}
         </>
       );
     case "request-failed":
-      return <>{t("46af5583eda6", "The upload request failed. Try again.")}</>;
+      return (
+        <>
+          {t(
+            "uploads_upload_request_failed_try_again",
+            "The upload request failed. Try again.",
+          )}
+        </>
+      );
     case "network-error":
       return (
         <>
-          {t("162f5326e719", "The network connection dropped during upload.")}
+          {t(
+            "uploads_network_connection_dropped_during_upload",
+            "The network connection dropped during upload.",
+          )}
         </>
       );
     case "upload-aborted":
-      return <>{t("155cdbd26440", "The upload was canceled.")}</>;
+      return (
+        <>{t("uploads_upload_was_canceled", "The upload was canceled.")}</>
+      );
     default:
-      return <>{t("36a9df773d18", "The upload could not be completed.")}</>;
+      return (
+        <>
+          {t(
+            "uploads_upload_could_not_completed",
+            "The upload could not be completed.",
+          )}
+        </>
+      );
   }
 }
 function HeadlessTileStatus({
@@ -98,19 +134,19 @@ function HeadlessTileStatus({
     case "uploading":
       return (
         <>
-          {t("59ba3bcd229b", "{progress}%", {
+          {t("uploads_server_progress_percent", "{progress}%", {
             progress,
           })}
         </>
       );
     case "success":
-      return <>{t("119f40118528", "Uploaded")}</>;
+      return <>{t("uploads_uploaded", "Uploaded")}</>;
     case "error":
-      return <>{t("9e307de530ea", "Needs attention")}</>;
+      return <>{t("uploads_needs_attention_headless", "Needs attention")}</>;
     case "canceled":
-      return <>{t("fe240bb1914c", "Canceled")}</>;
+      return <>{t("uploads_canceled", "Canceled")}</>;
     default:
-      return <>{t("6964a1a16283", "Queued")}</>;
+      return <>{t("uploads_queued_headless", "Queued")}</>;
   }
 }
 function HeadlessUploadTile({
@@ -135,9 +171,11 @@ function HeadlessUploadTile({
       })}
     >
       <Upload className="mb-2 h-5 w-5" />
-      <p className="text-sm font-medium">{t("e721b549cc34", "Add images")}</p>
+      <p className="text-sm font-medium">
+        {t("uploads_add_images", "Add images")}
+      </p>
       <p className="mt-1 text-xs">
-        {t("175943341e11", "Drag, drop, or browse")}
+        {t("uploads_drag_drop_browse", "Drag, drop, or browse")}
       </p>
     </div>
   );
@@ -213,7 +251,7 @@ function HeadlessUploadContent({
       {completedCount > 0 ? (
         <div className="flex flex-wrap gap-2">
           <Button size="sm" variant="outline" onClick={uploader.clearCompleted}>
-            {t("62046b76c6d5", "Clear completed")}
+            {t("uploads_clear_completed_headless", "Clear completed")}
           </Button>
         </div>
       ) : null}
@@ -254,7 +292,7 @@ export function UploadWorkbench() {
       description: (
         <>
           {t(
-            "f2f10c1a7bcf",
+            "uploads_best_gallery_style_uploads_image_compression",
             "Best for gallery-style uploads with image compression and instant preview tiles.",
           )}
         </>
@@ -262,7 +300,7 @@ export function UploadWorkbench() {
       meta: (
         <>
           {t(
-            "94a9e189bfb5",
+            "uploads_5_files_10_mb_each_compression",
             "5 files \u2022 10 MB each \u2022 compression enabled",
           )}
         </>
@@ -275,7 +313,7 @@ export function UploadWorkbench() {
         maxFileSize: 10 * 1024 * 1024,
         maxFiles: 5,
       },
-      title: <>{t("c9cc19dc1748", "Image uploads")}</>,
+      title: <>{t("uploads_image_uploads", "Image uploads")}</>,
     },
     documents: {
       acceptedFileTypes: [
@@ -289,7 +327,7 @@ export function UploadWorkbench() {
       description: (
         <>
           {t(
-            "d5d53a3c02f4",
+            "uploads_shows_narrower_preset_single_file_document",
             "Shows a narrower preset for single-file document collection and validation feedback.",
           )}
         </>
@@ -297,7 +335,7 @@ export function UploadWorkbench() {
       meta: (
         <>
           {t(
-            "bf93f825d493",
+            "uploads_1_file_10_mb_document_formats",
             "1 file \u2022 10 MB \u2022 document formats only",
           )}
         </>
@@ -306,37 +344,44 @@ export function UploadWorkbench() {
         maxFileSize: 10 * 1024 * 1024,
         maxFiles: 1,
       },
-      title: <>{t("7b7cff8f07f2", "Document uploads")}</>,
+      title: <>{t("uploads_document_uploads", "Document uploads")}</>,
     },
     batch: {
       acceptedFileTypes: undefined,
       description: (
         <>
           {t(
-            "26ba16e3e580",
+            "uploads_use_full_supported_matrix_when_workflow",
             "Use the full supported matrix when a workflow needs several files in one run.",
           )}
         </>
       ),
-      meta: <>{t("e61174f4a548", "10 files \u2022 default global limits")}</>,
+      meta: (
+        <>
+          {t(
+            "uploads_10_files_default_global_limits",
+            "10 files \u2022 default global limits",
+          )}
+        </>
+      ),
       settings: {
         maxFiles: 10,
       },
-      title: <>{t("24aac2d699ef", "Batch uploads")}</>,
+      title: <>{t("uploads_batch_uploads", "Batch uploads")}</>,
     },
     large: {
       acceptedFileTypes: undefined,
       description: (
         <>
           {t(
-            "5ad776a79d22",
+            "uploads_demonstrates_looser_preset_without_changing_application",
             "Demonstrates a looser preset without changing the application-wide safety checks.",
           )}
         </>
       ),
       meta: (
         <>
-          {t("b55fc81b5407", "2 files \u2022 {expression0} each", {
+          {t("uploads_2_files_each", "2 files \u2022 {expression0} each", {
             expression0: formatFileSize(50 * 1024 * 1024),
           })}
         </>
@@ -345,7 +390,7 @@ export function UploadWorkbench() {
         maxFileSize: 50 * 1024 * 1024,
         maxFiles: 2,
       },
-      title: <>{t("42eb954ee399", "Large files")}</>,
+      title: <>{t("uploads_large_files", "Large files")}</>,
     },
   };
   const capabilityCards = [
@@ -354,39 +399,39 @@ export function UploadWorkbench() {
       description: (
         <>
           {t(
-            "c3d284136549",
+            "uploads_preset_demos_image_document_batch_larger",
             "Preset demos for image, document, batch, and larger file uploads.",
           )}
         </>
       ),
       icon: LayoutTemplate,
-      title: <>{t("30fae2042253", "Default component")}</>,
+      title: <>{t("uploads_default_component", "Default component")}</>,
     },
     {
       id: "headless",
       description: (
         <>
           {t(
-            "08b217b883d1",
+            "uploads_same_upload_state_can_drive_custom",
             "The same upload state can drive a custom image grid through render props.",
           )}
         </>
       ),
       icon: Blocks,
-      title: <>{t("53fe962d76c7", "Headless usage")}</>,
+      title: <>{t("uploads_headless_usage", "Headless usage")}</>,
     },
     {
       id: "server",
       description: (
         <>
           {t(
-            "aea6d90b4fb9",
+            "uploads_route_files_through_backend_when_validation",
             "Route files through your backend when validation or processing must happen first.",
           )}
         </>
       ),
       icon: HardDriveUpload,
-      title: <>{t("d6eb86764c39", "Server pipeline")}</>,
+      title: <>{t("uploads_server_pipeline", "Server pipeline")}</>,
     },
   ];
   return (
@@ -413,10 +458,12 @@ export function UploadWorkbench() {
       <section className="grid gap-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]">
         <Card className="shadow-sm">
           <CardHeader>
-            <CardTitle>{t("ecd94a4d7e74", "Default uploader demos")}</CardTitle>
+            <CardTitle>
+              {t("uploads_default_uploader_demos", "Default uploader demos")}
+            </CardTitle>
             <CardDescription>
               {t(
-                "52646e63593e",
+                "uploads_reuse_shared_uploader_different_presets_demonstrate",
                 "Reuse the shared uploader with different presets to demonstrate the common paths most products need.",
               )}
             </CardDescription>
@@ -425,16 +472,16 @@ export function UploadWorkbench() {
             <Tabs defaultValue="images">
               <TabsList className="h-auto w-full justify-start">
                 <TabsTrigger value="images">
-                  {t("b7b5d0331413", "Images")}
+                  {t("uploads_images", "Images")}
                 </TabsTrigger>
                 <TabsTrigger value="documents">
-                  {t("0191297727bb", "Documents")}
+                  {t("uploads_documents", "Documents")}
                 </TabsTrigger>
                 <TabsTrigger value="batch">
-                  {t("a425b80f7878", "Batch")}
+                  {t("uploads_batch", "Batch")}
                 </TabsTrigger>
                 <TabsTrigger value="large">
-                  {t("f0d14e47d4c9", "Large")}
+                  {t("uploads_large", "Large")}
                 </TabsTrigger>
               </TabsList>
 
@@ -465,10 +512,12 @@ export function UploadWorkbench() {
 
         <Card className="shadow-sm">
           <CardHeader>
-            <CardTitle>{t("2ccce01e2f96", "Headless example")}</CardTitle>
+            <CardTitle>
+              {t("uploads_headless_example", "Headless example")}
+            </CardTitle>
             <CardDescription>
               {t(
-                "f2bbf612fabc",
+                "uploads_demo_uses_same_uploader_state_but",
                 "This demo uses the same uploader state, but renders a custom image grid instead of the default shell.",
               )}
             </CardDescription>
@@ -477,11 +526,11 @@ export function UploadWorkbench() {
             <div className="text-muted-foreground bg-muted/30 rounded-lg border p-3 text-sm">
               <div className="text-foreground flex items-center gap-2 font-medium">
                 <Blocks className="h-4 w-4" />
-                <span>{t("7dd29325ac4a", "Why this matters")}</span>
+                <span>{t("uploads_why_matters", "Why this matters")}</span>
               </div>
               <p className="mt-2">
                 {t(
-                  "50224d71556f",
+                  "uploads_product_pages_often_need_bespoke_previews",
                   "Product pages often need bespoke previews. The upload logic stays shared while the layout stays page-specific.",
                 )}
               </p>
@@ -496,11 +545,13 @@ export function UploadWorkbench() {
         <CardHeader>
           <div className="flex items-center gap-2">
             <Server className="text-primary h-5 w-5" />
-            <CardTitle>{t("5a5fe63d2053", "Server-side uploads")}</CardTitle>
+            <CardTitle>
+              {t("uploads_server_side_uploads", "Server-side uploads")}
+            </CardTitle>
           </div>
           <CardDescription>
             {t(
-              "179dea16873a",
+              "uploads_use_lane_when_application_must_inspect",
               "Use this lane when your application must inspect or transform files on the server before they reach object storage.",
             )}
           </CardDescription>

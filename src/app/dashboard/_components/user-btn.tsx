@@ -30,11 +30,25 @@ interface UserButtonProps {
 }
 function LoggedOutToast() {
   const { t } = useTranslation();
-  return <>{t("ebd9be9621fb", "You have been logged out successfully.")}</>;
+  return (
+    <>
+      {t(
+        "dashboard_you_have_been_logged_out_successfully",
+        "You have been logged out successfully.",
+      )}
+    </>
+  );
 }
 function LogoutFailedToast() {
   const { t } = useTranslation();
-  return <>{t("3936237fcb58", "Something went wrong. Please try again.")}</>;
+  return (
+    <>
+      {t(
+        "dashboard_something_went_wrong_please_try_again",
+        "Something went wrong. Please try again.",
+      )}
+    </>
+  );
 }
 export function UserButton({ user }: UserButtonProps) {
   const { t } = useTranslation();
@@ -120,7 +134,7 @@ export function UserButton({ user }: UserButtonProps) {
               <Link href="/dashboard/settings">
                 <DropdownMenuItem className="cursor-pointer">
                   <Settings className="size-4" />
-                  {t("57c1186f9419", "Settings")}
+                  {t("dashboard_settings", "Settings")}
                 </DropdownMenuItem>
               </Link>
             </DropdownMenuGroup>
@@ -129,12 +143,12 @@ export function UserButton({ user }: UserButtonProps) {
               {loggingOut ? (
                 <div className="flex items-center gap-2">
                   <Loader2 className="size-4 animate-spin" />
-                  <span>{t("b265105cba36", "Log Out")}</span>
+                  <span>{t("dashboard_log_out", "Log Out")}</span>
                 </div>
               ) : (
                 <div className="flex items-center gap-2">
                   <LogOut className="size-4" />
-                  {t("b265105cba36", "Log Out")}
+                  {t("dashboard_log_out", "Log Out")}
                 </div>
               )}
             </DropdownMenuItem>

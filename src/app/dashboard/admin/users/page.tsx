@@ -19,24 +19,24 @@ export async function generateMetadata() {
   const metadata = createMetadataDefaults({ locale });
   return {
     ...metadata,
-    title: t("d4087fd47957", "User Management"),
+    title: t("admin_user_management", "User Management"),
     description: t(
-      "c812c1d487d3",
+      "admin_manage_user_accounts_roles_permissions",
       "Manage user accounts, roles, and permissions",
     ),
     openGraph: {
       ...metadata.openGraph,
-      title: t("8fc0957ba892", "User Management"),
+      title: t("admin_user_management", "User Management"),
       description: t(
-        "d2c6a7c3e392",
+        "admin_manage_user_accounts_roles_permissions",
         "Manage user accounts, roles, and permissions",
       ),
     },
     twitter: {
       ...metadata.twitter,
-      title: t("7d06eadbc106", "User Management"),
+      title: t("admin_user_management", "User Management"),
       description: t(
-        "4d667a4b0712",
+        "admin_manage_user_accounts_roles_permissions",
         "Manage user accounts, roles, and permissions",
       ),
     },
@@ -48,8 +48,8 @@ export default async function UserManagementPage() {
   const initialTableData = await getUsers({});
   return (
     <DashboardPageWrapper
-      title={<>{t("ce91e184c28a", "User Management")}</>}
-      parentTitle={<>{t("d778c006a4d7", "Admin Dashboard")}</>}
+      title={<>{t("admin_user_management", "User Management")}</>}
+      parentTitle={<>{t("admin_dashboard_page", "Admin Dashboard")}</>}
       parentUrl="/dashboard/admin"
     >
       <Suspense fallback={<StatsCardsSkeleton />}>
@@ -58,9 +58,12 @@ export default async function UserManagementPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>{t("428e2f16de95", "All Users")}</CardTitle>
+          <CardTitle>{t("admin_all_users", "All Users")}</CardTitle>
           <CardDescription>
-            {t("ab6f59c0be34", "Manage user accounts, roles, and permissions")}
+            {t(
+              "admin_manage_user_accounts_roles_permissions_management",
+              "Manage user accounts, roles, and permissions",
+            )}
           </CardDescription>
         </CardHeader>
         <CardContent>

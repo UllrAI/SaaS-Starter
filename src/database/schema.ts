@@ -292,17 +292,14 @@ export const productEntitlements = pgTable(
   }),
 );
 
-// Webhook events table to ensure idempotency
+// Successfully processed provider events retained for idempotency
 export const webhookEvents = pgTable(
   "webhook_events",
   {
     id: uuid("id").primaryKey().defaultRandom(),
-    eventId: text("eventId").notNull(), // Unique identifier from webhook provider
+    eventId: text("eventId").notNull(),
     eventType: text("eventType").notNull(),
-    provider: text("provider").notNull().default("creem"), // Support multiple providers
-    processed: boolean("processed").notNull().default(true),
-    processedAt: timestamp("processedAt").notNull().defaultNow(),
-    payload: text("payload"), // Store original payload for debugging
+    provider: text("provider").notNull().default("creem"),
     createdAt: timestamp("createdAt").notNull().defaultNow(),
   },
   (table) => {

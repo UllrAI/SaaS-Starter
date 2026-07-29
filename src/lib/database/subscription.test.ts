@@ -60,9 +60,6 @@ const mockWebhookEvents = {
   eventId: "webhookEvents.eventId",
   eventType: "webhookEvents.eventType",
   provider: "webhookEvents.provider",
-  payload: "webhookEvents.payload",
-  processed: "webhookEvents.processed",
-  processedAt: "webhookEvents.processedAt",
 };
 
 const mockEq = jest.fn();
@@ -1222,41 +1219,37 @@ describe("Database Subscription Functions", () => {
     });
   });
 
-  describe("recordWebhookEvent", () => {
-    it("should record webhook event with all parameters", async () => {
-      mockDb.insert.mockReturnValue({
-        values: jest.fn().mockReturnValue({
-          onConflictDoNothing: jest.fn().mockReturnValue({
-            returning: jest.fn().mockResolvedValue([{ id: "event-row-id" }]),
-          }),
+  describe("claimWebhookEvent", () => {
+    it("should claim an event without retaining its raw payload", async () => {
+      const values = jest.fn().mockReturnValue({
+        onConflictDoNothing: jest.fn().mockReturnValue({
+          returning: jest.fn().mockResolvedValue([{ id: "event-row-id" }]),
         }),
       });
+      mockDb.insert.mockReturnValue({
+        values,
+      });
 
-      const { recordWebhookEvent } = await import("./subscription");
-
-      const result = await recordWebhookEvent(
+      const { claimWebhookEvent } = await import("./subscription");
+      const result = await claimWebhookEvent(
         "event-123",
         "payment.succeeded",
         "creem",
-        '{"eventType":"payment.succeeded"}',
       );
 
       expect(result).toBe(true);
       expect(mockDb.insert).toHaveBeenCalledWith(mockWebhookEvents);
+      expect(values).toHaveBeenCalledWith({
+        eventId: "event-123",
+        eventType: "payment.succeeded",
+        provider: "creem",
+      });
     });
 
     it("should use default provider when not specified", async () => {
-      const { recordWebhookEvent } = await import("./subscription");
+      const { claimWebhookEvent } = await import("./subscription");
 
-      await recordWebhookEvent("event-123", "payment.succeeded");
-
-      expect(mockDb.insert).toHaveBeenCalled();
-    });
-
-    it("should handle optional payload", async () => {
-      const { recordWebhookEvent } = await import("./subscription");
-
-      await recordWebhookEvent("event-123", "payment.succeeded", "creem");
+      await claimWebhookEvent("event-123", "payment.succeeded");
 
       expect(mockDb.insert).toHaveBeenCalled();
     });
@@ -1272,13 +1265,12 @@ describe("Database Subscription Functions", () => {
         }),
       };
 
-      const { recordWebhookEvent } = await import("./subscription");
+      const { claimWebhookEvent } = await import("./subscription");
 
-      await recordWebhookEvent(
+      await claimWebhookEvent(
         "event-123",
         "payment.succeeded",
         "creem",
-        undefined,
         mockTx as any,
       );
 
@@ -1297,9 +1289,9 @@ describe("Database Subscription Functions", () => {
         }),
       });
 
-      const { recordWebhookEvent } = await import("./subscription");
+      const { claimWebhookEvent } = await import("./subscription");
 
-      const result = await recordWebhookEvent("event-123", "payment.succeeded");
+      const result = await claimWebhookEvent("event-123", "payment.succeeded");
 
       expect(result).toBe(false);
       expect(mockOnConflictDoNothing).toHaveBeenCalledWith({

@@ -133,6 +133,9 @@ products and updates only the selected environment namespace. Review and commit
 that configuration change before deploying. Checkout fails closed when the
 active environment has no configured product ID.
 
+Webhook retry, idempotency, and manual replay behavior are documented in
+[Billing webhook operations](docs/webhooks.md).
+
 ### 4. Database Setup
 
 This project uses a single Drizzle config file, `src/database/config.ts`, and a single committed migration history in `src/database/migrations/`. The target database is selected only by `DATABASE_URL`.

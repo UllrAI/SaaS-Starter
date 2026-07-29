@@ -28,6 +28,11 @@ jest.mock("@/lib/billing", () => ({
   },
 }));
 
+const mockLogCreemWebhook = jest.fn();
+jest.mock("@/lib/billing/creem/webhook-log", () => ({
+  logCreemWebhook: mockLogCreemWebhook,
+}));
+
 describe("Billing Webhooks Creem API", () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -86,6 +91,11 @@ describe("Billing Webhooks Creem API", () => {
       expect(response.status).toBe(400);
       expect(data.error).toBe("Missing webhook signature header");
       expect(mockHeadersList.get).toHaveBeenCalledWith("creem-signature");
+      expect(mockLogCreemWebhook).toHaveBeenCalledWith("warn", {
+        eventId: null,
+        eventType: null,
+        outcome: "missing_signature",
+      });
     });
 
     it("should return 400 when signature header is empty string", async () => {
@@ -175,6 +185,7 @@ describe("Billing Webhooks Creem API", () => {
 
       expect(response.status).toBe(500);
       expect(data.error).toBe("Webhook processing failed");
+      expect(mockLogCreemWebhook).not.toHaveBeenCalled();
     });
 
     it("should handle non-Error exceptions with 500 status", async () => {
@@ -192,6 +203,7 @@ describe("Billing Webhooks Creem API", () => {
 
       expect(response.status).toBe(500);
       expect(data.error).toBe("Webhook processing failed");
+      expect(mockLogCreemWebhook).not.toHaveBeenCalled();
     });
 
     it("should handle request body read failure", async () => {
@@ -224,6 +236,11 @@ describe("Billing Webhooks Creem API", () => {
 
       expect(response.status).toBe(500);
       expect(data.error).toBe("Webhook processing failed");
+      expect(mockLogCreemWebhook).toHaveBeenCalledWith("error", {
+        eventId: null,
+        eventType: null,
+        outcome: "request_failed",
+      });
     });
 
     it("should handle headers() function failure", async () => {
@@ -322,6 +339,11 @@ describe("Billing Webhooks Creem API", () => {
       expect(response.status).toBe(413);
       expect(data.error).toBe("Webhook payload is too large");
       expect(mockHandleWebhook).not.toHaveBeenCalled();
+      expect(mockLogCreemWebhook).toHaveBeenCalledWith("warn", {
+        eventId: null,
+        eventType: null,
+        outcome: "body_too_large",
+      });
     });
 
     it("should return 500 when a non-signature error mentions signature", async () => {

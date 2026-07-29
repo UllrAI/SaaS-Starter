@@ -5,7 +5,7 @@ import type {
 } from "../provider";
 import type { CreateCheckoutOptions } from "@/types/billing";
 import { z } from "zod";
-import { creemClient, creemEnvironment, creemWebhookSecret } from "./client";
+import { creemClient, creemEnvironment } from "./client";
 import { handleCreemWebhook } from "./webhook";
 import { getCreemProductIds } from "./products";
 
@@ -146,23 +146,8 @@ const creemProvider: PaymentProvider = {
   async handleWebhook(
     payload: string,
     signature: string,
-  ): Promise<{ received: boolean; message?: string }> {
-    if (!creemWebhookSecret) {
-      console.error("Creem webhook secret is not configured.");
-      throw new Error("Webhook secret not configured.");
-    }
-
-    try {
-      return await handleCreemWebhook(payload, signature);
-    } catch (error) {
-      const message =
-        error instanceof Error ? error.message : "Webhook handling failed";
-      console.error(`[Creem Webhook Provider Error]: ${message}`);
-      if (error instanceof Error) {
-        throw error;
-      }
-      throw new Error(message);
-    }
+  ): Promise<{ received: true }> {
+    return handleCreemWebhook(payload, signature);
   },
 };
 

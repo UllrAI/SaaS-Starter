@@ -5,6 +5,7 @@ import {
   readTextBodyWithLimit,
   RequestBodyTooLargeError,
 } from "@/lib/http/request-body";
+import { logCreemWebhook } from "@/lib/billing/creem/webhook-log";
 
 const MAX_WEBHOOK_BODY_BYTES = 1024 * 1024;
 
@@ -17,6 +18,7 @@ function isInvalidWebhookPayloadError(error: unknown) {
 }
 
 export async function POST(request: NextRequest) {
+  let delegatedToHandler = false;
   try {
     const payload = await readTextBodyWithLimit(
       request,
@@ -27,23 +29,29 @@ export async function POST(request: NextRequest) {
     const signature = headersList.get("creem-signature");
 
     if (!signature) {
-      console.warn("Webhook request missing 'creem-signature' header.");
+      logCreemWebhook("warn", {
+        eventId: null,
+        eventType: null,
+        outcome: "missing_signature",
+      });
       return NextResponse.json(
         { error: "Missing webhook signature header" },
         { status: 400 },
       );
     }
 
-    // Pass the raw string payload for signature verification
+    // Preserve the raw body exclusively for signature verification.
+    delegatedToHandler = true;
     const result = await billing.handleWebhook(payload, signature);
 
     return NextResponse.json(result);
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "Webhook processing failed";
-    console.error(`[Creem Webhook Error]: ${message}`);
-
     if (error instanceof RequestBodyTooLargeError) {
+      logCreemWebhook("warn", {
+        eventId: null,
+        eventType: null,
+        outcome: "body_too_large",
+      });
       return NextResponse.json(
         { error: "Webhook payload is too large" },
         { status: 413 },
@@ -64,6 +72,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (!delegatedToHandler) {
+      logCreemWebhook("error", {
+        eventId: null,
+        eventType: null,
+        outcome: "request_failed",
+      });
+    }
     return NextResponse.json(
       { error: "Webhook processing failed" },
       { status: 500 },

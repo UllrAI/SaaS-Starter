@@ -26,5 +26,5 @@ export interface PaymentProvider {
   handleWebhook(
     payload: string,
     signature: string,
-  ): Promise<{ received: boolean; message?: string }>;
+  ): Promise<{ received: true }>;
 }

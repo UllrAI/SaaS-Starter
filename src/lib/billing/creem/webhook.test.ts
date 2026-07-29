@@ -36,7 +36,7 @@ const mockUpsertPayment = jest.fn();
 const mockGrantProductEntitlement = jest.fn();
 const mockLockBillingProductScope = jest.fn();
 const mockLockPaymentAdjustmentScope = jest.fn();
-const mockRecordWebhookEvent = jest.fn();
+const mockClaimWebhookEvent = jest.fn();
 const mockRevokeProductEntitlementByPaymentId = jest.fn();
 const mockSuspendSubscriptionAccess = jest.fn();
 const mockUpdatePaymentStatus = jest.fn();
@@ -75,7 +75,7 @@ jest.mock("@/lib/database/subscription", () => ({
   grantProductEntitlement: mockGrantProductEntitlement,
   lockBillingProductScope: mockLockBillingProductScope,
   lockPaymentAdjustmentScope: mockLockPaymentAdjustmentScope,
-  recordWebhookEvent: mockRecordWebhookEvent,
+  claimWebhookEvent: mockClaimWebhookEvent,
   revokeProductEntitlementByPaymentId: mockRevokeProductEntitlementByPaymentId,
   suspendSubscriptionAccess: mockSuspendSubscriptionAccess,
   updatePaymentStatus: mockUpdatePaymentStatus,
@@ -128,7 +128,7 @@ describe("Creem Webhook Handler", () => {
       return callback(mockTx);
     });
 
-    mockRecordWebhookEvent.mockResolvedValue(true);
+    mockClaimWebhookEvent.mockResolvedValue(true);
     mockFindUserByCustomerId.mockResolvedValue({
       id: "user1",
       email: "test@example.com",
@@ -193,11 +193,10 @@ describe("Creem Webhook Handler", () => {
       const result = await handleCreemWebhook(payload, "test-signature");
 
       expect(result).toEqual({ received: true });
-      expect(mockRecordWebhookEvent).toHaveBeenCalledWith(
+      expect(mockClaimWebhookEvent).toHaveBeenCalledWith(
         "evt_checkout_123",
         "checkout.completed",
         "creem",
-        payload,
         expect.any(Object),
       );
       expect(mockUpsertSubscription).toHaveBeenCalled();
@@ -291,7 +290,7 @@ describe("Creem Webhook Handler", () => {
       await expect(
         handleCreemWebhook("{invalid-json", "test-signature"),
       ).rejects.toThrow(InvalidWebhookPayloadError);
-      expect(mockRecordWebhookEvent).not.toHaveBeenCalled();
+      expect(mockClaimWebhookEvent).not.toHaveBeenCalled();
     });
 
     it("should reject payloads without a provider event ID", async () => {
@@ -306,7 +305,7 @@ describe("Creem Webhook Handler", () => {
       await expect(
         handleCreemWebhook(payload, "test-signature"),
       ).rejects.toThrow(InvalidWebhookPayloadError);
-      expect(mockRecordWebhookEvent).not.toHaveBeenCalled();
+      expect(mockClaimWebhookEvent).not.toHaveBeenCalled();
     });
 
     it("should reject recognized events with invalid object data", async () => {
@@ -320,16 +319,23 @@ describe("Creem Webhook Handler", () => {
       await expect(
         handleCreemWebhook(payload, "test-signature"),
       ).rejects.toThrow(InvalidWebhookPayloadError);
-      expect(mockRecordWebhookEvent).toHaveBeenCalledTimes(1);
+      expect(mockClaimWebhookEvent).toHaveBeenCalledTimes(1);
       expect(mockUpsertSubscription).not.toHaveBeenCalled();
     });
 
     it("should handle duplicate webhook events", async () => {
-      mockRecordWebhookEvent.mockResolvedValue(false);
+      mockClaimWebhookEvent.mockResolvedValue(false);
 
       const payload = createWebhookPayload({
-        eventType: "checkout.completed",
-        object: { id: "checkout_123" },
+        id: "evt_duplicate_123",
+        eventType: "payment.succeeded",
+        object: {
+          id: "payment_123",
+          customer: "cus_123",
+          product_id: "prod_123",
+          amount: 1000,
+          currency: "usd",
+        },
       });
 
       const { handleCreemWebhook } = await import("./webhook");
@@ -337,8 +343,79 @@ describe("Creem Webhook Handler", () => {
       const result = await handleCreemWebhook(payload, "test-signature");
 
       expect(result).toEqual({ received: true });
+      expect(mockClaimWebhookEvent).toHaveBeenCalledTimes(1);
       expect(mockUpsertSubscription).not.toHaveBeenCalled();
       expect(mockUpsertPayment).not.toHaveBeenCalled();
+      expect(console.log).toHaveBeenCalledWith(
+        JSON.stringify({
+          provider: "creem",
+          eventId: "evt_duplicate_123",
+          eventType: "payment.succeeded",
+          outcome: "duplicate",
+        }),
+      );
+    });
+
+    it("propagates processing failures so the transaction rolls back", async () => {
+      let transactionRolledBack = false;
+      mockDb.transaction.mockImplementation(async (callback) => {
+        const mockTx = {
+          update: jest.fn().mockReturnValue({
+            set: jest.fn().mockReturnValue({
+              where: jest.fn().mockResolvedValue([]),
+            }),
+          }),
+        };
+        try {
+          return await callback(mockTx);
+        } catch (error) {
+          transactionRolledBack = true;
+          throw error;
+        }
+      });
+      mockUpsertPayment.mockRejectedValue(new Error("Database write failed"));
+
+      const payload = createWebhookPayload({
+        id: "evt_failed_123",
+        eventType: "payment.succeeded",
+        object: {
+          id: "payment_123",
+          customer: "cus_123",
+          product_id: "prod_123",
+          amount: 1000,
+          currency: "usd",
+        },
+      });
+      const { handleCreemWebhook } = await import("./webhook");
+
+      await expect(
+        handleCreemWebhook(payload, "sensitive-signature"),
+      ).rejects.toThrow("Database write failed");
+
+      expect(transactionRolledBack).toBe(true);
+      expect(mockClaimWebhookEvent).toHaveBeenCalledWith(
+        "evt_failed_123",
+        "payment.succeeded",
+        "creem",
+        expect.any(Object),
+      );
+      expect(console.error).toHaveBeenCalledWith(
+        JSON.stringify({
+          provider: "creem",
+          eventId: "evt_failed_123",
+          eventType: "payment.succeeded",
+          outcome: "failed",
+        }),
+      );
+      const emittedLogs = [
+        ...(console.log as jest.Mock).mock.calls,
+        ...(console.warn as jest.Mock).mock.calls,
+        ...(console.error as jest.Mock).mock.calls,
+      ]
+        .flat()
+        .join("\n");
+      expect(emittedLogs).not.toContain(payload);
+      expect(emittedLogs).not.toContain("sensitive-signature");
     });
 
     it("should process distinct updates for the same subscription object", async () => {
@@ -364,20 +441,18 @@ describe("Creem Webhook Handler", () => {
         "sig",
       );
 
-      expect(mockRecordWebhookEvent).toHaveBeenNthCalledWith(
+      expect(mockClaimWebhookEvent).toHaveBeenNthCalledWith(
         1,
         "evt_update_1",
         "subscription.update",
         "creem",
-        expect.any(String),
         expect.any(Object),
       );
-      expect(mockRecordWebhookEvent).toHaveBeenNthCalledWith(
+      expect(mockClaimWebhookEvent).toHaveBeenNthCalledWith(
         2,
         "evt_update_2",
         "subscription.update",
         "creem",
-        expect.any(String),
         expect.any(Object),
       );
       expect(mockUpsertSubscription).toHaveBeenCalledTimes(2);
@@ -892,7 +967,7 @@ describe("Creem Webhook Handler", () => {
     });
 
     it("should skip already processed events", async () => {
-      mockRecordWebhookEvent.mockResolvedValue(false);
+      mockClaimWebhookEvent.mockResolvedValue(false);
 
       const payload = createWebhookPayload({
         eventType: "checkout.completed",
@@ -996,6 +1071,34 @@ describe("Creem Webhook Handler", () => {
           id: "checkout_123",
           customer: "cus_123",
           metadata: {
+            paymentMode: "subscription",
+          },
+          order: {
+            id: "order_123",
+            transaction: "txn_123",
+            amount_due: 1000,
+            currency: "usd",
+          },
+        },
+      });
+
+      const { handleCreemWebhook } = await import("./webhook");
+
+      await expect(
+        handleCreemWebhook(payload, "test-signature"),
+      ).rejects.toThrow(
+        "userId not found in metadata for checkout checkout_123",
+      );
+    });
+
+    it("should reject a non-string userId in metadata", async () => {
+      const payload = createWebhookPayload({
+        eventType: "checkout.completed",
+        object: {
+          id: "checkout_123",
+          customer: "cus_123",
+          metadata: {
+            userId: 123,
             paymentMode: "subscription",
           },
           order: {
@@ -1157,6 +1260,28 @@ describe("Creem Webhook Handler", () => {
       ).rejects.toThrow("Unsupported payment mode: unsupported_mode");
     });
 
+    it("should reject unsupported payment mode in payment events", async () => {
+      const payload = createWebhookPayload({
+        eventType: "payment.succeeded",
+        object: {
+          id: "payment_123",
+          customer: "cus_123",
+          product_id: "prod_123",
+          amount: 1000,
+          currency: "usd",
+          metadata: {
+            paymentMode: "unsupported_mode",
+          },
+        },
+      });
+
+      const { handleCreemWebhook } = await import("./webhook");
+
+      await expect(
+        handleCreemWebhook(payload, "test-signature"),
+      ).rejects.toThrow("Unsupported payment mode: unsupported_mode");
+    });
+
     it("should handle subscription.paid event with subscription object", async () => {
       const payload = createWebhookPayload({
         eventType: "subscription.paid",
@@ -1304,7 +1429,7 @@ describe("Creem Webhook Handler", () => {
         id: "user-123",
         paymentProviderCustomerId: "cus_123",
       });
-      mockRecordWebhookEvent.mockResolvedValue(true);
+      mockClaimWebhookEvent.mockResolvedValue(true);
       mockGetProductTierByCreemProductId.mockReturnValue({
         id: "pro",
         name: "Pro",

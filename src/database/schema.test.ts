@@ -359,10 +359,10 @@ describe("Database Schema", () => {
       expect(webhookEvents).toHaveProperty("eventId");
       expect(webhookEvents).toHaveProperty("eventType");
       expect(webhookEvents).toHaveProperty("provider");
-      expect(webhookEvents).toHaveProperty("processed");
-      expect(webhookEvents).toHaveProperty("processedAt");
-      expect(webhookEvents).toHaveProperty("payload");
       expect(webhookEvents).toHaveProperty("createdAt");
+      expect(webhookEvents).not.toHaveProperty("processed");
+      expect(webhookEvents).not.toHaveProperty("processedAt");
+      expect(webhookEvents).not.toHaveProperty("payload");
     });
 
     it("should have proper column constraints", () => {
@@ -372,9 +372,6 @@ describe("Database Schema", () => {
       expect(webhookEvents.eventType.notNull).toBe(true);
       expect(webhookEvents.provider.notNull).toBe(true);
       expect(webhookEvents.provider.default).toBe("creem");
-      expect(webhookEvents.processed.notNull).toBe(true);
-      expect(webhookEvents.processed.default).toBe(true);
-      expect(webhookEvents.processedAt.notNull).toBe(true);
       expect(webhookEvents.createdAt.notNull).toBe(true);
     });
   });
@@ -572,7 +569,6 @@ describe("Database Schema", () => {
       expect(users.role.default).toBe("user");
       expect(payments.currency.default).toBe("usd");
       expect(webhookEvents.provider.default).toBe("creem");
-      expect(webhookEvents.processed.default).toBe(true);
     });
   });
 
@@ -585,7 +581,6 @@ describe("Database Schema", () => {
 
       // Boolean columns
       expect(users.emailVerified.dataType).toBe("boolean");
-      expect(webhookEvents.processed.dataType).toBe("boolean");
 
       // Integer columns
       expect(payments.amount.dataType).toBe("number");
@@ -887,11 +882,8 @@ describe("Database Schema", () => {
       const tableKeys = Object.keys(webhookEventsTable);
       expect(tableKeys).toContain("eventId");
       expect(tableKeys).toContain("provider");
-      expect(tableKeys.length).toBeGreaterThan(6); // Should have all columns
-
-      // Access additional properties to ensure full definition
-      expect(webhookEventsTable.processed).toBeDefined();
-      expect(webhookEventsTable.payload).toBeDefined();
+      expect(tableKeys).toContain("createdAt");
+      expect(tableKeys).not.toContain("payload");
     });
 
     it("should execute uploads table index functions (lines 171-176)", () => {
@@ -1333,7 +1325,6 @@ describe("Database Schema", () => {
       expect(users.role.default).toBe("user");
       expect(payments.currency.default).toBe("usd");
       expect(webhookEvents.provider.default).toBe("creem");
-      expect(webhookEvents.processed.default).toBe(true);
     });
 
     it("should test UUID and timestamp columns with defaults", () => {
@@ -1348,7 +1339,6 @@ describe("Database Schema", () => {
       expect(subscriptions.updatedAt.notNull).toBe(true);
       expect(payments.createdAt.notNull).toBe(true);
       expect(payments.updatedAt.notNull).toBe(true);
-      expect(webhookEvents.processedAt.notNull).toBe(true);
       expect(webhookEvents.createdAt.notNull).toBe(true);
       expect(uploads.createdAt.notNull).toBe(true);
     });
@@ -1417,7 +1407,6 @@ describe("Database Schema", () => {
 
       // Test boolean columns
       expect(users.emailVerified.dataType).toBe("boolean");
-      expect(webhookEvents.processed.dataType).toBe("boolean");
 
       // Test integer columns
       expect(payments.amount.dataType).toBe("number");

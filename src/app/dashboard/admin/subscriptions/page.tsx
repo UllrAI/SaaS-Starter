@@ -12,8 +12,10 @@ import { Suspense } from "react";
 import { SubscriptionStatsCards } from "./_components/subscription-stats-cards";
 import { SubscriptionManagementTable } from "./_components/subscription-management-table";
 import { StatsCardsSkeleton } from "../_components/stats-cards-skeleton";
-import { getSubscriptions } from "@/lib/actions/admin";
+import { getSubscriptions } from "@/lib/actions/admin/subscriptions";
 import { createMetadataDefaults } from "@/lib/metadata";
+import { SITE_CONFIG } from "@/lib/config/site";
+import { notFound } from "next/navigation";
 export async function generateMetadata() {
   const { locale, t } = await getServerTranslations();
   const metadata = createMetadataDefaults({ locale });
@@ -40,6 +42,10 @@ export async function generateMetadata() {
   };
 }
 export default async function SubscriptionsPage() {
+  if (!SITE_CONFIG.features.billing) {
+    notFound();
+  }
+
   const { t } = await getServerTranslations();
   await requireAdmin();
   const initialTableData = await getSubscriptions({});

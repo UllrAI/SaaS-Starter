@@ -62,7 +62,7 @@ jest.mock("@aws-sdk/lib-storage", () => ({
 }));
 
 jest.mock("@/lib/r2", () => ({
-  r2Client: { send: jest.fn() },
+  getR2Client: jest.fn(() => ({ send: jest.fn() })),
 }));
 
 const mockCreateUploadIntent = jest.fn() as any;

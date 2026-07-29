@@ -33,7 +33,7 @@ import {
   getUsers,
   setUserDisabledAction,
   updateUserAction,
-} from "@/lib/actions/admin";
+} from "@/lib/actions/admin/users";
 import { useIntlLocale } from "@/hooks/use-intl-locale";
 interface UserManagementTableProps {
   initialData: UserWithSubscription[];

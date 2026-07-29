@@ -1,5 +1,7 @@
 import { createEnv } from "@t3-oss/env-nextjs";
 import { z } from "zod";
+import { validateIntegrationEnv } from "./src/lib/config/integration-env.mjs";
+import { SITE_CONFIG } from "./src/lib/config/site.js";
 
 const appOriginSchema = z
   .string()
@@ -46,11 +48,6 @@ const optionalCredentialSchema = z.preprocess(
     .optional(),
 );
 
-const requiredCredentialSchema = z
-  .string()
-  .trim()
-  .min(1, "Credential must not be empty");
-
 const env = createEnv({
   skipValidation: process.env.SKIP_ENV_VALIDATION === "1",
 
@@ -89,22 +86,23 @@ const env = createEnv({
       ),
 
     // API keys
-    RESEND_API_KEY: requiredCredentialSchema,
-    RESEND_EMAIL_FROM: z.string().email(),
+    RESEND_API_KEY: optionalCredentialSchema,
+    RESEND_EMAIL_FROM: z.string().email().optional(),
 
     // Cloudflare R2 Storage
-    R2_ENDPOINT: z.string().url(),
-    R2_ACCESS_KEY_ID: requiredCredentialSchema,
-    R2_SECRET_ACCESS_KEY: requiredCredentialSchema,
-    R2_BUCKET_NAME: requiredCredentialSchema,
-    R2_PUBLIC_URL: z.string().url(),
+    R2_ENDPOINT: z.string().url().optional(),
+    R2_ACCESS_KEY_ID: optionalCredentialSchema,
+    R2_SECRET_ACCESS_KEY: optionalCredentialSchema,
+    R2_BUCKET_NAME: optionalCredentialSchema,
+    R2_PUBLIC_URL: z.string().url().optional(),
     UPLOAD_CLEANUP_SECRET: z
       .string()
       .min(32, "UPLOAD_CLEANUP_SECRET must be at least 32 characters")
       .refine(
         (value) => value !== "replace-with-at-least-32-random-characters",
         "UPLOAD_CLEANUP_SECRET must not use the example placeholder",
-      ),
+      )
+      .optional(),
     UPLOAD_DAILY_QUOTA_BYTES: z.coerce
       .number()
       .int()
@@ -127,9 +125,9 @@ const env = createEnv({
     ),
 
     // Payments
-    CREEM_API_KEY: requiredCredentialSchema,
+    CREEM_API_KEY: optionalCredentialSchema,
     CREEM_ENVIRONMENT: z.enum(["test_mode", "live_mode"]).default("test_mode"),
-    CREEM_WEBHOOK_SECRET: requiredCredentialSchema,
+    CREEM_WEBHOOK_SECRET: optionalCredentialSchema,
 
     // E2E testing
     E2E_DATABASE_URL: databaseUrlSchema.optional(),
@@ -195,51 +193,7 @@ const env = createEnv({
 });
 
 if (process.env.SKIP_ENV_VALIDATION !== "1") {
-  const oauthPairs = [
-    ["Google", env.GOOGLE_CLIENT_ID, env.GOOGLE_CLIENT_SECRET],
-    ["GitHub", env.GITHUB_CLIENT_ID, env.GITHUB_CLIENT_SECRET],
-    ["LinkedIn", env.LINKEDIN_CLIENT_ID, env.LINKEDIN_CLIENT_SECRET],
-  ];
-
-  for (const [provider, clientId, clientSecret] of oauthPairs) {
-    if (Boolean(clientId) !== Boolean(clientSecret)) {
-      throw new Error(
-        `${provider} OAuth requires both its client ID and client secret.`,
-      );
-    }
-  }
-
-  const isTestCreemKey = env.CREEM_API_KEY.startsWith("creem_test_");
-  const hasCreemKeyPrefix = env.CREEM_API_KEY.startsWith("creem_");
-  if (
-    (env.CREEM_ENVIRONMENT === "test_mode" && !isTestCreemKey) ||
-    (env.CREEM_ENVIRONMENT === "live_mode" &&
-      (!hasCreemKeyPrefix || isTestCreemKey))
-  ) {
-    throw new Error(
-      `CREEM_API_KEY does not match CREEM_ENVIRONMENT=${env.CREEM_ENVIRONMENT}.`,
-    );
-  }
-
-  const legacySince = env.UPLOAD_LEGACY_COMPLETION_SINCE;
-  const legacyUntil = env.UPLOAD_LEGACY_COMPLETION_UNTIL;
-  if (Boolean(legacySince) !== Boolean(legacyUntil)) {
-    throw new Error(
-      "Legacy upload compatibility requires both UPLOAD_LEGACY_COMPLETION_SINCE and UPLOAD_LEGACY_COMPLETION_UNTIL.",
-    );
-  }
-  if (legacySince && legacyUntil) {
-    const compatibilityDuration =
-      Date.parse(legacyUntil) - Date.parse(legacySince);
-    if (
-      compatibilityDuration <= 0 ||
-      compatibilityDuration > 24 * 60 * 60 * 1000
-    ) {
-      throw new Error(
-        "The legacy upload compatibility window must be longer than zero and no more than 24 hours.",
-      );
-    }
-  }
+  validateIntegrationEnv(SITE_CONFIG.features, env);
 }
 
 export default env;

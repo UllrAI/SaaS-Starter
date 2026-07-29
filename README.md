@@ -83,7 +83,20 @@ The project is configured through environment variables. First, copy the example
 cp .env.example .env
 ```
 
-Then edit the `.env` file and fill in all required values.
+Then edit `.env` and fill in the core values plus the credentials for the
+features enabled in `src/lib/config/site.js`.
+
+#### Starter feature selection
+
+`SITE_CONFIG` is the client-safe source of truth for brand, contact, links,
+assets, and the static `emailAuth`, `billing`, and `uploads` feature switches.
+All three features default to enabled. Disable an unused feature there before
+removing its environment variables. Disabled features are removed from
+navigation and guarded at their pages, APIs, plugins, and server actions.
+
+If `emailAuth` is disabled, configure at least one complete OAuth provider so
+the web sign-in flow remains usable. Credentials remain server-only and must
+never be added to `SITE_CONFIG`.
 
 #### Environment Variables
 
@@ -93,17 +106,17 @@ Then edit the `.env` file and fill in all required values.
 | `RATE_LIMIT_IP_HEADER`           | Optional trusted client-IP header; defaults to Zeabur.          | `x-forwarded-for`                                   |
 | `NEXT_PUBLIC_APP_URL`            | **Required.** Public URL of your deployed app.                  | `http://localhost:3000` or `https://yourdomain.com` |
 | `BETTER_AUTH_SECRET`             | **Required.** Random session secret, at least 32 characters.    | Generate with `openssl rand -base64 32`             |
-| `RESEND_API_KEY`                 | **Required.** Resend API Key for sending emails.                | `re_xxxxxxxxxxxxxxxx`                               |
-| `RESEND_EMAIL_FROM`              | **Required.** Sender on a domain verified in Resend.            | `noreply@your-verified-domain.com`                  |
-| `CREEM_API_KEY`                  | **Required.** Key matching the selected Creem environment.      | `creem_test_...` or `creem_...`                     |
-| `CREEM_ENVIRONMENT`              | **Required.** Creem environment mode.                           | `test_mode` or `live_mode`                          |
-| `CREEM_WEBHOOK_SECRET`           | **Required.** Creem webhook secret.                             | `whsec_your_webhook_secret`                         |
-| `R2_ENDPOINT`                    | **Required.** Cloudflare R2 API endpoint.                       | `https://<ACCOUNT_ID>.r2.cloudflarestorage.com`     |
-| `R2_ACCESS_KEY_ID`               | **Required.** R2 access key ID.                                 | `your_r2_access_key_id`                             |
-| `R2_SECRET_ACCESS_KEY`           | **Required.** R2 secret access key.                             | `your_r2_secret_access_key`                         |
-| `R2_BUCKET_NAME`                 | **Required.** R2 bucket name.                                   | `your_r2_bucket_name`                               |
-| `R2_PUBLIC_URL`                  | **Required.** Public access URL for R2 bucket.                  | `https://your-bucket.your-account.r2.dev`           |
-| `UPLOAD_CLEANUP_SECRET`          | **Required.** 32+ character bearer secret for upload cleanup.   | Generate with `openssl rand -base64 32`             |
+| `RESEND_API_KEY`                 | Required when `emailAuth` is enabled. Resend API key.           | `re_xxxxxxxxxxxxxxxx`                               |
+| `RESEND_EMAIL_FROM`              | Required when `emailAuth` is enabled. Verified sender.          | `noreply@your-verified-domain.com`                  |
+| `CREEM_API_KEY`                  | Required when `billing` is enabled. Key matching its mode.      | `creem_test_...` or `creem_...`                     |
+| `CREEM_ENVIRONMENT`              | Creem mode; defaults to `test_mode`.                            | `test_mode` or `live_mode`                          |
+| `CREEM_WEBHOOK_SECRET`           | Required when `billing` is enabled. Webhook secret.             | `whsec_your_webhook_secret`                         |
+| `R2_ENDPOINT`                    | Required when `uploads` is enabled. R2 API endpoint.            | `https://<ACCOUNT_ID>.r2.cloudflarestorage.com`     |
+| `R2_ACCESS_KEY_ID`               | Required when `uploads` is enabled. R2 access key ID.           | `your_r2_access_key_id`                             |
+| `R2_SECRET_ACCESS_KEY`           | Required when `uploads` is enabled. R2 secret key.              | `your_r2_secret_access_key`                         |
+| `R2_BUCKET_NAME`                 | Required when `uploads` is enabled. R2 bucket name.             | `your_r2_bucket_name`                               |
+| `R2_PUBLIC_URL`                  | Required when `uploads` is enabled. Public bucket URL.          | `https://your-bucket.your-account.r2.dev`           |
+| `UPLOAD_CLEANUP_SECRET`          | Required when `uploads` is enabled. 32+ character secret.       | Generate with `openssl rand -base64 32`             |
 | `UPLOAD_DAILY_QUOTA_BYTES`       | Optional rolling 24-hour upload quota per user.                 | `1073741824` (1 GiB)                                |
 | `UPLOAD_TOTAL_QUOTA_BYTES`       | Optional total stored and reserved bytes per user.              | `5368709120` (5 GiB)                                |
 | `UPLOAD_LEGACY_COMPLETION_SINCE` | Optional ISO-8601 start of the bounded v1 compatibility window. | Set with `UPLOAD_LEGACY_COMPLETION_UNTIL` only      |

@@ -6,6 +6,7 @@ import { Logo } from "@/components/logo";
 import { SectionContainer } from "@/components/layout/page-container";
 import { ArrowRight, CheckCircle } from "lucide-react";
 import { LocalizedLink as Link } from "@/components/localized-link";
+import { SITE_CONFIG } from "@/lib/config/site";
 export function CallToAction({
   locale = SOURCE_LOCALE,
 }: {
@@ -66,16 +67,18 @@ export function CallToAction({
           </div>
 
           <div className="mt-12 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-            <Button
-              size="lg"
-              className="group h-14 px-10 text-base font-bold shadow-lg transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-md active:translate-x-[4px] active:translate-y-[4px]"
-              asChild
-            >
-              <Link href="/pricing" locale={locale}>
-                <>{t("12f934de1f96", "View pricing")}</>
-                <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-              </Link>
-            </Button>
+            {SITE_CONFIG.features.billing && (
+              <Button
+                size="lg"
+                className="group h-14 px-10 text-base font-bold shadow-lg transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-md active:translate-x-[4px] active:translate-y-[4px]"
+                asChild
+              >
+                <Link href="/pricing" locale={locale}>
+                  <>{t("12f934de1f96", "View pricing")}</>
+                  <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                </Link>
+              </Button>
+            )}
 
             <Button
               size="lg"

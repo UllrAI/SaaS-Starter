@@ -1,8 +1,15 @@
-import { useTranslation } from "@/lib/i18n/translation/client";
+import { getServerTranslations } from "@/lib/i18n/translation/server";
 import { DashboardPageWrapper } from "../_components/dashboard-page-wrapper";
 import { UploadWorkbench } from "./_components/upload-workbench";
-export default function UploadPage() {
-  const { t } = useTranslation();
+import { SITE_CONFIG } from "@/lib/config/site";
+import { notFound } from "next/navigation";
+
+export default async function UploadPage() {
+  if (!SITE_CONFIG.features.uploads) {
+    notFound();
+  }
+
+  const { t } = await getServerTranslations();
   return (
     <DashboardPageWrapper
       title={<>{t("cd7b070e19ed", "Uploads")}</>}

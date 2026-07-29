@@ -10,7 +10,7 @@ import { z } from "zod";
 import Link from "next/link";
 import { Mail } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { getAvailableSocialProviders } from "@/lib/auth/providers";
+import type { SocialProvider } from "@/lib/auth/providers";
 import { AuthFormBase } from "@/components/auth/auth-form-base";
 import { type ResolvedAuthFeedback } from "@/lib/auth/feedback";
 import {
@@ -22,13 +22,15 @@ type AuthMode = "login" | "signup";
 type AuthPendingAction = "magic-link" | "social" | null;
 interface AuthFormProps {
   mode: AuthMode;
-  availableProviders?: ReturnType<typeof getAvailableSocialProviders>;
+  availableProviders?: SocialProvider[];
+  emailAuthEnabled?: boolean;
   callbackURL?: string;
   initialFeedback?: ResolvedAuthFeedback | null;
 }
 export function AuthForm({
   mode,
   availableProviders,
+  emailAuthEnabled = true,
   callbackURL = DEFAULT_CALLBACK_URL,
   initialFeedback = null,
 }: AuthFormProps) {
@@ -45,11 +47,13 @@ export function AuthForm({
       ? ""
       : `?callbackUrl=${encodeURIComponent(resolvedCallbackURL)}`;
   useEffect(() => {
-    router.prefetch("/auth/sent");
+    if (emailAuthEnabled) {
+      router.prefetch("/auth/sent");
+    }
     if (resolvedCallbackURL.startsWith("/")) {
       router.prefetch(resolvedCallbackURL);
     }
-  }, [resolvedCallbackURL, router]);
+  }, [emailAuthEnabled, resolvedCallbackURL, router]);
   const form = useForm<z.infer<typeof authSchema>>({
     resolver: zodResolver(authSchema),
     defaultValues: {
@@ -81,18 +85,34 @@ export function AuthForm({
     ) : (
       <>{t("d5849f34a6d7", "Get started today")}</>
     ),
-    description: isLogin ? (
+    description: emailAuthEnabled ? (
+      isLogin ? (
+        <>
+          {t(
+            "afba6ba3fcb4",
+            "Enter your email to receive a secure magic link and access your dashboard",
+          )}
+        </>
+      ) : (
+        <>
+          {t(
+            "7aeedd14c669",
+            "Create your account in seconds with just your email address",
+          )}
+        </>
+      )
+    ) : isLogin ? (
       <>
         {t(
-          "afba6ba3fcb4",
-          "Enter your email to receive a secure magic link and access your dashboard",
+          "auth_oauth_login_description",
+          "Choose a connected account to access your dashboard",
         )}
       </>
     ) : (
       <>
         {t(
-          "7aeedd14c669",
-          "Create your account in seconds with just your email address",
+          "auth_oauth_signup_description",
+          "Choose a connected account to create your account",
         )}
       </>
     ),
@@ -147,6 +167,7 @@ export function AuthForm({
       fields={fields}
       availableProviders={availableProviders}
       feedback={feedback}
+      showMagicLink={emailAuthEnabled}
     />
   );
 }

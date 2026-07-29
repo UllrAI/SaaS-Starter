@@ -20,6 +20,7 @@ import {
 import { SOURCE_LOCALE, type SupportedLocale } from "@/lib/config/i18n";
 import { withLocalePrefix } from "@/lib/config/i18n-routing";
 import { getStaticTranslations } from "@/lib/i18n/translation/static";
+import { SITE_CONFIG } from "@/lib/config/site";
 
 type FooterLink = {
   id: string;
@@ -93,7 +94,7 @@ export function Footer({
           label: t("9968bdb69216", "Changelog"),
           external: true,
         },
-      ],
+      ].filter((link) => SITE_CONFIG.features.billing || link.id !== "pricing"),
     },
     {
       id: "other-products",

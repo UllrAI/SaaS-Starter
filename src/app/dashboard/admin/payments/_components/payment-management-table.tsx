@@ -9,7 +9,7 @@ import { UserAvatarCell } from "@/components/admin/user-avatar-cell";
 import { PaymentWithUser } from "@/types/billing";
 import { useAdminTable } from "@/hooks/use-admin-table";
 import { Button } from "@/components/ui/button";
-import { getPayments } from "@/lib/actions/admin";
+import { getPayments } from "@/lib/actions/admin/payments";
 import { useIntlLocale } from "@/hooks/use-intl-locale";
 import type { AppTranslate } from "@/lib/i18n/translation/shared";
 interface PaymentManagementTableProps {

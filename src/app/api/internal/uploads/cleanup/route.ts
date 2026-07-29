@@ -1,10 +1,12 @@
 import { timingSafeEqual } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
-import env from "@/env";
+import { getUploadCleanupSecret } from "@/lib/config/integrations";
 import {
   cleanupExpiredUploadIntents,
   recoverStaleUploadCleanupClaims,
 } from "@/lib/uploads/upload-intents";
+import { SITE_CONFIG } from "@/lib/config/site";
+import { integrationNotFound } from "@/lib/http/integration-response";
 
 const CLEANUP_BATCH_SIZE = 100;
 const MAX_CLEANUP_BATCHES = 5;
@@ -16,13 +18,17 @@ function isAuthorized(request: NextRequest) {
   }
 
   const provided = Buffer.from(authorization.slice("Bearer ".length));
-  const expected = Buffer.from(env.UPLOAD_CLEANUP_SECRET);
+  const expected = Buffer.from(getUploadCleanupSecret());
   return (
     provided.length === expected.length && timingSafeEqual(provided, expected)
   );
 }
 
 export async function POST(request: NextRequest) {
+  if (!SITE_CONFIG.features.uploads) {
+    return integrationNotFound();
+  }
+
   if (!isAuthorized(request)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }

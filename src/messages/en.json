@@ -1,4 +1,6 @@
 {
+  "auth_oauth_login_description": "Choose a connected account to access your dashboard",
+  "auth_oauth_signup_description": "Choose a connected account to create your account",
   "006f24988b60": "Sending magic link...",
   "00c1cd3bf46e": "Improve our services and develop new features",
   "00e0b9a5b021": "Images",

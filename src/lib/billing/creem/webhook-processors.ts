@@ -23,7 +23,7 @@ import type {
   PaymentMode,
 } from "@/types/billing";
 
-import { creemEnvironment } from "./client";
+import { getCreemEnvironment } from "./client";
 import {
   getCustomerId,
   InvalidWebhookPayloadError,
@@ -82,7 +82,10 @@ export async function processCheckoutCompletedEvent(
       typeof subscription.product === "string"
         ? subscription.product
         : subscription.product.id;
-    const tier = getProductTierByCreemProductId(productId, creemEnvironment);
+    const tier = getProductTierByCreemProductId(
+      productId,
+      getCreemEnvironment(),
+    );
     if (!tier) {
       throw new InvalidWebhookPayloadError(
         "Subscription references an unknown Creem product.",
@@ -157,7 +160,7 @@ export async function processCheckoutCompletedEvent(
         : checkoutData.product.id;
     if (
       checkoutProductId !==
-      getCreemProductIds(tier.id, creemEnvironment)?.oneTime
+      getCreemProductIds(tier.id, getCreemEnvironment())?.oneTime
     ) {
       throw new InvalidWebhookPayloadError(
         "One-time checkout product does not match its tier metadata.",
@@ -273,7 +276,7 @@ export async function processSubscriptionEvent(
     typeof subscriptionData.product === "string"
       ? subscriptionData.product
       : subscriptionData.product.id;
-  const tier = getProductTierByCreemProductId(productId, creemEnvironment);
+  const tier = getProductTierByCreemProductId(productId, getCreemEnvironment());
   if (!tier) {
     throw new InvalidWebhookPayloadError(
       "Subscription references an unknown Creem product.",
@@ -384,7 +387,7 @@ export async function processSubscriptionRenewal(
     throw new InvalidWebhookPayloadError("Product ID missing in renewal event");
   }
 
-  const tier = getProductTierByCreemProductId(productId, creemEnvironment);
+  const tier = getProductTierByCreemProductId(productId, getCreemEnvironment());
   if (!tier) {
     throw new InvalidWebhookPayloadError(
       "Subscription renewal references an unknown Creem product.",
@@ -430,7 +433,7 @@ export async function processPaymentSucceededEvent(
     throw new InvalidWebhookPayloadError("Product ID missing in payment event");
   }
 
-  const tier = getProductTierByCreemProductId(productId, creemEnvironment);
+  const tier = getProductTierByCreemProductId(productId, getCreemEnvironment());
   if (!tier) {
     throw new InvalidWebhookPayloadError(
       "Payment references an unknown Creem product.",

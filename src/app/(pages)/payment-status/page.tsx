@@ -7,6 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { SectionContainer } from "@/components/layout/page-container";
 import { Clock } from "lucide-react";
 import { SOURCE_LOCALE, type SupportedLocale } from "@/lib/config/i18n";
+import { SITE_CONFIG } from "@/lib/config/site";
+import { notFound } from "next/navigation";
 function PaymentStatusSkeleton({ locale }: { locale: SupportedLocale }) {
   const { t } = getStaticTranslations(locale);
   return (
@@ -47,6 +49,10 @@ export default function PaymentStatusPage({
 }: {
   locale?: SupportedLocale;
 } = {}) {
+  if (!SITE_CONFIG.features.billing) {
+    notFound();
+  }
+
   return (
     <Suspense fallback={<PaymentStatusSkeleton locale={locale} />}>
       <PaymentStatusContent />

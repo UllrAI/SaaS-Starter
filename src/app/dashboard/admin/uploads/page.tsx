@@ -12,8 +12,10 @@ import { DashboardPageWrapper } from "../../_components/dashboard-page-wrapper";
 import { UploadManagementTable } from "./_components/upload-management-table";
 import { UploadStatsCards } from "./_components/upload-stats-cards";
 import { StatsCardsSkeleton } from "../_components/stats-cards-skeleton";
-import { getUploads } from "@/lib/actions/admin";
+import { getUploads } from "@/lib/actions/admin/uploads";
 import { createMetadataDefaults } from "@/lib/metadata";
+import { SITE_CONFIG } from "@/lib/config/site";
+import { notFound } from "next/navigation";
 export async function generateMetadata() {
   const { locale, t } = await getServerTranslations();
   const metadata = createMetadataDefaults({ locale });
@@ -43,6 +45,10 @@ export async function generateMetadata() {
   };
 }
 export default async function UploadManagementPage() {
+  if (!SITE_CONFIG.features.uploads) {
+    notFound();
+  }
+
   const { t } = await getServerTranslations();
   await requireAdmin();
   const initialTableData = await getUploads({});

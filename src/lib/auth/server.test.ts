@@ -348,4 +348,16 @@ describe("Auth Server Configuration", () => {
       consoleLogSpy.mockRestore();
     }
   });
+
+  it("omits the magic-link plugin when email authentication is disabled", async () => {
+    jest.doMock("@/lib/config/site", () => ({
+      SITE_CONFIG: {
+        features: { emailAuth: false, billing: true, uploads: true },
+      },
+    }));
+
+    const { auth } = await import("./server");
+
+    expect(auth.options.plugins).toHaveLength(1);
+  });
 });

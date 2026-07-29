@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getAuthSessionFromHeaders } from "@/lib/auth/session";
 import { billing } from "@/lib/billing";
 import { checkRateLimit, getClientRateLimitKey } from "@/lib/rate-limit";
+import { SITE_CONFIG } from "@/lib/config/site";
+import { integrationUnavailable } from "@/lib/http/integration-response";
 
 const PAYMENT_STATUS_RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const PAYMENT_STATUS_RATE_LIMIT_MAX_REQUESTS = 30;
@@ -21,6 +23,10 @@ function privateJson(body: unknown, init?: ResponseInit): NextResponse {
 }
 
 export async function GET(request: NextRequest) {
+  if (!SITE_CONFIG.features.billing) {
+    return integrationUnavailable("billing");
+  }
+
   try {
     const rateLimit = await checkRateLimit({
       scope: "payment_status",

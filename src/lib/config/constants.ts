@@ -1,27 +1,19 @@
-// Brand Configuration
-export const APP_NAME =
-  process.env.NODE_ENV === "development"
-    ? "DEV - SaaS Starter"
-    : "SaaS Starter";
-export const COMPANY_NAME = "UllrAI Lab";
+import { SITE_CONFIG } from "@/lib/config/site";
 
-// https://www.dicebear.com/playground/
-// DEFAULT: initials
-export const AVATAR_STYLE = "adventurer-neutral";
+export const APP_NAME = SITE_CONFIG.brand.name;
+export const COMPANY_NAME = SITE_CONFIG.brand.companyName;
+export const AVATAR_STYLE = SITE_CONFIG.brand.avatarStyle;
 
-// Contact Information
-export const CONTACT_EMAIL = "support@ullrai.com";
-export const LEGAL_EMAIL = "legal@ullrai.com";
-export const PRIVACY_EMAIL = "privacy@ullrai.com";
+export const CONTACT_EMAIL = SITE_CONFIG.contact.support;
+export const LEGAL_EMAIL = SITE_CONFIG.contact.legal;
+export const PRIVACY_EMAIL = SITE_CONFIG.contact.privacy;
 
-// External Links
-export const GITHUB_URL = "https://github.com/ullrai/saas-starter";
-export const GITHUB_ISSUES_URL = `${GITHUB_URL}/issues`;
-export const GITHUB_RELEASES_URL = `${GITHUB_URL}/releases`;
-export const GITHUB_DISCUSSIONS_URL = `${GITHUB_URL}/discussions`;
-export const DOCS_URL = `${GITHUB_URL}#readme`;
+export const GITHUB_URL = SITE_CONFIG.links.repository;
+export const GITHUB_ISSUES_URL = SITE_CONFIG.links.issues;
+export const GITHUB_RELEASES_URL = SITE_CONFIG.links.releases;
+export const GITHUB_DISCUSSIONS_URL = SITE_CONFIG.links.discussions;
+export const DOCS_URL = SITE_CONFIG.links.docs;
 
-export const PAYMENT_PROVIDER = "creem" as const;
-// SEO
-export const OGIMAGE = "/og.png";
-export const TWITTERACCOUNT = "@ullr_ai";
+export const PAYMENT_PROVIDER = SITE_CONFIG.billing.provider;
+export const OGIMAGE = SITE_CONFIG.assets.openGraphImage;
+export const TWITTERACCOUNT = SITE_CONFIG.assets.twitterAccount;

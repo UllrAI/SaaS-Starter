@@ -34,6 +34,7 @@ import { UserButton } from "./user-btn";
 import { Logo } from "@/components/logo";
 import { cn } from "@/lib/utils";
 import { useSession } from "@/lib/auth/client";
+import { SITE_CONFIG } from "@/lib/config/site";
 type NavigationItem = {
   id: string;
   label: React.ReactNode;
@@ -123,80 +124,93 @@ export function AppSidebar() {
       image: session.user.image || undefined,
     };
   };
-  const navigation: NavigationItem[] = [
-    {
-      id: "home",
-      label: <>{t("f46e0c79923e", "Home")}</>,
-      url: "/dashboard",
-      icon: Home,
-      matchMode: "exact",
-    },
-    {
-      id: "upload",
-      label: <>{t("feaff8adafd7", "Upload")}</>,
-      url: "/dashboard/upload",
-      icon: Upload,
-      matchMode: "exact",
-    },
-    {
-      id: "billing",
-      label: <>{t("427f56136131", "Billing")}</>,
-      url: "/dashboard/billing",
-      icon: Wallet,
-      matchMode: "exact",
-    },
-    {
-      id: "developer-access",
-      label: <>{t("498f27b35f6a", "Developer Access")}</>,
-      url: "/dashboard/developer",
-      icon: KeyRound,
-      matchMode: "exact",
-    },
-    {
-      id: "settings",
-      label: <>{t("f907fab40310", "Settings")}</>,
-      url: "/dashboard/settings",
-      icon: Settings,
-      matchMode: "exact",
-    },
-  ];
-  const adminNavigation: NavigationItem[] = [
-    {
-      id: "admin-dashboard",
-      label: <>{t("5a5314407bc8", "Admin Dashboard")}</>,
-      url: "/dashboard/admin",
-      icon: BarChart3,
-      matchMode: "exact",
-    },
-    {
-      id: "user-management",
-      label: <>{t("cd3ae754b513", "User Management")}</>,
-      url: "/dashboard/admin/users",
-      icon: Users,
-      matchMode: "exact",
-    },
-    {
-      id: "payments",
-      label: <>{t("f9c91c2390bf", "Payments Management")}</>,
-      url: "/dashboard/admin/payments",
-      icon: CreditCard,
-      matchMode: "exact",
-    },
-    {
-      id: "subscriptions",
-      label: <>{t("15aad5874a7c", "Subscriptions Management")}</>,
-      url: "/dashboard/admin/subscriptions",
-      icon: Shield,
-      matchMode: "exact",
-    },
-    {
-      id: "uploads-management",
-      label: <>{t("ee57d04297c6", "Uploads Management")}</>,
-      url: "/dashboard/admin/uploads",
-      icon: Upload,
-      matchMode: "exact",
-    },
-  ];
+  const navigation = (
+    [
+      {
+        id: "home",
+        label: <>{t("f46e0c79923e", "Home")}</>,
+        url: "/dashboard",
+        icon: Home,
+        matchMode: "exact",
+      },
+      {
+        id: "upload",
+        label: <>{t("feaff8adafd7", "Upload")}</>,
+        url: "/dashboard/upload",
+        icon: Upload,
+        matchMode: "exact",
+      },
+      {
+        id: "billing",
+        label: <>{t("427f56136131", "Billing")}</>,
+        url: "/dashboard/billing",
+        icon: Wallet,
+        matchMode: "exact",
+      },
+      {
+        id: "developer-access",
+        label: <>{t("498f27b35f6a", "Developer Access")}</>,
+        url: "/dashboard/developer",
+        icon: KeyRound,
+        matchMode: "exact",
+      },
+      {
+        id: "settings",
+        label: <>{t("f907fab40310", "Settings")}</>,
+        url: "/dashboard/settings",
+        icon: Settings,
+        matchMode: "exact",
+      },
+    ] satisfies NavigationItem[]
+  ).filter(
+    (item) =>
+      (SITE_CONFIG.features.uploads || item.id !== "upload") &&
+      (SITE_CONFIG.features.billing || item.id !== "billing"),
+  );
+  const adminNavigation = (
+    [
+      {
+        id: "admin-dashboard",
+        label: <>{t("5a5314407bc8", "Admin Dashboard")}</>,
+        url: "/dashboard/admin",
+        icon: BarChart3,
+        matchMode: "exact",
+      },
+      {
+        id: "user-management",
+        label: <>{t("cd3ae754b513", "User Management")}</>,
+        url: "/dashboard/admin/users",
+        icon: Users,
+        matchMode: "exact",
+      },
+      {
+        id: "payments",
+        label: <>{t("f9c91c2390bf", "Payments Management")}</>,
+        url: "/dashboard/admin/payments",
+        icon: CreditCard,
+        matchMode: "exact",
+      },
+      {
+        id: "subscriptions",
+        label: <>{t("15aad5874a7c", "Subscriptions Management")}</>,
+        url: "/dashboard/admin/subscriptions",
+        icon: Shield,
+        matchMode: "exact",
+      },
+      {
+        id: "uploads-management",
+        label: <>{t("ee57d04297c6", "Uploads Management")}</>,
+        url: "/dashboard/admin/uploads",
+        icon: Upload,
+        matchMode: "exact",
+      },
+    ] satisfies NavigationItem[]
+  ).filter(
+    (item) =>
+      (SITE_CONFIG.features.billing ||
+        (item.id !== "payments" && item.id !== "subscriptions")) &&
+      (SITE_CONFIG.features.uploads || item.id !== "uploads-management"),
+  );
   return (
     <Sidebar collapsible="icon" variant="inset">
       <SidebarHeader

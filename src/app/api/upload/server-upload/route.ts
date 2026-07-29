@@ -10,13 +10,16 @@ import {
 } from "@/lib/config/upload";
 import { getAuthSessionFromHeaders } from "@/lib/auth/session";
 import { checkUploadRateLimit } from "@/lib/upload-rate-limit";
-import { r2Client } from "@/lib/r2";
+import { getR2Client } from "@/lib/r2";
+import { getUploadConfig } from "@/lib/config/integrations";
 import {
   completeUploadIntent,
   createUploadIntent,
   releaseUploadIntent,
   UploadQuotaExceededError,
 } from "@/lib/uploads/upload-intents";
+import { SITE_CONFIG } from "@/lib/config/site";
+import { integrationUnavailable } from "@/lib/http/integration-response";
 
 const MULTIPART_OVERHEAD_BYTES = 1024 * 1024;
 
@@ -69,6 +72,10 @@ async function processInBatches<T, R>(
 }
 
 export async function POST(request: NextRequest) {
+  if (!SITE_CONFIG.features.uploads) {
+    return integrationUnavailable("uploads");
+  }
+
   try {
     // Check authentication
     const session = await getAuthSessionFromHeaders(request.headers);
@@ -223,9 +230,9 @@ export async function POST(request: NextRequest) {
 
         // Use AWS SDK Upload class for streaming upload
         const upload = new Upload({
-          client: r2Client,
+          client: getR2Client(),
           params: {
-            Bucket: env.R2_BUCKET_NAME,
+            Bucket: getUploadConfig().bucketName,
             Key: intent.fileKey,
             Body: fileStream,
             ContentType: normalizedContentType,
@@ -314,6 +321,10 @@ export async function POST(request: NextRequest) {
 
 // Handle OPTIONS request for CORS
 export async function OPTIONS() {
+  if (!SITE_CONFIG.features.uploads) {
+    return integrationUnavailable("uploads");
+  }
+
   return new NextResponse(null, {
     status: 200,
     headers: {

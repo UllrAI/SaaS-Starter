@@ -32,6 +32,8 @@ import {
   LockKeyhole,
   Upload,
 } from "lucide-react";
+import { SITE_CONFIG } from "@/lib/config/site";
+import { notFound } from "next/navigation";
 export async function buildPricingMetadata(locale: SupportedLocale) {
   const { t } = await getServerTranslations({ locale });
   const metadata = createMetadataDefaults({
@@ -78,6 +80,10 @@ export default function PricingPage({
 }: {
   locale?: SupportedLocale;
 } = {}) {
+  if (!SITE_CONFIG.features.billing) {
+    notFound();
+  }
+
   const { t } = getStaticTranslations(locale);
   const includedCards = [
     {

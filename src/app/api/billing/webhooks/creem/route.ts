@@ -6,6 +6,8 @@ import {
   RequestBodyTooLargeError,
 } from "@/lib/http/request-body";
 import { logCreemWebhook } from "@/lib/billing/creem/webhook-log";
+import { SITE_CONFIG } from "@/lib/config/site";
+import { integrationNotFound } from "@/lib/http/integration-response";
 
 const MAX_WEBHOOK_BODY_BYTES = 1024 * 1024;
 
@@ -18,6 +20,10 @@ function isInvalidWebhookPayloadError(error: unknown) {
 }
 
 export async function POST(request: NextRequest) {
+  if (!SITE_CONFIG.features.billing) {
+    return integrationNotFound();
+  }
+
   let delegatedToHandler = false;
   try {
     const payload = await readTextBodyWithLimit(

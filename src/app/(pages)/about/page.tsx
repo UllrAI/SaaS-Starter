@@ -26,6 +26,7 @@ import type { Metadata } from "next";
 import type { SupportedLocale } from "@/lib/config/i18n";
 import { SUPPORTED_LOCALES } from "@/lib/config/i18n";
 import { getOpenGraphLocale } from "@/lib/metadata";
+import { SITE_CONFIG } from "@/lib/config/site";
 
 export async function buildAboutMetadata(
   locale: SupportedLocale,
@@ -265,11 +266,13 @@ export default function AboutPage({
               )}
             </PageIntroDescription>
             <div className="flex flex-wrap justify-center gap-4">
-              <Button asChild size="lg">
-                <Link href="/pricing" locale={locale}>
-                  {t("6ea7de9594bc", "Get Started Today")}
-                </Link>
-              </Button>
+              {SITE_CONFIG.features.billing && (
+                <Button asChild size="lg">
+                  <Link href="/pricing" locale={locale}>
+                    {t("6ea7de9594bc", "Get Started Today")}
+                  </Link>
+                </Button>
+              )}
               <Button variant="outline" size="lg" asChild>
                 <Link href="/contact" locale={locale}>
                   {t("a2d38631c005", "Contact Sales")}

@@ -7,6 +7,7 @@ import {
 } from "@/lib/auth/callback-url";
 import { requireGuest } from "@/lib/auth/permissions";
 import { createMetadataDefaults } from "@/lib/metadata";
+import { SITE_CONFIG } from "@/lib/config/site";
 
 export async function generateMetadata() {
   const { locale, t } = await getServerTranslations();
@@ -46,6 +47,7 @@ export default async function SignUpPage({ searchParams }: SignUpPageProps) {
     <AuthForm
       mode="signup"
       availableProviders={availableProviders}
+      emailAuthEnabled={SITE_CONFIG.features.emailAuth}
       callbackURL={callbackUrl}
     />
   );

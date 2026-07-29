@@ -1,0 +1,68 @@
+import { describe, expect, it } from "@jest/globals";
+
+import { validateIntegrationEnv } from "./integration-env.mjs";
+
+const oauthEnv = {
+  GOOGLE_CLIENT_ID: "google-id",
+  GOOGLE_CLIENT_SECRET: "google-secret",
+  CREEM_ENVIRONMENT: "test_mode",
+};
+
+describe("validateIntegrationEnv", () => {
+  it("allows disabled optional integrations without their credentials", () => {
+    expect(() =>
+      validateIntegrationEnv(
+        { emailAuth: false, billing: false, uploads: false },
+        oauthEnv,
+      ),
+    ).not.toThrow();
+  });
+
+  it("reports incomplete enabled integration groups", () => {
+    expect(() =>
+      validateIntegrationEnv(
+        { emailAuth: true, billing: false, uploads: false },
+        { ...oauthEnv, RESEND_API_KEY: "resend-key" },
+      ),
+    ).toThrow(
+      "Email authentication is enabled but missing: RESEND_EMAIL_FROM.",
+    );
+
+    expect(() =>
+      validateIntegrationEnv(
+        { emailAuth: false, billing: true, uploads: false },
+        { ...oauthEnv, CREEM_API_KEY: "creem_test_key" },
+      ),
+    ).toThrow("Billing is enabled but missing: CREEM_WEBHOOK_SECRET.");
+  });
+
+  it("accepts complete enabled integration groups", () => {
+    expect(() =>
+      validateIntegrationEnv(
+        { emailAuth: true, billing: true, uploads: true },
+        {
+          ...oauthEnv,
+          RESEND_API_KEY: "resend-key",
+          RESEND_EMAIL_FROM: "noreply@example.com",
+          CREEM_API_KEY: "creem_test_key",
+          CREEM_WEBHOOK_SECRET: "webhook-secret",
+          R2_ENDPOINT: "https://r2.example.com",
+          R2_ACCESS_KEY_ID: "access-key",
+          R2_SECRET_ACCESS_KEY: "secret-key",
+          R2_BUCKET_NAME: "bucket",
+          R2_PUBLIC_URL: "https://cdn.example.com",
+          UPLOAD_CLEANUP_SECRET: "cleanup-secret",
+        },
+      ),
+    ).not.toThrow();
+  });
+
+  it("requires an OAuth provider when email authentication is disabled", () => {
+    expect(() =>
+      validateIntegrationEnv(
+        { emailAuth: false, billing: false, uploads: false },
+        {},
+      ),
+    ).toThrow("at least one complete OAuth provider");
+  });
+});

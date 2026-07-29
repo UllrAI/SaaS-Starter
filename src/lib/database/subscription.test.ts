@@ -63,7 +63,10 @@ const mockWebhookEvents = {
 };
 
 const mockEq = jest.fn();
+const mockAnd = jest.fn((...conditions: unknown[]) => conditions);
+const mockCount = jest.fn();
 const mockDesc = jest.fn();
+const mockMax = jest.fn();
 const mockSql = jest.fn(
   (strings: TemplateStringsArray, ...values: unknown[]) => ({
     strings,
@@ -87,9 +90,11 @@ jest.mock("@/database/tables", () => ({
 }));
 
 jest.mock("drizzle-orm", () => ({
-  and: jest.fn((...conditions: unknown[]) => conditions),
+  and: mockAnd,
+  count: mockCount,
   eq: mockEq,
   desc: mockDesc,
+  max: mockMax,
   isNull: jest.fn((value: unknown) => ["isNull", value]),
   sql: mockSql,
 }));
@@ -1216,6 +1221,60 @@ describe("Database Subscription Functions", () => {
 
       expect(result[0].tierId).toBe("unknown-product");
       expect(result[0].tierName).toBe("Unknown Product");
+    });
+  });
+
+  describe("getUserPaymentCount", () => {
+    it("counts all payments for a user", async () => {
+      mockDb.select.mockReturnValue({
+        from: jest.fn().mockReturnValue({
+          where: jest.fn().mockResolvedValue([
+            {
+              count: 12,
+              latestCreatedAt: new Date("2026-02-03T00:00:00Z"),
+            },
+          ]),
+        }),
+      });
+
+      const { getUserPaymentCount } = await import("./subscription");
+
+      await expect(getUserPaymentCount("user-123")).resolves.toBe(12);
+      expect(mockCount).toHaveBeenCalledTimes(1);
+      expect(mockEq).toHaveBeenCalledWith(mockPayments.userId, "user-123");
+    });
+
+    it("returns the latest matching payment alongside its count", async () => {
+      const latestCreatedAt = new Date("2026-02-03T00:00:00Z");
+      mockDb.select.mockReturnValue({
+        from: jest.fn().mockReturnValue({
+          where: jest.fn().mockResolvedValue([{ count: 12, latestCreatedAt }]),
+        }),
+      });
+
+      const { getUserPaymentSummary } = await import("./subscription");
+
+      await expect(getUserPaymentSummary("user-123")).resolves.toEqual({
+        count: 12,
+        latestCreatedAt,
+      });
+      expect(mockMax).toHaveBeenCalledWith(mockPayments.createdAt);
+    });
+
+    it("optionally limits the count to one payment status", async () => {
+      mockDb.select.mockReturnValue({
+        from: jest.fn().mockReturnValue({
+          where: jest.fn().mockResolvedValue([{ count: 4 }]),
+        }),
+      });
+
+      const { getUserPaymentCount } = await import("./subscription");
+
+      await expect(getUserPaymentCount("user-123", "succeeded")).resolves.toBe(
+        4,
+      );
+      expect(mockEq).toHaveBeenCalledWith(mockPayments.status, "succeeded");
+      expect(mockAnd).toHaveBeenCalled();
     });
   });
 

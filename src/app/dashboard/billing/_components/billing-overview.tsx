@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslation } from "@/lib/i18n/translation/client";
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import { toast } from "sonner";
 import { CalendarClock, Loader2, ReceiptText } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -34,10 +34,17 @@ import type {
   Subscription,
 } from "@/types/billing";
 import { LocalizedLink } from "@/components/localized-link";
+import {
+  getPaymentStatusLabel,
+  getPaymentTypeLabel,
+  getSubscriptionStatusLabel,
+} from "@/lib/billing/labels";
 interface BillingOverviewProps {
   subscription: Subscription | null;
   entitlement: ProductEntitlement | null;
   payments: PaymentRecord[];
+  successfulPaymentCount: number;
+  latestSuccessfulPaymentAt: Date | null;
 }
 function RedirectingToSubscriptionManagementToast() {
   const { t } = useTranslation();
@@ -76,56 +83,12 @@ function NoPaymentRecordsLabel() {
   const { t } = useTranslation();
   return <>{t("fe7244137ccf", "No records yet")}</>;
 }
-function SubscriptionStatusLabel({ status }: { status: string }) {
-  const { t } = useTranslation();
-  switch (status) {
-    case "active":
-      return <>{t("billing_status_active", "Active")}</>;
-    case "trialing":
-      return <>{t("billing_status_trialing", "Trialing")}</>;
-    case "scheduled_cancel":
-      return <>{t("billing_status_scheduled_cancel", "Scheduled to cancel")}</>;
-    case "canceled":
-      return <>{t("billing_status_canceled", "Canceled")}</>;
-    default:
-      return <>{t("billing_status_inactive", "Inactive")}</>;
-  }
-}
-function PaymentTypeLabel({ type }: { type: string }) {
-  const { t } = useTranslation();
-  return type === "one_time" ? (
-    <>{t("billing_payment_type_one_time", "One-time purchase")}</>
-  ) : (
-    <>{t("billing_payment_type_subscription", "Subscription")}</>
-  );
-}
-function PaymentStatusLabel({ status }: { status: string }) {
-  const { t } = useTranslation();
-  switch (status) {
-    case "succeeded":
-      return <>{t("billing_payment_status_succeeded", "Succeeded")}</>;
-    case "pending":
-      return <>{t("billing_payment_status_pending", "Pending")}</>;
-    case "partially_refunded":
-      return (
-        <>
-          {t("billing_payment_status_partially_refunded", "Partially refunded")}
-        </>
-      );
-    case "refunded":
-      return <>{t("billing_payment_status_refunded", "Refunded")}</>;
-    case "disputed":
-      return <>{t("billing_payment_status_disputed", "Disputed")}</>;
-    case "failed":
-      return <>{t("billing_payment_status_failed", "Failed")}</>;
-    default:
-      return <>{t("billing_payment_status_unknown", "Unknown")}</>;
-  }
-}
 export function BillingOverview({
   subscription,
   entitlement,
   payments,
+  successfulPaymentCount,
+  latestSuccessfulPaymentAt,
 }: BillingOverviewProps) {
   const { t } = useTranslation();
   const intlLocale = useIntlLocale();
@@ -135,15 +98,6 @@ export function BillingOverview({
     billingAccess.kind === "subscription" ? billingAccess.subscription : null;
   const hasLifetimeAccess = billingAccess.kind === "lifetime";
   const canManage = canManageSubscription(subscription);
-  const paymentSummary = useMemo(() => {
-    const successfulPayments = payments.filter(
-      (payment) => payment.status === "succeeded",
-    );
-    return {
-      count: successfulPayments.length,
-      latestDate: successfulPayments[0]?.createdAt ?? null,
-    };
-  }, [payments]);
   const nextBillingDate = currentSubscription?.currentPeriodEnd
     ? new Date(currentSubscription.currentPeriodEnd).toLocaleDateString(
         intlLocale,
@@ -203,7 +157,7 @@ export function BillingOverview({
                     : "secondary"
                 }
               >
-                <SubscriptionStatusLabel status={currentSubscription.status} />
+                {getSubscriptionStatusLabel(currentSubscription.status, t)}
               </Badge>
             ) : hasLifetimeAccess ? (
               <Badge variant="default">
@@ -252,13 +206,15 @@ export function BillingOverview({
             <CardDescription>
               {t("7534811de973", "Successful Payments")}
             </CardDescription>
-            <CardTitle className="text-base">{paymentSummary.count}</CardTitle>
+            <CardTitle className="text-base">
+              {successfulPaymentCount}
+            </CardTitle>
           </CardHeader>
           <CardContent className="text-muted-foreground flex items-center gap-2 text-sm">
             <ReceiptText className="h-4 w-4" />
-            {paymentSummary.latestDate ? (
+            {latestSuccessfulPaymentAt ? (
               <LatestPaymentDateLabel
-                date={new Date(paymentSummary.latestDate).toLocaleDateString(
+                date={new Date(latestSuccessfulPaymentAt).toLocaleDateString(
                   intlLocale,
                 )}
               />
@@ -342,7 +298,7 @@ export function BillingOverview({
                             : "default"
                         }
                       >
-                        <PaymentTypeLabel type={payment.paymentType} />
+                        {getPaymentTypeLabel(payment.paymentType, t)}
                       </Badge>
                     </TableCell>
                     <TableCell>
@@ -361,7 +317,7 @@ export function BillingOverview({
                             : "destructive"
                         }
                       >
-                        <PaymentStatusLabel status={payment.status} />
+                        {getPaymentStatusLabel(payment.status, t)}
                       </Badge>
                     </TableCell>
                   </TableRow>

@@ -3,15 +3,17 @@
 import { useTranslation } from "@/lib/i18n/translation/client";
 import { type ComponentProps, type ReactNode, useCallback } from "react";
 import { Badge } from "@/components/ui/badge";
-import { ExternalLink } from "lucide-react";
 import { AdminTableBase } from "@/components/admin/admin-table-base";
 import { UserAvatarCell } from "@/components/admin/user-avatar-cell";
 import { PaymentWithUser } from "@/types/billing";
 import { useAdminTable } from "@/hooks/use-admin-table";
-import { Button } from "@/components/ui/button";
 import { getPayments } from "@/lib/actions/admin/payments";
 import { useIntlLocale } from "@/hooks/use-intl-locale";
 import type { AppTranslate } from "@/lib/i18n/translation/shared";
+import {
+  getPaymentStatusLabel,
+  getPaymentTypeLabel,
+} from "@/lib/billing/labels";
 interface PaymentManagementTableProps {
   initialData: PaymentWithUser[];
   initialPagination: {
@@ -46,41 +48,6 @@ const formatDate = (dateString: string | Date, locale: string) => {
     minute: "2-digit",
   });
 };
-const openProviderPayment = (paymentId: string) => {
-  window.open(`https://www.creem.io/dashboard/payments/${paymentId}`, "_blank");
-};
-function PaymentStatusLabel({ status }: { status: string }) {
-  const { t } = useTranslation();
-  switch (status) {
-    case "succeeded":
-      return <>{t("13c33dcdc696", "Succeeded")}</>;
-    case "pending":
-      return <>{t("68b7486ca0eb", "Pending")}</>;
-    case "failed":
-      return <>{t("dc2b4f6fc52d", "Failed")}</>;
-    case "canceled":
-      return <>{t("5e1068170863", "Canceled")}</>;
-    default:
-      return <>{t("257e80a7f3ee", "Unknown")}</>;
-  }
-}
-function PaymentMethodLabel({ paymentType }: { paymentType: string }) {
-  const { t } = useTranslation();
-  switch (paymentType) {
-    case "subscription":
-      return <>{t("81ac6999f996", "Subscription")}</>;
-    case "one_time":
-      return <>{t("dfcf573db228", "One-time Payment")}</>;
-    case "card":
-      return <>{t("161489760794", "Credit Card")}</>;
-    case "bank_transfer":
-      return <>{t("39a38e00159d", "Bank Transfer")}</>;
-    case "paypal":
-      return <>{t("bb6bd6003b71", "PayPal")}</>;
-    default:
-      return <>{t("508d3b02ab09", "Unknown")}</>;
-  }
-}
 const createColumns = (
   locale: string,
   t: AppTranslate,
@@ -117,7 +84,7 @@ const createColumns = (
         variant={getStatusBadgeVariant(payment.status)}
         className="capitalize"
       >
-        <PaymentStatusLabel status={payment.status} />
+        {getPaymentStatusLabel(payment.status, t)}
       </Badge>
     ),
   },
@@ -126,7 +93,7 @@ const createColumns = (
     label: <>{t("admin_payment_column_method", "Method")}</>,
     render: (payment) => (
       <div className="text-sm">
-        <PaymentMethodLabel paymentType={payment.paymentType} />
+        {getPaymentTypeLabel(payment.paymentType, t)}
       </div>
     ),
   },
@@ -134,20 +101,6 @@ const createColumns = (
     key: "created",
     label: <>{t("admin_payment_column_created", "Created")}</>,
     render: (payment) => formatDate(payment.createdAt, locale),
-  },
-  {
-    key: "actions",
-    label: <>{t("admin_payment_column_actions", "Actions")}</>,
-    render: (payment) => (
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={() => openProviderPayment(payment.paymentId)}
-        title={t("admin_payment_view_in_creem", "View in the Creem dashboard")}
-      >
-        <ExternalLink className="h-4 w-4" />
-      </Button>
-    ),
   },
 ];
 export function PaymentManagementTable({
@@ -204,19 +157,19 @@ export function PaymentManagementTable({
     },
     {
       value: "succeeded",
-      label: <PaymentStatusLabel status="succeeded" />,
+      label: <>{getPaymentStatusLabel("succeeded", t)}</>,
     },
     {
       value: "pending",
-      label: <PaymentStatusLabel status="pending" />,
+      label: <>{getPaymentStatusLabel("pending", t)}</>,
     },
     {
       value: "failed",
-      label: <PaymentStatusLabel status="failed" />,
+      label: <>{getPaymentStatusLabel("failed", t)}</>,
     },
     {
       value: "canceled",
-      label: <PaymentStatusLabel status="canceled" />,
+      label: <>{getPaymentStatusLabel("canceled", t)}</>,
     },
   ];
   return (

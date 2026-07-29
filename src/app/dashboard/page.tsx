@@ -14,6 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { requireAuth } from "@/lib/auth/permissions";
 import {
+  getUserPaymentCount,
   getUserPayments,
   getUserProductEntitlement,
   getUserSubscription,
@@ -26,7 +27,11 @@ import { formatFileSize } from "@/lib/config/upload";
 import { createMetadataDefaults } from "@/lib/metadata";
 import { getRequestLocale } from "@/lib/i18n/server-locale";
 import type { AppTranslate } from "@/lib/i18n/translation/shared";
-import type { SubscriptionStatus } from "@/types/billing";
+import {
+  getPaymentStatusLabel,
+  getPaymentTypeLabel,
+  getSubscriptionStatusLabel,
+} from "@/lib/billing/labels";
 import {
   ArrowRight,
   CreditCard,
@@ -48,62 +53,6 @@ function getPlanLabel(planId: string | null, t: AppTranslate) {
     default:
       return planId ?? t("dashboard_plan_free", "Free");
   }
-}
-
-function getSubscriptionStatusLabel(
-  status: SubscriptionStatus,
-  t: AppTranslate,
-) {
-  switch (status) {
-    case "active":
-      return t("billing_status_active", status);
-    case "canceled":
-      return t("billing_status_canceled", status);
-    case "expired":
-      return t("subscription_status_expired", "Expired");
-    case "past_due":
-      return t("64f180e9fb46", "Past Due");
-    case "unpaid":
-      return t("685a7728149e", "Unpaid");
-    case "paused":
-      return t("subscription_status_paused", "Paused");
-    case "scheduled_cancel":
-      return t("subscription_status_scheduled_cancel", "Scheduled to cancel");
-    case "trialing":
-      return t("billing_status_trialing", "Trialing");
-    case "incomplete":
-      return t("4704260a99f1", "Incomplete");
-  }
-}
-
-function getPaymentStatusLabel(status: string, t: AppTranslate) {
-  switch (status) {
-    case "succeeded":
-      return t("billing_payment_status_succeeded", "Succeeded");
-    case "pending":
-      return t("billing_payment_status_pending", "Pending");
-    case "failed":
-      return t("billing_payment_status_failed", "Failed");
-    case "refunded":
-      return t("billing_payment_status_refunded", "Refunded");
-    case "partially_refunded":
-      return t(
-        "billing_payment_status_partially_refunded",
-        "Partially refunded",
-      );
-    case "disputed":
-      return t("billing_payment_status_disputed", "Disputed");
-    case "canceled":
-      return t("billing_status_canceled", "Canceled");
-    default:
-      return t("billing_payment_status_unknown", "Unknown");
-  }
-}
-
-function getPaymentTypeLabel(paymentType: string, t: AppTranslate) {
-  return paymentType === "subscription"
-    ? t("billing_payment_type_subscription", "Subscription")
-    : t("billing_payment_type_one_time", "One-time purchase");
 }
 
 function getRoleLabel(role: string, t: AppTranslate) {
@@ -148,28 +97,37 @@ export async function generateMetadata() {
 export default async function HomeRoute() {
   const { t } = await getServerTranslations();
   const user = await requireAuth();
-  const [locale, subscription, entitlement, payments, [uploadSummary]] =
-    await Promise.all([
-      getRequestLocale(),
-      SITE_CONFIG.features.billing
-        ? getUserSubscription(user.id)
-        : Promise.resolve(null),
-      SITE_CONFIG.features.billing
-        ? getUserProductEntitlement(user.id)
-        : Promise.resolve(null),
-      SITE_CONFIG.features.billing
-        ? getUserPayments(user.id, 5)
-        : Promise.resolve([]),
-      SITE_CONFIG.features.uploads
-        ? db
-            .select({
-              count: count(),
-              totalSize: sum(uploads.fileSize),
-            })
-            .from(uploads)
-            .where(eq(uploads.userId, user.id))
-        : Promise.resolve([{ count: 0, totalSize: null }]),
-    ]);
+  const [
+    locale,
+    subscription,
+    entitlement,
+    payments,
+    paymentCount,
+    [uploadSummary],
+  ] = await Promise.all([
+    getRequestLocale(),
+    SITE_CONFIG.features.billing
+      ? getUserSubscription(user.id)
+      : Promise.resolve(null),
+    SITE_CONFIG.features.billing
+      ? getUserProductEntitlement(user.id)
+      : Promise.resolve(null),
+    SITE_CONFIG.features.billing
+      ? getUserPayments(user.id, 5)
+      : Promise.resolve([]),
+    SITE_CONFIG.features.billing
+      ? getUserPaymentCount(user.id)
+      : Promise.resolve(0),
+    SITE_CONFIG.features.uploads
+      ? db
+          .select({
+            count: count(),
+            totalSize: sum(uploads.fileSize),
+          })
+          .from(uploads)
+          .where(eq(uploads.userId, user.id))
+      : Promise.resolve([{ count: 0, totalSize: null }]),
+  ]);
   const latestPayment = payments[0] ?? null;
   const uploadedFileCount = uploadSummary?.count ?? 0;
   const uploadedFileSize = Number(uploadSummary?.totalSize ?? 0);
@@ -296,7 +254,7 @@ export default async function HomeRoute() {
                 <p className="text-muted-foreground text-xs uppercase">
                   {t("e6dc7b2a7611", "Payments")}
                 </p>
-                <p className="text-lg font-semibold">{payments.length}</p>
+                <p className="text-lg font-semibold">{paymentCount}</p>
                 <p className="text-muted-foreground text-sm">
                   {latestPayment ? (
                     formatCurrency(

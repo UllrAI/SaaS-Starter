@@ -496,5 +496,23 @@ describe("Billing Checkout API", () => {
       expect(oneTimeWithCycle.status).toBe(400);
       expect(mockCreateCheckoutSession).not.toHaveBeenCalled();
     });
+
+    it("returns 503 before authentication when billing is disabled", async () => {
+      jest.resetModules();
+      jest.doMock("@/lib/config/site", () => ({
+        SITE_CONFIG: {
+          features: { emailAuth: true, billing: false, uploads: true },
+        },
+      }));
+      const { POST } = await import("./route");
+
+      const response = await POST(createMockRequest({}));
+
+      expect(response.status).toBe(503);
+      await expect(response.json()).resolves.toMatchObject({
+        code: "integration_unavailable",
+      });
+      expect(mockGetSession).not.toHaveBeenCalled();
+    });
   });
 });

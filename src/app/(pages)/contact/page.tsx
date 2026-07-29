@@ -32,6 +32,7 @@ import {
 } from "@/lib/metadata";
 import { SOURCE_LOCALE, type SupportedLocale } from "@/lib/config/i18n";
 import { ContactMethods } from "./contact-methods";
+import { SITE_CONFIG } from "@/lib/config/site";
 export async function buildContactMetadata(locale: SupportedLocale) {
   const { t } = await getServerTranslations({ locale });
   const metadata = createMetadataDefaults({
@@ -368,11 +369,13 @@ export default function ContactPage({
               )}
             </PageIntroDescription>
             <div className="flex flex-wrap justify-center gap-4">
-              <Button asChild size="lg">
-                <Link href="/pricing" locale={locale}>
-                  {t("b32e51fc5358", "View Pricing")}
-                </Link>
-              </Button>
+              {SITE_CONFIG.features.billing && (
+                <Button asChild size="lg">
+                  <Link href="/pricing" locale={locale}>
+                    {t("b32e51fc5358", "View Pricing")}
+                  </Link>
+                </Button>
+              )}
               <Button variant="outline" size="lg" asChild>
                 <Link href="/about" locale={locale}>
                   {t("5c315fc2d27e", "Learn More")}

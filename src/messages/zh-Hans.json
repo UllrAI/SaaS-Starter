@@ -1,4 +1,6 @@
 {
+  "auth_oauth_login_description": "选择一个已关联的账号以访问控制台",
+  "auth_oauth_signup_description": "选择一个已关联的账号以创建账户",
   "006f24988b60": "正在发送魔法链接...",
   "00c1cd3bf46e": "改进我们的服务并开发新功能",
   "00e0b9a5b021": "图片",

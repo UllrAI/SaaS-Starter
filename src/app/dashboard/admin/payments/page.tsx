@@ -12,8 +12,10 @@ import { Suspense } from "react";
 import { PaymentStatsCards } from "./_components/payment-stats-cards";
 import { PaymentManagementTable } from "./_components/payment-management-table";
 import { StatsCardsSkeleton } from "../_components/stats-cards-skeleton";
-import { getPayments } from "@/lib/actions/admin";
+import { getPayments } from "@/lib/actions/admin/payments";
 import { createMetadataDefaults } from "@/lib/metadata";
+import { SITE_CONFIG } from "@/lib/config/site";
+import { notFound } from "next/navigation";
 export async function generateMetadata() {
   const { locale, t } = await getServerTranslations();
   const metadata = createMetadataDefaults({ locale });
@@ -43,6 +45,10 @@ export async function generateMetadata() {
   };
 }
 export default async function PaymentsPage() {
+  if (!SITE_CONFIG.features.billing) {
+    notFound();
+  }
+
   const { t } = await getServerTranslations();
   await requireAdmin();
   const initialTableData = await getPayments({});

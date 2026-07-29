@@ -21,7 +21,7 @@ import { useAdminTable } from "@/hooks/use-admin-table";
 import {
   getSubscriptions,
   cancelSubscriptionAction,
-} from "@/lib/actions/admin";
+} from "@/lib/actions/admin/subscriptions";
 import { SubscriptionStatus } from "@/types/billing";
 import { useIntlLocale } from "@/hooks/use-intl-locale";
 interface SubscriptionManagementTableProps {

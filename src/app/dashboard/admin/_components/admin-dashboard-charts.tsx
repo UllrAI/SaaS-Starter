@@ -10,6 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import type { AdminStatsWithCharts } from "@/lib/admin/stats";
+import { SITE_CONFIG } from "@/lib/config/site";
 const RecentUsersChart = dynamic(
   () => import("./recent-users-chart").then((mod) => mod.RecentUsersChart),
   {
@@ -58,17 +59,19 @@ export function AdminDashboardCharts({ charts }: AdminDashboardChartsProps) {
         </Card>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>{t("8d31b3a9d0ea", "Revenue Overview")}</CardTitle>
-          <CardDescription>
-            {t("d43e9ea97a29", "Monthly revenue and payment trends")}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="pl-2">
-          <RevenueChart chartData={charts.monthlyRevenue} />
-        </CardContent>
-      </Card>
+      {SITE_CONFIG.features.billing && (
+        <Card>
+          <CardHeader>
+            <CardTitle>{t("8d31b3a9d0ea", "Revenue Overview")}</CardTitle>
+            <CardDescription>
+              {t("d43e9ea97a29", "Monthly revenue and payment trends")}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="pl-2">
+            <RevenueChart chartData={charts.monthlyRevenue} />
+          </CardContent>
+        </Card>
+      )}
     </>
   );
 }

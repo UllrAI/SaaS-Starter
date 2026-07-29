@@ -83,37 +83,48 @@ pnpm install
 cp .env.example .env
 ```
 
-然后，编辑 `.env` 文件，填入所有必需的值。
+然后编辑 `.env`，填入核心配置，以及
+`src/lib/config/site.js` 中已启用功能所需的凭据。
+
+#### 脚手架功能开关
+
+`SITE_CONFIG` 是品牌、联系方式、外部链接、静态资源以及 `emailAuth`、`billing`、
+`uploads` 三个静态功能开关的客户端安全单一配置源。三个功能默认全部启用。若项目
+不需要某项能力，应先在这里关闭，再删除对应环境变量。禁用后，相关导航、页面、API、
+插件和 Server Action 都会同步关闭或拦截。
+
+关闭 `emailAuth` 时，必须至少配置一组完整 OAuth Provider，确保 Web 登录仍可用。
+所有凭据只能保留在服务端环境变量中，绝不能写入 `SITE_CONFIG`。
 
 #### 环境变量说明
 
-| 变量名                           | 描述                                                  | 示例                                                |
-| :------------------------------- | :---------------------------------------------------- | :-------------------------------------------------- |
-| `DATABASE_URL`                   | **必需。** PostgreSQL 连接字符串。                    | `postgresql://user:password@localhost:5432/db_name` |
-| `RATE_LIMIT_IP_HEADER`           | **选填。** 可信客户端 IP 请求头，默认适配 Zeabur。    | `x-forwarded-for`                                   |
-| `NEXT_PUBLIC_APP_URL`            | **必需。** 您应用部署后的公开 URL。                   | `http://localhost:3000` 或 `https://yourdomain.com` |
-| `BETTER_AUTH_SECRET`             | **必需。** 至少 32 个字符的随机会话密钥。             | 使用 `openssl rand -base64 32` 生成                 |
-| `RESEND_API_KEY`                 | **必需。** 用于发送邮件的 Resend API Key。            | `re_xxxxxxxxxxxxxxxx`                               |
-| `RESEND_EMAIL_FROM`              | **必需。** Resend 中已验证域名下的发件地址。          | `noreply@your-verified-domain.com`                  |
-| `CREEM_API_KEY`                  | **必需。** 必须与所选 Creem 环境匹配。                | `creem_test_...` 或 `creem_...`                     |
-| `CREEM_ENVIRONMENT`              | **必需。** Creem 环境模式。                           | `test_mode` 或 `live_mode`                          |
-| `CREEM_WEBHOOK_SECRET`           | **必需。** Creem Webhook 密钥。                       | `whsec_your_webhook_secret`                         |
-| `R2_ENDPOINT`                    | **必需。** Cloudflare R2 API 端点。                   | `https://<ACCOUNT_ID>.r2.cloudflarestorage.com`     |
-| `R2_ACCESS_KEY_ID`               | **必需。** R2 访问密钥 ID。                           | `your_r2_access_key_id`                             |
-| `R2_SECRET_ACCESS_KEY`           | **必需。** R2 秘密访问密钥。                          | `your_r2_secret_access_key`                         |
-| `R2_BUCKET_NAME`                 | **必需。** R2 存储桶名称。                            | `your_r2_bucket_name`                               |
-| `R2_PUBLIC_URL`                  | **必需。** R2 存储桶的公共访问 URL。                  | `https://your-bucket.your-account.r2.dev`           |
-| `UPLOAD_CLEANUP_SECRET`          | **必需。** 上传清理端点使用的 32 位以上 Bearer 密钥。 | 使用 `openssl rand -base64 32` 生成                 |
-| `UPLOAD_DAILY_QUOTA_BYTES`       | 可选。每用户滚动 24 小时上传额度。                    | `1073741824`（1 GiB）                               |
-| `UPLOAD_TOTAL_QUOTA_BYTES`       | 可选。每用户已存储与预留的总字节额度。                | `5368709120`（5 GiB）                               |
-| `UPLOAD_LEGACY_COMPLETION_SINCE` | 可选。v1 有界兼容窗口的 ISO-8601 开始时间。           | 仅与 `UPLOAD_LEGACY_COMPLETION_UNTIL` 同时设置      |
-| `UPLOAD_LEGACY_COMPLETION_UNTIL` | 可选。v1 有界兼容窗口的 ISO-8601 结束时间。           | 最多晚于对应开始时间 24 小时                        |
-| `GITHUB_CLIENT_ID`               | _可选。_ 用于 GitHub OAuth 的 Client ID。             | `your_github_client_id`                             |
-| `GITHUB_CLIENT_SECRET`           | _可选。_ 用于 GitHub OAuth 的 Client Secret。         | `your_github_client_secret`                         |
-| `GOOGLE_CLIENT_ID`               | _可选。_ 用于 Google OAuth 的 Client ID。             | `your_google_client_id`                             |
-| `GOOGLE_CLIENT_SECRET`           | _可选。_ 用于 Google OAuth 的 Client Secret。         | `your_google_client_secret`                         |
-| `LINKEDIN_CLIENT_ID`             | _可选。_ 用于 LinkedIn OAuth 的 Client ID。           | `your_linkedin_client_id`                           |
-| `LINKEDIN_CLIENT_SECRET`         | _可选。_ 用于 LinkedIn OAuth 的 Client Secret。       | `your_linkedin_client_secret`                       |
+| 变量名                           | 描述                                               | 示例                                                |
+| :------------------------------- | :------------------------------------------------- | :-------------------------------------------------- |
+| `DATABASE_URL`                   | **必需。** PostgreSQL 连接字符串。                 | `postgresql://user:password@localhost:5432/db_name` |
+| `RATE_LIMIT_IP_HEADER`           | **选填。** 可信客户端 IP 请求头，默认适配 Zeabur。 | `x-forwarded-for`                                   |
+| `NEXT_PUBLIC_APP_URL`            | **必需。** 您应用部署后的公开 URL。                | `http://localhost:3000` 或 `https://yourdomain.com` |
+| `BETTER_AUTH_SECRET`             | **必需。** 至少 32 个字符的随机会话密钥。          | 使用 `openssl rand -base64 32` 生成                 |
+| `RESEND_API_KEY`                 | 启用 `emailAuth` 时必需。Resend API Key。          | `re_xxxxxxxxxxxxxxxx`                               |
+| `RESEND_EMAIL_FROM`              | 启用 `emailAuth` 时必需。已验证的发件地址。        | `noreply@your-verified-domain.com`                  |
+| `CREEM_API_KEY`                  | 启用 `billing` 时必需。需与环境模式匹配。          | `creem_test_...` 或 `creem_...`                     |
+| `CREEM_ENVIRONMENT`              | Creem 环境模式，默认为 `test_mode`。               | `test_mode` 或 `live_mode`                          |
+| `CREEM_WEBHOOK_SECRET`           | 启用 `billing` 时必需。Creem Webhook 密钥。        | `whsec_your_webhook_secret`                         |
+| `R2_ENDPOINT`                    | 启用 `uploads` 时必需。Cloudflare R2 API 端点。    | `https://<ACCOUNT_ID>.r2.cloudflarestorage.com`     |
+| `R2_ACCESS_KEY_ID`               | 启用 `uploads` 时必需。R2 访问密钥 ID。            | `your_r2_access_key_id`                             |
+| `R2_SECRET_ACCESS_KEY`           | 启用 `uploads` 时必需。R2 秘密访问密钥。           | `your_r2_secret_access_key`                         |
+| `R2_BUCKET_NAME`                 | 启用 `uploads` 时必需。R2 存储桶名称。             | `your_r2_bucket_name`                               |
+| `R2_PUBLIC_URL`                  | 启用 `uploads` 时必需。R2 公共访问 URL。           | `https://your-bucket.your-account.r2.dev`           |
+| `UPLOAD_CLEANUP_SECRET`          | 启用 `uploads` 时必需。32 位以上清理密钥。         | 使用 `openssl rand -base64 32` 生成                 |
+| `UPLOAD_DAILY_QUOTA_BYTES`       | 可选。每用户滚动 24 小时上传额度。                 | `1073741824`（1 GiB）                               |
+| `UPLOAD_TOTAL_QUOTA_BYTES`       | 可选。每用户已存储与预留的总字节额度。             | `5368709120`（5 GiB）                               |
+| `UPLOAD_LEGACY_COMPLETION_SINCE` | 可选。v1 有界兼容窗口的 ISO-8601 开始时间。        | 仅与 `UPLOAD_LEGACY_COMPLETION_UNTIL` 同时设置      |
+| `UPLOAD_LEGACY_COMPLETION_UNTIL` | 可选。v1 有界兼容窗口的 ISO-8601 结束时间。        | 最多晚于对应开始时间 24 小时                        |
+| `GITHUB_CLIENT_ID`               | _可选。_ 用于 GitHub OAuth 的 Client ID。          | `your_github_client_id`                             |
+| `GITHUB_CLIENT_SECRET`           | _可选。_ 用于 GitHub OAuth 的 Client Secret。      | `your_github_client_secret`                         |
+| `GOOGLE_CLIENT_ID`               | _可选。_ 用于 Google OAuth 的 Client ID。          | `your_google_client_id`                             |
+| `GOOGLE_CLIENT_SECRET`           | _可选。_ 用于 Google OAuth 的 Client Secret。      | `your_google_client_secret`                         |
+| `LINKEDIN_CLIENT_ID`             | _可选。_ 用于 LinkedIn OAuth 的 Client ID。        | `your_linkedin_client_id`                           |
+| `LINKEDIN_CLIENT_SECRET`         | _可选。_ 用于 LinkedIn OAuth 的 Client Secret。    | `your_linkedin_client_secret`                       |
 
 > **提示:** 您可以使用以下命令生成一个安全的密钥：
 > `openssl rand -base64 32`

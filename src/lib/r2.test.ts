@@ -54,9 +54,9 @@ describe("R2 storage", () => {
     jest.restoreAllMocks();
   });
 
-  it("exports an initialized client", async () => {
-    const { r2Client } = await import("./r2");
-    expect(r2Client).toBeDefined();
+  it("initializes the client on demand", async () => {
+    const { getR2Client } = await import("./r2");
+    expect(getR2Client()).toBeDefined();
   });
 
   it("normalizes public URLs", async () => {

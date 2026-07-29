@@ -23,7 +23,7 @@ import {
   getUploads,
   deleteUploadAction,
   batchDeleteUploadsAction,
-} from "@/lib/actions/admin";
+} from "@/lib/actions/admin/uploads";
 import Image from "next/image";
 import { useIntlLocale } from "@/hooks/use-intl-locale";
 interface Upload {

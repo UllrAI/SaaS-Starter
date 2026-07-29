@@ -1,11 +1,16 @@
 import { Resend } from "resend";
 
-import env from "@/env";
 import type { ReactNode } from "react";
 import { APP_NAME } from "@/lib/config/constants";
-const resend = new Resend(env.RESEND_API_KEY);
+import { getEmailConfig } from "@/lib/config/integrations";
 
 const DEFAULT_SENDER_NAME = APP_NAME;
+let resend: Resend | undefined;
+
+function getResendClient(apiKey: string): Resend {
+  resend ??= new Resend(apiKey);
+  return resend;
+}
 
 type EmailBody = ReactNode | { html: string; text?: string };
 
@@ -14,6 +19,7 @@ export async function sendEmail(
   subject: string,
   body: EmailBody,
 ) {
+  const config = getEmailConfig();
   const payload =
     typeof body === "object" &&
     body !== null &&
@@ -27,8 +33,8 @@ export async function sendEmail(
           react: <>{body}</>,
         };
 
-  const { error } = await resend.emails.send({
-    from: `${DEFAULT_SENDER_NAME} <${env.RESEND_EMAIL_FROM}>`,
+  const { error } = await getResendClient(config.apiKey).emails.send({
+    from: `${DEFAULT_SENDER_NAME} <${config.from}>`,
     to: email,
     subject,
     ...payload,

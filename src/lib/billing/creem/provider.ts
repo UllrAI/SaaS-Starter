@@ -5,7 +5,8 @@ import type {
 } from "../provider";
 import type { CreateCheckoutOptions } from "@/types/billing";
 import { z } from "zod";
-import { creemClient, creemEnvironment } from "./client";
+import { getBillingConfig } from "@/lib/config/integrations";
+import { getCreemClient, type CreemClient } from "./client";
 import { handleCreemWebhook } from "./webhook";
 import { getCreemProductIds } from "./products";
 
@@ -34,7 +35,7 @@ function resolveCheckoutStatus(status: string): CheckoutStatus {
 }
 
 function mapCheckoutStatus(
-  checkout: Awaited<ReturnType<typeof creemClient.checkouts.retrieve>>,
+  checkout: Awaited<ReturnType<CreemClient["checkouts"]["retrieve"]>>,
 ): CheckoutStatusResult {
   const ownerId = checkout.metadata?.userId;
   const paymentMode = checkout.metadata?.paymentMode;
@@ -54,8 +55,10 @@ const creemProvider: PaymentProvider = {
     options: CreateCheckoutOptions,
   ): Promise<{ checkoutUrl: string }> {
     try {
+      const client = getCreemClient();
+      const { environment } = getBillingConfig();
       let creemProductId: string;
-      const productIds = getCreemProductIds(options.tierId, creemEnvironment);
+      const productIds = getCreemProductIds(options.tierId, environment);
       if (!productIds) {
         throw new Error(`Pricing tier with id "${options.tierId}" not found.`);
       }
@@ -89,7 +92,7 @@ const creemProvider: PaymentProvider = {
         },
       };
 
-      const response = await creemClient.checkouts.create(checkoutRequestData);
+      const response = await client.checkouts.create(checkoutRequestData);
 
       const parsed = CreemCheckoutResponseSchema.safeParse(response);
 
@@ -111,7 +114,7 @@ const creemProvider: PaymentProvider = {
     customerId: string,
   ): Promise<{ portalUrl: string }> {
     try {
-      const response = await creemClient.customers.generateBillingLinks({
+      const response = await getCreemClient().customers.generateBillingLinks({
         customerId,
       });
 
@@ -132,7 +135,7 @@ const creemProvider: PaymentProvider = {
   },
 
   async getCheckoutStatus(checkoutId: string): Promise<CheckoutStatusResult> {
-    const checkout = await creemClient.checkouts.retrieve(checkoutId);
+    const checkout = await getCreemClient().checkouts.retrieve(checkoutId);
     return mapCheckoutStatus(checkout);
   },
 
@@ -140,7 +143,7 @@ const creemProvider: PaymentProvider = {
     subscriptionId: string,
     options: { mode: "immediate" | "scheduled" },
   ): Promise<void> {
-    await creemClient.subscriptions.cancel(subscriptionId, options);
+    await getCreemClient().subscriptions.cancel(subscriptionId, options);
   },
 
   async handleWebhook(

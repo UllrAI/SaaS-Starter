@@ -8,6 +8,7 @@ import {
 import { createMetadataDefaults } from "@/lib/metadata";
 import { resolveAuthFeedback } from "@/lib/auth/feedback";
 import { requireGuest } from "@/lib/auth/permissions";
+import { SITE_CONFIG } from "@/lib/config/site";
 
 export async function generateMetadata() {
   const { locale, t } = await getServerTranslations();
@@ -62,6 +63,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
     <AuthForm
       mode="login"
       availableProviders={availableProviders}
+      emailAuthEnabled={SITE_CONFIG.features.emailAuth}
       callbackURL={callbackUrl}
       initialFeedback={feedback}
     />

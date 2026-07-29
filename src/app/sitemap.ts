@@ -3,6 +3,7 @@ import { SOURCE_LOCALE, SUPPORTED_LOCALES } from "@/lib/config/i18n";
 import { withLocalePrefix } from "@/lib/config/i18n-routing";
 import { getAllLocalizedPosts, getPostLocalizations } from "@/lib/content/blog";
 import { absoluteUrl } from "@/lib/url";
+import { SITE_CONFIG } from "@/lib/config/site";
 
 const localizedMarketingRoutes = [
   {
@@ -60,8 +61,11 @@ function buildLocaleAlternates(pathname: string) {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const staticPages: MetadataRoute.Sitemap = localizedMarketingRoutes.flatMap(
-    ({ pathname, changeFrequency, priority }) =>
+  const staticPages: MetadataRoute.Sitemap = localizedMarketingRoutes
+    .filter(
+      ({ pathname }) => SITE_CONFIG.features.billing || pathname !== "/pricing",
+    )
+    .flatMap(({ pathname, changeFrequency, priority }) =>
       SUPPORTED_LOCALES.map((locale) => ({
         url: absoluteUrl(withLocalePrefix(pathname, locale)),
         changeFrequency,
@@ -70,7 +74,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           languages: buildLocaleAlternates(pathname),
         },
       })),
-  );
+    );
 
   const blogPosts = getAllLocalizedPosts();
   const blogPostEntries: MetadataRoute.Sitemap = blogPosts.map((post) => {

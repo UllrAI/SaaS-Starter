@@ -4,7 +4,7 @@ import { db } from "@/database";
 import { claimWebhookEvent, type Tx } from "@/lib/database/subscription";
 import type { CreemWebhookPayload } from "@/types/billing";
 
-import { creemEnvironment, creemWebhookSecret } from "./client";
+import { getBillingConfig } from "@/lib/config/integrations";
 import { logCreemWebhook } from "./webhook-log";
 import {
   assertCreemObjectEnvironment,
@@ -121,16 +121,9 @@ export async function handleCreemWebhook(
   payload: string,
   signature: string,
 ): Promise<{ received: true }> {
-  if (!creemWebhookSecret) {
-    logCreemWebhook("error", {
-      eventId: null,
-      eventType: null,
-      outcome: "configuration_error",
-    });
-    throw new Error("Server configuration error: Webhook secret missing.");
-  }
+  const { environment, webhookSecret } = getBillingConfig();
 
-  if (!verifyCreemSignature(payload, signature, creemWebhookSecret)) {
+  if (!verifyCreemSignature(payload, signature, webhookSecret)) {
     logCreemWebhook("warn", {
       eventId: null,
       eventType: null,
@@ -142,7 +135,7 @@ export async function handleCreemWebhook(
   let event: CreemWebhookPayload;
   try {
     event = parseCreemWebhookPayload(payload);
-    assertCreemObjectEnvironment(event.object, creemEnvironment);
+    assertCreemObjectEnvironment(event.object, environment);
   } catch (error) {
     logCreemWebhook("warn", {
       eventId: null,

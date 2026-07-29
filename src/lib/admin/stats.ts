@@ -4,6 +4,7 @@ import { db } from "@/database";
 import { users, subscriptions, payments, uploads } from "@/database/schema";
 import { and, count, sum, desc, eq, inArray, gte, sql } from "drizzle-orm";
 import { formatFileSize } from "@/lib/config/upload";
+import { SITE_CONFIG } from "@/lib/config/site";
 
 // Extended interface for chart data
 interface ChartData {
@@ -116,9 +117,15 @@ export async function getAdminStats(): Promise<AdminStats> {
   const [userStats, subscriptionStats, paymentStats, uploadStats] =
     await Promise.all([
       getUserStats(),
-      getSubscriptionStats(),
-      getPaymentStats(),
-      getUploadStats(),
+      SITE_CONFIG.features.billing
+        ? getSubscriptionStats()
+        : Promise.resolve({ total: 0, active: 0, canceled: 0 }),
+      SITE_CONFIG.features.billing
+        ? getPaymentStats()
+        : Promise.resolve({ total: 0, totalRevenue: 0, successful: 0 }),
+      SITE_CONFIG.features.uploads
+        ? getUploadStats()
+        : Promise.resolve({ total: 0, totalSize: 0 }),
     ]);
 
   return {
@@ -149,22 +156,24 @@ export async function getAdminStatsWithCharts(): Promise<AdminStatsWithCharts> {
       .where(gte(users.createdAt, thirtyDaysAgo))
       .groupBy(userCreatedDate)
       .orderBy(desc(userCreatedDate)),
-    db
-      .select({
-        month: paymentCreatedMonth,
-        revenue: sum(payments.amount),
-        count: count(),
-      })
-      .from(payments)
-      .where(
-        and(
-          eq(payments.status, "succeeded"),
-          eq(payments.currency, "usd"),
-          gte(payments.createdAt, twelveMonthsAgo),
-        ),
-      )
-      .groupBy(paymentCreatedMonth)
-      .orderBy(desc(paymentCreatedMonth)),
+    SITE_CONFIG.features.billing
+      ? db
+          .select({
+            month: paymentCreatedMonth,
+            revenue: sum(payments.amount),
+            count: count(),
+          })
+          .from(payments)
+          .where(
+            and(
+              eq(payments.status, "succeeded"),
+              eq(payments.currency, "usd"),
+              gte(payments.createdAt, twelveMonthsAgo),
+            ),
+          )
+          .groupBy(paymentCreatedMonth)
+          .orderBy(desc(paymentCreatedMonth))
+      : Promise.resolve([]),
   ]);
 
   const monthlyRevenueData = monthlyRevenueRaw.map((data) => ({

@@ -1,13 +1,23 @@
 import "server-only";
 
-import env from "@/env";
+import { getBillingConfig } from "@/lib/config/integrations";
 import { createCreemClient } from "./api-client";
 
-const creemApiKey = env.CREEM_API_KEY;
-export const creemEnvironment = env.CREEM_ENVIRONMENT;
-export const creemWebhookSecret = env.CREEM_WEBHOOK_SECRET;
+export type CreemClient = ReturnType<typeof createCreemClient>;
 
-export const creemClient = createCreemClient({
-  apiKey: creemApiKey,
-  environment: creemEnvironment,
-});
+let client: CreemClient | undefined;
+
+export function getCreemClient(): CreemClient {
+  if (!client) {
+    const config = getBillingConfig();
+    client = createCreemClient({
+      apiKey: config.apiKey,
+      environment: config.environment,
+    });
+  }
+  return client;
+}
+
+export function getCreemEnvironment() {
+  return getBillingConfig().environment;
+}

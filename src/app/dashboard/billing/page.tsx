@@ -10,6 +10,8 @@ import {
 import { BillingOverview } from "./_components/billing-overview";
 import { createMetadataDefaults } from "@/lib/metadata";
 import { getAuthSessionFromHeaders } from "@/lib/auth/session";
+import { SITE_CONFIG } from "@/lib/config/site";
+import { notFound } from "next/navigation";
 export async function generateMetadata() {
   const { locale, t } = await getServerTranslations();
   const metadata = createMetadataDefaults({ locale });
@@ -39,6 +41,10 @@ export async function generateMetadata() {
   };
 }
 export default async function DashboardBillingPage() {
+  if (!SITE_CONFIG.features.billing) {
+    notFound();
+  }
+
   const { t } = await getServerTranslations();
   const requestHeaders = await headers();
   const session = await getAuthSessionFromHeaders(requestHeaders);

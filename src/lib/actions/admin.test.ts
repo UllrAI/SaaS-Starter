@@ -245,7 +245,7 @@ describe("Admin Actions", () => {
   });
 
   afterEach(() => {
-    jest.resetAllMocks();
+    jest.clearAllMocks();
   });
 
   describe("admin query authorization", () => {
@@ -253,28 +253,28 @@ describe("Admin Actions", () => {
       {
         name: "getUsers",
         call: async () => {
-          const { getUsers } = await import("./admin");
+          const { getUsers } = await import("./admin/users");
           return getUsers({});
         },
       },
       {
         name: "getPayments",
         call: async () => {
-          const { getPayments } = await import("./admin");
+          const { getPayments } = await import("./admin/payments");
           return getPayments({});
         },
       },
       {
         name: "getSubscriptions",
         call: async () => {
-          const { getSubscriptions } = await import("./admin");
+          const { getSubscriptions } = await import("./admin/subscriptions");
           return getSubscriptions({});
         },
       },
       {
         name: "getUploads",
         call: async () => {
-          const { getUploads } = await import("./admin");
+          const { getUploads } = await import("./admin/uploads");
           return getUploads({});
         },
       },
@@ -369,7 +369,7 @@ describe("Admin Actions", () => {
         .mockReturnValueOnce(mockSubscriptionsQuery);
 
       // Import and test the function
-      const { getUsers } = await import("./admin");
+      const { getUsers } = await import("./admin/users");
 
       const result = await getUsers({});
 
@@ -425,7 +425,7 @@ describe("Admin Actions", () => {
       mockOr.mockReturnValue("search-condition");
       mockIlike.mockReturnValue("like-condition");
 
-      const { getUsers } = await import("./admin");
+      const { getUsers } = await import("./admin/users");
 
       await getUsers({ search: "john" });
 
@@ -454,7 +454,7 @@ describe("Admin Actions", () => {
         .mockReturnValueOnce(mockTotalQuery);
       mockEq.mockReturnValue("role-condition");
 
-      const { getUsers } = await import("./admin");
+      const { getUsers } = await import("./admin/users");
 
       await getUsers({ role: "admin" });
 
@@ -480,7 +480,7 @@ describe("Admin Actions", () => {
         .mockReturnValueOnce(mockQuery)
         .mockReturnValueOnce(mockTotalQuery);
 
-      const { getUsers } = await import("./admin");
+      const { getUsers } = await import("./admin/users");
 
       await getUsers({ page: 2, limit: 10 });
 
@@ -509,7 +509,7 @@ describe("Admin Actions", () => {
       mockAsc.mockReturnValue("asc-sort");
       mockDesc.mockReturnValue("desc-sort");
 
-      const { getUsers } = await import("./admin");
+      const { getUsers } = await import("./admin/users");
 
       // Test ascending sort
       await getUsers({ sortBy: "name", sortOrder: "asc" });
@@ -575,7 +575,7 @@ describe("Admin Actions", () => {
         .mockReturnValueOnce(mockTotalQuery)
         .mockReturnValueOnce(mockSubscriptionsQuery);
 
-      const { getUsers } = await import("./admin");
+      const { getUsers } = await import("./admin/users");
 
       const result = await getUsers({});
 
@@ -634,7 +634,7 @@ describe("Admin Actions", () => {
         .mockReturnValueOnce(mockTotalQuery);
       mockGetProductTierById.mockReturnValue({ name: "Pro Tier" });
 
-      const { getPayments } = await import("./admin");
+      const { getPayments } = await import("./admin/payments");
 
       const result = await getPayments({});
 
@@ -672,7 +672,7 @@ describe("Admin Actions", () => {
         .mockReturnValueOnce(mockTotalQuery);
       mockEq.mockReturnValue("status-condition");
 
-      const { getPayments } = await import("./admin");
+      const { getPayments } = await import("./admin/payments");
 
       await getPayments({ status: "succeeded" });
 
@@ -701,7 +701,7 @@ describe("Admin Actions", () => {
       mockGte.mockReturnValue("gte-condition");
       mockLte.mockReturnValue("lte-condition");
 
-      const { getPayments } = await import("./admin");
+      const { getPayments } = await import("./admin/payments");
 
       await getPayments({
         dateFrom: "2024-01-01",
@@ -765,7 +765,7 @@ describe("Admin Actions", () => {
         .mockReturnValueOnce(mockTotalQuery);
       mockGetProductTierById.mockReturnValue({ name: "Pro Plan" });
 
-      const { getSubscriptions } = await import("./admin");
+      const { getSubscriptions } = await import("./admin/subscriptions");
 
       const result = await getSubscriptions({});
 
@@ -800,7 +800,7 @@ describe("Admin Actions", () => {
       mockOr.mockReturnValue("search-condition");
       mockEq.mockReturnValue("status-condition");
 
-      const { getSubscriptions } = await import("./admin");
+      const { getSubscriptions } = await import("./admin/subscriptions");
 
       await getSubscriptions({ search: "john", status: "active" });
 
@@ -851,7 +851,7 @@ describe("Admin Actions", () => {
         .mockReturnValueOnce(mockQuery)
         .mockReturnValueOnce(mockTotalQuery);
 
-      const { getUploads } = await import("./admin");
+      const { getUploads } = await import("./admin/uploads");
 
       const result = await getUploads({});
 
@@ -885,7 +885,7 @@ describe("Admin Actions", () => {
         .mockReturnValueOnce(mockTotalQuery);
       mockLike.mockReturnValue("like-condition");
 
-      const { getUploads } = await import("./admin");
+      const { getUploads } = await import("./admin/uploads");
 
       await getUploads({ fileType: "image" });
 
@@ -914,7 +914,7 @@ describe("Admin Actions", () => {
       mockOr.mockReturnValue("search-condition");
       mockIlike.mockReturnValue("like-condition");
 
-      const { getUploads } = await import("./admin");
+      const { getUploads } = await import("./admin/uploads");
 
       await getUploads({ search: "test.jpg" });
 
@@ -950,7 +950,7 @@ describe("Admin Actions", () => {
       mockNot.mockReturnValue("not-condition");
       mockAnd.mockReturnValue("and-condition");
 
-      const { getUploads } = await import("./admin");
+      const { getUploads } = await import("./admin/uploads");
 
       await getUploads({ fileType: "other" });
 
@@ -979,7 +979,7 @@ describe("Admin Actions", () => {
         }),
       });
 
-      const { updateUserAction } = await import("./admin");
+      const { updateUserAction } = await import("./admin/users");
 
       const result = await updateUserAction({
         parsedInput: { id: "user1", name: "New Name", role: "admin" },
@@ -1002,7 +1002,7 @@ describe("Admin Actions", () => {
         }),
       });
 
-      const { updateUserAction } = await import("./admin");
+      const { updateUserAction } = await import("./admin/users");
 
       await expect(
         updateUserAction({
@@ -1023,7 +1023,7 @@ describe("Admin Actions", () => {
         }),
       });
 
-      const { updateUserAction } = await import("./admin");
+      const { updateUserAction } = await import("./admin/users");
 
       await expect(
         updateUserAction({
@@ -1044,7 +1044,7 @@ describe("Admin Actions", () => {
         }),
       });
 
-      const { updateUserAction } = await import("./admin");
+      const { updateUserAction } = await import("./admin/users");
 
       await expect(
         updateUserAction({
@@ -1072,7 +1072,7 @@ describe("Admin Actions", () => {
         where: deleteWhere,
       });
 
-      const { setUserDisabledAction } = await import("./admin");
+      const { setUserDisabledAction } = await import("./admin/users");
 
       const result = await setUserDisabledAction({
         parsedInput: { id: "user1", disabled: true },
@@ -1099,7 +1099,7 @@ describe("Admin Actions", () => {
         }),
       });
 
-      const { setUserDisabledAction } = await import("./admin");
+      const { setUserDisabledAction } = await import("./admin/users");
 
       await expect(
         setUserDisabledAction({
@@ -1120,7 +1120,7 @@ describe("Admin Actions", () => {
         }),
       });
 
-      const { setUserDisabledAction } = await import("./admin");
+      const { setUserDisabledAction } = await import("./admin/users");
 
       await expect(
         setUserDisabledAction({
@@ -1148,7 +1148,8 @@ describe("Admin Actions", () => {
 
       mockCancelSubscription.mockResolvedValue(undefined);
 
-      const { cancelSubscriptionAction } = await import("./admin");
+      const { cancelSubscriptionAction } =
+        await import("./admin/subscriptions");
 
       const result = await cancelSubscriptionAction({
         parsedInput: { subscriptionId: "sub_123" },
@@ -1175,7 +1176,8 @@ describe("Admin Actions", () => {
         }),
       });
 
-      const { cancelSubscriptionAction } = await import("./admin");
+      const { cancelSubscriptionAction } =
+        await import("./admin/subscriptions");
 
       await expect(
         cancelSubscriptionAction({
@@ -1199,7 +1201,7 @@ describe("Admin Actions", () => {
 
       mockDeleteFileFromR2.mockResolvedValue({ success: true });
 
-      const { deleteUploadAction } = await import("./admin");
+      const { deleteUploadAction } = await import("./admin/uploads");
 
       const result = await deleteUploadAction({
         parsedInput: { uploadId: "upload1" },
@@ -1224,7 +1226,7 @@ describe("Admin Actions", () => {
         }),
       });
 
-      const { deleteUploadAction } = await import("./admin");
+      const { deleteUploadAction } = await import("./admin/uploads");
 
       await expect(
         deleteUploadAction({
@@ -1249,7 +1251,7 @@ describe("Admin Actions", () => {
 
       mockDeleteFilesFromR2.mockResolvedValue({ success: true });
 
-      const { batchDeleteUploadsAction } = await import("./admin");
+      const { batchDeleteUploadsAction } = await import("./admin/uploads");
 
       const result = await batchDeleteUploadsAction({
         parsedInput: { uploadIds: ["upload1", "upload2"] },
@@ -1275,7 +1277,7 @@ describe("Admin Actions", () => {
         }),
       });
 
-      const { batchDeleteUploadsAction } = await import("./admin");
+      const { batchDeleteUploadsAction } = await import("./admin/uploads");
 
       await expect(
         batchDeleteUploadsAction({
@@ -1298,7 +1300,7 @@ describe("Admin Actions", () => {
         error: "R2 service unavailable",
       });
 
-      const { batchDeleteUploadsAction } = await import("./admin");
+      const { batchDeleteUploadsAction } = await import("./admin/uploads");
 
       await expect(
         batchDeleteUploadsAction({
@@ -1334,7 +1336,7 @@ describe("Admin Actions", () => {
       mockOr.mockReturnValue("search-condition");
       mockIlike.mockReturnValue("ilike-condition");
 
-      const { getUsers } = await import("./admin");
+      const { getUsers } = await import("./admin/users");
 
       // Test search functionality - this should cover line 192
       const result = await getUsers({ search: "nonexistent@example.com" });
@@ -1367,7 +1369,7 @@ describe("Admin Actions", () => {
         .mockReturnValueOnce(mockQuery)
         .mockReturnValueOnce(mockTotalQuery);
 
-      const { getUsers } = await import("./admin");
+      const { getUsers } = await import("./admin/users");
 
       const result = await getUsers({ page: 100, limit: 10 });
 
@@ -1397,7 +1399,7 @@ describe("Admin Actions", () => {
       mockOr.mockReturnValue("search-condition");
       mockIlike.mockReturnValue("ilike-condition");
 
-      const { getUsers } = await import("./admin");
+      const { getUsers } = await import("./admin/users");
 
       // Test search with special characters
       await getUsers({ search: "user@domain-with-special.chars_123" });
@@ -1432,7 +1434,7 @@ describe("Admin Actions", () => {
           .mockReturnValueOnce(mockQuery)
           .mockReturnValueOnce(mockTotalQuery);
 
-        const { getUploads } = await import("./admin");
+        const { getUploads } = await import("./admin/uploads");
 
         await getUploads({ fileType });
       }
@@ -1460,7 +1462,7 @@ describe("Admin Actions", () => {
         .mockReturnValueOnce(mockQuery)
         .mockReturnValueOnce(mockTotalQuery);
 
-      const { getUploads } = await import("./admin");
+      const { getUploads } = await import("./admin/uploads");
 
       await getUploads({ fileType: "unknown-type" });
 
@@ -1487,7 +1489,7 @@ describe("Admin Actions", () => {
         .mockReturnValueOnce(mockQuery)
         .mockReturnValueOnce(mockTotalQuery);
 
-      const { getPayments } = await import("./admin");
+      const { getPayments } = await import("./admin/payments");
 
       // Test with all conditions set
       await getPayments({
@@ -1524,7 +1526,7 @@ describe("Admin Actions", () => {
       mockOr.mockReturnValue("search-condition");
       mockIlike.mockReturnValue("ilike-condition");
 
-      const { getPayments } = await import("./admin");
+      const { getPayments } = await import("./admin/payments");
 
       // Test payment search with paymentId search
       await getPayments({ search: "pay_123abc" });
@@ -1557,7 +1559,7 @@ describe("Admin Actions", () => {
         .mockReturnValueOnce(mockTotalQuery);
       mockAnd.mockReturnValue("and-condition");
 
-      const { getUploads } = await import("./admin");
+      const { getUploads } = await import("./admin/uploads");
 
       // Test with no search and fileType "all" to test empty conditions
       await getUploads({ search: "", fileType: "all" });

@@ -35,6 +35,7 @@ import {
   Sparkles,
   UserCircle2,
 } from "lucide-react";
+import { SITE_CONFIG } from "@/lib/config/site";
 
 function getPlanLabel(planId: string | null, t: AppTranslate) {
   switch (planId) {
@@ -150,16 +151,24 @@ export default async function HomeRoute() {
   const [locale, subscription, entitlement, payments, [uploadSummary]] =
     await Promise.all([
       getRequestLocale(),
-      getUserSubscription(user.id),
-      getUserProductEntitlement(user.id),
-      getUserPayments(user.id, 5),
-      db
-        .select({
-          count: count(),
-          totalSize: sum(uploads.fileSize),
-        })
-        .from(uploads)
-        .where(eq(uploads.userId, user.id)),
+      SITE_CONFIG.features.billing
+        ? getUserSubscription(user.id)
+        : Promise.resolve(null),
+      SITE_CONFIG.features.billing
+        ? getUserProductEntitlement(user.id)
+        : Promise.resolve(null),
+      SITE_CONFIG.features.billing
+        ? getUserPayments(user.id, 5)
+        : Promise.resolve([]),
+      SITE_CONFIG.features.uploads
+        ? db
+            .select({
+              count: count(),
+              totalSize: sum(uploads.fileSize),
+            })
+            .from(uploads)
+            .where(eq(uploads.userId, user.id))
+        : Promise.resolve([{ count: 0, totalSize: null }]),
     ]);
   const latestPayment = payments[0] ?? null;
   const uploadedFileCount = uploadSummary?.count ?? 0;
@@ -212,7 +221,11 @@ export default async function HomeRoute() {
       ),
       href: "/dashboard/settings",
     },
-  ];
+  ].filter(
+    (item) =>
+      (SITE_CONFIG.features.billing || item.id !== "billing") &&
+      (SITE_CONFIG.features.uploads || item.id !== "upload"),
+  );
   return (
     <DashboardPageWrapper
       title={<>{t("f33256a53736", "Dashboard")}</>}
@@ -240,57 +253,63 @@ export default async function HomeRoute() {
             </CardDescription>
           </CardHeader>
           <CardContent className="grid gap-4 md:grid-cols-3">
-            <div className="border-border space-y-2 border p-4">
-              <p className="text-muted-foreground text-xs uppercase">
-                {t("371bd6f449f6", "Plan")}
-              </p>
-              <p className="text-lg font-semibold">{subscriptionLabel}</p>
-              <Badge
-                className="capitalize"
-                variant={
-                  billingAccess.kind !== "free" ? "default" : "secondary"
-                }
-              >
-                {billingAccess.kind === "subscription" ? (
-                  getSubscriptionStatusLabel(
-                    billingAccess.subscription.status,
-                    t,
-                  )
-                ) : billingAccess.kind === "lifetime" ? (
-                  <>{t("billing_lifetime_access", "Lifetime access")}</>
-                ) : (
-                  <>{t("4269fcc20a1d", "No active subscription")}</>
-                )}
-              </Badge>
-            </div>
-            <div className="border-border space-y-2 border p-4">
-              <p className="text-muted-foreground text-xs uppercase">
-                {t("8a69847fa5c4", "Uploads")}
-              </p>
-              <p className="text-lg font-semibold">{uploadedFileCount}</p>
-              <p className="text-muted-foreground text-sm">
-                {t("1639540e6c5b", "{expression0} stored", {
-                  expression0: formatFileSize(uploadedFileSize),
-                })}
-              </p>
-            </div>
-            <div className="border-border space-y-2 border p-4">
-              <p className="text-muted-foreground text-xs uppercase">
-                {t("e6dc7b2a7611", "Payments")}
-              </p>
-              <p className="text-lg font-semibold">{payments.length}</p>
-              <p className="text-muted-foreground text-sm">
-                {latestPayment ? (
-                  formatCurrency(
-                    latestPayment.amount,
-                    latestPayment.currency,
-                    locale,
-                  )
-                ) : (
-                  <>{t("e0ad3db6609c", "No payment records yet")}</>
-                )}
-              </p>
-            </div>
+            {SITE_CONFIG.features.billing && (
+              <div className="border-border space-y-2 border p-4">
+                <p className="text-muted-foreground text-xs uppercase">
+                  {t("371bd6f449f6", "Plan")}
+                </p>
+                <p className="text-lg font-semibold">{subscriptionLabel}</p>
+                <Badge
+                  className="capitalize"
+                  variant={
+                    billingAccess.kind !== "free" ? "default" : "secondary"
+                  }
+                >
+                  {billingAccess.kind === "subscription" ? (
+                    getSubscriptionStatusLabel(
+                      billingAccess.subscription.status,
+                      t,
+                    )
+                  ) : billingAccess.kind === "lifetime" ? (
+                    <>{t("billing_lifetime_access", "Lifetime access")}</>
+                  ) : (
+                    <>{t("4269fcc20a1d", "No active subscription")}</>
+                  )}
+                </Badge>
+              </div>
+            )}
+            {SITE_CONFIG.features.uploads && (
+              <div className="border-border space-y-2 border p-4">
+                <p className="text-muted-foreground text-xs uppercase">
+                  {t("8a69847fa5c4", "Uploads")}
+                </p>
+                <p className="text-lg font-semibold">{uploadedFileCount}</p>
+                <p className="text-muted-foreground text-sm">
+                  {t("1639540e6c5b", "{expression0} stored", {
+                    expression0: formatFileSize(uploadedFileSize),
+                  })}
+                </p>
+              </div>
+            )}
+            {SITE_CONFIG.features.billing && (
+              <div className="border-border space-y-2 border p-4">
+                <p className="text-muted-foreground text-xs uppercase">
+                  {t("e6dc7b2a7611", "Payments")}
+                </p>
+                <p className="text-lg font-semibold">{payments.length}</p>
+                <p className="text-muted-foreground text-sm">
+                  {latestPayment ? (
+                    formatCurrency(
+                      latestPayment.amount,
+                      latestPayment.currency,
+                      locale,
+                    )
+                  ) : (
+                    <>{t("e0ad3db6609c", "No payment records yet")}</>
+                  )}
+                </p>
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -362,62 +381,66 @@ export default async function HomeRoute() {
           </CardContent>
         </Card>
 
-        <Card className="shadow-sm">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <CreditCard className="text-primary h-5 w-5" />
-              {t("c595dd7db3ee", "Recent billing activity")}
-            </CardTitle>
-            <CardDescription>
-              {t(
-                "dfcc3bcdf4eb",
-                "Recent payment records attached to your current account.",
+        {SITE_CONFIG.features.billing && (
+          <Card className="shadow-sm">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <CreditCard className="text-primary h-5 w-5" />
+                {t("c595dd7db3ee", "Recent billing activity")}
+              </CardTitle>
+              <CardDescription>
+                {t(
+                  "dfcc3bcdf4eb",
+                  "Recent payment records attached to your current account.",
+                )}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {payments.length > 0 ? (
+                <div className="space-y-3">
+                  {payments.map((payment) => (
+                    <div
+                      key={payment.paymentId}
+                      className="border-border flex items-center justify-between gap-4 border p-4"
+                    >
+                      <div>
+                        <p className="font-medium">{payment.tierName}</p>
+                        <p className="text-muted-foreground text-sm">
+                          {getPaymentStatusLabel(payment.status, t)} •{" "}
+                          {getPaymentTypeLabel(payment.paymentType, t)}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-medium">
+                          {formatCurrency(
+                            payment.amount,
+                            payment.currency,
+                            locale,
+                          )}
+                        </p>
+                        <p className="text-muted-foreground text-sm">
+                          {new Date(payment.createdAt).toLocaleDateString(
+                            locale,
+                          )}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="border-border flex items-center gap-3 border p-4 text-sm">
+                  <Files className="text-primary h-4 w-4" />
+                  <span className="text-muted-foreground">
+                    {t(
+                      "5ed90e574285",
+                      "No payment history yet. Visit billing when you are ready to test checkout.",
+                    )}
+                  </span>
+                </div>
               )}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {payments.length > 0 ? (
-              <div className="space-y-3">
-                {payments.map((payment) => (
-                  <div
-                    key={payment.paymentId}
-                    className="border-border flex items-center justify-between gap-4 border p-4"
-                  >
-                    <div>
-                      <p className="font-medium">{payment.tierName}</p>
-                      <p className="text-muted-foreground text-sm">
-                        {getPaymentStatusLabel(payment.status, t)} •{" "}
-                        {getPaymentTypeLabel(payment.paymentType, t)}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-medium">
-                        {formatCurrency(
-                          payment.amount,
-                          payment.currency,
-                          locale,
-                        )}
-                      </p>
-                      <p className="text-muted-foreground text-sm">
-                        {new Date(payment.createdAt).toLocaleDateString(locale)}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="border-border flex items-center gap-3 border p-4 text-sm">
-                <Files className="text-primary h-4 w-4" />
-                <span className="text-muted-foreground">
-                  {t(
-                    "5ed90e574285",
-                    "No payment history yet. Visit billing when you are ready to test checkout.",
-                  )}
-                </span>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </DashboardPageWrapper>
   );

@@ -14,6 +14,8 @@ import {
   RequestBodyTooLargeError,
 } from "@/lib/http/request-body";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { SITE_CONFIG } from "@/lib/config/site";
+import { integrationUnavailable } from "@/lib/http/integration-response";
 
 const MAX_CHECKOUT_BODY_BYTES = 4 * 1024;
 const CHECKOUT_RATE_LIMIT = 20;
@@ -39,6 +41,10 @@ const checkoutSchema = z.discriminatedUnion("paymentMode", [
 ]);
 
 export async function POST(request: NextRequest) {
+  if (!SITE_CONFIG.features.billing) {
+    return integrationUnavailable("billing");
+  }
+
   let session = null;
   try {
     session = await getAuthSessionFromHeaders(request.headers);

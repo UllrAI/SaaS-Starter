@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatFileSize } from "@/lib/config/upload";
 import { resolveIntlLocale } from "@/lib/locale";
 import { CreditCard, Shield, TrendingUp, Upload, Users } from "lucide-react";
+import { SITE_CONFIG } from "@/lib/config/site";
 export interface AdminStats {
   users: {
     total: number;
@@ -66,77 +67,83 @@ export function AdminStatsCards({ stats, locale }: AdminStatsCardsProps) {
         </CardContent>
       </Card>
 
-      <Card className="relative overflow-hidden">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0">
-          <CardTitle className="text-sm font-medium">
-            {t("dcefef9c76ad", "Active Subscriptions")}
-          </CardTitle>
-          <Shield className="text-muted-foreground h-4 w-4" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">
-            {stats.subscriptions.active.toLocaleString(intlLocale)}
-          </div>
-          <p className="text-muted-foreground flex items-center gap-1 text-xs">
-            {t(
-              "cda1c85c48d8",
-              "<TrendingUp0></TrendingUp0>{expression0} total \u2022 {expression1} canceled",
-              {
-                expression0: stats.subscriptions.total,
-                expression1: stats.subscriptions.canceled,
-                TrendingUp0: () => (
-                  <TrendingUp className="h-3 w-3 text-emerald-600" />
-                ),
-              },
-            )}
-          </p>
-        </CardContent>
-      </Card>
+      {SITE_CONFIG.features.billing && (
+        <Card className="relative overflow-hidden">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0">
+            <CardTitle className="text-sm font-medium">
+              {t("dcefef9c76ad", "Active Subscriptions")}
+            </CardTitle>
+            <Shield className="text-muted-foreground h-4 w-4" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {stats.subscriptions.active.toLocaleString(intlLocale)}
+            </div>
+            <p className="text-muted-foreground flex items-center gap-1 text-xs">
+              {t(
+                "cda1c85c48d8",
+                "<TrendingUp0></TrendingUp0>{expression0} total \u2022 {expression1} canceled",
+                {
+                  expression0: stats.subscriptions.total,
+                  expression1: stats.subscriptions.canceled,
+                  TrendingUp0: () => (
+                    <TrendingUp className="h-3 w-3 text-emerald-600" />
+                  ),
+                },
+              )}
+            </p>
+          </CardContent>
+        </Card>
+      )}
 
-      <Card className="relative overflow-hidden">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0">
-          <CardTitle className="text-sm font-medium">
-            {t("admin_settled_usd_revenue", "Settled USD Revenue")}
-          </CardTitle>
-          <CreditCard className="text-muted-foreground h-4 w-4" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">
-            {formatStatsCurrency(stats.payments.totalRevenue)}
-          </div>
-          <p className="text-muted-foreground flex items-center gap-1 text-xs">
-            {t(
-              "ff4e54d1b22b",
-              "<TrendingUp0></TrendingUp0>{expression0} successful payments",
-              {
-                expression0: stats.payments.successful,
-                TrendingUp0: () => (
-                  <TrendingUp className="h-3 w-3 text-emerald-600" />
-                ),
-              },
-            )}
-          </p>
-        </CardContent>
-      </Card>
+      {SITE_CONFIG.features.billing && (
+        <Card className="relative overflow-hidden">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0">
+            <CardTitle className="text-sm font-medium">
+              {t("admin_settled_usd_revenue", "Settled USD Revenue")}
+            </CardTitle>
+            <CreditCard className="text-muted-foreground h-4 w-4" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {formatStatsCurrency(stats.payments.totalRevenue)}
+            </div>
+            <p className="text-muted-foreground flex items-center gap-1 text-xs">
+              {t(
+                "ff4e54d1b22b",
+                "<TrendingUp0></TrendingUp0>{expression0} successful payments",
+                {
+                  expression0: stats.payments.successful,
+                  TrendingUp0: () => (
+                    <TrendingUp className="h-3 w-3 text-emerald-600" />
+                  ),
+                },
+              )}
+            </p>
+          </CardContent>
+        </Card>
+      )}
 
-      <Card className="relative overflow-hidden">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0">
-          <CardTitle className="text-sm font-medium">
-            {t("0445c5d97978", "File Uploads")}
-          </CardTitle>
-          <Upload className="text-muted-foreground h-4 w-4" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">
-            {stats.uploads.total.toLocaleString(intlLocale)}
-          </div>
-          <p className="text-muted-foreground text-xs">
-            {t("260455ef1aa8", "{expression0} total", {
-              expression0: formatFileSize(stats.uploads.totalSize),
-            })}
-          </p>
-        </CardContent>
-      </Card>
+      {SITE_CONFIG.features.uploads && (
+        <Card className="relative overflow-hidden">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0">
+            <CardTitle className="text-sm font-medium">
+              {t("0445c5d97978", "File Uploads")}
+            </CardTitle>
+            <Upload className="text-muted-foreground h-4 w-4" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {stats.uploads.total.toLocaleString(intlLocale)}
+            </div>
+            <p className="text-muted-foreground text-xs">
+              {t("260455ef1aa8", "{expression0} total", {
+                expression0: formatFileSize(stats.uploads.totalSize),
+              })}
+            </p>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

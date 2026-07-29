@@ -64,8 +64,15 @@ jest.mock("drizzle-orm", () => ({
 }));
 
 jest.mock("./client", () => ({
-  creemEnvironment: "live_mode",
-  creemWebhookSecret: mockCreemWebhookSecret,
+  getCreemEnvironment: () => "live_mode",
+}));
+
+jest.mock("@/lib/config/integrations", () => ({
+  getBillingConfig: () => ({
+    apiKey: "creem-key",
+    environment: "live_mode",
+    webhookSecret: mockCreemWebhookSecret,
+  }),
 }));
 
 jest.mock("@/lib/database/subscription", () => ({
@@ -1440,12 +1447,6 @@ describe("Creem Webhook Handler", () => {
           digest: jest.fn().mockReturnValue("test-signature"),
         }),
       });
-
-      // Ensure webhook secret is set
-      jest.doMock("./client", () => ({
-        creemEnvironment: "live_mode",
-        creemWebhookSecret: "test-webhook-secret",
-      }));
     });
 
     it("should handle missing customer field error", async () => {

@@ -23,7 +23,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Loader2, Sparkles, ArrowRight } from "lucide-react";
 import { SocialLoginButtons } from "@/components/auth/social-login-buttons";
-import { getAvailableSocialProviders } from "@/lib/auth/providers";
+import type { SocialProvider } from "@/lib/auth/providers";
 import { ReactNode } from "react";
 import { UseFormReturn, FieldValues, Path } from "react-hook-form";
 import type { ResolvedAuthFeedback } from "@/lib/auth/feedback";
@@ -59,8 +59,9 @@ interface AuthFormBaseProps<T extends FieldValues> {
   setPendingAction: (action: AuthPendingAction) => void;
   config: AuthFormConfig;
   fields: AuthFormField<T>[];
-  availableProviders?: ReturnType<typeof getAvailableSocialProviders>;
+  availableProviders?: SocialProvider[];
   feedback?: ResolvedAuthFeedback | null;
+  showMagicLink?: boolean;
 }
 export function AuthFormBase<T extends FieldValues>({
   form,
@@ -71,6 +72,7 @@ export function AuthFormBase<T extends FieldValues>({
   fields,
   availableProviders,
   feedback,
+  showMagicLink = true,
 }: AuthFormBaseProps<T>) {
   const { t } = useTranslation();
   const isPending = pendingAction !== null;
@@ -133,71 +135,73 @@ export function AuthFormBase<T extends FieldValues>({
                   }}
                 />
 
-                {/* Divider */}
-                <div className="relative my-6">
-                  <div className="absolute inset-0 flex items-center">
-                    <span className="border-border w-full border-t" />
+                {showMagicLink && (
+                  <div className="relative my-6">
+                    <div className="absolute inset-0 flex items-center">
+                      <span className="border-border w-full border-t" />
+                    </div>
+                    <div className="relative flex justify-center text-xs uppercase">
+                      <span className="bg-background text-muted-foreground px-3 font-medium">
+                        {t("a47fb0abca67", "Or continue with magic link")}
+                      </span>
+                    </div>
                   </div>
-                  <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-background text-muted-foreground px-3 font-medium">
-                      {t("a47fb0abca67", "Or continue with magic link")}
-                    </span>
-                  </div>
-                </div>
+                )}
               </>
             )}
 
-            {/* Dynamic Form Fields */}
-            {fields.map((field) => {
-              const IconComponent = field.icon;
-              return (
-                <FormField
-                  key={field.name}
-                  control={form.control}
-                  name={field.name}
-                  render={({ field: formField }) => (
-                    <FormItem className="space-y-2">
-                      <FormLabel className="text-foreground text-sm font-medium">
-                        {field.label}
-                      </FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <IconComponent className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
-                          <Input
-                            placeholder={field.placeholder}
-                            type={field.type || "text"}
-                            {...formField}
-                            disabled={isPending}
-                            className="focus:border-primary/50 h-12 border-2 pl-10 shadow-sm transition-all focus:translate-x-[1px] focus:translate-y-[1px] focus:shadow-none"
-                          />
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              );
-            })}
+            {showMagicLink &&
+              fields.map((field) => {
+                const IconComponent = field.icon;
+                return (
+                  <FormField
+                    key={field.name}
+                    control={form.control}
+                    name={field.name}
+                    render={({ field: formField }) => (
+                      <FormItem className="space-y-2">
+                        <FormLabel className="text-foreground text-sm font-medium">
+                          {field.label}
+                        </FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <IconComponent className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+                            <Input
+                              placeholder={field.placeholder}
+                              type={field.type || "text"}
+                              {...formField}
+                              disabled={isPending}
+                              className="focus:border-primary/50 h-12 border-2 pl-10 shadow-sm transition-all focus:translate-x-[1px] focus:translate-y-[1px] focus:shadow-none"
+                            />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                );
+              })}
 
-            {/* Submit Button */}
-            <Button
-              type="submit"
-              disabled={isPending}
-              className="from-primary to-primary/90 hover:from-primary/90 hover:to-primary text-primary-foreground h-12 w-full cursor-pointer bg-gradient-to-r font-medium shadow transition-all duration-200 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-sm active:translate-x-[4px] active:translate-y-[4px] active:shadow-none"
-            >
-              {isMagicLinkPending ? (
-                <span className="flex items-center gap-2">
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  <span>{config.magicLinkLoadingText}</span>
-                </span>
-              ) : (
-                <span className="flex items-center gap-2">
-                  <config.submitIcon className="h-4 w-4" />
-                  <span>{config.submitButtonText}</span>
-                  <ArrowRight className="h-4 w-4" />
-                </span>
-              )}
-            </Button>
+            {showMagicLink && (
+              <Button
+                type="submit"
+                disabled={isPending}
+                className="from-primary to-primary/90 hover:from-primary/90 hover:to-primary text-primary-foreground h-12 w-full cursor-pointer bg-gradient-to-r font-medium shadow transition-all duration-200 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-sm active:translate-x-[4px] active:translate-y-[4px] active:shadow-none"
+              >
+                {isMagicLinkPending ? (
+                  <span className="flex items-center gap-2">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span>{config.magicLinkLoadingText}</span>
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-2">
+                    <config.submitIcon className="h-4 w-4" />
+                    <span>{config.submitButtonText}</span>
+                    <ArrowRight className="h-4 w-4" />
+                  </span>
+                )}
+              </Button>
+            )}
 
             {/* Alternative Action Link */}
             <div className="pt-4 text-center">

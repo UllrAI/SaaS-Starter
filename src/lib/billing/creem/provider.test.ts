@@ -10,9 +10,14 @@ const mockGetCreemProductIds = jest.fn();
 const mockHandleCreemWebhook = jest.fn();
 
 jest.mock("./client", () => ({
-  creemClient: mockCreemClient,
-  creemEnvironment: "live_mode",
-  creemWebhookSecret: "webhook-secret",
+  getCreemClient: () => mockCreemClient,
+}));
+jest.mock("@/lib/config/integrations", () => ({
+  getBillingConfig: () => ({
+    apiKey: "creem-key",
+    environment: "live_mode",
+    webhookSecret: "webhook-secret",
+  }),
 }));
 jest.mock("./products", () => ({
   getCreemProductIds: mockGetCreemProductIds,

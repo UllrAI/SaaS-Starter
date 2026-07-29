@@ -4,8 +4,14 @@ import { getUserSubscription } from "@/lib/database/subscription";
 import { assertTrustedBillingUrl } from "@/lib/billing/url";
 import { getAuthSessionFromHeaders } from "@/lib/auth/session";
 import { canManageSubscription } from "@/lib/billing/access";
+import { SITE_CONFIG } from "@/lib/config/site";
+import { integrationUnavailable } from "@/lib/http/integration-response";
 
 export async function GET(request: NextRequest) {
+  if (!SITE_CONFIG.features.billing) {
+    return integrationUnavailable("billing");
+  }
+
   try {
     const session = await getAuthSessionFromHeaders(request.headers);
     if (!session?.user) {

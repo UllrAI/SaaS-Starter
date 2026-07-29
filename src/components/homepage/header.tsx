@@ -8,6 +8,7 @@ import { APP_NAME } from "@/lib/config/constants";
 import { SOURCE_LOCALE, type SupportedLocale } from "@/lib/config/i18n";
 import { withLocalePrefix } from "@/lib/config/i18n-routing";
 import { getStaticTranslations } from "@/lib/i18n/translation/static";
+import { SITE_CONFIG } from "@/lib/config/site";
 
 export type MarketingNavItem = {
   id: string;
@@ -48,7 +49,7 @@ export function Header({
       href: withLocalePrefix("/contact", locale),
       title: t("1a5e08adf49a", "Contact"),
     },
-  ];
+  ].filter((item) => SITE_CONFIG.features.billing || item.id !== "nav-pricing");
 
   return (
     <header className="border-border/40 bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur">

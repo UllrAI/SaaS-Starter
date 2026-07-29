@@ -7,8 +7,14 @@ import {
 } from "@/lib/http/request-body";
 import { checkUploadRateLimit } from "@/lib/upload-rate-limit";
 import { cancelUploadIntent } from "@/lib/uploads/upload-intents";
+import { SITE_CONFIG } from "@/lib/config/site";
+import { integrationUnavailable } from "@/lib/http/integration-response";
 
 export async function POST(request: NextRequest) {
+  if (!SITE_CONFIG.features.uploads) {
+    return integrationUnavailable("uploads");
+  }
+
   const session = await getAuthSessionFromHeaders(request.headers);
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

@@ -6,7 +6,7 @@ import {
   DeleteObjectsCommand,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import env from "@/env";
+import { getUploadConfig } from "@/lib/config/integrations";
 import {
   UPLOAD_CONFIG,
   isFileTypeAllowed,
@@ -14,18 +14,22 @@ import {
   normalizeContentType,
 } from "./config/upload";
 
-// Initialize S3 client for Cloudflare R2
-const r2Client = new S3Client({
-  region: "auto",
-  endpoint: env.R2_ENDPOINT,
-  credentials: {
-    accessKeyId: env.R2_ACCESS_KEY_ID,
-    secretAccessKey: env.R2_SECRET_ACCESS_KEY,
-  },
-});
+let r2Client: S3Client | undefined;
 
-// Export the client for reuse in other modules
-export { r2Client };
+export function getR2Client(): S3Client {
+  if (!r2Client) {
+    const config = getUploadConfig();
+    r2Client = new S3Client({
+      region: "auto",
+      endpoint: config.endpoint,
+      credentials: {
+        accessKeyId: config.accessKeyId,
+        secretAccessKey: config.secretAccessKey,
+      },
+    });
+  }
+  return r2Client;
+}
 
 interface CreatePresignedUrlParams {
   key: string;
@@ -50,6 +54,7 @@ export async function createPresignedUrl({
   size,
 }: CreatePresignedUrlParams): Promise<CreatePresignedUrlResult> {
   try {
+    const config = getUploadConfig();
     // Validate file type
     if (!isFileTypeAllowed(contentType)) {
       return {
@@ -68,14 +73,14 @@ export async function createPresignedUrl({
 
     // Create presigned URL for PUT operation
     const command = new PutObjectCommand({
-      Bucket: env.R2_BUCKET_NAME,
+      Bucket: config.bucketName,
       Key: key,
       ContentType: contentType,
       ContentLength: size,
       IfNoneMatch: "*",
     });
 
-    const presignedUrl = await getSignedUrl(r2Client, command, {
+    const presignedUrl = await getSignedUrl(getR2Client(), command, {
       expiresIn: UPLOAD_CONFIG.PRESIGNED_URL_EXPIRATION,
     });
 
@@ -102,23 +107,22 @@ export interface R2ObjectMetadata {
   contentType: string;
 }
 
-export function buildR2PublicUrl(
-  key: string,
-  baseUrl = env.R2_PUBLIC_URL,
-): string {
-  return `${baseUrl.replace(/\/+$/, "")}/${key.replace(/^\/+/, "")}`;
+export function buildR2PublicUrl(key: string, baseUrl?: string): string {
+  const resolvedBaseUrl = baseUrl ?? getUploadConfig().publicUrl;
+  return `${resolvedBaseUrl.replace(/\/+$/, "")}/${key.replace(/^\/+/, "")}`;
 }
 
 export async function getObjectMetadata(
   key: string,
 ): Promise<R2ObjectMetadata | null> {
   try {
+    const config = getUploadConfig();
     const command = new HeadObjectCommand({
-      Bucket: env.R2_BUCKET_NAME,
+      Bucket: config.bucketName,
       Key: key,
     });
 
-    const result = await r2Client.send(command);
+    const result = await getR2Client().send(command);
     const contentLength = result.ContentLength;
     const contentType = normalizeContentType(result.ContentType || "");
 
@@ -157,12 +161,13 @@ export async function deleteFile(
   key: string,
 ): Promise<{ success: boolean; error?: string }> {
   try {
+    const config = getUploadConfig();
     const command = new DeleteObjectCommand({
-      Bucket: env.R2_BUCKET_NAME,
+      Bucket: config.bucketName,
       Key: key,
     });
 
-    await r2Client.send(command);
+    await getR2Client().send(command);
 
     return { success: true };
   } catch (error) {
@@ -184,14 +189,15 @@ export async function deleteFiles(
     return { success: true };
   }
   try {
+    const config = getUploadConfig();
     const command = new DeleteObjectsCommand({
-      Bucket: env.R2_BUCKET_NAME,
+      Bucket: config.bucketName,
       Delete: {
         Objects: keys.map((key) => ({ Key: key })),
         Quiet: false,
       },
     });
-    const result = await r2Client.send(command);
+    const result = await getR2Client().send(command);
     if (result.Errors?.length) {
       const failedKeys = result.Errors.map(
         (item) => item.Key ?? "unknown key",

@@ -92,15 +92,10 @@ const mockNot = jest.fn();
 const mockInArray = jest.fn();
 
 const mockGetProductTierById = jest.fn();
-const mockGetProductTierByProductId = jest.fn();
 
 const mockRequireAdmin = jest.fn();
 
-const mockCreemClient = {
-  subscriptions: {
-    cancel: jest.fn(),
-  },
-};
+const mockCancelSubscription = jest.fn();
 
 const mockDeleteFileFromR2 = jest.fn();
 const mockDeleteFilesFromR2 = jest.fn();
@@ -168,7 +163,6 @@ jest.mock("drizzle-orm", () => ({
 
 jest.mock("@/lib/config/products", () => ({
   getProductTierById: mockGetProductTierById,
-  getProductTierByProductId: mockGetProductTierByProductId,
 }));
 
 jest.mock("next-safe-action", () => ({
@@ -191,8 +185,10 @@ jest.mock("next/cache", () => ({
   revalidatePath: mockRevalidatePath,
 }));
 
-jest.mock("../billing/creem/client", () => ({
-  creemClient: mockCreemClient,
+jest.mock("../billing", () => ({
+  billing: {
+    cancelSubscription: mockCancelSubscription,
+  },
 }));
 
 jest.mock("@/env", () => mockEnv);
@@ -636,7 +632,7 @@ describe("Admin Actions", () => {
       mockDb.select
         .mockReturnValueOnce(mockQuery)
         .mockReturnValueOnce(mockTotalQuery);
-      mockGetProductTierByProductId.mockReturnValue({ name: "Pro Tier" });
+      mockGetProductTierById.mockReturnValue({ name: "Pro Tier" });
 
       const { getPayments } = await import("./admin");
 
@@ -1150,7 +1146,7 @@ describe("Admin Actions", () => {
         }),
       });
 
-      mockCreemClient.subscriptions.cancel.mockResolvedValue({ success: true });
+      mockCancelSubscription.mockResolvedValue(undefined);
 
       const { cancelSubscriptionAction } = await import("./admin");
 
@@ -1158,10 +1154,9 @@ describe("Admin Actions", () => {
         parsedInput: { subscriptionId: "sub_123" },
       });
 
-      expect(mockCreemClient.subscriptions.cancel).toHaveBeenCalledWith(
-        "sub_123",
-        { mode: "immediate" },
-      );
+      expect(mockCancelSubscription).toHaveBeenCalledWith("sub_123", {
+        mode: "immediate",
+      });
       expect(result).toEqual({
         success: true,
         message: "Subscription cancellation initiated.",

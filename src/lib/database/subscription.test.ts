@@ -74,7 +74,6 @@ const mockSql = jest.fn(
   }),
 );
 
-const mockGetProductTierByProductId = jest.fn();
 const mockGetProductTierById = jest.fn();
 
 // Mock all imports
@@ -99,7 +98,6 @@ jest.mock("drizzle-orm", () => ({
 }));
 
 jest.mock("@/lib/config/products", () => ({
-  getProductTierByProductId: mockGetProductTierByProductId,
   getProductTierById: mockGetProductTierById,
 }));
 
@@ -141,14 +139,9 @@ describe("Database Subscription Functions", () => {
       }),
     });
 
-    mockGetProductTierByProductId.mockReturnValue({
+    mockGetProductTierById.mockReturnValue({
       id: "tier_pro",
       name: "Pro Plan",
-    });
-
-    mockGetProductTierById.mockReturnValue({
-      id: "tier_basic",
-      name: "Basic Plan",
     });
   });
 
@@ -162,7 +155,7 @@ describe("Database Subscription Functions", () => {
         userId: "user-123",
         customerId: "customer-123",
         subscriptionId: "sub-123",
-        productId: "product-123",
+        productId: "tier_pro",
         status: "active" as const,
         currentPeriodStart: new Date("2024-01-01"),
         currentPeriodEnd: new Date("2024-02-01"),
@@ -722,7 +715,7 @@ describe("Database Subscription Functions", () => {
         userId: "user-123",
         customerId: "customer-123",
         subscriptionId: "sub-123",
-        productId: "product-123",
+        productId: "tier_pro",
         status: "active",
         currentPeriodStart: new Date("2024-01-01"),
         currentPeriodEnd: new Date("2024-02-01"),
@@ -753,8 +746,6 @@ describe("Database Subscription Functions", () => {
         currentPeriodEnd: mockSubscription.currentPeriodEnd,
         canceledAt: null,
       });
-
-      expect(mockGetProductTierByProductId).toHaveBeenCalledWith("product-123");
     });
 
     it("should prefer active subscription over canceled ones", async () => {
@@ -790,6 +781,112 @@ describe("Database Subscription Functions", () => {
       const result = await getUserSubscription("user-123");
 
       expect(result?.subscriptionId).toBe("sub-active");
+    });
+
+    it("should prefer an unexpired canceled subscription over a newer incomplete one", async () => {
+      const mockSubscriptions = [
+        {
+          id: "sub-incomplete",
+          userId: "user-123",
+          subscriptionId: "sub-incomplete",
+          productId: "product-123",
+          status: "incomplete",
+          createdAt: new Date("2024-01-02"),
+        },
+        {
+          id: "sub-canceled",
+          userId: "user-123",
+          subscriptionId: "sub-canceled",
+          productId: "product-123",
+          status: "canceled",
+          currentPeriodEnd: new Date("2099-01-01"),
+          createdAt: new Date("2024-01-01"),
+        },
+      ];
+
+      mockDb.select.mockReturnValue({
+        from: jest.fn().mockReturnValue({
+          where: jest.fn().mockReturnValue({
+            orderBy: jest.fn().mockResolvedValue(mockSubscriptions),
+          }),
+        }),
+      });
+
+      const { getUserSubscription } = await import("./subscription");
+
+      const result = await getUserSubscription("user-123");
+
+      expect(result?.subscriptionId).toBe("sub-canceled");
+    });
+
+    it("should prefer scheduled cancellation over a newer expired subscription", async () => {
+      const mockSubscriptions = [
+        {
+          id: "sub-expired",
+          userId: "user-123",
+          subscriptionId: "sub-expired",
+          productId: "product-123",
+          status: "expired",
+          createdAt: new Date("2024-01-02"),
+        },
+        {
+          id: "sub-scheduled",
+          userId: "user-123",
+          subscriptionId: "sub-scheduled",
+          productId: "product-123",
+          status: "scheduled_cancel",
+          createdAt: new Date("2024-01-01"),
+        },
+      ];
+
+      mockDb.select.mockReturnValue({
+        from: jest.fn().mockReturnValue({
+          where: jest.fn().mockReturnValue({
+            orderBy: jest.fn().mockResolvedValue(mockSubscriptions),
+          }),
+        }),
+      });
+
+      const { getUserSubscription } = await import("./subscription");
+
+      const result = await getUserSubscription("user-123");
+
+      expect(result?.subscriptionId).toBe("sub-scheduled");
+    });
+
+    it("should prefer a manageable subscription over a newer terminal one", async () => {
+      const mockSubscriptions = [
+        {
+          id: "sub-expired",
+          userId: "user-123",
+          subscriptionId: "sub-expired",
+          productId: "product-123",
+          status: "expired",
+          createdAt: new Date("2024-01-02"),
+        },
+        {
+          id: "sub-past-due",
+          userId: "user-123",
+          subscriptionId: "sub-past-due",
+          productId: "product-123",
+          status: "past_due",
+          createdAt: new Date("2024-01-01"),
+        },
+      ];
+
+      mockDb.select.mockReturnValue({
+        from: jest.fn().mockReturnValue({
+          where: jest.fn().mockReturnValue({
+            orderBy: jest.fn().mockResolvedValue(mockSubscriptions),
+          }),
+        }),
+      });
+
+      const { getUserSubscription } = await import("./subscription");
+
+      const result = await getUserSubscription("user-123");
+
+      expect(result?.subscriptionId).toBe("sub-past-due");
     });
 
     it("should handle trialing subscriptions", async () => {
@@ -853,7 +950,7 @@ describe("Database Subscription Functions", () => {
 
       expect(consoleSpy).toHaveBeenCalledWith(
         expect.stringContaining(
-          "User user-123 has 2 active/trialing subscriptions",
+          "User user-123 has 2 currently accessible subscriptions",
         ),
         expect.objectContaining({
           userId: "user-123",
@@ -885,9 +982,6 @@ describe("Database Subscription Functions", () => {
           }),
         }),
       });
-
-      mockGetProductTierByProductId.mockReturnValue(null);
-
       const { getUserSubscription } = await import("./subscription");
 
       const result = await getUserSubscription("user-123");
@@ -1032,7 +1126,7 @@ describe("Database Subscription Functions", () => {
         },
       ]);
 
-      expect(mockGetProductTierByProductId).toHaveBeenCalledWith("product-123");
+      expect(mockGetProductTierById).toHaveBeenCalledWith("product-123");
     });
 
     it("should respect custom limit", async () => {
@@ -1055,7 +1149,7 @@ describe("Database Subscription Functions", () => {
       expect(mockLimit).toHaveBeenCalledWith(25);
     });
 
-    it("should fallback to tier by ID when product tier not found", async () => {
+    it("should map stored tier ids to catalog metadata", async () => {
       const mockPayments = [
         {
           id: "payment1",
@@ -1079,7 +1173,10 @@ describe("Database Subscription Functions", () => {
         }),
       });
 
-      mockGetProductTierByProductId.mockReturnValue(null);
+      mockGetProductTierById.mockReturnValue({
+        id: "tier_basic",
+        name: "Basic Plan",
+      });
 
       const { getUserPayments } = await import("./subscription");
 
@@ -1114,7 +1211,6 @@ describe("Database Subscription Functions", () => {
         }),
       });
 
-      mockGetProductTierByProductId.mockReturnValue(null);
       mockGetProductTierById.mockReturnValue(null);
 
       const { getUserPayments } = await import("./subscription");

@@ -127,7 +127,7 @@ No analytics provider or tracking script is bundled. Add your own provider only 
 #### Creem product setup
 
 Test and live product IDs are intentionally separate in
-`src/lib/config/products.ts`. Set `CREEM_ENVIRONMENT` and its matching API key,
+`src/lib/billing/creem/products.ts`. Set `CREEM_ENVIRONMENT` and its matching API key,
 then run `pnpm creem:sync-products`. The command reuses or creates the catalog
 products and updates only the selected environment namespace. Review and commit
 that configuration change before deploying. Checkout fails closed when the

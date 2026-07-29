@@ -2,10 +2,11 @@ import type { CreateCheckoutOptions } from "@/types/billing";
 import type { PaymentProvider } from "../provider";
 
 const mockCreemClient = {
-  checkouts: { create: jest.fn() },
+  checkouts: { create: jest.fn(), retrieve: jest.fn() },
   customers: { generateBillingLinks: jest.fn() },
+  subscriptions: { cancel: jest.fn() },
 };
-const mockGetProductTierById = jest.fn();
+const mockGetCreemProductIds = jest.fn();
 const mockHandleCreemWebhook = jest.fn();
 
 jest.mock("./client", () => ({
@@ -13,8 +14,8 @@ jest.mock("./client", () => ({
   creemEnvironment: "live_mode",
   creemWebhookSecret: "webhook-secret",
 }));
-jest.mock("@/lib/config/products", () => ({
-  getProductTierById: mockGetProductTierById,
+jest.mock("./products", () => ({
+  getCreemProductIds: mockGetCreemProductIds,
 }));
 jest.mock("./webhook", () => ({
   handleCreemWebhook: mockHandleCreemWebhook,
@@ -22,19 +23,10 @@ jest.mock("./webhook", () => ({
 
 let creemProvider: PaymentProvider;
 
-const tier = {
-  id: "plus",
-  name: "Plus",
-  pricing: {
-    creem: {
-      test_mode: { oneTime: "", monthly: "", yearly: "" },
-      live_mode: {
-        oneTime: "prod_once",
-        monthly: "prod_monthly",
-        yearly: "prod_yearly",
-      },
-    },
-  },
+const productIds = {
+  oneTime: "prod_once",
+  monthly: "prod_monthly",
+  yearly: "prod_yearly",
 };
 
 const checkoutOptions: CreateCheckoutOptions = {
@@ -58,7 +50,7 @@ describe("Creem provider", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.spyOn(console, "error").mockImplementation(() => undefined);
-    mockGetProductTierById.mockReturnValue(tier);
+    mockGetCreemProductIds.mockReturnValue(productIds);
   });
 
   afterEach(() => {
@@ -104,7 +96,7 @@ describe("Creem provider", () => {
   );
 
   it("rejects unknown tiers before contacting Creem", async () => {
-    mockGetProductTierById.mockReturnValue(undefined);
+    mockGetCreemProductIds.mockReturnValue(undefined);
 
     await expect(
       creemProvider.createCheckoutSession(checkoutOptions),
@@ -113,14 +105,9 @@ describe("Creem provider", () => {
   });
 
   it("rejects missing product configuration", async () => {
-    mockGetProductTierById.mockReturnValue({
-      ...tier,
-      pricing: {
-        creem: {
-          ...tier.pricing.creem,
-          live_mode: { ...tier.pricing.creem.live_mode, monthly: "" },
-        },
-      },
+    mockGetCreemProductIds.mockReturnValue({
+      ...productIds,
+      monthly: "",
     });
 
     await expect(
@@ -171,6 +158,68 @@ describe("Creem provider", () => {
     await expect(
       creemProvider.createCustomerPortalUrl("cust_123"),
     ).rejects.toThrow("Failed to parse customer portal response from Creem");
+  });
+
+  it.each([
+    ["completed", "success"],
+    ["succeeded", "success"],
+    ["failed", "failed"],
+    ["expired", "failed"],
+    ["canceled", "cancelled"],
+    ["cancelled", "cancelled"],
+    ["processing", "pending"],
+    ["unknown", "pending"],
+  ] as const)("normalizes checkout status %s", async (status, expected) => {
+    mockCreemClient.checkouts.retrieve.mockResolvedValue({
+      status,
+      metadata: {
+        userId: "user_123",
+        paymentMode: "subscription",
+      },
+    });
+
+    await expect(
+      creemProvider.getCheckoutStatus("checkout_123"),
+    ).resolves.toEqual({
+      status: expected,
+      ownerId: "user_123",
+      paymentMode: "subscription",
+    });
+  });
+
+  it("allowlists checkout ownership metadata", async () => {
+    mockCreemClient.checkouts.retrieve.mockResolvedValue({
+      status: "open",
+      metadata: {
+        userId: 123,
+        paymentMode: "invalid",
+      },
+    });
+
+    await expect(
+      creemProvider.getCheckoutStatus("checkout_123"),
+    ).resolves.toEqual({
+      status: "pending",
+      ownerId: null,
+      paymentMode: null,
+    });
+  });
+
+  it("cancels subscriptions through the Creem client", async () => {
+    mockCreemClient.subscriptions.cancel.mockResolvedValue({
+      id: "subscription_123",
+      status: "canceled",
+    });
+
+    await expect(
+      creemProvider.cancelSubscription("subscription_123", {
+        mode: "immediate",
+      }),
+    ).resolves.toBeUndefined();
+    expect(mockCreemClient.subscriptions.cancel).toHaveBeenCalledWith(
+      "subscription_123",
+      { mode: "immediate" },
+    );
   });
 
   it("delegates verified webhook processing", async () => {

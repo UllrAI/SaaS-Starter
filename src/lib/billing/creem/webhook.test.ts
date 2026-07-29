@@ -41,7 +41,8 @@ const mockRevokeProductEntitlementByPaymentId = jest.fn();
 const mockSuspendSubscriptionAccess = jest.fn();
 const mockUpdatePaymentStatus = jest.fn();
 
-const mockGetProductTierByProductId = jest.fn();
+const mockGetProductTierByCreemProductId = jest.fn();
+const mockGetCreemProductIds = jest.fn();
 const mockGetProductTierById = jest.fn();
 
 const mockEq = jest.fn();
@@ -82,7 +83,11 @@ jest.mock("@/lib/database/subscription", () => ({
 
 jest.mock("@/lib/config/products", () => ({
   getProductTierById: mockGetProductTierById,
-  getProductTierByProductId: mockGetProductTierByProductId,
+}));
+
+jest.mock("./products", () => ({
+  getCreemProductIds: mockGetCreemProductIds,
+  getProductTierByCreemProductId: mockGetProductTierByCreemProductId,
 }));
 
 jest.mock("crypto", () => ({
@@ -134,23 +139,18 @@ describe("Creem Webhook Handler", () => {
     mockLockPaymentAdjustmentScope.mockImplementation(
       async ([paymentReference]: string[]) => paymentReference,
     );
-    mockGetProductTierByProductId.mockReturnValue({
+    mockGetProductTierByCreemProductId.mockReturnValue({
       id: "tier_pro",
       name: "Pro Tier",
-      pricing: {
-        creem: {
-          live_mode: { oneTime: "prod_one_time" },
-        },
-      },
     });
     mockGetProductTierById.mockReturnValue({
       id: "tier_pro",
       name: "Pro Tier",
-      pricing: {
-        creem: {
-          live_mode: { oneTime: "prod_one_time" },
-        },
-      },
+    });
+    mockGetCreemProductIds.mockReturnValue({
+      oneTime: "prod_one_time",
+      monthly: "prod_monthly",
+      yearly: "prod_yearly",
     });
   });
 
@@ -618,13 +618,11 @@ describe("Creem Webhook Handler", () => {
       });
       mockGetProductTierById.mockReturnValue({
         id: "tier_pro",
-        pricing: {
-          creem: {
-            live_mode: {
-              oneTime: "prod_6tW66i0oZM7Uao6h7G0SGN",
-            },
-          },
-        },
+      });
+      mockGetCreemProductIds.mockReturnValue({
+        oneTime: "prod_6tW66i0oZM7Uao6h7G0SGN",
+        monthly: "prod_monthly",
+        yearly: "prod_yearly",
       });
       const { handleCreemWebhook } = await import("./webhook");
 
@@ -1060,7 +1058,7 @@ describe("Creem Webhook Handler", () => {
       const result = await handleCreemWebhook(payload, "test-signature");
 
       expect(result).toEqual({ received: true });
-      expect(mockGetProductTierByProductId).toHaveBeenCalledWith(
+      expect(mockGetProductTierByCreemProductId).toHaveBeenCalledWith(
         "prod_123",
         "live_mode",
       );
@@ -1307,7 +1305,10 @@ describe("Creem Webhook Handler", () => {
         paymentProviderCustomerId: "cus_123",
       });
       mockRecordWebhookEvent.mockResolvedValue(true);
-      mockGetProductTierByProductId.mockResolvedValue("pro");
+      mockGetProductTierByCreemProductId.mockReturnValue({
+        id: "pro",
+        name: "Pro",
+      });
       mockTimingSafeEqual.mockReturnValue(true);
       mockCreateHmacFunction.mockReturnValue({
         update: jest.fn().mockReturnValue({

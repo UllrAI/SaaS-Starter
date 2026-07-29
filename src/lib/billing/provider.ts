@@ -1,14 +1,27 @@
-import type { CreateCheckoutOptions } from "@/types/billing";
+import type { CreateCheckoutOptions, PaymentMode } from "@/types/billing";
+
+export type CheckoutStatus = "success" | "failed" | "pending" | "cancelled";
+
+export interface CheckoutStatusResult {
+  status: CheckoutStatus;
+  ownerId: string | null;
+  paymentMode: PaymentMode | null;
+}
 
 export interface PaymentProvider {
   createCheckoutSession(
     options: CreateCheckoutOptions,
   ): Promise<{ checkoutUrl: string }>;
   createCustomerPortalUrl(customerId: string): Promise<{ portalUrl: string }>;
+  getCheckoutStatus(checkoutId: string): Promise<CheckoutStatusResult>;
+  cancelSubscription(
+    subscriptionId: string,
+    options: { mode: "immediate" | "scheduled" },
+  ): Promise<void>;
 
   /**
    * @param payload - The raw request body as a string.
-   * @param signature - The signature from the 'creem-signature' header.
+   * @param signature - The provider webhook signature.
    */
   handleWebhook(
     payload: string,

@@ -126,7 +126,7 @@ cp .env.example .env
 
 #### Creem 产品配置
 
-`src/lib/config/products.ts` 会明确分开测试与生产产品 ID。先设置
+`src/lib/billing/creem/products.ts` 会明确分开测试与生产产品 ID。先设置
 `CREEM_ENVIRONMENT` 及其对应 API Key，再运行 `pnpm creem:sync-products`。
 该命令会复用或创建产品，并且只更新当前环境的命名空间。部署前请审查并提交这次配置
 变更；如果当前环境没有产品 ID，checkout 会安全失败，不会误用另一环境的产品。

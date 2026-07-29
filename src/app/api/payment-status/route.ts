@@ -1,64 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthSessionFromHeaders } from "@/lib/auth/session";
+import { billing } from "@/lib/billing";
 import { checkRateLimit, getClientRateLimitKey } from "@/lib/rate-limit";
-
-type ResolvedPaymentStatus = "success" | "failed" | "pending" | "cancelled";
 
 const PAYMENT_STATUS_RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const PAYMENT_STATUS_RATE_LIMIT_MAX_REQUESTS = 30;
-
-const CHECKOUT_STATUS_MAP = {
-  completed: {
-    status: "success",
-    message: "Payment completed successfully",
-  },
-  succeeded: {
-    status: "success",
-    message: "Payment completed successfully",
-  },
-  failed: {
-    status: "failed",
-    message: "Payment failed",
-  },
-  expired: {
-    status: "failed",
-    message: "Payment session expired",
-  },
-  canceled: {
-    status: "cancelled",
-    message: "Payment was cancelled",
-  },
-  cancelled: {
-    status: "cancelled",
-    message: "Payment was cancelled",
-  },
-  pending: {
-    status: "pending",
-    message: "Payment is being processed. This may take a few minutes.",
-  },
-  processing: {
-    status: "pending",
-    message: "Payment is being processed. This may take a few minutes.",
-  },
-  open: {
-    status: "pending",
-    message: "Payment is being processed. This may take a few minutes.",
-  },
-} as const;
-
-function resolveCheckoutStatus(normalizedStatus: string): {
-  status: ResolvedPaymentStatus;
-  message: string;
-} {
-  return (
-    CHECKOUT_STATUS_MAP[
-      normalizedStatus as keyof typeof CHECKOUT_STATUS_MAP
-    ] ?? {
-      status: "pending",
-      message: "Payment is being processed. This may take a few minutes.",
-    }
-  );
-}
 
 function getCheckoutReference(searchParams: URLSearchParams): string | null {
   const value =
@@ -72,29 +18,6 @@ function privateJson(body: unknown, init?: ResponseInit): NextResponse {
   const headers = new Headers(init?.headers);
   headers.set("Cache-Control", "private, no-store");
   return NextResponse.json(body, { ...init, headers });
-}
-
-function getCheckoutOwnerId(checkout: { metadata?: unknown }): string | null {
-  if (!checkout.metadata || typeof checkout.metadata !== "object") {
-    return null;
-  }
-
-  const userId = (checkout.metadata as Record<string, unknown>).userId;
-  return typeof userId === "string" ? userId : null;
-}
-
-function getCheckoutPaymentMode(checkout: {
-  metadata?: unknown;
-}): "subscription" | "one_time" | null {
-  if (!checkout.metadata || typeof checkout.metadata !== "object") {
-    return null;
-  }
-
-  const paymentMode = (checkout.metadata as Record<string, unknown>)
-    .paymentMode;
-  return paymentMode === "subscription" || paymentMode === "one_time"
-    ? paymentMode
-    : null;
 }
 
 export async function GET(request: NextRequest) {
@@ -141,23 +64,18 @@ export async function GET(request: NextRequest) {
     }
 
     try {
-      const { creemClient } = await import("@/lib/billing/creem/client");
-      const checkoutResponse = await creemClient.checkouts.retrieve(checkoutId);
+      const checkout = await billing.getCheckoutStatus(checkoutId);
 
-      if (getCheckoutOwnerId(checkoutResponse) !== session.user.id) {
+      if (checkout.ownerId !== session.user.id) {
         return privateJson({ error: "Checkout not found" }, { status: 404 });
       }
 
-      const resolvedStatus = resolveCheckoutStatus(
-        String(checkoutResponse.status ?? "").toLowerCase(),
-      );
       return privateJson({
-        status: resolvedStatus.status,
-        message: resolvedStatus.message,
-        paymentMode: getCheckoutPaymentMode(checkoutResponse),
+        status: checkout.status,
+        paymentMode: checkout.paymentMode,
       });
     } catch (error) {
-      console.error("Error checking Creem payment status:", error);
+      console.error("Error checking payment provider status:", error);
       return privateJson(
         { error: "Unable to verify payment status" },
         { status: 502 },

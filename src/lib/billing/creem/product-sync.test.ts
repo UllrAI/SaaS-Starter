@@ -9,6 +9,7 @@ import {
 } from "./product-sync";
 import { PRODUCT_TIERS } from "@/lib/config/products";
 import type { CreemClient } from "./api-client";
+import { getCreemProductIds } from "./products";
 
 describe("product-sync", () => {
   describe("buildCreemProductSpecs", () => {
@@ -215,10 +216,10 @@ describe("product-sync", () => {
     it("replaces product ids for the matching tier and variant", () => {
       const productsConfigPath = resolve(
         process.cwd(),
-        "src/lib/config/products.ts",
+        "src/lib/billing/creem/products.ts",
       );
       const source = readFileSync(productsConfigPath, "utf8");
-      const currentPlusTier = PRODUCT_TIERS.find((tier) => tier.id === "plus");
+      const currentLiveProductIds = getCreemProductIds("plus", "live_mode");
 
       const updated = updateProductsConfigSource(
         source,
@@ -237,13 +238,11 @@ describe("product-sync", () => {
         "test_mode",
       );
 
-      expect(currentPlusTier).toBeDefined();
+      expect(currentLiveProductIds).toBeDefined();
       expect(updated).toContain(
-        'test_mode: {\n          oneTime: "prod_new_one_time",\n          monthly: "prod_new_monthly"',
+        'test_mode: {\n      oneTime: "prod_new_one_time",\n      monthly: "prod_new_monthly"',
       );
-      expect(updated).toContain(
-        `oneTime: "${currentPlusTier!.pricing.creem.live_mode.oneTime}"`,
-      );
+      expect(updated).toContain(`oneTime: "${currentLiveProductIds!.oneTime}"`);
     });
   });
 });

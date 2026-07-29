@@ -9,6 +9,12 @@ const mockCreemProvider: PaymentProvider = {
   createCustomerPortalUrl: jest.fn() as jest.MockedFunction<
     PaymentProvider["createCustomerPortalUrl"]
   >,
+  getCheckoutStatus: jest.fn() as jest.MockedFunction<
+    PaymentProvider["getCheckoutStatus"]
+  >,
+  cancelSubscription: jest.fn() as jest.MockedFunction<
+    PaymentProvider["cancelSubscription"]
+  >,
   handleWebhook: jest.fn() as jest.MockedFunction<
     PaymentProvider["handleWebhook"]
   >,
@@ -43,6 +49,8 @@ describe("Billing Index", () => {
       expect(billing).toBe(mockCreemProvider);
       expect(typeof billing.createCheckoutSession).toBe("function");
       expect(typeof billing.createCustomerPortalUrl).toBe("function");
+      expect(typeof billing.getCheckoutStatus).toBe("function");
+      expect(typeof billing.cancelSubscription).toBe("function");
       expect(typeof billing.handleWebhook).toBe("function");
     });
 
@@ -277,11 +285,15 @@ describe("Billing Index", () => {
       // Verify the billing object implements PaymentProvider interface
       expect(billing).toHaveProperty("createCheckoutSession");
       expect(billing).toHaveProperty("createCustomerPortalUrl");
+      expect(billing).toHaveProperty("getCheckoutStatus");
+      expect(billing).toHaveProperty("cancelSubscription");
       expect(billing).toHaveProperty("handleWebhook");
 
       // Verify method signatures match interface
       expect(typeof billing.createCheckoutSession).toBe("function");
       expect(typeof billing.createCustomerPortalUrl).toBe("function");
+      expect(typeof billing.getCheckoutStatus).toBe("function");
+      expect(typeof billing.cancelSubscription).toBe("function");
       expect(typeof billing.handleWebhook).toBe("function");
     });
 

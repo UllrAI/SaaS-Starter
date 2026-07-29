@@ -1,9 +1,10 @@
 type CheckoutResult = {
-  status?: string;
-  metadata?: Record<string, unknown>;
+  status: "success" | "failed" | "pending" | "cancelled";
+  ownerId: string | null;
+  paymentMode: "subscription" | "one_time" | null;
 };
 
-const mockRetrieveCheckout = jest.fn<
+const mockGetCheckoutStatus = jest.fn<
   Promise<CheckoutResult>,
   [checkoutId: string]
 >();
@@ -13,11 +14,9 @@ const mockGetAuthSessionFromHeaders = jest.fn();
 
 beforeAll(() => {
   jest.resetModules();
-  jest.doMock("@/lib/billing/creem/client", () => ({
-    creemClient: {
-      checkouts: {
-        retrieve: mockRetrieveCheckout,
-      },
+  jest.doMock("@/lib/billing", () => ({
+    billing: {
+      getCheckoutStatus: mockGetCheckoutStatus,
     },
   }));
   jest.doMock("@/lib/rate-limit", () => ({
@@ -68,7 +67,7 @@ describe("Payment Status API", () => {
     expect(missing.status).toBe(400);
     expect(oversized.status).toBe(400);
     expect(mockGetAuthSessionFromHeaders).not.toHaveBeenCalled();
-    expect(mockRetrieveCheckout).not.toHaveBeenCalled();
+    expect(mockGetCheckoutStatus).not.toHaveBeenCalled();
   });
 
   it("rate limits before authentication or provider calls", async () => {
@@ -91,7 +90,7 @@ describe("Payment Status API", () => {
     expect(response.headers.get("Retry-After")).toBeTruthy();
     expect(response.headers.get("Cache-Control")).toBe("private, no-store");
     expect(mockGetAuthSessionFromHeaders).not.toHaveBeenCalled();
-    expect(mockRetrieveCheckout).not.toHaveBeenCalled();
+    expect(mockGetCheckoutStatus).not.toHaveBeenCalled();
   });
 
   it("requires an authenticated session", async () => {
@@ -107,13 +106,14 @@ describe("Payment Status API", () => {
     expect(await response.json()).toEqual({
       error: "Authentication required",
     });
-    expect(mockRetrieveCheckout).not.toHaveBeenCalled();
+    expect(mockGetCheckoutStatus).not.toHaveBeenCalled();
   });
 
   it("returns owned checkout status without exposing its identifier", async () => {
-    mockRetrieveCheckout.mockResolvedValue({
-      status: "completed",
-      metadata: { userId: "user-1" },
+    mockGetCheckoutStatus.mockResolvedValue({
+      status: "success",
+      ownerId: "user-1",
+      paymentMode: null,
     });
 
     const response = await GET(
@@ -125,19 +125,19 @@ describe("Payment Status API", () => {
 
     expect(response.status).toBe(200);
     expect(response.headers.get("Cache-Control")).toBe("private, no-store");
-    expect(mockRetrieveCheckout).toHaveBeenCalledWith("checkout-1");
+    expect(mockGetCheckoutStatus).toHaveBeenCalledWith("checkout-1");
     expect(data).toEqual({
       status: "success",
-      message: "Payment completed successfully",
       paymentMode: null,
     });
     expect(data).not.toHaveProperty("sessionId");
   });
 
   it("returns an allowlisted one-time payment mode", async () => {
-    mockRetrieveCheckout.mockResolvedValue({
-      status: "completed",
-      metadata: { userId: "user-1", paymentMode: "one_time" },
+    mockGetCheckoutStatus.mockResolvedValue({
+      status: "success",
+      ownerId: "user-1",
+      paymentMode: "one_time",
     });
 
     const response = await GET(
@@ -151,29 +151,36 @@ describe("Payment Status API", () => {
     );
   });
 
+  it.each(["pending", "cancelled", "failed"] as const)(
+    "returns normalized provider state %s",
+    async (status) => {
+      mockGetCheckoutStatus.mockResolvedValue({
+        status,
+        ownerId: "user-1",
+        paymentMode: null,
+      });
+
+      const response = await GET(
+        createRequest(
+          "http://localhost:3000/api/payment-status?session_id=checkout-1",
+        ),
+      );
+
+      expect(await response.json()).toEqual(
+        expect.objectContaining({ status }),
+      );
+    },
+  );
+
   it.each([
-    [{ status: "open", metadata: { userId: "user-1" } }, "pending"],
-    [{ status: "canceled", metadata: { userId: "user-1" } }, "cancelled"],
-    [{ status: "expired", metadata: { userId: "user-1" } }, "failed"],
-  ])("maps provider state %#", async (checkout, expectedStatus) => {
-    mockRetrieveCheckout.mockResolvedValue(checkout);
-
-    const response = await GET(
-      createRequest(
-        "http://localhost:3000/api/payment-status?session_id=checkout-1",
-      ),
-    );
-
-    expect(await response.json()).toEqual(
-      expect.objectContaining({ status: expectedStatus }),
-    );
-  });
-
-  it.each([
-    { status: "completed", metadata: { userId: "other-user" } },
-    { status: "completed" },
+    {
+      status: "success" as const,
+      ownerId: "other-user",
+      paymentMode: null,
+    },
+    { status: "success" as const, ownerId: null, paymentMode: null },
   ])("hides foreign or unowned checkouts", async (checkout) => {
-    mockRetrieveCheckout.mockResolvedValue(checkout);
+    mockGetCheckoutStatus.mockResolvedValue(checkout);
 
     const response = await GET(
       createRequest(
@@ -186,7 +193,9 @@ describe("Payment Status API", () => {
   });
 
   it("returns a controlled gateway error and ignores URL status claims", async () => {
-    mockRetrieveCheckout.mockRejectedValue(new Error("Creem unavailable"));
+    mockGetCheckoutStatus.mockRejectedValue(
+      new Error("Payment provider unavailable"),
+    );
 
     const response = await GET(
       createRequest(

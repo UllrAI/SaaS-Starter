@@ -110,7 +110,7 @@ async function writeResolvedProducts(
 ): Promise<void> {
   const productsConfigPath = resolve(
     process.cwd(),
-    "src/lib/config/products.ts",
+    "src/lib/billing/creem/products.ts",
   );
   const source = await readFile(productsConfigPath, "utf8");
   const nextSource = updateProductsConfigSource(

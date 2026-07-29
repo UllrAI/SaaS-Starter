@@ -25,10 +25,8 @@ import {
   updatePaymentStatus,
 } from "@/lib/database/subscription";
 import type { Tx } from "@/lib/database/subscription";
-import {
-  getProductTierById,
-  getProductTierByProductId,
-} from "@/lib/config/products";
+import { getProductTierById } from "@/lib/config/products";
+import { getCreemProductIds, getProductTierByCreemProductId } from "./products";
 
 export class CreemWebhookSignatureError extends Error {
   constructor(message = "Invalid signature.") {
@@ -466,16 +464,20 @@ async function processCheckoutCompletedEvent(
       typeof subscription.product === "string"
         ? subscription.product
         : subscription.product.id;
-    const tier = getProductTierByProductId(productId, creemEnvironment);
-    const storedProductId = tier?.id || productId;
+    const tier = getProductTierByCreemProductId(productId, creemEnvironment);
+    if (!tier) {
+      throw new InvalidWebhookPayloadError(
+        "Subscription references an unknown Creem product.",
+      );
+    }
 
-    await lockBillingProductScope(userId, storedProductId, tx);
+    await lockBillingProductScope(userId, tier.id, tx);
     await upsertSubscription(
       {
         userId,
         customerId,
         subscriptionId: subscription.id,
-        productId: storedProductId,
+        productId: tier.id,
         status: subscription.status,
         currentPeriodStart: parseOptionalWebhookDate(
           subscription.current_period_start_date,
@@ -504,7 +506,7 @@ async function processCheckoutCompletedEvent(
         userId,
         customerId,
         subscriptionId: subscription.id,
-        productId: storedProductId,
+        productId: tier.id,
         paymentId,
         amount,
         currency: order.currency,
@@ -533,7 +535,10 @@ async function processCheckoutCompletedEvent(
       typeof checkoutData.product === "string"
         ? checkoutData.product
         : checkoutData.product.id;
-    if (checkoutProductId !== tier.pricing.creem[creemEnvironment].oneTime) {
+    if (
+      checkoutProductId !==
+      getCreemProductIds(tier.id, creemEnvironment)?.oneTime
+    ) {
       throw new InvalidWebhookPayloadError(
         "One-time checkout product does not match its tier metadata.",
       );
@@ -646,16 +651,20 @@ async function processSubscriptionEvent(
     typeof subscriptionData.product === "string"
       ? subscriptionData.product
       : subscriptionData.product.id;
-  const tier = getProductTierByProductId(productId, creemEnvironment);
-  const storedProductId = tier?.id || productId;
+  const tier = getProductTierByCreemProductId(productId, creemEnvironment);
+  if (!tier) {
+    throw new InvalidWebhookPayloadError(
+      "Subscription references an unknown Creem product.",
+    );
+  }
 
-  await lockBillingProductScope(user.id, storedProductId, tx);
+  await lockBillingProductScope(user.id, tier.id, tx);
   await upsertSubscription(
     {
       userId: user.id,
       customerId,
       subscriptionId: subscriptionData.id,
-      productId: storedProductId,
+      productId: tier.id,
       status: subscriptionData.status,
       currentPeriodStart: parseOptionalWebhookDate(
         subscriptionData.current_period_start_date,
@@ -752,16 +761,20 @@ async function processSubscriptionRenewal(
   if (!productId)
     throw new InvalidWebhookPayloadError("Product ID missing in renewal event");
 
-  const tier = getProductTierByProductId(productId, creemEnvironment);
-  const storedProductId = tier?.id || productId;
+  const tier = getProductTierByCreemProductId(productId, creemEnvironment);
+  if (!tier) {
+    throw new InvalidWebhookPayloadError(
+      "Subscription renewal references an unknown Creem product.",
+    );
+  }
 
-  await lockBillingProductScope(user.id, storedProductId, tx);
+  await lockBillingProductScope(user.id, tier.id, tx);
   await upsertSubscription(
     {
       userId: user.id,
       customerId,
       subscriptionId,
-      productId: storedProductId,
+      productId: tier.id,
       status: "active",
       currentPeriodStart,
       currentPeriodEnd,
@@ -792,14 +805,19 @@ async function processPaymentSucceededEvent(
   if (!productId)
     throw new InvalidWebhookPayloadError("Product ID missing in payment event");
 
-  const tier = getProductTierByProductId(productId, creemEnvironment);
+  const tier = getProductTierByCreemProductId(productId, creemEnvironment);
+  if (!tier) {
+    throw new InvalidWebhookPayloadError(
+      "Payment references an unknown Creem product.",
+    );
+  }
 
   await upsertPayment(
     {
       userId: user.id,
       customerId,
       subscriptionId: paymentData.subscription_id || paymentData.subscription,
-      productId: tier?.id || productId,
+      productId: tier.id,
       paymentId: paymentData.id,
       amount: paymentData.amount ?? paymentData.amount_paid ?? 0,
       currency: paymentData.currency ?? "usd",

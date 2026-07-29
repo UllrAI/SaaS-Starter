@@ -30,15 +30,12 @@ import type {
   SubscriptionWithUser,
   SubscriptionStatus,
 } from "@/types/billing";
-import {
-  getProductTierById,
-  getProductTierByProductId,
-} from "@/lib/config/products";
+import { getProductTierById } from "@/lib/config/products";
 import { createSafeActionClient } from "next-safe-action";
 import { z } from "zod";
 import { requireAdmin } from "../auth/permissions";
 import { revalidatePath } from "next/cache";
-import { creemClient } from "../billing/creem/client";
+import { billing } from "../billing";
 import {
   deleteFiles as deleteFilesFromR2,
   deleteFile as deleteFileFromR2,
@@ -249,9 +246,7 @@ export async function getPayments({
       ...payment,
       user: payment.user!,
       tierName:
-        getProductTierByProductId(payment.productId)?.name ||
-        getProductTierById(payment.productId)?.name ||
-        "Unknown Product",
+        getProductTierById(payment.productId)?.name || "Unknown Product",
     }));
 
   return {
@@ -343,9 +338,7 @@ export async function getSubscriptions({
         sub.user !== null,
     )
     .map((sub) => {
-      const productTier =
-        getProductTierById(sub.productId) ||
-        getProductTierByProductId(sub.productId);
+      const productTier = getProductTierById(sub.productId);
       return {
         ...sub,
         tierId: sub.productId,
@@ -571,7 +564,7 @@ export const cancelSubscriptionAction = adminAction
       throw new Error("Subscription not found");
     }
 
-    await creemClient.subscriptions.cancel(subscription.subscriptionId, {
+    await billing.cancelSubscription(subscription.subscriptionId, {
       mode: "immediate",
     });
 

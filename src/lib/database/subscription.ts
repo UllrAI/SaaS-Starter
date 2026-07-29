@@ -11,10 +11,11 @@ import { and, desc, eq, isNull, sql } from "drizzle-orm";
 import type { PgTransaction } from "drizzle-orm/pg-core";
 import type { PostgresJsQueryResultHKT } from "drizzle-orm/postgres-js";
 import type { Subscription, SubscriptionStatus } from "@/types/billing";
+import { getProductTierById } from "@/lib/config/products";
 import {
-  getProductTierByProductId,
-  getProductTierById,
-} from "@/lib/config/products";
+  canManageSubscription,
+  hasCurrentSubscriptionAccess,
+} from "@/lib/billing/access";
 import { ExtractTablesWithRelations } from "drizzle-orm";
 
 export type Tx = PgTransaction<
@@ -417,50 +418,50 @@ export async function getUserSubscription(
     .where(eq(subscriptions.userId, userId))
     .orderBy(desc(subscriptions.createdAt)); // Order by creation date descending for deterministic behavior
 
-  if (!userSubscriptions || userSubscriptions.length === 0) return null;
-
-  // Filter active or trialing subscriptions
-  const activeSubscriptions = userSubscriptions.filter(
-    (sub) => sub.status === "active" || sub.status === "trialing",
+  const mappedSubscriptions: Subscription[] = userSubscriptions.map(
+    (subscription) => ({
+      id: subscription.id,
+      userId: subscription.userId,
+      customerId: subscription.customerId,
+      subscriptionId: subscription.subscriptionId,
+      status: subscription.status as SubscriptionStatus,
+      tierId: subscription.productId,
+      currentPeriodStart: subscription.currentPeriodStart,
+      currentPeriodEnd: subscription.currentPeriodEnd,
+      canceledAt: subscription.canceledAt,
+    }),
   );
 
-  let subToReturn: (typeof userSubscriptions)[0] | undefined;
+  const now = new Date();
+  const accessibleSubscriptions = mappedSubscriptions.filter((subscription) =>
+    hasCurrentSubscriptionAccess(subscription, now),
+  );
+  const manageableSubscriptions = mappedSubscriptions.filter(
+    (subscription) =>
+      !hasCurrentSubscriptionAccess(subscription, now) &&
+      canManageSubscription(subscription),
+  );
 
-  if (activeSubscriptions.length > 0) {
-    // If multiple active/trialing subscriptions exist, log warning and return the most recent one
-    if (activeSubscriptions.length > 1) {
-      console.warn(
-        `User ${userId} has ${activeSubscriptions.length} active/trialing subscriptions. ` +
-          `This may indicate a data consistency issue. Returning the most recent one.`,
-        {
-          userId,
-          subscriptionIds: activeSubscriptions.map((s) => s.subscriptionId),
-          statuses: activeSubscriptions.map((s) => s.status),
-        },
-      );
-    }
-    // Return the most recently created active/trialing subscription
-    subToReturn = activeSubscriptions[0]; // Already sorted by createdAt desc
-  } else {
-    // If no active or trialing subscription, take the most recently created one
-    subToReturn = userSubscriptions[0]; // Already sorted by createdAt desc
+  if (accessibleSubscriptions.length > 1) {
+    console.warn(
+      `User ${userId} has ${accessibleSubscriptions.length} currently accessible subscriptions. ` +
+        "This may indicate a data consistency issue. Returning the most recent one.",
+      {
+        userId,
+        subscriptionIds: accessibleSubscriptions.map(
+          ({ subscriptionId }) => subscriptionId,
+        ),
+        statuses: accessibleSubscriptions.map(({ status }) => status),
+      },
+    );
   }
 
-  if (!subToReturn) return null; // Should not happen if userSubscriptions is not empty
-
-  const tier = getProductTierByProductId(subToReturn.productId);
-
-  return {
-    id: subToReturn.id,
-    userId: subToReturn.userId,
-    customerId: subToReturn.customerId,
-    subscriptionId: subToReturn.subscriptionId,
-    status: subToReturn.status as SubscriptionStatus,
-    tierId: tier?.id || subToReturn.productId, // Fallback to raw product ID if tier mapping is missing
-    currentPeriodStart: subToReturn.currentPeriodStart,
-    currentPeriodEnd: subToReturn.currentPeriodEnd,
-    canceledAt: subToReturn.canceledAt,
-  };
+  return (
+    accessibleSubscriptions[0] ??
+    manageableSubscriptions[0] ??
+    mappedSubscriptions[0] ??
+    null
+  );
 }
 
 export async function getUserPayments(userId: string, limit: number = 10) {
@@ -472,11 +473,7 @@ export async function getUserPayments(userId: string, limit: number = 10) {
     .limit(limit);
 
   return userPayments.map((payment) => {
-    let tier = getProductTierByProductId(payment.productId);
-    // If tier is not found by Creem's product ID, try to find it by our internal tier ID
-    if (!tier) {
-      tier = getProductTierById(payment.productId);
-    }
+    const tier = getProductTierById(payment.productId);
     return {
       ...payment,
       tierId: tier?.id || payment.productId,

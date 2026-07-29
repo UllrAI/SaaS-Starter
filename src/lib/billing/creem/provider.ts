@@ -1,9 +1,13 @@
-import type { PaymentProvider } from "../provider";
+import type {
+  CheckoutStatus,
+  CheckoutStatusResult,
+  PaymentProvider,
+} from "../provider";
 import type { CreateCheckoutOptions } from "@/types/billing";
 import { z } from "zod";
 import { creemClient, creemEnvironment, creemWebhookSecret } from "./client";
-import { getProductTierById } from "@/lib/config/products";
 import { handleCreemWebhook } from "./webhook";
+import { getCreemProductIds } from "./products";
 
 const CreemCheckoutResponseSchema = z.object({
   checkoutUrl: z.string().url(),
@@ -13,18 +17,48 @@ const CreemCustomerPortalResponseSchema = z.object({
   customerPortalLink: z.string().url(),
 });
 
+const CHECKOUT_STATUS_MAP: Record<string, CheckoutStatus> = {
+  completed: "success",
+  succeeded: "success",
+  failed: "failed",
+  expired: "failed",
+  canceled: "cancelled",
+  cancelled: "cancelled",
+  pending: "pending",
+  processing: "pending",
+  open: "pending",
+};
+
+function resolveCheckoutStatus(status: string): CheckoutStatus {
+  return CHECKOUT_STATUS_MAP[status.toLowerCase()] ?? "pending";
+}
+
+function mapCheckoutStatus(
+  checkout: Awaited<ReturnType<typeof creemClient.checkouts.retrieve>>,
+): CheckoutStatusResult {
+  const ownerId = checkout.metadata?.userId;
+  const paymentMode = checkout.metadata?.paymentMode;
+
+  return {
+    status: resolveCheckoutStatus(checkout.status),
+    ownerId: typeof ownerId === "string" ? ownerId : null,
+    paymentMode:
+      paymentMode === "subscription" || paymentMode === "one_time"
+        ? paymentMode
+        : null,
+  };
+}
+
 const creemProvider: PaymentProvider = {
   async createCheckoutSession(
     options: CreateCheckoutOptions,
   ): Promise<{ checkoutUrl: string }> {
     try {
-      const tier = getProductTierById(options.tierId);
-      if (!tier) {
+      let creemProductId: string;
+      const productIds = getCreemProductIds(options.tierId, creemEnvironment);
+      if (!productIds) {
         throw new Error(`Pricing tier with id "${options.tierId}" not found.`);
       }
-
-      let creemProductId: string;
-      const productIds = tier.pricing.creem[creemEnvironment];
       if (options.paymentMode === "one_time") {
         creemProductId = productIds.oneTime;
       } else {
@@ -95,6 +129,18 @@ const creemProvider: PaymentProvider = {
         error instanceof Error ? error.message : "An unknown error occurred.";
       throw new Error(`Failed to create customer portal session: ${message}`);
     }
+  },
+
+  async getCheckoutStatus(checkoutId: string): Promise<CheckoutStatusResult> {
+    const checkout = await creemClient.checkouts.retrieve(checkoutId);
+    return mapCheckoutStatus(checkout);
+  },
+
+  async cancelSubscription(
+    subscriptionId: string,
+    options: { mode: "immediate" | "scheduled" },
+  ): Promise<void> {
+    await creemClient.subscriptions.cancel(subscriptionId, options);
   },
 
   async handleWebhook(

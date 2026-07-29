@@ -1,10 +1,7 @@
 import { createHash } from "node:crypto";
-import type {
-  CreemEnvironment,
-  CreemProductVariant,
-  PricingTier,
-} from "@/lib/config/products";
+import type { PricingTier } from "@/lib/config/products";
 import type { CreemClient, CreemProduct } from "./api-client";
+import type { CreemEnvironment, CreemProductVariant } from "./products";
 
 type ProductBillingType = CreemProduct["billingType"];
 type ProductBillingPeriod = "every-month" | "every-year";
@@ -205,7 +202,7 @@ function getEnvironmentBlock(source: string, environment: CreemEnvironment) {
     throw new Error(`Unable to find ${environment} product configuration.`);
   }
 
-  const end = source.indexOf("\n        },", start);
+  const end = source.indexOf("\n    },", start);
   if (end === -1) {
     throw new Error(`Unable to determine ${environment} product block.`);
   }
@@ -218,18 +215,20 @@ function getEnvironmentBlock(source: string, environment: CreemEnvironment) {
 }
 
 function getTierBlock(source: string, tierId: string) {
-  const tierMarker = `id: "${tierId}"`;
+  const tierMarker = `${tierId}: {`;
   const start = source.indexOf(tierMarker);
 
   if (start === -1) {
     throw new Error(`Unable to find tier "${tierId}" in products config.`);
   }
 
-  const nextTierStart = source.indexOf(
-    '\n  {\n    id: "',
-    start + tierMarker.length,
-  );
-  const arrayEnd = source.indexOf("\n];", start);
+  const remainingSource = source.slice(start + tierMarker.length);
+  const nextTierMatch = /\n  [A-Za-z0-9_-]+: \{/.exec(remainingSource);
+  const nextTierStart =
+    nextTierMatch?.index === undefined
+      ? -1
+      : start + tierMarker.length + nextTierMatch.index;
+  const arrayEnd = source.indexOf("\n};", start);
   const end =
     nextTierStart === -1 ? arrayEnd : Math.min(nextTierStart, arrayEnd);
 

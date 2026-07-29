@@ -15,6 +15,15 @@ function restoreEnvValue(key: string, value: string | undefined): void {
   }
 }
 
+beforeEach(() => {
+  delete process.env.E2E_DATABASE_URL;
+  delete process.env.E2E_BASE_URL;
+  delete process.env.DATABASE_URL;
+  delete process.env.CI;
+  delete process.env.TEST_WORKER_INDEX;
+  delete process.env.TEST_PARALLEL_INDEX;
+});
+
 afterEach(() => {
   restoreEnvValue("E2E_DATABASE_URL", originalDatabaseUrl);
   restoreEnvValue("E2E_BASE_URL", originalBaseUrl);

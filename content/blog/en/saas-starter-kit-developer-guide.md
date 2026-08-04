@@ -621,7 +621,7 @@ commit to `prod` only when that commit belongs to the default branch.
   - [Next.js](https://nextjs.org/docs)
   - [Drizzle ORM](https://orm.drizzle.team/docs)
   - [Better-Auth](https://better-auth.com/docs)
-  - [Creem](https://creem.io/docs)
+  - [Creem](https://docs.creem.io)
   - [shadcn/ui](https://ui.shadcn.com/docs)
   - [Content Collections](https://www.content-collections.dev/)
 

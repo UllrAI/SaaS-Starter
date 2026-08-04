@@ -17,7 +17,7 @@ This starter kit provides a comprehensive set of powerful features to help you q
 - **Modern Web Framework (Next.js 16 + TypeScript):** Built on the latest [Next.js 16](https://nextjs.org/) with App Router and Server Components. The entire project uses strict TypeScript type checking.
 - **Internationalization (next-intl):** Server-rendered localization with explicit catalogs, locale-aware routing, localized metadata, and canonical hreflang output. See [docs/i18n-next-intl.md](docs/i18n-next-intl.md).
 - **Database & ORM (Drizzle + PostgreSQL):** Uses [Drizzle ORM](https://orm.drizzle.team/) for type-safe database operations with deep PostgreSQL integration. Supports schema migrations and optimized queries.
-- **Payments & Subscriptions (Creem):** Integrated with [Creem](https://creem.io/) as the payment provider for easy subscription and one-time payment handling.
+- **Payments & Subscriptions (Creem):** Integrated with [Creem](https://www.creem.io/) as the payment provider for easy subscription and one-time payment handling.
 - **UI Component Library (shadcn/ui + Tailwind CSS):** Built with [shadcn/ui](https://ui.shadcn.com/), an accessible, composable component library based on Radix UI and Tailwind CSS with built-in theme support.
 - **Form Handling (Zod + React Hook Form):** Powerful, type-safe form validation through [Zod](https://zod.dev/) and [React Hook Form](https://react-hook-form.com/).
 - **File Upload (Cloudflare R2):** Secure file upload system based on Cloudflare R2, supporting client-side direct upload with various file type and size restrictions.
@@ -47,7 +47,7 @@ This starter kit provides a comprehensive set of powerful features to help you q
 | **Auth**            | [Better-Auth](https://better-auth.com/)                                                                                                                |
 | **Database**        | [PostgreSQL](https://www.postgresql.org/)                                                                                                              |
 | **ORM**             | [Drizzle ORM](https://orm.drizzle.team/)                                                                                                               |
-| **Payments**        | [Creem](https://creem.io/)                                                                                                                             |
+| **Payments**        | [Creem](https://www.creem.io/)                                                                                                                         |
 | **Email**           | [Resend](https://resend.com/), [React Email](https://react.email/)                                                                                     |
 | **Forms**           | [React Hook Form](https://react-hook-form.com/), [Zod](https://zod.dev/)                                                                               |
 | **Deployment**      | [Zeabur](https://zeabur.com/) or Docker                                                                                                                |
@@ -148,6 +148,12 @@ active environment has no configured product ID.
 
 Webhook retry, idempotency, and manual replay behavior are documented in
 [Billing webhook operations](docs/webhooks.md).
+
+> **Creem referral disclosure:** Under Creem's standard program, Creem may
+> credit the maintainer $50 after a business signs up through an eligible
+> referral link and reaches $1,000 in settled sales.
+>
+> Payments secured by [**Creem**](https://www.creem.io/).
 
 ### 4. Database Setup
 

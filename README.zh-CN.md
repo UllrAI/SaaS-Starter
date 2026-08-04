@@ -17,7 +17,7 @@
 - **现代 Web 框架 (Next.js 16 + TypeScript):** 基于最新的 [Next.js 16](https://nextjs.org/)，使用 App Router 和服务器组件。整个项目采用严格的 TypeScript 类型检查。
 - **国际化 (next-intl):** 基于显式语言目录、语言感知路由、本地化元数据与规范 hreflang 输出的服务端国际化方案。详见 [docs/i18n-next-intl.md](docs/i18n-next-intl.md)。
 - **数据库与 ORM (Drizzle + PostgreSQL):** 使用 [Drizzle ORM](https://orm.drizzle.team/) 进行类型安全的数据库操作，并与 PostgreSQL 深度集成。支持模式迁移和优化的查询。
-- **支付与订阅 (Creem):** 集成了 [Creem](https://creem.io/) 作为支付提供商，轻松处理订阅和一次性支付。
+- **支付与订阅 (Creem):** 集成了 [Creem](https://www.creem.io/) 作为支付提供商，轻松处理订阅和一次性支付。
 - **UI 组件库 (shadcn/ui + Tailwind CSS):** 使用 [shadcn/ui](https://ui.shadcn.com/) 构建，它是一个基于 Radix UI 和 Tailwind CSS 的可访问、可组合的组件库，内置主题支持。
 - **表单处理 (Zod + React Hook Form):** 通过 [Zod](https://zod.dev/) 和 [React Hook Form](https://react-hook-form.com/) 实现强大的、类型安全的表单验证。
 - **文件上传 (Cloudflare R2):** 基于 Cloudflare R2 的安全文件上传系统，支持客户端直传和多种文件类型与大小限制。
@@ -47,7 +47,7 @@
 | **认证**   | [Better-Auth](https://better-auth.com/)                                                                                                               |
 | **数据库** | [PostgreSQL](https://www.postgresql.org/)                                                                                                             |
 | **ORM**    | [Drizzle ORM](https://orm.drizzle.team/)                                                                                                              |
-| **支付**   | [Creem](https://creem.io/)                                                                                                                            |
+| **支付**   | [Creem](https://www.creem.io/)                                                                                                                        |
 | **邮件**   | [Resend](https://resend.com/), [React Email](https://react.email/)                                                                                    |
 | **表单**   | [React Hook Form](https://react-hook-form.com/), [Zod](https://zod.dev/)                                                                              |
 | **部署**   | [Zeabur](https://zeabur.com/) 或 Docker                                                                                                               |
@@ -144,6 +144,11 @@ cp .env.example .env
 
 Webhook 的重试、幂等和人工重放语义见
 [计费 Webhook 运维说明](docs/webhooks.zh-CN.md)。
+
+> **Creem 推荐计划说明：**根据 Creem 标准推荐计划，商家通过有效推荐链接注册并完成
+> 1,000 美元已结算销售额后，Creem 可能向本项目维护者发放 50 美元余额奖励。
+>
+> 支付由 [**Creem**](https://www.creem.io/) 安全处理。
 
 ### 4. 数据库设置
 

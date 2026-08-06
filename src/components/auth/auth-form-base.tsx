@@ -82,12 +82,7 @@ export function AuthFormBase<T extends FieldValues>({
       setPendingAction("magic-link");
       await onSubmit(data);
     } catch {
-      toast.error(
-        t(
-          "auth_unexpected_error",
-          "Something went wrong. Contact support if the issue persists.",
-        ),
-      );
+      toast.error(t("auth_unexpected_error"));
       setPendingAction(null);
     }
   };
@@ -142,10 +137,7 @@ export function AuthFormBase<T extends FieldValues>({
                     </div>
                     <div className="relative flex justify-center text-xs uppercase">
                       <span className="bg-background text-muted-foreground px-3 font-medium">
-                        {t(
-                          "auth_continue_magic_link",
-                          "Or continue with magic link",
-                        )}
+                        {t("auth_continue_magic_link")}
                       </span>
                     </div>
                   </div>
@@ -219,28 +211,24 @@ export function AuthFormBase<T extends FieldValues>({
         {config.showTerms && (
           <div className="border-border/50 border-t pt-4">
             <p className="text-muted-foreground/70 text-center text-xs leading-relaxed">
-              {t(
-                "auth_creating_account_you_agree_terms_service",
-                "By creating an account, you agree to our <Link0>Terms of Service </Link0> and <Link1>Privacy Policy </Link1> .",
-                {
-                  Link0: (chunks) => (
-                    <Link
-                      href="/terms"
-                      className="text-primary hover:text-primary/80 cursor-pointer font-medium underline-offset-4 transition-colors hover:underline"
-                    >
-                      {chunks}
-                    </Link>
-                  ),
-                  Link1: (chunks) => (
-                    <Link
-                      href="/privacy"
-                      className="text-primary hover:text-primary/80 cursor-pointer font-medium underline-offset-4 transition-colors hover:underline"
-                    >
-                      {chunks}
-                    </Link>
-                  ),
-                },
-              )}
+              {t.rich("auth_creating_account_you_agree_terms_service", {
+                Link0: (chunks) => (
+                  <Link
+                    href="/terms"
+                    className="text-primary hover:text-primary/80 cursor-pointer font-medium underline-offset-4 transition-colors hover:underline"
+                  >
+                    {chunks}
+                  </Link>
+                ),
+                Link1: (chunks) => (
+                  <Link
+                    href="/privacy"
+                    className="text-primary hover:text-primary/80 cursor-pointer font-medium underline-offset-4 transition-colors hover:underline"
+                  >
+                    {chunks}
+                  </Link>
+                ),
+              })}
             </p>
           </div>
         )}

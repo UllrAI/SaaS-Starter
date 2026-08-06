@@ -48,9 +48,7 @@ export function RevenueChart({ chartData }: RevenueChartProps) {
       <div className="flex h-[400px] items-center justify-center">
         <div className="text-muted-foreground flex items-center space-x-2">
           <AlertTriangle className="h-4 w-4" />
-          <span>
-            {t("admin_no_revenue_data_available", "No revenue data available")}
-          </span>
+          <span>{t("admin_no_revenue_data_available")}</span>
         </div>
       </div>
     );
@@ -91,7 +89,7 @@ export function RevenueChart({ chartData }: RevenueChartProps) {
                     </div>
                     <div className="flex flex-col">
                       <span className="text-muted-foreground text-[0.70rem] uppercase">
-                        {t("admin_settled_usd_revenue", "Settled USD Revenue")}
+                        {t("admin_settled_usd_revenue")}
                       </span>
                       <span className="font-bold">
                         {formatCurrency(payload[0].value as number)}
@@ -99,7 +97,7 @@ export function RevenueChart({ chartData }: RevenueChartProps) {
                     </div>
                     <div className="flex flex-col">
                       <span className="text-muted-foreground text-[0.70rem] uppercase">
-                        {t("admin_payments_label", "Payments")}
+                        {t("admin_payments_label")}
                       </span>
                       <span className="text-muted-foreground font-bold">
                         {payload[0].payload.count}

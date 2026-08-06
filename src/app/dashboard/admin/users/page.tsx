@@ -19,26 +19,17 @@ export async function generateMetadata() {
   const metadata = createMetadataDefaults({ locale });
   return {
     ...metadata,
-    title: t("admin_user_management", "User Management"),
-    description: t(
-      "admin_manage_user_accounts_roles_permissions",
-      "Manage user accounts, roles, and permissions",
-    ),
+    title: t("admin_user_management"),
+    description: t("admin_manage_user_accounts_roles_permissions"),
     openGraph: {
       ...metadata.openGraph,
-      title: t("admin_user_management", "User Management"),
-      description: t(
-        "admin_manage_user_accounts_roles_permissions",
-        "Manage user accounts, roles, and permissions",
-      ),
+      title: t("admin_user_management"),
+      description: t("admin_manage_user_accounts_roles_permissions"),
     },
     twitter: {
       ...metadata.twitter,
-      title: t("admin_user_management", "User Management"),
-      description: t(
-        "admin_manage_user_accounts_roles_permissions",
-        "Manage user accounts, roles, and permissions",
-      ),
+      title: t("admin_user_management"),
+      description: t("admin_manage_user_accounts_roles_permissions"),
     },
   };
 }
@@ -48,8 +39,8 @@ export default async function UserManagementPage() {
   const initialTableData = await getUsers({});
   return (
     <DashboardPageWrapper
-      title={<>{t("admin_user_management", "User Management")}</>}
-      parentTitle={<>{t("admin_dashboard_page", "Admin Dashboard")}</>}
+      title={<>{t("admin_user_management")}</>}
+      parentTitle={<>{t("admin_dashboard_page")}</>}
       parentUrl="/dashboard/admin"
     >
       <Suspense fallback={<StatsCardsSkeleton />}>
@@ -58,13 +49,8 @@ export default async function UserManagementPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>{t("admin_all_users", "All Users")}</CardTitle>
-          <CardDescription>
-            {t(
-              "admin_manage_user_accounts_roles_permissions_management",
-              "Manage user accounts, roles, and permissions",
-            )}
-          </CardDescription>
+          <CardTitle>{t("admin_all_users")}</CardTitle>
+          <CardDescription>{t("admin_manage_users_roles")}</CardDescription>
         </CardHeader>
         <CardContent>
           <UserManagementTable

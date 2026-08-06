@@ -18,26 +18,17 @@ export async function buildHomeMetadata(locale: SupportedLocale) {
   });
   return {
     ...metadata,
-    title: t("home_micro_saas_starter", "Micro SaaS Starter"),
-    description: t(
-      "home_authentication_billing_agent_ready_apis_cli",
-      "Authentication, billing, agent-ready APIs, CLI device auth, uploads, admin tooling, and Playwright-backed smoke coverage for shipping a SaaS product faster.",
-    ),
+    title: t("home_micro_saas_starter"),
+    description: t("home_auth_billing_apis_cli"),
     openGraph: {
       ...metadata.openGraph,
-      title: t("home_micro_saas_starter", "Micro SaaS Starter"),
-      description: t(
-        "home_authentication_billing_agent_ready_apis_cli",
-        "Authentication, billing, agent-ready APIs, CLI device auth, uploads, admin tooling, and Playwright-backed smoke coverage for shipping a SaaS product faster.",
-      ),
+      title: t("home_micro_saas_starter"),
+      description: t("home_auth_billing_apis_cli"),
     },
     twitter: {
       ...metadata.twitter,
-      title: t("home_micro_saas_starter", "Micro SaaS Starter"),
-      description: t(
-        "home_authentication_billing_agent_ready_apis_cli",
-        "Authentication, billing, agent-ready APIs, CLI device auth, uploads, admin tooling, and Playwright-backed smoke coverage for shipping a SaaS product faster.",
-      ),
+      title: t("home_micro_saas_starter"),
+      description: t("home_auth_billing_apis_cli"),
     },
   };
 }

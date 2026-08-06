@@ -60,192 +60,89 @@ export function Features({
   const features = [
     {
       id: "app-router",
-      title: (
-        <>
-          {t(
-            "home_next_js_app_router_foundation",
-            "Next.js App Router foundation",
-          )}
-        </>
-      ),
-      description: (
-        <>
-          {t(
-            "home_route_groups_metadata_helpers_loading_states",
-            "Route groups, metadata helpers, loading states, error boundaries, and page conventions are already wired in the codebase.",
-          )}
-        </>
-      ),
+      title: <>{t("home_next_js_app_router_foundation")}</>,
+      description: <>{t("home_route_groups_metadata")}</>,
       icon: Package2,
-      category: <>{t("home_architecture", "Architecture")}</>,
+      category: <>{t("home_architecture")}</>,
     },
     {
       id: "auth",
-      title: (
-        <>
-          {t(
-            "home_authentication_permissions",
-            "Authentication and permissions",
-          )}
-        </>
-      ),
-      description: (
-        <>
-          {t(
-            "home_better_auth_sessions_guarded_dashboard_routes",
-            "Better Auth sessions, guarded dashboard routes, role checks, and auth flows for login, signup, and magic-link style access.",
-          )}
-        </>
-      ),
+      title: <>{t("home_authentication_permissions")}</>,
+      description: <>{t("home_auth_guarded_routes")}</>,
       icon: LockKeyhole,
-      category: <>{t("home_auth", "Auth")}</>,
+      category: <>{t("home_auth")}</>,
     },
     {
       id: "agents",
-      title: (
-        <>
-          {t("home_agent_ready_api_cli_auth", "Agent-ready API and CLI auth")}
-        </>
-      ),
-      description: (
-        <>
-          {t(
-            "home_api_keys_cli_device_login_refresh",
-            "API keys, CLI device login, refresh rotation, and versioned machine endpoints give scripts and agent (OpenClaw, Codex, Claude Code, etc.) access without reusing browser session cookies.",
-          )}
-        </>
-      ),
+      title: <>{t("home_agent_ready_api_cli_auth")}</>,
+      description: <>{t("home_api_keys_cli_device_login_refresh")}</>,
       icon: KeyRound,
-      category: <>{t("home_agents", "Agents")}</>,
+      category: <>{t("home_agents")}</>,
     },
     {
       id: "billing",
-      title: <>{t("home_billing_workflow", "Billing workflow")}</>,
-      description: (
-        <>
-          {t(
-            "home_creem_checkout_customer_portal_handoff_webhook",
-            "Creem checkout, customer portal handoff, webhook handling, and subscription records are connected end to end.",
-          )}
-        </>
-      ),
+      title: <>{t("home_billing_workflow")}</>,
+      description: <>{t("home_creem_checkout_flow")}</>,
       icon: CreditCard,
-      category: <>{t("home_monetization", "Monetization")}</>,
+      category: <>{t("home_monetization")}</>,
     },
     {
       id: "admin",
-      title: <>{t("home_admin_operations", "Admin operations")}</>,
-      description: (
-        <>
-          {t(
-            "home_user_payment_subscription_upload_management_screens",
-            "User, payment, subscription, and upload management screens give you a working back office instead of an empty shell.",
-          )}
-        </>
-      ),
+      title: <>{t("home_admin_operations")}</>,
+      description: <>{t("home_management_screens")}</>,
       icon: LayoutDashboard,
-      category: <>{t("home_operations", "Operations")}</>,
+      category: <>{t("home_operations")}</>,
     },
     {
       id: "data",
-      title: <>{t("home_typed_database_layer", "Typed database layer")}</>,
-      description: (
-        <>
-          {t(
-            "home_drizzle_models_query_helpers_server_side",
-            "Drizzle models, query helpers, and server-side data access keep the app consistent without hand-written SQL scattered around the UI.",
-          )}
-        </>
-      ),
+      title: <>{t("home_typed_database_layer")}</>,
+      description: <>{t("home_drizzle_models_query_helpers_server_side")}</>,
       icon: Database,
-      category: <>{t("home_data", "Data")}</>,
+      category: <>{t("home_data")}</>,
     },
     {
       id: "uploads",
-      title: (
-        <>{t("home_direct_server_uploads", "Direct and server uploads")}</>
-      ),
-      description: (
-        <>
-          {t(
-            "home_cloudflare_r2_upload_flows_support_browser",
-            "Cloudflare R2 upload flows support browser uploads, server uploads, and administrative cleanup without leaking storage details into the UI.",
-          )}
-        </>
-      ),
+      title: <>{t("home_direct_server_uploads")}</>,
+      description: <>{t("home_r2_upload_flows")}</>,
       icon: BadgeCheck,
-      category: <>{t("home_storage", "Storage")}</>,
+      category: <>{t("home_storage")}</>,
     },
     {
       id: "content",
-      title: (
-        <>{t("home_content_seo_primitives", "Content and SEO primitives")}</>
-      ),
-      description: (
-        <>
-          {t(
-            "home_markdown_blog_content_collections_indexing_metadata",
-            "Markdown blog content, Content Collections indexing, metadata generation, sitemap output, and structured page shells are included for marketing content.",
-          )}
-        </>
-      ),
+      title: <>{t("home_content_seo_primitives")}</>,
+      description: <>{t("home_markdown_blog_collections")}</>,
       icon: FileText,
-      category: <>{t("home_content", "Content")}</>,
+      category: <>{t("home_content")}</>,
     },
     {
       id: "i18n",
-      title: (
-        <>
-          {t("home_localization_ready_routing", "Localization-ready routing")}
-        </>
-      ),
-      description: (
-        <>
-          {t(
-            "home_locale_persistence_marketing_url_handling_translated",
-            "Locale persistence, marketing URL handling, and translated UI strings are in place for Multilingual.",
-          )}
-        </>
-      ),
+      title: <>{t("home_localization_ready_routing")}</>,
+      description: <>{t("home_locale_persistence")}</>,
       icon: Globe,
-      category: <>{t("home_i18n", "i18n")}</>,
+      category: <>{t("home_i18n")}</>,
     },
     {
       id: "testing",
-      title: (
-        <>
-          {t(
-            "home_testing_regression_coverage",
-            "Testing and regression coverage",
-          )}
-        </>
-      ),
-      description: (
-        <>
-          {t(
-            "home_jest_covers_units_routes_while_playwright",
-            "Jest covers units and routes, while Playwright smoke tests exercise auth redirects, API key flows, CLI device auth, admin gating, and locale routing in a real browser.",
-          )}
-        </>
-      ),
+      title: <>{t("home_testing_regression_coverage")}</>,
+      description: <>{t("home_jest_playwright_coverage")}</>,
       icon: ShieldCheck,
-      category: <>{t("home_quality", "Quality")}</>,
+      category: <>{t("home_quality")}</>,
     },
   ];
   const featureStats = [
     {
       id: "modules",
-      label: <>{t("home_core_modules", "Core modules")}</>,
+      label: <>{t("home_core_modules")}</>,
       value: <span translate="no">10</span>,
     },
     {
       id: "locales",
-      label: <>{t("home_locales_shipped", "Locales shipped")}</>,
+      label: <>{t("home_locales_shipped")}</>,
       value: <span translate="no">2</span>,
     },
     {
       id: "billing-options",
-      label: <>{t("home_checkout_modes", "Checkout modes")}</>,
+      label: <>{t("home_checkout_modes")}</>,
       value: <span translate="no">3</span>,
     },
   ];
@@ -259,34 +156,19 @@ export function Features({
           <Badge className="border-border bg-background/50 mb-4 inline-flex items-center border px-3 py-1 text-sm backdrop-blur-sm">
             <Package2 className="text-muted-foreground mr-2 h-3 w-3" />
             <span className="text-muted-foreground font-mono">
-              {t("home_included_modules", "INCLUDED_MODULES")}
+              {t("home_included_modules")}
             </span>
           </Badge>
 
           <h2 className="text-foreground text-3xl font-bold tracking-tight sm:text-4xl">
-            <>
-              {t(
-                "home_starter_opinionated_where_it_should",
-                "The starter is opinionated where it should be,",
-              )}
-            </>
+            <>{t("home_starter_opinionated_where_it_should")}</>
             <span className="text-primary mt-1 block">
-              <>
-                {t(
-                  "home_extensible_where_it_matters",
-                  "and extensible where it matters.",
-                )}
-              </>
+              <>{t("home_extensible_where_it_matters")}</>
             </span>
           </h2>
 
           <p className="text-muted-foreground mt-6 text-lg">
-            <>
-              {t(
-                "home_not_demo_landing_page_wrapped_around",
-                "This is not a demo landing page wrapped around empty routes. The major app surfaces already exist and share the same design system and data model.",
-              )}
-            </>
+            <>{t("home_not_demo_landing_page_wrapped_around")}</>
           </p>
         </div>
 

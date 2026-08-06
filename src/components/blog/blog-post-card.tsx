@@ -56,12 +56,9 @@ export function BlogPostCard({
   const imageHeight = isFeatured ? "h-64 lg:h-80" : "h-48";
   const titleSize = isFeatured ? "text-2xl lg:text-3xl" : "text-xl lg:text-2xl";
   const readMoreText = isFeatured
-    ? t("blogReadFullArticle", "Read full article")
-    : t("blogReadArticle", "Read article");
-  const defaultExcerpt = t(
-    "blogDefaultExcerpt",
-    "Read the full article for implementation details, practical guidance, and related context.",
-  );
+    ? t("blog_read_full_article")
+    : t("blog_read_article");
+  const defaultExcerpt = t("blog_default_excerpt");
   return (
     <Card className={cardClasses}>
       {/* Hero Image */}
@@ -84,14 +81,14 @@ export function BlogPostCard({
                 className="bg-primary/90 text-primary-foreground border-primary/20 hover:bg-primary backdrop-blur-sm transition-colors"
               >
                 <Sparkles className="mr-1 h-3 w-3" />
-                {t("blog_featured", "Featured")}
+                {t("blog_featured")}
               </Badge>
             ) : (
               <Badge
                 variant="secondary"
                 className="bg-background/90 text-foreground border-border hover:bg-background backdrop-blur-sm transition-colors"
               >
-                {t("blog_article", "Article")}
+                {t("blog_article")}
               </Badge>
             )}
           </div>
@@ -108,14 +105,14 @@ export function BlogPostCard({
                 className="bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 transition-colors"
               >
                 <Sparkles className="mr-1 h-3 w-3" />
-                {t("blog_featured", "Featured")}
+                {t("blog_featured")}
               </Badge>
             ) : (
               <Badge
                 variant="secondary"
                 className="bg-muted/50 text-muted-foreground border-muted hover:bg-muted transition-colors"
               >
-                {t("blog_article", "Article")}
+                {t("blog_article")}
               </Badge>
             )}
           </div>

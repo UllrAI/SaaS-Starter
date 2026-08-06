@@ -56,9 +56,9 @@ function PaymentModeLabel({ mode }: { mode: PaymentMode }) {
   const { t } = useTranslation();
   switch (mode) {
     case "subscription":
-      return <>{t("billing_subscription", "Subscription")}</>;
+      return <>{t("billing_subscription")}</>;
     case "one_time":
-      return <>{t("billing_one_time", "One-Time")}</>;
+      return <>{t("billing_one_time")}</>;
     default:
       return null;
   }
@@ -67,9 +67,9 @@ function BillingCycleLabel({ cycle }: { cycle: BillingCycle }) {
   const { t } = useTranslation();
   switch (cycle) {
     case "monthly":
-      return <>{t("billing_monthly", "Monthly")}</>;
+      return <>{t("billing_monthly")}</>;
     case "yearly":
-      return <>{t("billing_yearly", "Yearly")}</>;
+      return <>{t("billing_yearly")}</>;
     default:
       return null;
   }
@@ -83,87 +83,31 @@ function TierBillingLabel({
 }) {
   const { t } = useTranslation();
   if (paymentMode === "one_time") {
-    return (
-      <>
-        {t(
-          "billing_one_time_purchase_no_automatic_renewal",
-          "One-time purchase, no automatic renewal",
-        )}
-      </>
-    );
+    return <>{t("billing_one_time_no_renewal")}</>;
   }
   return billingCycle === "yearly" ? (
-    <>{t("billing_billed_annually", "Billed annually")}</>
+    <>{t("billing_billed_annually")}</>
   ) : (
-    <>{t("billing_billed_monthly", "Billed monthly")}</>
+    <>{t("billing_billed_monthly")}</>
   );
 }
 function CheckoutMessage({ code }: { code: CheckoutMessageCode }) {
   const { t } = useTranslation();
   switch (code) {
     case "checkout_failed":
-      return (
-        <>
-          {t(
-            "billing_failed_create_checkout_session_please_try",
-            "Failed to create checkout session. Please try again later.",
-          )}
-        </>
-      );
+      return <>{t("billing_checkout_session_failed")}</>;
     case "initializing_checkout":
-      return (
-        <>
-          {t(
-            "billing_initializing_secure_checkout_sequence",
-            "Initializing secure checkout sequence...",
-          )}
-        </>
-      );
+      return <>{t("billing_initializing_secure_checkout_sequence")}</>;
     case "invalid_request":
-      return (
-        <>
-          {t(
-            "billing_unable_start_checkout_current_selection",
-            "Unable to start checkout with the current selection.",
-          )}
-        </>
-      );
+      return <>{t("billing_checkout_unavailable")}</>;
     case "login_required":
-      return (
-        <>
-          {t(
-            "billing_please_log_in_continue_purchase",
-            "Please log in to continue purchase.",
-          )}
-        </>
-      );
+      return <>{t("billing_please_log_in_continue_purchase")}</>;
     case "subscription_active":
-      return (
-        <>
-          {t(
-            "billing_subscription_already_active",
-            "Subscription already active.",
-          )}
-        </>
-      );
+      return <>{t("billing_subscription_already_active")}</>;
     case "unsafe_checkout_url":
-      return (
-        <>
-          {t(
-            "billing_checkout_link_was_blocked_because_it",
-            "The checkout link was blocked because it looked unsafe.",
-          )}
-        </>
-      );
+      return <>{t("billing_checkout_link_was_blocked_because_it")}</>;
     case "unexpected_checkout_error":
-      return (
-        <>
-          {t(
-            "billing_unexpected_error_occurred",
-            "An unexpected error occurred.",
-          )}
-        </>
-      );
+      return <>{t("billing_unexpected_error_occurred")}</>;
     default:
       return null;
   }
@@ -172,7 +116,7 @@ function TierActionGetLabel({ tierName }: { tierName: string }) {
   const { t } = useTranslation();
   return (
     <>
-      {t("billing_get_tier", "GET {expression0}", {
+      {t.rich("billing_get_tier", {
         expression0: tierName.toUpperCase(),
       })}
     </>
@@ -182,7 +126,7 @@ function TierBadgeLabel({ badge }: { badge: "recommended" }) {
   const { t } = useTranslation();
   switch (badge) {
     case "recommended":
-      return <>{t("billing_recommended", "Recommended")}</>;
+      return <>{t("billing_recommended")}</>;
     default:
       return null;
   }
@@ -195,9 +139,9 @@ function CheckoutButtonStatusLabel({
   const { t } = useTranslation();
   switch (status) {
     case "processing":
-      return <>{t("billing_processing", "Processing")}</>;
+      return <>{t("billing_processing")}</>;
     case "login_required":
-      return <>{t("billing_login_buy", "Login to buy")}</>;
+      return <>{t("billing_login_buy")}</>;
     default:
       return null;
   }
@@ -254,63 +198,31 @@ export function PricingSection({ className }: { className?: string }) {
   const featureDefinitions = [
     {
       id: "marketing-foundation",
-      label: (
-        <>
-          {t(
-            "billing_marketing_pages_blog_foundation",
-            "Marketing pages and blog foundation",
-          )}
-        </>
-      ),
+      label: <>{t("billing_marketing_pages_blog_foundation")}</>,
     },
     {
       id: "auth-dashboard",
-      label: (
-        <>
-          {t(
-            "billing_authentication_protected_dashboard",
-            "Authentication and protected dashboard",
-          )}
-        </>
-      ),
+      label: <>{t("billing_authentication_protected_dashboard")}</>,
     },
     {
       id: "billing-flow",
-      label: (
-        <>
-          {t(
-            "billing_creem_checkout_billing_portal_flow",
-            "Creem checkout and billing portal flow",
-          )}
-        </>
-      ),
+      label: <>{t("billing_creem_checkout_billing_portal_flow")}</>,
     },
     {
       id: "admin-operations",
-      label: (
-        <>{t("billing_admin_operations_screens", "Admin operations screens")}</>
-      ),
+      label: <>{t("billing_admin_operations_screens")}</>,
     },
     {
       id: "r2-uploads",
-      label: (
-        <>
-          {t(
-            "billing_cloudflare_r2_upload_workflows",
-            "Cloudflare R2 upload workflows",
-          )}
-        </>
-      ),
+      label: <>{t("billing_cloudflare_r2_upload_workflows")}</>,
     },
     {
       id: "localization-setup",
-      label: <>{t("billing_localization_setup", "Localization setup")}</>,
+      label: <>{t("billing_localization_setup")}</>,
     },
     {
       id: "implementation-guidance",
-      label: (
-        <>{t("billing_implementation_guidance", "Implementation guidance")}</>
-      ),
+      label: <>{t("billing_implementation_guidance")}</>,
     },
   ] as const satisfies ReadonlyArray<{
     id: string;
@@ -328,14 +240,7 @@ export function PricingSection({ className }: { className?: string }) {
     }
   > = {
     plus: {
-      description: (
-        <>
-          {t(
-            "billing_core_starter_package_solo_builders_shipping",
-            "Core starter package for solo builders shipping the basics",
-          )}
-        </>
-      ),
+      description: <>{t("billing_starter_solo_builders")}</>,
       includedFeatureIds: [
         "marketing-foundation",
         "auth-dashboard",
@@ -343,14 +248,7 @@ export function PricingSection({ className }: { className?: string }) {
       ],
     },
     pro: {
-      description: (
-        <>
-          {t(
-            "billing_full_featured_starter_package_teams_shipping",
-            "Full-featured starter package for teams shipping a real MVP",
-          )}
-        </>
-      ),
+      description: <>{t("billing_starter_teams")}</>,
       includedFeatureIds: [
         "marketing-foundation",
         "auth-dashboard",
@@ -361,14 +259,7 @@ export function PricingSection({ className }: { className?: string }) {
       ],
     },
     team: {
-      description: (
-        <>
-          {t(
-            "billing_everything_in_professional_plus_rollout_support",
-            "Everything in Professional plus rollout support for teams",
-          )}
-        </>
-      ),
+      description: <>{t("billing_professional_plus_support")}</>,
       includedFeatureIds: allFeatureIds,
     },
   };
@@ -386,7 +277,7 @@ export function PricingSection({ className }: { className?: string }) {
     if (!session?.user) {
       toast.error(<CheckoutMessage code="login_required" />, {
         action: {
-          label: t("pricing_action_login", "Log in"),
+          label: t("pricing_action_login"),
           onClick: redirectToLogin,
         },
       });
@@ -436,7 +327,7 @@ export function PricingSection({ className }: { className?: string }) {
             ...(safeManagementUrl
               ? {
                   action: {
-                    label: t("pricing_action_manage_plan", "Manage plan"),
+                    label: t("pricing_action_manage_plan"),
                     onClick: () => {
                       window.location.assign(safeManagementUrl);
                     },
@@ -453,7 +344,7 @@ export function PricingSection({ className }: { className?: string }) {
       if (response.status === 401) {
         toast.error(<CheckoutMessage code="login_required" />, {
           action: {
-            label: t("pricing_action_login", "Log in"),
+            label: t("pricing_action_login"),
             onClick: redirectToLogin,
           },
         });
@@ -555,7 +446,7 @@ export function PricingSection({ className }: { className?: string }) {
                 className="animate-in fade-in-0 border-emerald-500/30 bg-emerald-500/10 text-emerald-600 duration-300 dark:text-emerald-400"
               >
                 <Zap className="mr-1.5 h-3 w-3" />
-                <>{t("billing_save_17", "Save 17%")}</>
+                <>{t("billing_save_17")}</>
               </Badge>
             )}
           </div>
@@ -617,7 +508,7 @@ export function PricingSection({ className }: { className?: string }) {
                     </span>
                     {paymentMode === "subscription" && (
                       <span className="text-muted-foreground font-mono text-sm">
-                        {t("pricing_per_month", "/mo")}
+                        {t("pricing_per_month")}
                       </span>
                     )}
                   </div>

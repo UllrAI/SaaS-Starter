@@ -91,21 +91,11 @@ export function SubscriptionManagementTable({
       });
 
       if (result.data) {
-        toast.success(
-          t(
-            "subscription_cancel_success",
-            "The subscription has been canceled.",
-          ),
-        );
+        toast.success(t("subscription_cancel_success"));
         setCancellingSubscription(null);
         refresh();
       } else if (result.serverError) {
-        toast.error(
-          t(
-            "subscription_cancel_error",
-            "We couldn't cancel the subscription. Please try again.",
-          ),
-        );
+        toast.error(t("subscription_cancel_error"));
       }
     });
   };
@@ -126,7 +116,7 @@ export function SubscriptionManagementTable({
     return variants[status] || "secondary";
   };
   const formatDate = (dateString?: Date | string | null) => {
-    if (!dateString) return t("common_not_available", "Not available");
+    if (!dateString) return t("common_not_available");
     return new Date(dateString).toLocaleDateString(intlLocale, {
       year: "numeric",
       month: "short",
@@ -140,7 +130,7 @@ export function SubscriptionManagementTable({
   }> = [
     {
       key: "user",
-      label: <>{t("admin_user", "User")}</>,
+      label: <>{t("admin_user")}</>,
       render: (sub) => (
         <UserAvatarCell
           name={sub.user?.name}
@@ -151,12 +141,12 @@ export function SubscriptionManagementTable({
     },
     {
       key: "plan",
-      label: <>{t("admin_plan", "Plan")}</>,
+      label: <>{t("admin_plan")}</>,
       render: (sub) => <div className="font-medium">{sub.planName}</div>,
     },
     {
       key: "status",
-      label: <>{t("admin_status", "Status")}</>,
+      label: <>{t("admin_status")}</>,
       render: (sub) => (
         <Badge
           variant={getStatusBadgeVariant(sub.status)}
@@ -168,7 +158,7 @@ export function SubscriptionManagementTable({
     },
     {
       key: "period",
-      label: <>{t("admin_current_period", "Current Period")}</>,
+      label: <>{t("admin_current_period")}</>,
       render: (sub) => (
         <div className="flex items-center gap-1 text-sm">
           <Calendar className="h-3 w-3" />
@@ -181,7 +171,7 @@ export function SubscriptionManagementTable({
     },
     {
       key: "actions",
-      label: <>{t("admin_actions", "Actions")}</>,
+      label: <>{t("admin_actions")}</>,
       render: (sub) => (
         <Button
           variant="outline"
@@ -190,7 +180,7 @@ export function SubscriptionManagementTable({
           disabled={!["active", "trialing"].includes(sub.status) || isPending}
         >
           <X className="mr-1 h-4 w-4" />
-          {t("subscription_action_cancel", "Cancel")}
+          {t("subscription_action_cancel")}
         </Button>
       ),
     },
@@ -198,7 +188,7 @@ export function SubscriptionManagementTable({
   const statusFilterOptions = [
     {
       value: "all",
-      label: <>{t("admin_all_statuses", "All Statuses")}</>,
+      label: <>{t("admin_all_statuses")}</>,
     },
     {
       value: "active",
@@ -239,22 +229,15 @@ export function SubscriptionManagementTable({
         searchTerm={searchTerm}
         onSearchChange={handleSearch}
         searchPlaceholder={
-          <>
-            {t(
-              "admin_search_user_name_email_subscription_id",
-              "Search by user name, email, or subscription ID...",
-            )}
-          </>
+          <>{t("admin_search_user_name_email_subscription_id")}</>
         }
         filterValue={statusFilter}
         onFilterChange={handleStatusFilter}
         filterOptions={statusFilterOptions}
-        filterPlaceholder={<>{t("admin_filter_status", "Filter by status")}</>}
+        filterPlaceholder={<>{t("admin_filter_status")}</>}
         pagination={pagination}
         onPageChange={handlePageChange}
-        emptyMessage={
-          <>{t("admin_no_subscriptions_found", "No subscriptions found")}</>
-        }
+        emptyMessage={<>{t("admin_no_subscriptions_found")}</>}
       />
       <Dialog
         open={!!cancellingSubscription}
@@ -262,22 +245,16 @@ export function SubscriptionManagementTable({
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>
-              {t("admin_cancel_subscription", "Cancel Subscription")}
-            </DialogTitle>
+            <DialogTitle>{t("admin_cancel_subscription")}</DialogTitle>
             <DialogDescription>
-              {t(
-                "admin_you_sure_want_cancel_subscription_action",
-                "Are you sure you want to cancel the subscription for <strong0>{expression0}</strong0>? This action is irreversible.",
-                {
-                  expression0:
-                    cancellingSubscription?.user.name ??
-                    cancellingSubscription?.user.email ??
-                    cancellingSubscription?.subscriptionId ??
-                    "",
-                  strong0: (chunks) => <strong>{chunks}</strong>,
-                },
-              )}
+              {t.rich("admin_confirm_cancel_subscription", {
+                expression0:
+                  cancellingSubscription?.user.name ??
+                  cancellingSubscription?.user.email ??
+                  cancellingSubscription?.subscriptionId ??
+                  "",
+                strong0: (chunks) => <strong>{chunks}</strong>,
+              })}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -286,22 +263,19 @@ export function SubscriptionManagementTable({
               onClick={() => setCancellingSubscription(null)}
               disabled={isPending}
             >
-              {t("admin_back", "Back")}
+              {t("admin_back")}
             </Button>
             <Button
               variant="destructive"
               onClick={confirmCancelSubscription}
               disabled={isPending}
             >
-              {t(
-                "admin_confirm_cancellation",
-                "{expression0} Confirm Cancellation",
-                {
-                  expression0: isPending && (
+              {t.rich("admin_confirm_cancellation", {
+                expression0: () =>
+                  isPending && (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   ),
-                },
-              )}
+              })}
             </Button>
           </DialogFooter>
         </DialogContent>

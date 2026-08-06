@@ -14,26 +14,17 @@ export async function generateMetadata() {
   const metadata = createMetadataDefaults({ locale });
   return {
     ...metadata,
-    title: t("admin_dashboard", "Admin Dashboard"),
-    description: t(
-      "admin_administrative_dashboard_managing_users_payments_system",
-      "Administrative dashboard for managing users, payments, and system overview",
-    ),
+    title: t("admin_dashboard"),
+    description: t("admin_dashboard_overview"),
     openGraph: {
       ...metadata.openGraph,
-      title: t("admin_dashboard", "Admin Dashboard"),
-      description: t(
-        "admin_administrative_dashboard_managing_users_payments_system",
-        "Administrative dashboard for managing users, payments, and system overview",
-      ),
+      title: t("admin_dashboard"),
+      description: t("admin_dashboard_overview"),
     },
     twitter: {
       ...metadata.twitter,
-      title: t("admin_dashboard", "Admin Dashboard"),
-      description: t(
-        "admin_administrative_dashboard_managing_users_payments_system",
-        "Administrative dashboard for managing users, payments, and system overview",
-      ),
+      title: t("admin_dashboard"),
+      description: t("admin_dashboard_overview"),
     },
   };
 }
@@ -46,9 +37,7 @@ export default async function AdminDashboardPage() {
   ]);
   const { charts, ...summaryStats } = statsWithCharts as AdminStatsWithCharts;
   return (
-    <DashboardPageWrapper
-      title={<>{t("admin_dashboard_page", "Admin Dashboard")}</>}
-    >
+    <DashboardPageWrapper title={<>{t("admin_dashboard_page")}</>}>
       <AdminStatsCards stats={summaryStats} locale={locale} />
       <AdminDashboardCharts charts={charts} />
     </DashboardPageWrapper>

@@ -3,18 +3,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { DashboardPageWrapper } from "../_components/dashboard-page-wrapper";
 function SettingsPageTitle() {
   const { t } = useTranslation();
-  return <>{t("settings_title", "Settings")}</>;
+  return <>{t("settings_title")}</>;
 }
 function SettingsPageDescription() {
   const { t } = useTranslation();
-  return (
-    <>
-      {t(
-        "settings_manage_account_profile_personalize_dashboard_appearance",
-        "Manage your account profile and personalize dashboard appearance.",
-      )}
-    </>
-  );
+  return <>{t("settings_personalize_appearance")}</>;
 }
 export default function DashboardSettingsLoading() {
   return (

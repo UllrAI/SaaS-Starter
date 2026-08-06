@@ -9,7 +9,6 @@ import { PaymentWithUser } from "@/types/billing";
 import { useAdminTable } from "@/hooks/use-admin-table";
 import { getPayments } from "@/lib/actions/admin/payments";
 import { useIntlLocale } from "@/hooks/use-intl-locale";
-import type { AppTranslate } from "@/lib/i18n/translation/shared";
 import {
   getPaymentStatusLabel,
   getPaymentTypeLabel,
@@ -50,7 +49,7 @@ const formatDate = (dateString: string | Date, locale: string) => {
 };
 const createColumns = (
   locale: string,
-  t: AppTranslate,
+  t: (key: string) => string,
 ): Array<{
   key: keyof PaymentWithUser | string;
   label: ReactNode;
@@ -58,7 +57,7 @@ const createColumns = (
 }> => [
   {
     key: "user",
-    label: <>{t("admin_payment_column_user", "User")}</>,
+    label: <>{t("admin_payment_column_user")}</>,
     render: (payment) => (
       <UserAvatarCell
         name={payment.user?.name}
@@ -69,7 +68,7 @@ const createColumns = (
   },
   {
     key: "amount",
-    label: <>{t("admin_payment_column_amount", "Amount")}</>,
+    label: <>{t("admin_payment_column_amount")}</>,
     render: (payment) => (
       <div className="font-medium">
         {formatCurrency(payment.amount, payment.currency, locale)}
@@ -78,7 +77,7 @@ const createColumns = (
   },
   {
     key: "status",
-    label: <>{t("admin_payment_column_status", "Status")}</>,
+    label: <>{t("admin_payment_column_status")}</>,
     render: (payment) => (
       <Badge
         variant={getStatusBadgeVariant(payment.status)}
@@ -90,7 +89,7 @@ const createColumns = (
   },
   {
     key: "method",
-    label: <>{t("admin_payment_column_method", "Method")}</>,
+    label: <>{t("admin_payment_column_method")}</>,
     render: (payment) => (
       <div className="text-sm">
         {getPaymentTypeLabel(payment.paymentType, t)}
@@ -99,7 +98,7 @@ const createColumns = (
   },
   {
     key: "created",
-    label: <>{t("admin_payment_column_created", "Created")}</>,
+    label: <>{t("admin_payment_column_created")}</>,
     render: (payment) => formatDate(payment.createdAt, locale),
   },
 ];
@@ -153,7 +152,7 @@ export function PaymentManagementTable({
   const statusFilterOptions = [
     {
       value: "all",
-      label: <>{t("admin_payment_filter_all_statuses", "All statuses")}</>,
+      label: <>{t("admin_payment_filter_all_statuses")}</>,
     },
     {
       value: "succeeded",
@@ -180,21 +179,14 @@ export function PaymentManagementTable({
       error={error}
       searchTerm={searchTerm}
       onSearchChange={handleSearch}
-      searchPlaceholder={
-        <>
-          {t(
-            "admin_search_user_name_email_payment_id",
-            "Search by user name, email, or payment ID...",
-          )}
-        </>
-      }
+      searchPlaceholder={<>{t("admin_search_user_name_email_payment_id")}</>}
       filterValue={statusFilter}
       onFilterChange={handleStatusFilter}
       filterOptions={statusFilterOptions}
-      filterPlaceholder={<>{t("admin_filter_status", "Filter by status")}</>}
+      filterPlaceholder={<>{t("admin_filter_status")}</>}
       pagination={pagination}
       onPageChange={handlePageChange}
-      emptyMessage={<>{t("admin_no_payments_found", "No payments found")}</>}
+      emptyMessage={<>{t("admin_no_payments_found")}</>}
     />
   );
 }

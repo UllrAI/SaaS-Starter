@@ -24,85 +24,43 @@ export function OtherProducts({
     {
       id: "pixmiller",
       name: "PixMiller",
-      description: (
-        <>
-          {t(
-            "home_remove_backgrounds_in_seconds_ai_assisted",
-            "Remove backgrounds in seconds with AI-assisted image cleanup.",
-          )}
-        </>
-      ),
+      description: <>{t("home_ai_background_removal")}</>,
       url: "https://pixmiller.com/",
       icon: Image,
     },
     {
       id: "headshots-fun",
       name: "HeadShots.fun",
-      description: (
-        <>
-          {t(
-            "home_generate_polished_headshots_team_profiles_resumes",
-            "Generate polished headshots for team profiles, resumes, and listings.",
-          )}
-        </>
-      ),
+      description: <>{t("home_ai_headshots")}</>,
       url: "https://headshots.fun/",
       icon: Sparkles,
-      badgeLabel: <>{t("home_open_source", "Open Source")}</>,
+      badgeLabel: <>{t("home_open_source")}</>,
     },
     {
       id: "to-markdown",
       name: "To Markdown",
-      description: (
-        <>
-          {t(
-            "home_convert_docs_web_pages_into_markdown",
-            "Convert docs and web pages into Markdown you can actually edit.",
-          )}
-        </>
-      ),
+      description: <>{t("home_convert_docs_web_pages_into_markdown")}</>,
       url: "https://to-markdown.com/",
       icon: FileText,
     },
     {
       id: "trend-x-day",
       name: "Trend X Day",
-      description: (
-        <>
-          {t(
-            "home_track_daily_product_creator_trends_simpler",
-            "Track daily product and creator trends with a simpler research loop.",
-          )}
-        </>
-      ),
+      description: <>{t("home_product_creator_trends")}</>,
       url: "https://trendxday.com/",
       icon: TrendingUp,
     },
     {
       id: "ogimage-site",
       name: "OGimage.site",
-      description: (
-        <>
-          {t(
-            "home_generate_open_graph_images_social_cards",
-            "Generate open graph images for social cards and link previews.",
-          )}
-        </>
-      ),
+      description: <>{t("home_generate_open_graph_images_social_cards")}</>,
       url: "https://ogimage.site/",
       icon: Square,
     },
     {
       id: "hipng",
       name: "HiPNG.com",
-      description: (
-        <>
-          {t(
-            "home_browse_transparent_png_assets_quick_mockups",
-            "Browse transparent PNG assets for quick mockups and landing pages.",
-          )}
-        </>
-      ),
+      description: <>{t("home_png_assets_mockups")}</>,
       url: "https://hipng.com/",
       icon: Zap,
     },
@@ -113,18 +71,13 @@ export function OtherProducts({
         <div className="mx-auto max-w-3xl text-center">
           <Badge variant="outline" className="border-primary text-primary mb-4">
             <FlaskConical className="mr-2 h-3 w-3" />
-            <>{t("home_ullrai_lab", "UllrAI Lab")}</>
+            <>{t("home_ullrai_lab")}</>
           </Badge>
           <h2 className="text-foreground text-3xl font-bold tracking-tight sm:text-4xl">
-            <>{t("home_explore_rest_lab", "Explore the rest of the lab")}</>
+            <>{t("home_explore_rest_lab")}</>
           </h2>
           <p className="text-muted-foreground mt-4 text-lg leading-8">
-            <>
-              {t(
-                "home_adjacent_products_same_team_each_focused",
-                "Adjacent products from the same team, each focused on a narrower workflow than the starter itself.",
-              )}
-            </>
+            <>{t("home_adjacent_products_same_team_each_focused")}</>
           </p>
         </div>
 
@@ -165,11 +118,9 @@ export function OtherProducts({
                     target="_blank"
                     rel="noopener noreferrer"
                     className="absolute inset-0 z-10"
-                    aria-label={t(
-                      "other_product_visit",
-                      "Visit {productName}",
-                      { productName: product.name },
-                    )}
+                    aria-label={t("other_product_visit", {
+                      productName: product.name,
+                    })}
                   />
                 </CardContent>
               </Card>
@@ -178,14 +129,12 @@ export function OtherProducts({
         </div>
 
         <p className="text-muted-foreground mt-10 text-center text-sm">
-          <>
-            {t("home_have_idea_another_tool", "Have an idea for another tool?")}
-          </>
+          <>{t("home_have_idea_another_tool")}</>
           <a
             href="mailto:support@ullrai.com"
             className="text-primary ml-2 font-bold hover:underline"
           >
-            <>{t("home_let_us_know", "Let us know")}</>
+            <>{t("home_let_us_know")}</>
           </a>
         </p>
       </SectionContainer>

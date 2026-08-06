@@ -18,66 +18,38 @@ export function ContactMethods({
   const contactMethods = [
     {
       icon: Mail,
-      title: <>{t("contact_email_support", "Email Support")}</>,
-      description: (
-        <>
-          {t(
-            "contact_technical_support_via_email",
-            "Technical support via email",
-          )}
-        </>
-      ),
+      title: <>{t("contact_email_support")}</>,
+      description: <>{t("contact_technical_support_via_email")}</>,
       action: CONTACT_EMAIL,
       href: `mailto:${CONTACT_EMAIL}`,
-      label: <>{t("contactEmailGateway", "Email gateway")}</>,
+      label: <>{t("contact_email_gateway")}</>,
       actionSkip: true,
     },
     {
       icon: MessageSquare,
-      title: <>{t("contact_community_discussions", "Community Discussions")}</>,
-      description: (
-        <>
-          {t(
-            "contact_ask_product_integration_questions_in_public",
-            "Ask product and integration questions in public",
-          )}
-        </>
-      ),
-      action: <>{t("contactOpenDiscussions", "Open discussions")}</>,
+      title: <>{t("contact_community_discussions")}</>,
+      description: <>{t("contact_ask_public_questions")}</>,
+      action: <>{t("contact_open_discussions")}</>,
       href: GITHUB_DISCUSSIONS_URL,
-      label: <>{t("contactDiscussionBoard", "Discussion board")}</>,
+      label: <>{t("contact_discussion_board")}</>,
       external: true,
     },
     {
       icon: Bug,
-      title: <>{t("contact_bug_reports", "Bug Reports")}</>,
-      description: (
-        <>
-          {t(
-            "contact_report_reproducible_bugs_integration_failures",
-            "Report reproducible bugs and integration failures",
-          )}
-        </>
-      ),
-      action: <>{t("contactOpenIssues", "Open issues")}</>,
+      title: <>{t("contact_bug_reports")}</>,
+      description: <>{t("contact_report_bugs")}</>,
+      action: <>{t("contact_open_issues")}</>,
       href: GITHUB_ISSUES_URL,
-      label: <>{t("contactIssueTracker", "Issue tracker")}</>,
+      label: <>{t("contact_issue_tracker")}</>,
       external: true,
     },
     {
       icon: BookOpen,
-      title: <>{t("contact_documentation", "Documentation")}</>,
-      description: (
-        <>
-          {t(
-            "contact_setup_guides_billing_flow_notes_deployment",
-            "Setup guides, billing flow notes, and deployment docs",
-          )}
-        </>
-      ),
-      action: <>{t("contactReadDocs", "Read docs")}</>,
+      title: <>{t("contact_documentation")}</>,
+      description: <>{t("contact_setup_guides_docs")}</>,
+      action: <>{t("contact_read_docs")}</>,
       href: DOCS_URL,
-      label: <>{t("contactDocsPortal", "Documentation portal")}</>,
+      label: <>{t("contact_docs_portal")}</>,
       external: true,
     },
   ];

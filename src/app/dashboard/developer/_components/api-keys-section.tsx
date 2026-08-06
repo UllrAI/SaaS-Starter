@@ -44,9 +44,7 @@ export function ApiKeysSection({
       };
       setKeys(data.keys);
     } catch {
-      toast.error(
-        t("developer_api_keys_load_error", "Failed to load API keys."),
-      );
+      toast.error(t("developer_api_keys_load_error"));
     }
   }, [t]);
   return (
@@ -54,12 +52,9 @@ export function ApiKeysSection({
       <CardHeader>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="space-y-1.5">
-            <CardTitle>{t("device_api_keys", "API Keys")}</CardTitle>
+            <CardTitle>{t("device_api_keys")}</CardTitle>
             <CardDescription>
-              {t(
-                "device_create_long_lived_keys_servers_ci",
-                "Create long-lived keys for servers, CI jobs, and other non-interactive API clients.",
-              )}
+              {t("device_create_long_lived_keys_servers_ci")}
             </CardDescription>
           </div>
           <CreateApiKeyDialog onCreated={refreshKeys} />
@@ -70,10 +65,7 @@ export function ApiKeysSection({
           <div className="flex flex-col items-center gap-2 rounded-lg border border-dashed px-4 py-8 text-center">
             <KeyRound className="text-muted-foreground h-8 w-8" />
             <p className="text-muted-foreground text-sm">
-              {t(
-                "device_no_api_keys_yet_create_one",
-                "No API keys yet. Create one when you need server-to-server access.",
-              )}
+              {t("device_no_api_keys_yet_create_one")}
             </p>
           </div>
         ) : (
@@ -107,12 +99,10 @@ function ApiKeyRow({
       if (!response.ok) {
         throw new Error("Failed to revoke API key.");
       }
-      toast.success(t("developer_api_key_revoke_success", "API key revoked."));
+      toast.success(t("developer_api_key_revoke_success"));
       await onRevoked();
     } catch {
-      toast.error(
-        t("developer_api_key_revoke_error", "Failed to revoke API key."),
-      );
+      toast.error(t("developer_api_key_revoke_error"));
     } finally {
       setIsRevoking(false);
     }
@@ -126,9 +116,9 @@ function ApiKeyRow({
           </p>
           <Badge variant={apiKey.isActive ? "secondary" : "outline"}>
             {apiKey.isActive ? (
-              <>{t("device_active", "Active")}</>
+              <>{t("device_active")}</>
             ) : (
-              <>{t("device_revoked", "Revoked")}</>
+              <>{t("device_revoked")}</>
             )}
           </Badge>
         </div>
@@ -137,12 +127,12 @@ function ApiKeyRow({
         </p>
         <div className="text-muted-foreground flex flex-wrap gap-3 text-xs">
           <span>
-            {t("device_rate_limit_min", "Rate limit <span0></span0>/min", {
+            {t.rich("device_rate_limit_min", {
               span0: () => <span translate="no">{apiKey.rateLimit}</span>,
             })}
           </span>
           <span>
-            {t("device_created", "Created <span0></span0>", {
+            {t.rich("device_created", {
               span0: () => (
                 <span translate="no">
                   {new Date(apiKey.createdAt).toLocaleDateString()}
@@ -152,7 +142,7 @@ function ApiKeyRow({
           </span>
           {apiKey.lastUsedAt ? (
             <span>
-              {t("device_last_used", "Last used <span0></span0>", {
+              {t.rich("device_last_used", {
                 span0: () => (
                   <span translate="no">
                     {new Date(apiKey.lastUsedAt!).toLocaleDateString()}
@@ -161,7 +151,7 @@ function ApiKeyRow({
               })}
             </span>
           ) : (
-            <span>{t("device_never_used", "Never used")}</span>
+            <span>{t("device_never_used")}</span>
           )}
         </div>
       </div>
@@ -173,12 +163,13 @@ function ApiKeyRow({
           void handleRevoke();
         }}
       >
-        {t("device_revoke", "{expression0} Revoke", {
-          expression0: isRevoking ? (
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          ) : (
-            <ShieldOff className="mr-2 h-4 w-4" />
-          ),
+        {t.rich("device_revoke", {
+          expression0: () =>
+            isRevoking ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <ShieldOff className="mr-2 h-4 w-4" />
+            ),
         })}
       </Button>
     </div>
@@ -207,21 +198,16 @@ function CreateApiKeyDialog({ onCreated }: { onCreated: () => void }) {
       <DialogTrigger asChild>
         <Button size="sm" variant="secondary">
           <Plus className="mr-2 h-4 w-4" />
-          {t("device_create_key", "Create Key")}
+          {t("device_create_key")}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[440px]">
         {createdKey ? (
           <>
             <DialogHeader>
-              <DialogTitle>
-                {t("device_api_key_created", "API Key Created")}
-              </DialogTitle>
+              <DialogTitle>{t("device_api_key_created")}</DialogTitle>
               <DialogDescription>
-                {t(
-                  "device_copy_key_now_it_will_not",
-                  "Copy this key now. It will not be shown again.",
-                )}
+                {t("device_copy_key_now_it_will_not")}
               </DialogDescription>
             </DialogHeader>
             <div className="bg-muted flex items-center gap-2 rounded-lg border p-3">
@@ -236,30 +222,25 @@ function CreateApiKeyDialog({ onCreated }: { onCreated: () => void }) {
                   setOpen(false);
                 }}
               >
-                {t("device_done", "Done")}
+                {t("device_done")}
               </Button>
             </DialogFooter>
           </>
         ) : (
           <>
             <DialogHeader>
-              <DialogTitle>
-                {t("device_create_api_key", "Create API Key")}
-              </DialogTitle>
+              <DialogTitle>{t("device_create_api_key")}</DialogTitle>
               <DialogDescription>
-                {t(
-                  "device_use_descriptive_name_so_you_can",
-                  "Use a descriptive name so you can identify this key later.",
-                )}
+                {t("device_use_descriptive_name_so_you_can")}
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-2 py-2">
-              <Label htmlFor="api-key-name">{t("device_name", "Name")}</Label>
+              <Label htmlFor="api-key-name">{t("device_name")}</Label>
               <Input
                 id="api-key-name"
                 value={name}
                 onChange={(event) => setName(event.target.value)}
-                placeholder={t("device_production_server", "Production server")}
+                placeholder={t("device_production_server")}
               />
             </div>
             <DialogFooter>
@@ -284,26 +265,20 @@ function CreateApiKeyDialog({ onCreated }: { onCreated: () => void }) {
                       rawKey: string;
                     };
                     setCreatedKey(data.rawKey);
-                    toast.success(
-                      t("developer_api_key_create_success", "API key created."),
-                    );
+                    toast.success(t("developer_api_key_create_success"));
                     await onCreated();
                   } catch {
-                    toast.error(
-                      t(
-                        "developer_api_key_create_error",
-                        "Failed to create API key.",
-                      ),
-                    );
+                    toast.error(t("developer_api_key_create_error"));
                   } finally {
                     setIsCreating(false);
                   }
                 }}
               >
-                {t("device_create_key_api", "{expression0} Create Key", {
-                  expression0: isCreating ? (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  ) : null,
+                {t.rich("device_create_key_api", {
+                  expression0: () =>
+                    isCreating ? (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : null,
                 })}
               </Button>
             </DialogFooter>

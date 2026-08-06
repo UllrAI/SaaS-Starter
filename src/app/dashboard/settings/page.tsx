@@ -11,26 +11,17 @@ export async function generateMetadata() {
   const metadata = createMetadataDefaults({ locale });
   return {
     ...metadata,
-    title: t("settings_title", "Settings"),
-    description: t(
-      "settings_manage_account_profile_dashboard_appearance",
-      "Manage your account profile and dashboard appearance.",
-    ),
+    title: t("settings_title"),
+    description: t("settings_manage_profile"),
     openGraph: {
       ...metadata.openGraph,
-      title: t("settings_title", "Settings"),
-      description: t(
-        "settings_manage_account_profile_dashboard_appearance_description",
-        "Manage your account profile and dashboard appearance.",
-      ),
+      title: t("settings_title"),
+      description: t("settings_manage_profile_description"),
     },
     twitter: {
       ...metadata.twitter,
-      title: t("settings_title", "Settings"),
-      description: t(
-        "settings_manage_account_profile_dashboard_appearance",
-        "Manage your account profile and dashboard appearance.",
-      ),
+      title: t("settings_title"),
+      description: t("settings_manage_profile"),
     },
   };
 }
@@ -38,15 +29,8 @@ export default function SettingsPage() {
   const { t } = useTranslation();
   return (
     <DashboardPageWrapper
-      title={<>{t("settings_title", "Settings")}</>}
-      description={
-        <>
-          {t(
-            "settings_manage_account_profile_dashboard_appearance",
-            "Manage your account profile and dashboard appearance.",
-          )}
-        </>
-      }
+      title={<>{t("settings_title")}</>}
+      description={<>{t("settings_manage_profile")}</>}
     >
       <section className="space-y-8">
         <AccountPage />

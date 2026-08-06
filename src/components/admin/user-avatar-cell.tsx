@@ -31,8 +31,8 @@ export function UserAvatarCell({
   const avatarUrl = getUserAvatarUrl(image, email, name);
   const initials = name?.slice(0, 1).toUpperCase() || "?";
   const avatarAlt = name
-    ? t("user_avatar_named_alt", "Profile image for {name}", { name })
-    : t("user_avatar_alt", "User profile image");
+    ? t("user_avatar_named_alt", { name })
+    : t("user_avatar_alt");
 
   if (!showInfo) {
     return (
@@ -51,7 +51,7 @@ export function UserAvatarCell({
       </Avatar>
       <div className="min-w-0 flex-1">
         <div className="truncate font-medium">
-          {name || email || t("common_not_available", "Not available")}
+          {name || email || t("common_not_available")}
         </div>
         {email && (
           <div className="text-muted-foreground truncate text-sm">{email}</div>

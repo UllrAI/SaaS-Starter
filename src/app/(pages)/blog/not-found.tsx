@@ -18,7 +18,7 @@ export default function PagesNotFound() {
         <Badge className="border-border bg-background/50 mb-8 inline-flex items-center border px-3 py-1 text-sm backdrop-blur-sm">
           <Sparkles className="text-muted-foreground mr-2 h-3 w-3" />
           <span className="text-muted-foreground font-mono">
-            {t("blog_error_404", "ERROR_404")}
+            {t("blog_error_404")}
           </span>
         </Badge>
 
@@ -35,13 +35,10 @@ export default function PagesNotFound() {
         {/* Main Message */}
         <div className="mb-8 space-y-4">
           <h2 className="text-foreground text-2xl font-bold tracking-tight sm:text-3xl">
-            {t("blog_page_not_found", "Page Not Found")}
+            {t("blog_page_not_found")}
           </h2>
           <p className="text-muted-foreground text-base leading-relaxed">
-            {t(
-              "blog_page_youre_looking_doesnt_exist_has",
-              "The page you're looking for doesn't exist or has been moved. Let's get you back on track.",
-            )}
+            {t("blog_page_youre_looking_doesnt_exist_has")}
           </p>
         </div>
 
@@ -50,14 +47,14 @@ export default function PagesNotFound() {
           <Button asChild size="lg" className="min-w-[160px]">
             <Link href="/blog" prefetch={true}>
               <ArrowLeft className="mr-2 h-4 w-4" />
-              {t("blog_back_blog", "Back to Blog")}
+              {t("blog_back_blog")}
             </Link>
           </Button>
 
           <Button asChild variant="outline" size="lg" className="min-w-[160px]">
             <Link href="/" prefetch={true}>
               <Home className="mr-2 h-4 w-4" />
-              {t("blog_back_home", "Back to Home")}
+              {t("blog_back_home")}
             </Link>
           </Button>
         </div>
@@ -65,20 +62,13 @@ export default function PagesNotFound() {
         {/* Help Text */}
         <div className="text-muted-foreground mt-8 text-sm">
           <p>
-            {t(
-              "blog_need_help_contact_support_team",
-              "Need help? <Link0>Contact our support team </Link0>",
-              {
-                Link0: (chunks) => (
-                  <Link
-                    href="/contact"
-                    className="text-primary hover:underline"
-                  >
-                    {chunks}
-                  </Link>
-                ),
-              },
-            )}
+            {t.rich("blog_need_help_contact_support_team", {
+              Link0: (chunks) => (
+                <Link href="/contact" className="text-primary hover:underline">
+                  {chunks}
+                </Link>
+              ),
+            })}
           </p>
         </div>
       </ReadingContainer>

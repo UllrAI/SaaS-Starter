@@ -94,14 +94,12 @@ export function AdminTableBase<
   emptyMessage,
 }: AdminTableBaseProps<T>) {
   const { t } = useTranslation();
-  const resolvedEmptyMessage = emptyMessage ?? (
-    <>{t("common_no_data_found", "No data found")}</>
-  );
+  const resolvedEmptyMessage = emptyMessage ?? <>{t("common_no_data_found")}</>;
   const resolvedFilterPlaceholder = extractTextContent(
-    filterPlaceholder ?? t("admin_table_filter_placeholder", "Filter..."),
+    filterPlaceholder ?? t("admin_table_filter_placeholder"),
   );
   const resolvedSearchPlaceholder = extractTextContent(
-    searchPlaceholder ?? t("admin_table_search_placeholder", "Search..."),
+    searchPlaceholder ?? t("admin_table_search_placeholder"),
   );
 
   if (error) {
@@ -109,12 +107,7 @@ export function AdminTableBase<
       <div className="flex items-center justify-center p-8">
         <div className="text-destructive flex items-center space-x-2">
           <AlertTriangle className="h-4 w-4" />
-          <span>
-            {t(
-              "admin_table_load_error",
-              "We couldn't load this data. Please try again.",
-            )}
-          </span>
+          <span>{t("admin_table_load_error")}</span>
         </div>
       </div>
     );
@@ -207,18 +200,14 @@ export function AdminTableBase<
       {pagination.totalPages > 1 && (
         <div className="flex items-center justify-between">
           <div className="text-muted-foreground text-sm">
-            {t(
-              "common_showing_results",
-              "Showing {expression0} to {expression1} of {expression2} results",
-              {
-                expression0: (pagination.page - 1) * pagination.limit + 1,
-                expression1: Math.min(
-                  pagination.page * pagination.limit,
-                  pagination.total,
-                ),
-                expression2: pagination.total,
-              },
-            )}
+            {t.rich("common_showing_results", {
+              expression0: (pagination.page - 1) * pagination.limit + 1,
+              expression1: Math.min(
+                pagination.page * pagination.limit,
+                pagination.total,
+              ),
+              expression2: pagination.total,
+            })}
           </div>
           <div className="flex items-center space-x-2">
             <Button
@@ -228,7 +217,7 @@ export function AdminTableBase<
               disabled={pagination.page <= 1 || loading}
             >
               <ChevronLeft className="h-4 w-4" />
-              {t("common_previous", "Previous")}
+              {t("common_previous")}
             </Button>
             <div className="flex items-center space-x-1">
               {getVisiblePageNumbers(
@@ -254,7 +243,7 @@ export function AdminTableBase<
               onClick={() => onPageChange(pagination.page + 1)}
               disabled={pagination.page >= pagination.totalPages || loading}
             >
-              {t("common_next_admin", "Next")}
+              {t("common_next_admin")}
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>

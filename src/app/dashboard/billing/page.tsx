@@ -18,26 +18,17 @@ export async function generateMetadata() {
   const metadata = createMetadataDefaults({ locale });
   return {
     ...metadata,
-    title: t("billing_title_page", "Billing"),
-    description: t(
-      "billing_manage_subscription_plan_billing_history",
-      "Manage your subscription plan and billing history.",
-    ),
+    title: t("billing_title_page"),
+    description: t("billing_manage_plan_history"),
     openGraph: {
       ...metadata.openGraph,
-      title: t("billing_title", "Billing"),
-      description: t(
-        "billing_manage_subscription_plan_billing_history",
-        "Manage your subscription plan and billing history.",
-      ),
+      title: t("billing_title"),
+      description: t("billing_manage_plan_history"),
     },
     twitter: {
       ...metadata.twitter,
-      title: t("billing_title", "Billing"),
-      description: t(
-        "billing_manage_subscription_plan_billing_history",
-        "Manage your subscription plan and billing history.",
-      ),
+      title: t("billing_title"),
+      description: t("billing_manage_plan_history"),
     },
   };
 }
@@ -66,15 +57,8 @@ export default async function DashboardBillingPage() {
     ]);
   return (
     <DashboardPageWrapper
-      title={<>{t("billing_title_page", "Billing")}</>}
-      description={
-        <>
-          {t(
-            "billing_manage_subscription_plan_billing_history",
-            "Manage your subscription plan and billing history.",
-          )}
-        </>
-      }
+      title={<>{t("billing_title_page")}</>}
+      description={<>{t("billing_manage_plan_history")}</>}
     >
       <BillingOverview
         subscription={subscription}

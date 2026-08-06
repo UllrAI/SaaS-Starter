@@ -93,12 +93,7 @@ export function SocialLoginButtons({
       }
       redirectToProvider(redirectUrl);
     } catch {
-      toast.error(
-        t(
-          "auth_unexpected_error",
-          "Something went wrong. Contact support if the issue persists.",
-        ),
-      );
+      toast.error(t("auth_unexpected_error"));
       setActiveProvider(null);
       onLoadingChange?.(false);
     }
@@ -155,7 +150,7 @@ function SocialLoginPendingLabel({
     <span className="flex items-center gap-2">
       <Loader2 className="h-4 w-4 animate-spin" />
       <span>
-        {t("auth_redirecting", "Redirecting to {expression0}...", {
+        {t.rich("auth_redirecting", {
           expression0: provider.name,
         })}
       </span>
@@ -174,7 +169,7 @@ function SocialLoginDefaultLabel({
     <span className="flex items-center gap-3">
       <IconComponent className="h-5 w-5" />
       <span className="font-medium">
-        {t("auth_continue", "Continue with {expression0}", {
+        {t.rich("auth_continue", {
           expression0: provider.name,
         })}
       </span>

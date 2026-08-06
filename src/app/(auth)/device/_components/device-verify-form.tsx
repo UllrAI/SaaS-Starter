@@ -53,9 +53,7 @@ export function DeviceVerifyForm({
   const canSubmit = /^[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(normalizedCode);
   async function reviewDevice() {
     if (!canSubmit) {
-      setErrorMessage(
-        t("device_code_invalid", "Enter a valid 8-character code."),
-      );
+      setErrorMessage(t("device_code_invalid"));
       setViewState("error");
       return;
     }
@@ -73,21 +71,14 @@ export function DeviceVerifyForm({
         };
       };
       if (!response.ok || !payload.success || !payload.data?.device) {
-        setErrorMessage(
-          t(
-            "device_review_failed",
-            "This device request is invalid or expired.",
-          ),
-        );
+        setErrorMessage(t("device_review_failed"));
         setViewState("error");
         return;
       }
       setPendingDevice(payload.data.device);
       setViewState("idle");
     } catch {
-      setErrorMessage(
-        t("device_network_error", "Network error. Please try again."),
-      );
+      setErrorMessage(t("device_network_error"));
       setViewState("error");
     } finally {
       setIsSubmitting(false);
@@ -118,20 +109,13 @@ export function DeviceVerifyForm({
         };
       };
       if (!response.ok || !payload.success) {
-        setErrorMessage(
-          t(
-            "device_authorize_failed",
-            "We couldn't authorize this device request.",
-          ),
-        );
+        setErrorMessage(t("device_authorize_failed"));
         setViewState("error");
         return;
       }
       setViewState("success");
     } catch {
-      setErrorMessage(
-        t("device_network_error", "Network error. Please try again."),
-      );
+      setErrorMessage(t("device_network_error"));
       setViewState("error");
     } finally {
       setIsSubmitting(false);
@@ -152,22 +136,14 @@ export function DeviceVerifyForm({
         <CardContent className="flex flex-col items-center gap-4 py-12 text-center">
           <ShieldCheck className="h-12 w-12 text-green-600" />
           <div className="space-y-1">
-            <h2 className="text-lg font-semibold">
-              {t("device_authorized", "Device authorized")}
-            </h2>
+            <h2 className="text-lg font-semibold">{t("device_authorized")}</h2>
             <p className="text-muted-foreground text-sm">
-              {t(
-                "device_you_can_close_tab_return_terminal",
-                "You can close this tab and return to your terminal.",
-              )}
+              {t("device_you_can_close_tab_return_terminal")}
             </p>
           </div>
           <Button asChild variant="outline" size="sm">
             <Link href="/dashboard/developer#cli-sessions">
-              {t(
-                "device_review_authorized_devices",
-                "Review authorized devices",
-              )}
+              {t("device_review_authorized_devices")}
             </Link>
           </Button>
         </CardContent>
@@ -180,14 +156,9 @@ export function DeviceVerifyForm({
       <Card className="w-full">
         <CardHeader className="text-center">
           <Monitor className="text-muted-foreground mx-auto h-10 w-10" />
-          <CardTitle>
-            {t("device_authorize_cli_device", "Authorize CLI Device")}
-          </CardTitle>
+          <CardTitle>{t("device_authorize_cli_device")}</CardTitle>
           <CardDescription>
-            {t(
-              "device_sign_in_account_approve_command_line",
-              "Sign in to your account to approve this command-line session.",
-            )}
+            {t("device_sign_in_account_approve_command_line")}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -197,7 +168,7 @@ export function DeviceVerifyForm({
               window.location.href = `/login?callbackUrl=${encodeURIComponent(callbackUrl)}`;
             }}
           >
-            {t("device_sign_in_continue", "Sign in to continue")}
+            {t("device_sign_in_continue")}
           </Button>
         </CardContent>
       </Card>
@@ -207,14 +178,9 @@ export function DeviceVerifyForm({
     <Card className="w-full">
       <CardHeader className="text-center">
         <Monitor className="text-muted-foreground mx-auto h-10 w-10" />
-        <CardTitle>
-          {t("device_authorize_cli_device", "Authorize CLI Device")}
-        </CardTitle>
+        <CardTitle>{t("device_authorize_cli_device")}</CardTitle>
         <CardDescription>
-          {t(
-            "device_enter_code_shown_in_terminal_complete",
-            "Enter the code shown in your terminal to complete sign-in.",
-          )}
+          {t("device_enter_code_shown_in_terminal_complete")}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -224,7 +190,7 @@ export function DeviceVerifyForm({
           </div>
         ) : null}
         <div className="grid gap-2">
-          <Label htmlFor="device-code">{t("device_code", "Device code")}</Label>
+          <Label htmlFor="device-code">{t("device_code")}</Label>
           <Input
             id="device-code"
             value={normalizedCode}
@@ -232,7 +198,7 @@ export function DeviceVerifyForm({
               setCode(normalizeDeviceCode(event.target.value));
               setPendingDevice(null);
             }}
-            placeholder={t("device_abcd_efgh", "ABCD-EFGH")}
+            placeholder={t("device_abcd_efgh")}
             className="text-center font-mono text-lg tracking-[0.2em]"
             maxLength={9}
             autoFocus
@@ -241,50 +207,35 @@ export function DeviceVerifyForm({
         {pendingDevice ? (
           <div className="border-border bg-muted/40 space-y-3 rounded-lg border p-4">
             <div>
-              <p className="font-medium">
-                {t("device_review_title", "Review this device")}
-              </p>
+              <p className="font-medium">{t("device_review_title")}</p>
               <p className="text-muted-foreground text-sm">
-                {t(
-                  "device_review_warning",
-                  "Only continue if these details match the terminal you are signing in from.",
-                )}
+                {t("device_review_warning")}
               </p>
             </div>
             <dl className="grid gap-2 text-sm sm:grid-cols-2">
               <div>
                 <dt className="text-muted-foreground">
-                  {t("device_client_label", "Client")}
+                  {t("device_client_label")}
                 </dt>
-                <dd>
-                  {pendingDevice.clientName || t("device_unknown", "Unknown")}
-                </dd>
+                <dd>{pendingDevice.clientName || t("device_unknown")}</dd>
               </div>
               <div>
                 <dt className="text-muted-foreground">
-                  {t("device_version_label", "Version")}
+                  {t("device_version_label")}
                 </dt>
-                <dd>
-                  {pendingDevice.clientVersion ||
-                    t("device_unknown", "Unknown")}
-                </dd>
+                <dd>{pendingDevice.clientVersion || t("device_unknown")}</dd>
               </div>
               <div>
                 <dt className="text-muted-foreground">
-                  {t("device_hostname_label", "Device")}
+                  {t("device_hostname_label")}
                 </dt>
-                <dd>
-                  {pendingDevice.deviceHostname ||
-                    t("device_unknown", "Unknown")}
-                </dd>
+                <dd>{pendingDevice.deviceHostname || t("device_unknown")}</dd>
               </div>
               <div>
                 <dt className="text-muted-foreground">
-                  {t("device_os_label", "Operating system")}
+                  {t("device_os_label")}
                 </dt>
-                <dd>
-                  {pendingDevice.deviceOs || t("device_unknown", "Unknown")}
-                </dd>
+                <dd>{pendingDevice.deviceOs || t("device_unknown")}</dd>
               </div>
             </dl>
           </div>
@@ -296,15 +247,13 @@ export function DeviceVerifyForm({
             void (pendingDevice ? authorizeDevice() : reviewDevice());
           }}
         >
-          {t(
+          {t.rich(
             pendingDevice ? "device_confirm_authorize" : "device_review_action",
-            pendingDevice
-              ? "{expression0} Authorize this device"
-              : "{expression0} Review device",
             {
-              expression0: isSubmitting ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : null,
+              expression0: () =>
+                isSubmitting ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : null,
             },
           )}
         </Button>

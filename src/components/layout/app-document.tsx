@@ -31,10 +31,7 @@ export async function createRootMetadata(
   locale: SupportedLocale,
 ): Promise<Metadata> {
   const { t } = await getServerTranslations({ locale });
-  const description = t(
-    "common_complete_micro_ullrai_saas",
-    "Complete Micro UllrAI SaaS starter with authentication, payments, database, and deployment.",
-  );
+  const description = t("common_complete_micro_ullrai_saas");
   const openGraphLocale = locale === "zh-Hans" ? "zh_CN" : "en_US";
 
   return {

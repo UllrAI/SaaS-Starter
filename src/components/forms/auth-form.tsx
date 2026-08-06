@@ -81,59 +81,37 @@ export function AuthForm({
   const isLogin = mode === "login";
   const config = {
     title: isLogin ? (
-      <>{t("auth_welcome_back", "Welcome back")}</>
+      <>{t("auth_welcome_back")}</>
     ) : (
-      <>{t("auth_get_started_today", "Get started today")}</>
+      <>{t("auth_get_started_today")}</>
     ),
     description: emailAuthEnabled ? (
       isLogin ? (
-        <>
-          {t(
-            "auth_enter_email_receive_secure_magic_link",
-            "Enter your email to receive a secure magic link and access your dashboard",
-          )}
-        </>
+        <>{t("auth_enter_email_receive_secure_magic_link")}</>
       ) : (
-        <>
-          {t(
-            "auth_create_account_in_seconds_just_email",
-            "Create your account in seconds with just your email address",
-          )}
-        </>
+        <>{t("auth_create_account_in_seconds_just_email")}</>
       )
     ) : isLogin ? (
-      <>
-        {t(
-          "auth_oauth_login_description",
-          "Choose a connected account to access your dashboard",
-        )}
-      </>
+      <>{t("auth_oauth_login_description")}</>
     ) : (
-      <>
-        {t(
-          "auth_oauth_signup_description",
-          "Choose a connected account to create your account",
-        )}
-      </>
+      <>{t("auth_oauth_signup_description")}</>
     ),
     badgeText: isLogin ? (
-      <>{t("auth_welcome_back", "Welcome back")}</>
+      <>{t("auth_welcome_back")}</>
     ) : (
-      <>{t("auth_get_started", "Get started")}</>
+      <>{t("auth_get_started")}</>
     ),
     submitButtonText: isLogin ? (
-      <>{t("auth_send_magic_link", "Send Magic Link")}</>
+      <>{t("auth_send_magic_link")}</>
     ) : (
-      <>{t("auth_create_account", "Create Account")}</>
+      <>{t("auth_create_account")}</>
     ),
-    magicLinkLoadingText: (
-      <>{t("auth_sending_magic_link", "Sending magic link...")}</>
-    ),
+    magicLinkLoadingText: <>{t("auth_sending_magic_link")}</>,
     submitIcon: Mail,
     alternativeActionText: isLogin ? (
-      <>{t("auth_new_platform", "New to our platform?")}</>
+      <>{t("auth_new_platform")}</>
     ) : (
-      <>{t("auth_already_have_account", "Already have an account?")}</>
+      <>{t("auth_already_have_account")}</>
     ),
     alternativeActionLink: (
       <Link
@@ -141,9 +119,9 @@ export function AuthForm({
         className="text-primary hover:text-primary/80 cursor-pointer font-medium underline-offset-4 transition-colors hover:underline"
       >
         {isLogin ? (
-          <>{t("auth_create_account_alternative", "Create an account")}</>
+          <>{t("auth_create_account_alternative")}</>
         ) : (
-          <>{t("auth_sign_in_instead", "Sign in instead")}</>
+          <>{t("auth_sign_in_instead")}</>
         )}
       </Link>
     ),
@@ -153,7 +131,7 @@ export function AuthForm({
   const fields = [
     {
       name: "email" as const,
-      label: <>{t("auth_email_address", "Email address")}</>,
+      label: <>{t("auth_email_address")}</>,
       placeholder: "you@example.com",
       icon: Mail,
       type: "email",

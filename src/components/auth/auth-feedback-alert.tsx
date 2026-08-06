@@ -15,79 +15,31 @@ export function AuthFeedbackAlert({
     case "banned":
       description = feedback.banReason ? (
         <>
-          {t(
-            "auth_account_disabled_contact_support_reason",
-            "This account is disabled. Contact support. Reason: {expression0}",
-            {
-              expression0: feedback.banReason,
-            },
-          )}
+          {t.rich("auth_account_disabled_contact_support_reason", {
+            expression0: feedback.banReason,
+          })}
         </>
       ) : (
-        <>
-          {t(
-            "auth_account_disabled_contact_support",
-            "This account is disabled. Contact support.",
-          )}
-        </>
+        <>{t("auth_account_disabled_contact_support")}</>
       );
       break;
     case "session_expired":
-      description = (
-        <>
-          {t(
-            "auth_session_ended_sign_in_again_continue",
-            "Your session ended. Sign in again to continue.",
-          )}
-        </>
-      );
+      description = <>{t("auth_session_ended_sign_in_again_continue")}</>;
       break;
     case "INVALID_TOKEN":
-      description = (
-        <>
-          {t(
-            "auth_sign_in_link_invalid_request_new",
-            "This sign-in link is invalid. Request a new one.",
-          )}
-        </>
-      );
+      description = <>{t("auth_sign_in_link_invalid_request_new")}</>;
       break;
     case "EXPIRED_TOKEN":
-      description = (
-        <>
-          {t(
-            "auth_sign_in_link_expired_request_new",
-            "This sign-in link expired. Request a new one.",
-          )}
-        </>
-      );
+      description = <>{t("auth_sign_in_link_expired_request_new")}</>;
       break;
     case "ATTEMPTS_EXCEEDED":
-      description = (
-        <>
-          {t(
-            "auth_sign_in_link_was_already_used",
-            "This sign-in link was already used. Request a new one.",
-          )}
-        </>
-      );
+      description = <>{t("auth_sign_in_link_was_already_used")}</>;
       break;
     case "please_restart_the_process":
-      description = (
-        <>
-          {t(
-            "auth_sign_in_process_was_interrupted_start",
-            "The sign-in process was interrupted. Start again.",
-          )}
-        </>
-      );
+      description = <>{t("auth_sign_in_process_was_interrupted_start")}</>;
       break;
     case "sign_in_failed":
-      description = (
-        <>
-          {t("auth_unable_sign_in_try_again", "Unable to sign in. Try again.")}
-        </>
-      );
+      description = <>{t("auth_unable_sign_in_try_again")}</>;
       break;
     default:
       return null;

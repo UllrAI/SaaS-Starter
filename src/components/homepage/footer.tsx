@@ -71,34 +71,34 @@ export function Footer({
   const sections: FooterSection[] = [
     {
       id: "product",
-      title: t("home_product", "Product"),
+      title: t("home_product"),
       links: [
         {
           id: "features",
           href: withLocalePrefix("/features", locale),
-          label: t("home_features", "Features"),
+          label: t("home_features"),
         },
         {
           id: "pricing",
           href: withLocalePrefix("/pricing", locale),
-          label: t("home_pricing", "Pricing"),
+          label: t("home_pricing"),
         },
         {
           id: "blog",
           href: withLocalePrefix("/blog", locale),
-          label: t("home_blog", "Blog"),
+          label: t("home_blog"),
         },
         {
           id: "changelog",
           href: GITHUB_RELEASES_URL,
-          label: t("home_changelog", "Changelog"),
+          label: t("home_changelog"),
           external: true,
         },
       ].filter((link) => SITE_CONFIG.features.billing || link.id !== "pricing"),
     },
     {
       id: "other-products",
-      title: t("home_other_products", "Other Products"),
+      title: t("home_other_products"),
       links: [
         {
           id: "pixmiller",
@@ -128,57 +128,57 @@ export function Footer({
     },
     {
       id: "project",
-      title: t("home_project", "Project"),
+      title: t("home_project"),
       links: [
         {
           id: "about",
           href: withLocalePrefix("/about", locale),
-          label: t("home_about", "About"),
+          label: t("home_about"),
         },
         {
           id: "contact",
           href: withLocalePrefix("/contact", locale),
-          label: t("home_contact", "Contact"),
+          label: t("home_contact"),
         },
         {
           id: "github",
           href: GITHUB_URL,
-          label: t("home_git_hub", "GitHub"),
+          label: t("home_git_hub"),
           external: true,
         },
       ],
     },
     {
       id: "support",
-      title: t("home_support", "Support"),
+      title: t("home_support"),
       links: [
         {
           id: "issues",
           href: GITHUB_ISSUES_URL,
-          label: t("home_issue_tracker", "Issue Tracker"),
+          label: t("home_issue_tracker"),
           external: true,
         },
         {
           id: "discussions",
           href: GITHUB_DISCUSSIONS_URL,
-          label: t("home_discussions", "Discussions"),
+          label: t("home_discussions"),
           external: true,
         },
       ],
     },
     {
       id: "legal",
-      title: t("home_legal", "Legal"),
+      title: t("home_legal"),
       links: [
         {
           id: "privacy",
           href: withLocalePrefix("/privacy", locale),
-          label: t("home_privacy", "Privacy"),
+          label: t("home_privacy"),
         },
         {
           id: "terms",
           href: withLocalePrefix("/terms", locale),
-          label: t("home_terms", "Terms"),
+          label: t("home_terms"),
         },
       ],
     },
@@ -206,10 +206,7 @@ export function Footer({
                 </span>
               </div>
               <p className="text-muted-foreground mb-6 max-w-md text-sm">
-                {t(
-                  "home_practical_saas_starter_teams_want",
-                  "A practical SaaS starter for teams that want auth, billing, admin, upload, and content foundations without fake enterprise promises.",
-                )}
+                {t("home_practical_saas_starter_teams_want")}
               </p>
               <div className="flex items-center gap-3">
                 {socialLinks.map((social) => {
@@ -260,15 +257,11 @@ export function Footer({
         <Separator />
         <div className="flex flex-col items-center justify-between gap-4 py-8 sm:flex-row">
           <span className="text-muted-foreground text-sm">
-            {t(
-              "home_all_rights_reserved",
-              "\xA9 {currentYear}{COMPANY_NAME}. All rights reserved.",
-              { currentYear, COMPANY_NAME },
-            )}
+            {t.rich("home_all_rights_reserved", { currentYear, COMPANY_NAME })}
           </span>
           <span className="text-muted-foreground flex items-center gap-2 text-sm">
             <Heart className="h-4 w-4 text-red-500" />
-            {t("home_ullrai_developers", "by UllrAI, for developers")}
+            {t("home_ullrai_developers")}
           </span>
         </div>
       </ShellContainer>

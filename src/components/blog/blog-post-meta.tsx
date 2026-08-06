@@ -29,7 +29,7 @@ export function BlogPostMeta({
 }: BlogPostMetaProps) {
   const supportedLocale = locale ?? SOURCE_LOCALE;
   const { t } = getStaticTranslations(supportedLocale);
-  const resolvedAuthor = author ?? <>{t("blog_anonymous", "Anonymous")}</>;
+  const resolvedAuthor = author ?? <>{t("blog_anonymous")}</>;
   const isOverlay = variant === "overlay";
   const textColor = isOverlay ? "text-white/80" : "text-muted-foreground";
   const badgeVariant = featured ? "default" : "secondary";
@@ -60,7 +60,7 @@ export function BlogPostMeta({
               )}
             >
               <Sparkles className="mr-1 h-3 w-3" />
-              {t("blog_featured", "Featured")}
+              {t("blog_featured")}
             </Badge>
           ) : (
             <Badge
@@ -70,7 +70,7 @@ export function BlogPostMeta({
                 articleBadgeClasses,
               )}
             >
-              {t("blog_article", "Article")}
+              {t("blog_article")}
             </Badge>
           )}
         </div>
@@ -106,7 +106,7 @@ export function BlogPostMeta({
             <div className="flex items-center gap-2">
               <Clock className="h-4 w-4 flex-shrink-0" />
               <span className="whitespace-nowrap">
-                {t("blog_reading_time", "{minutes} min read", {
+                {t("blog_reading_time", {
                   minutes: readingMinutes,
                 })}
               </span>

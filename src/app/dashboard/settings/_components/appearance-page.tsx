@@ -89,17 +89,17 @@ export function AppearancePage() {
   const mounted = useHydrated();
   const themes = [
     {
-      name: t("theme_light", "Light"),
+      name: t("theme_light"),
       value: "light" as const,
       icon: Sun,
     },
     {
-      name: t("theme_dark", "Dark"),
+      name: t("theme_dark"),
       value: "dark" as const,
       icon: Moon,
     },
     {
-      name: t("theme_system", "System"),
+      name: t("theme_system"),
       value: "system" as const,
       icon: Monitor,
     },
@@ -110,14 +110,9 @@ export function AppearancePage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Monitor className="text-primary h-5 w-5" />
-            {t("settings_theme_preferences", "Theme Preferences")}
+            {t("settings_theme_preferences")}
           </CardTitle>
-          <CardDescription>
-            {t(
-              "settings_choose_preferred_theme_dashboard_interface",
-              "Choose your preferred theme for the dashboard interface",
-            )}
-          </CardDescription>
+          <CardDescription>{t("settings_choose_theme")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">

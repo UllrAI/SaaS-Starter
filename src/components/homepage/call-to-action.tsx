@@ -16,15 +16,15 @@ export function CallToAction({
   const proofPoints = [
     {
       id: "typed",
-      label: <>{t("home_type_safe_data_flow", "Type-safe data flow")}</>,
+      label: <>{t("home_type_safe_data_flow")}</>,
     },
     {
       id: "self-hosted",
-      label: <>{t("home_self_hosted_default", "Self-hosted by default")}</>,
+      label: <>{t("home_self_hosted_default")}</>,
     },
     {
       id: "extensible",
-      label: <>{t("home_built_customize", "Built to customize")}</>,
+      label: <>{t("home_built_customize")}</>,
     },
   ];
   return (
@@ -37,25 +37,13 @@ export function CallToAction({
 
           <div className="mx-auto mt-10 max-w-3xl space-y-6">
             <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase">
-              <>
-                {t("home_ship_foundation_first", "Ship the foundation first")}
-              </>
+              <>{t("home_ship_foundation_first")}</>
             </p>
             <h2 className="text-foreground text-4xl font-bold tracking-tight sm:text-5xl">
-              <>
-                {t(
-                  "home_start_working_product_shell_not_blank",
-                  "Start from a working product shell, not a blank repo",
-                )}
-              </>
+              <>{t("home_start_working_product_shell_not_blank")}</>
             </h2>
             <p className="text-muted-foreground text-lg leading-relaxed sm:text-xl">
-              <>
-                {t(
-                  "home_starter_gives_you_auth_billing_uploads",
-                  "The starter gives you auth, billing, uploads, admin pages, and content scaffolding so your next sprint can focus on product logic and customer workflows.",
-                )}
-              </>
+              <>{t("home_starter_gives_you_auth_billing_uploads")}</>
             </p>
           </div>
 
@@ -76,7 +64,7 @@ export function CallToAction({
                 asChild
               >
                 <Link href="/pricing" locale={locale}>
-                  <>{t("home_view_pricing", "View pricing")}</>
+                  <>{t("home_view_pricing")}</>
                   <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </Link>
               </Button>
@@ -89,18 +77,13 @@ export function CallToAction({
               asChild
             >
               <Link href="/features" locale={locale}>
-                <>{t("home_see_whats_inside", "See what's inside")}</>
+                <>{t("home_see_whats_inside")}</>
               </Link>
             </Button>
           </div>
 
           <p className="text-muted-foreground mt-6 text-sm">
-            <>
-              {t(
-                "home_own_codebase_keep_architecture_adapt_pieces",
-                "Own the codebase, keep the architecture, and adapt the pieces you actually need.",
-              )}
-            </>
+            <>{t("home_own_codebase")}</>
           </p>
         </div>
       </SectionContainer>

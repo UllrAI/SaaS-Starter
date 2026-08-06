@@ -26,7 +26,6 @@ import { formatCurrency } from "@/lib/utils";
 import { formatFileSize } from "@/lib/config/upload";
 import { createMetadataDefaults } from "@/lib/metadata";
 import { getRequestLocale } from "@/lib/i18n/server-locale";
-import type { AppTranslate } from "@/lib/i18n/translation/shared";
 import {
   getPaymentStatusLabel,
   getPaymentTypeLabel,
@@ -42,27 +41,27 @@ import {
 } from "lucide-react";
 import { SITE_CONFIG } from "@/lib/config/site";
 
-function getPlanLabel(planId: string | null, t: AppTranslate) {
+function getPlanLabel(planId: string | null, t: (key: string) => string) {
   switch (planId) {
     case "plus":
-      return t("dashboard_plan_plus", "Plus");
+      return t("dashboard_plan_plus");
     case "pro":
-      return t("dashboard_plan_professional", "Pro");
+      return t("dashboard_plan_professional");
     case "team":
-      return t("dashboard_plan_team", "Team");
+      return t("dashboard_plan_team");
     default:
-      return planId ?? t("dashboard_plan_free", "Free");
+      return planId ?? t("dashboard_plan_free");
   }
 }
 
-function getRoleLabel(role: string, t: AppTranslate) {
+function getRoleLabel(role: string, t: (key: string) => string) {
   switch (role) {
     case "admin":
-      return t("common_admin", role);
+      return t("common_admin");
     case "super_admin":
-      return t("common_super_admin", role.replace("_", " "));
+      return t("common_super_admin");
     default:
-      return t("common_user", role);
+      return t("common_user");
   }
 }
 
@@ -71,26 +70,17 @@ export async function generateMetadata() {
   const metadata = createMetadataDefaults({ locale });
   return {
     ...metadata,
-    title: t("dashboard_title", "Dashboard"),
-    description: t(
-      "dashboard_account_overview_billing_status_starter_setup",
-      "Account overview, billing status, and starter setup progress.",
-    ),
+    title: t("dashboard_title"),
+    description: t("dashboard_account_summary"),
     openGraph: {
       ...metadata.openGraph,
-      title: t("dashboard_title", "Dashboard"),
-      description: t(
-        "dashboard_account_overview_billing_status_starter_setup",
-        "Account overview, billing status, and starter setup progress.",
-      ),
+      title: t("dashboard_title"),
+      description: t("dashboard_account_summary"),
     },
     twitter: {
       ...metadata.twitter,
-      title: t("dashboard_title", "Dashboard"),
-      description: t(
-        "dashboard_account_overview_billing_status_starter_setup_description",
-        "Account overview, billing status, and starter setup progress.",
-      ),
+      title: t("dashboard_title"),
+      description: t("dashboard_account_summary_description"),
     },
   };
 }
@@ -142,41 +132,20 @@ export default async function HomeRoute() {
   const checklistLinks = [
     {
       id: "billing",
-      title: <>{t("dashboard_review_billing_flow", "Review billing flow")}</>,
-      description: (
-        <>
-          {t(
-            "dashboard_check_plan_selection_checkout_portal_access",
-            "Check plan selection, checkout, and portal access.",
-          )}
-        </>
-      ),
+      title: <>{t("dashboard_review_billing_flow")}</>,
+      description: <>{t("dashboard_check_billing_flow")}</>,
       href: "/dashboard/billing",
     },
     {
       id: "upload",
-      title: <>{t("dashboard_verify_uploads", "Verify uploads")}</>,
-      description: (
-        <>
-          {t(
-            "dashboard_test_client_server_uploads_against_storage",
-            "Test client and server uploads against your storage config.",
-          )}
-        </>
-      ),
+      title: <>{t("dashboard_verify_uploads")}</>,
+      description: <>{t("dashboard_test_uploads")}</>,
       href: "/dashboard/upload",
     },
     {
       id: "settings",
-      title: <>{t("dashboard_finish_account_setup", "Finish account setup")}</>,
-      description: (
-        <>
-          {t(
-            "dashboard_update_profile_validate_theme_locale_preferences",
-            "Update your profile and validate theme and locale preferences.",
-          )}
-        </>
-      ),
+      title: <>{t("dashboard_finish_account_setup")}</>,
+      description: <>{t("dashboard_update_profile_preferences")}</>,
       href: "/dashboard/settings",
     },
   ].filter(
@@ -186,35 +155,23 @@ export default async function HomeRoute() {
   );
   return (
     <DashboardPageWrapper
-      title={<>{t("dashboard_title", "Dashboard")}</>}
-      description={
-        <>
-          {t(
-            "dashboard_account_overview_billing_status_starter_setup",
-            "Account overview, billing status, and starter setup progress.",
-          )}
-        </>
-      }
+      title={<>{t("dashboard_title")}</>}
+      description={<>{t("dashboard_account_summary")}</>}
     >
       <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
         <Card className="shadow-sm">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <UserCircle2 className="text-primary h-5 w-5" />
-              {t("dashboard_account_overview", "Account overview")}
+              {t("dashboard_account_overview")}
             </CardTitle>
-            <CardDescription>
-              {t(
-                "dashboard_summary_account_starter_modules_currently_in",
-                "A summary of the account and starter modules currently in use.",
-              )}
-            </CardDescription>
+            <CardDescription>{t("dashboard_summary_modules")}</CardDescription>
           </CardHeader>
           <CardContent className="grid gap-4 md:grid-cols-3">
             {SITE_CONFIG.features.billing && (
               <div className="border-border space-y-2 border p-4">
                 <p className="text-muted-foreground text-xs uppercase">
-                  {t("dashboard_plan", "Plan")}
+                  {t("dashboard_plan")}
                 </p>
                 <p className="text-lg font-semibold">{subscriptionLabel}</p>
                 <Badge
@@ -229,14 +186,9 @@ export default async function HomeRoute() {
                       t,
                     )
                   ) : billingAccess.kind === "lifetime" ? (
-                    <>{t("billing_lifetime_access", "Lifetime access")}</>
+                    <>{t("billing_lifetime_access")}</>
                   ) : (
-                    <>
-                      {t(
-                        "dashboard_no_active_subscription",
-                        "No active subscription",
-                      )}
-                    </>
+                    <>{t("dashboard_no_active_subscription")}</>
                   )}
                 </Badge>
               </div>
@@ -244,11 +196,11 @@ export default async function HomeRoute() {
             {SITE_CONFIG.features.uploads && (
               <div className="border-border space-y-2 border p-4">
                 <p className="text-muted-foreground text-xs uppercase">
-                  {t("dashboard_uploads", "Uploads")}
+                  {t("dashboard_uploads")}
                 </p>
                 <p className="text-lg font-semibold">{uploadedFileCount}</p>
                 <p className="text-muted-foreground text-sm">
-                  {t("dashboard_stored", "{expression0} stored", {
+                  {t.rich("dashboard_stored", {
                     expression0: formatFileSize(uploadedFileSize),
                   })}
                 </p>
@@ -257,7 +209,7 @@ export default async function HomeRoute() {
             {SITE_CONFIG.features.billing && (
               <div className="border-border space-y-2 border p-4">
                 <p className="text-muted-foreground text-xs uppercase">
-                  {t("dashboard_payments", "Payments")}
+                  {t("dashboard_payments")}
                 </p>
                 <p className="text-lg font-semibold">{paymentCount}</p>
                 <p className="text-muted-foreground text-sm">
@@ -268,12 +220,7 @@ export default async function HomeRoute() {
                       locale,
                     )
                   ) : (
-                    <>
-                      {t(
-                        "dashboard_no_payment_records_yet",
-                        "No payment records yet",
-                      )}
-                    </>
+                    <>{t("dashboard_no_payment_records_yet")}</>
                   )}
                 </p>
               </div>
@@ -285,26 +232,20 @@ export default async function HomeRoute() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <ShieldCheck className="text-primary h-5 w-5" />
-              {t("dashboard_current_account", "Current account")}
+              {t("dashboard_current_account")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4 text-sm">
             <div className="border-border border p-4">
-              <p className="text-muted-foreground">
-                {t("dashboard_name", "Name")}
-              </p>
+              <p className="text-muted-foreground">{t("dashboard_name")}</p>
               <p className="font-medium">{user.name}</p>
             </div>
             <div className="border-border border p-4">
-              <p className="text-muted-foreground">
-                {t("dashboard_email", "Email")}
-              </p>
+              <p className="text-muted-foreground">{t("dashboard_email")}</p>
               <p className="font-medium">{user.email}</p>
             </div>
             <div className="border-border border p-4">
-              <p className="text-muted-foreground">
-                {t("dashboard_role", "Role")}
-              </p>
+              <p className="text-muted-foreground">{t("dashboard_role")}</p>
               <p className="font-medium capitalize">
                 {getRoleLabel(user.role, t)}
               </p>
@@ -318,13 +259,10 @@ export default async function HomeRoute() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Sparkles className="text-primary h-5 w-5" />
-              {t("dashboard_setup_checklist", "Setup checklist")}
+              {t("dashboard_setup_checklist")}
             </CardTitle>
             <CardDescription>
-              {t(
-                "dashboard_starter_already_wired_up_these_next",
-                "The starter is already wired up. These are the next places to make it match your product.",
-              )}
+              {t("dashboard_starter_already_wired_up_these_next")}
             </CardDescription>
           </CardHeader>
           <CardContent className="grid gap-3">
@@ -339,7 +277,7 @@ export default async function HomeRoute() {
                   </div>
                   <Button asChild size="sm" variant="outline">
                     <Link href={item.href}>
-                      <>{t("dashboard_checklist_open", "Open")}</>
+                      <>{t("dashboard_checklist_open")}</>
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
                   </Button>
@@ -354,16 +292,10 @@ export default async function HomeRoute() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <CreditCard className="text-primary h-5 w-5" />
-                {t(
-                  "dashboard_recent_billing_activity",
-                  "Recent billing activity",
-                )}
+                {t("dashboard_recent_billing_activity")}
               </CardTitle>
               <CardDescription>
-                {t(
-                  "dashboard_recent_payment_records_attached_current_account",
-                  "Recent payment records attached to your current account.",
-                )}
+                {t("dashboard_recent_payment_records")}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -402,10 +334,7 @@ export default async function HomeRoute() {
                 <div className="border-border flex items-center gap-3 border p-4 text-sm">
                   <Files className="text-primary h-4 w-4" />
                   <span className="text-muted-foreground">
-                    {t(
-                      "dashboard_no_payment_history_yet_visit_billing",
-                      "No payment history yet. Visit billing when you are ready to test checkout.",
-                    )}
+                    {t("dashboard_no_payment_history")}
                   </span>
                 </div>
               )}

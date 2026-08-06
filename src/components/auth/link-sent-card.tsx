@@ -38,20 +38,16 @@ export function LinkSentCard({
 
       <CardFooter className="flex-col space-y-0 border-t">
         <p className="text-muted-foreground text-center text-xs leading-relaxed">
-          {t(
-            "auth_didnt_receive_send_again_check_spam",
-            "Didn''t receive? <Link0>Send again </Link0> or check your spam folder.",
-            {
-              Link0: (chunks) => (
-                <Link
-                  href={retryHref}
-                  className="font-medium underline-offset-2 hover:underline"
-                >
-                  {chunks}
-                </Link>
-              ),
-            },
-          )}
+          {t.rich("auth_didnt_receive_send_again_check_spam", {
+            Link0: (chunks) => (
+              <Link
+                href={retryHref}
+                className="font-medium underline-offset-2 hover:underline"
+              >
+                {chunks}
+              </Link>
+            ),
+          })}
         </p>
       </CardFooter>
     </Card>

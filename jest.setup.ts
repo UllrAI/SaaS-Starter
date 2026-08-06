@@ -1,6 +1,8 @@
 import "@testing-library/jest-dom";
 import type React from "react";
 
+import enMessages from "@/messages/en.json";
+
 // Jest setup for test environment
 
 // Type definitions for test mocks
@@ -514,12 +516,44 @@ const mockCrypto: MockCrypto = {
 // Mock crypto module to avoid ES module issues
 jest.mock("uncrypto", () => mockCrypto, { virtual: true });
 
+function renderMessage(
+  template: string,
+  values?: Record<string, unknown>,
+): string {
+  if (!values) return template;
+  let out = template;
+  for (const [name, value] of Object.entries(values)) {
+    const render = (chunks = "") =>
+      String(
+        typeof value === "function"
+          ? value(chunks)
+          : value instanceof Date
+            ? value.toISOString()
+            : (value ?? chunks),
+      );
+    out = out.replace(
+      new RegExp(`<${name}>([\\s\\S]*?)</${name}>`, "g"),
+      (_, chunks) => render(chunks),
+    );
+    out = out.replace(new RegExp(`\\{${name}\\}`, "g"), () => render(""));
+  }
+  return out;
+}
+
 const createIntlTranslatorMock = () =>
-  Object.assign((key: string) => key, {
-    has: () => false,
-    rich: (key: string) => key,
-    raw: (key: string) => key,
-  });
+  Object.assign(
+    (key: string, values?: Record<string, unknown>) =>
+      renderMessage((enMessages as Record<string, string>)[key] ?? key, values),
+    {
+      has: (key: string) => key in enMessages,
+      rich: (key: string, values?: Record<string, unknown>) =>
+        renderMessage(
+          (enMessages as Record<string, string>)[key] ?? key,
+          values,
+        ),
+      raw: (key: string) => (enMessages as Record<string, string>)[key],
+    },
+  );
 
 jest.mock("next-intl", () => ({
   createTranslator: () => createIntlTranslatorMock(),

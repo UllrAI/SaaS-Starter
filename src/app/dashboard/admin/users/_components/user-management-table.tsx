@@ -48,11 +48,11 @@ function RoleLabel({ role }: { role: UserRole }) {
   const { t } = useTranslation();
   switch (role) {
     case "user":
-      return <>{t("common_user", "User")}</>;
+      return <>{t("common_user")}</>;
     case "admin":
-      return <>{t("common_admin", "Admin")}</>;
+      return <>{t("common_admin")}</>;
     case "super_admin":
-      return <>{t("common_super_admin", "Super Admin")}</>;
+      return <>{t("common_super_admin")}</>;
     default:
       return null;
   }
@@ -60,17 +60,17 @@ function RoleLabel({ role }: { role: UserRole }) {
 function EmailStatusLabel({ verified }: { verified: boolean | null }) {
   const { t } = useTranslation();
   return verified ? (
-    <>{t("admin_user_email_verified", "Verified")}</>
+    <>{t("admin_user_email_verified")}</>
   ) : (
-    <>{t("admin_user_email_unverified", "Unverified")}</>
+    <>{t("admin_user_email_unverified")}</>
   );
 }
 function AccessStatusLabel({ banned }: { banned: boolean }) {
   const { t } = useTranslation();
   return banned ? (
-    <>{t("admin_user_access_disabled", "Disabled")}</>
+    <>{t("admin_user_access_disabled")}</>
   ) : (
-    <>{t("admin_user_access_active", "Active")}</>
+    <>{t("admin_user_access_active")}</>
   );
 }
 export function UserManagementTable({
@@ -135,16 +135,11 @@ export function UserManagementTable({
         role: editingUser.role as UserRole,
       });
       if (result.data) {
-        toast.success(t("admin_user_update_success", "User details updated."));
+        toast.success(t("admin_user_update_success"));
         setEditingUser(null);
         refresh();
       } else if (result.serverError || result.validationErrors) {
-        toast.error(
-          t(
-            "admin_user_update_error",
-            "Could not save the user changes. Please try again.",
-          ),
-        );
+        toast.error(t("admin_user_update_error"));
       }
     });
   };
@@ -158,22 +153,15 @@ export function UserManagementTable({
       if (result.data) {
         toast.success(
           result.data.disabled ? (
-            <>
-              {t("admin_user_disable_success", "User disabled and signed out.")}
-            </>
+            <>{t("admin_user_disable_success")}</>
           ) : (
-            <>{t("admin_user_enable_success", "User access restored.")}</>
+            <>{t("admin_user_enable_success")}</>
           ),
         );
         setEditingUser(null);
         refresh();
       } else if (result.serverError || result.validationErrors) {
-        toast.error(
-          t(
-            "admin_user_access_update_error",
-            "Could not update user access. Please try again.",
-          ),
-        );
+        toast.error(t("admin_user_access_update_error"));
       }
     });
   };
@@ -191,7 +179,7 @@ export function UserManagementTable({
   }> = [
     {
       key: "user",
-      label: <>{t("admin_user", "User")}</>,
+      label: <>{t("admin_user")}</>,
       render: (user) => (
         <UserAvatarCell
           name={user.name}
@@ -202,7 +190,7 @@ export function UserManagementTable({
     },
     {
       key: "role",
-      label: <>{t("admin_role", "Role")}</>,
+      label: <>{t("admin_role")}</>,
       render: (user) => (
         <Badge
           className="capitalize"
@@ -218,7 +206,7 @@ export function UserManagementTable({
     },
     {
       key: "emailStatus",
-      label: <>{t("admin_email_status", "Email Status")}</>,
+      label: <>{t("admin_email_status")}</>,
       render: (user) => (
         <Badge variant={user.emailVerified ? "outline" : "default"}>
           <EmailStatusLabel verified={user.emailVerified} />
@@ -227,7 +215,7 @@ export function UserManagementTable({
     },
     {
       key: "access",
-      label: <>{t("admin_access", "Access")}</>,
+      label: <>{t("admin_access")}</>,
       render: (user) => (
         <Badge variant={user.banned ? "destructive" : "outline"}>
           <AccessStatusLabel banned={user.banned} />
@@ -236,12 +224,12 @@ export function UserManagementTable({
     },
     {
       key: "createdAt",
-      label: <>{t("admin_joined", "Joined")}</>,
+      label: <>{t("admin_joined")}</>,
       render: (user) => formatDate(user.createdAt),
     },
     {
       key: "actions",
-      label: <>{t("admin_actions", "Actions")}</>,
+      label: <>{t("admin_actions")}</>,
       render: (user) => (
         <Button variant="ghost" size="sm" onClick={() => handleEditUser(user)}>
           <Edit className="h-4 w-4" />
@@ -252,7 +240,7 @@ export function UserManagementTable({
   const roleFilterOptions = [
     {
       value: "all",
-      label: <>{t("admin_all_roles", "All Roles")}</>,
+      label: <>{t("admin_all_roles")}</>,
     },
     ...userRoleEnum.enumValues.map((role) => ({
       value: role,
@@ -271,18 +259,11 @@ export function UserManagementTable({
         filterValue={roleFilter}
         onFilterChange={handleRoleFilter}
         filterOptions={roleFilterOptions}
-        filterPlaceholder={<>{t("admin_filter_role", "Filter by role")}</>}
+        filterPlaceholder={<>{t("admin_filter_role")}</>}
         pagination={pagination}
         onPageChange={handlePageChange}
-        searchPlaceholder={
-          <>
-            {t(
-              "admin_search_users_name_email",
-              "Search users by name or email...",
-            )}
-          </>
-        }
-        emptyMessage={<>{t("admin_no_users_found", "No users found")}</>}
+        searchPlaceholder={<>{t("admin_search_users_name_email")}</>}
+        emptyMessage={<>{t("admin_no_users_found")}</>}
       />
       <Dialog
         open={!!editingUser}
@@ -290,19 +271,16 @@ export function UserManagementTable({
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{t("admin_edit_user", "Edit User")}</DialogTitle>
+            <DialogTitle>{t("admin_edit_user")}</DialogTitle>
             <DialogDescription>
-              {t(
-                "admin_modify_user_details_role_access_status",
-                "Modify user details, role, and access status.",
-              )}
+              {t("admin_modify_user_details_role_access_status")}
             </DialogDescription>
           </DialogHeader>
           {editingUser && (
             <div className="grid gap-4 py-4">
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="name" className="text-right">
-                  {t("admin_name", "Name")}
+                  {t("admin_name")}
                 </Label>
                 <Input
                   id="name"
@@ -318,7 +296,7 @@ export function UserManagementTable({
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="role" className="text-right">
-                  {t("admin_role", "Role")}
+                  {t("admin_role")}
                 </Label>
                 <Select
                   value={editingUser.role}
@@ -342,9 +320,7 @@ export function UserManagementTable({
                 </Select>
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label className="text-right">
-                  {t("admin_access", "Access")}
-                </Label>
+                <Label className="text-right">{t("admin_access")}</Label>
                 <div className="col-span-3 flex items-center gap-3">
                   <Badge
                     variant={editingUser.banned ? "destructive" : "outline"}
@@ -369,9 +345,9 @@ export function UserManagementTable({
               >
                 {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 {editingUser.banned ? (
-                  <>{t("admin_enable_user", "Enable User")}</>
+                  <>{t("admin_enable_user")}</>
                 ) : (
-                  <>{t("admin_disable_user", "Disable User")}</>
+                  <>{t("admin_disable_user")}</>
                 )}
               </Button>
             )}
@@ -380,13 +356,14 @@ export function UserManagementTable({
               onClick={() => setEditingUser(null)}
               disabled={isPending}
             >
-              {t("admin_cancel", "Cancel")}
+              {t("admin_cancel")}
             </Button>
             <Button onClick={handleUpdateUser} disabled={isPending}>
-              {t("admin_save_changes", "{expression0} Save Changes", {
-                expression0: isPending && (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ),
+              {t.rich("admin_save_changes", {
+                expression0: () =>
+                  isPending && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ),
               })}
             </Button>
           </DialogFooter>

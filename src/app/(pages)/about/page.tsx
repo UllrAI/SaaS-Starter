@@ -41,17 +41,11 @@ export async function buildAboutMetadata(
   return {
     metadataBase: new URL(env.NEXT_PUBLIC_APP_URL),
     alternates,
-    title: t("about_us", "About Us"),
-    description: t(
-      "about_learn_about_mission_help_developers_build",
-      "Learn about our mission to help developers build and launch SaaS products faster with real, tested, and agent-friendly foundations.",
-    ),
+    title: t("about_us"),
+    description: t("about_mission"),
     openGraph: {
-      title: t("about_us", "About Us"),
-      description: t(
-        "about_learn_about_mission_help_developers_build",
-        "Learn about our mission to help developers build and launch SaaS products faster with real, tested, and agent-friendly foundations.",
-      ),
+      title: t("about_us"),
+      description: t("about_mission"),
       url: canonicalUrl,
       images: [{ url: OGIMAGE, width: 1480, height: 777, alt: APP_NAME }],
       locale: getOpenGraphLocale(locale),
@@ -64,11 +58,8 @@ export async function buildAboutMetadata(
     twitter: {
       card: "summary_large_image",
       creator: TWITTERACCOUNT,
-      title: t("about_us", "About Us"),
-      description: t(
-        "about_learn_about_mission_help_developers_build",
-        "Learn about our mission to help developers build and launch SaaS products faster with real, tested, and agent-friendly foundations.",
-      ),
+      title: t("about_us"),
+      description: t("about_mission"),
       images: [{ url: OGIMAGE, width: 1480, height: 777, alt: APP_NAME }],
     },
   };
@@ -93,19 +84,14 @@ export default function AboutPage({
             <Badge className="border-border bg-background/50 inline-flex items-center border px-3 py-1 text-sm backdrop-blur-sm">
               <Info className="text-muted-foreground mr-2 h-3 w-3" />
               <span className="text-muted-foreground font-mono">
-                {t("about_readme_md", "README.md")}
+                {t("about_readme_md")}
               </span>
             </Badge>
           }
         >
-          <PageIntroHeading>
-            {t("about_building_future_saas", "Building the future of SaaS")}
-          </PageIntroHeading>
+          <PageIntroHeading>{t("about_building_future_saas")}</PageIntroHeading>
           <PageIntroDescription>
-            {t(
-              "about_starter_focuses_real_saas_foundations",
-              "This starter focuses on real SaaS foundations: authentication, billing, database access, uploads, localization, and operational screens that can be inspected, tested, and extended without replacing placeholder flows first.",
-            )}
+            {t("about_starter_focuses_real_saas_foundations")}
           </PageIntroDescription>
         </PageIntro>
 
@@ -113,7 +99,7 @@ export default function AboutPage({
           <PageSectionHeading
             icon={<Terminal className="text-primary h-6 w-6" />}
           >
-            {t("about_core_principles", "Core Principles")}
+            {t("about_core_principles")}
           </PageSectionHeading>
 
           <div className="grid gap-6 md:grid-cols-3">
@@ -122,17 +108,9 @@ export default function AboutPage({
                 <div className="bg-primary/10 text-primary border-primary/20 mb-4 flex h-12 w-12 items-center justify-center border">
                   <Zap className="h-6 w-6" />
                 </div>
-                <CardTitle>
-                  {t(
-                    "about_practical_workflow_speed",
-                    "Practical Workflow Speed",
-                  )}
-                </CardTitle>
+                <CardTitle>{t("about_practical_workflow_speed")}</CardTitle>
                 <CardDescription>
-                  {t(
-                    "about_project_shaped_builders_who_need_move",
-                    "The project is shaped for builders who need to move quickly without losing the ability to understand, test, and modify the code they ship.",
-                  )}
+                  {t("about_project_shaped_builders_who_need_move")}
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -142,14 +120,9 @@ export default function AboutPage({
                 <div className="bg-primary/10 text-primary border-primary/20 mb-4 flex h-12 w-12 items-center justify-center border">
                   <Shield className="h-6 w-6" />
                 </div>
-                <CardTitle>
-                  {t("about_security_boundaries", "Security Boundaries")}
-                </CardTitle>
+                <CardTitle>{t("about_security_boundaries")}</CardTitle>
                 <CardDescription>
-                  {t(
-                    "about_auth_billing_uploads_environment_configuration_kept",
-                    "Auth, billing, uploads, and environment configuration are kept behind explicit server-side checks instead of optimistic UI assumptions.",
-                  )}
+                  {t("about_services_behind_config")}
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -159,15 +132,8 @@ export default function AboutPage({
                 <div className="bg-primary/10 text-primary border-primary/20 mb-4 flex h-12 w-12 items-center justify-center border">
                   <Users className="h-6 w-6" />
                 </div>
-                <CardTitle>
-                  {t("about_maintainable_defaults", "Maintainable Defaults")}
-                </CardTitle>
-                <CardDescription>
-                  {t(
-                    "about_code_favors_ordinary_next_js_conventions",
-                    "The code favors ordinary Next.js conventions, small modules, and reusable components over framework tricks or hidden generators.",
-                  )}
-                </CardDescription>
+                <CardTitle>{t("about_maintainable_defaults")}</CardTitle>
+                <CardDescription>{t("about_code_conventions")}</CardDescription>
               </CardHeader>
             </Card>
           </div>
@@ -175,48 +141,33 @@ export default function AboutPage({
 
         <div className="mb-24">
           <PageSectionHeading icon={<Users className="text-primary h-6 w-6" />}>
-            {t("about_what_you_can_verify", "What You Can Verify")}
+            {t("about_what_you_can_verify")}
           </PageSectionHeading>
 
           <div className="grid gap-6 md:grid-cols-3">
             <Card className="shadow-sm">
               <CardHeader>
-                <CardTitle>
-                  {t("about_real_checkout_flow", "Real Checkout Flow")}
-                </CardTitle>
+                <CardTitle>{t("about_real_checkout_flow")}</CardTitle>
                 <CardDescription>
-                  {t(
-                    "about_pricing_actions_call_billing_provider_abstraction",
-                    "Pricing actions call the billing provider abstraction and return users through a verifiable payment status page.",
-                  )}
+                  {t("about_billing_abstraction")}
                 </CardDescription>
               </CardHeader>
             </Card>
 
             <Card className="shadow-sm">
               <CardHeader>
-                <CardTitle>
-                  {t("about_protected_app_routes", "Protected App Routes")}
-                </CardTitle>
+                <CardTitle>{t("about_protected_app_routes")}</CardTitle>
                 <CardDescription>
-                  {t(
-                    "about_dashboard_settings_admin_areas_use_same",
-                    "Dashboard, settings, and admin areas use the same route protection and session boundaries as production features.",
-                  )}
+                  {t("about_dashboard_settings_admin_areas_use_same")}
                 </CardDescription>
               </CardHeader>
             </Card>
 
             <Card className="shadow-sm">
               <CardHeader>
-                <CardTitle>
-                  {t("about_repository_content", "Repository Content")}
-                </CardTitle>
+                <CardTitle>{t("about_repository_content")}</CardTitle>
                 <CardDescription>
-                  {t(
-                    "about_marketing_pages_blog_content_legal_live",
-                    "Marketing pages, blog content, and legal pages live in the repository so changes can be reviewed with the code.",
-                  )}
+                  {t("about_marketing_pages_blog_content_legal_live")}
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -227,37 +178,24 @@ export default function AboutPage({
           <PageSectionHeading
             icon={<Shield className="text-primary h-6 w-6" />}
           >
-            {t("about_maintenance_model", "Maintenance Model")}
+            {t("about_maintenance_model")}
           </PageSectionHeading>
 
           <div className="grid gap-6 md:grid-cols-2">
             <Card className="shadow-sm">
               <CardHeader>
-                <CardTitle>
-                  {t("about_code_over_claims", "Code Over Claims")}
-                </CardTitle>
+                <CardTitle>{t("about_code_over_claims")}</CardTitle>
                 <CardDescription>
-                  {t(
-                    "about_project_capabilities_represented_implemented_routes_configuration",
-                    "Project capabilities are represented by implemented routes, configuration, tests, and documentation instead of invented release milestones.",
-                  )}
+                  {t("about_capabilities_in_code")}
                 </CardDescription>
               </CardHeader>
             </Card>
 
             <Card className="shadow-sm">
               <CardHeader>
-                <CardTitle>
-                  {t(
-                    "about_small_reviewable_changes",
-                    "Small, Reviewable Changes",
-                  )}
-                </CardTitle>
+                <CardTitle>{t("about_small_reviewable_changes")}</CardTitle>
                 <CardDescription>
-                  {t(
-                    "about_improvements_should_stay_scoped_keep_migrations",
-                    "Improvements should stay scoped, keep migrations and generated assets aligned, and include the checks needed for confidence.",
-                  )}
+                  {t("about_scoped_improvements")}
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -269,28 +207,22 @@ export default function AboutPage({
         <SectionContainer>
           <PageIntro>
             <PageIntroHeading as="h2" className="mb-4 text-3xl">
-              {t(
-                "about_ready_build_something_amazing",
-                "Ready to Build Something Amazing?",
-              )}
+              {t("about_ready_build_something_amazing")}
             </PageIntroHeading>
             <PageIntroDescription className="mb-8 text-lg">
-              {t(
-                "about_build_saas_product_works_well",
-                "Build a SaaS product that works well for end users, internal tooling, and agent-friendly automation from day one.",
-              )}
+              {t("about_build_saas_product_works_well")}
             </PageIntroDescription>
             <div className="flex flex-wrap justify-center gap-4">
               {SITE_CONFIG.features.billing && (
                 <Button asChild size="lg">
                   <Link href="/pricing" locale={locale}>
-                    {t("about_get_started_today", "Get Started Today")}
+                    {t("about_get_started_today")}
                   </Link>
                 </Button>
               )}
               <Button variant="outline" size="lg" asChild>
                 <Link href="/contact" locale={locale}>
-                  {t("about_contact_sales", "Contact Sales")}
+                  {t("about_contact_sales")}
                 </Link>
               </Button>
             </div>

@@ -12,15 +12,8 @@ export default async function UploadPage() {
   const { t } = await getServerTranslations();
   return (
     <DashboardPageWrapper
-      title={<>{t("uploads_title_dashboard", "Uploads")}</>}
-      description={
-        <>
-          {t(
-            "uploads_focused_demo_page_direct_uploads_headless",
-            "A focused demo page for direct uploads, headless composition, and server-side file handling.",
-          )}
-        </>
-      }
+      title={<>{t("uploads_title_dashboard")}</>}
+      description={<>{t("uploads_demo_page")}</>}
     >
       <UploadWorkbench />
     </DashboardPageWrapper>

@@ -14,42 +14,30 @@ export async function SubscriptionStatsCards() {
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       <StatCard
-        title={t("admin_total_subscriptions", "Total Subscriptions")}
+        title={t("admin_total_subscriptions")}
         value={stats.total}
-        description={t(
-          "admin_all_time_subscriptions",
-          "All-time subscriptions",
-        )}
+        description={t("admin_all_time_subscriptions")}
         icon={Users}
         locale={locale}
       />
       <StatCard
-        title={t("admin_active_subscriptions", "Active Subscriptions")}
+        title={t("admin_active_subscriptions")}
         value={stats.active}
-        description={t(
-          "admin_currently_active_plans",
-          "Currently active plans",
-        )}
+        description={t("admin_currently_active_plans")}
         icon={UserCheck}
         locale={locale}
       />
       <StatCard
-        title={t("admin_canceled_subscriptions", "Canceled Subscriptions")}
+        title={t("admin_canceled_subscriptions")}
         value={stats.canceled}
-        description={t(
-          "admin_subscriptions_marked_cancellation",
-          "Subscriptions marked for cancellation",
-        )}
+        description={t("admin_subscriptions_marked_cancellation")}
         icon={UserX}
         locale={locale}
       />
       <StatCard
-        title={t("admin_activation_rate", "Activation Rate")}
+        title={t("admin_activation_rate")}
         value={`${activationRate}%`}
-        description={t(
-          "admin_share_subscriptions_currently_active",
-          "Share of subscriptions currently active",
-        )}
+        description={t("admin_share_subscriptions_currently_active")}
         icon={TrendingUp}
         locale={locale}
       />

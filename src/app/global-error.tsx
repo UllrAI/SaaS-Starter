@@ -24,7 +24,7 @@ export default function GlobalError({
               {messages["common_application_error"]}
             </h1>
             <p className="text-muted-foreground text-sm">
-              {messages["common_app_encountered_fatal_error_please_retry"]}
+              {messages["common_fatal_error_retry"]}
             </p>
             <Button onClick={reset}>{messages["common_reload"]}</Button>
           </div>

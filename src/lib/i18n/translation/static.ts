@@ -5,7 +5,6 @@ import { createTranslator } from "next-intl";
 import enMessages from "@/messages/en.json";
 import zhHansMessages from "@/messages/zh-Hans.json";
 import type { SupportedLocale } from "@/lib/config/i18n";
-import { createAppTranslate } from "@/lib/i18n/translation/shared";
 
 const messagesByLocale = {
   en: enMessages,
@@ -19,6 +18,6 @@ export function getStaticTranslations(locale: SupportedLocale) {
   });
 
   return {
-    t: createAppTranslate(translator),
+    t: translator,
   };
 }

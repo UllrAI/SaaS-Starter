@@ -32,41 +32,27 @@ export function CliTokensSection({
       };
       setTokens(data.tokens);
     } catch {
-      toast.error(
-        t("developer_cli_load_error", "Failed to load CLI sessions."),
-      );
+      toast.error(t("developer_cli_load_error"));
     }
   }, [t]);
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle>{t("device_cli_sessions", "CLI Sessions")}</CardTitle>
-        <CardDescription>
-          {t(
-            "device_review_active_command_line_sessions_created",
-            "Review active command-line sessions created via browser login and revoke any device instantly.",
-          )}
-        </CardDescription>
+        <CardTitle>{t("device_cli_sessions")}</CardTitle>
+        <CardDescription>{t("device_review_cli_sessions")}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">
         {tokens.length === 0 ? (
           <div className="flex flex-col items-center gap-2 rounded-lg border border-dashed px-4 py-8 text-center">
             <Terminal className="text-muted-foreground h-8 w-8" />
             <p className="text-muted-foreground text-sm">
-              {t(
-                "device_no_cli_sessions_yet_run_authorize",
-                "No CLI sessions yet. Run <code0></code0> to authorize a device.",
-                {
-                  code0: () => (
-                    <code
-                      className="bg-muted rounded px-1 py-0.5"
-                      translate="no"
-                    >
-                      pnpm saas-cli -- auth login
-                    </code>
-                  ),
-                },
-              )}
+              {t.rich("device_no_cli_sessions_yet_run_authorize", {
+                code0: () => (
+                  <code className="bg-muted rounded px-1 py-0.5" translate="no">
+                    pnpm saas-cli -- auth login
+                  </code>
+                ),
+              })}
             </p>
           </div>
         ) : (
@@ -100,12 +86,10 @@ function CliTokenRow({
       if (!response.ok) {
         throw new Error("Failed to revoke CLI session.");
       }
-      toast.success(t("developer_cli_revoke_success", "CLI session revoked."));
+      toast.success(t("developer_cli_revoke_success"));
       await onRevoked();
     } catch {
-      toast.error(
-        t("developer_cli_revoke_error", "Failed to revoke CLI session."),
-      );
+      toast.error(t("developer_cli_revoke_error"));
     } finally {
       setIsRevoking(false);
     }
@@ -124,11 +108,11 @@ function CliTokenRow({
             }
           >
             {!token.isActive ? (
-              <>{t("device_revoked", "Revoked")}</>
+              <>{t("device_revoked")}</>
             ) : token.isExpired ? (
-              <>{t("device_expired", "Expired")}</>
+              <>{t("device_expired")}</>
             ) : (
-              <>{t("device_active", "Active")}</>
+              <>{t("device_active")}</>
             )}
           </Badge>
         </div>
@@ -144,7 +128,7 @@ function CliTokenRow({
             <span translate="no">{token.cliVersion}</span>
           ) : null}
           <span>
-            {t("device_created", "Created <span0></span0>", {
+            {t.rich("device_created", {
               span0: () => (
                 <span translate="no">
                   {new Date(token.createdAt).toLocaleDateString()}
@@ -154,7 +138,7 @@ function CliTokenRow({
           </span>
           {token.lastUsedAt ? (
             <span>
-              {t("device_last_used", "Last used <span0></span0>", {
+              {t.rich("device_last_used", {
                 span0: () => (
                   <span translate="no">
                     {new Date(token.lastUsedAt!).toLocaleDateString()}
@@ -163,7 +147,7 @@ function CliTokenRow({
               })}
             </span>
           ) : (
-            <span>{t("device_never_used", "Never used")}</span>
+            <span>{t("device_never_used")}</span>
           )}
         </div>
       </div>
@@ -175,12 +159,13 @@ function CliTokenRow({
           void handleRevoke();
         }}
       >
-        {t("device_revoke", "{expression0} Revoke", {
-          expression0: isRevoking ? (
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          ) : (
-            <ShieldOff className="mr-2 h-4 w-4" />
-          ),
+        {t.rich("device_revoke", {
+          expression0: () =>
+            isRevoking ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <ShieldOff className="mr-2 h-4 w-4" />
+            ),
         })}
       </Button>
     </div>

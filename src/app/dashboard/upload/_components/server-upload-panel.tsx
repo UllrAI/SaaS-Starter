@@ -28,15 +28,7 @@ interface ServerUploadResponse {
 }
 function ServerUploadSuccessToast({ count }: { count: number }) {
   const { t } = useTranslation();
-  return (
-    <>
-      {t(
-        "server_upload_success",
-        "{count, plural, one {# file finished through the server pipeline.} other {# files finished through the server pipeline.}}",
-        { count },
-      )}
-    </>
-  );
+  return <>{t("server_upload_success", { count })}</>;
 }
 function ServerUploadWarningToast({
   failed,
@@ -48,27 +40,16 @@ function ServerUploadWarningToast({
   const { t } = useTranslation();
   return (
     <>
-      {t(
-        "uploads_file_s_uploaded_need_attention",
-        "{success} file(s) uploaded and {failed} file(s) need attention.",
-        {
-          success,
-          failed,
-        },
-      )}
+      {t.rich("uploads_file_s_uploaded_need_attention", {
+        success,
+        failed,
+      })}
     </>
   );
 }
 function ServerUploadFailureToast() {
   const { t } = useTranslation();
-  return (
-    <>
-      {t(
-        "uploads_server_upload_did_not_complete",
-        "The server upload did not complete.",
-      )}
-    </>
-  );
+  return <>{t("uploads_server_upload_did_not_complete")}</>;
 }
 export function ServerUploadPanel() {
   const { t } = useTranslation();
@@ -158,28 +139,17 @@ export function ServerUploadPanel() {
         <div className="space-y-1">
           <div className="flex items-center gap-2 text-sm font-medium">
             <Server className="h-4 w-4" />
-            <span>
-              {t("uploads_upload_through_server", "Upload through the server")}
-            </span>
+            <span>{t("uploads_upload_through_server")}</span>
           </div>
           <p className="text-muted-foreground text-sm">
-            {t(
-              "uploads_use_path_when_backend_needs_validate",
-              "Use this path when the backend needs to validate or transform files before storage.",
-            )}
+            {t("uploads_use_path_when_backend_needs_validate")}
           </p>
         </div>
 
         <div className="flex flex-wrap gap-2">
-          <Badge variant="secondary">
-            {t("uploads_bounded_request", "Bounded request")}
-          </Badge>
-          <Badge variant="secondary">
-            {t("uploads_auth_checked", "Auth checked")}
-          </Badge>
-          <Badge variant="outline">
-            {t("uploads_parallel_processing", "Parallel processing")}
-          </Badge>
+          <Badge variant="secondary">{t("uploads_bounded_request")}</Badge>
+          <Badge variant="secondary">{t("uploads_auth_checked")}</Badge>
+          <Badge variant="outline">{t("uploads_parallel_processing")}</Badge>
         </div>
       </div>
 
@@ -210,34 +180,21 @@ export function ServerUploadPanel() {
           <div className="space-y-2">
             <p className="text-sm font-medium">
               {isUploading ? (
-                <>
-                  {t(
-                    "uploads_uploading_through_server",
-                    "Uploading through the server\u2026",
-                  )}
-                </>
+                <>{t("uploads_uploading_through_server")}</>
               ) : (
-                <>
-                  {t(
-                    "uploads_select_files_server_processing",
-                    "Select files for server processing",
-                  )}
-                </>
+                <>{t("uploads_select_files_server_processing")}</>
               )}
             </p>
             <p className="text-muted-foreground text-sm">
-              {t(
-                "uploads_request_stays_inside_application_boundary_before",
-                "The request stays inside your application boundary before landing in storage.",
-              )}
+              {t("uploads_request_in_app_boundary")}
             </p>
           </div>
 
           <span className="text-muted-foreground group-hover:text-foreground text-sm transition">
             {isUploading ? (
-              <>{t("uploads_working", "Working\u2026")}</>
+              <>{t("uploads_working")}</>
             ) : (
-              <>{t("uploads_browse_files", "Browse files")}</>
+              <>{t("uploads_browse_files")}</>
             )}
           </span>
         </div>
@@ -246,9 +203,9 @@ export function ServerUploadPanel() {
       {isUploading ? (
         <div className="bg-background space-y-2 rounded-lg border p-3">
           <div className="flex items-center justify-between text-sm">
-            <span>{t("uploads_pipeline_progress", "Pipeline progress")}</span>
+            <span>{t("uploads_pipeline_progress")}</span>
             <span>
-              {t("uploads_server_progress_percent", "{progress}%", {
+              {t.rich("uploads_server_progress_percent", {
                 progress,
               })}
             </span>
@@ -261,15 +218,15 @@ export function ServerUploadPanel() {
         <div className="flex flex-wrap items-center gap-4">
           <span className="inline-flex items-center gap-2">
             <ShieldCheck className="h-4 w-4" />
-            {t("uploads_validation", "Validation")}
+            {t("uploads_validation")}
           </span>
           <span className="inline-flex items-center gap-2">
             <Sparkles className="h-4 w-4" />
-            {t("uploads_enrichment", "Enrichment")}
+            {t("uploads_enrichment")}
           </span>
           <span className="inline-flex items-center gap-2">
             <Workflow className="h-4 w-4" />
-            {t("uploads_parallel_processing", "Parallel processing")}
+            {t("uploads_parallel_processing")}
           </span>
         </div>
       </div>
@@ -299,7 +256,7 @@ export function ServerUploadPanel() {
               <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/65 via-black/15 to-transparent p-3 text-white">
                 <p className="truncate text-xs font-medium">{file.fileName}</p>
                 <p className="text-[11px] text-white/80">
-                  {t("server_upload_status_uploaded", "Uploaded")}
+                  {t("server_upload_status_uploaded")}
                 </p>
               </div>
             </a>

@@ -17,29 +17,20 @@ export function ProductProof({
     {
       id: "source",
       icon: Github,
-      title: t("productProofSourceTitle", "Inspect the source"),
-      description: t(
-        "productProofSourceDescription",
-        "Review the real routes, migrations, tests, and deployment files before you adopt the starter.",
-      ),
+      title: t("product_proof_source_title"),
+      description: t("product_proof_source_description"),
     },
     {
       id: "workflows",
       icon: CheckCircle2,
-      title: t("productProofWorkflowsTitle", "Complete workflows"),
-      description: t(
-        "productProofWorkflowsDescription",
-        "Authentication, billing, uploads, admin operations, API keys, and CLI device auth are connected end to end.",
-      ),
+      title: t("product_proof_workflows_title"),
+      description: t("product_proof_workflows_description"),
     },
     {
       id: "verification",
       icon: TestTube2,
-      title: t("productProofVerificationTitle", "Verification included"),
-      description: t(
-        "productProofVerificationDescription",
-        "Unit, route, integration, and browser smoke checks protect the foundations you are most likely to extend.",
-      ),
+      title: t("product_proof_verification_title"),
+      description: t("product_proof_verification_description"),
     },
   ];
 
@@ -49,16 +40,13 @@ export function ProductProof({
         <div className="grid gap-10 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:items-start">
           <div className="max-w-xl">
             <Badge variant="outline" className="border-primary text-primary">
-              {t("productProofBadge", "Verifiable foundations")}
+              {t("product_proof_badge")}
             </Badge>
             <h2 className="text-foreground mt-5 text-3xl font-bold tracking-tight sm:text-4xl">
-              {t("productProofTitle", "Proof lives in the repository")}
+              {t("product_proof_title")}
             </h2>
             <p className="text-muted-foreground mt-5 text-lg leading-8">
-              {t(
-                "productProofDescription",
-                "No invented customer logos or placeholder endorsements. Evaluate the implementation, run the checks, and keep only what your product needs.",
-              )}
+              {t("product_proof_description")}
             </p>
             <a
               href={GITHUB_URL}
@@ -66,7 +54,7 @@ export function ProductProof({
               rel="noreferrer"
               className="text-primary mt-6 inline-flex items-center gap-2 text-sm font-semibold hover:underline"
             >
-              {t("productProofSourceLink", "Review the GitHub repository")}
+              {t("product_proof_source_link")}
               <ExternalLink className="h-4 w-4" aria-hidden="true" />
             </a>
           </div>

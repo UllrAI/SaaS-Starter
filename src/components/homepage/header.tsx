@@ -27,27 +27,27 @@ export function Header({
     {
       id: "nav-features",
       href: withLocalePrefix("/features", locale),
-      title: t("home_features", "Features"),
+      title: t("home_features"),
     },
     {
       id: "nav-pricing",
       href: withLocalePrefix("/pricing", locale),
-      title: t("home_pricing_title", "Pricing"),
+      title: t("home_pricing_title"),
     },
     {
       id: "nav-about",
       href: withLocalePrefix("/about", locale),
-      title: t("home_about", "About"),
+      title: t("home_about"),
     },
     {
       id: "nav-blog",
       href: withLocalePrefix("/blog", locale),
-      title: t("home_blog", "Blog"),
+      title: t("home_blog"),
     },
     {
       id: "nav-contact",
       href: withLocalePrefix("/contact", locale),
-      title: t("home_contact", "Contact"),
+      title: t("home_contact"),
     },
   ].filter((item) => SITE_CONFIG.features.billing || item.id !== "nav-pricing");
 
@@ -83,11 +83,11 @@ export function Header({
           <HeaderActions
             navigationItems={navigationItems}
             labels={{
-              dashboard: t("header_dashboard", "Dashboard"),
-              getStarted: t("home_get_started", "Get Started"),
-              navigationMenu: t("home_navigation_menu", "Navigation Menu"),
-              signIn: t("home_sign_in", "Sign In"),
-              toggleMenu: t("home_toggle_menu", "Toggle menu"),
+              dashboard: t("header_dashboard"),
+              getStarted: t("home_get_started"),
+              navigationMenu: t("home_navigation_menu"),
+              signIn: t("home_sign_in"),
+              toggleMenu: t("home_toggle_menu"),
             }}
           />
         </div>

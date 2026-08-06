@@ -27,7 +27,7 @@ function PaymentStatusSkeleton({ locale }: { locale: SupportedLocale }) {
             className="border-border bg-background/50 text-muted-foreground inline-flex items-center border px-3 py-1 font-mono text-sm backdrop-blur-sm"
           >
             <Clock className="mr-2 h-3 w-3" />
-            {t("billing_loading_status", "LOADING_STATUS")}
+            {t("billing_loading_status")}
           </Badge>
         </div>
 

@@ -44,7 +44,7 @@ export function AdminStatsCards({ stats, locale }: AdminStatsCardsProps) {
       <Card className="relative overflow-hidden">
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
           <CardTitle className="text-sm font-medium">
-            {t("admin_total_users", "Total Users")}
+            {t("admin_total_users")}
           </CardTitle>
           <Users className="text-muted-foreground h-4 w-4" />
         </CardHeader>
@@ -54,12 +54,12 @@ export function AdminStatsCards({ stats, locale }: AdminStatsCardsProps) {
           </div>
           <div className="mt-1 flex items-center gap-2">
             <Badge variant="secondary" className="text-xs">
-              {t("admin_verified", "{expression0} verified", {
+              {t.rich("admin_verified", {
                 expression0: stats.users.verified,
               })}
             </Badge>
             <Badge variant="outline" className="text-xs">
-              {t("admin_admins", "{expression0} admins", {
+              {t.rich("admin_admins", {
                 expression0: stats.users.admins,
               })}
             </Badge>
@@ -71,7 +71,7 @@ export function AdminStatsCards({ stats, locale }: AdminStatsCardsProps) {
         <Card className="relative overflow-hidden">
           <CardHeader className="flex flex-row items-center justify-between space-y-0">
             <CardTitle className="text-sm font-medium">
-              {t("admin_active_subscriptions_stats", "Active Subscriptions")}
+              {t("admin_active_subscriptions_stats")}
             </CardTitle>
             <Shield className="text-muted-foreground h-4 w-4" />
           </CardHeader>
@@ -80,17 +80,13 @@ export function AdminStatsCards({ stats, locale }: AdminStatsCardsProps) {
               {stats.subscriptions.active.toLocaleString(intlLocale)}
             </div>
             <p className="text-muted-foreground flex items-center gap-1 text-xs">
-              {t(
-                "admin_total_canceled",
-                "<TrendingUp0></TrendingUp0>{expression0} total \u2022 {expression1} canceled",
-                {
-                  expression0: stats.subscriptions.total,
-                  expression1: stats.subscriptions.canceled,
-                  TrendingUp0: () => (
-                    <TrendingUp className="h-3 w-3 text-emerald-600" />
-                  ),
-                },
-              )}
+              {t.rich("admin_total_canceled", {
+                expression0: stats.subscriptions.total,
+                expression1: stats.subscriptions.canceled,
+                TrendingUp0: () => (
+                  <TrendingUp className="h-3 w-3 text-emerald-600" />
+                ),
+              })}
             </p>
           </CardContent>
         </Card>
@@ -100,7 +96,7 @@ export function AdminStatsCards({ stats, locale }: AdminStatsCardsProps) {
         <Card className="relative overflow-hidden">
           <CardHeader className="flex flex-row items-center justify-between space-y-0">
             <CardTitle className="text-sm font-medium">
-              {t("admin_settled_usd_revenue", "Settled USD Revenue")}
+              {t("admin_settled_usd_revenue")}
             </CardTitle>
             <CreditCard className="text-muted-foreground h-4 w-4" />
           </CardHeader>
@@ -109,16 +105,12 @@ export function AdminStatsCards({ stats, locale }: AdminStatsCardsProps) {
               {formatStatsCurrency(stats.payments.totalRevenue)}
             </div>
             <p className="text-muted-foreground flex items-center gap-1 text-xs">
-              {t(
-                "admin_successful_payments_stats",
-                "<TrendingUp0></TrendingUp0>{expression0} successful payments",
-                {
-                  expression0: stats.payments.successful,
-                  TrendingUp0: () => (
-                    <TrendingUp className="h-3 w-3 text-emerald-600" />
-                  ),
-                },
-              )}
+              {t.rich("admin_successful_payments_stats", {
+                expression0: stats.payments.successful,
+                TrendingUp0: () => (
+                  <TrendingUp className="h-3 w-3 text-emerald-600" />
+                ),
+              })}
             </p>
           </CardContent>
         </Card>
@@ -128,7 +120,7 @@ export function AdminStatsCards({ stats, locale }: AdminStatsCardsProps) {
         <Card className="relative overflow-hidden">
           <CardHeader className="flex flex-row items-center justify-between space-y-0">
             <CardTitle className="text-sm font-medium">
-              {t("admin_file_uploads", "File Uploads")}
+              {t("admin_file_uploads")}
             </CardTitle>
             <Upload className="text-muted-foreground h-4 w-4" />
           </CardHeader>
@@ -137,7 +129,7 @@ export function AdminStatsCards({ stats, locale }: AdminStatsCardsProps) {
               {stats.uploads.total.toLocaleString(intlLocale)}
             </div>
             <p className="text-muted-foreground text-xs">
-              {t("admin_total", "{expression0} total", {
+              {t.rich("admin_total", {
                 expression0: formatFileSize(stats.uploads.totalSize),
               })}
             </p>

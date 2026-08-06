@@ -21,26 +21,17 @@ export async function generateMetadata() {
   const metadata = createMetadataDefaults({ locale });
   return {
     ...metadata,
-    title: t("admin_upload_management", "Upload Management"),
-    description: t(
-      "admin_manage_user_uploads_file_storage_content",
-      "Manage user uploads, file storage, and content moderation",
-    ),
+    title: t("admin_upload_management"),
+    description: t("admin_manage_uploads_storage"),
     openGraph: {
       ...metadata.openGraph,
-      title: t("admin_upload_management", "Upload Management"),
-      description: t(
-        "admin_manage_user_uploads_file_storage_content",
-        "Manage user uploads, file storage, and content moderation",
-      ),
+      title: t("admin_upload_management"),
+      description: t("admin_manage_uploads_storage"),
     },
     twitter: {
       ...metadata.twitter,
-      title: t("admin_upload_management", "Upload Management"),
-      description: t(
-        "admin_manage_user_uploads_file_storage_content",
-        "Manage user uploads, file storage, and content moderation",
-      ),
+      title: t("admin_upload_management"),
+      description: t("admin_manage_uploads_storage"),
     },
   };
 }
@@ -54,8 +45,8 @@ export default async function UploadManagementPage() {
   const initialTableData = await getUploads({});
   return (
     <DashboardPageWrapper
-      title={<>{t("admin_upload_management", "Upload Management")}</>}
-      parentTitle={<>{t("admin_dashboard", "Admin Dashboard")}</>}
+      title={<>{t("admin_upload_management")}</>}
+      parentTitle={<>{t("admin_dashboard")}</>}
       parentUrl="/dashboard/admin"
     >
       <Suspense fallback={<StatsCardsSkeleton />}>
@@ -64,13 +55,8 @@ export default async function UploadManagementPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>{t("admin_all_uploads", "All Uploads")}</CardTitle>
-          <CardDescription>
-            {t(
-              "admin_manage_user_uploads_monitor_storage_usage",
-              "Manage user uploads, monitor storage usage, and moderate content",
-            )}
-          </CardDescription>
+          <CardTitle>{t("admin_all_uploads")}</CardTitle>
+          <CardDescription>{t("admin_monitor_storage_usage")}</CardDescription>
         </CardHeader>
         <CardContent>
           <UploadManagementTable

@@ -4,7 +4,6 @@ import { getTranslations } from "next-intl/server";
 
 import type { SupportedLocale } from "@/lib/config/i18n";
 import { getRequestLocale } from "@/lib/i18n/server-locale";
-import { createAppTranslate } from "@/lib/i18n/translation/shared";
 
 export async function getServerTranslations({
   locale,
@@ -16,6 +15,6 @@ export async function getServerTranslations({
 
   return {
     locale: resolvedLocale,
-    t: createAppTranslate(translator),
+    t: translator,
   };
 }

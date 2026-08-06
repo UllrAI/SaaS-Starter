@@ -31,31 +31,21 @@ export function Hero({
                   <span className="bg-primary absolute inline-flex h-full w-full animate-ping rounded-full opacity-75"></span>
                   <span className="bg-primary relative inline-flex h-2 w-2 rounded-full"></span>
                 </span>
-                <>
-                  {t(
-                    "home_open_source_agent_ready",
-                    "Open source and agent ready",
-                  )}
-                </>
+                <>{t("home_open_source_agent_ready")}</>
               </Badge>
             </div>
 
             {/* Massive Headline */}
             <h1 className="text-foreground mb-6 text-5xl leading-[0.9] font-black tracking-tighter sm:text-6xl lg:text-7xl xl:text-8xl">
-              <span className="block">{t("home_ship", "SHIP YOUR")}</span>
+              <span className="block">{t("home_ship")}</span>
               <span className="from-foreground to-foreground/50 block bg-gradient-to-b bg-clip-text pr-1 text-transparent">
-                {t("home_micro_saas", "MICRO SaaS")}
+                {t("home_micro_saas")}
               </span>
             </h1>
 
             {/* Subtext */}
             <p className="text-muted-foreground mb-10 max-w-xl text-lg leading-relaxed sm:text-xl lg:text-2xl">
-              <>
-                {t(
-                  "home_complete_ullrai_saas_starter",
-                  "Complete UllrAI SaaS starter with authentication, payments, database, admin tooling, agent-ready APIs, and CLI device auth for agent (OpenClaw, Codex, Claude Code, etc.) workflows. Everything you need to go from idea to revenue.",
-                )}
-              </>
+              <>{t("home_complete_ullrai_saas_starter")}</>
             </p>
 
             {/* CTAs */}
@@ -66,7 +56,7 @@ export function Hero({
                 asChild
               >
                 <Link href="/signup">
-                  <>{t("home_start_now", "START NOW")}</>
+                  <>{t("home_start_now")}</>
                   <Terminal className="ml-3 h-5 w-5" />
                 </Link>
               </Button>
@@ -79,7 +69,7 @@ export function Hero({
               >
                 <Link href={GITHUB_URL} target="_blank">
                   <Github className="mr-2 h-5 w-5" />
-                  <>{t("home_view_source", "VIEW SOURCE")}</>
+                  <>{t("home_view_source")}</>
                 </Link>
               </Button>
             </div>
@@ -100,14 +90,11 @@ export function Hero({
                   <div className="bg-foreground/20 mx-2 h-6 w-px" />
                   <span className="text-foreground flex items-center gap-2 font-mono text-sm font-bold">
                     <Terminal className="h-4 w-4" />
-                    {t("home_developer_console", "developer-console")}
+                    {t("home_developer_console")}
                   </span>
                 </div>
                 <div className="text-muted-foreground hidden font-mono text-xs font-bold sm:block">
-                  {t(
-                    "home_user_saas_starter_projects_my_app",
-                    "user@saas-starter:~/projects/my-app",
-                  )}
+                  {t("home_user_saas_starter_projects_my_app")}
                 </div>
               </div>
 
@@ -117,8 +104,8 @@ export function Hero({
                 <div className="border-border overflow-hidden border-b p-6 text-left font-mono text-xs sm:p-8 lg:col-span-7 lg:border-r lg:border-b-0">
                   <CopyCommand
                     command={command}
-                    copyLabel={t("hero_copy_command", "Copy command")}
-                    copiedLabel={t("hero_command_copied", "Command copied")}
+                    copyLabel={t("hero_copy_command")}
+                    copiedLabel={t("hero_command_copied")}
                   />
 
                   <div translate="no" className="space-y-2 text-xs sm:text-xs">
@@ -181,7 +168,7 @@ export function Hero({
                         className="bg-primary block h-4 w-2"
                       />
                       <span>
-                        <>{t("hero_running", "Running...")}</>
+                        <>{t("hero_running")}</>
                       </span>
                     </div>
                   </div>
@@ -191,12 +178,12 @@ export function Hero({
                 <div className="bg-secondary/5 flex flex-col p-6 text-left sm:p-8 lg:col-span-5">
                   <div className="mb-6 space-y-2">
                     <div className="text-muted-foreground text-xs font-bold tracking-widest uppercase">
-                      <>{t("home_whats_included", "What's Included")}</>
+                      <>{t("home_whats_included")}</>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="bg-primary h-3 w-3 rounded-full" />
                       <span className="text-foreground font-bold">
-                        <>{t("home_production_ready", "Production Ready")}</>
+                        <>{t("home_production_ready")}</>
                       </span>
                     </div>
                   </div>
@@ -209,7 +196,7 @@ export function Hero({
                           ✓
                         </span>
                         <span>
-                          <>{t("home_authentication", "Authentication")}</>
+                          <>{t("home_authentication")}</>
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
@@ -217,7 +204,7 @@ export function Hero({
                           ✓
                         </span>
                         <span>
-                          <>{t("home_agent_ready_apis", "Agent-ready APIs")}</>
+                          <>{t("home_agent_ready_apis")}</>
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
@@ -225,7 +212,7 @@ export function Hero({
                           ✓
                         </span>
                         <span>
-                          <>{t("home_cli_device_auth", "CLI Device Auth")}</>
+                          <>{t("home_cli_device_auth")}</>
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
@@ -233,7 +220,7 @@ export function Hero({
                           ✓
                         </span>
                         <span>
-                          <>{t("home_database", "Database")}</>
+                          <>{t("home_database")}</>
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
@@ -241,7 +228,7 @@ export function Hero({
                           ✓
                         </span>
                         <span>
-                          <>{t("home_payments", "Payments")}</>
+                          <>{t("home_payments")}</>
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
@@ -249,7 +236,7 @@ export function Hero({
                           ✓
                         </span>
                         <span>
-                          <>{t("home_file_upload", "File Upload")}</>
+                          <>{t("home_file_upload")}</>
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
@@ -257,7 +244,7 @@ export function Hero({
                           ✓
                         </span>
                         <span>
-                          <>{t("home_admin_panel", "Admin Panel")}</>
+                          <>{t("home_admin_panel")}</>
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
@@ -265,7 +252,7 @@ export function Hero({
                           ✓
                         </span>
                         <span>
-                          <>{t("home_i18n_ready", "i18n Ready")}</>
+                          <>{t("home_i18n_ready")}</>
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
@@ -273,7 +260,7 @@ export function Hero({
                           ✓
                         </span>
                         <span>
-                          <>{t("home_e2_e_smoke_tests", "E2E Smoke Tests")}</>
+                          <>{t("home_e2_e_smoke_tests")}</>
                         </span>
                       </div>
                     </div>
@@ -281,9 +268,7 @@ export function Hero({
 
                   <div className="border-border mt-auto border-t pt-6">
                     <div className="text-muted-foreground text-xs">
-                      <span className="block">
-                        {t("home_built", "Built with")}
-                      </span>
+                      <span className="block">{t("home_built")}</span>
                       <span
                         translate="no"
                         className="text-primary block font-mono"

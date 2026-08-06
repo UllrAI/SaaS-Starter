@@ -44,82 +44,24 @@ function HeadlessIssueMessage({ code }: { code: string }) {
   const { t } = useTranslation();
   switch (code) {
     case "too-many-files":
-      return (
-        <>
-          {t(
-            "uploads_too_many_files_selected_demo",
-            "Too many files selected for this demo.",
-          )}
-        </>
-      );
+      return <>{t("uploads_too_many_files_selected_demo")}</>;
     case "file-type-not-accepted":
-      return (
-        <>
-          {t(
-            "uploads_demo_only_accepts_image_files",
-            "This demo only accepts image files.",
-          )}
-        </>
-      );
+      return <>{t("uploads_demo_only_accepts_image_files")}</>;
     case "file-too-large":
     case "file-too-large-for-app":
-      return (
-        <>
-          {t(
-            "uploads_one_files_larger_than_allowed_limit",
-            "One of the files is larger than the allowed limit.",
-          )}
-        </>
-      );
+      return <>{t("uploads_one_files_larger_than_allowed_limit")}</>;
     case "upload-quota-exceeded":
-      return (
-        <>
-          {t(
-            "uploadQuotaExceeded",
-            "Your upload quota has been reached. Remove files or try again later.",
-          )}
-        </>
-      );
+      return <>{t("upload_quota_exceeded")}</>;
     case "upload-preparation-failed":
-      return (
-        <>
-          {t(
-            "uploads_file_could_not_prepared_before_upload",
-            "The file could not be prepared before upload.",
-          )}
-        </>
-      );
+      return <>{t("uploads_file_could_not_prepared_before_upload")}</>;
     case "request-failed":
-      return (
-        <>
-          {t(
-            "uploads_upload_request_failed_try_again",
-            "The upload request failed. Try again.",
-          )}
-        </>
-      );
+      return <>{t("uploads_upload_request_failed_try_again")}</>;
     case "network-error":
-      return (
-        <>
-          {t(
-            "uploads_network_connection_dropped_during_upload",
-            "The network connection dropped during upload.",
-          )}
-        </>
-      );
+      return <>{t("uploads_network_connection_dropped")}</>;
     case "upload-aborted":
-      return (
-        <>{t("uploads_upload_was_canceled", "The upload was canceled.")}</>
-      );
+      return <>{t("uploads_upload_was_canceled")}</>;
     default:
-      return (
-        <>
-          {t(
-            "uploads_upload_could_not_completed",
-            "The upload could not be completed.",
-          )}
-        </>
-      );
+      return <>{t("uploads_upload_could_not_completed")}</>;
   }
 }
 function HeadlessTileStatus({
@@ -134,19 +76,19 @@ function HeadlessTileStatus({
     case "uploading":
       return (
         <>
-          {t("uploads_server_progress_percent", "{progress}%", {
+          {t.rich("uploads_server_progress_percent", {
             progress,
           })}
         </>
       );
     case "success":
-      return <>{t("uploads_uploaded", "Uploaded")}</>;
+      return <>{t("uploads_uploaded")}</>;
     case "error":
-      return <>{t("uploads_needs_attention_headless", "Needs attention")}</>;
+      return <>{t("uploads_needs_attention_headless")}</>;
     case "canceled":
-      return <>{t("uploads_canceled", "Canceled")}</>;
+      return <>{t("uploads_canceled")}</>;
     default:
-      return <>{t("uploads_queued_headless", "Queued")}</>;
+      return <>{t("uploads_queued_headless")}</>;
   }
 }
 function HeadlessUploadTile({
@@ -171,12 +113,8 @@ function HeadlessUploadTile({
       })}
     >
       <Upload className="mb-2 h-5 w-5" />
-      <p className="text-sm font-medium">
-        {t("uploads_add_images", "Add images")}
-      </p>
-      <p className="mt-1 text-xs">
-        {t("uploads_drag_drop_browse", "Drag, drop, or browse")}
-      </p>
+      <p className="text-sm font-medium">{t("uploads_add_images")}</p>
+      <p className="mt-1 text-xs">{t("uploads_drag_drop_browse")}</p>
     </div>
   );
 }
@@ -251,7 +189,7 @@ function HeadlessUploadContent({
       {completedCount > 0 ? (
         <div className="flex flex-wrap gap-2">
           <Button size="sm" variant="outline" onClick={uploader.clearCompleted}>
-            {t("uploads_clear_completed_headless", "Clear completed")}
+            {t("uploads_clear_completed_headless")}
           </Button>
         </div>
       ) : null}
@@ -289,22 +227,8 @@ export function UploadWorkbench() {
         "image/bmp",
         "image/tiff",
       ],
-      description: (
-        <>
-          {t(
-            "uploads_best_gallery_style_uploads_image_compression",
-            "Best for gallery-style uploads with image compression and instant preview tiles.",
-          )}
-        </>
-      ),
-      meta: (
-        <>
-          {t(
-            "uploads_5_files_10_mb_each_compression",
-            "5 files \u2022 10 MB each \u2022 compression enabled",
-          )}
-        </>
-      ),
+      description: <>{t("uploads_gallery_style_compression")}</>,
+      meta: <>{t("uploads_5_files_10_mb_each_compression")}</>,
       settings: {
         enableImageCompression: true,
         imageCompressionMaxHeight: 1080,
@@ -313,7 +237,7 @@ export function UploadWorkbench() {
         maxFileSize: 10 * 1024 * 1024,
         maxFiles: 5,
       },
-      title: <>{t("uploads_image_uploads", "Image uploads")}</>,
+      title: <>{t("uploads_image_uploads")}</>,
     },
     documents: {
       acceptedFileTypes: [
@@ -324,64 +248,29 @@ export function UploadWorkbench() {
         "text/csv",
         "text/markdown",
       ],
-      description: (
-        <>
-          {t(
-            "uploads_shows_narrower_preset_single_file_document",
-            "Shows a narrower preset for single-file document collection and validation feedback.",
-          )}
-        </>
-      ),
-      meta: (
-        <>
-          {t(
-            "uploads_1_file_10_mb_document_formats",
-            "1 file \u2022 10 MB \u2022 document formats only",
-          )}
-        </>
-      ),
+      description: <>{t("uploads_narrower_single_file_preset")}</>,
+      meta: <>{t("uploads_1_file_10_mb_document_formats")}</>,
       settings: {
         maxFileSize: 10 * 1024 * 1024,
         maxFiles: 1,
       },
-      title: <>{t("uploads_document_uploads", "Document uploads")}</>,
+      title: <>{t("uploads_document_uploads")}</>,
     },
     batch: {
       acceptedFileTypes: undefined,
-      description: (
-        <>
-          {t(
-            "uploads_use_full_supported_matrix_when_workflow",
-            "Use the full supported matrix when a workflow needs several files in one run.",
-          )}
-        </>
-      ),
-      meta: (
-        <>
-          {t(
-            "uploads_10_files_default_global_limits",
-            "10 files \u2022 default global limits",
-          )}
-        </>
-      ),
+      description: <>{t("uploads_full_matrix_when_needed")}</>,
+      meta: <>{t("uploads_10_files_default_global_limits")}</>,
       settings: {
         maxFiles: 10,
       },
-      title: <>{t("uploads_batch_uploads", "Batch uploads")}</>,
+      title: <>{t("uploads_batch_uploads")}</>,
     },
     large: {
       acceptedFileTypes: undefined,
-      description: (
-        <>
-          {t(
-            "uploads_demonstrates_looser_preset_without_changing_application",
-            "Demonstrates a looser preset without changing the application-wide safety checks.",
-          )}
-        </>
-      ),
+      description: <>{t("uploads_looser_preset_demo")}</>,
       meta: (
         <>
-          {t("uploads_2_files_each", "2 files \u2022 {expression0} each", {
+          {t.rich("uploads_2_files_each", {
             expression0: formatFileSize(50 * 1024 * 1024),
           })}
         </>
@@ -390,48 +279,27 @@ export function UploadWorkbench() {
         maxFileSize: 50 * 1024 * 1024,
         maxFiles: 2,
       },
-      title: <>{t("uploads_large_files", "Large files")}</>,
+      title: <>{t("uploads_large_files")}</>,
     },
   };
   const capabilityCards = [
     {
       id: "default",
-      description: (
-        <>
-          {t(
-            "uploads_preset_demos_image_document_batch_larger",
-            "Preset demos for image, document, batch, and larger file uploads.",
-          )}
-        </>
-      ),
+      description: <>{t("uploads_preset_demos")}</>,
       icon: LayoutTemplate,
-      title: <>{t("uploads_default_component", "Default component")}</>,
+      title: <>{t("uploads_default_component")}</>,
     },
     {
       id: "headless",
-      description: (
-        <>
-          {t(
-            "uploads_same_upload_state_can_drive_custom",
-            "The same upload state can drive a custom image grid through render props.",
-          )}
-        </>
-      ),
+      description: <>{t("uploads_same_upload_state_can_drive_custom")}</>,
       icon: Blocks,
-      title: <>{t("uploads_headless_usage", "Headless usage")}</>,
+      title: <>{t("uploads_headless_usage")}</>,
     },
     {
       id: "server",
-      description: (
-        <>
-          {t(
-            "uploads_route_files_through_backend_when_validation",
-            "Route files through your backend when validation or processing must happen first.",
-          )}
-        </>
-      ),
+      description: <>{t("uploads_route_through_backend")}</>,
       icon: HardDriveUpload,
-      title: <>{t("uploads_server_pipeline", "Server pipeline")}</>,
+      title: <>{t("uploads_server_pipeline")}</>,
     },
   ];
   return (
@@ -458,31 +326,20 @@ export function UploadWorkbench() {
       <section className="grid gap-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]">
         <Card className="shadow-sm">
           <CardHeader>
-            <CardTitle>
-              {t("uploads_default_uploader_demos", "Default uploader demos")}
-            </CardTitle>
+            <CardTitle>{t("uploads_default_uploader_demos")}</CardTitle>
             <CardDescription>
-              {t(
-                "uploads_reuse_shared_uploader_different_presets_demonstrate",
-                "Reuse the shared uploader with different presets to demonstrate the common paths most products need.",
-              )}
+              {t("uploads_shared_uploader_presets")}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <Tabs defaultValue="images">
               <TabsList className="h-auto w-full justify-start">
-                <TabsTrigger value="images">
-                  {t("uploads_images", "Images")}
-                </TabsTrigger>
+                <TabsTrigger value="images">{t("uploads_images")}</TabsTrigger>
                 <TabsTrigger value="documents">
-                  {t("uploads_documents", "Documents")}
+                  {t("uploads_documents")}
                 </TabsTrigger>
-                <TabsTrigger value="batch">
-                  {t("uploads_batch", "Batch")}
-                </TabsTrigger>
-                <TabsTrigger value="large">
-                  {t("uploads_large", "Large")}
-                </TabsTrigger>
+                <TabsTrigger value="batch">{t("uploads_batch")}</TabsTrigger>
+                <TabsTrigger value="large">{t("uploads_large")}</TabsTrigger>
               </TabsList>
 
               {Object.entries(presetConfigs).map(([key, preset]) => (
@@ -512,28 +369,18 @@ export function UploadWorkbench() {
 
         <Card className="shadow-sm">
           <CardHeader>
-            <CardTitle>
-              {t("uploads_headless_example", "Headless example")}
-            </CardTitle>
+            <CardTitle>{t("uploads_headless_example")}</CardTitle>
             <CardDescription>
-              {t(
-                "uploads_demo_uses_same_uploader_state_but",
-                "This demo uses the same uploader state, but renders a custom image grid instead of the default shell.",
-              )}
+              {t("uploads_demo_uses_same_uploader_state_but")}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="text-muted-foreground bg-muted/30 rounded-lg border p-3 text-sm">
               <div className="text-foreground flex items-center gap-2 font-medium">
                 <Blocks className="h-4 w-4" />
-                <span>{t("uploads_why_matters", "Why this matters")}</span>
+                <span>{t("uploads_why_matters")}</span>
               </div>
-              <p className="mt-2">
-                {t(
-                  "uploads_product_pages_often_need_bespoke_previews",
-                  "Product pages often need bespoke previews. The upload logic stays shared while the layout stays page-specific.",
-                )}
-              </p>
+              <p className="mt-2">{t("uploads_product_page_previews")}</p>
             </div>
 
             <HeadlessUploadDemo />
@@ -545,16 +392,9 @@ export function UploadWorkbench() {
         <CardHeader>
           <div className="flex items-center gap-2">
             <Server className="text-primary h-5 w-5" />
-            <CardTitle>
-              {t("uploads_server_side_uploads", "Server-side uploads")}
-            </CardTitle>
+            <CardTitle>{t("uploads_server_side_uploads")}</CardTitle>
           </div>
-          <CardDescription>
-            {t(
-              "uploads_use_lane_when_application_must_inspect",
-              "Use this lane when your application must inspect or transform files on the server before they reach object storage.",
-            )}
-          </CardDescription>
+          <CardDescription>{t("uploads_lane_for_inspection")}</CardDescription>
         </CardHeader>
         <CardContent>
           <ServerUploadPanel />

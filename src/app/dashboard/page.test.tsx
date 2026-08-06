@@ -197,14 +197,15 @@ describe("Dashboard Home Page", () => {
         "Account overview, billing status, and starter setup progress.",
       ),
     ).toBeInTheDocument();
-    expect(screen.getAllByText("Pro")).toHaveLength(2);
+    expect(screen.getByText("Professional")).toBeInTheDocument();
+    expect(screen.getByText("Pro")).toBeInTheDocument();
     expect(screen.getByText("Active")).toBeInTheDocument();
     expect(screen.getByText("12")).toBeInTheDocument();
     expect(screen.getByText("4096 bytes stored")).toBeInTheDocument();
     expect(screen.getAllByText("1200-usd-en-US")).toHaveLength(2);
     expect(screen.getByText("Test User")).toBeInTheDocument();
     expect(screen.getByText("test@example.com")).toBeInTheDocument();
-    expect(screen.getByText("super admin")).toBeInTheDocument();
+    expect(screen.getByText("Super Admin")).toBeInTheDocument();
     expect(screen.getAllByRole("link", { name: /Open/ })[0]).toHaveAttribute(
       "href",
       "/dashboard/billing",

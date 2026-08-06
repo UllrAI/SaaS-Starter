@@ -31,7 +31,7 @@ function ChartLoadingMessage({ heightClassName }: { heightClassName: string }) {
     <div
       className={`text-muted-foreground flex items-center justify-center text-sm ${heightClassName}`}
     >
-      {t("admin_loading_chart", "Loading chart...")}
+      {t("admin_loading_chart")}
     </div>
   );
 }
@@ -45,12 +45,9 @@ export function AdminDashboardCharts({ charts }: AdminDashboardChartsProps) {
       <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-1">
         <Card>
           <CardHeader>
-            <CardTitle>{t("admin_user_growth", "User Growth")}</CardTitle>
+            <CardTitle>{t("admin_user_growth")}</CardTitle>
             <CardDescription>
-              {t(
-                "admin_new_user_registrations_over_last_30",
-                "New user registrations over the last 30 days",
-              )}
+              {t("admin_new_user_registrations_over_last_30")}
             </CardDescription>
           </CardHeader>
           <CardContent className="pl-2">
@@ -62,14 +59,9 @@ export function AdminDashboardCharts({ charts }: AdminDashboardChartsProps) {
       {SITE_CONFIG.features.billing && (
         <Card>
           <CardHeader>
-            <CardTitle>
-              {t("admin_revenue_overview", "Revenue Overview")}
-            </CardTitle>
+            <CardTitle>{t("admin_revenue_overview")}</CardTitle>
             <CardDescription>
-              {t(
-                "admin_monthly_revenue_payment_trends",
-                "Monthly revenue and payment trends",
-              )}
+              {t("admin_monthly_revenue_payment_trends")}
             </CardDescription>
           </CardHeader>
           <CardContent className="pl-2">

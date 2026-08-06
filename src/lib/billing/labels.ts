@@ -1,4 +1,3 @@
-import type { AppTranslate } from "@/lib/i18n/translation/shared";
 import type { SubscriptionStatus } from "@/types/billing";
 
 interface BillingLabel {
@@ -60,18 +59,24 @@ const UNKNOWN_PAYMENT_TYPE: BillingLabel = {
   fallback: "Unknown",
 };
 
-function translateLabel(label: BillingLabel, t: AppTranslate): string {
-  return t(label.key, label.fallback);
+function translateLabel(
+  label: BillingLabel,
+  t: (key: string) => string,
+): string {
+  return t(label.key);
 }
 
 export function getSubscriptionStatusLabel(
   status: SubscriptionStatus,
-  t: AppTranslate,
+  t: (key: string) => string,
 ): string {
   return translateLabel(SUBSCRIPTION_STATUS_LABELS[status], t);
 }
 
-export function getPaymentStatusLabel(status: string, t: AppTranslate): string {
+export function getPaymentStatusLabel(
+  status: string,
+  t: (key: string) => string,
+): string {
   const label =
     PAYMENT_STATUS_LABELS[status as keyof typeof PAYMENT_STATUS_LABELS] ??
     UNKNOWN_PAYMENT_STATUS;
@@ -80,7 +85,7 @@ export function getPaymentStatusLabel(status: string, t: AppTranslate): string {
 
 export function getPaymentTypeLabel(
   paymentType: string,
-  t: AppTranslate,
+  t: (key: string) => string,
 ): string {
   const label =
     PAYMENT_TYPE_LABELS[paymentType as keyof typeof PAYMENT_TYPE_LABELS] ??

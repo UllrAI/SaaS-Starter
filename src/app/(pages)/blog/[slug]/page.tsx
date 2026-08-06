@@ -42,11 +42,8 @@ export function generateBlogPostMetadata({
   const post = getPostBySlug(slug, locale);
   if (!post) {
     const metadata = createMetadataDefaults({ locale });
-    const title = t("blogPostNotFoundTitle", "Post not found");
-    const description = t(
-      "blogPostNotFoundDescription",
-      "The requested blog post could not be found.",
-    );
+    const title = t("blog_post_not_found_title");
+    const description = t("blog_post_not_found_description");
     return {
       ...metadata,
       title,
@@ -78,12 +75,7 @@ export function generateBlogPostMetadata({
     (localizedPost) => localizedPost.locale === SOURCE_LOCALE,
   );
   const description =
-    post.excerpt ||
-    t(
-      "blogPostDefaultDescription",
-      "Read {title} for implementation details, practical guidance, and related context.",
-      { title: post.title },
-    );
+    post.excerpt || t("blog_post_default_description", { title: post.title });
   const publishedTime = post.publishedDate
     ? new Date(post.publishedDate).toISOString()
     : undefined;
@@ -237,20 +229,17 @@ export async function BlogPostPageContent({
         <ReadingContainer>
           <div className="text-center">
             <h2 className="text-foreground mb-4 text-xl font-bold sm:text-2xl">
-              {t("blog_thanks_reading", "Thanks for reading!")}
+              {t("blog_thanks_reading")}
             </h2>
             <p className="text-muted-foreground mb-6 text-sm sm:mb-8 sm:text-base">
-              {t(
-                "blog_want_read_more_articles_check_out",
-                "Want to read more articles? Check out our blog for the latest insights and updates.",
-              )}
+              {t("blog_want_read_more_articles_check_out")}
             </p>
             <Link href={getLocalizedBlogPath(locale)}>
               <Button
                 size="lg"
                 className="bg-primary hover:bg-primary/90 text-primary-foreground transition-colors"
               >
-                {t("blog_explore_more_articles", "Explore More Articles")}
+                {t("blog_explore_more_articles")}
               </Button>
             </Link>
           </div>

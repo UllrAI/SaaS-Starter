@@ -63,111 +63,76 @@ function getStatusConfig(
   switch (status) {
     case "success":
       return {
-        badgeText: (
-          <>{t("payment_status_completed_badge", "Payment completed")}</>
-        ),
+        badgeText: <>{t("payment_status_completed_badge")}</>,
         badgeVariant: "default",
         description:
           paymentMode === "one_time" ? (
-            <>
-              {t(
-                "payment_status_lifetime_success_description",
-                "Your one-time purchase is complete. Lifetime access is now active, with no recurring charge.",
-              )}
-            </>
+            <>{t("payment_status_lifetime_success_description")}</>
           ) : (
-            <>
-              {t(
-                "payment_status_subscription_success_description",
-                "Your subscription is active, and your account now includes the purchased features.",
-              )}
-            </>
+            <>{t("payment_status_success_description")}</>
           ),
         icon: <CheckCircle className="h-20 w-20 text-emerald-500" />,
         primaryAction: {
           href: "/dashboard",
-          text: <>{t("payment_status_access_dashboard", "Access dashboard")}</>,
+          text: <>{t("payment_status_access_dashboard")}</>,
           variant: "default",
         },
         secondaryAction: {
           href: "/dashboard/billing",
-          text: <>{t("payment_status_manage_billing", "View billing")}</>,
+          text: <>{t("payment_status_manage_billing")}</>,
         },
-        title: <>{t("payment_status_success_title", "Payment successful")}</>,
+        title: <>{t("payment_status_success_title")}</>,
       };
     case "failed":
       return {
-        badgeText: <>{t("payment_status_failed_badge", "Payment failed")}</>,
+        badgeText: <>{t("payment_status_failed_badge")}</>,
         badgeVariant: "destructive",
-        description: (
-          <>
-            {t(
-              "payment_status_failed_description",
-              "We could not process your payment. Check your payment method and try again, or contact support for help.",
-            )}
-          </>
-        ),
+        description: <>{t("payment_status_failed_description")}</>,
         icon: <XCircle className="h-20 w-20 text-red-500" />,
         primaryAction: {
           href: "/pricing",
-          text: <>{t("payment_status_try_again", "Try again")}</>,
+          text: <>{t("payment_status_try_again")}</>,
           variant: "default",
         },
         secondaryAction: {
           href: "/contact",
-          text: <>{t("payment_status_contact_support", "Contact support")}</>,
+          text: <>{t("payment_status_contact_support")}</>,
         },
-        title: <>{t("payment_status_failed_title", "Payment failed")}</>,
+        title: <>{t("payment_status_failed_title")}</>,
       };
     case "pending":
       return {
-        badgeText: <>{t("payment_status_processing_badge", "Processing")}</>,
+        badgeText: <>{t("payment_status_processing_badge")}</>,
         badgeVariant: "secondary",
-        description: (
-          <>
-            {t(
-              "payment_status_processing_description",
-              "Your payment is still processing. This page will update automatically when its status changes.",
-            )}
-          </>
-        ),
+        description: <>{t("payment_status_processing_description")}</>,
         icon: <Clock className="h-20 w-20 text-amber-500" />,
         primaryAction: {
           href: "/dashboard",
-          text: <>{t("payment_status_go_dashboard", "Go to dashboard")}</>,
+          text: <>{t("payment_status_go_dashboard")}</>,
           variant: "outline",
         },
         secondaryAction: {
           href: "/dashboard/billing",
-          text: <>{t("payment_status_check_billing", "Check billing")}</>,
+          text: <>{t("payment_status_check_billing")}</>,
         },
-        title: (
-          <>{t("payment_status_processing_title", "Payment processing")}</>
-        ),
+        title: <>{t("payment_status_processing_title")}</>,
       };
     case "cancelled":
       return {
-        badgeText: <>{t("payment_status_cancelled_badge", "Cancelled")}</>,
+        badgeText: <>{t("payment_status_cancelled_badge")}</>,
         badgeVariant: "outline",
-        description: (
-          <>
-            {t(
-              "payment_status_cancelled_description",
-              "You cancelled checkout. No charge was made, and you can try again at any time.",
-            )}
-          </>
-        ),
+        description: <>{t("payment_status_cancelled_description")}</>,
         icon: <AlertCircle className="h-20 w-20 text-slate-500" />,
         primaryAction: {
           href: "/pricing",
-          text: <>{t("payment_status_view_plans", "View plans")}</>,
+          text: <>{t("payment_status_view_plans")}</>,
           variant: "default",
         },
         secondaryAction: {
           href: "/dashboard",
-          text: <>{t("payment_status_go_dashboard", "Go to dashboard")}</>,
+          text: <>{t("payment_status_go_dashboard")}</>,
         },
-        title: <>{t("payment_status_cancelled_title", "Payment cancelled")}</>,
+        title: <>{t("payment_status_cancelled_title")}</>,
       };
   }
 }
@@ -175,32 +140,11 @@ function PaymentStatusErrorMessage({ code }: { code: PaymentStatusErrorCode }) {
   const { t } = useTranslation();
   switch (code) {
     case "missing_reference":
-      return (
-        <>
-          {t(
-            "billing_we_received_checkout_return_but_reference",
-            "We received the checkout return, but the checkout reference is missing. Check your billing page in a few minutes or contact support if access does not update.",
-          )}
-        </>
-      );
+      return <>{t("billing_checkout_reference_missing")}</>;
     case "status_check_failed":
-      return (
-        <>
-          {t(
-            "billing_failed_check_payment_status",
-            "Failed to check payment status.",
-          )}
-        </>
-      );
+      return <>{t("billing_failed_check_payment_status")}</>;
     case "status_check_timeout":
-      return (
-        <>
-          {t(
-            "payment_status_timeout",
-            "Payment verification is taking longer than expected. Check your billing page for the latest status.",
-          )}
-        </>
-      );
+      return <>{t("payment_status_timeout")}</>;
     default:
       return null;
   }
@@ -335,26 +279,16 @@ export function PaymentStatusContent() {
               <div className="mb-4 flex justify-center">
                 <Badge variant="secondary" className="gap-2">
                   <Clock className="h-3 w-3" />
-                  <>{t("billing_verifying_payment", "Verifying Payment")}</>
+                  <>{t("billing_verifying_payment")}</>
                 </Badge>
               </div>
 
               <h1 className="mb-3 text-xl font-semibold">
-                <>
-                  {t(
-                    "billing_checking_payment_status",
-                    "Checking Payment Status",
-                  )}
-                </>
+                <>{t("billing_checking_payment_status")}</>
               </h1>
 
               <p className="text-muted-foreground text-sm leading-relaxed">
-                <>
-                  {t(
-                    "billing_please_wait_while_we_confirm_payment",
-                    "Please wait while we confirm your payment...",
-                  )}
-                </>
+                <>{t("billing_please_wait_while_we_confirm_payment")}</>
               </p>
             </CardContent>
           </Card>

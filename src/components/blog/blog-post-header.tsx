@@ -37,7 +37,7 @@ export function BlogPostHeader({
   locale,
 }: BlogPostHeaderProps) {
   const { t } = getStaticTranslations(locale ?? SOURCE_LOCALE);
-  const resolvedBackText = backText ?? t("blogBackToBlog", "Back to blog");
+  const resolvedBackText = backText ?? t("blog_back_to_blog");
   const hasImage = !!heroImage;
   if (hasImage) {
     return (
@@ -65,7 +65,7 @@ export function BlogPostHeader({
                 <Link href={backHref}>
                   <ArrowLeft className="mr-2 h-4 w-4" />
                   <span className="hidden sm:inline">{resolvedBackText}</span>
-                  <span className="sm:hidden">{t("blog_back", "Back")}</span>
+                  <span className="sm:hidden">{t("blog_back")}</span>
                 </Link>
               </Button>
             </div>
@@ -137,7 +137,7 @@ export function BlogPostHeader({
               <Link href={backHref}>
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 <span className="hidden sm:inline">{resolvedBackText}</span>
-                <span className="sm:hidden">{t("blog_back", "Back")}</span>
+                <span className="sm:hidden">{t("blog_back")}</span>
               </Link>
             </Button>
           </div>

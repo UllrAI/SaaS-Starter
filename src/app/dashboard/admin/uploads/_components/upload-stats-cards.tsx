@@ -14,30 +14,27 @@ export async function UploadStatsCards() {
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       <StatCard
-        title={t("admin_total_uploads", "Total Uploads")}
+        title={t("admin_total_uploads")}
         value={stats.total}
-        description={t("upload_recent_count", "{count} in the last 24 hours", {
+        description={t("upload_recent_count", {
           count: stats.recentUploads,
         })}
         icon={Upload}
         locale={locale}
       />
       <StatCard
-        title={t("admin_storage_used", "Storage Used")}
+        title={t("admin_storage_used")}
         value={stats.totalSizeFormatted}
-        description={t("upload_average_size", "Average: {size}", {
+        description={t("upload_average_size", {
           size: stats.averageSizeFormatted,
         })}
         icon={HardDrive}
         locale={locale}
       />
       <StatCard
-        title={t("admin_top_file_type", "Top File Type")}
-        value={
-          stats.topFileTypes?.[0]?.type ??
-          t("common_not_available", "Not available")
-        }
-        description={t("upload_file_count", "{count} files", {
+        title={t("admin_top_file_type")}
+        value={stats.topFileTypes?.[0]?.type ?? t("common_not_available")}
+        description={t("upload_file_count", {
           count: stats.topFileTypes?.[0]?.count ?? 0,
         })}
         icon={FileText}
@@ -46,7 +43,7 @@ export async function UploadStatsCards() {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
           <CardTitle className="text-sm font-medium">
-            {t("admin_file_types", "File Types")}
+            {t("admin_file_types")}
           </CardTitle>
           <FileText className="text-muted-foreground h-4 w-4" />
         </CardHeader>

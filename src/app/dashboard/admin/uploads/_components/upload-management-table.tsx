@@ -109,18 +109,11 @@ export function UploadManagementTable({
         uploadId: uploadToDelete.id,
       });
       if (result.data) {
-        toast.success(
-          t("upload_delete_success", "The upload has been deleted."),
-        );
+        toast.success(t("upload_delete_success"));
         setUploadToDelete(null);
         refresh();
       } else if (result.serverError) {
-        toast.error(
-          t(
-            "upload_delete_error",
-            "We couldn't delete the upload. Please try again.",
-          ),
-        );
+        toast.error(t("upload_delete_error"));
       }
     });
   };
@@ -131,22 +124,12 @@ export function UploadManagementTable({
         uploadIds: Array.from(selectedUploads),
       });
       if (result.data) {
-        toast.success(
-          t(
-            "upload_batch_delete_success",
-            "The selected uploads were deleted.",
-          ),
-        );
+        toast.success(t("upload_batch_delete_success"));
         setSelectedUploads(new Set());
         setIsBatchDeleteConfirmOpen(false);
         refresh();
       } else if (result.serverError) {
-        toast.error(
-          t(
-            "upload_batch_delete_error",
-            "We couldn't delete the selected uploads. Please try again.",
-          ),
-        );
+        toast.error(t("upload_batch_delete_error"));
       }
     });
   };
@@ -190,7 +173,7 @@ export function UploadManagementTable({
     },
     {
       key: "user",
-      label: <>{t("admin_user", "User")}</>,
+      label: <>{t("admin_user")}</>,
       render: (upload) => (
         <UserAvatarCell
           name={upload.user.name}
@@ -201,7 +184,7 @@ export function UploadManagementTable({
     },
     {
       key: "fileName",
-      label: <>{t("admin_file", "File")}</>,
+      label: <>{t("admin_file")}</>,
       render: (upload) => (
         <div>
           <p className="max-w-xs truncate font-medium">{upload.fileName}</p>
@@ -213,7 +196,7 @@ export function UploadManagementTable({
     },
     {
       key: "createdAt",
-      label: <>{t("admin_uploaded", "Uploaded")}</>,
+      label: <>{t("admin_uploaded")}</>,
       render: (upload) => (
         <p className="text-sm">
           {new Date(upload.createdAt).toLocaleDateString(intlLocale)}
@@ -222,13 +205,13 @@ export function UploadManagementTable({
     },
     {
       key: "actions",
-      label: <>{t("admin_actions", "Actions")}</>,
+      label: <>{t("admin_actions")}</>,
       render: (upload) => (
         <div className="flex items-center space-x-1">
           <Button
             variant="ghost"
             size="icon"
-            aria-label={t("upload_action_view", "View {fileName}", {
+            aria-label={t("upload_action_view", {
               fileName: upload.fileName,
             })}
             onClick={() => {
@@ -243,7 +226,7 @@ export function UploadManagementTable({
               href={upload.url}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label={t("upload_action_open", "Open {fileName}", {
+              aria-label={t("upload_action_open", {
                 fileName: upload.fileName,
               })}
             >
@@ -253,7 +236,7 @@ export function UploadManagementTable({
           <Button
             variant="ghost"
             size="icon"
-            aria-label={t("upload_action_delete", "Delete {fileName}", {
+            aria-label={t("upload_action_delete", {
               fileName: upload.fileName,
             })}
             onClick={() => setUploadToDelete(upload)}
@@ -268,35 +251,35 @@ export function UploadManagementTable({
   const filterOptions = [
     {
       value: "all",
-      label: <>{t("admin_all_types", "All Types")}</>,
+      label: <>{t("admin_all_types")}</>,
     },
     {
       value: "image",
-      label: <>{t("admin_images", "Images")}</>,
+      label: <>{t("admin_images")}</>,
     },
     {
       value: "video",
-      label: <>{t("admin_videos", "Videos")}</>,
+      label: <>{t("admin_videos")}</>,
     },
     {
       value: "audio",
-      label: <>{t("admin_audio", "Audio")}</>,
+      label: <>{t("admin_audio")}</>,
     },
     {
       value: "pdf",
-      label: <>{t("admin_pdf", "PDF")}</>,
+      label: <>{t("admin_pdf")}</>,
     },
     {
       value: "text",
-      label: <>{t("admin_text", "Text")}</>,
+      label: <>{t("admin_text")}</>,
     },
     {
       value: "archive",
-      label: <>{t("admin_archives", "Archives")}</>,
+      label: <>{t("admin_archives")}</>,
     },
     {
       value: "other",
-      label: <>{t("admin_other", "Other")}</>,
+      label: <>{t("admin_other")}</>,
     },
   ];
   return (
@@ -304,7 +287,7 @@ export function UploadManagementTable({
       {selectedUploads.size > 0 && (
         <div className="bg-muted/50 mb-4 flex items-center justify-between rounded-lg border p-3">
           <span className="text-sm font-medium">
-            {t("admin_selected", "{expression0} selected", {
+            {t.rich("admin_selected", {
               expression0: selectedUploads.size,
             })}
           </span>
@@ -314,8 +297,8 @@ export function UploadManagementTable({
             onClick={() => setIsBatchDeleteConfirmOpen(true)}
             disabled={isPending}
           >
-            {t("admin_delete_selected", "{expression0} Delete Selected", {
-              expression0:
+            {t.rich("admin_delete_selected", {
+              expression0: () =>
                 isPending && selectedUploads.size > 1 ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : (
@@ -335,27 +318,18 @@ export function UploadManagementTable({
         filterValue={fileTypeFilter}
         onFilterChange={handleFileTypeFilter}
         filterOptions={filterOptions}
-        filterPlaceholder={<>{t("admin_filter_type", "Filter by type")}</>}
+        filterPlaceholder={<>{t("admin_filter_type")}</>}
         pagination={pagination}
         onPageChange={setCurrentPage}
-        searchPlaceholder={
-          <>
-            {t(
-              "admin_search_filename_user_email",
-              "Search by filename, user email...",
-            )}
-          </>
-        }
-        emptyMessage={<>{t("admin_no_uploads_found", "No uploads found")}</>}
+        searchPlaceholder={<>{t("admin_search_filename_user_email")}</>}
+        emptyMessage={<>{t("admin_no_uploads_found")}</>}
       />
 
       {/* View Details Dialog */}
       <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>
-              {t("admin_upload_details", "Upload Details")}
-            </DialogTitle>
+            <DialogTitle>{t("admin_upload_details")}</DialogTitle>
           </DialogHeader>
           {selectedUpload && (
             <div className="space-y-4 py-4">
@@ -369,13 +343,13 @@ export function UploadManagementTable({
                 />
               )}
               <div className="grid grid-cols-2 gap-x-4 gap-y-2">
-                <Label>{t("admin_file_name_upload", "File Name")}</Label>
+                <Label>{t("admin_file_name_upload")}</Label>
                 <p className="truncate text-sm">{selectedUpload.fileName}</p>
-                <Label>{t("admin_size", "Size")}</Label>
+                <Label>{t("admin_size")}</Label>
                 <p className="text-sm">
                   {formatFileSize(selectedUpload.fileSize)}
                 </p>
-                <Label>{t("admin_user", "User")}</Label>
+                <Label>{t("admin_user")}</Label>
                 <p className="truncate text-sm">{selectedUpload.user.email}</p>
               </div>
             </div>
@@ -390,18 +364,13 @@ export function UploadManagementTable({
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>
-              {t("admin_confirm_deletion", "Confirm Deletion")}
-            </DialogTitle>
+            <DialogTitle>{t("admin_confirm_deletion")}</DialogTitle>
             <DialogDescription>
-              {t(
-                "admin_you_sure_want_delete_file_action",
-                "Are you sure you want to delete this file? This action is irreversible.",
-              )}
+              {t("admin_you_sure_want_delete_file_action")}
             </DialogDescription>
             <div className="bg-muted mt-2 rounded border p-2">
               <p className="text-muted-foreground mb-1 text-sm">
-                {t("admin_file_name", "File name:")}
+                {t("admin_file_name")}
               </p>
               <p className="text-sm font-medium break-all">
                 {uploadToDelete?.fileName}
@@ -414,17 +383,18 @@ export function UploadManagementTable({
               onClick={() => setUploadToDelete(null)}
               disabled={isPending}
             >
-              {t("admin_cancel", "Cancel")}
+              {t("admin_cancel")}
             </Button>
             <Button
               variant="destructive"
               onClick={confirmDeleteUpload}
               disabled={isPending}
             >
-              {t("admin_delete", "{expression0} Delete", {
-                expression0: isPending && (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ),
+              {t.rich("admin_delete", {
+                expression0: () =>
+                  isPending && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ),
               })}
             </Button>
           </DialogFooter>
@@ -438,17 +408,11 @@ export function UploadManagementTable({
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>
-              {t("admin_confirm_batch_deletion", "Confirm Batch Deletion")}
-            </DialogTitle>
+            <DialogTitle>{t("admin_confirm_batch_deletion")}</DialogTitle>
             <DialogDescription>
-              {t(
-                "admin_you_sure_want_delete_selected_file",
-                "Are you sure you want to delete {expression0} selected file(s)? This action is irreversible.",
-                {
-                  expression0: selectedUploads.size,
-                },
-              )}
+              {t.rich("admin_you_sure_want_delete_selected_file", {
+                expression0: selectedUploads.size,
+              })}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -457,17 +421,18 @@ export function UploadManagementTable({
               onClick={() => setIsBatchDeleteConfirmOpen(false)}
               disabled={isPending}
             >
-              {t("admin_cancel", "Cancel")}
+              {t("admin_cancel")}
             </Button>
             <Button
               variant="destructive"
               onClick={handleBatchDelete}
               disabled={isPending}
             >
-              {t("admin_delete", "{expression0} Delete", {
-                expression0: isPending && (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ),
+              {t.rich("admin_delete", {
+                expression0: () =>
+                  isPending && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ),
               })}
             </Button>
           </DialogFooter>

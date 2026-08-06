@@ -33,19 +33,12 @@ interface EditableSession {
 
 function ProfileUpdatedToast() {
   const { t } = useTranslation();
-  return (
-    <>
-      {t(
-        "settings_profile_updated_successfully",
-        "Profile updated successfully",
-      )}
-    </>
-  );
+  return <>{t("settings_profile_updated_successfully")}</>;
 }
 
 function ProfileUpdateFailedToast() {
   const { t } = useTranslation();
-  return <>{t("profile_update_failed", "We couldn't update your profile.")}</>;
+  return <>{t("profile_update_failed")}</>;
 }
 
 export function AccountPage() {
@@ -54,9 +47,7 @@ export function AccountPage() {
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle>
-          {t("settings_account_information", "Account Information")}
-        </CardTitle>
+        <CardTitle>{t("settings_account_information")}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="flex flex-col items-start justify-between gap-4 sm:flex-row">
@@ -71,10 +62,7 @@ export function AccountPage() {
                     currentUserSession?.user.email,
                     currentUserSession?.user.name,
                   )}
-                  alt={
-                    currentUserSession?.user.name ||
-                    t("profile_avatar_alt", "User avatar")
-                  }
+                  alt={currentUserSession?.user.name || t("profile_avatar_alt")}
                   className="object-cover"
                 />
                 <AvatarFallback className="text-lg uppercase">
@@ -124,21 +112,19 @@ function EditUserDialog({
       <DialogTrigger asChild>
         <Button size="sm" variant="secondary" className="gap-2">
           <Edit size={16} />
-          {t("settings_edit_profile", "Edit Profile")}
+          {t("settings_edit_profile")}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>
-            {t("settings_edit_profile_user", "Edit Your Profile")}
-          </DialogTitle>
+          <DialogTitle>{t("settings_edit_profile_user")}</DialogTitle>
           <DialogDescription>
-            {t("settings_change_display_name", "Change your display name")}
+            {t("settings_change_display_name")}
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid gap-2">
-            <Label htmlFor="name">{t("settings_full_name", "Full Name")}</Label>
+            <Label htmlFor="name">{t("settings_full_name")}</Label>
             <Input
               id="name"
               value={name}
@@ -147,7 +133,7 @@ function EditUserDialog({
             />
           </div>
           <div className="grid gap-2">
-            <Label>{t("settings_profile_picture", "Profile Picture")}</Label>
+            <Label>{t("settings_profile_picture")}</Label>
             <div className="flex items-center gap-4">
               {isPending ? (
                 <Skeleton className="h-16 w-16 rounded-full" />
@@ -159,17 +145,14 @@ function EditUserDialog({
                       session?.user.email,
                       session?.user.name,
                     )}
-                    alt={name || t("profile_avatar_alt", "User avatar")}
+                    alt={name || t("profile_avatar_alt")}
                   />
                   <AvatarFallback>{name?.charAt(0) || "U"}</AvatarFallback>
                 </Avatar>
               )}
               <div className="flex-1">
                 <p className="text-muted-foreground text-sm">
-                  {t(
-                    "settings_profile_pictures_automatically_generated_using_dice",
-                    "Profile pictures are automatically generated using DiceBear avatars based on your email address.",
-                  )}
+                  {t("settings_profile_pictures_dicebear")}
                 </p>
               </div>
             </div>
@@ -181,9 +164,7 @@ function EditUserDialog({
             onClick={async () => {
               const normalizedName = name.trim();
               if (!normalizedName) {
-                toast.error(
-                  t("profile_name_required", "Enter your display name."),
-                );
+                toast.error(t("profile_name_required"));
                 return;
               }
               setIsLoading(true);
@@ -211,10 +192,11 @@ function EditUserDialog({
               }
             }}
           >
-            {t("settings_update_profile", "{expression0} Update Profile", {
-              expression0: isLoading ? (
-                <Loader2 size={15} className="mr-2 animate-spin" />
-              ) : null,
+            {t.rich("settings_update_profile", {
+              expression0: () =>
+                isLoading ? (
+                  <Loader2 size={15} className="mr-2 animate-spin" />
+                ) : null,
             })}
           </Button>
         </DialogFooter>

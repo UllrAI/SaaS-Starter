@@ -2,6 +2,7 @@
 
 import { useTranslation } from "@/lib/i18n/translation/client";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { Loader2, Monitor, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -40,6 +41,7 @@ export function DeviceVerifyForm({
   initialIsSignedIn?: boolean;
 }) {
   const { t } = useTranslation();
+  const router = useRouter();
   const { data: session, isPending } = useSession();
   const [code, setCode] = useState(normalizeDeviceCode(prefilledCode ?? ""));
   const [viewState, setViewState] = useState<ViewState>("idle");
@@ -165,7 +167,9 @@ export function DeviceVerifyForm({
           <Button
             className="w-full"
             onClick={() => {
-              window.location.href = `/login?callbackUrl=${encodeURIComponent(callbackUrl)}`;
+              router.push(
+                `/login?callbackUrl=${encodeURIComponent(callbackUrl)}`,
+              );
             }}
           >
             {t("device_sign_in_continue")}

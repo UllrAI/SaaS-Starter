@@ -51,6 +51,11 @@ function sourceFiles(directory: string): string[] {
 
 function collectSourceTranslationKeys() {
   const translationKeys = new Set<string>();
+  const translationValues: Array<{
+    file: string;
+    key: string;
+    token: string;
+  }> = [];
   const hashLiterals: Array<{ file: string; key: string }> = [];
 
   for (const file of sourceFiles(SRC_ROOT)) {
@@ -70,13 +75,48 @@ function collectSourceTranslationKeys() {
         });
       }
 
-      if (
-        ts.isCallExpression(node) &&
-        ts.isIdentifier(node.expression) &&
-        node.expression.text === "t" &&
-        ts.isStringLiteral(node.arguments[0])
-      ) {
-        translationKeys.add(node.arguments[0].text);
+      if (ts.isCallExpression(node)) {
+        const isPlainTranslation =
+          ts.isIdentifier(node.expression) && node.expression.text === "t";
+        const isRichTranslation =
+          ts.isPropertyAccessExpression(node.expression) &&
+          ts.isIdentifier(node.expression.expression) &&
+          node.expression.expression.text === "t" &&
+          node.expression.name.text === "rich";
+        const keyArgument = node.arguments[0];
+
+        if (
+          (isPlainTranslation || isRichTranslation) &&
+          keyArgument &&
+          ts.isStringLiteral(keyArgument)
+        ) {
+          translationKeys.add(keyArgument.text);
+
+          const valuesArgument = node.arguments[1];
+          if (valuesArgument && ts.isObjectLiteralExpression(valuesArgument)) {
+            for (const property of valuesArgument.properties) {
+              if (
+                !ts.isPropertyAssignment(property) &&
+                !ts.isShorthandPropertyAssignment(property)
+              ) {
+                continue;
+              }
+
+              const name = property.name.getText(source);
+              const value = ts.isShorthandPropertyAssignment(property)
+                ? property.name
+                : property.initializer;
+              const isRichValue =
+                ts.isArrowFunction(value) || ts.isFunctionExpression(value);
+
+              translationValues.push({
+                file: path.relative(process.cwd(), file),
+                key: keyArgument.text,
+                token: `${isRichValue ? "tag" : "icu"}:${name}`,
+              });
+            }
+          }
+        }
       }
 
       if (
@@ -109,7 +149,7 @@ function collectSourceTranslationKeys() {
     visit(source);
   }
 
-  return { hashLiterals, translationKeys };
+  return { hashLiterals, translationKeys, translationValues };
 }
 
 describe("translation catalog integrity", () => {
@@ -145,5 +185,25 @@ describe("translation catalog integrity", () => {
     expect(
       [...translationKeys].filter((key) => catalogs.en[key] === undefined),
     ).toEqual([]);
+  });
+
+  it("uses ICU placeholders for primitives and rich tags for render functions", () => {
+    const { translationValues } = collectSourceTranslationKeys();
+
+    for (const { file, key, token } of translationValues) {
+      for (const [locale, catalog] of Object.entries(catalogs)) {
+        expect({
+          file,
+          key,
+          locale,
+          token,
+          tokens: messageTokens(catalog[key]!),
+        }).toEqual(
+          expect.objectContaining({
+            tokens: expect.arrayContaining([token]),
+          }),
+        );
+      }
+    }
   });
 });

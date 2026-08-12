@@ -150,7 +150,7 @@ function SocialLoginPendingLabel({
     <span className="flex items-center gap-2">
       <Loader2 className="h-4 w-4 animate-spin" />
       <span>
-        {t.rich("auth_redirecting", {
+        {t("auth_redirecting", {
           expression0: provider.name,
         })}
       </span>
@@ -169,7 +169,7 @@ function SocialLoginDefaultLabel({
     <span className="flex items-center gap-3">
       <IconComponent className="h-5 w-5" />
       <span className="font-medium">
-        {t.rich("auth_continue", {
+        {t("auth_continue", {
           expression0: provider.name,
         })}
       </span>

@@ -2,9 +2,10 @@
 slug: saas-starter-kit-developer-guide
 title: UllrAI SaaS Starter Kit Developer Documentation
 publishedDate: 2025-06-24
+updatedDate: 2026-08-12
 author: admin
 excerpt: >-
-  This documentation provides a comprehensive and in-depth technical reference for developers using the UllrAI SaaS Starter Kit. Whether you want to quickly launch a new project or perform deep customization and secondary development, this documentation will provide you with the necessary guidance.
+  Build and deploy a production-ready Next.js 16 SaaS with Better Auth, Creem, Drizzle, PostgreSQL, R2, i18n, tests, and agent-ready APIs.
 tags:
   - Next.js
   - SaaS Starter
@@ -22,9 +23,7 @@ featured: true
 heroImage: https://images.unsplash.com/photo-1561886362-a2b38ce83470?q=80&w=1674&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D
 ---
 
-# UllrAI SaaS Starter Kit Developer Documentation
-
-This documentation provides a comprehensive and in-depth technical reference for developers using the UllrAI SaaS Starter Kit. Whether you want to quickly launch a new project or perform deep customization and secondary development, this documentation will provide you with the necessary guidance.
+Updated for v0.1.3, this guide follows the current production paths in the repository: Next.js 16 App Router, Better Auth, Creem billing, PostgreSQL with Drizzle, Cloudflare R2 uploads, localized marketing pages, API keys, and browser-approved CLI device authentication. Use it as an implementation map, then verify every change with the repository's own lint, type-check, test, and build commands.
 
 ## 1. Project Overview
 
@@ -203,7 +202,7 @@ SaaS-Starter-main/
 
 The project's configuration is highly centralized for easy maintenance and extension.
 
-- **Environment Variables (`env.ts`)**: Uses `@t3-oss/env-nextjs` to enforce environment variable validation. All environment variables (like API keys, database URLs) must be defined in the `.env` file and accessed through `env.ts` for type safety. This prevents runtime errors due to missing environment variables.
+- **Environment Variables (`env.js`)**: Uses `@t3-oss/env-nextjs` to enforce environment variable validation. All environment variables (like API keys and database URLs) are defined in `.env` and accessed through `env.js` for type safety. This prevents runtime errors due to missing environment variables.
 - **Application Constants (`src/lib/config/constants.ts`)**: Stores app name, description, contact email, and other hardcoded values that don't change frequently.
 - **Product Plans (`src/lib/config/products.ts`)**: Centrally defines all paid plans. Each plan includes internal ID, name, feature list, and product IDs in different payment providers (like Creem). This structure makes it easy to add new plans or switch payment providers.
 - **User Roles (`src/lib/config/roles.ts`)**: Defines user roles and their hierarchical relationships (`user`, `admin`, `super_admin`). Helper functions like `hasRole` provide unified permission checking logic.
@@ -272,7 +271,7 @@ The project uses Next.js App Router and leverages Route Groups for logical page 
    - Edit `database/schema.ts`.
    - Run `pnpm db:push` to sync changes.
 1. **Create New Pages**:
-   - Create new folders and `page.tsx` files in `app/(pages)` or `app/(dashboard)`.
+   - Create marketing routes in `src/app/(pages)` and protected routes in `src/app/dashboard`.
 1. **Create API Routes**:
    - Create new folders and `route.ts` files in the `app/api` directory.
 1. **Create Server Actions**:
@@ -453,7 +452,7 @@ Provides a powerful, extensible data management system.
 
 ### 5.1. Extension Point Identification
 
-- **Add New Pages**: Create new routes in `app/(pages)` or `app/(dashboard)`.
+- **Add New Pages**: Create new routes in `src/app/(pages)` or `src/app/dashboard`.
 - **Add New Admin Management Tables**:
   1. Define new table in `database/schema.ts`.
   1. Add corresponding query/mutation logic in `src/lib/actions/admin.ts`.
@@ -612,6 +611,8 @@ commit to `prod` only when that commit belongs to the default branch.
 ---
 
 ## 11. Community & Ecosystem
+
+Before deploying, compare the [Next.js 16 architecture guide](/blog/nextjs-16-saas-starter-architecture), the [Creem billing production guide](/blog/creem-nextjs-billing-production-guide), and the [API key, OAuth, and device-flow guide](/blog/api-keys-oauth-device-flow-saas-agents). Then inspect the [feature boundaries](/features), review [pricing behavior](/pricing), and clone the [GitHub source](https://github.com/ullrai/saas-starter) instead of copying isolated snippets out of context.
 
 ### 11.1. Community Resources
 

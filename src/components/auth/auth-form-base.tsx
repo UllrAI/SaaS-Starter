@@ -51,6 +51,7 @@ interface AuthFormConfig {
   alternativeActionLink: ReactNode;
   showTerms?: boolean;
   callbackURL: string;
+  newUserCallbackURL?: string;
 }
 interface AuthFormBaseProps<T extends FieldValues> {
   form: UseFormReturn<T>;
@@ -123,6 +124,7 @@ export function AuthFormBase<T extends FieldValues>({
               <>
                 <SocialLoginButtons
                   callbackURL={config.callbackURL}
+                  newUserCallbackURL={config.newUserCallbackURL}
                   availableProviders={availableProviders}
                   loading={isPending}
                   onLoadingChange={(loading) => {

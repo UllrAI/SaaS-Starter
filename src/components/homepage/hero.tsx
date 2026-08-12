@@ -55,7 +55,11 @@ export function Hero({
                 className="bg-primary text-primary-foreground hover:bg-primary/90 h-14 px-10 text-base font-bold shadow-md transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-lg active:translate-x-[8px] active:translate-y-[8px] lg:h-16 lg:px-12 lg:text-lg"
                 asChild
               >
-                <Link href="/signup">
+                <Link
+                  href="/signup"
+                  data-umami-event="signup_click"
+                  data-umami-event-source="homepage_hero"
+                >
                   <>{t("home_start_now")}</>
                   <Terminal className="ml-3 h-5 w-5" />
                 </Link>
@@ -67,7 +71,12 @@ export function Hero({
                 className="bg-background hover:bg-secondary h-14 border-2 px-10 text-base font-bold transition-colors lg:h-16 lg:px-12 lg:text-lg"
                 asChild
               >
-                <Link href={GITHUB_URL} target="_blank">
+                <Link
+                  href={GITHUB_URL}
+                  target="_blank"
+                  data-umami-event="github_source_click"
+                  data-umami-event-source="homepage_hero"
+                >
                   <Github className="mr-2 h-5 w-5" />
                   <>{t("home_view_source")}</>
                 </Link>

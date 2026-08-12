@@ -2,10 +2,10 @@
 slug: saas-starter-kit-developer-guide
 title: UllrAI SaaS Starter Kit 开发者文档
 publishedDate: 2025-06-23
+updatedDate: 2026-08-12
 author: admin
 excerpt: >-
-  本文档旨在为使用 UllrAI SaaS Starter Kit
-  的开发者提供一份全面、深入的技术参考。无论您是希望快速启动一个新项目，还是对项目进行深度定制和二次开发，本文档都将为您提供必要的指导。
+  从 Next.js 16、Better Auth、Creem、Drizzle、PostgreSQL 和 R2 出发，完整搭建、验证并发布支持 API 与 CLI 的生产级 SaaS。
 tags:
   - Next.js
   - SaaS Starter
@@ -23,9 +23,7 @@ featured: true
 heroImage: https://images.unsplash.com/photo-1561886362-a2b38ce83470?q=80&w=1674&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D
 ---
 
-# UllrAI SaaS Starter Kit 开发者文档
-
-本文档旨在为使用 UllrAI SaaS Starter Kit 的开发者提供一份全面、深入的技术参考。无论您是希望快速启动一个新项目，还是对项目进行深度定制和二次开发，本文档都将为您提供必要的指导。
+本文已按 v0.1.3 的实际代码路径更新，覆盖 Next.js 16 App Router、Better Auth、Creem 支付、PostgreSQL 与 Drizzle、Cloudflare R2 上传、多语言营销页、API Key，以及浏览器批准的 CLI 设备登录。请把它作为实现地图，并用仓库现有的 lint、类型检查、测试和构建命令验证每次改动。
 
 ## 1. 项目概览
 
@@ -204,7 +202,7 @@ SaaS-Starter-main/
 
 项目的配置高度集中化，便于维护和扩展。
 
-- **环境变量 (`env.ts`)**: 使用 `@t3-oss/env-nextjs` 强制校验环境变量。所有环境变量（如 API 密钥、数据库 URL）必须在 `.env` 文件中定义，并通过 `env.ts` 进行类型安全访问。这避免了运行时因缺少环境变量而导致的错误。
+- **环境变量 (`env.js`)**: 使用 `@t3-oss/env-nextjs` 强制校验环境变量。所有环境变量（如 API 密钥、数据库 URL）必须在 `.env` 文件中定义，并通过 `env.js` 进行类型安全访问。这避免了运行时因缺少环境变量而导致的错误。
 - **应用常量 (`src/lib/config/constants.ts`)**: 存放应用名称、描述、联系邮箱等不会频繁更改的硬编码值。
 - **产品套餐 (`src/lib/config/products.ts`)**: 统一定义所有付费套餐。每个套餐包含内部 ID、名称、特性列表以及在不同支付提供商（如 Creem）中的产品 ID。这种结构使得添加新套餐或更换支付提供商变得容易。
 - **用户角色 (`src/lib/config/roles.ts`)**: 定义了用户角色及其层级关系（`user`, `admin`, `super_admin`）。`hasRole` 等辅助函数提供了统一的权限检查逻辑。
@@ -273,7 +271,7 @@ SaaS-Starter-main/
    - 编辑 `src/database/schema.ts`。
    - 运行 `pnpm db:push` 同步变更。
 1. **创建新页面**:
-   - 在 `src/app/(pages)` 或 `src/app/(dashboard)` 中创建新的文件夹和 `page.tsx` 文件。
+   - 营销页放在 `src/app/(pages)`；受保护页面放在 `src/app/dashboard`，并创建对应的 `page.tsx`。
 1. **创建 API 路由**:
    - 在 `src/app/api` 目录下创建新的文件夹和 `route.ts` 文件。
 1. **创建 Server Action**:
@@ -454,7 +452,7 @@ sequenceDiagram
 
 ### 5.1. 扩展点识别
 
-- **添加新页面**: 在 `src/app/(pages)` 或 `src/app/(dashboard)` 中创建新路由。
+- **添加新页面**: 在 `src/app/(pages)` 或 `src/app/dashboard` 中创建新路由。
 - **添加新后台管理表**:
   1. 在 `src/database/schema.ts` 中定义新表。
   1. 在 `src/lib/actions/admin.ts` 中添加对应查询/变更逻辑。
@@ -613,6 +611,8 @@ workflow 才会将 `prod` 更新到该 commit。
 ---
 
 ## 11. 社区与生态
+
+部署前，请对照 [Next.js 16 架构指南](/blog/nextjs-16-saas-starter-architecture)、[Creem 生产级支付指南](/blog/creem-nextjs-billing-production-guide) 与 [API Key、OAuth 和设备流选型指南](/blog/api-keys-oauth-device-flow-saas-agents)，再检查[功能边界](/zh-Hans/features)、验证[价格与结账行为](/zh-Hans/pricing)，并从 [GitHub 源码](https://github.com/ullrai/saas-starter)完整克隆项目，而不是脱离上下文复制零散代码。
 
 ### 11.1. 社区资源
 

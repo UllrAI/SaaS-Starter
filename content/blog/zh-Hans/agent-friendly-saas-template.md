@@ -2,6 +2,7 @@
 slug: agent-friendly-saas-template
 title: 打造 Agent 友好的 SaaS 模板：API Key 与 CLI 鉴权为什么要一开始就做好
 publishedDate: 2026-03-11
+updatedDate: 2026-08-12
 author: admin
 excerpt: >-
   一篇面向实践的说明，解释为什么一个 Agent 友好的 SaaS 模板应该从第一天就具备机器认证、API Key、浏览器批准的 CLI 登录，以及清晰的设备管理入口。
@@ -15,8 +16,6 @@ tags:
 featured: false
 heroImage: https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1600&auto=format&fit=crop
 ---
-
-# 打造 Agent 友好的 SaaS 模板：API Key 与 CLI 鉴权为什么要一开始就做好
 
 今天再谈一个现代 SaaS 模板，已经不能只盯着浏览器页面、支付和后台管理。越来越多团队希望同一套产品既能服务人类用户，也能服务脚本、内部自动化，以及 OpenClaw、Codex、Claude Code 这类 agent 工作流。
 

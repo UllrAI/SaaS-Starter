@@ -1,6 +1,9 @@
 import { Inter, JetBrains_Mono } from "next/font/google";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import Script from "next/script";
+import env from "@/env";
+import { SignupSuccessTracker } from "@/components/analytics/signup-success-tracker";
 
 import { AppIntlProvider } from "@/lib/i18n/provider";
 import type { AppMessages } from "@/lib/i18n/messages";
@@ -73,6 +76,13 @@ export async function createRootMetadata(
       description,
       images: [{ url: OGIMAGE, width: 1480, height: 777, alt: APP_NAME }],
     },
+    verification: env.BING_SITE_VERIFICATION
+      ? {
+          other: {
+            "msvalidate.01": env.BING_SITE_VERIFICATION,
+          },
+        }
+      : undefined,
   };
 }
 
@@ -85,6 +95,11 @@ export function AppDocument({
   locale: SupportedLocale;
   messages: AppMessages;
 }) {
+  const umamiEnabled = Boolean(
+    env.NEXT_PUBLIC_UMAMI_SCRIPT_URL &&
+    env.NEXT_PUBLIC_UMAMI_WEBSITE_ID &&
+    env.NEXT_PUBLIC_UMAMI_DOMAINS,
+  );
   const structuredData = {
     "@context": "https://schema.org",
     "@graph": [
@@ -130,6 +145,18 @@ export function AppDocument({
             __html: JSON.stringify(structuredData).replace(/</g, "\\u003c"),
           }}
         />
+        {umamiEnabled && (
+          <Script
+            id="umami-tracker"
+            src={env.NEXT_PUBLIC_UMAMI_SCRIPT_URL}
+            data-website-id={env.NEXT_PUBLIC_UMAMI_WEBSITE_ID}
+            data-domains={env.NEXT_PUBLIC_UMAMI_DOMAINS}
+            data-do-not-track="true"
+            data-exclude-search="true"
+            strategy="afterInteractive"
+          />
+        )}
+        {umamiEnabled && <SignupSuccessTracker />}
       </body>
     </html>
   );

@@ -7,6 +7,7 @@ import { resolveIntlLocale } from "@/lib/locale";
 import { SOURCE_LOCALE, type SupportedLocale } from "@/lib/config/i18n";
 interface BlogPostMetaProps {
   publishedDate?: string;
+  updatedDate?: string;
   featured?: boolean;
   tags?: string[];
   readingMinutes?: number;
@@ -18,6 +19,7 @@ interface BlogPostMetaProps {
 }
 export function BlogPostMeta({
   publishedDate,
+  updatedDate,
   featured = false,
   tags = [],
   readingMinutes,
@@ -41,6 +43,13 @@ export function BlogPostMeta({
     ? "bg-background/90 text-foreground border-border backdrop-blur-sm"
     : "bg-muted/50 text-muted-foreground border-muted";
   const intlLocale = resolveIntlLocale(supportedLocale);
+  const formattedUpdatedDate = updatedDate
+    ? new Date(updatedDate).toLocaleDateString(intlLocale, {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      })
+    : undefined;
   return (
     <div className={cn("space-y-4", className)}>
       {/* Badge */}
@@ -99,6 +108,13 @@ export function BlogPostMeta({
                   month: "short",
                   day: "numeric",
                 })}
+              </span>
+            </div>
+          )}
+          {formattedUpdatedDate && updatedDate !== publishedDate && (
+            <div className="flex items-center gap-2">
+              <span className="whitespace-nowrap">
+                {t("blog_updated_on", { date: formattedUpdatedDate })}
               </span>
             </div>
           )}

@@ -56,6 +56,7 @@ describe("SocialLoginButtons", () => {
     render(
       <SocialLoginButtons
         availableProviders={["google"]}
+        newUserCallbackURL="/dashboard?signup=success"
         onLoadingChange={handleLoadingChange}
       />,
     );
@@ -69,6 +70,7 @@ describe("SocialLoginButtons", () => {
         provider: "google",
         callbackURL: "/dashboard",
         errorCallbackURL: "/login?callbackUrl=%2Fdashboard",
+        newUserCallbackURL: "/dashboard?signup=success",
         disableRedirect: true,
       });
     });

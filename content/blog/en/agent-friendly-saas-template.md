@@ -2,6 +2,7 @@
 slug: agent-friendly-saas-template
 title: Building an Agent-Friendly SaaS Template with API Keys and CLI Auth
 publishedDate: 2026-03-11
+updatedDate: 2026-08-12
 author: admin
 excerpt: >-
   A practical walkthrough of why an agent-friendly SaaS template needs machine auth, API keys, browser-approved CLI login, and clear management surfaces from day one.
@@ -15,8 +16,6 @@ tags:
 featured: false
 heroImage: https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1600&auto=format&fit=crop
 ---
-
-# Building an Agent-Friendly SaaS Template with API Keys and CLI Auth
 
 Shipping a modern SaaS template is no longer only about browser pages and billing flows. More teams now expect the same product to work well for human users, scripts, internal automation, and agent workflows such as OpenClaw, Codex, Claude Code, or similar tools.
 
@@ -77,3 +76,5 @@ An agent-friendly SaaS template does not need to become an "AI platform" to be u
 modern SaaS products are used by humans and machines at the same time.
 
 If the starter handles both well from the beginning, everything after that gets easier.
+
+For implementation details and threat-model tradeoffs, continue with [API keys vs OAuth vs device flow for SaaS agents](/blog/api-keys-oauth-device-flow-saas-agents). The broader [Next.js 16 SaaS architecture guide](/blog/nextjs-16-saas-starter-architecture) shows where those boundaries live, and the complete [developer guide](/blog/saas-starter-kit-developer-guide) covers setup and deployment. You can also inspect the [GitHub source](https://github.com/ullrai/saas-starter).

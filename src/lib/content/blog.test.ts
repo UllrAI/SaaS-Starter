@@ -34,15 +34,18 @@ describe("blog content localization helpers", () => {
     expect(posts.every((post) => post.locale === "zh-Hans")).toBe(true);
     expect(getAllPostSlugs()).toEqual([
       "agent-friendly-saas-template",
+      "api-keys-oauth-device-flow-saas-agents",
+      "creem-nextjs-billing-production-guide",
       "modern-css-techniques",
       "nextjs-15-features",
+      "nextjs-16-saas-starter-architecture",
       "saas-starter-kit-developer-guide",
       "typescript-best-practices",
     ]);
   });
 
   it("exposes all localized source records for sitemap and metadata", () => {
-    expect(getAllLocalizedPosts()).toHaveLength(7);
+    expect(getAllLocalizedPosts()).toHaveLength(10);
     expect(
       getPostLocalizations("saas-starter-kit-developer-guide").map(
         (post) => post.locale,
@@ -53,6 +56,17 @@ describe("blog content localization helpers", () => {
         (post) => post.locale,
       ),
     ).toEqual(["en", "zh-Hans"]);
+  });
+
+  it("keeps the page template as the only source of article H1 headings", () => {
+    expect(
+      getAllLocalizedPosts().every(
+        (post) =>
+          !post.content
+            .replaceAll(/```[\s\S]*?```|~~~[\s\S]*?~~~/g, "")
+            .match(/^#\s+/m),
+      ),
+    ).toBe(true);
   });
 
   it("builds locale-aware paths and resolves authors", () => {

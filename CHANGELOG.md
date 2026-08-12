@@ -51,6 +51,25 @@ Database migration `0014_adorable_dorian_gray` adds the cancelled upload-intent
 state, a two-stage deletion marker, normalized payment currencies, and the
 settled-payment reporting index.
 
+## 0.1.3 — 2026-08-13
+
+### SEO measurement and organic growth foundations
+
+- Added optional, environment-validated Umami tracking with a deployment-specific
+  website ID, hostname filtering, Do Not Track support, and stable funnel events.
+- Added true new-user signup measurement through Better Auth's dedicated
+  new-user callback, plus source, clone, pricing, checkout, and payment events.
+- Restored the externally linked SaaS introduction URL with a permanent,
+  single-hop redirect to the current developer guide.
+- Added optional Bing Webmaster verification metadata for per-deployment site
+  ownership without committing a maintainer token to downstream forks.
+- Enforced one article H1, exposed meaningful update dates, and added Article and
+  BreadcrumbList structured data to blog posts.
+- Refreshed both developer-guide locales and published three repository-backed
+  English guides for Next.js 16 architecture, Creem billing, and machine auth.
+- Documented the keyword map, index inventory, analytics contract, 20 qualified
+  discovery prospects, campaign logging rules, and dated review schedule.
+
 ## 2026-07-24
 
 ### PR #37 — Locale negotiation and static marketing delivery

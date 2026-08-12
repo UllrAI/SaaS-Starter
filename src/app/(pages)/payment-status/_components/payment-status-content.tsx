@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { LocalizedLink } from "@/components/localized-link";
 import { type ReactNode, useEffect, useRef, useState } from "react";
+import { trackUmamiEvent } from "@/lib/analytics/umami";
 type PaymentStatus = "success" | "failed" | "pending" | "cancelled";
 type PaymentMode = "subscription" | "one_time";
 type PaymentStatusErrorCode =
@@ -159,6 +160,7 @@ export function PaymentStatusContent() {
     null,
   );
   const pollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const trackedSuccessRef = useRef(false);
   useEffect(() => {
     let isActive = true;
     let pollAttempt = 0;
@@ -255,6 +257,15 @@ export function PaymentStatusContent() {
       clearPollTimeout();
     };
   }, [searchParams]); // Re-run when search params change
+
+  useEffect(() => {
+    if (status !== "success" || trackedSuccessRef.current) return;
+
+    trackedSuccessRef.current = true;
+    trackUmamiEvent("payment_success", {
+      payment_mode: paymentMode ?? "unknown",
+    });
+  }, [paymentMode, status]);
 
   // Show loading state while checking status
   if (isLoading || status === null) {

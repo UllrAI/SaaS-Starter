@@ -116,7 +116,7 @@ function TierActionGetLabel({ tierName }: { tierName: string }) {
   const { t } = useTranslation();
   return (
     <>
-      {t.rich("billing_get_tier", {
+      {t("billing_get_tier", {
         expression0: tierName.toUpperCase(),
       })}
     </>

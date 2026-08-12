@@ -15,7 +15,7 @@ export function AuthFeedbackAlert({
     case "banned":
       description = feedback.banReason ? (
         <>
-          {t.rich("auth_account_disabled_contact_support_reason", {
+          {t("auth_account_disabled_contact_support_reason", {
             expression0: feedback.banReason,
           })}
         </>

@@ -212,7 +212,7 @@ export default function ContactPage({
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground text-sm leading-relaxed">
-                  {t.rich("contact_yes_send_use_case_include_product", {
+                  {t("contact_yes_send_use_case_include_product", {
                     CONTACT_EMAIL,
                   })}
                 </p>
@@ -325,7 +325,7 @@ export default function ContactPage({
               {t("contact_ready_get_started")}
             </PageIntroHeading>
             <PageIntroDescription className="mb-8 text-lg">
-              {t.rich("contact_join_developers", {
+              {t("contact_join_developers", {
                 COMPANY_NAME,
               })}
             </PageIntroDescription>

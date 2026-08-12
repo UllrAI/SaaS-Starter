@@ -287,7 +287,7 @@ export function UploadManagementTable({
       {selectedUploads.size > 0 && (
         <div className="bg-muted/50 mb-4 flex items-center justify-between rounded-lg border p-3">
           <span className="text-sm font-medium">
-            {t.rich("admin_selected", {
+            {t("admin_selected", {
               expression0: selectedUploads.size,
             })}
           </span>
@@ -410,7 +410,7 @@ export function UploadManagementTable({
           <DialogHeader>
             <DialogTitle>{t("admin_confirm_batch_deletion")}</DialogTitle>
             <DialogDescription>
-              {t.rich("admin_you_sure_want_delete_selected_file", {
+              {t("admin_you_sure_want_delete_selected_file", {
                 expression0: selectedUploads.size,
               })}
             </DialogDescription>

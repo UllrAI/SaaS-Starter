@@ -40,7 +40,7 @@ function ServerUploadWarningToast({
   const { t } = useTranslation();
   return (
     <>
-      {t.rich("uploads_file_s_uploaded_need_attention", {
+      {t("uploads_file_s_uploaded_need_attention", {
         success,
         failed,
       })}
@@ -205,7 +205,7 @@ export function ServerUploadPanel() {
           <div className="flex items-center justify-between text-sm">
             <span>{t("uploads_pipeline_progress")}</span>
             <span>
-              {t.rich("uploads_server_progress_percent", {
+              {t("uploads_server_progress_percent", {
                 progress,
               })}
             </span>

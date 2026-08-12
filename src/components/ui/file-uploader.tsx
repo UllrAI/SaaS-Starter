@@ -53,7 +53,7 @@ function IssueMessage({ issue }: { issue: FileUploadIssue }) {
     case "too-many-files":
       return (
         <>
-          {t.rich("uploads_you_can_upload_up_file_s", {
+          {t("uploads_you_can_upload_up_file_s", {
             expression0: issue.maxFiles ?? 0,
           })}
         </>
@@ -61,7 +61,7 @@ function IssueMessage({ issue }: { issue: FileUploadIssue }) {
     case "file-type-not-accepted":
       return (
         <>
-          {t.rich("uploads_does_not_match_allowed_upload_preset", {
+          {t("uploads_does_not_match_allowed_upload_preset", {
             expression0: issue.fileName ?? "",
           })}
         </>
@@ -69,7 +69,7 @@ function IssueMessage({ issue }: { issue: FileUploadIssue }) {
     case "file-type-not-supported":
       return (
         <>
-          {t.rich("uploads_app_does_not_support_uploads", {
+          {t("uploads_app_does_not_support_uploads", {
             expression0: issue.contentType ?? "",
           })}
         </>
@@ -77,7 +77,7 @@ function IssueMessage({ issue }: { issue: FileUploadIssue }) {
     case "file-too-large":
       return (
         <>
-          {t.rich("uploads_preset_limit", {
+          {t("uploads_preset_limit", {
             expression0: issue.fileName ?? "",
             expression1: formatFileSize(issue.fileSize ?? 0),
             expression2: formatFileSize(issue.maxFileSize ?? 0),
@@ -87,7 +87,7 @@ function IssueMessage({ issue }: { issue: FileUploadIssue }) {
     case "file-too-large-for-app":
       return (
         <>
-          {t.rich("uploads_exceeds_app_wide_limit", {
+          {t("uploads_exceeds_app_wide_limit", {
             expression0: issue.fileName ?? "",
             expression1: formatFileSize(issue.maxFileSize ?? 0),
           })}
@@ -138,7 +138,7 @@ function QueueStatusText({ item }: { item: FileUploadItem }) {
   if (item.status === "uploading") {
     return (
       <>
-        {t.rich("uploads_progress_percent", {
+        {t("uploads_progress_percent", {
           expression0: item.progress,
         })}
       </>
@@ -291,7 +291,7 @@ function FileQueueItem({
             <div className="text-muted-foreground flex justify-between text-xs">
               <span>{t("uploads_uploading_now")}</span>
               <span>
-                {t.rich("uploads_progress_percent", {
+                {t("uploads_progress_percent", {
                   expression0: item.progress,
                 })}
               </span>
@@ -481,7 +481,7 @@ export function FileUploader({
                 <Upload className="mb-2 h-5 w-5" />
                 <p className="text-sm font-medium">{t("uploads_upload")}</p>
                 <p className="mt-1 text-xs">
-                  {t.rich("uploads_slot_range", {
+                  {t("uploads_slot_range", {
                     expression0: uploader.items.length + 1,
                     expression1: Math.max(
                       options.maxFiles ?? 1,

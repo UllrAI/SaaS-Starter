@@ -257,7 +257,7 @@ export function Footer({
         <Separator />
         <div className="flex flex-col items-center justify-between gap-4 py-8 sm:flex-row">
           <span className="text-muted-foreground text-sm">
-            {t.rich("home_all_rights_reserved", { currentYear, COMPANY_NAME })}
+            {t("home_all_rights_reserved", { currentYear, COMPANY_NAME })}
           </span>
           <span className="text-muted-foreground flex items-center gap-2 text-sm">
             <Heart className="h-4 w-4 text-red-500" />

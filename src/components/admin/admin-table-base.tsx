@@ -200,7 +200,7 @@ export function AdminTableBase<
       {pagination.totalPages > 1 && (
         <div className="flex items-center justify-between">
           <div className="text-muted-foreground text-sm">
-            {t.rich("common_showing_results", {
+            {t("common_showing_results", {
               expression0: (pagination.page - 1) * pagination.limit + 1,
               expression1: Math.min(
                 pagination.page * pagination.limit,

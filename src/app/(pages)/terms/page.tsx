@@ -56,7 +56,7 @@ export default function TermsPage({
       title: <>{t("legal_acceptance_terms")}</>,
       items: [
         <>
-          {t.rich("legal_accessing_using_you_agree_bound_these", {
+          {t("legal_accessing_using_you_agree_bound_these", {
             COMPANY_NAME,
           })}
         </>,
@@ -159,7 +159,7 @@ export default function TermsPage({
         >
           <PageIntroHeading>{t("legal_terms_service")}</PageIntroHeading>
           <PageIntroDescription className="mb-10">
-            {t.rich("legal_these_terms_govern_use_outline_rights", {
+            {t("legal_these_terms_govern_use_outline_rights", {
               COMPANY_NAME,
             })}
           </PageIntroDescription>
@@ -226,7 +226,7 @@ export default function TermsPage({
 
         <div className="text-muted-foreground mt-12 border-t pt-8 text-center text-sm">
           <p>
-            {t.rich("legal_governing_law", {
+            {t("legal_governing_law", {
               COMPANY_NAME,
             })}
           </p>

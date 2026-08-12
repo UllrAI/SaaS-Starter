@@ -9,20 +9,21 @@ overrides:
   "@modelcontextprotocol/sdk": 1.29.0
   ai: 6.0.197
   body-parser: 2.3.0
-  brace-expansion@^1.1.0: 1.1.17
-  brace-expansion@^2.0.0: 2.1.3
-  brace-expansion@^5.0.0: 5.0.8
+  brace-expansion@^1.1.0: 1.1.18
+  brace-expansion@^2.0.0: 2.1.4
+  brace-expansion@^5.0.0: 5.0.9
   diff: 8.0.3
   effect: 3.21.2
   esbuild: 0.25.12
   express-rate-limit: 8.3.0
-  fast-uri: 3.1.4
+  fast-uri: 3.1.5
   fast-xml-parser: 5.8.0
-  hono: 4.12.31
+  hono: 4.12.34
   ip-address: 10.2.0
   js-cookie: 3.0.8
-  js-yaml@^3.0.0: 3.15.0
+  js-yaml@^3.0.0: 3.15.1
   lodash: 4.18.1
+  nanoid@^3.0.0: 3.3.17
   path-to-regexp: 8.4.2
   picomatch@^2.3.1: 2.3.2
   picomatch@^4.0.0: 4.0.4
@@ -1466,7 +1467,7 @@ packages:
       }
     engines: { node: ">=20" }
     peerDependencies:
-      hono: 4.12.31
+      hono: 4.12.34
 
   "@hookform/resolvers@5.4.0":
     resolution:
@@ -4873,22 +4874,22 @@ packages:
         integrity: sha512-tzPjzCxygAKWFOJP011oxFHs57HzIhOEracIgAePE4pqB3LikALKnSzUyU4MGs9/iCEUuHlAJTjTc5M+u7YEGg==,
       }
 
-  brace-expansion@1.1.17:
+  brace-expansion@1.1.18:
     resolution:
       {
-        integrity: sha512-w+aeW/mkgM4PyRMOJCgi3fOrTm5Q8QY1OSfn2TO2iuDj3ezIHqejmuxbjfPrqUkgqRew1iqkyAn0tr0ZwHD9+w==,
+        integrity: sha512-Edep/X9fGqVNmzKBVsDYIOtD+z1tuezV70LBjdCst9Tqu76lsnvRiZ6oTic1n+/BIwX6QDGAO94PN4N2SADvtw==,
       }
 
-  brace-expansion@2.1.3:
+  brace-expansion@2.1.4:
     resolution:
       {
-        integrity: sha512-DRdx5neNsG/QXbniLFWi2YmC/68oeOOmKz6zOjVk6ZS1ZLXgLIKqVEc6hWsmkjBbgii0SwaBTcJ5XKj5gzY/4A==,
+        integrity: sha512-hGfVzPxthbf3+2yjg/RBs60cB0FhqBS/zvdV/4wn4/BmN0bNMMHPc4V/BbFieqf1TKAGGAHnY4eSjajCl0f2Xg==,
       }
 
-  brace-expansion@5.0.8:
+  brace-expansion@5.0.9:
     resolution:
       {
-        integrity: sha512-JZyDyq3D4AUifKTPOB7DELf6XsB3WdPuNxCtob1vFXPsSXhdAiHBWJ/tJ8HAc9aH84BK+5JFZLNkJKx3G9kzQg==,
+        integrity: sha512-ScQ4IuvIEF1TMlP7Zt+vjJ//9zlPb2SDcxWxM3bk8s6t6GGdJ7KO1dCcTidOPJKePW30LE/2cT7wCyPho9/Wxg==,
       }
     engines: { node: 20 || >=22 }
 
@@ -6186,10 +6187,10 @@ packages:
         integrity: sha512-n11RGP/lrWEFI/bWdygLxhI+pVeo1ZYIVwvvPkW7azl/rOy+F3HYRZ2K5zeE9mmkhQppyv9sQFx0JM9UabnpPQ==,
       }
 
-  fast-uri@3.1.4:
+  fast-uri@3.1.5:
     resolution:
       {
-        integrity: sha512-8JnbkQ4juDyvYs4mgFGQqg4yCYtFDtUtmp2QIQq11ZZe5CFQ5wcqm1rqDgAh/QdMySuBnPzMUiJUNZG5N/AiQw==,
+        integrity: sha512-gHwA1O9LDIcKunMKhObS/HimwtehO1nPUECKAu5TpKgaO19fcWEl4bliWe1jWxVFvIXztJjjQ4L8XQ1EU9f7Jw==,
       }
 
   fast-xml-builder@1.3.0:
@@ -6595,10 +6596,10 @@ packages:
         integrity: sha512-6pEjquH3rqaI6cYAXYPcz9MS4rY6R4ngRgrgfDshRptUZIc3lw0MCIJIGDj9++mfySOuPTHB4nrSW99BCvOPIA==,
       }
 
-  hono@4.12.31:
+  hono@4.12.34:
     resolution:
       {
-        integrity: sha512-zJIHFrl6bq3RDd2YusFNCDlM8qUprxKswyi/OPzPyzKDdyBXDqWx8bZlZ7R+saTdSTatUmb3O7K4SspGPaEOQg==,
+        integrity: sha512-GqXJqY/xJkJmuloTrnV1ZEXG3fqte+VjkUqoRNZXcrUidiUOP4fMSIHHY4tsqZBK++kVyWmt/AAfSUuy57/eSA==,
       }
     engines: { node: ">=16.9.0" }
 
@@ -7409,10 +7410,10 @@ packages:
         integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==,
       }
 
-  js-yaml@3.15.0:
+  js-yaml@3.15.1:
     resolution:
       {
-        integrity: sha512-ttBQIIQPDeLjpPOohtUdXuXUVoA2uIB6fEH9HyJ7234s5mBJ5wTx20njxplLZQgLaOfpmPQA7X2t5AX6tIPbog==,
+        integrity: sha512-S99WuO3HlhO3XN41EtYUNl9zzXjoJx7QvmipxsJVxtCBT0YHEFy+iOJhjSvrmV12nYhWpZaM8lPHkJm0yUMbag==,
       }
     hasBin: true
 
@@ -8262,10 +8263,10 @@ packages:
       }
     engines: { node: ">=8.0.0" }
 
-  nanoid@3.3.16:
+  nanoid@3.3.17:
     resolution:
       {
-        integrity: sha512-bzlKTyNJ7+LdGIIwy8ijFpIqEQIvafahV7eYykJ8Cvh42EdJeODoJ6gUJXpQJvej1BddH8OqTXZNE/KfbWAu8Q==,
+        integrity: sha512-xQLf0A3HOMlgHq0n247/LRuAOYmB7dXJ/DvAxGvsSBij45XtBSmQycu+F8ODbHwns/XyFZagyL1+J0Offw1E0g==,
       }
     engines: { node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1 }
     hasBin: true
@@ -11465,9 +11466,9 @@ snapshots:
     dependencies:
       "@formatjs/fast-memoize": 3.1.7
 
-  "@hono/node-server@2.0.11(hono@4.12.31)":
+  "@hono/node-server@2.0.11(hono@4.12.34)":
     dependencies:
-      hono: 4.12.31
+      hono: 4.12.34
     optional: true
 
   "@hookform/resolvers@5.4.0(react-hook-form@7.76.1(react@19.2.6))":
@@ -11612,7 +11613,7 @@ snapshots:
       camelcase: 5.3.1
       find-up: 4.1.0
       get-package-type: 0.1.0
-      js-yaml: 3.15.0
+      js-yaml: 3.15.1
       resolve-from: 5.0.0
 
   "@istanbuljs/schema@0.1.6": {}
@@ -12163,13 +12164,13 @@ snapshots:
       "@electric-sql/pglite": 0.3.15
       "@electric-sql/pglite-socket": 0.0.20(@electric-sql/pglite@0.3.15)
       "@electric-sql/pglite-tools": 0.2.20(@electric-sql/pglite@0.3.15)
-      "@hono/node-server": 2.0.11(hono@4.12.31)
+      "@hono/node-server": 2.0.11(hono@4.12.34)
       "@mrleebo/prisma-ast": 0.13.1
       "@prisma/get-platform": 7.2.0
       "@prisma/query-plan-executor": 7.2.0
       foreground-child: 3.3.1
       get-port-please: 3.2.0
-      hono: 4.12.31
+      hono: 4.12.34
       http-status-codes: 2.3.0
       pathe: 2.0.3
       proper-lockfile: 4.1.2
@@ -13296,7 +13297,7 @@ snapshots:
   ajv@8.20.0:
     dependencies:
       fast-deep-equal: 3.1.3
-      fast-uri: 3.1.4
+      fast-uri: 3.1.5
       json-schema-traverse: 1.0.0
       require-from-string: 2.0.2
 
@@ -13541,16 +13542,16 @@ snapshots:
 
   bowser@2.14.1: {}
 
-  brace-expansion@1.1.17:
+  brace-expansion@1.1.18:
     dependencies:
       balanced-match: 1.0.2
       concat-map: 0.0.1
 
-  brace-expansion@2.1.3:
+  brace-expansion@2.1.4:
     dependencies:
       balanced-match: 1.0.2
 
-  brace-expansion@5.0.8:
+  brace-expansion@5.0.9:
     dependencies:
       balanced-match: 4.0.4
 
@@ -14433,7 +14434,7 @@ snapshots:
 
   fast-sha256@1.3.0: {}
 
-  fast-uri@3.1.4: {}
+  fast-uri@3.1.5: {}
 
   fast-xml-builder@1.3.0:
     dependencies:
@@ -14635,7 +14636,7 @@ snapshots:
 
   gray-matter@4.0.3:
     dependencies:
-      js-yaml: 3.15.0
+      js-yaml: 3.15.1
       kind-of: 6.0.3
       section-matter: 1.0.0
       strip-bom-string: 1.0.0
@@ -14700,7 +14701,7 @@ snapshots:
     dependencies:
       hermes-estree: 0.25.1
 
-  hono@4.12.31:
+  hono@4.12.34:
     optional: true
 
   html-encoding-sniffer@4.0.0:
@@ -15410,7 +15411,7 @@ snapshots:
 
   js-tokens@4.0.0: {}
 
-  js-yaml@3.15.0:
+  js-yaml@3.15.1:
     dependencies:
       argparse: 1.0.10
       esprima: 4.0.1
@@ -16006,15 +16007,15 @@ snapshots:
 
   minimatch@10.2.5:
     dependencies:
-      brace-expansion: 5.0.8
+      brace-expansion: 5.0.9
 
   minimatch@3.1.5:
     dependencies:
-      brace-expansion: 1.1.17
+      brace-expansion: 1.1.18
 
   minimatch@9.0.9:
     dependencies:
-      brace-expansion: 2.1.3
+      brace-expansion: 2.1.4
 
   minimist@1.2.8: {}
 
@@ -16055,7 +16056,7 @@ snapshots:
       lru.min: 1.1.4
     optional: true
 
-  nanoid@3.3.16: {}
+  nanoid@3.3.17: {}
 
   nanostores@1.4.1: {}
 
@@ -16429,7 +16430,7 @@ snapshots:
 
   postcss@8.5.25:
     dependencies:
-      nanoid: 3.3.16
+      nanoid: 3.3.17
       picocolors: 1.1.1
       source-map-js: 1.2.1
 

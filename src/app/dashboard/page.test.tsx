@@ -45,7 +45,7 @@ describe("Dashboard Home Page", () => {
       },
     ]);
     mockGetUserPaymentCount.mockResolvedValue(12);
-    mockGetRequestLocale.mockResolvedValue("en-US");
+    mockGetRequestLocale.mockResolvedValue("en");
     mockDbSelect.mockReturnValue({
       from: jest.fn().mockReturnValue({
         where: jest.fn().mockResolvedValue([{ count: 3, totalSize: "4096" }]),
@@ -202,7 +202,7 @@ describe("Dashboard Home Page", () => {
     expect(screen.getByText("Active")).toBeInTheDocument();
     expect(screen.getByText("12")).toBeInTheDocument();
     expect(screen.getByText("4096 bytes stored")).toBeInTheDocument();
-    expect(screen.getAllByText("1200-usd-en-US")).toHaveLength(2);
+    expect(screen.getAllByText("1200-usd-en")).toHaveLength(2);
     expect(screen.getByText("Test User")).toBeInTheDocument();
     expect(screen.getByText("test@example.com")).toBeInTheDocument();
     expect(screen.getByText("Super Admin")).toBeInTheDocument();

@@ -4,10 +4,6 @@ jest.mock("next/navigation", () => ({
   }),
 }));
 
-jest.mock("next-intl/server", () => ({
-  setRequestLocale: jest.fn(),
-}));
-
 import {
   getStaticMarketingLocaleParams,
   resolveStaticMarketingLocale,

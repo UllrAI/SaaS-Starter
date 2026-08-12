@@ -25,10 +25,6 @@ jest.mock("@/lib/i18n/messages", () => ({
   loadMarketingMessages: jest.fn(() => Promise.resolve({})),
 }));
 
-jest.mock("next-intl/server", () => ({
-  setRequestLocale: jest.fn(),
-}));
-
 jest.mock("@/lib/i18n/static-marketing-locale", () => ({
   getStaticMarketingLocaleParams: jest.fn(() => [{ locale: "zh-Hans" }]),
   resolveStaticMarketingParams: jest.fn(() => Promise.resolve("zh-Hans")),

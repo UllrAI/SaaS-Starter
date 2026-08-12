@@ -1,52 +1,36 @@
-jest.mock("@/lib/i18n/server-locale", () => ({
-  getRequestLocale: jest.fn(),
-}));
+import { describe, expect, it } from "@jest/globals";
 
-jest.mock("@/lib/i18n/messages", () => ({
-  loadMessages: jest.fn(),
-}));
+import { resolveRequestConfigLocale } from "@/lib/i18n/request-locale";
 
-import { getRequestLocale } from "@/lib/i18n/server-locale";
-import { loadMessages } from "@/lib/i18n/messages";
-import getRequestConfig from "./request";
-
-const mockGetRequestLocale = jest.mocked(getRequestLocale);
-const mockLoadMessages = jest.mocked(loadMessages);
-
-describe("next-intl request config", () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-    mockGetRequestLocale.mockResolvedValue("en");
-    mockLoadMessages.mockImplementation(async (locale: string) => ({
-      locale,
-    }));
+describe("request config locale resolution", () => {
+  it("prefers and normalizes an explicit locale override", () => {
+    expect(resolveRequestConfigLocale({ localeOverride: "zh-CN" })).toBe(
+      "zh-Hans",
+    );
   });
 
-  it("lets an explicit route locale override request preferences", async () => {
-    const result = await getRequestConfig({
-      locale: "zh-Hans",
-      requestLocale: Promise.resolve("en"),
-    });
-
-    expect(mockGetRequestLocale).not.toHaveBeenCalled();
-    expect(mockLoadMessages).toHaveBeenCalledWith("zh-Hans");
-    expect(result).toEqual({
-      locale: "zh-Hans",
-      messages: { locale: "zh-Hans" },
-      timeZone: "UTC",
-    });
+  it("accepts canonical root locales", () => {
+    expect(resolveRequestConfigLocale({ rootLocale: "zh-Hans" })).toBe(
+      "zh-Hans",
+    );
   });
 
-  it("falls back to the request locale for non-route surfaces", async () => {
-    mockGetRequestLocale.mockResolvedValue("zh-Hans");
+  it("returns undefined when neither locale source is available", () => {
+    expect(resolveRequestConfigLocale({})).toBeUndefined();
+  });
 
-    const result = await getRequestConfig({
-      locale: undefined,
-      requestLocale: Promise.resolve(undefined),
-    });
+  it.each(["fr", "zh", "zh-CN"])(
+    "rejects unsupported or non-canonical root locale %s",
+    (rootLocale) => {
+      expect(() => resolveRequestConfigLocale({ rootLocale })).toThrow(
+        "NEXT_HTTP_ERROR_FALLBACK;404",
+      );
+    },
+  );
 
-    expect(mockGetRequestLocale).toHaveBeenCalledTimes(1);
-    expect(mockLoadMessages).toHaveBeenCalledWith("zh-Hans");
-    expect(result.locale).toBe("zh-Hans");
+  it("rejects an unsupported explicit locale", () => {
+    expect(() => resolveRequestConfigLocale({ localeOverride: "fr" })).toThrow(
+      "NEXT_HTTP_ERROR_FALLBACK;404",
+    );
   });
 });

@@ -1,8 +1,9 @@
 import "server-only";
 
-import { getTranslations } from "next-intl/server";
+import { createTranslator } from "next-intl";
 
 import type { SupportedLocale } from "@/lib/config/i18n";
+import { loadMessages } from "@/lib/i18n/messages";
 import { getRequestLocale } from "@/lib/i18n/server-locale";
 
 export async function getServerTranslations({
@@ -11,10 +12,11 @@ export async function getServerTranslations({
   locale?: SupportedLocale;
 } = {}) {
   const resolvedLocale = locale ?? (await getRequestLocale());
-  const translator = await getTranslations({ locale: resolvedLocale });
+  const messages = await loadMessages(resolvedLocale);
+  const t = createTranslator({ locale: resolvedLocale, messages });
 
   return {
     locale: resolvedLocale,
-    t: translator,
+    t,
   };
 }

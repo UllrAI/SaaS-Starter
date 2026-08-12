@@ -1,5 +1,3 @@
-import { setRequestLocale } from "next-intl/server";
-
 import {
   getStaticMarketingLocaleParams,
   resolveStaticMarketingParams,
@@ -36,7 +34,6 @@ export default async function LocalizedMarketingLayout({
   params: Promise<{ locale: string }>;
 }) {
   const locale = await resolveStaticMarketingParams(params);
-  setRequestLocale(locale);
   const messages = await loadMarketingMessages(locale);
 
   return (

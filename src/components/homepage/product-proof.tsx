@@ -52,6 +52,8 @@ export function ProductProof({
               href={GITHUB_URL}
               target="_blank"
               rel="noreferrer"
+              data-umami-event="github_source_click"
+              data-umami-event-source="homepage_proof"
               className="text-primary mt-6 inline-flex items-center gap-2 text-sm font-semibold hover:underline"
             >
               {t("product_proof_source_link")}

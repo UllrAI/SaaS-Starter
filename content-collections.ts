@@ -69,7 +69,12 @@ const posts = defineCollection({
         message: "updatedDate must not be earlier than publishedDate",
         path: ["updatedDate"],
       },
-    ),
+    )
+    .refine((post) => !post.content.trimStart().startsWith("# "), {
+      message:
+        "Blog Markdown must not start with an H1; the page template renders the article title as the single H1",
+      path: ["content"],
+    }),
   transform: (post) => {
     const { locale, pathSlug } = getPostLocaleAndSlug(post._meta.path);
 

@@ -36,6 +36,9 @@ jest.mock("@/env", () => ({
   __esModule: true,
   default: {
     NEXT_PUBLIC_APP_URL: "http://localhost:3000",
+    NEXT_PUBLIC_UMAMI_SCRIPT_URL: "https://analytics.example.com/script.js",
+    NEXT_PUBLIC_UMAMI_WEBSITE_ID: "11111111-1111-4111-8111-111111111111",
+    NEXT_PUBLIC_UMAMI_DOMAINS: "starter.example.com",
   },
 }));
 
@@ -79,5 +82,17 @@ describe("AppDocument", () => {
       structuredDataScript?.props.dangerouslySetInnerHTML.__html,
     );
     expect(structuredData["@graph"][1].inLanguage).toEqual(["en", "zh-Hans"]);
+
+    const umamiScript = getElementChildren(
+      body as React.ReactElement<{ children: React.ReactNode }>,
+    ).find((child) => child.props.id === "umami-tracker");
+    expect(umamiScript?.props.src).toBe(
+      "https://analytics.example.com/script.js",
+    );
+    expect(umamiScript?.props["data-website-id"]).toBe(
+      "11111111-1111-4111-8111-111111111111",
+    );
+    expect(umamiScript?.props["data-domains"]).toBe("starter.example.com");
+    expect(umamiScript?.props["data-do-not-track"]).toBe("true");
   });
 });

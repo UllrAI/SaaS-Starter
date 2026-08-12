@@ -69,6 +69,7 @@ const env = createEnv({
         "x-forwarded-for",
       ])
       .default("x-forwarded-for"),
+    BING_SITE_VERIFICATION: optionalCredentialSchema,
 
     // Authentication credentials
     GOOGLE_CLIENT_ID: optionalCredentialSchema,
@@ -139,6 +140,25 @@ const env = createEnv({
   client: {
     // Application settings
     NEXT_PUBLIC_APP_URL: appOriginSchema,
+    NEXT_PUBLIC_UMAMI_SCRIPT_URL: z.url().optional(),
+    NEXT_PUBLIC_UMAMI_WEBSITE_ID: z.uuid().optional(),
+    NEXT_PUBLIC_UMAMI_DOMAINS: z
+      .string()
+      .trim()
+      .min(1)
+      .refine(
+        (value) =>
+          value.split(",").every((domain) => {
+            const normalizedDomain = domain.trim();
+            return (
+              normalizedDomain.length > 0 &&
+              !normalizedDomain.includes("://") &&
+              !normalizedDomain.includes("/")
+            );
+          }),
+        "NEXT_PUBLIC_UMAMI_DOMAINS must be a comma-separated hostname list",
+      )
+      .optional(),
   },
 
   // Linking runtime environment variables
@@ -152,6 +172,7 @@ const env = createEnv({
     DB_MAX_LIFETIME: process.env.DB_MAX_LIFETIME,
     DB_CONNECT_TIMEOUT: process.env.DB_CONNECT_TIMEOUT,
     RATE_LIMIT_IP_HEADER: process.env.RATE_LIMIT_IP_HEADER,
+    BING_SITE_VERIFICATION: process.env.BING_SITE_VERIFICATION,
 
     // Authentication credentials
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
@@ -180,6 +201,9 @@ const env = createEnv({
 
     // Application settings
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
+    NEXT_PUBLIC_UMAMI_SCRIPT_URL: process.env.NEXT_PUBLIC_UMAMI_SCRIPT_URL,
+    NEXT_PUBLIC_UMAMI_WEBSITE_ID: process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID,
+    NEXT_PUBLIC_UMAMI_DOMAINS: process.env.NEXT_PUBLIC_UMAMI_DOMAINS,
     // Payments
     CREEM_API_KEY: process.env.CREEM_API_KEY,
     CREEM_ENVIRONMENT: process.env.CREEM_ENVIRONMENT,
@@ -191,6 +215,22 @@ const env = createEnv({
     E2E_TEST_SECRET: process.env.E2E_TEST_SECRET,
   },
 });
+
+const umamiConfiguration = [
+  env.NEXT_PUBLIC_UMAMI_SCRIPT_URL,
+  env.NEXT_PUBLIC_UMAMI_WEBSITE_ID,
+  env.NEXT_PUBLIC_UMAMI_DOMAINS,
+];
+
+if (
+  process.env.SKIP_ENV_VALIDATION !== "1" &&
+  umamiConfiguration.some(Boolean) &&
+  !umamiConfiguration.every(Boolean)
+) {
+  throw new Error(
+    "Umami analytics requires NEXT_PUBLIC_UMAMI_SCRIPT_URL, NEXT_PUBLIC_UMAMI_WEBSITE_ID, and NEXT_PUBLIC_UMAMI_DOMAINS together.",
+  );
+}
 
 if (process.env.SKIP_ENV_VALIDATION !== "1") {
   validateIntegrationEnv(SITE_CONFIG.features, env);

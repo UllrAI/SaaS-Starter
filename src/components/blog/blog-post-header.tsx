@@ -15,6 +15,7 @@ interface BlogPostHeaderProps {
   excerpt?: string;
   heroImage?: string;
   publishedDate?: string;
+  updatedDate?: string;
   featured?: boolean;
   tags?: string[];
   backHref?: string;
@@ -28,6 +29,7 @@ export function BlogPostHeader({
   excerpt,
   heroImage,
   publishedDate,
+  updatedDate,
   featured = false,
   tags = [],
   backHref = "/blog",
@@ -75,6 +77,7 @@ export function BlogPostHeader({
               <div className="mx-auto max-w-5xl text-center">
                 <BlogPostMeta
                   publishedDate={publishedDate}
+                  updatedDate={updatedDate}
                   featured={featured}
                   variant="overlay"
                   className="mb-6 justify-center"
@@ -146,6 +149,7 @@ export function BlogPostHeader({
           <header className="text-center">
             <BlogPostMeta
               publishedDate={publishedDate}
+              updatedDate={updatedDate}
               featured={featured}
               className="mb-6 justify-center sm:mb-8"
               showBadge={true}

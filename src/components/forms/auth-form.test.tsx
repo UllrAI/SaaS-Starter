@@ -248,6 +248,29 @@ describe("AuthForm", () => {
       });
     });
 
+    it("tracks only a newly created signup through the new-user callback", async () => {
+      mockSignIn.magicLink = jest.fn().mockResolvedValue({ error: null });
+
+      render(
+        <AuthForm mode="signup" callbackURL="/dashboard/billing?tab=plans" />,
+      );
+
+      fireEvent.change(screen.getByPlaceholderText("you@example.com"), {
+        target: { value: "new@example.com" },
+      });
+      fireEvent.click(screen.getByRole("button", { name: /Create Account/i }));
+
+      await waitFor(() => {
+        expect(mockSignIn.magicLink).toHaveBeenCalledWith({
+          email: "new@example.com",
+          callbackURL: "/dashboard/billing?tab=plans",
+          errorCallbackURL:
+            "/login?callbackUrl=%2Fdashboard%2Fbilling%3Ftab%3Dplans",
+          newUserCallbackURL: "/dashboard/billing?tab=plans&signup=success",
+        });
+      });
+    });
+
     it("does not perform an account-enumeration preflight", async () => {
       mockSignIn.magicLink = jest.fn().mockResolvedValue({
         error: { message: "This account is disabled. Contact support." },

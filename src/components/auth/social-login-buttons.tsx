@@ -51,12 +51,14 @@ type SocialProvider = keyof typeof socialProviders;
 type SocialProviderConfig = (typeof socialProviders)[SocialProvider];
 interface SocialLoginButtonsProps {
   callbackURL?: string;
+  newUserCallbackURL?: string;
   availableProviders?: SocialProvider[];
   loading?: boolean;
   onLoadingChange?: (loading: boolean) => void;
 }
 export function SocialLoginButtons({
   callbackURL = "/dashboard",
+  newUserCallbackURL,
   availableProviders,
   loading: externalLoading = false,
   onLoadingChange,
@@ -82,6 +84,7 @@ export function SocialLoginButtons({
         provider,
         callbackURL,
         errorCallbackURL,
+        ...(newUserCallbackURL ? { newUserCallbackURL } : {}),
         disableRedirect: true,
       });
       if (result.error) {

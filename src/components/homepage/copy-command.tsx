@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Check, Copy } from "lucide-react";
+import { trackUmamiEvent } from "@/lib/analytics/umami";
 
 export function CopyCommand({
   command,
@@ -16,6 +17,7 @@ export function CopyCommand({
 
   async function handleCopy() {
     await navigator.clipboard.writeText(command);
+    trackUmamiEvent("clone_command_copy", { location: "homepage_hero" });
     setCopied(true);
     window.setTimeout(() => setCopied(false), 2000);
   }

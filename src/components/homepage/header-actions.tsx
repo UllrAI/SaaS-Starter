@@ -49,7 +49,13 @@ function AuthButtons({
         <Link href="/login">{labels.signIn}</Link>
       </Button>
       <Button asChild size="sm">
-        <Link href="/signup">{labels.getStarted}</Link>
+        <Link
+          href="/signup"
+          data-umami-event="signup_click"
+          data-umami-event-source="marketing_header"
+        >
+          {labels.getStarted}
+        </Link>
       </Button>
     </div>
   );
@@ -83,7 +89,13 @@ function MobileAuthButtons({
         <Link href="/login">{labels.signIn}</Link>
       </Button>
       <Button asChild variant="outline" className="w-full">
-        <Link href="/signup">{labels.getStarted}</Link>
+        <Link
+          href="/signup"
+          data-umami-event="signup_click"
+          data-umami-event-source="mobile_menu"
+        >
+          {labels.getStarted}
+        </Link>
       </Button>
     </div>
   );

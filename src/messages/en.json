@@ -949,6 +949,7 @@
   "blog_read_article": "Read article",
   "blog_read_full_article": "Read full article",
   "blog_reading_time": "{minutes} min read",
+  "blog_updated_on": "Updated {date}",
   "pricing_per_month": "/mo",
   "product_proof_badge": "Verifiable foundations",
   "product_proof_description": "No invented customer logos or placeholder endorsements. Evaluate the implementation, run the checks, and keep only what your product needs.",

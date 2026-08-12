@@ -949,6 +949,7 @@
   "blog_read_article": "阅读文章",
   "blog_read_full_article": "阅读全文",
   "blog_reading_time": "{minutes} 分钟阅读",
+  "blog_updated_on": "更新于 {date}",
   "pricing_per_month": "/月",
   "product_proof_badge": "可验证的产品基础",
   "product_proof_description": "不虚构客户标志，也不使用占位推荐语。直接审阅实现、运行检查，并只保留产品真正需要的部分。",

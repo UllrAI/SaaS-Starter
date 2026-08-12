@@ -156,35 +156,59 @@ export async function BlogPostPageContent({
   ).toString();
   const articleStructuredData = {
     "@context": "https://schema.org",
-    "@type": "Article",
-    headline: post.title,
-    description: post.excerpt,
-    image: post.heroImage ? [post.heroImage] : undefined,
-    datePublished: post.publishedDate
-      ? new Date(post.publishedDate).toISOString()
-      : undefined,
-    dateModified: post.updatedDate
-      ? new Date(post.updatedDate).toISOString()
-      : undefined,
-    author: author?.name
-      ? {
-          "@type": "Person",
-          name: author.name,
-        }
-      : undefined,
-    publisher: {
-      "@type": "Organization",
-      "@id": absoluteUrl("/#organization"),
-      name: COMPANY_NAME,
-      logo: {
-        "@type": "ImageObject",
-        url: absoluteUrl("/icon-512.png"),
-        width: 512,
-        height: 512,
+    "@graph": [
+      {
+        "@type": "Article",
+        headline: post.title,
+        description: post.excerpt,
+        image: post.heroImage ? [post.heroImage] : undefined,
+        datePublished: post.publishedDate
+          ? new Date(post.publishedDate).toISOString()
+          : undefined,
+        dateModified: post.updatedDate
+          ? new Date(post.updatedDate).toISOString()
+          : undefined,
+        author: author?.name
+          ? {
+              "@type": "Person",
+              name: author.name,
+            }
+          : undefined,
+        publisher: {
+          "@type": "Organization",
+          "@id": absoluteUrl("/#organization"),
+          name: COMPANY_NAME,
+          logo: {
+            "@type": "ImageObject",
+            url: absoluteUrl("/icon-512.png"),
+            width: 512,
+            height: 512,
+          },
+        },
+        mainEntityOfPage: canonicalUrl,
+        inLanguage: post.locale,
       },
-    },
-    mainEntityOfPage: canonicalUrl,
-    inLanguage: post.locale,
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: t("blog_title"),
+            item: new URL(
+              getLocalizedBlogPath(locale),
+              env.NEXT_PUBLIC_APP_URL,
+            ).toString(),
+          },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: post.title,
+            item: canonicalUrl,
+          },
+        ],
+      },
+    ],
   };
   return (
     <>
@@ -205,6 +229,7 @@ export async function BlogPostPageContent({
         excerpt={post.excerpt || undefined}
         heroImage={post.heroImage || undefined}
         publishedDate={post.publishedDate || undefined}
+        updatedDate={post.updatedDate || undefined}
         featured={post.featured}
         tags={post.tags ? [...post.tags] : undefined}
         content={post.content}

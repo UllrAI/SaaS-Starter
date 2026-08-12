@@ -3,15 +3,26 @@ import nextBundleAnalyzer from "@next/bundle-analyzer";
 import { withContentCollections } from "@content-collections/next";
 import createNextIntlPlugin from "next-intl/plugin";
 import { getRemotePatterns } from "./next-images.config";
+import { PERMANENT_REDIRECTS } from "./src/lib/config/redirects";
 
 const isDevelopment = process.env.NODE_ENV === "development";
+const umamiScriptOrigin = (() => {
+  const scriptUrl = process.env.NEXT_PUBLIC_UMAMI_SCRIPT_URL;
+  if (!scriptUrl) return null;
+
+  try {
+    return new URL(scriptUrl).origin;
+  } catch {
+    return null;
+  }
+})();
 const contentSecurityPolicy = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline'${isDevelopment ? " 'unsafe-eval'" : ""}`,
+  `script-src 'self' 'unsafe-inline'${isDevelopment ? " 'unsafe-eval'" : ""}${umamiScriptOrigin ? ` ${umamiScriptOrigin}` : ""}`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https:",
   "font-src 'self' data:",
-  "connect-src 'self' https: wss:",
+  `connect-src 'self' https: wss:${umamiScriptOrigin ? ` ${umamiScriptOrigin}` : ""}`,
   "frame-src 'none'",
   "object-src 'none'",
   "base-uri 'self'",
@@ -63,6 +74,9 @@ const nextConfig: NextConfig = {
         headers: securityHeaders,
       },
     ];
+  },
+  async redirects() {
+    return PERMANENT_REDIRECTS;
   },
 };
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");

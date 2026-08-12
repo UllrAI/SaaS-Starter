@@ -105,6 +105,10 @@ never be added to `SITE_CONFIG`.
 | `DATABASE_URL`                   | **Required.** PostgreSQL connection string.                     | `postgresql://user:password@localhost:5432/db_name` |
 | `RATE_LIMIT_IP_HEADER`           | Optional trusted client-IP header; defaults to Zeabur.          | `x-forwarded-for`                                   |
 | `NEXT_PUBLIC_APP_URL`            | **Required.** Public URL of your deployed app.                  | `http://localhost:3000` or `https://yourdomain.com` |
+| `BING_SITE_VERIFICATION`         | Optional Bing Webmaster `msvalidate.01` verification token.     | Value issued for your deployed hostname             |
+| `NEXT_PUBLIC_UMAMI_SCRIPT_URL`   | Optional Umami tracker URL; set all three Umami variables.      | `https://analytics.example.com/script.js`           |
+| `NEXT_PUBLIC_UMAMI_WEBSITE_ID`   | Optional deployment-specific Umami website UUID.                | `00000000-0000-4000-8000-000000000000`              |
+| `NEXT_PUBLIC_UMAMI_DOMAINS`      | Optional comma-separated host allowlist for this deployment.    | `yourdomain.com`                                    |
 | `BETTER_AUTH_SECRET`             | **Required.** Random session secret, at least 32 characters.    | Generate with `openssl rand -base64 32`             |
 | `RESEND_API_KEY`                 | Required when `emailAuth` is enabled. Resend API key.           | `re_xxxxxxxxxxxxxxxx`                               |
 | `RESEND_EMAIL_FROM`              | Required when `emailAuth` is enabled. Verified sender.          | `noreply@your-verified-domain.com`                  |
@@ -135,7 +139,23 @@ never be added to `SITE_CONFIG`.
 
 #### Analytics
 
-No analytics provider or tracking script is bundled. Add your own provider only when needed, and implement a real consent flow before loading non-essential cookies or trackers in jurisdictions where consent is required.
+Umami tracking is optional and disabled unless all three public Umami variables
+are set. Each deployment must create its own website in Umami and use its own
+website ID; never copy the maintainer deployment's ID into a fork. The tracker
+honors Do Not Track, excludes URL search parameters, and only records the hosts
+listed in `NEXT_PUBLIC_UMAMI_DOMAINS`.
+
+The stable event vocabulary is `github_source_click`, `clone_command_copy`,
+`signup_click`, `signup_submit`, `signup_link_sent`, `login_submit`,
+`signup_success`, `login_link_sent`, `pricing_view`, `payment_start`, and
+`payment_success`.
+Tracking is best-effort and never controls authentication or billing behavior.
+Umami's accounting remains separate from provider webhooks and database records.
+
+This configuration is cookieless, but operators remain responsible for their
+privacy notice and any consent flow required by the data they add or the
+jurisdictions they serve. Verification and SEO measurement procedures are in
+[SEO growth operations](docs/seo-growth.md).
 
 #### Creem product setup
 

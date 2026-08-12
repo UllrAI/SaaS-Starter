@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslation } from "@/lib/i18n/translation/client";
-import { type ReactNode, useRef, useState } from "react";
+import { type ReactNode, useEffect, useRef, useState } from "react";
 import {
   Card,
   CardContent,
@@ -33,6 +33,7 @@ import { Skeleton } from "./ui/skeleton";
 import { useIntlLocale } from "@/hooks/use-intl-locale";
 import { getSafeBillingRedirectUrl } from "@/lib/billing/url";
 import { useIsClient } from "@/hooks/use-is-client";
+import { trackUmamiEvent } from "@/lib/analytics/umami";
 type CheckoutMessageCode =
   | "checkout_failed"
   | "initializing_checkout"
@@ -195,6 +196,9 @@ export function PricingSection({ className }: { className?: string }) {
   const isClient = useIsClient();
   const { data: session, isPending: isSessionLoading } = useSession();
   const router = useRouter();
+  useEffect(() => {
+    trackUmamiEvent("pricing_view");
+  }, []);
   const featureDefinitions = [
     {
       id: "marketing-foundation",
@@ -356,6 +360,11 @@ export function PricingSection({ className }: { className?: string }) {
         window.location,
       );
       if (response.ok && safeCheckoutUrl) {
+        trackUmamiEvent("payment_start", {
+          tier_id: tier.id,
+          payment_mode: mode,
+          billing_cycle: cycle ?? "none",
+        });
         isRedirecting = true;
         window.location.assign(safeCheckoutUrl);
         return;

@@ -18,6 +18,7 @@ import {
   buildLoginRedirectPath,
   normalizeCallbackUrl,
 } from "@/lib/auth/callback-url";
+import { trackUmamiEvent } from "@/lib/analytics/umami";
 type AuthMode = "login" | "signup";
 type AuthPendingAction = "magic-link" | "social" | null;
 interface AuthFormProps {
@@ -41,6 +42,10 @@ export function AuthForm({
   );
   const router = useRouter();
   const resolvedCallbackURL = normalizeCallbackUrl(callbackURL);
+  const newUserCallbackURL =
+    mode === "signup"
+      ? withSignupSuccessSignal(resolvedCallbackURL)
+      : undefined;
   const errorCallbackURL = buildLoginRedirectPath(resolvedCallbackURL);
   const callbackQuery =
     resolvedCallbackURL === DEFAULT_CALLBACK_URL
@@ -60,13 +65,18 @@ export function AuthForm({
       email: "",
     },
   });
+  const isLogin = mode === "login";
   const onSubmit = async (data: z.infer<typeof authSchema>) => {
+    trackUmamiEvent(isLogin ? "login_submit" : "signup_submit", {
+      method: "magic_link",
+    });
     setFeedback(null);
     form.clearErrors("email");
     const result = await signIn.magicLink({
       email: data.email,
       callbackURL: resolvedCallbackURL,
       errorCallbackURL,
+      ...(newUserCallbackURL ? { newUserCallbackURL } : {}),
     });
     if (result.error) {
       setFeedback({
@@ -76,9 +86,12 @@ export function AuthForm({
       return;
     }
 
+    trackUmamiEvent(isLogin ? "login_link_sent" : "signup_link_sent", {
+      method: "magic_link",
+    });
+
     router.push("/auth/sent");
   };
-  const isLogin = mode === "login";
   const config = {
     title: isLogin ? (
       <>{t("auth_welcome_back")}</>
@@ -127,6 +140,7 @@ export function AuthForm({
     ),
     showTerms: !isLogin,
     callbackURL: resolvedCallbackURL,
+    newUserCallbackURL,
   };
   const fields = [
     {
@@ -150,4 +164,10 @@ export function AuthForm({
       showMagicLink={emailAuthEnabled}
     />
   );
+}
+
+function withSignupSuccessSignal(callbackURL: string): string {
+  const url = new URL(callbackURL, "http://localhost");
+  url.searchParams.set("signup", "success");
+  return `${url.pathname}${url.search}${url.hash}`;
 }

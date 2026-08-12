@@ -15,4 +15,14 @@ describe("trackUmamiEvent", () => {
 
     expect(() => trackUmamiEvent("cta_click")).not.toThrow();
   });
+
+  it("does not fail when the third-party tracker throws", () => {
+    window.umami = {
+      track: jest.fn(() => {
+        throw new Error("tracker unavailable");
+      }),
+    } as unknown as UmamiTracker;
+
+    expect(() => trackUmamiEvent("cta_click")).not.toThrow();
+  });
 });

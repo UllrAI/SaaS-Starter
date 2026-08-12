@@ -28,6 +28,28 @@ function getPostLocaleAndSlug(path: string): {
   };
 }
 
+function containsMarkdownH1(content: string): boolean {
+  let fenceMarker: "```" | "~~~" | null = null;
+
+  for (const line of content.split("\n")) {
+    const trimmedLine = line.trimStart();
+    const marker = trimmedLine.startsWith("```")
+      ? "```"
+      : trimmedLine.startsWith("~~~")
+        ? "~~~"
+        : null;
+
+    if (marker) {
+      fenceMarker = fenceMarker === marker ? null : (fenceMarker ?? marker);
+      continue;
+    }
+
+    if (!fenceMarker && /^#\s+/.test(trimmedLine)) return true;
+  }
+
+  return false;
+}
+
 const authors = defineCollection({
   name: "authors",
   directory: "content/authors",
@@ -70,9 +92,9 @@ const posts = defineCollection({
         path: ["updatedDate"],
       },
     )
-    .refine((post) => !post.content.trimStart().startsWith("# "), {
+    .refine((post) => !containsMarkdownH1(post.content), {
       message:
-        "Blog Markdown must not start with an H1; the page template renders the article title as the single H1",
+        "Blog Markdown must not contain H1 headings; the page template renders the article title as the single H1",
       path: ["content"],
     }),
   transform: (post) => {

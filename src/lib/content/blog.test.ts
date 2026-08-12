@@ -61,7 +61,10 @@ describe("blog content localization helpers", () => {
   it("keeps the page template as the only source of article H1 headings", () => {
     expect(
       getAllLocalizedPosts().every(
-        (post) => !post.content.trimStart().startsWith("# "),
+        (post) =>
+          !post.content
+            .replaceAll(/```[\s\S]*?```|~~~[\s\S]*?~~~/g, "")
+            .match(/^#\s+/m),
       ),
     ).toBe(true);
   });

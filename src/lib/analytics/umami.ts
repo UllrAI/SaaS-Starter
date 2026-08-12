@@ -6,5 +6,9 @@ export function trackUmamiEvent(
 ): void {
   if (typeof window === "undefined") return;
 
-  window.umami?.track(eventName, data);
+  try {
+    window.umami?.track(eventName, data);
+  } catch {
+    // Analytics must never block the product action being measured.
+  }
 }

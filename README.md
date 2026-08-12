@@ -157,6 +157,12 @@ privacy notice and any consent flow required by the data they add or the
 jurisdictions they serve. Verification and SEO measurement procedures are in
 [SEO growth operations](docs/seo-growth.md).
 
+Implementation guides:
+
+- [Next.js 16 SaaS starter architecture](https://starter.ullrai.com/blog/nextjs-16-saas-starter-architecture)
+- [Creem billing with Next.js](https://starter.ullrai.com/blog/creem-nextjs-billing-production-guide)
+- [API keys vs OAuth vs device flow for SaaS agents](https://starter.ullrai.com/blog/api-keys-oauth-device-flow-saas-agents)
+
 #### Creem product setup
 
 Test and live product IDs are intentionally separate in

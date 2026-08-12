@@ -4,7 +4,9 @@ import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { SectionContainer } from "@/components/layout/page-container";
+import { LocalizedLink } from "@/components/localized-link";
 import {
+  ArrowRight,
   BadgeCheck,
   CreditCard,
   Database,
@@ -21,6 +23,7 @@ function FeatureCard({
   description,
   icon: Icon,
   title,
+  guide,
 }: {
   category: React.ReactNode;
   description: React.ReactNode;
@@ -28,6 +31,10 @@ function FeatureCard({
     className?: string;
   }>;
   title: React.ReactNode;
+  guide?: {
+    href: string;
+    label: React.ReactNode;
+  };
 }) {
   return (
     <Card className="group border-border bg-card hover:border-primary h-full border p-6 transition-all">
@@ -46,6 +53,15 @@ function FeatureCard({
           <p className="text-muted-foreground text-sm leading-relaxed">
             {description}
           </p>
+          {guide && (
+            <LocalizedLink
+              href={guide.href}
+              className="text-primary inline-flex items-center gap-1 text-sm font-medium underline-offset-4 hover:underline"
+            >
+              {guide.label}
+              <ArrowRight className="h-3.5 w-3.5" />
+            </LocalizedLink>
+          )}
         </div>
       </div>
     </Card>
@@ -57,6 +73,20 @@ export function Features({
   locale?: SupportedLocale;
 } = {}) {
   const { t } = getStaticTranslations(locale);
+  const localizedGuidePath = {
+    architecture:
+      locale === "en"
+        ? "/blog/nextjs-16-saas-starter-architecture"
+        : "/blog/saas-starter-kit-developer-guide",
+    agents:
+      locale === "en"
+        ? "/blog/api-keys-oauth-device-flow-saas-agents"
+        : "/blog/agent-friendly-saas-template",
+    billing:
+      locale === "en"
+        ? "/blog/creem-nextjs-billing-production-guide"
+        : "/blog/saas-starter-kit-developer-guide",
+  } as const;
   const features = [
     {
       id: "app-router",
@@ -64,6 +94,10 @@ export function Features({
       description: <>{t("home_route_groups_metadata")}</>,
       icon: Package2,
       category: <>{t("home_architecture")}</>,
+      guide: {
+        href: localizedGuidePath.architecture,
+        label: <>{t("home_nextjs_architecture_guide")}</>,
+      },
     },
     {
       id: "auth",
@@ -78,6 +112,10 @@ export function Features({
       description: <>{t("home_api_keys_cli_device_login_refresh")}</>,
       icon: KeyRound,
       category: <>{t("home_agents")}</>,
+      guide: {
+        href: localizedGuidePath.agents,
+        label: <>{t("home_agent_auth_guide")}</>,
+      },
     },
     {
       id: "billing",
@@ -85,6 +123,10 @@ export function Features({
       description: <>{t("home_creem_checkout_flow")}</>,
       icon: CreditCard,
       category: <>{t("home_monetization")}</>,
+      guide: {
+        href: localizedGuidePath.billing,
+        label: <>{t("home_creem_billing_guide")}</>,
+      },
     },
     {
       id: "admin",

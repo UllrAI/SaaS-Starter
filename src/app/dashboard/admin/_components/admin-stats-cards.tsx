@@ -54,12 +54,12 @@ export function AdminStatsCards({ stats, locale }: AdminStatsCardsProps) {
           </div>
           <div className="mt-1 flex items-center gap-2">
             <Badge variant="secondary" className="text-xs">
-              {t.rich("admin_verified", {
+              {t("admin_verified", {
                 expression0: stats.users.verified,
               })}
             </Badge>
             <Badge variant="outline" className="text-xs">
-              {t.rich("admin_admins", {
+              {t("admin_admins", {
                 expression0: stats.users.admins,
               })}
             </Badge>
@@ -129,7 +129,7 @@ export function AdminStatsCards({ stats, locale }: AdminStatsCardsProps) {
               {stats.uploads.total.toLocaleString(intlLocale)}
             </div>
             <p className="text-muted-foreground text-xs">
-              {t.rich("admin_total", {
+              {t("admin_total", {
                 expression0: formatFileSize(stats.uploads.totalSize),
               })}
             </p>

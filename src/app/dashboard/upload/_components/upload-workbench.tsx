@@ -76,7 +76,7 @@ function HeadlessTileStatus({
     case "uploading":
       return (
         <>
-          {t.rich("uploads_server_progress_percent", {
+          {t("uploads_server_progress_percent", {
             progress,
           })}
         </>
@@ -270,7 +270,7 @@ export function UploadWorkbench() {
       description: <>{t("uploads_looser_preset_demo")}</>,
       meta: (
         <>
-          {t.rich("uploads_2_files_each", {
+          {t("uploads_2_files_each", {
             expression0: formatFileSize(50 * 1024 * 1024),
           })}
         </>

@@ -66,7 +66,7 @@ function LatestPaymentDateLabel({ date }: { date: string }) {
   const { t } = useTranslation();
   return (
     <>
-      {t.rich("billing_latest", {
+      {t("billing_latest", {
         date,
       })}
     </>

@@ -200,7 +200,7 @@ export default async function HomeRoute() {
                 </p>
                 <p className="text-lg font-semibold">{uploadedFileCount}</p>
                 <p className="text-muted-foreground text-sm">
-                  {t.rich("dashboard_stored", {
+                  {t("dashboard_stored", {
                     expression0: formatFileSize(uploadedFileSize),
                   })}
                 </p>

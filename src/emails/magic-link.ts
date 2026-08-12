@@ -1,5 +1,3 @@
-import type { ReactNode } from "react";
-import { isValidElement } from "react";
 import { userAgent } from "next/server";
 import { sendEmail } from "@/lib/email";
 import { APP_NAME, COMPANY_NAME } from "@/lib/config/constants";
@@ -20,28 +18,6 @@ import {
 import { MAGIC_LINK_TTL_SECONDS } from "@/lib/auth/constants";
 
 type DeviceInfo = MagicLinkEmailDeviceInfo;
-
-async function resolveText(node: Promise<ReactNode> | ReactNode) {
-  return extractTextContent(await node).trim();
-}
-
-function extractTextContent(node: ReactNode): string {
-  if (typeof node === "string" || typeof node === "number") {
-    return String(node);
-  }
-
-  if (Array.isArray(node)) {
-    return node.map(extractTextContent).join("");
-  }
-
-  if (isValidElement(node)) {
-    return extractTextContent(
-      (node.props as { children?: ReactNode }).children ?? null,
-    );
-  }
-
-  return "";
-}
 
 function getCookieValue(
   cookieHeader: string | null,
@@ -145,35 +121,29 @@ async function createMagicLinkEmailCopy({
 }): Promise<MagicLinkEmailCopy> {
   const { t } = await getServerTranslations({ locale });
 
-  const preview = await resolveText(
-    t.rich("email_click_secure_button_below_complete_sign", { appName }),
-  );
-  const requestDetails = await resolveText(
-    t.rich("email_we_received_request_sign_in_account", { appName }),
-  );
-  const footer = await resolveText(
-    t.rich("email_all_rights_reserved", {
-      currentYear,
-      appName,
-      companyName,
-      formattedDate,
-    }),
-  );
+  const preview = t("email_click_secure_button_below_complete_sign", {
+    appName,
+  });
+  const requestDetails = t("email_we_received_request_sign_in_account", {
+    appName,
+  });
+  const footer = t("email_all_rights_reserved", {
+    currentYear,
+    appName,
+    companyName,
+    formattedDate,
+  });
   const deviceLine =
     deviceInfo?.browser && deviceInfo.os
-      ? await resolveText(
-          t.rich("email_device", {
-            browser: deviceInfo.browser,
-            os: deviceInfo.os,
-          }),
-        )
+      ? t("email_device", {
+          browser: deviceInfo.browser,
+          os: deviceInfo.os,
+        })
       : "";
   const locationLine = deviceInfo?.location
-    ? await resolveText(
-        t.rich("email_location_approximate", {
-          location: deviceInfo.location,
-        }),
-      )
+    ? t("email_location_approximate", {
+        location: deviceInfo.location,
+      })
     : "";
 
   return {
@@ -183,11 +153,9 @@ async function createMagicLinkEmailCopy({
     greeting: t("email_hello"),
     requestDetails,
     cta: t("email_open_sign_in_link"),
-    securityReminder: await resolveText(
-      t("email_link_expires_in_minutes", {
-        minutes: MAGIC_LINK_TTL_SECONDS / 60,
-      }),
-    ),
+    securityReminder: t("email_link_expires_in_minutes", {
+      minutes: MAGIC_LINK_TTL_SECONDS / 60,
+    }),
     fallback: t("email_if_button_doesnt_work_you_can"),
     sentToLabel: t("email_sent"),
     footer,
@@ -226,11 +194,9 @@ export async function sendMagicLink(
         locale,
       }),
     ]);
-    const subject = await resolveText(
-      t.rich("email_secure_sign_in_link", {
-        appName: APP_NAME,
-      }),
-    );
+    const subject = t("email_secure_sign_in_link", {
+      appName: APP_NAME,
+    });
 
     const body = await renderMagicLinkEmail({
       copy,

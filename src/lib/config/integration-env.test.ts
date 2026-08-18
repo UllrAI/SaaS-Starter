@@ -5,7 +5,7 @@ import { validateIntegrationEnv } from "./integration-env.mjs";
 const oauthEnv = {
   GOOGLE_CLIENT_ID: "google-id",
   GOOGLE_CLIENT_SECRET: "google-secret",
-  CREEM_ENVIRONMENT: "test_mode",
+  STRIPE_ENVIRONMENT: "test_mode",
 };
 
 describe("validateIntegrationEnv", () => {
@@ -31,9 +31,9 @@ describe("validateIntegrationEnv", () => {
     expect(() =>
       validateIntegrationEnv(
         { emailAuth: false, billing: true, uploads: false },
-        { ...oauthEnv, CREEM_API_KEY: "creem_test_key" },
+        { ...oauthEnv, STRIPE_SECRET_KEY: "sk_test_key" },
       ),
-    ).toThrow("Billing is enabled but missing: CREEM_WEBHOOK_SECRET.");
+    ).toThrow("Billing is enabled but missing: STRIPE_WEBHOOK_SECRET.");
   });
 
   it("accepts complete enabled integration groups", () => {
@@ -44,8 +44,8 @@ describe("validateIntegrationEnv", () => {
           ...oauthEnv,
           RESEND_API_KEY: "resend-key",
           RESEND_EMAIL_FROM: "noreply@example.com",
-          CREEM_API_KEY: "creem_test_key",
-          CREEM_WEBHOOK_SECRET: "webhook-secret",
+          STRIPE_SECRET_KEY: "sk_test_key",
+          STRIPE_WEBHOOK_SECRET: "whsec_webhook-secret",
           R2_ENDPOINT: "https://r2.example.com",
           R2_ACCESS_KEY_ID: "access-key",
           R2_SECRET_ACCESS_KEY: "secret-key",
@@ -55,6 +55,33 @@ describe("validateIntegrationEnv", () => {
         },
       ),
     ).not.toThrow();
+  });
+
+  it("rejects Stripe credentials for the wrong environment", () => {
+    expect(() =>
+      validateIntegrationEnv(
+        { emailAuth: false, billing: true, uploads: false },
+        {
+          ...oauthEnv,
+          STRIPE_ENVIRONMENT: "live_mode",
+          STRIPE_SECRET_KEY: "sk_test_key",
+          STRIPE_WEBHOOK_SECRET: "whsec_secret",
+        },
+      ),
+    ).toThrow("STRIPE_SECRET_KEY does not match STRIPE_ENVIRONMENT=live_mode.");
+  });
+
+  it("requires a Stripe endpoint signing secret", () => {
+    expect(() =>
+      validateIntegrationEnv(
+        { emailAuth: false, billing: true, uploads: false },
+        {
+          ...oauthEnv,
+          STRIPE_SECRET_KEY: "sk_test_key",
+          STRIPE_WEBHOOK_SECRET: "not-a-signing-secret",
+        },
+      ),
+    ).toThrow("STRIPE_WEBHOOK_SECRET must start with whsec_.");
   });
 
   it("requires an OAuth provider when email authentication is disabled", () => {

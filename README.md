@@ -17,7 +17,7 @@ This starter kit provides a comprehensive set of powerful features to help you q
 - **Modern Web Framework (Next.js 16 + TypeScript):** Built on the latest [Next.js 16](https://nextjs.org/) with App Router and Server Components. The entire project uses strict TypeScript type checking.
 - **Internationalization (next-intl):** Server-rendered localization with explicit catalogs, locale-aware routing, localized metadata, and canonical hreflang output. See [docs/i18n-next-intl.md](docs/i18n-next-intl.md).
 - **Database & ORM (Drizzle + PostgreSQL):** Uses [Drizzle ORM](https://orm.drizzle.team/) for type-safe database operations with deep PostgreSQL integration. Supports schema migrations and optimized queries.
-- **Payments & Subscriptions (Creem):** Integrated with [Creem](https://www.creem.io/) as the payment provider for easy subscription and one-time payment handling.
+- **Payments & Subscriptions (Stripe):** Integrated with [Stripe](https://stripe.com/) as the payment provider for easy subscription and one-time payment handling.
 - **UI Component Library (shadcn/ui + Tailwind CSS):** Built with [shadcn/ui](https://ui.shadcn.com/), an accessible, composable component library based on Radix UI and Tailwind CSS with built-in theme support.
 - **Form Handling (Zod + React Hook Form):** Powerful, type-safe form validation through [Zod](https://zod.dev/) and [React Hook Form](https://react-hook-form.com/).
 - **File Upload (Cloudflare R2):** Secure file upload system based on Cloudflare R2, supporting client-side direct upload with various file type and size restrictions.
@@ -47,7 +47,7 @@ This starter kit provides a comprehensive set of powerful features to help you q
 | **Auth**            | [Better-Auth](https://better-auth.com/)                                                                                                                |
 | **Database**        | [PostgreSQL](https://www.postgresql.org/)                                                                                                              |
 | **ORM**             | [Drizzle ORM](https://orm.drizzle.team/)                                                                                                               |
-| **Payments**        | [Creem](https://www.creem.io/)                                                                                                                         |
+| **Payments**        | [Stripe](https://stripe.com/)                                                                                                                          |
 | **Email**           | [Resend](https://resend.com/), [React Email](https://react.email/)                                                                                     |
 | **Forms**           | [React Hook Form](https://react-hook-form.com/), [Zod](https://zod.dev/)                                                                               |
 | **Deployment**      | [Zeabur](https://zeabur.com/) or Docker                                                                                                                |
@@ -112,9 +112,9 @@ never be added to `SITE_CONFIG`.
 | `BETTER_AUTH_SECRET`             | **Required.** Random session secret, at least 32 characters.    | Generate with `openssl rand -base64 32`             |
 | `RESEND_API_KEY`                 | Required when `emailAuth` is enabled. Resend API key.           | `re_xxxxxxxxxxxxxxxx`                               |
 | `RESEND_EMAIL_FROM`              | Required when `emailAuth` is enabled. Verified sender.          | `noreply@your-verified-domain.com`                  |
-| `CREEM_API_KEY`                  | Required when `billing` is enabled. Key matching its mode.      | `creem_test_...` or `creem_...`                     |
-| `CREEM_ENVIRONMENT`              | Creem mode; defaults to `test_mode`.                            | `test_mode` or `live_mode`                          |
-| `CREEM_WEBHOOK_SECRET`           | Required when `billing` is enabled. Webhook secret.             | `whsec_your_webhook_secret`                         |
+| `STRIPE_SECRET_KEY`              | Required when `billing` is enabled. Key matching its mode.      | `sk_test_...` or `sk_live_...`                      |
+| `STRIPE_ENVIRONMENT`             | Stripe mode; defaults to `test_mode`.                           | `test_mode` or `live_mode`                          |
+| `STRIPE_WEBHOOK_SECRET`          | Required when `billing` is enabled. Endpoint signing secret.    | `whsec_your_webhook_secret`                         |
 | `R2_ENDPOINT`                    | Required when `uploads` is enabled. R2 API endpoint.            | `https://<ACCOUNT_ID>.r2.cloudflarestorage.com`     |
 | `R2_ACCESS_KEY_ID`               | Required when `uploads` is enabled. R2 access key ID.           | `your_r2_access_key_id`                             |
 | `R2_SECRET_ACCESS_KEY`           | Required when `uploads` is enabled. R2 secret key.              | `your_r2_secret_access_key`                         |
@@ -160,26 +160,20 @@ jurisdictions they serve. Verification and SEO measurement procedures are in
 Implementation guides:
 
 - [Next.js 16 SaaS starter architecture](https://starter.ullrai.com/blog/nextjs-16-saas-starter-architecture)
-- [Creem billing with Next.js](https://starter.ullrai.com/blog/creem-nextjs-billing-production-guide)
+- [Stripe billing with Next.js](https://starter.ullrai.com/blog/stripe-nextjs-billing-production-guide)
 - [API keys vs OAuth vs device flow for SaaS agents](https://starter.ullrai.com/blog/api-keys-oauth-device-flow-saas-agents)
 
-#### Creem product setup
+#### Stripe catalog setup
 
-Test and live product IDs are intentionally separate in
-`src/lib/billing/creem/products.ts`. Set `CREEM_ENVIRONMENT` and its matching API key,
-then run `pnpm creem:sync-products`. The command reuses or creates the catalog
-products and updates only the selected environment namespace. Review and commit
-that configuration change before deploying. Checkout fails closed when the
-active environment has no configured product ID.
+Test and live Price IDs are intentionally separate in
+`src/lib/billing/stripe/prices.ts`. Set `STRIPE_ENVIRONMENT` and its matching
+`STRIPE_SECRET_KEY`, then run `pnpm stripe:sync-products`. The command reuses or
+creates Stripe Products and Prices and updates only the selected environment
+namespace. Review and commit that configuration change before deploying.
+Checkout fails closed when the active environment has no configured Price ID.
 
 Webhook retry, idempotency, and manual replay behavior are documented in
 [Billing webhook operations](docs/webhooks.md).
-
-> **Creem referral disclosure:** Under Creem's standard program, Creem may
-> credit the maintainer $50 after a business signs up through an eligible
-> referral link and reaches $1,000 in settled sales.
->
-> Payments secured by [**Creem**](https://www.creem.io/).
 
 ### 4. Database Setup
 

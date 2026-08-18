@@ -17,7 +17,7 @@
 - **现代 Web 框架 (Next.js 16 + TypeScript):** 基于最新的 [Next.js 16](https://nextjs.org/)，使用 App Router 和服务器组件。整个项目采用严格的 TypeScript 类型检查。
 - **国际化 (next-intl):** 基于显式语言目录、语言感知路由、本地化元数据与规范 hreflang 输出的服务端国际化方案。详见 [docs/i18n-next-intl.md](docs/i18n-next-intl.md)。
 - **数据库与 ORM (Drizzle + PostgreSQL):** 使用 [Drizzle ORM](https://orm.drizzle.team/) 进行类型安全的数据库操作，并与 PostgreSQL 深度集成。支持模式迁移和优化的查询。
-- **支付与订阅 (Creem):** 集成了 [Creem](https://www.creem.io/) 作为支付提供商，轻松处理订阅和一次性支付。
+- **支付与订阅 (Stripe):** 集成了 [Stripe](https://stripe.com/) 作为支付提供商，轻松处理订阅和一次性支付。
 - **UI 组件库 (shadcn/ui + Tailwind CSS):** 使用 [shadcn/ui](https://ui.shadcn.com/) 构建，它是一个基于 Radix UI 和 Tailwind CSS 的可访问、可组合的组件库，内置主题支持。
 - **表单处理 (Zod + React Hook Form):** 通过 [Zod](https://zod.dev/) 和 [React Hook Form](https://react-hook-form.com/) 实现强大的、类型安全的表单验证。
 - **文件上传 (Cloudflare R2):** 基于 Cloudflare R2 的安全文件上传系统，支持客户端直传和多种文件类型与大小限制。
@@ -47,7 +47,7 @@
 | **认证**   | [Better-Auth](https://better-auth.com/)                                                                                                               |
 | **数据库** | [PostgreSQL](https://www.postgresql.org/)                                                                                                             |
 | **ORM**    | [Drizzle ORM](https://orm.drizzle.team/)                                                                                                              |
-| **支付**   | [Creem](https://www.creem.io/)                                                                                                                        |
+| **支付**   | [Stripe](https://stripe.com/)                                                                                                                         |
 | **邮件**   | [Resend](https://resend.com/), [React Email](https://react.email/)                                                                                    |
 | **表单**   | [React Hook Form](https://react-hook-form.com/), [Zod](https://zod.dev/)                                                                              |
 | **部署**   | [Zeabur](https://zeabur.com/) 或 Docker                                                                                                               |
@@ -106,9 +106,9 @@ cp .env.example .env
 | `BETTER_AUTH_SECRET`             | **必需。** 至少 32 个字符的随机会话密钥。          | 使用 `openssl rand -base64 32` 生成                 |
 | `RESEND_API_KEY`                 | 启用 `emailAuth` 时必需。Resend API Key。          | `re_xxxxxxxxxxxxxxxx`                               |
 | `RESEND_EMAIL_FROM`              | 启用 `emailAuth` 时必需。已验证的发件地址。        | `noreply@your-verified-domain.com`                  |
-| `CREEM_API_KEY`                  | 启用 `billing` 时必需。需与环境模式匹配。          | `creem_test_...` 或 `creem_...`                     |
-| `CREEM_ENVIRONMENT`              | Creem 环境模式，默认为 `test_mode`。               | `test_mode` 或 `live_mode`                          |
-| `CREEM_WEBHOOK_SECRET`           | 启用 `billing` 时必需。Creem Webhook 密钥。        | `whsec_your_webhook_secret`                         |
+| `STRIPE_SECRET_KEY`              | 启用 `billing` 时必需。需与环境模式匹配。          | `sk_test_...` 或 `sk_live_...`                      |
+| `STRIPE_ENVIRONMENT`             | Stripe 环境模式，默认为 `test_mode`。              | `test_mode` 或 `live_mode`                          |
+| `STRIPE_WEBHOOK_SECRET`          | 启用 `billing` 时必需。Endpoint 签名密钥。         | `whsec_your_webhook_secret`                         |
 | `R2_ENDPOINT`                    | 启用 `uploads` 时必需。Cloudflare R2 API 端点。    | `https://<ACCOUNT_ID>.r2.cloudflarestorage.com`     |
 | `R2_ACCESS_KEY_ID`               | 启用 `uploads` 时必需。R2 访问密钥 ID。            | `your_r2_access_key_id`                             |
 | `R2_SECRET_ACCESS_KEY`           | 启用 `uploads` 时必需。R2 秘密访问密钥。           | `your_r2_secret_access_key`                         |
@@ -135,20 +135,16 @@ cp .env.example .env
 
 项目默认不包含统计服务或跟踪脚本。确有需要时再接入自己的服务；在依法需要用户授权的地区，必须先实现真实有效的同意管理，再加载非必要 Cookie 或跟踪器。
 
-#### Creem 产品配置
+#### Stripe 产品目录配置
 
-`src/lib/billing/creem/products.ts` 会明确分开测试与生产产品 ID。先设置
-`CREEM_ENVIRONMENT` 及其对应 API Key，再运行 `pnpm creem:sync-products`。
-该命令会复用或创建产品，并且只更新当前环境的命名空间。部署前请审查并提交这次配置
-变更；如果当前环境没有产品 ID，checkout 会安全失败，不会误用另一环境的产品。
+`src/lib/billing/stripe/prices.ts` 会明确分开测试与生产 Price ID。先设置
+`STRIPE_ENVIRONMENT` 及其对应的 `STRIPE_SECRET_KEY`，再运行
+`pnpm stripe:sync-products`。该命令会复用或创建 Stripe Product 与 Price，并且只更新
+当前环境的命名空间。部署前请审查并提交这次配置变更；如果当前环境没有 Price ID，
+Checkout 会安全失败，不会误用另一环境的目录。
 
 Webhook 的重试、幂等和人工重放语义见
 [计费 Webhook 运维说明](docs/webhooks.zh-CN.md)。
-
-> **Creem 推荐计划说明：**根据 Creem 标准推荐计划，商家通过有效推荐链接注册并完成
-> 1,000 美元已结算销售额后，Creem 可能向本项目维护者发放 50 美元余额奖励。
->
-> 支付由 [**Creem**](https://www.creem.io/) 安全处理。
 
 ### 4. 数据库设置
 

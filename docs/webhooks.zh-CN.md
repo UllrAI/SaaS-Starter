@@ -1,6 +1,6 @@
 # 计费 Webhook 运维说明
 
-Creem 入口会先校验请求签名和 payload，再开启数据库事务。事务内先认领提供商的事件
+Stripe 入口会先校验请求签名和 payload，再开启数据库事务。事务内先认领提供商的事件
 ID，然后执行该事件涉及的全部计费写入。因此，事件认领与业务变更只会一起提交或一起
 回滚。
 
@@ -8,7 +8,7 @@ ID，然后执行该事件涉及的全部计费写入。因此，事件认领与
 
 - 成功事件会在 `webhook_events` 中保留一条以 `(provider, eventId)` 唯一标识的记录。
   同一事件再次投递时会直接返回成功，不会重复执行。
-- 处理失败时返回非 2xx；事件认领和计费写入都会回滚，Creem 可以安全地重试完整事件。
+- 处理失败时返回非 2xx；事件认领和计费写入都会回滚，Stripe 可以安全地重试完整事件。
 - 签名或 payload 无效时返回 `400`。修复发送方或入口配置后再重放。
 - 日志只包含 `provider`、`eventId`、`eventType` 和 `outcome`，不会记录或持久化原始
   payload 与签名。
@@ -18,9 +18,16 @@ ID，然后执行该事件涉及的全部计费写入。因此，事件认领与
 
 ## 人工重放
 
-需要人工重放时，请在 Creem Dashboard 中将事件重新发送到现有 Webhook 入口，不要
+需要人工重放时，请在 Stripe Dashboard 中将事件重新发送到现有 Webhook 入口，不要
 手工插入或删除账本记录。已成功处理的事件会被识别为重复事件；事务曾失败的事件则可
 正常重新处理。
 
-本脚手架不额外提供第二套重试队列或重放后台。Creem 是事件投递源，数据库事务是本地
+本脚手架不额外提供第二套重试队列或重放后台。Stripe 是事件投递源，数据库事务是本地
 一致性边界。
+
+请将 Stripe Endpoint 配置为 `/api/billing/webhooks/stripe`，并订阅
+`checkout.session.completed`、`checkout.session.async_payment_succeeded`、
+`customer.subscription.created`、`customer.subscription.updated`、
+`customer.subscription.deleted`、`customer.subscription.paused`、
+`customer.subscription.resumed`、`invoice.paid`、`invoice.payment_failed`、
+`charge.refunded` 和 `charge.dispute.created`。

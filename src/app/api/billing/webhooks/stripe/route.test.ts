@@ -28,12 +28,12 @@ jest.mock("@/lib/billing", () => ({
   },
 }));
 
-const mockLogCreemWebhook = jest.fn();
-jest.mock("@/lib/billing/creem/webhook-log", () => ({
-  logCreemWebhook: mockLogCreemWebhook,
+const mockLogStripeWebhook = jest.fn();
+jest.mock("@/lib/billing/stripe/webhook-log", () => ({
+  logStripeWebhook: mockLogStripeWebhook,
 }));
 
-describe("Billing Webhooks Creem API", () => {
+describe("Billing Webhooks Stripe API", () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
@@ -73,12 +73,12 @@ describe("Billing Webhooks Creem API", () => {
         entries: () => [],
       },
       cookies: { get: () => null, has: () => false },
-      nextUrl: { pathname: "/api/billing/webhooks/creem" },
-      url: "http://localhost:3000/api/billing/webhooks/creem",
+      nextUrl: { pathname: "/api/billing/webhooks/stripe" },
+      url: "http://localhost:3000/api/billing/webhooks/stripe",
     } as any as NextRequest;
   };
 
-  describe("POST /api/billing/webhooks/creem", () => {
+  describe("POST /api/billing/webhooks/stripe", () => {
     it("should return 400 when signature header is missing", async () => {
       mockHeadersList.get.mockReturnValue(null);
 
@@ -89,9 +89,9 @@ describe("Billing Webhooks Creem API", () => {
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data.error).toBe("Missing webhook signature header");
-      expect(mockHeadersList.get).toHaveBeenCalledWith("creem-signature");
-      expect(mockLogCreemWebhook).toHaveBeenCalledWith("warn", {
+      expect(data.error).toBe("Missing Stripe-Signature header");
+      expect(mockHeadersList.get).toHaveBeenCalledWith("stripe-signature");
+      expect(mockLogStripeWebhook).toHaveBeenCalledWith("warn", {
         eventId: null,
         eventType: null,
         outcome: "missing_signature",
@@ -108,7 +108,7 @@ describe("Billing Webhooks Creem API", () => {
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data.error).toBe("Missing webhook signature header");
+      expect(data.error).toBe("Missing Stripe-Signature header");
     });
 
     it("should process webhook successfully with valid signature", async () => {
@@ -138,7 +138,7 @@ describe("Billing Webhooks Creem API", () => {
       const mockSignature = "invalid-signature";
       const mockPayload = '{"event": "test"}';
       const signatureError = new Error("Invalid signature.");
-      signatureError.name = "CreemWebhookSignatureError";
+      signatureError.name = "StripeWebhookSignatureError";
 
       mockHeadersList.get.mockReturnValue(mockSignature);
       mockHandleWebhook.mockRejectedValue(signatureError);
@@ -185,7 +185,7 @@ describe("Billing Webhooks Creem API", () => {
 
       expect(response.status).toBe(500);
       expect(data.error).toBe("Webhook processing failed");
-      expect(mockLogCreemWebhook).not.toHaveBeenCalled();
+      expect(mockLogStripeWebhook).not.toHaveBeenCalled();
     });
 
     it("should handle non-Error exceptions with 500 status", async () => {
@@ -203,7 +203,7 @@ describe("Billing Webhooks Creem API", () => {
 
       expect(response.status).toBe(500);
       expect(data.error).toBe("Webhook processing failed");
-      expect(mockLogCreemWebhook).not.toHaveBeenCalled();
+      expect(mockLogStripeWebhook).not.toHaveBeenCalled();
     });
 
     it("should handle request body read failure", async () => {
@@ -225,8 +225,8 @@ describe("Billing Webhooks Creem API", () => {
           entries: () => [],
         },
         cookies: { get: () => null, has: () => false },
-        nextUrl: { pathname: "/api/billing/webhooks/creem" },
-        url: "http://localhost:3000/api/billing/webhooks/creem",
+        nextUrl: { pathname: "/api/billing/webhooks/stripe" },
+        url: "http://localhost:3000/api/billing/webhooks/stripe",
       } as any as NextRequest;
 
       const { POST } = await import("./route");
@@ -236,7 +236,7 @@ describe("Billing Webhooks Creem API", () => {
 
       expect(response.status).toBe(500);
       expect(data.error).toBe("Webhook processing failed");
-      expect(mockLogCreemWebhook).toHaveBeenCalledWith("error", {
+      expect(mockLogStripeWebhook).toHaveBeenCalledWith("error", {
         eventId: null,
         eventType: null,
         outcome: "request_failed",
@@ -339,7 +339,7 @@ describe("Billing Webhooks Creem API", () => {
       expect(response.status).toBe(413);
       expect(data.error).toBe("Webhook payload is too large");
       expect(mockHandleWebhook).not.toHaveBeenCalled();
-      expect(mockLogCreemWebhook).toHaveBeenCalledWith("warn", {
+      expect(mockLogStripeWebhook).toHaveBeenCalledWith("warn", {
         eventId: null,
         eventType: null,
         outcome: "body_too_large",

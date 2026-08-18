@@ -9,7 +9,7 @@ import {
 
 // Mock environment variables
 const mockEnv = {
-  CREEM_API_KEY: "test-creem-api-key",
+  STRIPE_SECRET_KEY: "sk_test_admin-key",
 };
 
 // Mock all external dependencies

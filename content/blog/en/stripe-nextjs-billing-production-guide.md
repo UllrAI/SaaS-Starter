@@ -1,12 +1,12 @@
 ---
-slug: creem-nextjs-billing-production-guide
-title: "Creem Billing with Next.js: Production Checkout and Webhook Guide"
+slug: stripe-nextjs-billing-production-guide
+title: "Stripe Billing with Next.js: Production Checkout and Webhook Guide"
 publishedDate: 2026-08-12
 author: admin
 excerpt: >-
-  Implement Creem checkout, subscriptions, one-time purchases, idempotent webhooks, catalog sync, and production release checks in a Next.js SaaS.
+  Implement Stripe checkout, subscriptions, one-time purchases, idempotent webhooks, catalog sync, and production release checks in a Next.js SaaS.
 tags:
-  - Creem
+  - Stripe
   - Next.js
   - SaaS Billing
   - Webhooks
@@ -20,7 +20,7 @@ Adding a checkout button is the shortest part of a billing integration. Producti
 
 The application-level contract lives in `src/lib/billing/provider.ts`. Callers provide a tier ID, payment mode, optional billing cycle, authenticated owner, and return URLs. They receive a validated checkout URL rather than a raw provider response.
 
-The current Creem adapter maps that intent to the matching product ID in `src/lib/billing/creem/products.ts`. Subscription and one-time purchase flows share the contract while retaining different entitlement behavior.
+The current Stripe adapter maps that intent to the matching Price ID in `src/lib/billing/stripe/prices.ts`. Subscription and one-time purchase flows share the contract while retaining different entitlement behavior.
 
 This is enough abstraction to protect business code without pretending every billing provider has identical concepts.
 
@@ -31,7 +31,7 @@ This is enough abstraction to protect business code without pretending every bil
 - the feature is enabled;
 - the user session is valid;
 - the request body matches the supported tier, payment mode, and billing cycle;
-- a live or test product ID exists for the active Creem environment;
+- a live or test Price ID exists for the active Stripe environment;
 - an existing entitlement does not conflict with the purchase;
 - repeated browser attempts reuse a request ID instead of creating accidental duplicate sessions.
 
@@ -39,17 +39,17 @@ The client then allowlists the returned redirect host before calling `window.loc
 
 ## Separate test and live catalogs
 
-`CREEM_ENVIRONMENT` selects `test_mode` or `live_mode`. Product IDs are stored separately for the two environments. The sync command updates only the active namespace:
+`STRIPE_ENVIRONMENT` selects `test_mode` or `live_mode`. Price IDs are stored separately for the two environments. The sync command updates only the active namespace:
 
 ```bash
-pnpm creem:sync-products
+pnpm stripe:sync-products
 ```
 
-Review and commit the resulting catalog configuration. A production release should fail closed when a live product ID is missing; it should never fall back to the test catalog or create products during an application request.
+Review and commit the resulting catalog configuration. A production release should fail closed when a live Price ID is missing; it should never fall back to the test catalog or create Products or Prices during an application request.
 
 ## Treat webhooks as the source of durable state
 
-The browser returning from checkout is useful feedback, but it is not durable billing evidence. The webhook path verifies the Creem signature before parsing business data, records the provider event ID, and processes each event idempotently.
+The browser returning from checkout is useful feedback, but it is not durable billing evidence. The webhook path verifies the Stripe signature before parsing business data, records the provider event ID, and processes each event idempotently.
 
 Relevant transitions include:
 
@@ -72,9 +72,9 @@ Analytics records `payment_start` before the redirect and `payment_success` only
 
 Before enabling live mode:
 
-1. Configure the live Creem API key and webhook secret.
-2. Sync and review live catalog IDs.
-3. Register the exact production webhook endpoint in Creem.
+1. Configure the live Stripe secret key and endpoint signing secret.
+2. Sync and review the live Price IDs.
+3. Register `/api/billing/webhooks/stripe` as the production endpoint in Stripe.
 4. Exercise subscription and one-time checkouts with an authenticated test account.
 5. Replay a webhook and confirm the database changes only once.
 6. Test cancellation, refund, and failed-payment paths.

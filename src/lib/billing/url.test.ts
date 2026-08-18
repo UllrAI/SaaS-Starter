@@ -5,14 +5,17 @@ describe("billing url helpers", () => {
   describe("assertTrustedBillingUrl", () => {
     it("accepts trusted https billing hosts", () => {
       expect(
-        assertTrustedBillingUrl("https://creem.io/checkout", "redirect"),
-      ).toBe("https://creem.io/checkout");
-      expect(
         assertTrustedBillingUrl(
-          "https://checkout.creem.io/session/123",
+          "https://billing.stripe.com/session",
           "redirect",
         ),
-      ).toBe("https://checkout.creem.io/session/123");
+      ).toBe("https://billing.stripe.com/session");
+      expect(
+        assertTrustedBillingUrl(
+          "https://checkout.stripe.com/c/pay/cs_123",
+          "redirect",
+        ),
+      ).toBe("https://checkout.stripe.com/c/pay/cs_123");
     });
 
     it("rejects invalid, untrusted, or non-https urls", () => {
@@ -20,10 +23,13 @@ describe("billing url helpers", () => {
         "Invalid redirect.",
       );
       expect(() =>
-        assertTrustedBillingUrl("http://creem.io/checkout", "redirect"),
+        assertTrustedBillingUrl(
+          "http://checkout.stripe.com/checkout",
+          "redirect",
+        ),
       ).toThrow("Invalid redirect.");
       expect(() =>
-        assertTrustedBillingUrl("https://evil-creem.io/checkout", "redirect"),
+        assertTrustedBillingUrl("https://evil-stripe.com/checkout", "redirect"),
       ).toThrow("Invalid redirect.");
     });
   });
@@ -31,8 +37,8 @@ describe("billing url helpers", () => {
   describe("getSafeBillingRedirectUrl", () => {
     it("returns trusted https billing urls", () => {
       expect(
-        getSafeBillingRedirectUrl("https://checkout.creem.io/session/123"),
-      ).toBe("https://checkout.creem.io/session/123");
+        getSafeBillingRedirectUrl("https://checkout.stripe.com/c/pay/cs_123"),
+      ).toBe("https://checkout.stripe.com/c/pay/cs_123");
     });
 
     it("allows same-origin redirects when current location matches", () => {
@@ -49,7 +55,7 @@ describe("billing url helpers", () => {
       expect(getSafeBillingRedirectUrl(null)).toBeNull();
       expect(getSafeBillingRedirectUrl("not-a-url")).toBeNull();
       expect(
-        getSafeBillingRedirectUrl("http://checkout.creem.io/session/123"),
+        getSafeBillingRedirectUrl("http://checkout.stripe.com/c/pay/cs_123"),
       ).toBeNull();
       expect(
         getSafeBillingRedirectUrl("https://example.com/billing"),

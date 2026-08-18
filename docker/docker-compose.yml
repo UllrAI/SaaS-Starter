@@ -86,10 +86,10 @@ services:
       UPLOAD_LEGACY_COMPLETION_SINCE: ${UPLOAD_LEGACY_COMPLETION_SINCE:-}
       UPLOAD_LEGACY_COMPLETION_UNTIL: ${UPLOAD_LEGACY_COMPLETION_UNTIL:-}
 
-      # Payment provider (configure with your Creem credentials)
-      CREEM_API_KEY: ${CREEM_API_KEY:?Set CREEM_API_KEY}
-      CREEM_ENVIRONMENT: ${CREEM_ENVIRONMENT:-test_mode}
-      CREEM_WEBHOOK_SECRET: ${CREEM_WEBHOOK_SECRET:?Set CREEM_WEBHOOK_SECRET}
+      # Payment provider (configure with your Stripe credentials)
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:?Set STRIPE_SECRET_KEY}
+      STRIPE_ENVIRONMENT: ${STRIPE_ENVIRONMENT:-test_mode}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:?Set STRIPE_WEBHOOK_SECRET}
     depends_on:
       migrate:
         condition: service_completed_successfully

@@ -50,7 +50,7 @@ export default function FeaturesPage({
     <>{t("features_next_js_app_router_structure_page")}</>,
     <>{t("features_auth_login_signup")}</>,
     <>{t("features_api_keys_cli_device_login_versioned")}</>,
-    <>{t("features_creem_billing")}</>,
+    <>{t("features_stripe_billing")}</>,
     <>{t("features_admin_pages")}</>,
     <>{t("features_r2_upload_flows")}</>,
     <>{t("features_blog_markdown")}</>,

@@ -7,7 +7,7 @@
  * @property {{repository: string, issues: string, releases: string, discussions: string, docs: string}} links
  * @property {{openGraphImage: string, twitterAccount: string}} assets
  * @property {{emailAuth: boolean, billing: boolean, uploads: boolean}} features
- * @property {{provider: "creem"}} billing
+ * @property {{provider: "stripe"}} billing
  */
 
 const repository = "https://github.com/ullrai/saas-starter";
@@ -44,7 +44,7 @@ const SITE_CONFIG = Object.freeze({
     uploads: true,
   },
   billing: {
-    provider: "creem",
+    provider: "stripe",
   },
 });
 

@@ -295,7 +295,7 @@ export const webhookEvents = pgTable(
     id: uuid("id").primaryKey().defaultRandom(),
     eventId: text("eventId").notNull(),
     eventType: text("eventType").notNull(),
-    provider: text("provider").notNull().default("creem"),
+    provider: text("provider").notNull().default("stripe"),
     createdAt: timestamp("createdAt").notNull().defaultNow(),
   },
   (table) => {

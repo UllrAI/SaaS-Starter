@@ -5,7 +5,7 @@ publishedDate: 2025-06-23
 updatedDate: 2026-08-12
 author: admin
 excerpt: >-
-  从 Next.js 16、Better Auth、Creem、Drizzle、PostgreSQL 和 R2 出发，完整搭建、验证并发布支持 API 与 CLI 的生产级 SaaS。
+  从 Next.js 16、Better Auth、Stripe、Drizzle、PostgreSQL 和 R2 出发，完整搭建、验证并发布支持 API 与 CLI 的生产级 SaaS。
 tags:
   - Next.js
   - SaaS Starter
@@ -16,14 +16,14 @@ tags:
   - Tailwind CSS
   - shadcn/ui
   - Drizzle ORM
-  - Creem
+  - Stripe
   - Resend
   - Cloudflare R2
 featured: true
 heroImage: https://images.unsplash.com/photo-1561886362-a2b38ce83470?q=80&w=1674&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D
 ---
 
-本文已按 v0.1.3 的实际代码路径更新，覆盖 Next.js 16 App Router、Better Auth、Creem 支付、PostgreSQL 与 Drizzle、Cloudflare R2 上传、多语言营销页、API Key，以及浏览器批准的 CLI 设备登录。请把它作为实现地图，并用仓库现有的 lint、类型检查、测试和构建命令验证每次改动。
+本文已按 v0.1.3 的实际代码路径更新，覆盖 Next.js 16 App Router、Better Auth、Stripe 支付、PostgreSQL 与 Drizzle、Cloudflare R2 上传、多语言营销页、API Key，以及浏览器批准的 CLI 设备登录。请把它作为实现地图，并用仓库现有的 lint、类型检查、测试和构建命令验证每次改动。
 
 ## 1. 项目概览
 
@@ -33,7 +33,7 @@ heroImage: https://images.unsplash.com/photo-1561886362-a2b38ce83470?q=80&w=1674
 
 - **核心功能**：提供身份验证、支付订阅、数据库管理、文件上传、内容管理等 SaaS 应用的核心功能。
 - **Agent 友好定位**：同一套代码同时服务浏览器用户、API、终端自动化，以及 agent（OpenClaw、Codex、Claude Code 等）工作流。
-- **技术栈**：基于 Next.js 16 App Router、TypeScript、PostgreSQL、Drizzle ORM，并集成了 Creem 支付、Resend 邮件服务和 Cloudflare R2 文件存储。
+- **技术栈**：基于 Next.js 16 App Router、TypeScript、PostgreSQL、Drizzle ORM，并集成了 Stripe 支付、Resend 邮件服务和 Cloudflare R2 文件存储。
 - **适用场景**：
   - 快速搭建需要用户登录和付费订阅功能的全栈 SaaS 应用。
   - 作为学习现代全栈 Web 开发技术的实践项目。
@@ -84,7 +84,7 @@ pnpm dev
 - **认证**: Better-Auth (魔法链接, OAuth - Google/GitHub/LinkedIn)
 - **机器认证**: API Key、浏览器批准的 CLI 设备登录、CLI 会话查看、版本化 `/api/v1/*` 接口
 - **数据库**: PostgreSQL + Drizzle ORM (类型安全查询, 迁移管理)
-- **支付订阅**: Creem 集成 (一次性支付, 订阅, 客户门户, Webhooks)
+- **支付订阅**: Stripe 集成 (一次性支付, 订阅, 客户门户, Webhooks)
 - **文件上传**: Cloudflare R2 集成 (客户端预签名直传, 服务端代理上传, 图片压缩)
 - **内容管理**: Content Collections (Markdown 博客系统)
 - **邮件服务**: Resend + React Email (事务性邮件模板)
@@ -113,7 +113,7 @@ graph TD
         D -- ORM --> E[Drizzle ORM];
         E --> F[(PostgreSQL)];
         D -- Auth API --> G[Better-Auth];
-        D -- Payment API --> H[Creem];
+        D -- Payment API --> H[Stripe];
         D -- Email API --> I[Resend];
         D -- Storage API --> J[Cloudflare R2];
     end
@@ -167,7 +167,7 @@ SaaS-Starter-main/
 │   │   ├── actions/      # Next.js Server Actions
 │   │   ├── admin/        # 管理后台核心逻辑
 │   │   ├── auth/         # 认证配置与逻辑 (Better-Auth)
-│   │   ├── billing/      # 支付抽象层与提供商 (Creem)
+│   │   ├── billing/      # 支付抽象层与提供商 (Stripe)
 │   │   ├── config/       # 全局常量、产品、角色等配置
 │   │   ├── database/     # 数据库辅助函数
 │   │   ├── email.tsx     # 邮件发送服务
@@ -204,7 +204,7 @@ SaaS-Starter-main/
 
 - **环境变量 (`env.js`)**: 使用 `@t3-oss/env-nextjs` 强制校验环境变量。所有环境变量（如 API 密钥、数据库 URL）必须在 `.env` 文件中定义，并通过 `env.js` 进行类型安全访问。这避免了运行时因缺少环境变量而导致的错误。
 - **应用常量 (`src/lib/config/constants.ts`)**: 存放应用名称、描述、联系邮箱等不会频繁更改的硬编码值。
-- **产品套餐 (`src/lib/config/products.ts`)**: 统一定义所有付费套餐。每个套餐包含内部 ID、名称、特性列表以及在不同支付提供商（如 Creem）中的产品 ID。这种结构使得添加新套餐或更换支付提供商变得容易。
+- **产品套餐 (`src/lib/config/products.ts`)**: 统一定义内部套餐和价格。Stripe 测试与生产 Price ID 分别保存在 `src/lib/billing/stripe/prices.ts`，并由产品目录同步命令生成。
 - **用户角色 (`src/lib/config/roles.ts`)**: 定义了用户角色及其层级关系（`user`, `admin`, `super_admin`）。`hasRole` 等辅助函数提供了统一的权限检查逻辑。
 - **文件上传 (`src/lib/config/upload.ts`)**: 集中管理文件上传的所有规则，包括最大文件大小、允许的文件类型等。所有上传路径（客户端和服务器端）都共享此配置，确保规则一致性。
 
@@ -255,7 +255,7 @@ SaaS-Starter-main/
    - 复制 `.env.example` 到 `.env`。
    - 生成一个安全的 `BETTER_AUTH_SECRET`: `openssl rand -base64 32`。
    - 填入您的 PostgreSQL `DATABASE_URL`。
-   - 注册并获取 Creem, Resend, Cloudflare R2 的 API 密钥，并填入 `.env` 文件。
+   - 在 `.env` 中配置 Stripe Secret Key 与 Webhook Endpoint Secret，以及 Resend、Cloudflare R2 所需凭据。
 1. **数据库设置**:
    - **开发环境**: `pnpm db:push` 会将 `src/database/schema.ts` 的更改直接同步到数据库，适合快速迭代。
    - **共享环境**: 使用 `pnpm db:generate` 生成并提交 SQL 迁移，部署代码后，再针对目标 `DATABASE_URL` 执行一次 `pnpm db:migrate`。
@@ -341,16 +341,16 @@ SaaS-Starter-main/
   - `pnpm db:push`: 仅限开发，直接将 schema 同步到数据库，会丢失历史记录。
   - `pnpm db:migrate`: 对 `DATABASE_URL` 指向的数据库应用已提交的迁移文件。
 
-### 4.3. 支付与订阅 (Creem)
+### 4.3. 支付与订阅 (Stripe)
 
-- **抽象层**: `src/lib/billing/index.ts` 导出一个统一的 `billing` 对象，未来可以轻松切换到其他支付提供商（如 Stripe），而无需修改上层业务代码。
-- **提供商实现**: `src/lib/billing/creem/provider.ts` 是 Creem 支付提供商的具体实现，封装了创建 Checkout 会话、客户门户和处理 Webhook 的逻辑。
+- **抽象层**: `src/lib/billing/index.ts` 导出统一的 `billing` 对象，使路由与操作逻辑不依赖 Stripe API 细节。
+- **提供商实现**: `src/lib/billing/stripe/provider.ts` 是 Stripe 支付提供商的具体实现，封装了创建 Checkout 会话、客户门户和处理 Webhook 的逻辑。
 - **API 接口**:
   - `/api/billing/checkout`: 创建支付会话。在用户尝试购买已有的订阅时，会返回 `409 Conflict` 状态码和管理链接。
-  - `/api/billing/portal`: 创建一个指向 Creem 客户门户的 URL，用户可以在此管理自己的订阅。
-  - `/api/billing/webhooks/creem`: 接收来自 Creem 的 Webhook 事件，用于更新订阅状态、记录付款等。
-- **Webhook 处理**: `src/lib/billing/creem/webhook.ts`
-  - **安全**: 使用 `crypto.timingSafeEqual` 验证 Webhook 签名，防止伪造请求。
+  - `/api/billing/portal`: 创建一个指向 Stripe 客户门户的 URL，用户可以在此管理自己的订阅。
+  - `/api/billing/webhooks/stripe`: 接收来自 Stripe 的 Webhook 事件，用于更新订阅状态、记录付款等。
+- **Webhook 处理**: `src/lib/billing/stripe/webhook.ts`
+  - **安全**: 使用 Stripe 官方 SDK 验证原始请求体和 `Stripe-Signature` 请求头，再处理事件。
   - **幂等性**: 在 `webhook_events` 表中记录已处理的事件 ID，防止同一事件被重复处理。
   - **事务性**: 所有数据库操作都在一个事务中完成，确保数据一致性。
 - **支付流程图**:
@@ -361,16 +361,16 @@ SaaS-Starter-main/
       participant User
       participant Client as 客户端 (Pricing Page)
       participant Server as 服务器
-      participant Creem
+      participant Stripe
 
       User->>Client: 点击 "Get Plan"
       Client->>Server: POST /api/billing/checkout
-      Server->>Creem: Create Checkout Session
-      Creem-->>Server: checkoutUrl
+      Server->>Stripe: Create Checkout Session
+      Stripe-->>Server: checkoutUrl
       Server-->>Client: 返回 checkoutUrl
-      Client->>User: 重定向到 Creem 支付页
-      User->>Creem: 完成支付
-      Creem-->>Server: Webhook (checkout.completed)
+      Client->>User: 重定向到 Stripe 支付页
+      User->>Stripe: 完成支付
+      Stripe-->>Server: Webhook (checkout.session.completed)
       Server->>Server: 验证签名, 记录事件
       Server->>Server: (DB Transaction) 更新用户订阅状态
       User->>Client: 重定向到 /payment-status
@@ -465,15 +465,15 @@ sequenceDiagram
 
 ### 5.2. API 参考
 
-| 路由                          | 方法      | 描述                              |
-| ----------------------------- | --------- | --------------------------------- |
-| `/api/auth/[...all]`          | GET, POST | 处理所有 `better-auth` 认证请求。 |
-| `/api/billing/checkout`       | POST      | 创建支付会话。                    |
-| `/api/billing/portal`         | GET       | 获取客户门户 URL。                |
-| `/api/billing/webhooks/creem` | POST      | 接收 Creem Webhook 事件。         |
-| `/api/upload/presigned-url`   | POST      | 为客户端直传获取预签名 URL。      |
-| `/api/upload/server-upload`   | POST      | 服务器端代理上传文件。            |
-| `/api/payment-status`         | GET       | 查询支付状态。                    |
+| 路由                           | 方法      | 描述                              |
+| ------------------------------ | --------- | --------------------------------- |
+| `/api/auth/[...all]`           | GET, POST | 处理所有 `better-auth` 认证请求。 |
+| `/api/billing/checkout`        | POST      | 创建支付会话。                    |
+| `/api/billing/portal`          | GET       | 获取客户门户 URL。                |
+| `/api/billing/webhooks/stripe` | POST      | 接收 Stripe Webhook 事件。        |
+| `/api/upload/presigned-url`    | POST      | 为客户端直传获取预签名 URL。      |
+| `/api/upload/server-upload`    | POST      | 服务器端代理上传文件。            |
+| `/api/payment-status`          | GET       | 查询支付状态。                    |
 
 ### 5.3. Hook 和事件
 
@@ -587,7 +587,7 @@ sequenceDiagram
 - **路由保护**: `proxy.ts` 是第一道防线，但**必须**在 Server Actions 和 API 路由中使用 `requireAuth`、`requireAdmin` 等函数进行后端权限验证。
 - **SQL 注入**: 使用 Drizzle ORM 可以有效防止 SQL 注入攻击，因为它会自动参数化查询。
 - **XSS**: Next.js 和 React 默认会对 JSX 内容进行转义，防止跨站脚本攻击。处理用户生成的内容时，请使用成熟的库（如 `DOMPurify`）进行清理。
-- **Webhook 安全**: `src/lib/billing/creem/webhook.ts` 中的签名验证是确保 Webhook 请求来源可信的关键。
+- **Webhook 安全**: `src/lib/billing/stripe/webhook.ts` 中的签名验证是确保 Webhook 请求来源可信的关键。
 
 ### 10.3. 部署指南
 
@@ -612,7 +612,7 @@ workflow 才会将 `prod` 更新到该 commit。
 
 ## 11. 社区与生态
 
-部署前，请对照 [Next.js 16 架构指南](/blog/nextjs-16-saas-starter-architecture)、[Creem 生产级支付指南](/blog/creem-nextjs-billing-production-guide) 与 [API Key、OAuth 和设备流选型指南](/blog/api-keys-oauth-device-flow-saas-agents)，再检查[功能边界](/zh-Hans/features)、验证[价格与结账行为](/zh-Hans/pricing)，并从 [GitHub 源码](https://github.com/ullrai/saas-starter)完整克隆项目，而不是脱离上下文复制零散代码。
+部署前，请对照 [Next.js 16 架构指南](/blog/nextjs-16-saas-starter-architecture)、[Stripe 生产级支付指南](/blog/stripe-nextjs-billing-production-guide) 与 [API Key、OAuth 和设备流选型指南](/blog/api-keys-oauth-device-flow-saas-agents)，再检查[功能边界](/zh-Hans/features)、验证[价格与结账行为](/zh-Hans/pricing)，并从 [GitHub 源码](https://github.com/ullrai/saas-starter)完整克隆项目，而不是脱离上下文复制零散代码。
 
 ### 11.1. 社区资源
 
@@ -622,7 +622,7 @@ workflow 才会将 `prod` 更新到该 commit。
   - [Next.js](https://nextjs.org/docs)
   - [Drizzle ORM](https://orm.drizzle.team/docs)
   - [Better-Auth](https://better-auth.com/docs)
-  - [Creem](https://docs.creem.io)
+  - [Stripe](https://docs.stripe.com)
   - [shadcn/ui](https://ui.shadcn.com/docs)
   - [Content Collections](https://www.content-collections.dev/)
 

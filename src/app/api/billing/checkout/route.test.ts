@@ -23,6 +23,7 @@ const mockGetSession = jest.fn();
 const mockCreateCheckoutSession = jest.fn();
 const mockCreateCustomerPortalUrl = jest.fn();
 const mockGetUserSubscription = jest.fn();
+const mockGetUserBillingCustomerId = jest.fn();
 const mockHasUserProductEntitlement = jest.fn();
 const mockCheckRateLimit = jest.fn();
 
@@ -43,6 +44,7 @@ jest.mock("@/lib/billing", () => ({
 
 jest.mock("@/lib/database/subscription", () => ({
   getUserSubscription: mockGetUserSubscription,
+  getUserBillingCustomerId: mockGetUserBillingCustomerId,
   hasUserProductEntitlement: mockHasUserProductEntitlement,
 }));
 
@@ -57,6 +59,7 @@ describe("Billing Checkout API", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockHasUserProductEntitlement.mockResolvedValue(false);
+    mockGetUserBillingCustomerId.mockResolvedValue(null);
     mockCheckRateLimit.mockResolvedValue({
       allowed: true,
       info: { limit: 20, remaining: 19, resetAt: 2_000_000_000 },
@@ -172,7 +175,7 @@ describe("Billing Checkout API", () => {
         status: "active",
       });
       mockCreateCustomerPortalUrl.mockResolvedValue({
-        portalUrl: "https://portal.creem.io/customer-123",
+        portalUrl: "https://billing.stripe.com/customer-123",
       });
 
       const { POST } = await import("./route");
@@ -187,7 +190,9 @@ describe("Billing Checkout API", () => {
 
       expect(response.status).toBe(409);
       expect(data.error).toContain("already have an active subscription");
-      expect(data.managementUrl).toBe("https://portal.creem.io/customer-123");
+      expect(data.managementUrl).toBe(
+        "https://billing.stripe.com/customer-123",
+      );
     });
 
     it("should return 409 when user has trialing subscription", async () => {
@@ -197,7 +202,7 @@ describe("Billing Checkout API", () => {
         status: "trialing",
       });
       mockCreateCustomerPortalUrl.mockResolvedValue({
-        portalUrl: "https://portal.creem.io/customer-123",
+        portalUrl: "https://billing.stripe.com/customer-123",
       });
 
       const { POST } = await import("./route");
@@ -211,7 +216,9 @@ describe("Billing Checkout API", () => {
       const data = await response.json();
 
       expect(response.status).toBe(409);
-      expect(data.managementUrl).toBe("https://portal.creem.io/customer-123");
+      expect(data.managementUrl).toBe(
+        "https://billing.stripe.com/customer-123",
+      );
     });
 
     it("should proceed when user has canceled subscription", async () => {
@@ -221,7 +228,7 @@ describe("Billing Checkout API", () => {
         status: "canceled",
       });
       mockCreateCheckoutSession.mockResolvedValue({
-        checkoutUrl: "https://checkout.creem.io/session-123",
+        checkoutUrl: "https://checkout.stripe.com/session-123",
       });
 
       const { POST } = await import("./route");
@@ -235,7 +242,7 @@ describe("Billing Checkout API", () => {
       const data = await response.json();
 
       expect(response.status).toBe(200);
-      expect(data.checkoutUrl).toBe("https://checkout.creem.io/session-123");
+      expect(data.checkoutUrl).toBe("https://checkout.stripe.com/session-123");
     });
 
     it("should proceed with one-time payment regardless of subscription status", async () => {
@@ -245,7 +252,7 @@ describe("Billing Checkout API", () => {
         status: "active",
       });
       mockCreateCheckoutSession.mockResolvedValue({
-        checkoutUrl: "https://checkout.creem.io/session-123",
+        checkoutUrl: "https://checkout.stripe.com/session-123",
       });
 
       const { POST } = await import("./route");
@@ -258,7 +265,7 @@ describe("Billing Checkout API", () => {
       const data = await response.json();
 
       expect(response.status).toBe(200);
-      expect(data.checkoutUrl).toBe("https://checkout.creem.io/session-123");
+      expect(data.checkoutUrl).toBe("https://checkout.stripe.com/session-123");
       expect(mockGetUserSubscription).not.toHaveBeenCalled();
     });
 
@@ -284,7 +291,7 @@ describe("Billing Checkout API", () => {
       mockGetSession.mockResolvedValue(mockSession);
       mockGetUserSubscription.mockResolvedValue(null);
       mockCreateCheckoutSession.mockResolvedValue({
-        checkoutUrl: "https://checkout.creem.io/session-123",
+        checkoutUrl: "https://checkout.stripe.com/session-123",
       });
 
       const { POST } = await import("./route");
@@ -301,6 +308,7 @@ describe("Billing Checkout API", () => {
         userId: "user-123",
         userEmail: "test@example.com",
         userName: "Test User",
+        customerId: null,
         tierId: "pro",
         paymentMode: "subscription",
         billingCycle: "yearly",
@@ -311,14 +319,14 @@ describe("Billing Checkout API", () => {
 
       const data = await response.json();
       expect(response.status).toBe(200);
-      expect(data.checkoutUrl).toBe("https://checkout.creem.io/session-123");
+      expect(data.checkoutUrl).toBe("https://checkout.stripe.com/session-123");
     });
 
     it("should require billingCycle for subscriptions", async () => {
       mockGetSession.mockResolvedValue(mockSession);
       mockGetUserSubscription.mockResolvedValue(null);
       mockCreateCheckoutSession.mockResolvedValue({
-        checkoutUrl: "https://checkout.creem.io/session-123",
+        checkoutUrl: "https://checkout.stripe.com/session-123",
       });
 
       const { POST } = await import("./route");
@@ -414,7 +422,7 @@ describe("Billing Checkout API", () => {
       mockGetSession.mockResolvedValue(mockSession);
       mockGetUserSubscription.mockResolvedValue(null);
       mockCreateCheckoutSession.mockResolvedValue({
-        checkoutUrl: "https://checkout.creem.io/session-123",
+        checkoutUrl: "https://checkout.stripe.com/session-123",
       });
 
       const { POST } = await import("./route");

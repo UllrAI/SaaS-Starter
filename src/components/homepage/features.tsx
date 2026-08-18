@@ -84,7 +84,7 @@ export function Features({
         : "/blog/agent-friendly-saas-template",
     billing:
       locale === "en"
-        ? "/blog/creem-nextjs-billing-production-guide"
+        ? "/blog/stripe-nextjs-billing-production-guide"
         : "/blog/saas-starter-kit-developer-guide",
   } as const;
   const features = [
@@ -120,12 +120,12 @@ export function Features({
     {
       id: "billing",
       title: <>{t("home_billing_workflow")}</>,
-      description: <>{t("home_creem_checkout_flow")}</>,
+      description: <>{t("home_stripe_checkout_flow")}</>,
       icon: CreditCard,
       category: <>{t("home_monetization")}</>,
       guide: {
         href: localizedGuidePath.billing,
-        label: <>{t("home_creem_billing_guide")}</>,
+        label: <>{t("home_stripe_billing_guide")}</>,
       },
     },
     {

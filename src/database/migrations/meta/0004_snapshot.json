@@ -1253,7 +1253,7 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "default": "'creem'"
+          "default": "'stripe'"
         },
         "processed": {
           "name": "processed",

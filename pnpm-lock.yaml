@@ -160,6 +160,9 @@ importers:
       sonner:
         specifier: ^2.0.7
         version: 2.0.7(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+      stripe:
+        specifier: ^22.5.0
+        version: 22.5.0(@types/node@22.20.1)
       tailwind-merge:
         specifier: ^3.6.0
         version: 3.6.0
@@ -9817,6 +9820,18 @@ packages:
       }
     engines: { node: ">=14.16" }
 
+  stripe@22.5.0:
+    resolution:
+      {
+        integrity: sha512-QVwMwriC0bbySx6R4dpsvJ0W//GojC1kwWVS6rPSoVqDUIZX4Hy3TaUrd2AZeXEAaKbfWIjQjvo3vKAReHZ0vQ==,
+      }
+    engines: { node: ">=18" }
+    peerDependencies:
+      "@types/node": ">=18"
+    peerDependenciesMeta:
+      "@types/node":
+        optional: true
+
   strnum@2.4.1:
     resolution:
       {
@@ -17084,6 +17099,10 @@ snapshots:
   strip-json-comments@3.1.1: {}
 
   strip-json-comments@5.0.3: {}
+
+  stripe@22.5.0(@types/node@22.20.1):
+    optionalDependencies:
+      "@types/node": 22.20.1
 
   strnum@2.4.1:
     dependencies:

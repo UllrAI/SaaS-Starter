@@ -1,12 +1,11 @@
-const BILLING_REDIRECT_HOSTS: readonly string[] = ["creem.io"];
-const BILLING_REDIRECT_HOST_SUFFIXES: readonly string[] = [".creem.io"];
+const BILLING_REDIRECT_HOSTS: readonly string[] = [
+  "billing.stripe.com",
+  "checkout.stripe.com",
+];
 
 const isTrustedBillingHost = (hostname: string): boolean => {
   const normalizedHostname = hostname.toLowerCase();
-  if (BILLING_REDIRECT_HOSTS.includes(normalizedHostname)) return true;
-  return BILLING_REDIRECT_HOST_SUFFIXES.some((suffix) =>
-    normalizedHostname.endsWith(suffix),
-  );
+  return BILLING_REDIRECT_HOSTS.includes(normalizedHostname);
 };
 
 export const assertTrustedBillingUrl = (url: string, label: string): string => {

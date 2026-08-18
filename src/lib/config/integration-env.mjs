@@ -50,21 +50,24 @@ export function validateIntegrationEnv(features, values) {
 
   if (features.billing) {
     requireIntegrationValues("Billing", values, [
-      "CREEM_API_KEY",
-      "CREEM_WEBHOOK_SECRET",
+      "STRIPE_SECRET_KEY",
+      "STRIPE_WEBHOOK_SECRET",
     ]);
 
-    const apiKey = String(values.CREEM_API_KEY);
-    const environment = values.CREEM_ENVIRONMENT;
-    const isTestKey = apiKey.startsWith("creem_test_");
-    const hasCreemPrefix = apiKey.startsWith("creem_");
+    const apiKey = String(values.STRIPE_SECRET_KEY);
+    const environment = values.STRIPE_ENVIRONMENT;
+    const isTestKey = apiKey.startsWith("sk_test_");
+    const isLiveKey = apiKey.startsWith("sk_live_");
     if (
       (environment === "test_mode" && !isTestKey) ||
-      (environment === "live_mode" && (!hasCreemPrefix || isTestKey))
+      (environment === "live_mode" && !isLiveKey)
     ) {
       throw new Error(
-        `CREEM_API_KEY does not match CREEM_ENVIRONMENT=${environment}.`,
+        `STRIPE_SECRET_KEY does not match STRIPE_ENVIRONMENT=${environment}.`,
       );
+    }
+    if (!String(values.STRIPE_WEBHOOK_SECRET).startsWith("whsec_")) {
+      throw new Error("STRIPE_WEBHOOK_SECRET must start with whsec_.");
     }
   }
 

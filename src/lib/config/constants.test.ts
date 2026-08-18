@@ -15,7 +15,7 @@ describe("application constants", () => {
     expect(APP_NAME).toBe("SaaS Starter");
     expect(COMPANY_NAME).toBe("UllrAI Lab");
     expect(AVATAR_STYLE).toBe("adventurer-neutral");
-    expect(PAYMENT_PROVIDER).toBe("creem");
+    expect(PAYMENT_PROVIDER).toBe("stripe");
   });
 
   it("uses valid public URLs and contact addresses", () => {

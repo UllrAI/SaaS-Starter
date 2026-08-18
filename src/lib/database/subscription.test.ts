@@ -333,6 +333,39 @@ describe("Database Subscription Functions", () => {
       expect(mockSql).toHaveBeenCalled();
     });
 
+    it("does not downgrade a succeeded invoice when a failed event arrives late", async () => {
+      const paymentData = {
+        userId: "user-123",
+        customerId: "customer-123",
+        paymentId: "invoice-123",
+        productId: "product-123",
+        amount: 1000,
+        currency: "usd",
+        status: "failed",
+        paymentType: "subscription",
+      };
+      const onConflictDoUpdate = jest.fn().mockReturnValue({
+        returning: jest.fn().mockResolvedValue([
+          {
+            ...paymentData,
+            subscriptionId: null,
+            status: "succeeded",
+          },
+        ]),
+      });
+      mockDb.insert.mockReturnValue({
+        values: jest.fn().mockReturnValue({ onConflictDoUpdate }),
+      });
+      const { upsertPayment } = await import("./subscription");
+
+      await upsertPayment(paymentData);
+
+      const statusExpression = onConflictDoUpdate.mock.calls[0]?.[0].set
+        .status as { strings: string[]; values: unknown[] };
+      expect(statusExpression.strings.join(" ")).toContain("= 'succeeded' and");
+      expect(statusExpression.values).toContain("failed");
+    });
+
     it("should handle nullable subscriptionId", async () => {
       const paymentData = {
         userId: "user-123",
@@ -1293,7 +1326,7 @@ describe("Database Subscription Functions", () => {
       const result = await claimWebhookEvent(
         "event-123",
         "payment.succeeded",
-        "creem",
+        "stripe",
       );
 
       expect(result).toBe(true);
@@ -1301,7 +1334,7 @@ describe("Database Subscription Functions", () => {
       expect(values).toHaveBeenCalledWith({
         eventId: "event-123",
         eventType: "payment.succeeded",
-        provider: "creem",
+        provider: "stripe",
       });
     });
 
@@ -1329,7 +1362,7 @@ describe("Database Subscription Functions", () => {
       await claimWebhookEvent(
         "event-123",
         "payment.succeeded",
-        "creem",
+        "stripe",
         mockTx as any,
       );
 

@@ -6,8 +6,8 @@ const mockEnv = {
   BETTER_AUTH_SECRET: "test-secret",
   DATABASE_URL: "postgresql://test",
   RESEND_API_KEY: "test-key",
-  CREEM_API_KEY: "test-creem-key",
-  CREEM_WEBHOOK_SECRET: "test-webhook-secret",
+  STRIPE_SECRET_KEY: "sk_test_auth-key",
+  STRIPE_WEBHOOK_SECRET: "test-webhook-secret",
 };
 
 // Mock modules

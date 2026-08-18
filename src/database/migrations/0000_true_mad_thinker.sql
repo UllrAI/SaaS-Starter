@@ -103,7 +103,7 @@ CREATE TABLE "webhook_events" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"eventId" text NOT NULL,
 	"eventType" text NOT NULL,
-	"provider" text DEFAULT 'creem' NOT NULL,
+	"provider" text DEFAULT 'stripe' NOT NULL,
 	"processed" boolean DEFAULT true NOT NULL,
 	"processedAt" timestamp DEFAULT now() NOT NULL,
 	"payload" text,

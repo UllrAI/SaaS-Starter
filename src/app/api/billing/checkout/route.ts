@@ -3,6 +3,7 @@ import { billing } from "@/lib/billing";
 import { z } from "zod";
 import {
   getUserSubscription,
+  getUserBillingCustomerId,
   hasUserProductEntitlement,
 } from "@/lib/database/subscription";
 import { assertTrustedBillingUrl } from "@/lib/billing/url";
@@ -158,6 +159,7 @@ export async function POST(request: NextRequest) {
       userId: session.user.id,
       userEmail: session.user.email,
       userName: session.user.name,
+      customerId: await getUserBillingCustomerId(session.user.id),
       tierId,
       paymentMode,
       billingCycle,

@@ -39,7 +39,7 @@ export interface MockUser {
   updatedAt: Date;
 }
 
-export interface MockCreemCheckout {
+export interface MockStripeCheckout {
   id: string;
   status?:
     | "open"
@@ -219,9 +219,9 @@ export const createMockUser = (
   ...overrides,
 });
 
-export const createMockCreemCheckout = (
-  overrides: Partial<MockCreemCheckout> = {},
-): MockCreemCheckout => ({
+export const createMockStripeCheckout = (
+  overrides: Partial<MockStripeCheckout> = {},
+): MockStripeCheckout => ({
   id: "test-checkout-id",
   status: "open",
   url: "https://test-checkout-url.com",
@@ -818,9 +818,8 @@ type MockEnvironment = {
   CLOUDFLARE_R2_ENDPOINT: string;
   CLOUDFLARE_R2_ACCESS_KEY_ID: string;
   CLOUDFLARE_R2_SECRET_ACCESS_KEY: string;
-  CREEM_API_KEY: string;
-  CREEM_SECRET_KEY: string;
-  CREEM_WEBHOOK_SECRET: string;
+  STRIPE_SECRET_KEY: string;
+  STRIPE_WEBHOOK_SECRET: string;
   DB_POOL_SIZE: number;
   DB_IDLE_TIMEOUT: number;
   DB_MAX_LIFETIME: number;
@@ -846,9 +845,8 @@ const mockEnvConfig: MockEnvironment = {
   CLOUDFLARE_R2_ENDPOINT: "mock-endpoint",
   CLOUDFLARE_R2_ACCESS_KEY_ID: "mock-r2-key",
   CLOUDFLARE_R2_SECRET_ACCESS_KEY: "mock-r2-secret",
-  CREEM_API_KEY: "creem_test_mock_api_key",
-  CREEM_SECRET_KEY: "mock-creem-secret",
-  CREEM_WEBHOOK_SECRET: "mock-webhook-secret",
+  STRIPE_SECRET_KEY: "sk_test_mock_api_key",
+  STRIPE_WEBHOOK_SECRET: "whsec_mock_webhook_secret",
   DB_POOL_SIZE: 20,
   DB_IDLE_TIMEOUT: 300,
   DB_MAX_LIFETIME: 14400,
@@ -1046,9 +1044,9 @@ jest.mock("./env.js", () => ({
     R2_SECRET_ACCESS_KEY: "mock-secret-key",
     R2_BUCKET_NAME: "mock-bucket",
     R2_PUBLIC_URL: "https://mock-public-url.com",
-    CREEM_API_KEY: "creem_test_mock_api_key",
-    CREEM_ENVIRONMENT: "test_mode",
-    CREEM_WEBHOOK_SECRET: "mock-webhook-secret",
+    STRIPE_SECRET_KEY: "sk_test_mock_api_key",
+    STRIPE_ENVIRONMENT: "test_mode",
+    STRIPE_WEBHOOK_SECRET: "whsec_mock_webhook_secret",
     DB_POOL_SIZE: 20,
     DB_IDLE_TIMEOUT: 300,
     DB_MAX_LIFETIME: 14400,

@@ -103,6 +103,8 @@ export async function upsertPayment(data: UpsertPaymentData, tx?: Tx) {
         status: sql`case
           when ${payments.status} in ('partially_refunded', 'refunded', 'disputed')
             then ${payments.status}
+          when ${payments.status} = 'succeeded' and ${data.status} = 'failed'
+            then ${payments.status}
           else ${data.status}
         end`,
         updatedAt: now,
@@ -409,6 +411,17 @@ export async function findUserByCustomerId(customerId: string, tx?: Tx) {
   return result[0] ?? null;
 }
 
+export async function getUserBillingCustomerId(
+  userId: string,
+): Promise<string | null> {
+  const [user] = await db
+    .select({ customerId: users.paymentProviderCustomerId })
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1);
+  return user?.customerId ?? null;
+}
+
 export async function getUserSubscription(
   userId: string,
 ): Promise<Subscription | null> {
@@ -516,7 +529,7 @@ export async function getUserPaymentSummary(userId: string, status?: string) {
 export async function claimWebhookEvent(
   eventId: string,
   eventType: string,
-  provider: string = "creem",
+  provider: string = "stripe",
   tx?: Tx,
 ): Promise<boolean> {
   const dbase = getDb(tx);

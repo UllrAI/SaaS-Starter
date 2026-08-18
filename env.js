@@ -126,9 +126,9 @@ const env = createEnv({
     ),
 
     // Payments
-    CREEM_API_KEY: optionalCredentialSchema,
-    CREEM_ENVIRONMENT: z.enum(["test_mode", "live_mode"]).default("test_mode"),
-    CREEM_WEBHOOK_SECRET: optionalCredentialSchema,
+    STRIPE_SECRET_KEY: optionalCredentialSchema,
+    STRIPE_ENVIRONMENT: z.enum(["test_mode", "live_mode"]).default("test_mode"),
+    STRIPE_WEBHOOK_SECRET: optionalCredentialSchema,
 
     // E2E testing
     E2E_DATABASE_URL: databaseUrlSchema.optional(),
@@ -205,9 +205,9 @@ const env = createEnv({
     NEXT_PUBLIC_UMAMI_WEBSITE_ID: process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID,
     NEXT_PUBLIC_UMAMI_DOMAINS: process.env.NEXT_PUBLIC_UMAMI_DOMAINS,
     // Payments
-    CREEM_API_KEY: process.env.CREEM_API_KEY,
-    CREEM_ENVIRONMENT: process.env.CREEM_ENVIRONMENT,
-    CREEM_WEBHOOK_SECRET: process.env.CREEM_WEBHOOK_SECRET,
+    STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
+    STRIPE_ENVIRONMENT: process.env.STRIPE_ENVIRONMENT,
+    STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
 
     // E2E testing
     E2E_DATABASE_URL: process.env.E2E_DATABASE_URL,

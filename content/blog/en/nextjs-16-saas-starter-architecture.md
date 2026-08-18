@@ -4,12 +4,12 @@ title: "Next.js 16 SaaS Starter Architecture: Auth, Billing, Data, and Deploymen
 publishedDate: 2026-08-12
 author: admin
 excerpt: >-
-  A code-level tour of a production-ready Next.js 16 SaaS starter with Better Auth, Creem billing, Drizzle, PostgreSQL, R2 uploads, i18n, and release checks.
+  A code-level tour of a production-ready Next.js 16 SaaS starter with Better Auth, Stripe billing, Drizzle, PostgreSQL, R2 uploads, i18n, and release checks.
 tags:
   - Next.js 16
   - SaaS Starter
   - Better Auth
-  - Creem
+  - Stripe
   - Drizzle ORM
   - PostgreSQL
 featured: true
@@ -45,11 +45,11 @@ This avoids the common shortcut of copying browser cookies into automation. For 
 
 ## Billing through a provider contract
 
-Product code calls the interface in `src/lib/billing/provider.ts`. The current provider is Creem, but checkout ownership, payment modes, billing cycles, webhook validation, and idempotency live behind stable application types.
+Product code calls the interface in `src/lib/billing/provider.ts`. The current provider is Stripe, but checkout ownership, payment modes, billing cycles, webhook validation, and idempotency live behind stable application types.
 
 The checkout route validates the requested tier and the authenticated user before it creates a provider session. Webhooks validate first, record provider event IDs, and process state changes idempotently. Production catalog IDs are separate from test-mode IDs so a release cannot silently charge against the wrong catalog.
 
-The complete implementation path is covered in [Creem Billing with Next.js](/blog/creem-nextjs-billing-production-guide).
+The complete implementation path is covered in [Stripe Billing with Next.js](/blog/stripe-nextjs-billing-production-guide).
 
 ## PostgreSQL and Drizzle without startup migrations
 
@@ -85,6 +85,6 @@ The release workflow also verifies that a `release/vX.Y.Z` tag matches `package.
 
 ## When this architecture fits
 
-Choose this starter when you need an open-source Next.js foundation with Creem, self-managed PostgreSQL, R2 uploads, internationalized public pages, and first-class machine access. A smaller demo may be better when you only need to prototype UI. A multi-tenant enterprise boilerplate may be better when organizations, SSO, and audit exports are already hard requirements.
+Choose this starter when you need an open-source Next.js foundation with Stripe, self-managed PostgreSQL, R2 uploads, internationalized public pages, and first-class machine access. A smaller demo may be better when you only need to prototype UI. A multi-tenant enterprise boilerplate may be better when organizations, SSO, and audit exports are already hard requirements.
 
 Inspect the [full developer guide](/blog/saas-starter-kit-developer-guide), review the [source repository](https://github.com/UllrAI/SaaS-Starter), and run the verification commands before replacing any boundary with project-specific code.

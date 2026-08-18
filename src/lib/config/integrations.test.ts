@@ -3,9 +3,9 @@ import { beforeEach, describe, expect, it, jest } from "@jest/globals";
 const env = {
   RESEND_API_KEY: "resend-key",
   RESEND_EMAIL_FROM: "noreply@example.com",
-  CREEM_API_KEY: "creem_test_key",
-  CREEM_ENVIRONMENT: "test_mode",
-  CREEM_WEBHOOK_SECRET: "webhook-secret",
+  STRIPE_SECRET_KEY: "sk_test_key",
+  STRIPE_ENVIRONMENT: "test_mode",
+  STRIPE_WEBHOOK_SECRET: "whsec_webhook-secret",
   R2_ENDPOINT: "https://r2.example.com",
   R2_ACCESS_KEY_ID: "access-key",
   R2_SECRET_ACCESS_KEY: "secret-key",
@@ -34,9 +34,9 @@ describe("integration configuration accessors", () => {
       from: env.RESEND_EMAIL_FROM,
     });
     expect(getBillingConfig()).toEqual({
-      apiKey: env.CREEM_API_KEY,
-      environment: env.CREEM_ENVIRONMENT,
-      webhookSecret: env.CREEM_WEBHOOK_SECRET,
+      apiKey: env.STRIPE_SECRET_KEY,
+      environment: env.STRIPE_ENVIRONMENT,
+      webhookSecret: env.STRIPE_WEBHOOK_SECRET,
     });
     expect(getUploadConfig().bucketName).toBe(env.R2_BUCKET_NAME);
     expect(getUploadCleanupSecret()).toBe(env.UPLOAD_CLEANUP_SECRET);

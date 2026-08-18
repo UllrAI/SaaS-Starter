@@ -10,7 +10,7 @@ These parts already exist in the repository today:
 
 - Authentication with magic link, OAuth, and role-based access control
 - Machine auth with API keys, CLI device login, CLI session review, and `/api/v1/*` endpoints
-- Billing flow with Creem checkout, portal handoff, and webhook processing
+- Billing flow with Stripe checkout, portal handoff, and webhook processing
 - Dashboard and admin pages for users, payments, subscriptions, and uploads
 - Cloudflare R2 upload flows for browser and server-side uploads
 - Localization foundation with next-intl multiple language support
@@ -87,7 +87,7 @@ These are not treated as default roadmap items unless a real use case appears:
 
 - 支持 magic link、OAuth 和基于角色权限控制的认证体系
 - 支持 API Key、CLI 设备登录、CLI 会话查看，以及位于 `/api/v1/*` 下的机器认证接口
-- 基于 Creem 的计费流程，包括 checkout、portal 跳转和 webhook 处理
+- 基于 Stripe 的计费流程，包括 checkout、portal 跳转和 webhook 处理
 - 用户、支付、订阅、上传等 Dashboard 与后台管理页面
 - 面向浏览器直传和服务端上传的 Cloudflare R2 上传链路
 - 基于 next-intl 的多语言本地化基础设施

@@ -2,7 +2,7 @@ import { describe, it, expect, jest, beforeEach } from "@jest/globals";
 import type { PaymentProvider } from "./provider";
 
 // Mock the provider types
-const mockCreemProvider: PaymentProvider = {
+const mockStripeProvider: PaymentProvider = {
   createCheckoutSession: jest.fn() as jest.MockedFunction<
     PaymentProvider["createCheckoutSession"]
   >,
@@ -22,16 +22,16 @@ const mockCreemProvider: PaymentProvider = {
 
 // Mock constants with different scenarios
 const mockConstants = {
-  PAYMENT_PROVIDER: "creem",
+  PAYMENT_PROVIDER: "stripe",
 };
 
 // Mock the constants
 jest.mock("@/lib/config/constants", () => mockConstants);
 
-// Mock the creem provider
-jest.mock("./creem/provider", () => ({
+// Mock the stripe provider
+jest.mock("./stripe/provider", () => ({
   __esModule: true,
-  default: mockCreemProvider,
+  default: mockStripeProvider,
 }));
 
 describe("Billing Index", () => {
@@ -41,12 +41,12 @@ describe("Billing Index", () => {
   });
 
   describe("Provider Selection", () => {
-    it("should select creem provider when PAYMENT_PROVIDER is creem", async () => {
-      mockConstants.PAYMENT_PROVIDER = "creem";
+    it("should select stripe provider when PAYMENT_PROVIDER is stripe", async () => {
+      mockConstants.PAYMENT_PROVIDER = "stripe";
 
       const { billing } = await import("./index");
 
-      expect(billing).toBe(mockCreemProvider);
+      expect(billing).toBe(mockStripeProvider);
       expect(typeof billing.createCheckoutSession).toBe("function");
       expect(typeof billing.createCustomerPortalUrl).toBe("function");
       expect(typeof billing.getCheckoutStatus).toBe("function");
@@ -61,15 +61,6 @@ describe("Billing Index", () => {
       await expect(async () => {
         await import("./index");
       }).rejects.toThrow("Unsupported payment provider: unsupported");
-    });
-
-    it("should throw error for stripe provider (not yet implemented)", async () => {
-      (mockConstants as { PAYMENT_PROVIDER: string }).PAYMENT_PROVIDER =
-        "stripe";
-
-      await expect(async () => {
-        await import("./index");
-      }).rejects.toThrow("Unsupported payment provider: stripe");
     });
 
     it("should throw error for empty payment provider", async () => {
@@ -102,7 +93,7 @@ describe("Billing Index", () => {
 
   describe("Provider Interface", () => {
     beforeEach(() => {
-      mockConstants.PAYMENT_PROVIDER = "creem";
+      mockConstants.PAYMENT_PROVIDER = "stripe";
     });
 
     it("should export billing object with all required methods", async () => {
@@ -132,18 +123,18 @@ describe("Billing Index", () => {
 
       const expectedResult = { checkoutUrl: "https://checkout.example.com" };
       (
-        mockCreemProvider.createCheckoutSession as jest.MockedFunction<
-          typeof mockCreemProvider.createCheckoutSession
+        mockStripeProvider.createCheckoutSession as jest.MockedFunction<
+          typeof mockStripeProvider.createCheckoutSession
         >
       ).mockResolvedValue(expectedResult);
 
       const result = await billing.createCheckoutSession(mockOptions);
 
       expect(result).toEqual(expectedResult);
-      expect(mockCreemProvider.createCheckoutSession).toHaveBeenCalledWith(
+      expect(mockStripeProvider.createCheckoutSession).toHaveBeenCalledWith(
         mockOptions,
       );
-      expect(mockCreemProvider.createCheckoutSession).toHaveBeenCalledTimes(1);
+      expect(mockStripeProvider.createCheckoutSession).toHaveBeenCalledTimes(1);
     });
 
     it("should delegate createCustomerPortalUrl to provider", async () => {
@@ -152,18 +143,18 @@ describe("Billing Index", () => {
       const customerId = "customer123";
       const expectedResult = { portalUrl: "https://portal.example.com" };
       (
-        mockCreemProvider.createCustomerPortalUrl as jest.MockedFunction<
-          typeof mockCreemProvider.createCustomerPortalUrl
+        mockStripeProvider.createCustomerPortalUrl as jest.MockedFunction<
+          typeof mockStripeProvider.createCustomerPortalUrl
         >
       ).mockResolvedValue(expectedResult);
 
       const result = await billing.createCustomerPortalUrl(customerId);
 
       expect(result).toEqual(expectedResult);
-      expect(mockCreemProvider.createCustomerPortalUrl).toHaveBeenCalledWith(
+      expect(mockStripeProvider.createCustomerPortalUrl).toHaveBeenCalledWith(
         customerId,
       );
-      expect(mockCreemProvider.createCustomerPortalUrl).toHaveBeenCalledTimes(
+      expect(mockStripeProvider.createCustomerPortalUrl).toHaveBeenCalledTimes(
         1,
       );
     });
@@ -175,25 +166,25 @@ describe("Billing Index", () => {
       const signature = "signature123";
       const expectedResult = { received: true } as const;
       (
-        mockCreemProvider.handleWebhook as jest.MockedFunction<
-          typeof mockCreemProvider.handleWebhook
+        mockStripeProvider.handleWebhook as jest.MockedFunction<
+          typeof mockStripeProvider.handleWebhook
         >
       ).mockResolvedValue(expectedResult);
 
       const result = await billing.handleWebhook(payload, signature);
 
       expect(result).toEqual(expectedResult);
-      expect(mockCreemProvider.handleWebhook).toHaveBeenCalledWith(
+      expect(mockStripeProvider.handleWebhook).toHaveBeenCalledWith(
         payload,
         signature,
       );
-      expect(mockCreemProvider.handleWebhook).toHaveBeenCalledTimes(1);
+      expect(mockStripeProvider.handleWebhook).toHaveBeenCalledTimes(1);
     });
   });
 
   describe("Error Handling", () => {
     beforeEach(() => {
-      mockConstants.PAYMENT_PROVIDER = "creem";
+      mockConstants.PAYMENT_PROVIDER = "stripe";
     });
 
     it("should propagate createCheckoutSession errors", async () => {
@@ -210,8 +201,8 @@ describe("Billing Index", () => {
 
       const error = new Error("Checkout failed");
       (
-        mockCreemProvider.createCheckoutSession as jest.MockedFunction<
-          typeof mockCreemProvider.createCheckoutSession
+        mockStripeProvider.createCheckoutSession as jest.MockedFunction<
+          typeof mockStripeProvider.createCheckoutSession
         >
       ).mockRejectedValue(error);
 
@@ -225,8 +216,8 @@ describe("Billing Index", () => {
 
       const error = new Error("Portal creation failed");
       (
-        mockCreemProvider.createCustomerPortalUrl as jest.MockedFunction<
-          typeof mockCreemProvider.createCustomerPortalUrl
+        mockStripeProvider.createCustomerPortalUrl as jest.MockedFunction<
+          typeof mockStripeProvider.createCustomerPortalUrl
         >
       ).mockRejectedValue(error);
 
@@ -240,8 +231,8 @@ describe("Billing Index", () => {
 
       const error = new Error("Webhook processing failed");
       (
-        mockCreemProvider.handleWebhook as jest.MockedFunction<
-          typeof mockCreemProvider.handleWebhook
+        mockStripeProvider.handleWebhook as jest.MockedFunction<
+          typeof mockStripeProvider.handleWebhook
         >
       ).mockRejectedValue(error);
 
@@ -253,30 +244,30 @@ describe("Billing Index", () => {
 
   describe("Provider Isolation", () => {
     it("should maintain separation between different provider instances", async () => {
-      mockConstants.PAYMENT_PROVIDER = "creem";
+      mockConstants.PAYMENT_PROVIDER = "stripe";
 
       const { billing: billing1 } = await import("./index");
 
       // Reset and import again
       jest.resetModules();
-      mockConstants.PAYMENT_PROVIDER = "creem";
+      mockConstants.PAYMENT_PROVIDER = "stripe";
 
       const { billing: billing2 } = await import("./index");
 
       // Should be the same provider but different import
       expect(billing1).toBe(billing2);
       expect(billing1.createCheckoutSession).toBe(
-        mockCreemProvider.createCheckoutSession,
+        mockStripeProvider.createCheckoutSession,
       );
       expect(billing2.createCheckoutSession).toBe(
-        mockCreemProvider.createCheckoutSession,
+        mockStripeProvider.createCheckoutSession,
       );
     });
   });
 
   describe("Type Safety", () => {
     beforeEach(() => {
-      mockConstants.PAYMENT_PROVIDER = "creem";
+      mockConstants.PAYMENT_PROVIDER = "stripe";
     });
 
     it("should maintain PaymentProvider interface contract", async () => {
@@ -319,20 +310,20 @@ describe("Billing Index", () => {
       };
 
       (
-        mockCreemProvider.createCheckoutSession as jest.MockedFunction<
-          typeof mockCreemProvider.createCheckoutSession
+        mockStripeProvider.createCheckoutSession as jest.MockedFunction<
+          typeof mockStripeProvider.createCheckoutSession
         >
       ).mockResolvedValue({ checkoutUrl: "test" });
 
       await billing.createCheckoutSession(subscriptionOptions);
       await billing.createCheckoutSession(oneTimeOptions);
 
-      expect(mockCreemProvider.createCheckoutSession).toHaveBeenCalledTimes(2);
-      expect(mockCreemProvider.createCheckoutSession).toHaveBeenNthCalledWith(
+      expect(mockStripeProvider.createCheckoutSession).toHaveBeenCalledTimes(2);
+      expect(mockStripeProvider.createCheckoutSession).toHaveBeenNthCalledWith(
         1,
         subscriptionOptions,
       );
-      expect(mockCreemProvider.createCheckoutSession).toHaveBeenNthCalledWith(
+      expect(mockStripeProvider.createCheckoutSession).toHaveBeenNthCalledWith(
         2,
         oneTimeOptions,
       );
@@ -362,20 +353,20 @@ describe("Billing Index", () => {
       };
 
       (
-        mockCreemProvider.createCheckoutSession as jest.MockedFunction<
-          typeof mockCreemProvider.createCheckoutSession
+        mockStripeProvider.createCheckoutSession as jest.MockedFunction<
+          typeof mockStripeProvider.createCheckoutSession
         >
       ).mockResolvedValue({ checkoutUrl: "test" });
 
       await billing.createCheckoutSession(monthlyOptions);
       await billing.createCheckoutSession(yearlyOptions);
 
-      expect(mockCreemProvider.createCheckoutSession).toHaveBeenCalledTimes(2);
-      expect(mockCreemProvider.createCheckoutSession).toHaveBeenNthCalledWith(
+      expect(mockStripeProvider.createCheckoutSession).toHaveBeenCalledTimes(2);
+      expect(mockStripeProvider.createCheckoutSession).toHaveBeenNthCalledWith(
         1,
         monthlyOptions,
       );
-      expect(mockCreemProvider.createCheckoutSession).toHaveBeenNthCalledWith(
+      expect(mockStripeProvider.createCheckoutSession).toHaveBeenNthCalledWith(
         2,
         yearlyOptions,
       );

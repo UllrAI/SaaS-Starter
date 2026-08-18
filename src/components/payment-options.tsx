@@ -210,7 +210,7 @@ export function PricingSection({ className }: { className?: string }) {
     },
     {
       id: "billing-flow",
-      label: <>{t("billing_creem_checkout_billing_portal_flow")}</>,
+      label: <>{t("billing_stripe_checkout_billing_portal_flow")}</>,
     },
     {
       id: "admin-operations",

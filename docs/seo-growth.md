@@ -58,7 +58,7 @@ intent; they must not trigger a second near-duplicate page.
 | ------------------------------------------------ | -------------- | ---------------------------------------------- | --------------------------------------------------- |
 | open-source Next.js 16 SaaS starter              | Consideration  | `/blog/nextjs-16-saas-starter-architecture`    | Architecture hub; GitHub source click               |
 | Next.js SaaS starter developer documentation     | Implementation | `/blog/saas-starter-kit-developer-guide`       | Complete setup reference; clone-command copy        |
-| Creem Next.js billing production guide           | Implementation | `/blog/creem-nextjs-billing-production-guide`  | Billing spoke; pricing view and checkout start      |
+| Stripe Next.js billing production guide          | Implementation | `/blog/stripe-nextjs-billing-production-guide` | Billing spoke; pricing view and checkout start      |
 | API keys vs OAuth vs device flow for SaaS agents | Consideration  | `/blog/api-keys-oauth-device-flow-saas-agents` | Machine-auth spoke; GitHub source click             |
 | agent-friendly SaaS template                     | Awareness      | `/blog/agent-friendly-saas-template`           | Concept introduction; continue to auth spoke        |
 | Next.js SaaS starter features                    | Decision       | `/features`                                    | Product capability summary; signup click            |
@@ -108,7 +108,7 @@ or editorial judgment is logged in issue #62 before it is sent.
 | ------------------------------ | ----------------------------------------------------------------- | ------------------------------------------------------------- | ------------------------------ | -------------------------------------------- |
 | Vercel Templates               | Official Next.js template catalog; deployability review           | `https://vercel.com/templates/submit`                         | Repository + architecture hub  | Ready after production smoke test            |
 | Zeabur Template Marketplace    | Official deployment marketplace; tested YAML and docs required    | Zeabur template publish CLI/dashboard                         | Repository + deployment guide  | Needs reusable template asset                |
-| Creem Community Resources      | Official billing ecosystem showcase                               | Creem Discord community/showcase                              | Billing production guide       | Needs maintainer community post              |
+| Stripe Community Resources     | Official billing ecosystem showcase                               | Stripe Discord community/showcase                             | Billing production guide       | Needs maintainer community post              |
 | Better Auth community          | Direct authentication audience; technical discussion only         | Better Auth GitHub Discussions/Discord                        | Auth threat-model guide        | Needs discussion tailored to community rules |
 | Drizzle community              | Direct ORM/PostgreSQL implementation audience                     | Drizzle Discord/community channels                            | Architecture hub               | Needs database-focused case study            |
 | Next.js community              | Direct framework audience; high moderation bar                    | Next.js GitHub Discussions                                    | Architecture hub               | Needs concise implementation write-up        |

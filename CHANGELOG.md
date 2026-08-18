@@ -7,14 +7,14 @@ Routine formatting and test-only maintenance are omitted.
 
 ### Quality, reliability, and deployment hardening
 
-- Replaced the license-unclear Creem SDK with a small, typed REST client using
-  the official test and production API origins, bounded requests, response
-  validation, and controlled failures.
-- Aligned checkout, refund, and dispute handling with Creem's documented order
-  references, including checkout orders that do not contain a transaction ID.
-- Separated Creem test and live product IDs and made checkout fail closed when
-  the active environment is not configured. One-time product matching no longer
-  invents a recurring billing period.
+- Replaced the billing integration with the official Stripe Node SDK, hosted
+  Checkout, Billing Portal, signed webhooks, and idempotent subscription,
+  invoice, refund, and dispute processing.
+- Added deterministic Stripe Product and Price synchronization. Test and live
+  Price IDs are isolated, reviewed in source, and never created during an
+  application request.
+- Added Stripe checkout ownership checks, reusable Customer IDs, idempotency
+  keys, environment-mode validation, and controlled payment-status polling.
 - Added checkout idempotency and synchronous duplicate-click protection.
 - Added bounded request bodies and persistent rate limits to sensitive API
   creation flows.
@@ -30,7 +30,7 @@ Routine formatting and test-only maintenance are omitted.
 - Corrected financial reporting to count only settled USD payments and added
   the supporting composite index. Currency values are normalized, and chart
   month labels are fixed to the same UTC boundary used by the SQL aggregation.
-- Tightened required credential validation and enforced that Creem keys match
+- Tightened required credential validation and enforced that Stripe keys match
   the selected test or live environment at startup.
 - Removed unused components, dependencies, compatibility exports, assets, and
   deployment configuration.
@@ -66,7 +66,7 @@ settled-payment reporting index.
 - Enforced one article H1, exposed meaningful update dates, and added Article and
   BreadcrumbList structured data to blog posts.
 - Refreshed both developer-guide locales and published three repository-backed
-  English guides for Next.js 16 architecture, Creem billing, and machine auth.
+  English guides for Next.js 16 architecture, Stripe billing, and machine auth.
 - Documented the keyword map, index inventory, analytics contract, 20 qualified
   discovery prospects, campaign logging rules, and dated review schedule.
 

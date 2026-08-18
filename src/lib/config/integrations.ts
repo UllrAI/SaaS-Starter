@@ -34,11 +34,11 @@ export function getBillingConfig() {
   }
 
   return {
-    apiKey: requireValue(env.CREEM_API_KEY, "CREEM_API_KEY"),
-    environment: env.CREEM_ENVIRONMENT,
+    apiKey: requireValue(env.STRIPE_SECRET_KEY, "STRIPE_SECRET_KEY"),
+    environment: env.STRIPE_ENVIRONMENT,
     webhookSecret: requireValue(
-      env.CREEM_WEBHOOK_SECRET,
-      "CREEM_WEBHOOK_SECRET",
+      env.STRIPE_WEBHOOK_SECRET,
+      "STRIPE_WEBHOOK_SECRET",
     ),
   };
 }

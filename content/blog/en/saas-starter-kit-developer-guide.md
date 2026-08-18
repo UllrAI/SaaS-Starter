@@ -5,7 +5,7 @@ publishedDate: 2025-06-24
 updatedDate: 2026-08-12
 author: admin
 excerpt: >-
-  Build and deploy a production-ready Next.js 16 SaaS with Better Auth, Creem, Drizzle, PostgreSQL, R2, i18n, tests, and agent-ready APIs.
+  Build and deploy a production-ready Next.js 16 SaaS with Better Auth, Stripe, Drizzle, PostgreSQL, R2, i18n, tests, and agent-ready APIs.
 tags:
   - Next.js
   - SaaS Starter
@@ -16,14 +16,14 @@ tags:
   - Tailwind CSS
   - shadcn/ui
   - Drizzle ORM
-  - Creem
+  - Stripe
   - Resend
   - Cloudflare R2
 featured: true
 heroImage: https://images.unsplash.com/photo-1561886362-a2b38ce83470?q=80&w=1674&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D
 ---
 
-Updated for v0.1.3, this guide follows the current production paths in the repository: Next.js 16 App Router, Better Auth, Creem billing, PostgreSQL with Drizzle, Cloudflare R2 uploads, localized marketing pages, API keys, and browser-approved CLI device authentication. Use it as an implementation map, then verify every change with the repository's own lint, type-check, test, and build commands.
+Updated for v0.1.3, this guide follows the current production paths in the repository: Next.js 16 App Router, Better Auth, Stripe billing, PostgreSQL with Drizzle, Cloudflare R2 uploads, localized marketing pages, API keys, and browser-approved CLI device authentication. Use it as an implementation map, then verify every change with the repository's own lint, type-check, test, and build commands.
 
 ## 1. Project Overview
 
@@ -33,7 +33,7 @@ Updated for v0.1.3, this guide follows the current production paths in the repos
 
 - **Core Features**: Provides authentication, payment subscriptions, database management, file uploads, content management, and other core SaaS application features.
 - **Agent-Friendly Positioning**: Built for browser users, APIs, local automation, and agent (OpenClaw, Codex, Claude Code, etc.) workflows from the same codebase.
-- **Technology Stack**: Based on Next.js 16 App Router, TypeScript, PostgreSQL, Drizzle ORM, and integrates Creem payments, Resend email service, and Cloudflare R2 file storage.
+- **Technology Stack**: Based on Next.js 16 App Router, TypeScript, PostgreSQL, Drizzle ORM, and integrates Stripe payments, Resend email service, and Cloudflare R2 file storage.
 - **Use Cases**:
   - Quickly build full-stack SaaS applications requiring user login and paid subscription features.
   - As a practical project for learning modern full-stack web development technologies.
@@ -84,7 +84,7 @@ The application will run at `http://localhost:3000`.
 - **Authentication**: Better-Auth (Magic Link, OAuth - Google/GitHub/LinkedIn)
 - **Machine Auth**: API keys, browser-approved CLI device login, CLI session review, versioned `/api/v1/*` endpoints
 - **Database**: PostgreSQL + Drizzle ORM (Type-safe queries, Migration management)
-- **Payment Subscriptions**: Creem integration (One-time payments, Subscriptions, Customer portal, Webhooks)
+- **Payment Subscriptions**: Stripe integration (One-time payments, Subscriptions, Customer portal, Webhooks)
 - **File Upload**: Cloudflare R2 integration (Client-side presigned direct upload, Server-side proxy upload, Image compression)
 - **Content Management**: Content Collections (Markdown blog system)
 - **Email Service**: Resend + React Email (Transactional email templates)
@@ -113,7 +113,7 @@ graph TD
         D -- ORM --> E[Drizzle ORM];
         E --> F[(PostgreSQL)];
         D -- Auth API --> G[Better-Auth];
-        D -- Payment API --> H[Creem];
+        D -- Payment API --> H[Stripe];
         D -- Email API --> I[Resend];
         D -- Storage API --> J[Cloudflare R2];
     end
@@ -167,7 +167,7 @@ SaaS-Starter-main/
 │   │   ├── actions/      # Next.js Server Actions
 │   │   ├── admin/        # Admin dashboard core logic
 │   │   ├── auth/         # Authentication config and logic (Better-Auth)
-│   │   ├── billing/      # Payment abstraction layer and providers (Creem)
+│   │   ├── billing/      # Payment abstraction layer and providers (Stripe)
 │   │   ├── config/       # Global constants, products, roles, etc.
 │   │   ├── database/     # Database helper functions
 │   │   ├── email.tsx     # Email sending service
@@ -204,7 +204,7 @@ The project's configuration is highly centralized for easy maintenance and exten
 
 - **Environment Variables (`env.js`)**: Uses `@t3-oss/env-nextjs` to enforce environment variable validation. All environment variables (like API keys and database URLs) are defined in `.env` and accessed through `env.js` for type safety. This prevents runtime errors due to missing environment variables.
 - **Application Constants (`src/lib/config/constants.ts`)**: Stores app name, description, contact email, and other hardcoded values that don't change frequently.
-- **Product Plans (`src/lib/config/products.ts`)**: Centrally defines all paid plans. Each plan includes internal ID, name, feature list, and product IDs in different payment providers (like Creem). This structure makes it easy to add new plans or switch payment providers.
+- **Product Plans (`src/lib/config/products.ts`)**: Centrally defines internal tiers and prices. Stripe test and live Price IDs are isolated in `src/lib/billing/stripe/prices.ts` and generated by the catalog sync command.
 - **User Roles (`src/lib/config/roles.ts`)**: Defines user roles and their hierarchical relationships (`user`, `admin`, `super_admin`). Helper functions like `hasRole` provide unified permission checking logic.
 - **File Upload (`src/lib/config/upload.ts`)**: Centrally manages all file upload rules, including maximum file size, allowed file types, etc. All upload paths (client and server-side) share this configuration, ensuring rule consistency.
 
@@ -255,7 +255,7 @@ The project uses Next.js App Router and leverages Route Groups for logical page 
    - Copy `.env.example` to `.env`.
    - Generate a secure `BETTER_AUTH_SECRET`: `openssl rand -base64 32`.
    - Fill in your PostgreSQL `DATABASE_URL`.
-   - Register and obtain API keys for Creem, Resend, Cloudflare R2, and fill them in the `.env` file.
+   - Configure a Stripe secret key and webhook endpoint secret, plus credentials for Resend and Cloudflare R2, in `.env`.
 1. **Database Setup**:
    - **Development**: `pnpm db:push` synchronizes changes from `database/schema.ts` directly to the database, suitable for rapid iteration.
    - **Shared environments**: generate and commit SQL migrations with `pnpm db:generate`, deploy the code, then run `pnpm db:migrate` once against the target `DATABASE_URL`.
@@ -341,16 +341,16 @@ This starter kit uses the `better-auth` library to provide a complete authentica
   - `pnpm db:push`: Development only, directly syncs schema to database, loses history.
   - `pnpm db:migrate`: Apply committed migration files to the database selected by `DATABASE_URL`.
 
-### 4.3. Payment & Subscriptions (Creem)
+### 4.3. Payment & Subscriptions (Stripe)
 
-- **Abstraction Layer**: `src/lib/billing/index.ts` exports a unified `billing` object, making it easy to switch to other payment providers (like Stripe) in the future without modifying upper-level business code.
-- **Provider Implementation**: `src/lib/billing/creem/provider.ts` is the specific implementation for Creem payment provider, encapsulating logic for creating checkout sessions, customer portals, and handling webhooks.
+- **Abstraction Layer**: `src/lib/billing/index.ts` exports a unified `billing` object so routes and actions stay independent from Stripe API details.
+- **Provider Implementation**: `src/lib/billing/stripe/provider.ts` is the specific implementation for Stripe payment provider, encapsulating logic for creating checkout sessions, customer portals, and handling webhooks.
 - **API Interfaces**:
   - `/api/billing/checkout`: Creates payment sessions. Returns `409 Conflict` status and management link when user tries to purchase existing subscription.
-  - `/api/billing/portal`: Creates a URL to Creem customer portal where users can manage their subscriptions.
-  - `/api/billing/webhooks/creem`: Receives webhook events from Creem for updating subscription status, recording payments, etc.
-- **Webhook Handling**: `src/lib/billing/creem/webhook.ts`
-  - **Security**: Uses `crypto.timingSafeEqual` to verify webhook signatures, preventing forged requests.
+  - `/api/billing/portal`: Creates a URL to Stripe customer portal where users can manage their subscriptions.
+  - `/api/billing/webhooks/stripe`: Receives webhook events from Stripe for updating subscription status, recording payments, etc.
+- **Webhook Handling**: `src/lib/billing/stripe/webhook.ts`
+  - **Security**: Uses Stripe's official SDK to verify the raw request body and `Stripe-Signature` header before processing any event.
   - **Idempotency**: Records processed event IDs in `webhook_events` table to prevent duplicate processing of the same event.
   - **Transactional**: All database operations are completed in one transaction, ensuring data consistency.
 - **Payment Flow**:
@@ -361,16 +361,16 @@ This starter kit uses the `better-auth` library to provide a complete authentica
       participant User
       participant Client as Frontend (Pricing Page)
       participant Server as Server
-      participant Creem
+      participant Stripe
 
       User->>Client: Click "Get Plan"
       Client->>Server: POST /api/billing/checkout
-      Server->>Creem: Create Checkout Session
-      Creem-->>Server: checkoutUrl
+      Server->>Stripe: Create Checkout Session
+      Stripe-->>Server: checkoutUrl
       Server-->>Client: Return checkoutUrl
-      Client->>User: Redirect to Creem payment page
-      User->>Creem: Complete payment
-      Creem-->>Server: Webhook (checkout.completed)
+      Client->>User: Redirect to Stripe payment page
+      User->>Stripe: Complete payment
+      Stripe-->>Server: Webhook (checkout.session.completed)
       Server->>Server: Verify signature, record event
       Server->>Server: (DB Transaction) Update user subscription status
       User->>Client: Redirect to /payment-status
@@ -465,15 +465,15 @@ Provides a powerful, extensible data management system.
 
 ### 5.2. API Reference
 
-| Route                         | Method    | Description                                       |
-| ----------------------------- | --------- | ------------------------------------------------- |
-| `/api/auth/[...all]`          | GET, POST | Handle all `better-auth` authentication requests. |
-| `/api/billing/checkout`       | POST      | Create payment session.                           |
-| `/api/billing/portal`         | GET       | Get customer portal URL.                          |
-| `/api/billing/webhooks/creem` | POST      | Receive Creem webhook events.                     |
-| `/api/upload/presigned-url`   | POST      | Get presigned URL for client-side direct upload.  |
-| `/api/upload/server-upload`   | POST      | Server-side proxy file upload.                    |
-| `/api/payment-status`         | GET       | Query payment status.                             |
+| Route                          | Method    | Description                                       |
+| ------------------------------ | --------- | ------------------------------------------------- |
+| `/api/auth/[...all]`           | GET, POST | Handle all `better-auth` authentication requests. |
+| `/api/billing/checkout`        | POST      | Create payment session.                           |
+| `/api/billing/portal`          | GET       | Get customer portal URL.                          |
+| `/api/billing/webhooks/stripe` | POST      | Receive Stripe webhook events.                    |
+| `/api/upload/presigned-url`    | POST      | Get presigned URL for client-side direct upload.  |
+| `/api/upload/server-upload`    | POST      | Server-side proxy file upload.                    |
+| `/api/payment-status`          | GET       | Query payment status.                             |
 
 ### 5.3. Hooks and Events
 
@@ -587,7 +587,7 @@ All required and optional environment variables are detailed in the environment 
 - **Route Protection**: `proxy.ts` is the first line of defense, but **must** use functions like `requireAuth`, `requireAdmin` in Server Actions and API routes for backend permission verification.
 - **SQL Injection**: Using Drizzle ORM effectively prevents SQL injection attacks because it automatically parameterizes queries.
 - **XSS**: Next.js and React escape JSX content by default, preventing cross-site scripting attacks. When handling user-generated content, use mature libraries (like `DOMPurify`) for sanitization.
-- **Webhook Security**: Signature verification in `src/lib/billing/creem/webhook.ts` is key to ensuring webhook requests come from trusted sources.
+- **Webhook Security**: Signature verification in `src/lib/billing/stripe/webhook.ts` is key to ensuring webhook requests come from trusted sources.
 
 ### 10.3. Deployment Guide
 
@@ -612,7 +612,7 @@ commit to `prod` only when that commit belongs to the default branch.
 
 ## 11. Community & Ecosystem
 
-Before deploying, compare the [Next.js 16 architecture guide](/blog/nextjs-16-saas-starter-architecture), the [Creem billing production guide](/blog/creem-nextjs-billing-production-guide), and the [API key, OAuth, and device-flow guide](/blog/api-keys-oauth-device-flow-saas-agents). Then inspect the [feature boundaries](/features), review [pricing behavior](/pricing), and clone the [GitHub source](https://github.com/ullrai/saas-starter) instead of copying isolated snippets out of context.
+Before deploying, compare the [Next.js 16 architecture guide](/blog/nextjs-16-saas-starter-architecture), the [Stripe billing production guide](/blog/stripe-nextjs-billing-production-guide), and the [API key, OAuth, and device-flow guide](/blog/api-keys-oauth-device-flow-saas-agents). Then inspect the [feature boundaries](/features), review [pricing behavior](/pricing), and clone the [GitHub source](https://github.com/ullrai/saas-starter) instead of copying isolated snippets out of context.
 
 ### 11.1. Community Resources
 
@@ -622,7 +622,7 @@ Before deploying, compare the [Next.js 16 architecture guide](/blog/nextjs-16-sa
   - [Next.js](https://nextjs.org/docs)
   - [Drizzle ORM](https://orm.drizzle.team/docs)
   - [Better-Auth](https://better-auth.com/docs)
-  - [Creem](https://docs.creem.io)
+  - [Stripe](https://docs.stripe.com)
   - [shadcn/ui](https://ui.shadcn.com/docs)
   - [Content Collections](https://www.content-collections.dev/)
 

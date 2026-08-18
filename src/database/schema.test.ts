@@ -371,7 +371,7 @@ describe("Database Schema", () => {
       expect(webhookEvents.eventId.isUnique).toBe(false);
       expect(webhookEvents.eventType.notNull).toBe(true);
       expect(webhookEvents.provider.notNull).toBe(true);
-      expect(webhookEvents.provider.default).toBe("creem");
+      expect(webhookEvents.provider.default).toBe("stripe");
       expect(webhookEvents.createdAt.notNull).toBe(true);
     });
   });
@@ -568,7 +568,7 @@ describe("Database Schema", () => {
     it("should have proper default values", () => {
       expect(users.role.default).toBe("user");
       expect(payments.currency.default).toBe("usd");
-      expect(webhookEvents.provider.default).toBe("creem");
+      expect(webhookEvents.provider.default).toBe("stripe");
     });
   });
 
@@ -1321,7 +1321,7 @@ describe("Database Schema", () => {
       // Test default values
       expect(users.role.default).toBe("user");
       expect(payments.currency.default).toBe("usd");
-      expect(webhookEvents.provider.default).toBe("creem");
+      expect(webhookEvents.provider.default).toBe("stripe");
     });
 
     it("should test UUID and timestamp columns with defaults", () => {

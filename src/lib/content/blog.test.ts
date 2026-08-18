@@ -35,11 +35,11 @@ describe("blog content localization helpers", () => {
     expect(getAllPostSlugs()).toEqual([
       "agent-friendly-saas-template",
       "api-keys-oauth-device-flow-saas-agents",
-      "creem-nextjs-billing-production-guide",
       "modern-css-techniques",
       "nextjs-15-features",
       "nextjs-16-saas-starter-architecture",
       "saas-starter-kit-developer-guide",
+      "stripe-nextjs-billing-production-guide",
       "typescript-best-practices",
     ]);
   });

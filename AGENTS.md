@@ -44,7 +44,7 @@ pnpm db:push
 
 ```bash
 pnpm set:admin
-pnpm creem:sync-products
+pnpm stripe:sync-products
 ```
 
 ## 3. Project Snapshot
@@ -54,7 +54,7 @@ pnpm creem:sync-products
 - Package manager: `pnpm`
 - Database: PostgreSQL with Drizzle ORM
 - Auth: Better Auth, magic link via Resend, optional OAuth providers
-- Billing: provider abstraction in `src/lib/billing/provider.ts`, current implementation uses Creem
+- Billing: provider abstraction in `src/lib/billing/provider.ts`, current implementation uses Stripe
 - Storage: Cloudflare R2 with presigned uploads
 - Content: Content Collections plus repository-managed Markdown
 - Localization: `next-intl`

@@ -49,7 +49,7 @@ export const MARKETING_CLIENT_MESSAGE_KEYS = [
   "billing_cloudflare_r2_upload_workflows",
   "billing_subscription_already_active",
   "billing_admin_operations_screens",
-  "billing_creem_checkout_billing_portal_flow",
+  "billing_stripe_checkout_billing_portal_flow",
   "billing_subscription",
   "common_error_404",
   "payment_status_access_dashboard",

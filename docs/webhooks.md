@@ -38,3 +38,13 @@ to `checkout.session.completed`, `checkout.session.async_payment_succeeded`,
 `customer.subscription.deleted`, `customer.subscription.paused`,
 `customer.subscription.resumed`, `invoice.paid`, `invoice.payment_failed`,
 `charge.refunded`, and `charge.dispute.created`.
+
+## Endpoint API version
+
+Each Stripe endpoint is pinned to the API version that was current when it was
+created, and that version decides the shape of the payloads it receives. This
+starter reads `invoice.parent.subscription_details` and per-item billing
+periods, both introduced in `2025-04-30`. An endpoint older than that delivers
+subscription and invoice events the handler cannot read, so those events are
+rejected with `400` and logged as `api_version_unsupported`. Recreate the
+endpoint, or upgrade its version in the dashboard, to fix it.

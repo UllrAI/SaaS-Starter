@@ -4,6 +4,7 @@ const mockConstructEvent = jest.fn();
 const mockListInvoicePayments = jest.fn();
 const mockTransaction = jest.fn();
 const mockClaimWebhookEvent = jest.fn();
+const mockIsWebhookEventProcessed = jest.fn();
 const mockLogStripeWebhook = jest.fn();
 const mockProcessCheckoutSession = jest.fn();
 const mockProcessSubscription = jest.fn();
@@ -23,6 +24,7 @@ jest.mock("@/lib/config/integrations", () => ({
 }));
 jest.mock("@/lib/database/subscription", () => ({
   claimWebhookEvent: mockClaimWebhookEvent,
+  isWebhookEventProcessed: mockIsWebhookEventProcessed,
 }));
 jest.mock("./client", () => ({
   getStripeClient: () => ({
@@ -58,7 +60,7 @@ function event(
   return {
     id: "evt_123",
     object: "event",
-    api_version: "2026-07-29.basil",
+    api_version: "2026-07-29.dahlia",
     created: 1_700_000_000,
     data: { object },
     livemode: false,
@@ -73,6 +75,7 @@ describe("Stripe webhook handler", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockClaimWebhookEvent.mockResolvedValue(true);
+    mockIsWebhookEventProcessed.mockResolvedValue(false);
     mockListInvoicePayments.mockResolvedValue({ data: [] });
     mockTransaction.mockImplementation(async (callback) => callback({}));
   });
@@ -108,6 +111,28 @@ describe("Stripe webhook handler", () => {
     expect(mockTransaction).not.toHaveBeenCalled();
   });
 
+  it("rejects endpoints pinned to an API version that predates Basil", async () => {
+    mockConstructEvent.mockReturnValue(
+      event(
+        "customer.subscription.updated",
+        { id: "sub_123" },
+        { api_version: "2025-03-31.basil" },
+      ),
+    );
+    const { handleStripeWebhook, StripeWebhookApiVersionError } =
+      await import("./webhook");
+
+    await expect(
+      handleStripeWebhook("payload", "signature"),
+    ).rejects.toBeInstanceOf(StripeWebhookApiVersionError);
+    expect(mockTransaction).not.toHaveBeenCalled();
+    expect(mockLogStripeWebhook).toHaveBeenCalledWith("error", {
+      eventId: "evt_123",
+      eventType: "customer.subscription.updated",
+      outcome: "api_version_unsupported",
+    });
+  });
+
   it("claims and processes checkout events atomically", async () => {
     const checkout = { id: "cs_123" };
     mockConstructEvent.mockReturnValue(
@@ -134,6 +159,24 @@ describe("Stripe webhook handler", () => {
       eventType: "checkout.session.completed",
       outcome: "processed",
     });
+  });
+
+  it("short-circuits redeliveries before touching Stripe or the database", async () => {
+    mockConstructEvent.mockReturnValue(
+      event("charge.refunded", { id: "ch_1" }),
+    );
+    mockIsWebhookEventProcessed.mockResolvedValue(true);
+    const { handleStripeWebhook } = await import("./webhook");
+
+    await expect(handleStripeWebhook("payload", "signature")).resolves.toEqual({
+      received: true,
+    });
+    expect(mockListInvoicePayments).not.toHaveBeenCalled();
+    expect(mockTransaction).not.toHaveBeenCalled();
+    expect(mockLogStripeWebhook).toHaveBeenCalledWith(
+      "log",
+      expect.objectContaining({ outcome: "duplicate" }),
+    );
   });
 
   it("acknowledges duplicate events without repeating business writes", async () => {
@@ -175,6 +218,34 @@ describe("Stripe webhook handler", () => {
       new Date(1_700_000_000_000),
       {},
     );
+  });
+
+  it("still applies a refund when the invoice lookup fails", async () => {
+    const charge = { id: "ch_123", payment_intent: "pi_123" };
+    mockConstructEvent.mockReturnValue(event("charge.refunded", charge));
+    mockListInvoicePayments.mockRejectedValue(new Error("Stripe is down"));
+    const consoleWarn = jest
+      .spyOn(console, "warn")
+      .mockImplementation(() => {});
+    const { handleStripeWebhook } = await import("./webhook");
+
+    try {
+      await handleStripeWebhook("payload", "signature");
+    } finally {
+      consoleWarn.mockRestore();
+    }
+
+    expect(mockProcessRefund).toHaveBeenCalledWith(
+      charge,
+      ["ch_123", "pi_123"],
+      new Date(1_700_000_000_000),
+      {},
+    );
+    expect(mockLogStripeWebhook).toHaveBeenCalledWith("warn", {
+      eventId: "evt_123",
+      eventType: "charge.refunded",
+      outcome: "invoice_lookup_failed",
+    });
   });
 
   it("claims unsupported events and records them as ignored", async () => {

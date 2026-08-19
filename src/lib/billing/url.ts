@@ -3,9 +3,23 @@ const BILLING_REDIRECT_HOSTS: readonly string[] = [
   "checkout.stripe.com",
 ];
 
+/**
+ * Stripe serves checkout and the portal from a custom domain when one is
+ * configured, so those hostnames have to be allowed explicitly. Reads
+ * `process.env` directly because this module also runs in the browser.
+ */
+const getConfiguredBillingHosts = (): string[] =>
+  (process.env.NEXT_PUBLIC_BILLING_TRUSTED_HOSTS ?? "")
+    .split(",")
+    .map((host) => host.trim().toLowerCase())
+    .filter(Boolean);
+
 const isTrustedBillingHost = (hostname: string): boolean => {
   const normalizedHostname = hostname.toLowerCase();
-  return BILLING_REDIRECT_HOSTS.includes(normalizedHostname);
+  return (
+    BILLING_REDIRECT_HOSTS.includes(normalizedHostname) ||
+    getConfiguredBillingHosts().includes(normalizedHostname)
+  );
 };
 
 export const assertTrustedBillingUrl = (url: string, label: string): string => {

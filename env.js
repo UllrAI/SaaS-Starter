@@ -140,6 +140,24 @@ const env = createEnv({
   client: {
     // Application settings
     NEXT_PUBLIC_APP_URL: appOriginSchema,
+    // Extra hostnames Stripe may redirect to, e.g. a custom checkout domain.
+    NEXT_PUBLIC_BILLING_TRUSTED_HOSTS: z
+      .string()
+      .trim()
+      .min(1)
+      .refine(
+        (value) =>
+          value.split(",").every((host) => {
+            const normalizedHost = host.trim();
+            return (
+              normalizedHost.length > 0 &&
+              !normalizedHost.includes("://") &&
+              !normalizedHost.includes("/")
+            );
+          }),
+        "NEXT_PUBLIC_BILLING_TRUSTED_HOSTS must be a comma-separated hostname list",
+      )
+      .optional(),
     NEXT_PUBLIC_UMAMI_SCRIPT_URL: z.url().optional(),
     NEXT_PUBLIC_UMAMI_WEBSITE_ID: z.uuid().optional(),
     NEXT_PUBLIC_UMAMI_DOMAINS: z
@@ -201,6 +219,8 @@ const env = createEnv({
 
     // Application settings
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
+    NEXT_PUBLIC_BILLING_TRUSTED_HOSTS:
+      process.env.NEXT_PUBLIC_BILLING_TRUSTED_HOSTS,
     NEXT_PUBLIC_UMAMI_SCRIPT_URL: process.env.NEXT_PUBLIC_UMAMI_SCRIPT_URL,
     NEXT_PUBLIC_UMAMI_WEBSITE_ID: process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID,
     NEXT_PUBLIC_UMAMI_DOMAINS: process.env.NEXT_PUBLIC_UMAMI_DOMAINS,

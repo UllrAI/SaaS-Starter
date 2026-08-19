@@ -23,7 +23,7 @@ const mockGetSession = jest.fn();
 const mockCreateCheckoutSession = jest.fn();
 const mockCreateCustomerPortalUrl = jest.fn();
 const mockGetUserSubscription = jest.fn();
-const mockGetUserBillingCustomerId = jest.fn();
+const mockEnsureBillingCustomerId = jest.fn();
 const mockHasUserProductEntitlement = jest.fn();
 const mockCheckRateLimit = jest.fn();
 
@@ -42,9 +42,12 @@ jest.mock("@/lib/billing", () => ({
   },
 }));
 
+jest.mock("@/lib/billing/customer", () => ({
+  ensureBillingCustomerId: mockEnsureBillingCustomerId,
+}));
+
 jest.mock("@/lib/database/subscription", () => ({
   getUserSubscription: mockGetUserSubscription,
-  getUserBillingCustomerId: mockGetUserBillingCustomerId,
   hasUserProductEntitlement: mockHasUserProductEntitlement,
 }));
 
@@ -59,7 +62,7 @@ describe("Billing Checkout API", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockHasUserProductEntitlement.mockResolvedValue(false);
-    mockGetUserBillingCustomerId.mockResolvedValue(null);
+    mockEnsureBillingCustomerId.mockResolvedValue("cus_123");
     mockCheckRateLimit.mockResolvedValue({
       allowed: true,
       info: { limit: 20, remaining: 19, resetAt: 2_000_000_000 },
@@ -306,9 +309,7 @@ describe("Billing Checkout API", () => {
       expect(mockCreateCheckoutSession).toHaveBeenCalledWith({
         requestId: "22a24fd6-c394-4c09-b1df-fd93a2e16d20",
         userId: "user-123",
-        userEmail: "test@example.com",
-        userName: "Test User",
-        customerId: null,
+        customerId: "cus_123",
         tierId: "pro",
         paymentMode: "subscription",
         billingCycle: "yearly",

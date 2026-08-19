@@ -31,3 +31,11 @@ ID，然后执行该事件涉及的全部计费写入。因此，事件认领与
 `customer.subscription.deleted`、`customer.subscription.paused`、
 `customer.subscription.resumed`、`invoice.paid`、`invoice.payment_failed`、
 `charge.refunded` 和 `charge.dispute.created`。
+
+## Endpoint API 版本
+
+Stripe 的每个 Endpoint 会锁定在创建时的 API 版本，投递的 payload 结构也由该版本
+决定。本脚手架依赖 `invoice.parent.subscription_details` 与订阅明细上的账期字段，
+二者均自 `2025-04-30` 起提供。低于该版本的 Endpoint 投递的订阅与账单事件无法被解析，
+会返回 `400` 并记录 `api_version_unsupported`。重新创建 Endpoint，或在 Dashboard
+中升级其 API 版本即可恢复。

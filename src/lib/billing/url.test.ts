@@ -1,7 +1,11 @@
-import { describe, expect, it } from "@jest/globals";
+import { afterEach, describe, expect, it } from "@jest/globals";
 import { assertTrustedBillingUrl, getSafeBillingRedirectUrl } from "./url";
 
 describe("billing url helpers", () => {
+  afterEach(() => {
+    delete process.env.NEXT_PUBLIC_BILLING_TRUSTED_HOSTS;
+  });
+
   describe("assertTrustedBillingUrl", () => {
     it("accepts trusted https billing hosts", () => {
       expect(
@@ -30,6 +34,24 @@ describe("billing url helpers", () => {
       ).toThrow("Invalid redirect.");
       expect(() =>
         assertTrustedBillingUrl("https://evil-stripe.com/checkout", "redirect"),
+      ).toThrow("Invalid redirect.");
+    });
+
+    it("accepts hosts configured for a Stripe custom domain", () => {
+      process.env.NEXT_PUBLIC_BILLING_TRUSTED_HOSTS =
+        "pay.acme.com, Billing.Acme.com";
+
+      expect(
+        assertTrustedBillingUrl(
+          "https://pay.acme.com/c/pay/cs_123",
+          "redirect",
+        ),
+      ).toBe("https://pay.acme.com/c/pay/cs_123");
+      expect(
+        getSafeBillingRedirectUrl("https://billing.acme.com/p/session/test"),
+      ).toBe("https://billing.acme.com/p/session/test");
+      expect(() =>
+        assertTrustedBillingUrl("https://other.acme.com/checkout", "redirect"),
       ).toThrow("Invalid redirect.");
     });
   });

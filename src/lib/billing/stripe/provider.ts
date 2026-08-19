@@ -9,24 +9,26 @@ import type {
   PaymentProvider,
 } from "../provider";
 import { getStripeClient } from "./client";
-import { getStripePriceIds } from "./prices";
+import {
+  getActiveStripePriceId,
+  getStripePriceIds,
+  type StripePriceVariant,
+} from "./prices";
 import { handleStripeWebhook } from "./webhook";
 
 function getCheckoutPriceId(options: CreateCheckoutOptions): string {
-  const priceIds = getStripePriceIds(
-    options.tierId,
-    getBillingConfig().environment,
-  );
-  if (!priceIds) {
+  const environment = getBillingConfig().environment;
+  if (!getStripePriceIds(options.tierId, environment)) {
     throw new Error(`Pricing tier with id "${options.tierId}" not found.`);
   }
 
-  const priceId =
+  const variant: StripePriceVariant =
     options.paymentMode === "one_time"
-      ? priceIds.oneTime
+      ? "oneTime"
       : options.billingCycle === "yearly"
-        ? priceIds.yearly
-        : priceIds.monthly;
+        ? "yearly"
+        : "monthly";
+  const priceId = getActiveStripePriceId(options.tierId, environment, variant);
   if (!priceId) {
     throw new Error(
       `Stripe price ID not found for tier "${options.tierId}" with mode "${options.paymentMode}" and cycle "${options.billingCycle}". Run pnpm stripe:sync-products for the selected environment.`,
@@ -58,6 +60,18 @@ function resolveCheckoutStatus(
 }
 
 const stripeProvider: PaymentProvider = {
+  async createCustomer({ userId, email, name }) {
+    const customer = await getStripeClient().customers.create(
+      {
+        email,
+        name: name ?? undefined,
+        metadata: { userId },
+      },
+      { idempotencyKey: `billing-customer:${userId}` },
+    );
+    return { customerId: customer.id };
+  },
+
   async createCheckoutSession(options) {
     if (!options.cancelUrl) {
       throw new Error("A checkout cancel URL is required.");
@@ -72,6 +86,7 @@ const stripeProvider: PaymentProvider = {
     };
     const params: Stripe.Checkout.SessionCreateParams = {
       mode: options.paymentMode === "subscription" ? "subscription" : "payment",
+      customer: options.customerId,
       client_reference_id: options.userId,
       line_items: [{ price: priceId, quantity: 1 }],
       metadata,
@@ -79,16 +94,9 @@ const stripeProvider: PaymentProvider = {
       cancel_url: options.cancelUrl,
     };
 
-    if (options.customerId) {
-      params.customer = options.customerId;
-    } else {
-      params.customer_email = options.userEmail;
-    }
-
     if (options.paymentMode === "subscription") {
       params.subscription_data = { metadata };
     } else {
-      if (!options.customerId) params.customer_creation = "always";
       params.payment_intent_data = { metadata };
     }
 

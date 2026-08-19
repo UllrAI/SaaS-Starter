@@ -1,9 +1,11 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 
+import prettier from "prettier";
 import Stripe from "stripe";
 import { z } from "zod";
 
+import { STRIPE_API_VERSION } from "@/lib/billing/stripe/api-version";
 import {
   buildStripePriceSpecs,
   type ResolvedStripePrice,
@@ -25,6 +27,7 @@ async function main() {
   assertKeyMatchesEnvironment(env.STRIPE_SECRET_KEY, env.STRIPE_ENVIRONMENT);
 
   const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
+    apiVersion: STRIPE_API_VERSION,
     maxNetworkRetries: 2,
     timeout: 10_000,
     telemetry: false,
@@ -142,7 +145,19 @@ async function writeResolvedPrices(
     resolvedPrices,
     environment,
   );
-  if (source !== nextSource) await writeFile(configPath, nextSource, "utf8");
+  if (source === nextSource) return;
+
+  // The price lists are written on one line; let Prettier decide where they
+  // wrap so the committed file still passes `pnpm prettier:check`.
+  const options = await prettier.resolveConfig(configPath);
+  await writeFile(
+    configPath,
+    await prettier.format(nextSource, {
+      ...options,
+      filepath: configPath,
+    }),
+    "utf8",
+  );
 }
 
 function assertKeyMatchesEnvironment(

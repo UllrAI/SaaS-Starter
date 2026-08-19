@@ -1,4 +1,5 @@
 type StripeWebhookOutcome =
+  | "api_version_unsupported"
   | "body_too_large"
   | "duplicate"
   | "environment_mismatch"
@@ -6,6 +7,7 @@ type StripeWebhookOutcome =
   | "ignored"
   | "invalid_payload"
   | "invalid_signature"
+  | "invoice_lookup_failed"
   | "missing_signature"
   | "processed"
   | "request_failed";

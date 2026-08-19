@@ -3,9 +3,9 @@ import { billing } from "@/lib/billing";
 import { z } from "zod";
 import {
   getUserSubscription,
-  getUserBillingCustomerId,
   hasUserProductEntitlement,
 } from "@/lib/database/subscription";
+import { ensureBillingCustomerId } from "@/lib/billing/customer";
 import { assertTrustedBillingUrl } from "@/lib/billing/url";
 import { getAuthSessionFromHeaders } from "@/lib/auth/session";
 import { getProductTierById } from "@/lib/config/products";
@@ -157,9 +157,11 @@ export async function POST(request: NextRequest) {
     const checkoutOptions = {
       requestId,
       userId: session.user.id,
-      userEmail: session.user.email,
-      userName: session.user.name,
-      customerId: await getUserBillingCustomerId(session.user.id),
+      customerId: await ensureBillingCustomerId({
+        id: session.user.id,
+        email: session.user.email,
+        name: session.user.name,
+      }),
       tierId,
       paymentMode,
       billingCycle,

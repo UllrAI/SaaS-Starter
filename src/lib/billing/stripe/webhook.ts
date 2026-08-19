@@ -2,8 +2,13 @@ import type Stripe from "stripe";
 
 import { db } from "@/database";
 import { getBillingConfig } from "@/lib/config/integrations";
-import { claimWebhookEvent, type Tx } from "@/lib/database/subscription";
+import {
+  claimWebhookEvent,
+  isWebhookEventProcessed,
+  type Tx,
+} from "@/lib/database/subscription";
 
+import { MIN_SUPPORTED_API_DATE } from "./api-version";
 import { getStripeClient } from "./client";
 import { logStripeWebhook } from "./webhook-log";
 import {
@@ -26,6 +31,15 @@ export class StripeWebhookEnvironmentError extends Error {
   constructor() {
     super("Webhook event mode does not match STRIPE_ENVIRONMENT.");
     this.name = "StripeWebhookEnvironmentError";
+  }
+}
+
+export class StripeWebhookApiVersionError extends Error {
+  constructor(apiVersion: string) {
+    super(
+      `Stripe webhook endpoint uses API version ${apiVersion}. Recreate it on ${MIN_SUPPORTED_API_DATE} or later, otherwise subscription and invoice events cannot be read.`,
+    );
+    this.name = "StripeWebhookApiVersionError";
   }
 }
 
@@ -60,16 +74,28 @@ async function getAdjustmentPaymentReferences(
   );
   if (!paymentIntentId) return references;
 
-  const invoicePayments = await getStripeClient().invoicePayments.list({
-    payment: {
-      type: "payment_intent",
-      payment_intent: paymentIntentId,
-    },
-    limit: 10,
-  });
-  for (const invoicePayment of invoicePayments.data) {
-    const invoiceId = getOptionalId(invoicePayment.invoice);
-    if (invoiceId) references.push(invoiceId);
+  try {
+    const invoicePayments = await getStripeClient().invoicePayments.list({
+      payment: {
+        type: "payment_intent",
+        payment_intent: paymentIntentId,
+      },
+      limit: 10,
+    });
+    for (const invoicePayment of invoicePayments.data) {
+      const invoiceId = getOptionalId(invoicePayment.invoice);
+      if (invoiceId) references.push(invoiceId);
+    }
+  } catch (error) {
+    // Subscription payments are keyed by invoice, so losing this lookup only
+    // matters for them. Keep the charge and intent references and let the
+    // processor decide, instead of failing a one-time refund on an API blip.
+    logStripeWebhook("warn", {
+      eventId: event.id,
+      eventType: event.type,
+      outcome: "invoice_lookup_failed",
+    });
+    console.warn("[Stripe Webhook] Invoice payment lookup failed.", error);
   }
 
   return [...new Set(references)];
@@ -149,6 +175,16 @@ export async function handleStripeWebhook(
     throw new StripeWebhookEnvironmentError();
   }
 
+  const apiDate = event.api_version?.slice(0, 10);
+  if (apiDate && apiDate < MIN_SUPPORTED_API_DATE) {
+    logStripeWebhook("error", {
+      eventId: event.id,
+      eventType: event.type,
+      outcome: "api_version_unsupported",
+    });
+    throw new StripeWebhookApiVersionError(event.api_version as string);
+  }
+
   try {
     const eventCreatedAt = new Date(event.created * 1000);
     if (Number.isNaN(eventCreatedAt.getTime())) {
@@ -156,6 +192,18 @@ export async function handleStripeWebhook(
         "Stripe event creation timestamp is invalid.",
       );
     }
+
+    // Stripe redelivers aggressively. Short-circuit before the adjustment
+    // lookup so replays cost neither a Stripe API call nor a transaction.
+    if (await isWebhookEventProcessed(event.id, "stripe")) {
+      logStripeWebhook("log", {
+        eventId: event.id,
+        eventType: event.type,
+        outcome: "duplicate",
+      });
+      return { received: true };
+    }
+
     const adjustmentPaymentReferences =
       await getAdjustmentPaymentReferences(event);
     const outcome = await db.transaction<ProcessingOutcome>(async (tx) => {

@@ -7,7 +7,7 @@ type StripeWebhookOutcome =
   | "ignored"
   | "invalid_payload"
   | "invalid_signature"
-  | "invoice_lookup_failed"
+  | "invoice_payment_lookup_failed"
   | "missing_signature"
   | "processed"
   | "request_failed";

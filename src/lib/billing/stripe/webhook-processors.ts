@@ -1,5 +1,5 @@
 import type Stripe from "stripe";
-import { eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 
 import { users } from "@/database/tables";
 import { getProductTierById } from "@/lib/config/products";
@@ -18,7 +18,7 @@ import {
 import type { PaymentMode, SubscriptionStatus } from "@/types/billing";
 
 import { getStripeEnvironment } from "./client";
-import { getProductTierByStripePriceId } from "./prices";
+import { getProductTierByStripeProductId } from "./prices";
 
 export class InvalidWebhookPayloadError extends Error {
   constructor(message = "Invalid webhook payload.") {
@@ -54,19 +54,21 @@ function parseUnixTimestamp(value: number, label: string): Date {
   return new Date(value * 1000);
 }
 
-function resolveTier(priceId: string, metadataTierId?: string) {
-  const tier = getProductTierByStripePriceId(priceId, getStripeEnvironment());
+function resolveTier(productId: string, metadataTierId?: string) {
+  const tier = getProductTierByStripeProductId(
+    productId,
+    getStripeEnvironment(),
+  );
   if (!tier) {
     throw new InvalidWebhookPayloadError(
-      "Stripe object references an unknown price.",
+      "Stripe object references an unknown product.",
     );
   }
-  // The price is authoritative. Subscription metadata is a snapshot from
-  // checkout and Stripe does not refresh it when a plan is switched in the
-  // billing portal, so a mismatch is expected after an upgrade or downgrade.
+  // The Product is the stable tier identity. Subscription metadata is only a
+  // checkout-time snapshot and can become stale after a portal plan switch.
   if (metadataTierId && metadataTierId !== tier.id) {
     console.warn("[Stripe Webhook] Tier metadata is stale.", {
-      priceId,
+      productId,
       metadataTierId,
       resolvedTierId: tier.id,
     });
@@ -108,26 +110,25 @@ async function resolveUserId(
       "Stripe event references an unknown user.",
     );
   }
-  if (
-    user.paymentProviderCustomerId &&
-    user.paymentProviderCustomerId !== customerId
-  ) {
-    // A second customer for the same user, e.g. one created in the Stripe
-    // dashboard. Rejecting here would lose a real payment, so accept the event
-    // and keep the stored customer, which is the one the portal links to.
-    console.warn("[Stripe Webhook] User has more than one Stripe customer.", {
-      userId: user.id,
-      storedCustomerId: user.paymentProviderCustomerId,
-      eventCustomerId: customerId,
-    });
-    return user.id;
-  }
+  if (user.paymentProviderCustomerId !== customerId) {
+    if (user.paymentProviderCustomerId) {
+      throw new InvalidWebhookPayloadError(
+        "Stripe customer ownership does not match the stored customer.",
+      );
+    }
 
-  if (!user.paymentProviderCustomerId) {
-    await tx
+    const claimed = await tx
       .update(users)
       .set({ paymentProviderCustomerId: customerId })
-      .where(eq(users.id, user.id));
+      .where(
+        and(eq(users.id, user.id), isNull(users.paymentProviderCustomerId)),
+      )
+      .returning({ id: users.id });
+    if (claimed.length === 0) {
+      throw new InvalidWebhookPayloadError(
+        "Stripe customer ownership changed while processing the event.",
+      );
+    }
   }
   return user.id;
 }
@@ -172,17 +173,64 @@ function getInvoiceSubscription(invoice: Stripe.Invoice): string | null {
   );
 }
 
-function getInvoicePriceId(invoice: Stripe.Invoice): string {
-  const price = invoice.lines.data.find(
-    (line) => line.pricing?.price_details?.price,
-  )?.pricing?.price_details?.price;
-  return getId(price);
+function getPriceProductId(price: Stripe.Price): string {
+  return getId(price.product);
+}
+
+function getInvoiceProductId(invoice: Stripe.Invoice): string {
+  const subscriptionId = getInvoiceSubscription(invoice);
+  const candidates: Array<{
+    productId: string;
+    amount: number;
+    proration: boolean;
+  }> = [];
+  for (const line of invoice.lines.data) {
+    const details = line.pricing?.price_details;
+    const lineSubscription =
+      line.parent?.subscription_item_details?.subscription ??
+      line.parent?.invoice_item_details?.subscription ??
+      getOptionalId(line.subscription);
+    if (!details?.product) continue;
+    if (lineSubscription && lineSubscription !== subscriptionId) continue;
+    candidates.push({
+      productId: details.product,
+      amount: line.amount,
+      proration:
+        line.parent?.subscription_item_details?.proration ??
+        line.parent?.invoice_item_details?.proration ??
+        false,
+    });
+  }
+
+  const uniqueProduct = (entries: typeof candidates): string | undefined => {
+    const productIds = new Set(entries.map(({ productId }) => productId));
+    return productIds.size === 1 ? [...productIds][0] : undefined;
+  };
+  const productId =
+    uniqueProduct(candidates.filter(({ proration }) => !proration)) ??
+    uniqueProduct(candidates.filter(({ amount }) => amount > 0)) ??
+    uniqueProduct(candidates);
+  if (!productId) {
+    throw new InvalidWebhookPayloadError(
+      "Stripe invoice does not resolve to exactly one subscription product.",
+    );
+  }
+  return productId;
 }
 
 function getInvoiceMetadata(invoice: Stripe.Invoice): Stripe.Metadata {
   return (
     invoice.parent?.subscription_details?.metadata ?? invoice.metadata ?? {}
   );
+}
+
+function getInvoicePaymentIntentId(invoice: Stripe.Invoice): string | null {
+  for (const payment of invoice.payments?.data ?? []) {
+    if (payment.payment.type !== "payment_intent") continue;
+    const paymentIntentId = getOptionalId(payment.payment.payment_intent);
+    if (paymentIntentId) return paymentIntentId;
+  }
+  return null;
 }
 
 export async function processCheckoutSession(
@@ -244,6 +292,7 @@ export async function processCheckoutSession(
       subscriptionId: null,
       productId: tier.id,
       paymentId,
+      paymentIntentId: getOptionalId(session.payment_intent),
       amount: session.amount_total,
       currency: session.currency,
       status: "succeeded",
@@ -276,7 +325,15 @@ export async function processSubscription(
       "Stripe subscription has no price item.",
     );
   }
-  const tier = resolveTier(item.price.id, subscription.metadata.tierId);
+  if (subscription.items.data.length !== 1) {
+    throw new InvalidWebhookPayloadError(
+      "Stripe subscription must contain exactly one price item.",
+    );
+  }
+  const tier = resolveTier(
+    getPriceProductId(item.price),
+    subscription.metadata.tierId,
+  );
 
   await lockBillingProductScope(userId, tier.id, tx);
   await upsertSubscription(
@@ -311,6 +368,7 @@ export async function processInvoice(
   status: "failed" | "succeeded",
   _eventCreatedAt: Date,
   tx: Tx,
+  paymentIntentId?: string | null,
 ): Promise<void> {
   const subscriptionId = getInvoiceSubscription(invoice);
   if (!subscriptionId) return;
@@ -318,7 +376,7 @@ export async function processInvoice(
   const customerId = getId(invoice.customer);
   const metadata = getInvoiceMetadata(invoice);
   const userId = await resolveUserId(customerId, metadata.userId, tx);
-  const tier = resolveTier(getInvoicePriceId(invoice), metadata.tierId);
+  const tier = resolveTier(getInvoiceProductId(invoice), metadata.tierId);
 
   await lockBillingProductScope(userId, tier.id, tx);
   await upsertPayment(
@@ -328,6 +386,7 @@ export async function processInvoice(
       subscriptionId,
       productId: tier.id,
       paymentId: invoice.id,
+      paymentIntentId: paymentIntentId ?? getInvoicePaymentIntentId(invoice),
       // `amount_due` is fixed at finalization and identical across the failed
       // and paid events for one invoice. `amount_paid` would differ and trip
       // the immutable-payment guard on retry.

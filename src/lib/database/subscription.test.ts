@@ -366,6 +366,34 @@ describe("Database Subscription Functions", () => {
       expect(statusExpression.values).toContain("failed");
     });
 
+    it("preserves a previously linked PaymentIntent when a replay omits it", async () => {
+      const paymentData = {
+        userId: "user-123",
+        customerId: "customer-123",
+        subscriptionId: "sub-123",
+        productId: "product-123",
+        paymentId: "invoice-123",
+        amount: 1000,
+        currency: "usd",
+        status: "failed",
+        paymentType: "subscription",
+      };
+      const onConflictDoUpdate = jest.fn().mockReturnValue({
+        returning: jest
+          .fn()
+          .mockResolvedValue([
+            { ...paymentData, paymentIntentId: "pi_existing" },
+          ]),
+      });
+      mockDb.insert.mockReturnValue({
+        values: jest.fn().mockReturnValue({ onConflictDoUpdate }),
+      });
+
+      const { upsertPayment } = await import("./subscription");
+
+      await expect(upsertPayment(paymentData)).resolves.toHaveLength(1);
+    });
+
     it("should handle nullable subscriptionId", async () => {
       const paymentData = {
         userId: "user-123",

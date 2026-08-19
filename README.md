@@ -112,7 +112,7 @@ never be added to `SITE_CONFIG`.
 | `BETTER_AUTH_SECRET`             | **Required.** Random session secret, at least 32 characters.    | Generate with `openssl rand -base64 32`             |
 | `RESEND_API_KEY`                 | Required when `emailAuth` is enabled. Resend API key.           | `re_xxxxxxxxxxxxxxxx`                               |
 | `RESEND_EMAIL_FROM`              | Required when `emailAuth` is enabled. Verified sender.          | `noreply@your-verified-domain.com`                  |
-| `STRIPE_SECRET_KEY`              | Required when `billing` is enabled. Key matching its mode.      | `sk_test_...` or `sk_live_...`                      |
+| `STRIPE_SECRET_KEY`              | Required for billing. Prefer a least-privilege restricted key.  | `rk_test_...` or `rk_live_...`                      |
 | `STRIPE_ENVIRONMENT`             | Stripe mode; defaults to `test_mode`.                           | `test_mode` or `live_mode`                          |
 | `STRIPE_WEBHOOK_SECRET`          | Required when `billing` is enabled. Endpoint signing secret.    | `whsec_your_webhook_secret`                         |
 | `R2_ENDPOINT`                    | Required when `uploads` is enabled. R2 API endpoint.            | `https://<ACCOUNT_ID>.r2.cloudflarestorage.com`     |
@@ -165,12 +165,15 @@ Implementation guides:
 
 #### Stripe catalog setup
 
-Test and live Price IDs are intentionally separate in
+Test and live Stripe catalog IDs are intentionally separate in
 `src/lib/billing/stripe/prices.ts`. Set `STRIPE_ENVIRONMENT` and its matching
-`STRIPE_SECRET_KEY`, then run `pnpm stripe:sync-products`. The command reuses or
-creates Stripe Products and Prices and updates only the selected environment
-namespace. Review and commit that configuration change before deploying.
-Checkout fails closed when the active environment has no configured Price ID.
+`STRIPE_SECRET_KEY`, then run `pnpm stripe:sync-products`. Each tier owns one
+stable Stripe Product; a price change creates a new Price under that Product,
+deactivates the old Price for new checkouts, and leaves existing subscriptions
+on their original amount. Webhooks resolve the tier from the Product ID, so no
+finite or unbounded retired-Price list is needed. Review and commit the
+selected-environment configuration change before deploying. Checkout fails
+closed when the active environment has no configured Price ID.
 
 Webhook retry, idempotency, and manual replay behavior are documented in
 [Billing webhook operations](docs/webhooks.md).

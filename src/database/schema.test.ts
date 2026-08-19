@@ -247,6 +247,7 @@ describe("Database Schema", () => {
       expect(payments).toHaveProperty("subscriptionId");
       expect(payments).toHaveProperty("productId");
       expect(payments).toHaveProperty("paymentId");
+      expect(payments).toHaveProperty("paymentIntentId");
       expect(payments).toHaveProperty("amount");
       expect(payments).toHaveProperty("currency");
       expect(payments).toHaveProperty("status");
@@ -262,11 +263,24 @@ describe("Database Schema", () => {
       expect(payments.productId.notNull).toBe(true);
       expect(payments.paymentId.notNull).toBe(true);
       expect(payments.paymentId.isUnique).toBe(true);
+      expect(payments.paymentIntentId.notNull).toBe(false);
       expect(payments.amount.notNull).toBe(true);
       expect(payments.currency.notNull).toBe(true);
       expect(payments.currency.default).toBe("usd");
       expect(payments.status.notNull).toBe(true);
       expect(payments.paymentType.notNull).toBe(true);
+    });
+
+    it("keeps PaymentIntent IDs unique when present", () => {
+      const indexes = getIndexConfigs(payments);
+      expect(indexes).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            name: "payments_paymentIntentId_unique",
+            unique: true,
+          }),
+        ]),
+      );
     });
   });
 

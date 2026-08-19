@@ -14,6 +14,7 @@ export interface StripePriceSpec {
 }
 
 export interface ResolvedStripePrice extends StripePriceSpec {
+  productId: string;
   priceId: string;
   created: boolean;
 }
@@ -66,24 +67,6 @@ export function buildStripePriceSpecs(
   );
 }
 
-/**
- * How many rotated-out price IDs to keep per variant. Old IDs stay so webhooks
- * for subscriptions still on them can resolve a tier; the cap keeps the config
- * from growing without bound.
- */
-export const PRICE_ID_HISTORY_LIMIT = 10;
-
-/** Newest-first list with `priceId` promoted to the front, duplicates removed. */
-export function mergePriceIdHistory(
-  existingIds: string[],
-  priceId: string,
-): string[] {
-  return [priceId, ...existingIds.filter((id) => id !== priceId)].slice(
-    0,
-    PRICE_ID_HISTORY_LIMIT,
-  );
-}
-
 export function updatePricesConfigSource(
   source: string,
   resolvedPrices: ResolvedStripePrice[],
@@ -92,9 +75,15 @@ export function updatePricesConfigSource(
   return resolvedPrices.reduce((updatedSource, resolvedPrice) => {
     const tierBlock = getTierBlock(updatedSource, resolvedPrice.tierId);
     const environmentBlock = getEnvironmentBlock(tierBlock.block, environment);
+    const productPattern = /(productId:\s*")([^"]*)(")/;
     const fieldPattern = new RegExp(
-      `(${resolvedPrice.variant}:\\s*\\[)([^\\]]*)(\\])`,
+      `(${resolvedPrice.variant}:\\s*")([^"]*)(")`,
     );
+    if (!productPattern.test(environmentBlock.block)) {
+      throw new Error(
+        `Unable to find "productId" for tier "${resolvedPrice.tierId}" in ${environment}.`,
+      );
+    }
     const field = fieldPattern.exec(environmentBlock.block);
     if (!field) {
       throw new Error(
@@ -102,14 +91,9 @@ export function updatePricesConfigSource(
       );
     }
 
-    const existingIds = [...field[2].matchAll(/"([^"]+)"/g)].map(
-      (match) => match[1],
-    );
-    const nextIds = mergePriceIdHistory(existingIds, resolvedPrice.priceId);
-    const nextEnvironmentBlock = environmentBlock.block.replace(
-      fieldPattern,
-      `$1${nextIds.map((id) => `"${id}"`).join(", ")}$3`,
-    );
+    const nextEnvironmentBlock = environmentBlock.block
+      .replace(productPattern, `$1${resolvedPrice.productId}$3`)
+      .replace(fieldPattern, `$1${resolvedPrice.priceId}$3`);
     const nextTierBlock =
       tierBlock.block.slice(0, environmentBlock.start) +
       nextEnvironmentBlock +

@@ -56,8 +56,8 @@ export function validateIntegrationEnv(features, values) {
 
     const apiKey = String(values.STRIPE_SECRET_KEY);
     const environment = values.STRIPE_ENVIRONMENT;
-    const isTestKey = apiKey.startsWith("sk_test_");
-    const isLiveKey = apiKey.startsWith("sk_live_");
+    const isTestKey = /^(?:sk|rk)_test_/.test(apiKey);
+    const isLiveKey = /^(?:sk|rk)_live_/.test(apiKey);
     if (
       (environment === "test_mode" && !isTestKey) ||
       (environment === "live_mode" && !isLiveKey)

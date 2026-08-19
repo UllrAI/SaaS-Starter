@@ -54,6 +54,7 @@ async function findOrCreateProduct(
   stripe: Stripe,
   spec: StripePriceSpec,
 ): Promise<Stripe.Product> {
+  let managedProduct: Stripe.Product | undefined;
   for await (const product of stripe.products.list({
     active: true,
     limit: 100,
@@ -62,11 +63,22 @@ async function findOrCreateProduct(
       product.metadata.tierId === spec.tierId &&
       product.metadata.managedBy === "saas-starter"
     ) {
-      if (product.name !== spec.productName) {
-        return stripe.products.update(product.id, { name: spec.productName });
+      if (managedProduct && managedProduct.id !== product.id) {
+        throw new Error(
+          `Stripe has multiple managed Products for tier "${spec.tierId}"; resolve the catalog ambiguity before syncing prices.`,
+        );
       }
-      return product;
+      managedProduct = product;
     }
+  }
+
+  if (managedProduct) {
+    if (managedProduct.name !== spec.productName) {
+      return stripe.products.update(managedProduct.id, {
+        name: spec.productName,
+      });
+    }
+    return managedProduct;
   }
 
   return stripe.products.create(
@@ -90,7 +102,17 @@ async function resolvePrice(
   });
   const price = existing.data[0];
   if (price && priceMatches(price, product.id, spec)) {
-    return { ...spec, priceId: price.id, created: false };
+    if (!priceMetadataMatches(price, spec)) {
+      await stripe.prices.update(price.id, {
+        metadata: buildPriceMetadata(spec),
+      });
+    }
+    return {
+      ...spec,
+      productId: product.id,
+      priceId: price.id,
+      created: false,
+    };
   }
 
   const created = await stripe.prices.create(
@@ -103,6 +125,7 @@ async function resolvePrice(
       currency: spec.currency,
       recurring: spec.recurring,
       tax_behavior: "exclusive",
+      metadata: buildPriceMetadata(spec),
     },
     {
       idempotencyKey: [
@@ -116,7 +139,26 @@ async function resolvePrice(
     },
   );
   if (price) await stripe.prices.update(price.id, { active: false });
-  return { ...spec, priceId: created.id, created: true };
+  return {
+    ...spec,
+    productId: product.id,
+    priceId: created.id,
+    created: true,
+  };
+}
+
+function buildPriceMetadata(spec: StripePriceSpec) {
+  return {
+    managedBy: "saas-starter",
+    tierId: spec.tierId,
+    variant: spec.variant,
+  };
+}
+
+function priceMetadataMatches(price: Stripe.Price, spec: StripePriceSpec) {
+  return Object.entries(buildPriceMetadata(spec)).every(
+    ([key, value]) => price.metadata[key] === value,
+  );
 }
 
 function priceMatches(
@@ -164,8 +206,8 @@ function assertKeyMatchesEnvironment(
   key: string,
   environment: "test_mode" | "live_mode",
 ) {
-  const expectedPrefix = environment === "test_mode" ? "sk_test_" : "sk_live_";
-  if (!key.startsWith(expectedPrefix)) {
+  const expectedSuffix = environment === "test_mode" ? "test" : "live";
+  if (!new RegExp(`^(?:sk|rk)_${expectedSuffix}_`).test(key)) {
     throw new Error(
       `STRIPE_SECRET_KEY does not match STRIPE_ENVIRONMENT=${environment}.`,
     );

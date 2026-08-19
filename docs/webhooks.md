@@ -21,6 +21,11 @@ The event ledger intentionally contains only successful event metadata. Keep
 these rows for idempotency; deleting them can allow an old delivery to run
 again.
 
+Payment records for subscription invoices keep the Stripe PaymentIntent ID
+alongside the invoice ID. Refund and dispute events use that persisted
+association, so handling them does not depend on a best-effort Stripe API
+lookup during webhook delivery.
+
 ## Manual replay
 
 Use Stripe's dashboard to resend an event to the existing webhook endpoint. Do

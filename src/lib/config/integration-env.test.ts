@@ -57,6 +57,19 @@ describe("validateIntegrationEnv", () => {
     ).not.toThrow();
   });
 
+  it("accepts a restricted Stripe key matching the selected environment", () => {
+    expect(() =>
+      validateIntegrationEnv(
+        { emailAuth: false, billing: true, uploads: false },
+        {
+          ...oauthEnv,
+          STRIPE_SECRET_KEY: "rk_test_key",
+          STRIPE_WEBHOOK_SECRET: "whsec_secret",
+        },
+      ),
+    ).not.toThrow();
+  });
+
   it("rejects Stripe credentials for the wrong environment", () => {
     expect(() =>
       validateIntegrationEnv(

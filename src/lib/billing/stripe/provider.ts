@@ -11,14 +11,27 @@ import type {
 import { getStripeClient } from "./client";
 import {
   getActiveStripePriceId,
-  getStripePriceIds,
+  getStripeCatalogItem,
   type StripePriceVariant,
 } from "./prices";
 import { handleStripeWebhook } from "./webhook";
 
+const CHECKOUT_INTEGRATION_IDENTIFIER = "saas_starter_qjmxnrvk";
+
+function buildCustomerSearchQuery(userId: string): string {
+  // Stripe Search uses a quoted value. Escape the two characters that can
+  // change the query structure and reject control characters that cannot be
+  // represented safely in a Search query.
+  if (!userId || /[\u0000-\u001f\u007f]/.test(userId)) {
+    throw new Error("Stripe customer metadata user ID is invalid.");
+  }
+  const escapedUserId = userId.replaceAll("\\", "\\\\").replaceAll("'", "\\'");
+  return `metadata['userId']:'${escapedUserId}'`;
+}
+
 function getCheckoutPriceId(options: CreateCheckoutOptions): string {
   const environment = getBillingConfig().environment;
-  if (!getStripePriceIds(options.tierId, environment)) {
+  if (!getStripeCatalogItem(options.tierId, environment)) {
     throw new Error(`Pricing tier with id "${options.tierId}" not found.`);
   }
 
@@ -61,6 +74,17 @@ function resolveCheckoutStatus(
 
 const stripeProvider: PaymentProvider = {
   async createCustomer({ userId, email, name }) {
+    const existing = await getStripeClient().customers.search({
+      query: buildCustomerSearchQuery(userId),
+      limit: 2,
+    });
+    if (existing.data.length > 1) {
+      throw new Error(
+        `Stripe has multiple customers for user ${userId}; refusing to choose one.`,
+      );
+    }
+    if (existing.data[0]) return { customerId: existing.data[0].id };
+
     const customer = await getStripeClient().customers.create(
       {
         email,
@@ -88,6 +112,7 @@ const stripeProvider: PaymentProvider = {
       mode: options.paymentMode === "subscription" ? "subscription" : "payment",
       customer: options.customerId,
       client_reference_id: options.userId,
+      integration_identifier: CHECKOUT_INTEGRATION_IDENTIFIER,
       line_items: [{ price: priceId, quantity: 1 }],
       metadata,
       success_url: buildSuccessUrl(options.successUrl),

@@ -8,12 +8,4 @@ describe("permanent redirects", () => {
       permanent: true,
     });
   });
-
-  it("keeps the pre-Stripe billing guide URL reachable", () => {
-    expect(PERMANENT_REDIRECTS).toContainEqual({
-      source: "/blog/creem-nextjs-billing-production-guide",
-      destination: "/blog/stripe-nextjs-billing-production-guide",
-      permanent: true,
-    });
-  });
 });

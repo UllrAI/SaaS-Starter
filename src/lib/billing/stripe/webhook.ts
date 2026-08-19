@@ -35,9 +35,9 @@ export class StripeWebhookEnvironmentError extends Error {
 }
 
 export class StripeWebhookApiVersionError extends Error {
-  constructor(apiVersion: string) {
+  constructor(apiVersion: string | null) {
     super(
-      `Stripe webhook endpoint uses API version ${apiVersion}. Recreate it on ${MIN_SUPPORTED_API_DATE} or later, otherwise subscription and invoice events cannot be read.`,
+      `Stripe webhook endpoint uses API version ${apiVersion ?? "unknown"}. Recreate it on ${MIN_SUPPORTED_API_DATE} or later, otherwise subscription and invoice events cannot be read.`,
     );
     this.name = "StripeWebhookApiVersionError";
   }
@@ -53,9 +53,7 @@ function getOptionalId(
   return id?.trim() ? id : null;
 }
 
-async function getAdjustmentPaymentReferences(
-  event: Stripe.Event,
-): Promise<string[]> {
+function getAdjustmentPaymentReferences(event: Stripe.Event): string[] {
   let paymentIntentId: string | null = null;
   let chargeId: string | null = null;
 
@@ -72,39 +70,51 @@ async function getAdjustmentPaymentReferences(
   const references = [chargeId, paymentIntentId].filter(
     (value): value is string => Boolean(value),
   );
-  if (!paymentIntentId) return references;
+  // Payment records persist the PaymentIntent ID. This makes subscription
+  // refunds deterministic and avoids a second Stripe API call inside webhook
+  // handling; a missing record causes Stripe to retry the event.
+  return [...new Set(references)];
+}
+
+async function getInvoicePaymentIntentId(
+  invoice: Stripe.Invoice,
+  eventId: string,
+  eventType: "invoice.paid" | "invoice.payment_failed",
+): Promise<string | null> {
+  for (const payment of invoice.payments?.data ?? []) {
+    if (payment.payment.type !== "payment_intent") continue;
+    const paymentIntentId = getOptionalId(payment.payment.payment_intent);
+    if (paymentIntentId) return paymentIntentId;
+  }
 
   try {
     const invoicePayments = await getStripeClient().invoicePayments.list({
-      payment: {
-        type: "payment_intent",
-        payment_intent: paymentIntentId,
-      },
+      invoice: invoice.id,
       limit: 10,
     });
     for (const invoicePayment of invoicePayments.data) {
-      const invoiceId = getOptionalId(invoicePayment.invoice);
-      if (invoiceId) references.push(invoiceId);
+      if (invoicePayment.payment.type !== "payment_intent") continue;
+      const paymentIntentId = getOptionalId(
+        invoicePayment.payment.payment_intent,
+      );
+      if (paymentIntentId) return paymentIntentId;
     }
+    return null;
   } catch (error) {
-    // Subscription payments are keyed by invoice, so losing this lookup only
-    // matters for them. Keep the charge and intent references and let the
-    // processor decide, instead of failing a one-time refund on an API blip.
     logStripeWebhook("warn", {
-      eventId: event.id,
-      eventType: event.type,
-      outcome: "invoice_lookup_failed",
+      eventId,
+      eventType,
+      outcome: "invoice_payment_lookup_failed",
     });
-    console.warn("[Stripe Webhook] Invoice payment lookup failed.", error);
+    throw error;
   }
-
-  return [...new Set(references)];
 }
 
 async function dispatchStripeWebhook(
   event: Stripe.Event,
   eventCreatedAt: Date,
   adjustmentPaymentReferences: string[],
+  invoicePaymentIntentId: string | null,
   tx: Tx,
 ): Promise<"ignored" | "processed"> {
   switch (event.type) {
@@ -120,10 +130,22 @@ async function dispatchStripeWebhook(
       await processSubscription(event.data.object, eventCreatedAt, tx);
       return "processed";
     case "invoice.paid":
-      await processInvoice(event.data.object, "succeeded", eventCreatedAt, tx);
+      await processInvoice(
+        event.data.object,
+        "succeeded",
+        eventCreatedAt,
+        tx,
+        invoicePaymentIntentId,
+      );
       return "processed";
     case "invoice.payment_failed":
-      await processInvoice(event.data.object, "failed", eventCreatedAt, tx);
+      await processInvoice(
+        event.data.object,
+        "failed",
+        eventCreatedAt,
+        tx,
+        invoicePaymentIntentId,
+      );
       return "processed";
     case "charge.refunded":
       await processRefund(
@@ -175,14 +197,20 @@ export async function handleStripeWebhook(
     throw new StripeWebhookEnvironmentError();
   }
 
+  const requiresStructuredPayload =
+    event.type.startsWith("customer.subscription.") ||
+    event.type.startsWith("invoice.");
   const apiDate = event.api_version?.slice(0, 10);
-  if (apiDate && apiDate < MIN_SUPPORTED_API_DATE) {
+  if (
+    requiresStructuredPayload &&
+    (!apiDate || apiDate < MIN_SUPPORTED_API_DATE)
+  ) {
     logStripeWebhook("error", {
       eventId: event.id,
       eventType: event.type,
       outcome: "api_version_unsupported",
     });
-    throw new StripeWebhookApiVersionError(event.api_version as string);
+    throw new StripeWebhookApiVersionError(event.api_version);
   }
 
   try {
@@ -204,8 +232,15 @@ export async function handleStripeWebhook(
       return { received: true };
     }
 
-    const adjustmentPaymentReferences =
-      await getAdjustmentPaymentReferences(event);
+    const adjustmentPaymentReferences = getAdjustmentPaymentReferences(event);
+    const invoicePaymentIntentId =
+      event.type === "invoice.paid" || event.type === "invoice.payment_failed"
+        ? await getInvoicePaymentIntentId(
+            event.data.object,
+            event.id,
+            event.type,
+          )
+        : null;
     const outcome = await db.transaction<ProcessingOutcome>(async (tx) => {
       const claimed = await claimWebhookEvent(
         event.id,
@@ -218,6 +253,7 @@ export async function handleStripeWebhook(
         event,
         eventCreatedAt,
         adjustmentPaymentReferences,
+        invoicePaymentIntentId,
         tx,
       );
     });

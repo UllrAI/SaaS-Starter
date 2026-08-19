@@ -37,8 +37,6 @@ export interface ProductEntitlement {
 export interface CreateCheckoutOptions {
   requestId: string;
   userId: string;
-  userEmail: string;
-  userName?: string | null;
   /** Provider customer, resolved before checkout so a user has exactly one. */
   customerId: string;
   tierId: string;

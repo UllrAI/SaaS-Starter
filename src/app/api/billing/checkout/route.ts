@@ -157,8 +157,6 @@ export async function POST(request: NextRequest) {
     const checkoutOptions = {
       requestId,
       userId: session.user.id,
-      userEmail: session.user.email,
-      userName: session.user.name,
       customerId: await ensureBillingCustomerId({
         id: session.user.id,
         email: session.user.email,

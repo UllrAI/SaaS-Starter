@@ -111,8 +111,7 @@ describe("Billing Index", () => {
       const mockOptions = {
         requestId: "request-123",
         userId: "user123",
-        userEmail: "test@example.com",
-        userName: "Test User",
+        customerId: "cus_123",
         tierId: "tier123",
         paymentMode: "subscription" as const,
         billingCycle: "monthly" as const,
@@ -193,7 +192,7 @@ describe("Billing Index", () => {
       const mockOptions = {
         requestId: "request-123",
         userId: "user123",
-        userEmail: "test@example.com",
+        customerId: "cus_123",
         tierId: "tier123",
         paymentMode: "subscription" as const,
         successUrl: "https://example.com/success",
@@ -294,7 +293,7 @@ describe("Billing Index", () => {
       const subscriptionOptions = {
         requestId: "subscription-request",
         userId: "user123",
-        userEmail: "test@example.com",
+        customerId: "cus_123",
         tierId: "tier123",
         paymentMode: "subscription" as const,
         successUrl: "https://example.com/success",
@@ -303,7 +302,7 @@ describe("Billing Index", () => {
       const oneTimeOptions = {
         requestId: "one-time-request",
         userId: "user123",
-        userEmail: "test@example.com",
+        customerId: "cus_123",
         tierId: "tier123",
         paymentMode: "one_time" as const,
         successUrl: "https://example.com/success",
@@ -335,7 +334,7 @@ describe("Billing Index", () => {
       const monthlyOptions = {
         requestId: "monthly-request",
         userId: "user123",
-        userEmail: "test@example.com",
+        customerId: "cus_123",
         tierId: "tier123",
         paymentMode: "subscription" as const,
         billingCycle: "monthly" as const,
@@ -345,7 +344,7 @@ describe("Billing Index", () => {
       const yearlyOptions = {
         requestId: "yearly-request",
         userId: "user123",
-        userEmail: "test@example.com",
+        customerId: "cus_123",
         tierId: "tier123",
         paymentMode: "subscription" as const,
         billingCycle: "yearly" as const,

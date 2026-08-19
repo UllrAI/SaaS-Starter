@@ -309,8 +309,6 @@ describe("Billing Checkout API", () => {
       expect(mockCreateCheckoutSession).toHaveBeenCalledWith({
         requestId: "22a24fd6-c394-4c09-b1df-fd93a2e16d20",
         userId: "user-123",
-        userEmail: "test@example.com",
-        userName: "Test User",
         customerId: "cus_123",
         tierId: "pro",
         paymentMode: "subscription",

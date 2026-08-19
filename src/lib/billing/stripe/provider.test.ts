@@ -42,8 +42,6 @@ const checkoutOptions: CreateCheckoutOptions = {
   requestId: "22a24fd6-c394-4c09-b1df-fd93a2e16d20",
   tierId: "plus",
   userId: "user_123",
-  userEmail: "user@example.com",
-  userName: "Taylor",
   customerId: "cus_123",
   paymentMode: "subscription",
   billingCycle: "monthly",

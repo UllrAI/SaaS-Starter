@@ -4,60 +4,67 @@ export type StripeEnvironment = "test_mode" | "live_mode";
 export type StripePriceVariant = "oneTime" | "monthly" | "yearly";
 
 /**
- * Price IDs are stored newest-first. Index 0 is what new checkouts use; the
- * remaining entries are prices that were rotated out but may still be attached
- * to live subscriptions, so their webhooks can still resolve a tier.
- * `pnpm stripe:sync-products` maintains this history automatically.
+ * A Stripe Product is the stable identity of a tier. Prices can be replaced
+ * whenever an amount changes without changing the product or keeping an
+ * unbounded list of retired price IDs in source control.
  */
-export type StripePriceIds = Record<StripePriceVariant, string[]>;
+export type StripeCatalogItem = Record<StripePriceVariant, string> & {
+  productId: string;
+};
 
-export const STRIPE_PRICE_IDS: Record<
+export const STRIPE_CATALOG: Record<
   string,
-  Record<StripeEnvironment, StripePriceIds>
+  Record<StripeEnvironment, StripeCatalogItem>
 > = {
   plus: {
     test_mode: {
-      oneTime: [],
-      monthly: [],
-      yearly: [],
+      productId: "",
+      oneTime: "",
+      monthly: "",
+      yearly: "",
     },
     live_mode: {
-      oneTime: [],
-      monthly: [],
-      yearly: [],
+      productId: "",
+      oneTime: "",
+      monthly: "",
+      yearly: "",
     },
   },
   pro: {
     test_mode: {
-      oneTime: [],
-      monthly: [],
-      yearly: [],
+      productId: "",
+      oneTime: "",
+      monthly: "",
+      yearly: "",
     },
     live_mode: {
-      oneTime: [],
-      monthly: [],
-      yearly: [],
+      productId: "",
+      oneTime: "",
+      monthly: "",
+      yearly: "",
     },
   },
   team: {
     test_mode: {
-      oneTime: [],
-      monthly: [],
-      yearly: [],
+      productId: "",
+      oneTime: "",
+      monthly: "",
+      yearly: "",
     },
     live_mode: {
-      oneTime: [],
-      monthly: [],
-      yearly: [],
+      productId: "",
+      oneTime: "",
+      monthly: "",
+      yearly: "",
     },
   },
 };
 
-export function getStripePriceIds(
+export function getStripeCatalogItem(
   tierId: string,
   environment: StripeEnvironment,
-): StripePriceIds | undefined {
-  return STRIPE_PRICE_IDS[tierId]?.[environment];
+): StripeCatalogItem | undefined {
+  return STRIPE_CATALOG[tierId]?.[environment];
 }
 
 /** The price ID new checkouts should use for this tier and variant. */
@@ -66,26 +73,20 @@ export function getActiveStripePriceId(
   environment: StripeEnvironment,
   variant: StripePriceVariant,
 ): string | undefined {
-  return getStripePriceIds(tierId, environment)?.[variant][0];
+  return getStripeCatalogItem(tierId, environment)?.[variant] || undefined;
 }
 
-export function getProductTierByStripePriceId(
-  priceId: string,
+export function getProductTierByStripeProductId(
+  productId: string,
   environment?: StripeEnvironment,
 ): PricingTier | undefined {
-  if (!priceId.trim()) return undefined;
+  if (!productId.trim()) return undefined;
 
-  for (const [tierId, priceIdsByEnvironment] of Object.entries(
-    STRIPE_PRICE_IDS,
-  )) {
-    const priceGroups = environment
-      ? [priceIdsByEnvironment[environment]]
-      : Object.values(priceIdsByEnvironment);
-    const matches = priceGroups.some((priceIds) =>
-      Object.values(priceIds).some((variantIds) =>
-        variantIds.includes(priceId),
-      ),
-    );
+  for (const [tierId, catalogByEnvironment] of Object.entries(STRIPE_CATALOG)) {
+    const entries = environment
+      ? [catalogByEnvironment[environment]]
+      : Object.values(catalogByEnvironment);
+    const matches = entries.some((entry) => entry.productId === productId);
     if (matches) return getProductTierById(tierId);
   }
 

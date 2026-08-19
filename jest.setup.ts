@@ -786,6 +786,12 @@ const mockGte = jest.fn().mockImplementation(
     value,
   }),
 );
+const mockIsNull = jest.fn().mockImplementation(
+  (field: unknown): DrizzleCondition => ({
+    field,
+    type: "isNull",
+  }),
+);
 const mockDrizzleSql = jest
   .fn()
   .mockImplementation(
@@ -801,6 +807,7 @@ jest.mock("drizzle-orm", () => ({
   desc: mockDesc,
   and: mockAnd,
   gte: mockGte,
+  isNull: mockIsNull,
   sql: mockDrizzleSql,
 }));
 

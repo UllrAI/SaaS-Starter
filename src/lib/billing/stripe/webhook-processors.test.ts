@@ -9,7 +9,7 @@ const mockSuspendSubscriptionAccess = jest.fn();
 const mockUpdatePaymentStatus = jest.fn();
 const mockUpsertPayment = jest.fn();
 const mockUpsertSubscription = jest.fn();
-const mockGetProductTierByStripePriceId = jest.fn();
+const mockGetProductTierByStripeProductId = jest.fn();
 
 jest.mock("@/lib/database/subscription", () => ({
   findUserByCustomerId: mockFindUserByCustomerId,
@@ -26,17 +26,17 @@ jest.mock("./client", () => ({
   getStripeEnvironment: () => "test_mode",
 }));
 jest.mock("./prices", () => ({
-  getProductTierByStripePriceId: mockGetProductTierByStripePriceId,
+  getProductTierByStripeProductId: mockGetProductTierByStripeProductId,
 }));
 
 const tx = {} as never;
 const tier = { id: "pro", name: "Professional" };
 
 /** Minimal Drizzle stub for the `resolveUserId` fallback lookup. */
-function createUserLookupTx(user?: {
-  id: string;
-  paymentProviderCustomerId: string | null;
-}) {
+function createUserLookupTx(
+  user?: { id: string; paymentProviderCustomerId: string | null },
+  claimSucceeds = true,
+) {
   const setCustomerId = jest.fn();
   return {
     setCustomerId,
@@ -48,7 +48,12 @@ function createUserLookupTx(user?: {
       }),
       update: () => ({
         set: (values: { paymentProviderCustomerId: string }) => ({
-          where: async () => setCustomerId(values.paymentProviderCustomerId),
+          where: () => ({
+            returning: async () => {
+              setCustomerId(values.paymentProviderCustomerId);
+              return claimSucceeds ? [{ id: user?.id }] : [];
+            },
+          }),
         }),
       }),
     } as never,
@@ -59,7 +64,7 @@ describe("Stripe webhook processors", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockFindUserByCustomerId.mockResolvedValue({ id: "user_123" });
-    mockGetProductTierByStripePriceId.mockReturnValue(tier);
+    mockGetProductTierByStripeProductId.mockReturnValue(tier);
     mockUpsertPayment.mockResolvedValue([{ status: "succeeded" }]);
   });
 
@@ -88,6 +93,7 @@ describe("Stripe webhook processors", () => {
         customerId: "cus_123",
         productId: "pro",
         paymentId: "pi_123",
+        paymentIntentId: "pi_123",
         amount: 2999,
         currency: "usd",
         paymentType: "one_time",
@@ -144,7 +150,7 @@ describe("Stripe webhook processors", () => {
     );
   });
 
-  it("accepts a second Stripe customer without rewriting the stored one", async () => {
+  it("rejects a second Stripe customer for the same user", async () => {
     mockFindUserByCustomerId.mockResolvedValue(null);
     const { setCustomerId, tx: lookupTx } = createUserLookupTx({
       id: "user_123",
@@ -155,8 +161,8 @@ describe("Stripe webhook processors", () => {
       .mockImplementation(() => {});
     const { processCheckoutSession } = await import("./webhook-processors");
 
-    try {
-      await processCheckoutSession(
+    await expect(
+      processCheckoutSession(
         {
           id: "cs_123",
           customer: "cus_dashboard",
@@ -174,16 +180,73 @@ describe("Stripe webhook processors", () => {
         } as unknown as Stripe.Checkout.Session,
         new Date(),
         lookupTx,
-      );
-    } finally {
-      consoleWarn.mockRestore();
-    }
-
+      ),
+    ).rejects.toThrow("does not match the stored customer");
+    consoleWarn.mockRestore();
     expect(setCustomerId).not.toHaveBeenCalled();
-    expect(mockUpsertPayment).toHaveBeenCalledWith(
-      expect.objectContaining({ userId: "user_123", paymentId: "pi_123" }),
+    expect(mockUpsertPayment).not.toHaveBeenCalled();
+  });
+
+  it("claims an unassigned Stripe customer exactly once", async () => {
+    mockFindUserByCustomerId.mockResolvedValue(null);
+    const { setCustomerId, tx: lookupTx } = createUserLookupTx({
+      id: "user_123",
+      paymentProviderCustomerId: null,
+    });
+    const { processCheckoutSession } = await import("./webhook-processors");
+
+    await processCheckoutSession(
+      {
+        id: "cs_123",
+        customer: "cus_first",
+        client_reference_id: "user_123",
+        payment_status: "paid",
+        payment_intent: "pi_123",
+        amount_total: 2999,
+        currency: "usd",
+        metadata: {
+          userId: "user_123",
+          tierId: "pro",
+          paymentMode: "one_time",
+        },
+      } as unknown as Stripe.Checkout.Session,
+      new Date(),
       lookupTx,
     );
+
+    expect(setCustomerId).toHaveBeenCalledWith("cus_first");
+    expect(mockUpsertPayment).toHaveBeenCalled();
+  });
+
+  it("rejects a customer claim lost to a concurrent event", async () => {
+    mockFindUserByCustomerId.mockResolvedValue(null);
+    const { tx: lookupTx } = createUserLookupTx(
+      { id: "user_123", paymentProviderCustomerId: null },
+      false,
+    );
+    const { processCheckoutSession } = await import("./webhook-processors");
+
+    await expect(
+      processCheckoutSession(
+        {
+          id: "cs_123",
+          customer: "cus_lost",
+          client_reference_id: "user_123",
+          payment_status: "paid",
+          payment_intent: "pi_123",
+          amount_total: 2999,
+          currency: "usd",
+          metadata: {
+            userId: "user_123",
+            tierId: "pro",
+            paymentMode: "one_time",
+          },
+        } as unknown as Stripe.Checkout.Session,
+        new Date(),
+        lookupTx,
+      ),
+    ).rejects.toThrow("ownership changed");
+    expect(mockUpsertPayment).not.toHaveBeenCalled();
   });
 
   it("maps scheduled cancellation and Stripe billing periods", async () => {
@@ -198,7 +261,7 @@ describe("Stripe webhook processors", () => {
       items: {
         data: [
           {
-            price: { id: "price_monthly" },
+            price: { id: "price_monthly", product: "prod_pro" },
             current_period_start: 1_700_000_000,
             current_period_end: 1_702_592_000,
           },
@@ -211,8 +274,8 @@ describe("Stripe webhook processors", () => {
       new Date("2026-08-18T00:00:00Z"),
       tx,
     );
-    expect(mockGetProductTierByStripePriceId).toHaveBeenCalledWith(
-      "price_monthly",
+    expect(mockGetProductTierByStripeProductId).toHaveBeenCalledWith(
+      "prod_pro",
       "test_mode",
     );
     expect(mockUpsertSubscription).toHaveBeenCalledWith(
@@ -225,6 +288,32 @@ describe("Stripe webhook processors", () => {
       }),
       tx,
     );
+  });
+
+  it("rejects subscriptions with multiple price items", async () => {
+    const { processSubscription } = await import("./webhook-processors");
+    const item = {
+      price: { id: "price_monthly", product: "prod_pro" },
+      current_period_start: 1_700_000_000,
+      current_period_end: 1_702_592_000,
+    };
+
+    await expect(
+      processSubscription(
+        {
+          id: "sub_multi",
+          customer: "cus_123",
+          status: "active",
+          cancel_at_period_end: false,
+          canceled_at: null,
+          metadata: { userId: "user_123", tierId: "pro" },
+          items: { data: [item, item] },
+        } as unknown as Stripe.Subscription,
+        new Date(),
+        tx,
+      ),
+    ).rejects.toThrow("exactly one price item");
+    expect(mockUpsertSubscription).not.toHaveBeenCalled();
   });
 
   it("trusts the price over stale tier metadata after a plan switch", async () => {
@@ -243,7 +332,7 @@ describe("Stripe webhook processors", () => {
       items: {
         data: [
           {
-            price: { id: "price_pro_monthly" },
+            price: { id: "price_pro_monthly", product: "prod_pro" },
             current_period_start: 1_700_000_000,
             current_period_end: 1_702_592_000,
           },
@@ -281,7 +370,13 @@ describe("Stripe webhook processors", () => {
         },
       },
       lines: {
-        data: [{ pricing: { price_details: { price: "price_monthly" } } }],
+        data: [
+          {
+            pricing: {
+              price_details: { price: "price_monthly", product: "prod_pro" },
+            },
+          },
+        ],
       },
     } as unknown as Stripe.Invoice;
 
@@ -315,7 +410,13 @@ describe("Stripe webhook processors", () => {
         },
       },
       lines: {
-        data: [{ pricing: { price_details: { price: "price_monthly" } } }],
+        data: [
+          {
+            pricing: {
+              price_details: { price: "price_monthly", product: "prod_pro" },
+            },
+          },
+        ],
       },
     } as unknown as Stripe.Invoice;
 
@@ -324,6 +425,89 @@ describe("Stripe webhook processors", () => {
       expect.objectContaining({ amount: 1999, status: "failed" }),
       tx,
     );
+  });
+
+  it("uses the positive product for a multi-product proration invoice", async () => {
+    const { processInvoice } = await import("./webhook-processors");
+    const invoice = {
+      id: "in_proration",
+      customer: "cus_123",
+      amount_due: 500,
+      currency: "usd",
+      metadata: {},
+      parent: {
+        subscription_details: {
+          subscription: "sub_123",
+          metadata: { userId: "user_123", tierId: "pro" },
+        },
+      },
+      lines: {
+        data: [
+          {
+            amount: -1000,
+            parent: {
+              subscription_item_details: {
+                subscription: "sub_123",
+                proration: true,
+              },
+            },
+            pricing: {
+              price_details: { price: "price_old", product: "prod_plus" },
+            },
+          },
+          {
+            amount: 1500,
+            parent: {
+              subscription_item_details: {
+                subscription: "sub_123",
+                proration: true,
+              },
+            },
+            pricing: {
+              price_details: { price: "price_new", product: "prod_pro" },
+            },
+          },
+        ],
+      },
+    } as unknown as Stripe.Invoice;
+
+    await processInvoice(invoice, "succeeded", new Date(), tx);
+    expect(mockUpsertPayment).toHaveBeenCalledWith(
+      expect.objectContaining({ productId: "pro", paymentId: "in_proration" }),
+      tx,
+    );
+  });
+
+  it("rejects an invoice with multiple positive subscription products", async () => {
+    const { processInvoice } = await import("./webhook-processors");
+    const line = (product: string) => ({
+      amount: 1000,
+      parent: {
+        subscription_item_details: {
+          subscription: "sub_123",
+          proration: true,
+        },
+      },
+      pricing: { price_details: { price: `price_${product}`, product } },
+    });
+    const invoice = {
+      id: "in_ambiguous",
+      customer: "cus_123",
+      amount_due: 2000,
+      currency: "usd",
+      parent: {
+        subscription_details: {
+          subscription: "sub_123",
+          metadata: { userId: "user_123", tierId: "pro" },
+        },
+      },
+      lines: { data: [line("prod_plus"), line("prod_pro")] },
+    } as unknown as Stripe.Invoice;
+
+    await expect(
+      processInvoice(invoice, "succeeded", new Date(), tx),
+    ).rejects.toThrow("exactly one subscription product");
+    expect(mockUpsertPayment).not.toHaveBeenCalled();
   });
 
   it("revokes fully refunded and disputed payments", async () => {

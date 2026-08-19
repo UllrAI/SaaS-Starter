@@ -133,6 +133,19 @@ describe("Stripe webhook handler", () => {
     });
   });
 
+  it("rejects structured events whose API version is missing", async () => {
+    mockConstructEvent.mockReturnValue(
+      event("invoice.paid", { id: "in_123" }, { api_version: null }),
+    );
+    const { handleStripeWebhook, StripeWebhookApiVersionError } =
+      await import("./webhook");
+
+    await expect(
+      handleStripeWebhook("payload", "signature"),
+    ).rejects.toBeInstanceOf(StripeWebhookApiVersionError);
+    expect(mockTransaction).not.toHaveBeenCalled();
+  });
+
   it("claims and processes checkout events atomically", async () => {
     const checkout = { id: "cs_123" };
     mockConstructEvent.mockReturnValue(
@@ -196,55 +209,80 @@ describe("Stripe webhook handler", () => {
     );
   });
 
-  it("resolves invoice IDs before applying subscription refunds", async () => {
+  it("passes persisted payment references to subscription refunds", async () => {
     const charge = {
       id: "ch_123",
       payment_intent: "pi_123",
     };
     mockConstructEvent.mockReturnValue(event("charge.refunded", charge));
-    mockListInvoicePayments.mockResolvedValue({
-      data: [{ invoice: "in_123" }],
-    });
     const { handleStripeWebhook } = await import("./webhook");
 
     await handleStripeWebhook("payload", "signature");
-    expect(mockListInvoicePayments).toHaveBeenCalledWith({
-      payment: { type: "payment_intent", payment_intent: "pi_123" },
-      limit: 10,
-    });
-    expect(mockProcessRefund).toHaveBeenCalledWith(
-      charge,
-      ["ch_123", "pi_123", "in_123"],
-      new Date(1_700_000_000_000),
-      {},
-    );
-  });
-
-  it("still applies a refund when the invoice lookup fails", async () => {
-    const charge = { id: "ch_123", payment_intent: "pi_123" };
-    mockConstructEvent.mockReturnValue(event("charge.refunded", charge));
-    mockListInvoicePayments.mockRejectedValue(new Error("Stripe is down"));
-    const consoleWarn = jest
-      .spyOn(console, "warn")
-      .mockImplementation(() => {});
-    const { handleStripeWebhook } = await import("./webhook");
-
-    try {
-      await handleStripeWebhook("payload", "signature");
-    } finally {
-      consoleWarn.mockRestore();
-    }
-
+    expect(mockListInvoicePayments).not.toHaveBeenCalled();
     expect(mockProcessRefund).toHaveBeenCalledWith(
       charge,
       ["ch_123", "pi_123"],
       new Date(1_700_000_000_000),
       {},
     );
+  });
+
+  it("does not need a Stripe lookup before applying a refund", async () => {
+    const charge = { id: "ch_123", payment_intent: "pi_123" };
+    mockConstructEvent.mockReturnValue(event("charge.refunded", charge));
+    const { handleStripeWebhook } = await import("./webhook");
+
+    await handleStripeWebhook("payload", "signature");
+
+    expect(mockListInvoicePayments).not.toHaveBeenCalled();
+    expect(mockProcessRefund).toHaveBeenCalledWith(
+      charge,
+      ["ch_123", "pi_123"],
+      new Date(1_700_000_000_000),
+      {},
+    );
+  });
+
+  it("persists the PaymentIntent discovered from an invoice payment", async () => {
+    const invoice = { id: "in_123" };
+    mockConstructEvent.mockReturnValue(event("invoice.paid", invoice));
+    mockListInvoicePayments.mockResolvedValue({
+      data: [
+        {
+          payment: { type: "payment_intent", payment_intent: "pi_invoice" },
+        },
+      ],
+    });
+    const { handleStripeWebhook } = await import("./webhook");
+
+    await handleStripeWebhook("payload", "signature");
+    expect(mockListInvoicePayments).toHaveBeenCalledWith({
+      invoice: "in_123",
+      limit: 10,
+    });
+    expect(mockProcessInvoice).toHaveBeenCalledWith(
+      invoice,
+      "succeeded",
+      new Date(1_700_000_000_000),
+      {},
+      "pi_invoice",
+    );
+  });
+
+  it("lets Stripe retry when invoice payment lookup fails", async () => {
+    const invoice = { id: "in_123" };
+    mockConstructEvent.mockReturnValue(event("invoice.paid", invoice));
+    mockListInvoicePayments.mockRejectedValue(new Error("Stripe is down"));
+    const { handleStripeWebhook } = await import("./webhook");
+
+    await expect(handleStripeWebhook("payload", "signature")).rejects.toThrow(
+      "Stripe is down",
+    );
+    expect(mockTransaction).not.toHaveBeenCalled();
     expect(mockLogStripeWebhook).toHaveBeenCalledWith("warn", {
       eventId: "evt_123",
-      eventType: "charge.refunded",
-      outcome: "invoice_lookup_failed",
+      eventType: "invoice.paid",
+      outcome: "invoice_payment_lookup_failed",
     });
   });
 

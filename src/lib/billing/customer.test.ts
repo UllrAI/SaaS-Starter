@@ -1,38 +1,43 @@
-const mockTransaction = jest.fn();
 const mockCreateCustomer = jest.fn();
-const mockForUpdate = jest.fn();
 const mockSetCustomerId = jest.fn();
+const mockSelect = jest.fn();
+const mockUpdate = jest.fn();
 
 jest.mock("@/database", () => ({
-  db: { transaction: mockTransaction },
+  db: { select: mockSelect, update: mockUpdate },
 }));
 jest.mock(".", () => ({
   billing: { createCustomer: mockCreateCustomer },
 }));
-
-const tx = {
-  select: () => ({
-    from: () => ({
-      where: () => ({ for: mockForUpdate }),
-    }),
-  }),
-  update: () => ({
-    set: (values: { paymentProviderCustomerId: string }) => ({
-      where: async () => mockSetCustomerId(values.paymentProviderCustomerId),
-    }),
-  }),
-};
 
 const user = { id: "user_123", email: "user@example.com", name: "Taylor" };
 
 describe("ensureBillingCustomerId", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockTransaction.mockImplementation(async (callback) => callback(tx));
+    mockSelect.mockReturnValue({
+      from: () => ({
+        where: () => ({ limit: async () => [{ customerId: null }] }),
+      }),
+    });
+    mockUpdate.mockReturnValue({
+      set: (values: { paymentProviderCustomerId: string }) => ({
+        where: () => ({
+          returning: async () => {
+            mockSetCustomerId(values.paymentProviderCustomerId);
+            return [{ customerId: values.paymentProviderCustomerId }];
+          },
+        }),
+      }),
+    });
   });
 
   it("reuses the stored customer without calling the provider", async () => {
-    mockForUpdate.mockResolvedValue([{ customerId: "cus_stored" }]);
+    mockSelect.mockReturnValue({
+      from: () => ({
+        where: () => ({ limit: async () => [{ customerId: "cus_stored" }] }),
+      }),
+    });
     const { ensureBillingCustomerId } = await import("./customer");
 
     await expect(ensureBillingCustomerId(user)).resolves.toBe("cus_stored");
@@ -41,7 +46,11 @@ describe("ensureBillingCustomerId", () => {
   });
 
   it("creates and stores a customer on first checkout", async () => {
-    mockForUpdate.mockResolvedValue([{ customerId: null }]);
+    mockSelect.mockReturnValue({
+      from: () => ({
+        where: () => ({ limit: async () => [{ customerId: null }] }),
+      }),
+    });
     mockCreateCustomer.mockResolvedValue({ customerId: "cus_new" });
     const { ensureBillingCustomerId } = await import("./customer");
 
@@ -54,16 +63,24 @@ describe("ensureBillingCustomerId", () => {
     expect(mockSetCustomerId).toHaveBeenCalledWith("cus_new");
   });
 
-  it("takes the row lock so parallel checkouts cannot fork the customer", async () => {
-    mockForUpdate.mockResolvedValue([{ customerId: "cus_stored" }]);
+  it("reuses the stored customer before attempting a provider call", async () => {
+    mockSelect.mockReturnValue({
+      from: () => ({
+        where: () => ({ limit: async () => [{ customerId: "cus_stored" }] }),
+      }),
+    });
     const { ensureBillingCustomerId } = await import("./customer");
 
     await ensureBillingCustomerId(user);
-    expect(mockForUpdate).toHaveBeenCalledWith("update");
+    expect(mockSelect).toHaveBeenCalled();
   });
 
   it("fails loudly when the user row is gone", async () => {
-    mockForUpdate.mockResolvedValue([]);
+    mockSelect.mockReturnValue({
+      from: () => ({
+        where: () => ({ limit: async () => [] }),
+      }),
+    });
     const { ensureBillingCustomerId } = await import("./customer");
 
     await expect(ensureBillingCustomerId(user)).rejects.toThrow(

@@ -42,6 +42,7 @@ interface UpsertPaymentData {
   subscriptionId?: string | null;
   productId: string;
   paymentId: string;
+  paymentIntentId?: string | null;
   amount: number;
   currency: string;
   status: string;
@@ -107,6 +108,7 @@ export async function upsertPayment(data: UpsertPaymentData, tx?: Tx) {
             then ${payments.status}
           else ${data.status}
         end`,
+        paymentIntentId: sql`coalesce(${payments.paymentIntentId}, ${data.paymentIntentId ?? null})`,
         updatedAt: now,
       },
     })
@@ -121,7 +123,13 @@ export async function upsertPayment(data: UpsertPaymentData, tx?: Tx) {
     payment.amount !== data.amount ||
     payment.currency !== normalizedData.currency ||
     payment.paymentType !== data.paymentType ||
-    payment.subscriptionId !== (data.subscriptionId ?? null)
+    payment.subscriptionId !== (data.subscriptionId ?? null) ||
+    // An event may arrive without the optional PaymentIntent reference after
+    // an earlier replay already filled it in. Preserve the stored reference;
+    // only reject a non-null reference that conflicts with the existing one.
+    (data.paymentIntentId !== null &&
+      data.paymentIntentId !== undefined &&
+      payment.paymentIntentId !== data.paymentIntentId)
   ) {
     throw new Error(
       `Payment ${data.paymentId} conflicts with existing immutable payment data.`,
@@ -308,7 +316,9 @@ export async function lockPaymentAdjustmentScope(
         productId: payments.productId,
       })
       .from(payments)
-      .where(eq(payments.paymentId, reference))
+      .where(
+        sql`${payments.paymentId} = ${reference} or ${payments.paymentIntentId} = ${reference}`,
+      )
       .limit(1);
     if (payment) {
       break;

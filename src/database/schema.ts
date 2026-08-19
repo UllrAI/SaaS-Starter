@@ -233,6 +233,7 @@ export const payments = pgTable(
     subscriptionId: text("subscriptionId"),
     productId: text("productId").notNull(),
     paymentId: text("paymentId").notNull().unique(),
+    paymentIntentId: text("paymentIntentId"),
     amount: integer("amount").notNull(),
     currency: text("currency").notNull().default("usd"),
     status: text("status").notNull(),
@@ -249,6 +250,9 @@ export const payments = pgTable(
       settledCurrencyCreatedAtIdx: index(
         "payments_status_currency_createdAt_idx",
       ).on(table.status, table.currency, table.createdAt.desc()),
+      paymentIntentIdUnique: uniqueIndex("payments_paymentIntentId_unique").on(
+        table.paymentIntentId,
+      ),
       paymentOwnerProductUnique: uniqueIndex(
         "payments_paymentId_userId_productId_unique",
       ).on(table.paymentId, table.userId, table.productId),

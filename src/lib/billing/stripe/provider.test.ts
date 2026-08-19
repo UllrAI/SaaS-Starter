@@ -5,11 +5,11 @@ const mockStripeClient = {
   checkout: {
     sessions: { create: jest.fn(), retrieve: jest.fn() },
   },
-  customers: { create: jest.fn() },
+  customers: { create: jest.fn(), search: jest.fn() },
   billingPortal: { sessions: { create: jest.fn() } },
   subscriptions: { cancel: jest.fn(), update: jest.fn() },
 };
-const mockGetStripePriceIds = jest.fn();
+const mockGetStripeCatalogItem = jest.fn();
 const mockGetActiveStripePriceId = jest.fn();
 const mockHandleStripeWebhook = jest.fn();
 
@@ -24,7 +24,7 @@ jest.mock("@/lib/config/integrations", () => ({
   }),
 }));
 jest.mock("./prices", () => ({
-  getStripePriceIds: mockGetStripePriceIds,
+  getStripeCatalogItem: mockGetStripeCatalogItem,
   getActiveStripePriceId: mockGetActiveStripePriceId,
 }));
 jest.mock("./webhook", () => ({
@@ -33,10 +33,11 @@ jest.mock("./webhook", () => ({
 
 let stripeProvider: PaymentProvider;
 
-const priceIds = {
-  oneTime: ["price_once"],
-  monthly: ["price_monthly", "price_monthly_retired"],
-  yearly: ["price_yearly"],
+const catalogItem = {
+  productId: "prod_plus",
+  oneTime: "price_once",
+  monthly: "price_monthly",
+  yearly: "price_yearly",
 };
 const checkoutOptions: CreateCheckoutOptions = {
   requestId: "22a24fd6-c394-4c09-b1df-fd93a2e16d20",
@@ -56,15 +57,19 @@ describe("Stripe provider", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockGetStripePriceIds.mockReturnValue(priceIds);
+    mockGetStripeCatalogItem.mockReturnValue(catalogItem);
     mockGetActiveStripePriceId.mockImplementation(
-      (_tierId: string, _environment: string, variant: keyof typeof priceIds) =>
-        priceIds[variant][0],
+      (
+        _tierId: string,
+        _environment: string,
+        variant: "oneTime" | "monthly" | "yearly",
+      ) => catalogItem[variant],
     );
     mockStripeClient.checkout.sessions.create.mockResolvedValue({
       id: "cs_123",
       url: "https://checkout.stripe.com/c/pay/cs_123",
     });
+    mockStripeClient.customers.search.mockResolvedValue({ data: [] });
   });
 
   it.each([
@@ -89,6 +94,7 @@ describe("Stripe provider", () => {
           mode: stripeMode,
           customer: "cus_123",
           client_reference_id: "user_123",
+          integration_identifier: "saas_starter_qjmxnrvk",
           line_items: [{ price: expectedPrice, quantity: 1 }],
           success_url:
             "https://example.com/payment-status?status=pending&session_id={CHECKOUT_SESSION_ID}",
@@ -126,6 +132,53 @@ describe("Stripe provider", () => {
       },
       { idempotencyKey: "billing-customer:user_123" },
     );
+    expect(mockStripeClient.customers.search).toHaveBeenCalledWith({
+      query: "metadata['userId']:'user_123'",
+      limit: 2,
+    });
+  });
+
+  it("reuses the canonical customer found after an idempotency window", async () => {
+    mockStripeClient.customers.search.mockResolvedValue({
+      data: [{ id: "cus_existing" }],
+    });
+
+    await expect(
+      stripeProvider.createCustomer({
+        userId: "user_123",
+        email: "user@example.com",
+      }),
+    ).resolves.toEqual({ customerId: "cus_existing" });
+    expect(mockStripeClient.customers.create).not.toHaveBeenCalled();
+  });
+
+  it("fails closed when customer metadata is ambiguous", async () => {
+    mockStripeClient.customers.search.mockResolvedValue({
+      data: [{ id: "cus_one" }, { id: "cus_two" }],
+    });
+
+    await expect(
+      stripeProvider.createCustomer({
+        userId: "user_123",
+        email: "user@example.com",
+      }),
+    ).rejects.toThrow("multiple customers");
+    expect(mockStripeClient.customers.create).not.toHaveBeenCalled();
+  });
+
+  it("escapes customer metadata search values", async () => {
+    mockStripeClient.customers.search.mockResolvedValue({ data: [] });
+    mockStripeClient.customers.create.mockResolvedValue({ id: "cus_new" });
+
+    await stripeProvider.createCustomer({
+      userId: "user\\'quoted",
+      email: "user@example.com",
+    });
+
+    expect(mockStripeClient.customers.search).toHaveBeenCalledWith({
+      query: "metadata['userId']:'user\\\\\\'quoted'",
+      limit: 2,
+    });
   });
 
   it("always checks out against the stored customer", async () => {

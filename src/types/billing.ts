@@ -39,7 +39,8 @@ export interface CreateCheckoutOptions {
   userId: string;
   userEmail: string;
   userName?: string | null;
-  customerId?: string | null;
+  /** Provider customer, resolved before checkout so a user has exactly one. */
+  customerId: string;
   tierId: string;
   paymentMode: PaymentMode;
   billingCycle?: BillingCycle;

@@ -9,6 +9,15 @@ export interface CheckoutStatusResult {
 }
 
 export interface PaymentProvider {
+  /**
+   * Create a provider-side customer for a user. Must be idempotent per user so
+   * concurrent first checkouts cannot strand payments on a second customer.
+   */
+  createCustomer(options: {
+    userId: string;
+    email: string;
+    name?: string | null;
+  }): Promise<{ customerId: string }>;
   createCheckoutSession(
     options: CreateCheckoutOptions,
   ): Promise<{ checkoutUrl: string }>;

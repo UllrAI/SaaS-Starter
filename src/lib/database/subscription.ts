@@ -411,17 +411,6 @@ export async function findUserByCustomerId(customerId: string, tx?: Tx) {
   return result[0] ?? null;
 }
 
-export async function getUserBillingCustomerId(
-  userId: string,
-): Promise<string | null> {
-  const [user] = await db
-    .select({ customerId: users.paymentProviderCustomerId })
-    .from(users)
-    .where(eq(users.id, userId))
-    .limit(1);
-  return user?.customerId ?? null;
-}
-
 export async function getUserSubscription(
   userId: string,
 ): Promise<Subscription | null> {
@@ -520,6 +509,28 @@ export async function getUserPaymentSummary(userId: string, status?: string) {
     count: result?.count ?? 0,
     latestCreatedAt: result?.latestCreatedAt ?? null,
   };
+}
+
+/**
+ * Best-effort duplicate check outside the transaction. `claimWebhookEvent`
+ * remains the authoritative guard; this only avoids redundant work on replays.
+ */
+export async function isWebhookEventProcessed(
+  eventId: string,
+  provider: string = "stripe",
+): Promise<boolean> {
+  const [existing] = await db
+    .select({ id: webhookEvents.id })
+    .from(webhookEvents)
+    .where(
+      and(
+        eq(webhookEvents.provider, provider),
+        eq(webhookEvents.eventId, eventId),
+      ),
+    )
+    .limit(1);
+
+  return Boolean(existing);
 }
 
 /**

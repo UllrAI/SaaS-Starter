@@ -63,7 +63,8 @@ export async function POST(request: NextRequest) {
     }
     if (
       hasErrorName(error, "InvalidWebhookPayloadError") ||
-      hasErrorName(error, "StripeWebhookEnvironmentError")
+      hasErrorName(error, "StripeWebhookEnvironmentError") ||
+      hasErrorName(error, "StripeWebhookApiVersionError")
     ) {
       return NextResponse.json(
         { error: "Invalid webhook payload" },

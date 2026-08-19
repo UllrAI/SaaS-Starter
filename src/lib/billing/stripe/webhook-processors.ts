@@ -61,10 +61,15 @@ function resolveTier(priceId: string, metadataTierId?: string) {
       "Stripe object references an unknown price.",
     );
   }
+  // The price is authoritative. Subscription metadata is a snapshot from
+  // checkout and Stripe does not refresh it when a plan is switched in the
+  // billing portal, so a mismatch is expected after an upgrade or downgrade.
   if (metadataTierId && metadataTierId !== tier.id) {
-    throw new InvalidWebhookPayloadError(
-      "Stripe price does not match its tier metadata.",
-    );
+    console.warn("[Stripe Webhook] Tier metadata is stale.", {
+      priceId,
+      metadataTierId,
+      resolvedTierId: tier.id,
+    });
   }
   return tier;
 }
@@ -107,9 +112,15 @@ async function resolveUserId(
     user.paymentProviderCustomerId &&
     user.paymentProviderCustomerId !== customerId
   ) {
-    throw new InvalidWebhookPayloadError(
-      "Stripe event conflicts with the user's stored customer ID.",
-    );
+    // A second customer for the same user, e.g. one created in the Stripe
+    // dashboard. Rejecting here would lose a real payment, so accept the event
+    // and keep the stored customer, which is the one the portal links to.
+    console.warn("[Stripe Webhook] User has more than one Stripe customer.", {
+      userId: user.id,
+      storedCustomerId: user.paymentProviderCustomerId,
+      eventCustomerId: customerId,
+    });
+    return user.id;
   }
 
   if (!user.paymentProviderCustomerId) {
@@ -218,7 +229,9 @@ export async function processCheckoutSession(
     return;
   }
 
-  const paymentId = getId(session.payment_intent);
+  // Stripe skips the PaymentIntent when nothing is charged, e.g. a 100% off
+  // coupon, so fall back to the session as the payment reference.
+  const paymentId = getOptionalId(session.payment_intent) ?? getId(session.id);
   if (session.amount_total === null || !session.currency) {
     throw new InvalidWebhookPayloadError(
       "Paid checkout is missing amount or currency.",
@@ -315,7 +328,10 @@ export async function processInvoice(
       subscriptionId,
       productId: tier.id,
       paymentId: invoice.id,
-      amount: status === "succeeded" ? invoice.amount_paid : invoice.amount_due,
+      // `amount_due` is fixed at finalization and identical across the failed
+      // and paid events for one invoice. `amount_paid` would differ and trip
+      // the immutable-payment guard on retry.
+      amount: invoice.amount_due,
       currency: invoice.currency,
       status,
       paymentType: "subscription",

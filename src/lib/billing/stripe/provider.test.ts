@@ -5,10 +5,12 @@ const mockStripeClient = {
   checkout: {
     sessions: { create: jest.fn(), retrieve: jest.fn() },
   },
+  customers: { create: jest.fn() },
   billingPortal: { sessions: { create: jest.fn() } },
   subscriptions: { cancel: jest.fn(), update: jest.fn() },
 };
 const mockGetStripePriceIds = jest.fn();
+const mockGetActiveStripePriceId = jest.fn();
 const mockHandleStripeWebhook = jest.fn();
 
 jest.mock("./client", () => ({
@@ -23,6 +25,7 @@ jest.mock("@/lib/config/integrations", () => ({
 }));
 jest.mock("./prices", () => ({
   getStripePriceIds: mockGetStripePriceIds,
+  getActiveStripePriceId: mockGetActiveStripePriceId,
 }));
 jest.mock("./webhook", () => ({
   handleStripeWebhook: mockHandleStripeWebhook,
@@ -31,9 +34,9 @@ jest.mock("./webhook", () => ({
 let stripeProvider: PaymentProvider;
 
 const priceIds = {
-  oneTime: "price_once",
-  monthly: "price_monthly",
-  yearly: "price_yearly",
+  oneTime: ["price_once"],
+  monthly: ["price_monthly", "price_monthly_retired"],
+  yearly: ["price_yearly"],
 };
 const checkoutOptions: CreateCheckoutOptions = {
   requestId: "22a24fd6-c394-4c09-b1df-fd93a2e16d20",
@@ -41,6 +44,7 @@ const checkoutOptions: CreateCheckoutOptions = {
   userId: "user_123",
   userEmail: "user@example.com",
   userName: "Taylor",
+  customerId: "cus_123",
   paymentMode: "subscription",
   billingCycle: "monthly",
   successUrl: "https://example.com/payment-status?status=pending",
@@ -55,6 +59,10 @@ describe("Stripe provider", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockGetStripePriceIds.mockReturnValue(priceIds);
+    mockGetActiveStripePriceId.mockImplementation(
+      (_tierId: string, _environment: string, variant: keyof typeof priceIds) =>
+        priceIds[variant][0],
+    );
     mockStripeClient.checkout.sessions.create.mockResolvedValue({
       id: "cs_123",
       url: "https://checkout.stripe.com/c/pay/cs_123",
@@ -81,8 +89,8 @@ describe("Stripe provider", () => {
       expect(mockStripeClient.checkout.sessions.create).toHaveBeenCalledWith(
         expect.objectContaining({
           mode: stripeMode,
+          customer: "cus_123",
           client_reference_id: "user_123",
-          customer_email: "user@example.com",
           line_items: [{ price: expectedPrice, quantity: 1 }],
           success_url:
             "https://example.com/payment-status?status=pending&session_id={CHECKOUT_SESSION_ID}",
@@ -102,18 +110,34 @@ describe("Stripe provider", () => {
     },
   );
 
-  it("reuses an existing Stripe customer", async () => {
-    await stripeProvider.createCheckoutSession({
-      ...checkoutOptions,
-      customerId: "cus_123",
-    });
+  it("creates customers with a per-user idempotency key", async () => {
+    mockStripeClient.customers.create.mockResolvedValue({ id: "cus_new" });
 
-    expect(mockStripeClient.checkout.sessions.create).toHaveBeenCalledWith(
-      expect.objectContaining({ customer: "cus_123" }),
-      expect.anything(),
+    await expect(
+      stripeProvider.createCustomer({
+        userId: "user_123",
+        email: "user@example.com",
+        name: "Taylor",
+      }),
+    ).resolves.toEqual({ customerId: "cus_new" });
+    expect(mockStripeClient.customers.create).toHaveBeenCalledWith(
+      {
+        email: "user@example.com",
+        name: "Taylor",
+        metadata: { userId: "user_123" },
+      },
+      { idempotencyKey: "billing-customer:user_123" },
     );
+  });
+
+  it("always checks out against the stored customer", async () => {
+    await stripeProvider.createCheckoutSession(checkoutOptions);
+
     const params = mockStripeClient.checkout.sessions.create.mock.calls[0][0];
+    // Letting Stripe create the customer would orphan it from the user record.
+    expect(params.customer).toBe("cus_123");
     expect(params.customer_email).toBeUndefined();
+    expect(params.customer_creation).toBeUndefined();
   });
 
   it("configures subscription and one-time metadata on the owned object", async () => {
@@ -127,7 +151,6 @@ describe("Stripe provider", () => {
       billingCycle: undefined,
     });
     params = mockStripeClient.checkout.sessions.create.mock.calls[1][0];
-    expect(params.customer_creation).toBe("always");
     expect(params.payment_intent_data?.metadata).toEqual(params.metadata);
   });
 
@@ -139,7 +162,7 @@ describe("Stripe provider", () => {
       }),
     ).rejects.toThrow("cancel URL is required");
 
-    mockGetStripePriceIds.mockReturnValue({ ...priceIds, monthly: "" });
+    mockGetActiveStripePriceId.mockReturnValue(undefined);
     await expect(
       stripeProvider.createCheckoutSession(checkoutOptions),
     ).rejects.toThrow("Stripe price ID not found");

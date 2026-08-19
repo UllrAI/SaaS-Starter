@@ -5,16 +5,25 @@ Routine formatting and test-only maintenance are omitted.
 
 ## Unreleased
 
+## 0.1.4 — 2026-08-19
+
 ### Quality, reliability, and deployment hardening
 
 - Replaced the billing integration with the official Stripe Node SDK, hosted
   Checkout, Billing Portal, signed webhooks, and idempotent subscription,
   invoice, refund, and dispute processing.
-- Added deterministic Stripe Product and Price synchronization. Test and live
-  Price IDs are isolated, reviewed in source, and never created during an
-  application request.
-- Added Stripe checkout ownership checks, reusable Customer IDs, idempotency
-  keys, environment-mode validation, and controlled payment-status polling.
+- Added deterministic Stripe Product and Price synchronization. Each tier has
+  a stable Product identity, while price changes create a new checkout Price
+  without breaking existing subscriptions. Test and live catalog IDs remain
+  isolated, reviewed in source, and never created during an application
+  request.
+- Added Stripe checkout ownership checks, metadata-backed Customer recovery,
+  idempotency keys, environment-mode validation, and controlled payment-status
+  polling.
+- Persisted PaymentIntent references for invoice payments and made refund and
+  dispute processing deterministic. Webhooks now fail closed on ambiguous
+  customer ownership, subscription items, invoice products, and unsupported
+  API versions.
 - Added checkout idempotency and synchronous duplicate-click protection.
 - Added bounded request bodies and persistent rate limits to sensitive API
   creation flows.

@@ -5,6 +5,13 @@ Routine formatting and test-only maintenance are omitted.
 
 ## Unreleased
 
+## 0.1.6 — 2026-08-20
+
+### Security
+
+- Resolved the high-severity `deepmerge-ts` and `nanoid` advisories reported
+  by Dependabot, with narrow dependency overrides and a refreshed lockfile.
+
 ## 0.1.5 — 2026-08-20
 
 ### Stripe migration completion

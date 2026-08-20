@@ -1715,7 +1715,7 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "default": "'stripe'"
+          "default": "'creem'"
         },
         "createdAt": {
           "name": "createdAt",

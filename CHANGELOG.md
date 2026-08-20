@@ -5,6 +5,23 @@ Routine formatting and test-only maintenance are omitted.
 
 ## Unreleased
 
+## 0.1.5 — 2026-08-20
+
+### Stripe migration completion
+
+- Added the configured Stripe test catalog used by local development and the
+  hosted reference deployment.
+- Replaced the partial Creem customer cleanup with a forward migration that
+  removes all legacy billing records while preserving users and administrator
+  roles, and corrected the provider default without rewriting migration
+  history.
+- Reconciled subscription webhooks against Stripe's current state so
+  same-second, out-of-order deliveries cannot regress access.
+- Added durable asynchronous checkout failure handling and complete dispute
+  closure reconciliation, including access restoration after a won dispute.
+- Made catalog tests accept reviewed test or live IDs instead of requiring an
+  unusable empty configuration.
+
 ## 0.1.4 — 2026-08-19
 
 ### Quality, reliability, and deployment hardening

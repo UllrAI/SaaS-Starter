@@ -1,6 +1,6 @@
 {
-  "id": "58e8e390-9ef4-4657-9108-747edf71a6aa",
-  "prevId": "9636fa25-caec-493e-a6ad-5a9dad7f766c",
+  "id": "db2ad68e-d594-4c8b-a693-7061de13b714",
+  "prevId": "537a38e7-fee2-4078-b6d0-31ceffb0ddfa",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -99,20 +99,20 @@
             }
           ],
           "isUnique": false,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
         }
       },
       "foreignKeys": {
         "accounts_userId_users_id_fk": {
           "name": "accounts_userId_users_id_fk",
           "tableFrom": "accounts",
-          "tableTo": "users",
           "columnsFrom": ["userId"],
+          "tableTo": "users",
           "columnsTo": ["id"],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
@@ -234,9 +234,9 @@
             }
           ],
           "isUnique": false,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
         },
         "api_keys_keyHash_idx": {
           "name": "api_keys_keyHash_idx",
@@ -249,20 +249,20 @@
             }
           ],
           "isUnique": false,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
         }
       },
       "foreignKeys": {
         "api_keys_userId_users_id_fk": {
           "name": "api_keys_userId_users_id_fk",
           "tableFrom": "api_keys",
-          "tableTo": "users",
           "columnsFrom": ["userId"],
+          "tableTo": "users",
           "columnsTo": ["id"],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
@@ -394,33 +394,33 @@
             }
           ],
           "isUnique": false,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
         }
       },
       "foreignKeys": {
         "cli_tokens_userId_users_id_fk": {
           "name": "cli_tokens_userId_users_id_fk",
           "tableFrom": "cli_tokens",
-          "tableTo": "users",
           "columnsFrom": ["userId"],
+          "tableTo": "users",
           "columnsTo": ["id"],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
         "cli_tokens_tokenHash_unique": {
           "name": "cli_tokens_tokenHash_unique",
-          "nullsNotDistinct": false,
-          "columns": ["tokenHash"]
+          "columns": ["tokenHash"],
+          "nullsNotDistinct": false
         },
         "cli_tokens_refreshTokenHash_unique": {
           "name": "cli_tokens_refreshTokenHash_unique",
-          "nullsNotDistinct": false,
-          "columns": ["refreshTokenHash"]
+          "columns": ["refreshTokenHash"],
+          "nullsNotDistinct": false
         }
       },
       "policies": {},
@@ -533,33 +533,33 @@
             }
           ],
           "isUnique": false,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
         }
       },
       "foreignKeys": {
         "device_codes_userId_users_id_fk": {
           "name": "device_codes_userId_users_id_fk",
           "tableFrom": "device_codes",
-          "tableTo": "users",
           "columnsFrom": ["userId"],
+          "tableTo": "users",
           "columnsTo": ["id"],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
         "device_codes_deviceCode_unique": {
           "name": "device_codes_deviceCode_unique",
-          "nullsNotDistinct": false,
-          "columns": ["deviceCode"]
+          "columns": ["deviceCode"],
+          "nullsNotDistinct": false
         },
         "device_codes_userCode_unique": {
           "name": "device_codes_userCode_unique",
-          "nullsNotDistinct": false,
-          "columns": ["userCode"]
+          "columns": ["userCode"],
+          "nullsNotDistinct": false
         }
       },
       "policies": {},
@@ -606,6 +606,12 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true
+        },
+        "paymentIntentId": {
+          "name": "paymentIntentId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
         },
         "amount": {
           "name": "amount",
@@ -665,28 +671,97 @@
             }
           ],
           "isUnique": false,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
+        },
+        "payments_status_currency_createdAt_idx": {
+          "name": "payments_status_currency_createdAt_idx",
+          "columns": [
+            {
+              "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "currency",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "createdAt",
+              "isExpression": false,
+              "asc": false,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "with": {},
+          "method": "btree",
+          "concurrently": false
+        },
+        "payments_paymentIntentId_unique": {
+          "name": "payments_paymentIntentId_unique",
+          "columns": [
+            {
+              "expression": "paymentIntentId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "with": {},
+          "method": "btree",
+          "concurrently": false
+        },
+        "payments_paymentId_userId_productId_unique": {
+          "name": "payments_paymentId_userId_productId_unique",
+          "columns": [
+            {
+              "expression": "paymentId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "userId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "productId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "with": {},
+          "method": "btree",
+          "concurrently": false
         }
       },
       "foreignKeys": {
         "payments_userId_users_id_fk": {
           "name": "payments_userId_users_id_fk",
           "tableFrom": "payments",
-          "tableTo": "users",
           "columnsFrom": ["userId"],
+          "tableTo": "users",
           "columnsTo": ["id"],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
         "payments_paymentId_unique": {
           "name": "payments_paymentId_unique",
-          "nullsNotDistinct": false,
-          "columns": ["paymentId"]
+          "columns": ["paymentId"],
+          "nullsNotDistinct": false
         }
       },
       "policies": {},
@@ -760,9 +835,9 @@
             }
           ],
           "isUnique": true,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
         },
         "product_entitlements_sourcePaymentId_unique": {
           "name": "product_entitlements_sourcePaymentId_unique",
@@ -775,9 +850,9 @@
             }
           ],
           "isUnique": true,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
         },
         "product_entitlements_userId_createdAt_idx": {
           "name": "product_entitlements_userId_createdAt_idx",
@@ -796,29 +871,29 @@
             }
           ],
           "isUnique": false,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
         }
       },
       "foreignKeys": {
         "product_entitlements_userId_users_id_fk": {
           "name": "product_entitlements_userId_users_id_fk",
           "tableFrom": "product_entitlements",
-          "tableTo": "users",
           "columnsFrom": ["userId"],
+          "tableTo": "users",
           "columnsTo": ["id"],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         },
-        "product_entitlements_sourcePaymentId_payments_paymentId_fk": {
-          "name": "product_entitlements_sourcePaymentId_payments_paymentId_fk",
+        "product_entitlements_payment_owner_product_fk": {
+          "name": "product_entitlements_payment_owner_product_fk",
           "tableFrom": "product_entitlements",
+          "columnsFrom": ["sourcePaymentId", "userId", "productId"],
           "tableTo": "payments",
-          "columnsFrom": ["sourcePaymentId"],
-          "columnsTo": ["paymentId"],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "columnsTo": ["paymentId", "userId", "productId"],
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -875,9 +950,9 @@
             }
           ],
           "isUnique": false,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
         }
       },
       "foreignKeys": {},
@@ -938,24 +1013,6 @@
           "primaryKey": false,
           "notNull": false
         },
-        "os": {
-          "name": "os",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "browser": {
-          "name": "browser",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "deviceType": {
-          "name": "deviceType",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
         "impersonatedBy": {
           "name": "impersonatedBy",
           "type": "text",
@@ -981,28 +1038,28 @@
             }
           ],
           "isUnique": false,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
         }
       },
       "foreignKeys": {
         "sessions_userId_users_id_fk": {
           "name": "sessions_userId_users_id_fk",
           "tableFrom": "sessions",
-          "tableTo": "users",
           "columnsFrom": ["userId"],
+          "tableTo": "users",
           "columnsTo": ["id"],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
         "sessions_token_unique": {
           "name": "sessions_token_unique",
-          "nullsNotDistinct": false,
-          "columns": ["token"]
+          "columns": ["token"],
+          "nullsNotDistinct": false
         }
       },
       "policies": {},
@@ -1107,9 +1164,9 @@
             }
           ],
           "isUnique": false,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
         },
         "subscriptions_customerId_idx": {
           "name": "subscriptions_customerId_idx",
@@ -1122,32 +1179,224 @@
             }
           ],
           "isUnique": false,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
         }
       },
       "foreignKeys": {
         "subscriptions_userId_users_id_fk": {
           "name": "subscriptions_userId_users_id_fk",
           "tableFrom": "subscriptions",
-          "tableTo": "users",
           "columnsFrom": ["userId"],
+          "tableTo": "users",
           "columnsTo": ["id"],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
         "subscriptions_subscriptionId_unique": {
           "name": "subscriptions_subscriptionId_unique",
-          "nullsNotDistinct": false,
-          "columns": ["subscriptionId"]
+          "columns": ["subscriptionId"],
+          "nullsNotDistinct": false
         }
       },
       "policies": {},
       "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.upload_intents": {
+      "name": "upload_intents",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "userId": {
+          "name": "userId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "fileKey": {
+          "name": "fileKey",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "fileName": {
+          "name": "fileName",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "fileSize": {
+          "name": "fileSize",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "contentType": {
+          "name": "contentType",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "upload_intent_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'pending'"
+        },
+        "expiresAt": {
+          "name": "expiresAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "completedAt": {
+          "name": "completedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "deleteCheckedAt": {
+          "name": "deleteCheckedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cleanupAttempts": {
+          "name": "cleanupAttempts",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "lastCleanupError": {
+          "name": "lastCleanupError",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "upload_intents_fileKey_unique": {
+          "name": "upload_intents_fileKey_unique",
+          "columns": [
+            {
+              "expression": "fileKey",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "with": {},
+          "method": "btree",
+          "concurrently": false
+        },
+        "upload_intents_userId_status_expiresAt_idx": {
+          "name": "upload_intents_userId_status_expiresAt_idx",
+          "columns": [
+            {
+              "expression": "userId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "expiresAt",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "with": {},
+          "method": "btree",
+          "concurrently": false
+        },
+        "upload_intents_cleanup_queue_idx": {
+          "name": "upload_intents_cleanup_queue_idx",
+          "columns": [
+            {
+              "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "cleanupAttempts",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "expiresAt",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "with": {},
+          "method": "btree",
+          "concurrently": false
+        }
+      },
+      "foreignKeys": {
+        "upload_intents_userId_users_id_fk": {
+          "name": "upload_intents_userId_users_id_fk",
+          "tableFrom": "upload_intents",
+          "columnsFrom": ["userId"],
+          "tableTo": "users",
+          "columnsTo": ["id"],
+          "onUpdate": "no action",
+          "onDelete": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "upload_intents_fileSize_positive": {
+          "name": "upload_intents_fileSize_positive",
+          "value": "\"upload_intents\".\"fileSize\" > 0"
+        },
+        "upload_intents_cleanupAttempts_non_negative": {
+          "name": "upload_intents_cleanupAttempts_non_negative",
+          "value": "\"upload_intents\".\"cleanupAttempts\" >= 0"
+        }
+      },
       "isRLSEnabled": false
     },
     "public.uploads": {
@@ -1166,6 +1415,12 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true
+        },
+        "uploadIntentId": {
+          "name": "uploadIntentId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
         },
         "fileKey": {
           "name": "fileKey",
@@ -1223,9 +1478,24 @@
             }
           ],
           "isUnique": false,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
+        },
+        "uploads_uploadIntentId_unique": {
+          "name": "uploads_uploadIntentId_unique",
+          "columns": [
+            {
+              "expression": "uploadIntentId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "with": {},
+          "method": "btree",
+          "concurrently": false
         },
         "uploads_fileKey_unique": {
           "name": "uploads_fileKey_unique",
@@ -1238,26 +1508,40 @@
             }
           ],
           "isUnique": true,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
         }
       },
       "foreignKeys": {
         "uploads_userId_users_id_fk": {
           "name": "uploads_userId_users_id_fk",
           "tableFrom": "uploads",
-          "tableTo": "users",
           "columnsFrom": ["userId"],
+          "tableTo": "users",
           "columnsTo": ["id"],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
+        },
+        "uploads_uploadIntentId_upload_intents_id_fk": {
+          "name": "uploads_uploadIntentId_upload_intents_id_fk",
+          "tableFrom": "uploads",
+          "columnsFrom": ["uploadIntentId"],
+          "tableTo": "upload_intents",
+          "columnsTo": ["id"],
+          "onUpdate": "no action",
+          "onDelete": "set null"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
-      "checkConstraints": {},
+      "checkConstraints": {
+        "uploads_fileSize_positive": {
+          "name": "uploads_fileSize_positive",
+          "value": "\"uploads\".\"fileSize\" > 0"
+        }
+      },
       "isRLSEnabled": false
     },
     "public.users": {
@@ -1346,13 +1630,13 @@
       "uniqueConstraints": {
         "users_email_unique": {
           "name": "users_email_unique",
-          "nullsNotDistinct": false,
-          "columns": ["email"]
+          "columns": ["email"],
+          "nullsNotDistinct": false
         },
         "users_paymentProviderCustomerId_unique": {
           "name": "users_paymentProviderCustomerId_unique",
-          "nullsNotDistinct": false,
-          "columns": ["paymentProviderCustomerId"]
+          "columns": ["paymentProviderCustomerId"],
+          "nullsNotDistinct": false
         }
       },
       "policies": {},
@@ -1412,9 +1696,9 @@
             }
           ],
           "isUnique": false,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
         }
       },
       "foreignKeys": {},
@@ -1452,27 +1736,7 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "default": "'creem'"
-        },
-        "processed": {
-          "name": "processed",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "default": true
-        },
-        "processedAt": {
-          "name": "processedAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "payload": {
-          "name": "payload",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
+          "default": "'stripe'"
         },
         "createdAt": {
           "name": "createdAt",
@@ -1500,9 +1764,9 @@
             }
           ],
           "isUnique": true,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
         },
         "webhook_events_provider_idx": {
           "name": "webhook_events_provider_idx",
@@ -1515,9 +1779,9 @@
             }
           ],
           "isUnique": false,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
         }
       },
       "foreignKeys": {},
@@ -1529,6 +1793,11 @@
     }
   },
   "enums": {
+    "public.upload_intent_status": {
+      "name": "upload_intent_status",
+      "schema": "public",
+      "values": ["pending", "cancelled", "cleaning", "completed"]
+    },
     "public.user_role": {
       "name": "user_role",
       "schema": "public",
@@ -1536,10 +1805,10 @@
     }
   },
   "schemas": {},
+  "views": {},
   "sequences": {},
   "roles": {},
   "policies": {},
-  "views": {},
   "_meta": {
     "columns": {},
     "schemas": {},

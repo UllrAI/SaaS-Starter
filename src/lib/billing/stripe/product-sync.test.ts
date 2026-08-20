@@ -6,6 +6,7 @@ import {
   buildStripePriceSpecs,
   updatePricesConfigSource,
 } from "./product-sync";
+import { STRIPE_CATALOG } from "./prices";
 
 describe("Stripe product sync", () => {
   it("builds one-time, monthly, and yearly prices for every tier", () => {
@@ -74,8 +75,9 @@ describe("Stripe product sync", () => {
     expect(updated).toContain(
       'test_mode: {\n      productId: "prod_plus",\n      oneTime: "price_one_time",\n      monthly: "price_monthly"',
     );
+    const liveCatalog = STRIPE_CATALOG.plus.live_mode;
     expect(updated).toContain(
-      'live_mode: {\n      productId: "",\n      oneTime: "",\n      monthly: ""',
+      `live_mode: {\n      productId: "${liveCatalog.productId}",\n      oneTime: "${liveCatalog.oneTime}",\n      monthly: "${liveCatalog.monthly}"`,
     );
   });
 

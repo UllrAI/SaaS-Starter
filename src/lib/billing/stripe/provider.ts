@@ -69,6 +69,31 @@ function resolveCheckoutStatus(
   ) {
     return "success";
   }
+  if (session.metadata?.asyncPaymentStatus === "failed") return "failed";
+  if (session.status === "complete" && session.payment_status === "unpaid") {
+    const paymentIntent =
+      session.payment_intent && typeof session.payment_intent !== "string"
+        ? session.payment_intent
+        : null;
+    if (
+      paymentIntent?.status === "canceled" ||
+      paymentIntent?.status === "requires_payment_method"
+    ) {
+      return "failed";
+    }
+
+    const subscription =
+      session.subscription && typeof session.subscription !== "string"
+        ? session.subscription
+        : null;
+    if (
+      subscription?.status === "canceled" ||
+      subscription?.status === "incomplete_expired" ||
+      subscription?.status === "unpaid"
+    ) {
+      return "failed";
+    }
+  }
   return "pending";
 }
 
@@ -143,8 +168,10 @@ const stripeProvider: PaymentProvider = {
   },
 
   async getCheckoutStatus(checkoutId): Promise<CheckoutStatusResult> {
-    const session =
-      await getStripeClient().checkout.sessions.retrieve(checkoutId);
+    const session = await getStripeClient().checkout.sessions.retrieve(
+      checkoutId,
+      { expand: ["payment_intent", "subscription"] },
+    );
     const paymentMode = session.metadata?.paymentMode;
 
     return {

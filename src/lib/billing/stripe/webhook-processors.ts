@@ -8,6 +8,7 @@ import {
   grantProductEntitlement,
   lockBillingProductScope,
   lockPaymentAdjustmentScope,
+  reconcilePaymentAfterDispute,
   revokeProductEntitlementByPaymentId,
   suspendSubscriptionAccess,
   type Tx,
@@ -237,8 +238,10 @@ export async function processCheckoutSession(
   session: Stripe.Checkout.Session,
   _eventCreatedAt: Date,
   tx: Tx,
+  outcome: "completed" | "failed" = "completed",
 ): Promise<void> {
   if (
+    outcome === "completed" &&
     session.payment_status !== "paid" &&
     session.payment_status !== "no_payment_required"
   ) {
@@ -295,7 +298,7 @@ export async function processCheckoutSession(
       paymentIntentId: getOptionalId(session.payment_intent),
       amount: session.amount_total,
       currency: session.currency,
-      status: "succeeded",
+      status: outcome === "failed" ? "failed" : "succeeded",
       paymentType: "one_time",
     },
     tx,
@@ -427,14 +430,93 @@ export async function processRefund(
 }
 
 export async function processDispute(
+  dispute: Stripe.Dispute,
   paymentReferences: string[],
   eventCreatedAt: Date,
   tx: Tx,
 ): Promise<void> {
+  if (dispute.status.startsWith("warning_") || dispute.status === "prevented") {
+    return;
+  }
+
   const paymentId = await lockPaymentAdjustmentScope(paymentReferences, tx);
   const [payment] = await updatePaymentStatus(paymentId, "disputed", tx);
   await revokeProductEntitlementByPaymentId(paymentId, "disputed", tx);
   if (payment?.subscriptionId) {
     await suspendSubscriptionAccess(payment.subscriptionId, eventCreatedAt, tx);
+  }
+}
+
+export async function processClosedDispute(
+  dispute: Stripe.Dispute,
+  charge: Stripe.Charge,
+  paymentReferences: string[],
+  eventCreatedAt: Date,
+  tx: Tx,
+  currentSubscription: Stripe.Subscription | null,
+): Promise<void> {
+  if (dispute.status === "warning_closed" || dispute.status === "prevented") {
+    return;
+  }
+  if (dispute.status === "lost") {
+    await processDispute(dispute, paymentReferences, eventCreatedAt, tx);
+    return;
+  }
+  if (dispute.status !== "won") {
+    throw new InvalidWebhookPayloadError(
+      `Closed Stripe dispute has unsupported status: ${dispute.status}`,
+    );
+  }
+
+  const paymentId = await lockPaymentAdjustmentScope(paymentReferences, tx);
+  const reconciledStatus =
+    charge.refunded && charge.amount_refunded >= charge.amount
+      ? "refunded"
+      : charge.amount_refunded > 0
+        ? "partially_refunded"
+        : "succeeded";
+  const [payment] = await reconcilePaymentAfterDispute(
+    paymentId,
+    reconciledStatus,
+    tx,
+  );
+  if (!payment) {
+    throw new Error(`Payment ${paymentId} could not be reconciled.`);
+  }
+
+  if (reconciledStatus === "refunded") {
+    await revokeProductEntitlementByPaymentId(paymentId, "refunded", tx);
+    if (payment.subscriptionId) {
+      await suspendSubscriptionAccess(
+        payment.subscriptionId,
+        eventCreatedAt,
+        tx,
+      );
+    }
+    return;
+  }
+
+  if (payment.paymentType === "one_time") {
+    await grantProductEntitlement(
+      {
+        userId: payment.userId,
+        productId: payment.productId,
+        sourcePaymentId: payment.paymentId,
+      },
+      tx,
+    );
+    return;
+  }
+
+  if (payment.subscriptionId) {
+    if (
+      !currentSubscription ||
+      currentSubscription.id !== payment.subscriptionId
+    ) {
+      throw new Error(
+        `Subscription ${payment.subscriptionId} is not available for dispute reconciliation yet.`,
+      );
+    }
+    await processSubscription(currentSubscription, eventCreatedAt, tx);
   }
 }

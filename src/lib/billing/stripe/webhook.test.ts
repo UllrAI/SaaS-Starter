@@ -2,11 +2,16 @@ import type Stripe from "stripe";
 
 const mockConstructEvent = jest.fn();
 const mockListInvoicePayments = jest.fn();
+const mockRetrieveCharge = jest.fn();
+const mockRetrieveSubscription = jest.fn();
+const mockUpdateCheckoutSession = jest.fn();
 const mockTransaction = jest.fn();
 const mockClaimWebhookEvent = jest.fn();
+const mockFindPaymentByReferences = jest.fn();
 const mockIsWebhookEventProcessed = jest.fn();
 const mockLogStripeWebhook = jest.fn();
 const mockProcessCheckoutSession = jest.fn();
+const mockProcessClosedDispute = jest.fn();
 const mockProcessSubscription = jest.fn();
 const mockProcessInvoice = jest.fn();
 const mockProcessRefund = jest.fn();
@@ -24,12 +29,16 @@ jest.mock("@/lib/config/integrations", () => ({
 }));
 jest.mock("@/lib/database/subscription", () => ({
   claimWebhookEvent: mockClaimWebhookEvent,
+  findPaymentByReferences: mockFindPaymentByReferences,
   isWebhookEventProcessed: mockIsWebhookEventProcessed,
 }));
 jest.mock("./client", () => ({
   getStripeClient: () => ({
     webhooks: { constructEvent: mockConstructEvent },
+    checkout: { sessions: { update: mockUpdateCheckoutSession } },
+    charges: { retrieve: mockRetrieveCharge },
     invoicePayments: { list: mockListInvoicePayments },
+    subscriptions: { retrieve: mockRetrieveSubscription },
   }),
 }));
 jest.mock("./webhook-log", () => ({
@@ -44,6 +53,7 @@ jest.mock("./webhook-processors", () => {
   }
   return {
     InvalidWebhookPayloadError,
+    processClosedDispute: mockProcessClosedDispute,
     processCheckoutSession: mockProcessCheckoutSession,
     processSubscription: mockProcessSubscription,
     processInvoice: mockProcessInvoice,
@@ -77,6 +87,7 @@ describe("Stripe webhook handler", () => {
     mockClaimWebhookEvent.mockResolvedValue(true);
     mockIsWebhookEventProcessed.mockResolvedValue(false);
     mockListInvoicePayments.mockResolvedValue({ data: [] });
+    mockFindPaymentByReferences.mockResolvedValue(null);
     mockTransaction.mockImplementation(async (callback) => callback({}));
   });
 
@@ -174,6 +185,45 @@ describe("Stripe webhook handler", () => {
     });
   });
 
+  it("records terminal asynchronous checkout failures", async () => {
+    const checkout = { id: "cs_failed" };
+    mockConstructEvent.mockReturnValue(
+      event("checkout.session.async_payment_failed", checkout),
+    );
+    const { handleStripeWebhook } = await import("./webhook");
+
+    await handleStripeWebhook("payload", "signature");
+
+    expect(mockProcessCheckoutSession).toHaveBeenCalledWith(
+      checkout,
+      new Date(1_700_000_000_000),
+      {},
+      "failed",
+    );
+    expect(mockUpdateCheckoutSession).toHaveBeenCalledWith("cs_failed", {
+      metadata: { asyncPaymentStatus: "failed" },
+    });
+  });
+
+  it("reconciles subscription events from Stripe's current state", async () => {
+    const eventSubscription = { id: "sub_123", status: "incomplete" };
+    const currentSubscription = { id: "sub_123", status: "active" };
+    mockConstructEvent.mockReturnValue(
+      event("customer.subscription.created", eventSubscription),
+    );
+    mockRetrieveSubscription.mockResolvedValue(currentSubscription);
+    const { handleStripeWebhook } = await import("./webhook");
+
+    await handleStripeWebhook("payload", "signature");
+
+    expect(mockRetrieveSubscription).toHaveBeenCalledWith("sub_123");
+    expect(mockProcessSubscription).toHaveBeenCalledWith(
+      currentSubscription,
+      new Date(1_700_000_000_000),
+      {},
+    );
+  });
+
   it("short-circuits redeliveries before touching Stripe or the database", async () => {
     mockConstructEvent.mockReturnValue(
       event("charge.refunded", { id: "ch_1" }),
@@ -224,6 +274,42 @@ describe("Stripe webhook handler", () => {
       ["ch_123", "pi_123"],
       new Date(1_700_000_000_000),
       {},
+    );
+  });
+
+  it("prepares authoritative state for a won dispute", async () => {
+    const dispute = {
+      id: "dp_123",
+      status: "won",
+      charge: "ch_123",
+      payment_intent: "pi_123",
+    };
+    const charge = {
+      id: "ch_123",
+      amount: 2999,
+      amount_refunded: 0,
+      refunded: false,
+    };
+    const subscription = { id: "sub_123", status: "active" };
+    mockConstructEvent.mockReturnValue(event("charge.dispute.closed", dispute));
+    mockRetrieveCharge.mockResolvedValue(charge);
+    mockFindPaymentByReferences.mockResolvedValue({
+      subscriptionId: "sub_123",
+    });
+    mockRetrieveSubscription.mockResolvedValue(subscription);
+    const { handleStripeWebhook } = await import("./webhook");
+
+    await handleStripeWebhook("payload", "signature");
+
+    expect(mockRetrieveCharge).toHaveBeenCalledWith("ch_123");
+    expect(mockRetrieveSubscription).toHaveBeenCalledWith("sub_123");
+    expect(mockProcessClosedDispute).toHaveBeenCalledWith(
+      dispute,
+      charge,
+      ["ch_123", "pi_123"],
+      new Date(1_700_000_000_000),
+      {},
+      subscription,
     );
   });
 

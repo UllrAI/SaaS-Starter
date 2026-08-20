@@ -55,6 +55,15 @@ interface GrantProductEntitlementData {
   sourcePaymentId: string;
 }
 
+export interface PaymentReferenceRecord {
+  paymentId: string;
+  paymentType: string;
+  productId: string;
+  status: string;
+  subscriptionId: string | null;
+  userId: string;
+}
+
 const getDb = (tx?: Tx) => tx || db;
 
 export async function upsertSubscription(
@@ -294,36 +303,70 @@ export async function updatePaymentStatus(
   return rows;
 }
 
-export async function lockPaymentAdjustmentScope(
-  paymentReferences: string[],
-  tx: Tx,
-): Promise<string> {
-  const references = [
-    ...new Set(paymentReferences.map((value) => value.trim()).filter(Boolean)),
-  ];
-  if (references.length === 0) {
-    throw new Error("A payment reference is required for an adjustment.");
+export async function reconcilePaymentAfterDispute(
+  paymentId: string,
+  status: "partially_refunded" | "refunded" | "succeeded",
+  tx?: Tx,
+) {
+  const rows = await getDb(tx)
+    .update(payments)
+    .set({ status, updatedAt: new Date() })
+    .where(eq(payments.paymentId, paymentId))
+    .returning();
+
+  if (rows.length === 0) {
+    throw new Error(
+      `Payment ${paymentId} is not available for dispute reconciliation yet.`,
+    );
   }
 
-  let payment:
-    | { paymentId: string; userId: string; productId: string }
-    | undefined;
+  return rows;
+}
+
+function normalizePaymentReferences(paymentReferences: string[]): string[] {
+  return [
+    ...new Set(paymentReferences.map((value) => value.trim()).filter(Boolean)),
+  ];
+}
+
+export async function findPaymentByReferences(
+  paymentReferences: string[],
+  tx?: Tx,
+): Promise<PaymentReferenceRecord | null> {
+  const references = normalizePaymentReferences(paymentReferences);
+  const dbase = getDb(tx);
+
   for (const reference of references) {
-    [payment] = await tx
+    const [payment] = await dbase
       .select({
         paymentId: payments.paymentId,
-        userId: payments.userId,
+        paymentType: payments.paymentType,
         productId: payments.productId,
+        status: payments.status,
+        subscriptionId: payments.subscriptionId,
+        userId: payments.userId,
       })
       .from(payments)
       .where(
         sql`${payments.paymentId} = ${reference} or ${payments.paymentIntentId} = ${reference}`,
       )
       .limit(1);
-    if (payment) {
-      break;
-    }
+    if (payment) return payment;
   }
+
+  return null;
+}
+
+export async function lockPaymentAdjustmentScope(
+  paymentReferences: string[],
+  tx: Tx,
+): Promise<string> {
+  const references = normalizePaymentReferences(paymentReferences);
+  if (references.length === 0) {
+    throw new Error("A payment reference is required for an adjustment.");
+  }
+
+  const payment = await findPaymentByReferences(references, tx);
 
   if (!payment) {
     throw new Error(

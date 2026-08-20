@@ -4,6 +4,7 @@ const mockFindUserByCustomerId = jest.fn();
 const mockGrantProductEntitlement = jest.fn();
 const mockLockBillingProductScope = jest.fn();
 const mockLockPaymentAdjustmentScope = jest.fn();
+const mockReconcilePaymentAfterDispute = jest.fn();
 const mockRevokeProductEntitlementByPaymentId = jest.fn();
 const mockSuspendSubscriptionAccess = jest.fn();
 const mockUpdatePaymentStatus = jest.fn();
@@ -16,6 +17,7 @@ jest.mock("@/lib/database/subscription", () => ({
   grantProductEntitlement: mockGrantProductEntitlement,
   lockBillingProductScope: mockLockBillingProductScope,
   lockPaymentAdjustmentScope: mockLockPaymentAdjustmentScope,
+  reconcilePaymentAfterDispute: mockReconcilePaymentAfterDispute,
   revokeProductEntitlementByPaymentId: mockRevokeProductEntitlementByPaymentId,
   suspendSubscriptionAccess: mockSuspendSubscriptionAccess,
   updatePaymentStatus: mockUpdatePaymentStatus,
@@ -66,6 +68,7 @@ describe("Stripe webhook processors", () => {
     mockFindUserByCustomerId.mockResolvedValue({ id: "user_123" });
     mockGetProductTierByStripeProductId.mockReturnValue(tier);
     mockUpsertPayment.mockResolvedValue([{ status: "succeeded" }]);
+    mockReconcilePaymentAfterDispute.mockResolvedValue([]);
   });
 
   it("records a paid one-time checkout and grants its entitlement", async () => {
@@ -121,6 +124,36 @@ describe("Stripe webhook processors", () => {
       tx,
     );
     expect(mockUpsertPayment).not.toHaveBeenCalled();
+    expect(mockGrantProductEntitlement).not.toHaveBeenCalled();
+  });
+
+  it("records a failed asynchronous one-time checkout without granting access", async () => {
+    const { processCheckoutSession } = await import("./webhook-processors");
+    mockUpsertPayment.mockResolvedValue([{ status: "failed" }]);
+    const session = {
+      id: "cs_failed",
+      customer: "cus_123",
+      client_reference_id: "user_123",
+      payment_status: "unpaid",
+      payment_intent: "pi_failed",
+      amount_total: 2999,
+      currency: "usd",
+      metadata: {
+        userId: "user_123",
+        tierId: "pro",
+        paymentMode: "one_time",
+      },
+    } as unknown as Stripe.Checkout.Session;
+
+    await processCheckoutSession(session, new Date(), tx, "failed");
+
+    expect(mockUpsertPayment).toHaveBeenCalledWith(
+      expect.objectContaining({
+        paymentId: "pi_failed",
+        status: "failed",
+      }),
+      tx,
+    );
     expect(mockGrantProductEntitlement).not.toHaveBeenCalled();
   });
 
@@ -538,7 +571,12 @@ describe("Stripe webhook processors", () => {
       tx,
     );
 
-    await processDispute(["pi_123"], createdAt, tx);
+    await processDispute(
+      { status: "needs_response" } as Stripe.Dispute,
+      ["pi_123"],
+      createdAt,
+      tx,
+    );
     expect(mockUpdatePaymentStatus).toHaveBeenCalledWith(
       "pi_123",
       "disputed",
@@ -547,6 +585,113 @@ describe("Stripe webhook processors", () => {
     expect(mockSuspendSubscriptionAccess).toHaveBeenCalledWith(
       "sub_123",
       createdAt,
+      tx,
+    );
+  });
+
+  it("ignores warning disputes that have not withdrawn funds", async () => {
+    const { processDispute } = await import("./webhook-processors");
+
+    await processDispute(
+      { status: "warning_needs_response" } as Stripe.Dispute,
+      ["pi_123"],
+      new Date(),
+      tx,
+    );
+
+    expect(mockLockPaymentAdjustmentScope).not.toHaveBeenCalled();
+    expect(mockUpdatePaymentStatus).not.toHaveBeenCalled();
+  });
+
+  it("restores a won one-time dispute from the authoritative charge", async () => {
+    const { processClosedDispute } = await import("./webhook-processors");
+    mockLockPaymentAdjustmentScope.mockResolvedValue("pi_123");
+    mockReconcilePaymentAfterDispute.mockResolvedValue([
+      {
+        paymentId: "pi_123",
+        paymentType: "one_time",
+        productId: "pro",
+        subscriptionId: null,
+        userId: "user_123",
+      },
+    ]);
+
+    await processClosedDispute(
+      { status: "won" } as Stripe.Dispute,
+      {
+        amount: 2999,
+        amount_refunded: 0,
+        refunded: false,
+      } as Stripe.Charge,
+      ["pi_123"],
+      new Date(),
+      tx,
+      null,
+    );
+
+    expect(mockReconcilePaymentAfterDispute).toHaveBeenCalledWith(
+      "pi_123",
+      "succeeded",
+      tx,
+    );
+    expect(mockGrantProductEntitlement).toHaveBeenCalledWith(
+      {
+        userId: "user_123",
+        productId: "pro",
+        sourcePaymentId: "pi_123",
+      },
+      tx,
+    );
+  });
+
+  it("reconciles subscription access after a won dispute", async () => {
+    const { processClosedDispute } = await import("./webhook-processors");
+    const currentSubscription = {
+      id: "sub_123",
+      customer: "cus_123",
+      status: "active",
+      cancel_at_period_end: false,
+      canceled_at: null,
+      metadata: { userId: "user_123", tierId: "pro" },
+      items: {
+        data: [
+          {
+            price: { product: "prod_pro" },
+            current_period_start: 1_700_000_000,
+            current_period_end: 1_702_592_000,
+          },
+        ],
+      },
+    } as unknown as Stripe.Subscription;
+    mockLockPaymentAdjustmentScope.mockResolvedValue("in_123");
+    mockReconcilePaymentAfterDispute.mockResolvedValue([
+      {
+        paymentId: "in_123",
+        paymentType: "subscription",
+        productId: "pro",
+        subscriptionId: "sub_123",
+        userId: "user_123",
+      },
+    ]);
+
+    await processClosedDispute(
+      { status: "won" } as Stripe.Dispute,
+      {
+        amount: 1999,
+        amount_refunded: 0,
+        refunded: false,
+      } as Stripe.Charge,
+      ["pi_123"],
+      new Date("2026-08-20T00:00:00Z"),
+      tx,
+      currentSubscription,
+    );
+
+    expect(mockUpsertSubscription).toHaveBeenCalledWith(
+      expect.objectContaining({
+        subscriptionId: "sub_123",
+        status: "active",
+      }),
       tx,
     );
   });

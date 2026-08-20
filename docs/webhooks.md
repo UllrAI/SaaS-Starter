@@ -39,10 +39,17 @@ boundary.
 
 Configure the Stripe endpoint as `/api/billing/webhooks/stripe` and subscribe
 to `checkout.session.completed`, `checkout.session.async_payment_succeeded`,
+`checkout.session.async_payment_failed`,
 `customer.subscription.created`, `customer.subscription.updated`,
 `customer.subscription.deleted`, `customer.subscription.paused`,
 `customer.subscription.resumed`, `invoice.paid`, `invoice.payment_failed`,
-`charge.refunded`, and `charge.dispute.created`.
+`charge.refunded`, `charge.dispute.created`, and `charge.dispute.closed`.
+
+Subscription events are reconciled against Stripe's current Subscription
+object before entering the database transaction. This avoids regressing state
+when events generated in the same second arrive out of order. A closed dispute
+uses the current Charge and Subscription state to restore access after a win or
+preserve revocation after a loss.
 
 ## Endpoint API version
 

@@ -4,6 +4,7 @@ import { db } from "@/database";
 import { getBillingConfig } from "@/lib/config/integrations";
 import {
   claimWebhookEvent,
+  findPaymentByReferences,
   isWebhookEventProcessed,
   type Tx,
 } from "@/lib/database/subscription";
@@ -13,6 +14,7 @@ import { getStripeClient } from "./client";
 import { logStripeWebhook } from "./webhook-log";
 import {
   InvalidWebhookPayloadError,
+  processClosedDispute,
   processCheckoutSession,
   processDispute,
   processInvoice,
@@ -60,7 +62,10 @@ function getAdjustmentPaymentReferences(event: Stripe.Event): string[] {
   if (event.type === "charge.refunded") {
     chargeId = event.data.object.id;
     paymentIntentId = getOptionalId(event.data.object.payment_intent);
-  } else if (event.type === "charge.dispute.created") {
+  } else if (
+    event.type === "charge.dispute.created" ||
+    event.type === "charge.dispute.closed"
+  ) {
     chargeId = getOptionalId(event.data.object.charge);
     paymentIntentId = getOptionalId(event.data.object.payment_intent);
   } else {
@@ -74,6 +79,62 @@ function getAdjustmentPaymentReferences(event: Stripe.Event): string[] {
   // refunds deterministic and avoids a second Stripe API call inside webhook
   // handling; a missing record causes Stripe to retry the event.
   return [...new Set(references)];
+}
+
+interface PreparedStripeState {
+  currentSubscription: Stripe.Subscription | null;
+  disputeCharge: Stripe.Charge | null;
+}
+
+async function prepareStripeState(
+  event: Stripe.Event,
+  paymentReferences: string[],
+): Promise<PreparedStripeState> {
+  switch (event.type) {
+    case "customer.subscription.created":
+    case "customer.subscription.updated":
+    case "customer.subscription.deleted":
+    case "customer.subscription.paused":
+    case "customer.subscription.resumed":
+      return {
+        currentSubscription: await getStripeClient().subscriptions.retrieve(
+          event.data.object.id,
+        ),
+        disputeCharge: null,
+      };
+  }
+
+  if (event.type === "checkout.session.async_payment_failed") {
+    await getStripeClient().checkout.sessions.update(event.data.object.id, {
+      metadata: { asyncPaymentStatus: "failed" },
+    });
+    return { currentSubscription: null, disputeCharge: null };
+  }
+
+  if (event.type !== "charge.dispute.closed") {
+    return { currentSubscription: null, disputeCharge: null };
+  }
+
+  const chargeId = getOptionalId(event.data.object.charge);
+  if (!chargeId) {
+    throw new InvalidWebhookPayloadError(
+      "Closed Stripe dispute is missing its charge reference.",
+    );
+  }
+  const disputeCharge = await getStripeClient().charges.retrieve(chargeId);
+  const payment = await findPaymentByReferences(paymentReferences);
+  const shouldRestoreSubscription =
+    event.data.object.status === "won" &&
+    !(
+      disputeCharge.refunded &&
+      disputeCharge.amount_refunded >= disputeCharge.amount
+    ) &&
+    Boolean(payment?.subscriptionId);
+  const currentSubscription = shouldRestoreSubscription
+    ? await getStripeClient().subscriptions.retrieve(payment!.subscriptionId!)
+    : null;
+
+  return { currentSubscription, disputeCharge };
 }
 
 async function getInvoicePaymentIntentId(
@@ -115,6 +176,7 @@ async function dispatchStripeWebhook(
   eventCreatedAt: Date,
   adjustmentPaymentReferences: string[],
   invoicePaymentIntentId: string | null,
+  preparedState: PreparedStripeState,
   tx: Tx,
 ): Promise<"ignored" | "processed"> {
   switch (event.type) {
@@ -122,12 +184,29 @@ async function dispatchStripeWebhook(
     case "checkout.session.async_payment_succeeded":
       await processCheckoutSession(event.data.object, eventCreatedAt, tx);
       return "processed";
+    case "checkout.session.async_payment_failed":
+      await processCheckoutSession(
+        event.data.object,
+        eventCreatedAt,
+        tx,
+        "failed",
+      );
+      return "processed";
     case "customer.subscription.created":
     case "customer.subscription.updated":
     case "customer.subscription.deleted":
     case "customer.subscription.paused":
     case "customer.subscription.resumed":
-      await processSubscription(event.data.object, eventCreatedAt, tx);
+      if (!preparedState.currentSubscription) {
+        throw new InvalidWebhookPayloadError(
+          "Stripe subscription state could not be resolved.",
+        );
+      }
+      await processSubscription(
+        preparedState.currentSubscription,
+        eventCreatedAt,
+        tx,
+      );
       return "processed";
     case "invoice.paid":
       await processInvoice(
@@ -156,7 +235,27 @@ async function dispatchStripeWebhook(
       );
       return "processed";
     case "charge.dispute.created":
-      await processDispute(adjustmentPaymentReferences, eventCreatedAt, tx);
+      await processDispute(
+        event.data.object,
+        adjustmentPaymentReferences,
+        eventCreatedAt,
+        tx,
+      );
+      return "processed";
+    case "charge.dispute.closed":
+      if (!preparedState.disputeCharge) {
+        throw new InvalidWebhookPayloadError(
+          "Stripe dispute charge could not be resolved.",
+        );
+      }
+      await processClosedDispute(
+        event.data.object,
+        preparedState.disputeCharge,
+        adjustmentPaymentReferences,
+        eventCreatedAt,
+        tx,
+        preparedState.currentSubscription,
+      );
       return "processed";
     default:
       return "ignored";
@@ -241,6 +340,10 @@ export async function handleStripeWebhook(
             event.type,
           )
         : null;
+    const preparedState = await prepareStripeState(
+      event,
+      adjustmentPaymentReferences,
+    );
     const outcome = await db.transaction<ProcessingOutcome>(async (tx) => {
       const claimed = await claimWebhookEvent(
         event.id,
@@ -254,6 +357,7 @@ export async function handleStripeWebhook(
         eventCreatedAt,
         adjustmentPaymentReferences,
         invoicePaymentIntentId,
+        preparedState,
         tx,
       );
     });

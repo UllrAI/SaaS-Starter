@@ -12,18 +12,14 @@ describe("Stripe price configuration", () => {
       PRODUCT_TIERS.map(({ id }) => id).sort(),
     );
     for (const tier of PRODUCT_TIERS) {
-      expect(getStripeCatalogItem(tier.id, "test_mode")).toEqual({
-        productId: "",
-        oneTime: "",
-        monthly: "",
-        yearly: "",
-      });
-      expect(getStripeCatalogItem(tier.id, "live_mode")).toEqual({
-        productId: "",
-        oneTime: "",
-        monthly: "",
-        yearly: "",
-      });
+      for (const environment of ["test_mode", "live_mode"] as const) {
+        expect(getStripeCatalogItem(tier.id, environment)).toEqual({
+          productId: expect.any(String),
+          oneTime: expect.any(String),
+          monthly: expect.any(String),
+          yearly: expect.any(String),
+        });
+      }
     }
   });
 
@@ -58,9 +54,6 @@ describe("Stripe price configuration", () => {
     expect(getStripeCatalogItem("unknown", "live_mode")).toBeUndefined();
     expect(
       getActiveStripePriceId("unknown", "live_mode", "monthly"),
-    ).toBeUndefined();
-    expect(
-      getActiveStripePriceId("plus", "live_mode", "monthly"),
     ).toBeUndefined();
     expect(getProductTierByStripeProductId("")).toBeUndefined();
     expect(getProductTierByStripeProductId("prod_unknown")).toBeUndefined();

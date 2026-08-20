@@ -30,10 +30,15 @@ ID，然后执行该事件涉及的全部计费写入。因此，事件认领与
 
 请将 Stripe Endpoint 配置为 `/api/billing/webhooks/stripe`，并订阅
 `checkout.session.completed`、`checkout.session.async_payment_succeeded`、
+`checkout.session.async_payment_failed`、
 `customer.subscription.created`、`customer.subscription.updated`、
 `customer.subscription.deleted`、`customer.subscription.paused`、
 `customer.subscription.resumed`、`invoice.paid`、`invoice.payment_failed`、
-`charge.refunded` 和 `charge.dispute.created`。
+`charge.refunded`、`charge.dispute.created` 和 `charge.dispute.closed`。
+
+订阅事件会在进入数据库事务前读取 Stripe 当前的 Subscription 对象，以避免同一秒生成的
+事件乱序到达时把状态回退。争议关闭时会根据当前 Charge 与 Subscription 状态，在胜诉后
+恢复访问，或在败诉后保持撤销状态。
 
 ## Endpoint API 版本
 

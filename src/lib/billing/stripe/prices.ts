@@ -18,10 +18,10 @@ export const STRIPE_CATALOG: Record<
 > = {
   plus: {
     test_mode: {
-      productId: "",
-      oneTime: "",
-      monthly: "",
-      yearly: "",
+      productId: "prod_V6eg0UZMwGjBT6",
+      oneTime: "price_1U6RMjB9KYdWZZKtlQUyf7aW",
+      monthly: "price_1U6RMkB9KYdWZZKtImJZZsqe",
+      yearly: "price_1U6RMkB9KYdWZZKtxrLaUgRf",
     },
     live_mode: {
       productId: "",
@@ -32,10 +32,10 @@ export const STRIPE_CATALOG: Record<
   },
   pro: {
     test_mode: {
-      productId: "",
-      oneTime: "",
-      monthly: "",
-      yearly: "",
+      productId: "prod_V6egfyOPZCZZYI",
+      oneTime: "price_1U6RMlB9KYdWZZKtkzZEqTNY",
+      monthly: "price_1U6RMmB9KYdWZZKtudqfcH8X",
+      yearly: "price_1U6RMnB9KYdWZZKtDuKMIn0g",
     },
     live_mode: {
       productId: "",
@@ -46,10 +46,10 @@ export const STRIPE_CATALOG: Record<
   },
   team: {
     test_mode: {
-      productId: "",
-      oneTime: "",
-      monthly: "",
-      yearly: "",
+      productId: "prod_V6egOauLh3UuUg",
+      oneTime: "price_1U6RMoB9KYdWZZKtLepHKFnh",
+      monthly: "price_1U6RMoB9KYdWZZKtMnyLViuT",
+      yearly: "price_1U6RMpB9KYdWZZKtpXWw05x6",
     },
     live_mode: {
       productId: "",

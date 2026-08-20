@@ -138,6 +138,22 @@ describe("Stripe provider", () => {
     });
   });
 
+  it("uses the durable asynchronous failure marker", async () => {
+    mockStripeClient.checkout.sessions.retrieve.mockResolvedValue({
+      status: "complete",
+      payment_status: "unpaid",
+      client_reference_id: "user_123",
+      metadata: {
+        paymentMode: "subscription",
+        asyncPaymentStatus: "failed",
+      },
+    });
+
+    await expect(
+      stripeProvider.getCheckoutStatus("cs_failed"),
+    ).resolves.toEqual(expect.objectContaining({ status: "failed" }));
+  });
+
   it("reuses the canonical customer found after an idempotency window", async () => {
     mockStripeClient.customers.search.mockResolvedValue({
       data: [{ id: "cus_existing" }],
@@ -251,8 +267,39 @@ describe("Stripe provider", () => {
           paymentMode: "subscription",
         },
       );
+      expect(mockStripeClient.checkout.sessions.retrieve).toHaveBeenCalledWith(
+        "cs_123",
+        { expand: ["payment_intent", "subscription"] },
+      );
     },
   );
+
+  it.each([
+    {
+      payment_intent: { status: "requires_payment_method" },
+      subscription: null,
+    },
+    {
+      payment_intent: null,
+      subscription: { status: "incomplete_expired" },
+    },
+  ])("maps terminal asynchronous failures to failed", async (expandedState) => {
+    mockStripeClient.checkout.sessions.retrieve.mockResolvedValue({
+      status: "complete",
+      payment_status: "unpaid",
+      client_reference_id: "user_123",
+      metadata: { paymentMode: "subscription" },
+      ...expandedState,
+    });
+
+    await expect(
+      stripeProvider.getCheckoutStatus("cs_failed"),
+    ).resolves.toEqual({
+      status: "failed",
+      ownerId: "user_123",
+      paymentMode: "subscription",
+    });
+  });
 
   it("creates portal sessions and supports both cancellation modes", async () => {
     mockStripeClient.billingPortal.sessions.create.mockResolvedValue({

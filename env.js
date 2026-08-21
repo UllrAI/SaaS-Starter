@@ -130,7 +130,7 @@ const env = createEnv({
     STRIPE_ENVIRONMENT: z.enum(["test_mode", "live_mode"]).default("test_mode"),
     STRIPE_WEBHOOK_SECRET: optionalCredentialSchema,
 
-    // AI assistant (any OpenAI-compatible endpoint)
+    // AI assistant (OpenAI Responses-compatible endpoint)
     LLM_API_KEY: optionalCredentialSchema,
     LLM_BASE_URL: z.string().url().default("https://api.openai.com/v1"),
     AI_DEFAULT_MODEL: z.string().trim().min(1).default("gpt-5.6-luna"),

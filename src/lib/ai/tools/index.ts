@@ -3,6 +3,7 @@ import type { AgentContext } from "../context";
 import { createGetAccountOverview } from "./get-account-overview";
 import { createGetCurrentTime } from "./get-current-time";
 import { createReadArticle, createSearchKnowledgeBase } from "./knowledge-base";
+import { createPresentArtifact } from "./present-artifact";
 
 /**
  * The tool registry. Each key is the name the model sees, so every tool name
@@ -15,6 +16,7 @@ export const agentTools = {
   getAccountOverview: createGetAccountOverview,
   searchKnowledgeBase: createSearchKnowledgeBase,
   readArticle: createReadArticle,
+  presentArtifact: createPresentArtifact,
 } satisfies Record<string, (context: AgentContext) => ToolSet[string]>;
 
 export type AgentToolName = keyof typeof agentTools;

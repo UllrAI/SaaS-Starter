@@ -103,6 +103,22 @@ describe("DashboardPageWrapper", () => {
     );
   });
 
+  it("allows a page to extend the main layout classes", () => {
+    render(
+      <DashboardPageWrapper title="Test Title" mainClassName="overflow-hidden">
+        <div>Content</div>
+      </DashboardPageWrapper>,
+    );
+
+    expect(screen.getByRole("main")).toHaveClass(
+      "flex-1",
+      "space-y-6",
+      "px-4",
+      "py-2",
+      "overflow-hidden",
+    );
+  });
+
   it("should default showSidebarTrigger to true", () => {
     render(
       <DashboardPageWrapper title="Test Title">

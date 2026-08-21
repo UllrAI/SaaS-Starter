@@ -5,6 +5,19 @@ Routine formatting and test-only maintenance are omitted.
 
 ## Unreleased
 
+## 0.1.8 — 2026-08-22
+
+### Responses API and AI workspace
+
+- Migrated the AI agent from Chat Completions compatibility mode to the OpenAI
+  Responses API so reasoning and function tools work together.
+- Added signed native response chaining, a low-by-default reasoning selector,
+  and restricted GPT Image 2 generation at 1024 × 1024 low quality.
+- Rebuilt the assistant as a responsive Chat + Canvas workspace with structured
+  reasoning, tool activity, Markdown documents, image and video artifacts, and
+  localized controls.
+- Added focused unit, route, end-to-end, and visual design QA coverage.
+
 ## 0.1.7 — 2026-08-21
 
 ### Agent-ready AI stack

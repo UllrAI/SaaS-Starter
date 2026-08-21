@@ -4,6 +4,8 @@ const mockGetAuthSessionFromHeaders = jest.fn();
 const mockCheckRateLimit = jest.fn();
 const mockCreateAgent = jest.fn();
 const mockCreateAgentUIStreamResponse = jest.fn();
+const mockCreateResponseHandle = jest.fn();
+const mockReadResponseHandle = jest.fn();
 
 const siteConfig = {
   features: { emailAuth: true, billing: true, uploads: true, ai: true },
@@ -34,6 +36,11 @@ jest.mock("@/lib/ai/agents", () => ({
 
 jest.mock("ai", () => ({
   createAgentUIStreamResponse: mockCreateAgentUIStreamResponse,
+}));
+
+jest.mock("@/lib/ai/response-chain", () => ({
+  createResponseHandle: mockCreateResponseHandle,
+  readResponseHandle: mockReadResponseHandle,
 }));
 
 const session = {
@@ -71,6 +78,8 @@ describe("/api/chat", () => {
       info: { limit: 30, remaining: 29, resetAt: 2_000_000_000 },
     });
     mockCreateAgent.mockReturnValue({ id: "assistant-agent" });
+    mockCreateResponseHandle.mockReturnValue("signed-response-handle");
+    mockReadResponseHandle.mockReturnValue("resp_previous");
     mockCreateAgentUIStreamResponse.mockResolvedValue(
       new Response("stream", { status: 200 }),
     );
@@ -135,13 +144,17 @@ describe("/api/chat", () => {
     });
 
     expect(response.status).toBe(200);
-    expect(mockCreateAgent).toHaveBeenCalledWith("assistant", {
-      userId: "user-1",
-      userName: "Ada",
-      userEmail: "ada@example.com",
-      userRole: "user",
-      locale: "zh-Hans",
-    });
+    expect(mockCreateAgent).toHaveBeenCalledWith(
+      "assistant",
+      {
+        userId: "user-1",
+        userName: "Ada",
+        userEmail: "ada@example.com",
+        userRole: "user",
+        locale: "zh-Hans",
+      },
+      { reasoningEffort: "low", previousResponseId: undefined },
+    );
     const [streamArgs] = mockCreateAgentUIStreamResponse.mock.calls[0] as [
       { agent: unknown; uiMessages: unknown; onError: (e: unknown) => string },
     ];
@@ -155,7 +168,57 @@ describe("/api/chat", () => {
     expect(mockCreateAgent).toHaveBeenCalledWith(
       "assistant",
       expect.objectContaining({ userId: "user-1" }),
+      { reasoningEffort: "low", previousResponseId: undefined },
     );
+  });
+
+  it("passes a selected reasoning effort and verified response chain", async () => {
+    const response = await postChat({
+      messages,
+      reasoningEffort: "high",
+      responseHandle: "resp_previous.signature",
+    });
+
+    expect(response.status).toBe(200);
+    expect(mockReadResponseHandle).toHaveBeenCalledWith(
+      "resp_previous.signature",
+      "user-1",
+    );
+    expect(mockCreateAgent).toHaveBeenCalledWith(
+      "assistant",
+      expect.objectContaining({ userId: "user-1" }),
+      { reasoningEffort: "high", previousResponseId: "resp_previous" },
+    );
+  });
+
+  it("rejects an invalid response handle", async () => {
+    mockReadResponseHandle.mockReturnValue(null);
+
+    const response = await postChat({
+      messages,
+      responseHandle: "forged.signature",
+    });
+
+    expect(response.status).toBe(400);
+    expect(mockCreateAgent).not.toHaveBeenCalled();
+  });
+
+  it("signs the Responses API id into assistant message metadata", async () => {
+    await postChat({ messages });
+
+    const [streamArgs] = mockCreateAgentUIStreamResponse.mock.calls[0] as [
+      {
+        messageMetadata: (options: {
+          part: { type: string; response?: { id: string } };
+        }) => unknown;
+      },
+    ];
+    const metadata = streamArgs.messageMetadata({
+      part: { type: "finish-step", response: { id: "resp_new" } },
+    });
+
+    expect(mockCreateResponseHandle).toHaveBeenCalledWith("resp_new", "user-1");
+    expect(metadata).toEqual({ responseHandle: "signed-response-handle" });
   });
 
   it("masks provider errors surfaced through the stream", async () => {

@@ -1,4 +1,5 @@
 import type { AgentContext } from "../context";
+import type { ReasoningEffort } from "../reasoning";
 import { createAssistantAgent } from "./assistant";
 
 // Register every agent here. The chat route resolves agents by id, so a new
@@ -13,6 +14,15 @@ export function isAgentId(value: string): value is AgentId {
   return value in agentFactories;
 }
 
-export function createAgent(agentId: AgentId, context: AgentContext) {
-  return agentFactories[agentId](context);
+export interface CreateAgentOptions {
+  reasoningEffort: ReasoningEffort;
+  previousResponseId?: string;
+}
+
+export function createAgent(
+  agentId: AgentId,
+  context: AgentContext,
+  options: CreateAgentOptions,
+) {
+  return agentFactories[agentId](context, options);
 }

@@ -1,6 +1,6 @@
 {
   "name": "ullrai-starter",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "private": true,
   "packageManager": "pnpm@10.33.0",
   "engines": {
@@ -32,7 +32,7 @@
     "stripe:sync-products": "node --env-file-if-exists=.env --import tsx scripts/sync-stripe-products.ts"
   },
   "dependencies": {
-    "@ai-sdk/openai-compatible": "^3.0.34",
+    "@ai-sdk/openai": "^4.0.45",
     "@ai-sdk/react": "^4.0.76",
     "@aws-sdk/client-s3": "^3.1056.0",
     "@aws-sdk/lib-storage": "^3.1056.0",

@@ -1,204 +1,194 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useChat } from "@ai-sdk/react";
+import { DefaultChatTransport } from "ai";
 import {
-  DefaultChatTransport,
-  getToolOrDynamicToolName,
-  isToolUIPart,
-  type DynamicToolUIPart,
-  type ToolUIPart,
-  type UIMessage,
-} from "ai";
-import { Bot, CircleAlert, Loader2, Send, Square, Wrench } from "lucide-react";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import {
+  DEFAULT_REASONING_EFFORT,
+  REASONING_EFFORTS,
+  type ReasoningEffort,
+} from "@/lib/ai/reasoning";
 import { useTranslation } from "@/lib/i18n/translation/client";
 import { cn } from "@/lib/utils";
+import {
+  createMarkdownArtifact,
+  extractArtifacts,
+  type CanvasArtifact,
+} from "./artifacts";
+import { CanvasPanel } from "./canvas-panel";
+import { ChatPanel } from "./chat-panel";
+import { prepareChatRequest } from "./chat-request";
+import type { AiMessage } from "./chat-types";
 
-function ToolCallChip({ part }: { part: ToolUIPart | DynamicToolUIPart }) {
-  const { t } = useTranslation();
-  const name = getToolOrDynamicToolName(part);
-  // Only the input states spin; anything else is settled, so a state this UI
-  // does not know about can never leave a spinner running forever.
-  const isRunning =
-    part.state === "input-streaming" || part.state === "input-available";
-  const isError = part.state === "output-error";
-
-  return (
-    <div className="border-border bg-muted/50 text-muted-foreground my-1 flex w-fit items-center gap-2 rounded-md border px-2 py-1 text-xs">
-      {isError ? (
-        <CircleAlert className="text-destructive size-3.5" />
-      ) : isRunning ? (
-        <Loader2 className="size-3.5 animate-spin" />
-      ) : (
-        <Wrench className="size-3.5" />
-      )}
-      <span translate="no">
-        {isError
-          ? t("ai_chat_tool_error", { name })
-          : isRunning
-            ? t("ai_chat_tool_running", { name })
-            : t("ai_chat_tool_result", { name })}
-      </span>
-    </div>
-  );
-}
-
-function MessageParts({ message }: { message: UIMessage }) {
-  const { t } = useTranslation();
-
-  return (
-    <>
-      {message.parts.map((part, index) => {
-        if (part.type === "text") {
-          return message.role === "assistant" ? (
-            <div
-              key={index}
-              className="prose prose-sm prose-slate dark:prose-invert max-w-none [&_pre]:max-w-full [&_pre]:overflow-x-auto"
-            >
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                {part.text}
-              </ReactMarkdown>
-            </div>
-          ) : (
-            <p key={index} className="whitespace-pre-wrap">
-              {part.text}
-            </p>
-          );
-        }
-        if (part.type === "reasoning") {
-          return (
-            <p key={index} className="text-muted-foreground text-xs italic">
-              {t("ai_chat_thinking")}
-            </p>
-          );
-        }
-        if (isToolUIPart(part)) {
-          return <ToolCallChip key={index} part={part} />;
-        }
-        return null;
-      })}
-    </>
-  );
+function isReasoningEffort(value: unknown): value is ReasoningEffort {
+  return REASONING_EFFORTS.some((effort) => effort === value);
 }
 
 export function AiChat() {
   const { t } = useTranslation();
   const [input, setInput] = useState("");
-  const bottomRef = useRef<HTMLDivElement>(null);
-  const { messages, sendMessage, status, stop, error, regenerate, clearError } =
-    useChat({
-      transport: new DefaultChatTransport({ api: "/api/chat" }),
-    });
+  const [reasoningEffort, setReasoningEffort] = useState<ReasoningEffort>(
+    DEFAULT_REASONING_EFFORT,
+  );
+  const [manualArtifacts, setManualArtifacts] = useState<CanvasArtifact[]>([]);
+  const [activeArtifactId, setActiveArtifactId] = useState<string>();
+  const [desktopCanvasOpen, setDesktopCanvasOpen] = useState(true);
+  const [mobileCanvasOpen, setMobileCanvasOpen] = useState(false);
+  const latestAutomaticArtifactId = useRef<string | undefined>(undefined);
 
-  const isBusy = status === "submitted" || status === "streaming";
+  const transport = useMemo(
+    () =>
+      new DefaultChatTransport<AiMessage>({
+        api: "/api/chat",
+        prepareSendMessagesRequest: ({
+          messages,
+          trigger,
+          messageId,
+          body,
+        }) => ({
+          body: prepareChatRequest({
+            messages,
+            trigger,
+            messageId,
+            reasoningEffort: isReasoningEffort(body?.reasoningEffort)
+              ? body.reasoningEffort
+              : DEFAULT_REASONING_EFFORT,
+          }),
+        }),
+      }),
+    [],
+  );
+
+  const { messages, sendMessage, status, stop, error, regenerate, clearError } =
+    useChat<AiMessage>({ transport });
+  const automaticArtifacts = useMemo(
+    () => extractArtifacts(messages),
+    [messages],
+  );
+  const artifacts = useMemo(() => {
+    const byId = new Map<string, CanvasArtifact>();
+    [...automaticArtifacts, ...manualArtifacts].forEach((artifact) =>
+      byId.set(artifact.id, artifact),
+    );
+    return [...byId.values()];
+  }, [automaticArtifacts, manualArtifacts]);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, status]);
-
-  const handleSubmit = () => {
-    const text = input.trim();
-    if (!text || isBusy) {
+    const latestArtifact = automaticArtifacts.at(-1);
+    if (
+      !latestArtifact ||
+      latestArtifact.id === latestAutomaticArtifactId.current
+    ) {
       return;
     }
+
+    latestAutomaticArtifactId.current = latestArtifact.id;
+    setActiveArtifactId(latestArtifact.id);
+    setDesktopCanvasOpen(true);
+  }, [automaticArtifacts]);
+
+  const openCanvasForCurrentViewport = () => {
+    if (window.matchMedia("(min-width: 64rem)").matches) {
+      setDesktopCanvasOpen(true);
+    } else {
+      setMobileCanvasOpen(true);
+    }
+  };
+
+  const handleSubmit = (suggestedText?: string) => {
+    const text = (suggestedText ?? input).trim();
+    const isBusy = status === "submitted" || status === "streaming";
+    if (!text || isBusy) return;
+
     clearError();
-    void sendMessage({ text });
+    void sendMessage({ text }, { body: { reasoningEffort } });
     setInput("");
   };
 
+  const handleOpenMessage = (message: AiMessage) => {
+    const artifact = createMarkdownArtifact(
+      message,
+      t("ai_canvas_assistant_response"),
+    );
+    if (!artifact) return;
+
+    setManualArtifacts((current) => {
+      const withoutExisting = current.filter((item) => item.id !== artifact.id);
+      return [...withoutExisting, artifact];
+    });
+    setActiveArtifactId(artifact.id);
+    openCanvasForCurrentViewport();
+  };
+
+  const handleOpenArtifact = (id: string) => {
+    const artifact = artifacts.find((item) => item.id === id);
+    if (!artifact) return;
+    setActiveArtifactId(artifact.id);
+    openCanvasForCurrentViewport();
+  };
+
   return (
-    <div className="border-border bg-card flex h-[calc(100dvh-11rem)] min-h-96 flex-col rounded-lg border">
-      <div className="flex-1 space-y-4 overflow-y-auto p-4">
-        {messages.length === 0 && (
-          <div className="text-muted-foreground flex h-full flex-col items-center justify-center gap-2 text-center">
-            <Bot className="size-8" />
-            <p className="text-foreground font-medium">
-              {t("ai_chat_empty_title")}
-            </p>
-            <p className="max-w-sm text-sm">{t("ai_chat_empty_description")}</p>
-          </div>
-        )}
-        {messages.map((message) => (
-          <div
-            key={message.id}
-            className={cn(
-              "flex",
-              message.role === "user" ? "justify-end" : "justify-start",
-            )}
-          >
-            <div
-              className={cn(
-                "max-w-[85%] rounded-lg px-3 py-2 text-sm",
-                message.role === "user"
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted/50",
-              )}
-            >
-              <MessageParts message={message} />
-            </div>
-          </div>
-        ))}
-        {status === "submitted" && (
-          <Loader2 className="text-muted-foreground size-4 animate-spin" />
-        )}
-        {error && (
-          <div className="border-destructive/30 bg-destructive/10 flex items-center justify-between gap-3 rounded-md border px-3 py-2 text-sm">
-            <span className="flex items-center gap-2">
-              <CircleAlert className="text-destructive size-4" />
-              {t("ai_chat_error_message")}
-            </span>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                clearError();
-                void regenerate();
-              }}
-            >
-              {t("ai_chat_retry")}
-            </Button>
-          </div>
-        )}
-        <div ref={bottomRef} />
-      </div>
-      <div className="border-border flex items-end gap-2 border-t p-3">
-        <Textarea
-          value={input}
-          onChange={(event) => setInput(event.currentTarget.value)}
-          onKeyDown={(event) => {
-            if (event.key === "Enter" && !event.shiftKey) {
-              event.preventDefault();
-              handleSubmit();
-            }
-          }}
-          placeholder={t("ai_chat_input_placeholder")}
-          className="max-h-40 min-h-10 resize-none"
-          rows={1}
+    <div
+      className={cn(
+        "grid min-h-0 w-full flex-1 overflow-hidden border-y lg:border",
+        desktopCanvasOpen
+          ? "lg:grid-cols-[minmax(22rem,0.8fr)_minmax(32rem,1.2fr)]"
+          : "lg:grid-cols-1",
+      )}
+    >
+      <ChatPanel
+        messages={messages}
+        input={input}
+        status={status}
+        error={error}
+        reasoningEffort={reasoningEffort}
+        canvasCount={artifacts.length}
+        onInputChange={setInput}
+        onReasoningEffortChange={setReasoningEffort}
+        onSubmit={handleSubmit}
+        onStop={() => void stop()}
+        onRetry={() => {
+          clearError();
+          void regenerate({ body: { reasoningEffort } });
+        }}
+        onOpenCanvas={openCanvasForCurrentViewport}
+        onOpenMessage={handleOpenMessage}
+        onOpenArtifact={handleOpenArtifact}
+      />
+
+      {desktopCanvasOpen && (
+        <CanvasPanel
+          artifacts={artifacts}
+          activeArtifactId={activeArtifactId}
+          onSelectArtifact={setActiveArtifactId}
+          onClose={() => setDesktopCanvasOpen(false)}
+          className="hidden border-l lg:flex"
         />
-        {isBusy ? (
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => void stop()}
-            aria-label={t("ai_chat_stop")}
-          >
-            <Square className="size-4" />
-          </Button>
-        ) : (
-          <Button
-            size="icon"
-            onClick={handleSubmit}
-            disabled={!input.trim()}
-            aria-label={t("ai_chat_send")}
-          >
-            <Send className="size-4" />
-          </Button>
-        )}
-      </div>
+      )}
+
+      <Sheet open={mobileCanvasOpen} onOpenChange={setMobileCanvasOpen}>
+        <SheetContent className="w-full max-w-none gap-0 p-0 sm:max-w-none lg:hidden">
+          <SheetHeader className="sr-only">
+            <SheetTitle>{t("ai_canvas_title")}</SheetTitle>
+            <SheetDescription>
+              {t("ai_canvas_empty_description")}
+            </SheetDescription>
+          </SheetHeader>
+          <CanvasPanel
+            artifacts={artifacts}
+            activeArtifactId={activeArtifactId}
+            onSelectArtifact={setActiveArtifactId}
+            className="flex h-full"
+          />
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }

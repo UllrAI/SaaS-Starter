@@ -9,12 +9,16 @@ are already wired.
 
 ```
 src/lib/ai/
-├── models.ts              # Provider + default model (OpenAI-compatible, env-configurable)
+├── models.ts              # Responses API provider + default model (env-configurable)
+├── reasoning.ts           # Allowed reasoning effort levels and low default
+├── artifacts.ts           # Shared Markdown/image/video artifact schema
+├── response-chain.ts      # User-bound signed handles for previous_response_id
 ├── context.ts             # AgentContext: per-request session data for tools
 ├── tools/                 # One file per tool
 │   ├── index.ts           # Tool registry: name → factory, plus buildTools()
 │   ├── get-current-time.ts
 │   ├── get-account-overview.ts
+│   ├── present-artifact.ts
 │   └── knowledge-base.ts  # Search + read tools over site content
 ├── skills/
 │   ├── types.ts           # AgentSkill: instructions + tool names
@@ -35,28 +39,34 @@ agent factory from the registry, and returns `createAgentUIStreamResponse`. The 
 `ToolLoopAgent`: it calls the model, executes tool calls, and loops until the model finishes
 or `isStepCount` stops it.
 
-The built-in assistant at `/dashboard/ai` is a working example composed from two skills:
+The built-in assistant at `/dashboard/ai` is a working Chat + Canvas example composed from two skills:
 `account-support` (looks up the signed-in user's profile and subscription) and
 `knowledge-base` (a search → read → answer loop over the site's published articles — ask it
 "does this product support API keys?" and watch it search, open the matching article, and
 answer with a source link). Both run on real data; there are no mocks to remove.
+Substantial Markdown drafts, returned image/video files, and generated images open in the adjacent
+canvas, where users can switch artifacts, copy them, and download them.
 
 ## Configuration
 
-The stack is provider-neutral: any OpenAI-compatible endpoint works out of the box (the OpenAI
-API, LLM gateways, proxies, or local runtimes), so no vendor is hard-wired.
+The stack uses the OpenAI Responses protocol so reasoning and function tools work together.
+`LLM_BASE_URL` remains configurable for gateways that implement the Responses API.
 
 | Setting            | Where                                                 | Notes                                    |
 | :----------------- | :---------------------------------------------------- | :--------------------------------------- |
 | Feature switch     | `SITE_CONFIG.features.ai` in `src/lib/config/site.js` | Gates the nav item, page, and API route. |
 | `LLM_API_KEY`      | `.env`                                                | Required while the feature is enabled.   |
-| `LLM_BASE_URL`     | `.env`                                                | Optional; defaults to the OpenAI API.    |
+| `LLM_BASE_URL`     | `.env`                                                | Optional Responses API base URL.         |
 | `AI_DEFAULT_MODEL` | `.env`                                                | Optional; defaults to `gpt-5.6-luna`.    |
 
-To use a vendor-specific SDK instead (for provider-only features such as native reasoning
-options), change `src/lib/ai/models.ts` only — for example install `@ai-sdk/anthropic` and swap
-`createOpenAICompatible` for `createAnthropic`. Tools, skills, agents, the route, and the UI
-are provider-agnostic.
+The assistant defaults to `low` reasoning; the client may select `low`, `medium`, or `high` per
+request. Image generation is intentionally fixed in code to GPT Image 2, `1024x1024`, low quality,
+WebP output, and at most one built-in tool call per model response. A custom gateway must support
+both the Responses protocol and the OpenAI image-generation built-in tool for that feature to work.
+
+To use another vendor, change `src/lib/ai/models.ts` only — for example install
+`@ai-sdk/anthropic` and swap `createOpenAI` for `createAnthropic`. Tools, skills, agents, and
+routes remain provider-agnostic.
 
 ## Adding a tool
 
@@ -120,13 +130,17 @@ Agents are request-scoped `ToolLoopAgent` instances composed from skills:
 
 ```ts
 // src/lib/ai/agents/support.ts
-export function createSupportAgent(context: AgentContext) {
+export function createSupportAgent(
+  context: AgentContext,
+  options: CreateAgentOptions,
+) {
   const { instructions, toolNames } = composeSkills([
     agentSkills.accountSupport,
     agentSkills.invoicing,
   ]);
   return new ToolLoopAgent({
     model: getChatModel(),
+    reasoning: options.reasoningEffort,
     instructions: `You are the support agent. ...\n\n${instructions}`,
     tools: buildTools(toolNames, context),
     stopWhen: isStepCount(10),
@@ -144,6 +158,7 @@ Add the factory to `agentFactories` in `src/lib/ai/agents/index.ts`; the chat ro
 - Session cookie auth; `401` without a signed-in user.
 - Rate limited per user (30 requests / 10 minutes, `ai_chat` scope).
 - Body capped at 512 KB and 80 messages.
+- Accepts only `low`, `medium`, or `high` reasoning effort and defaults to `low`.
 - Streams a UI message response, including tool-call parts the client can render.
 - Provider errors are logged server-side and masked in the stream; a misconfigured agent
   answers `500` and an unusable message payload answers `400`, neither leaking details.
@@ -151,8 +166,16 @@ Add the factory to `agentFactories` in `src/lib/ai/agents/index.ts`; the chat ro
 `AgentContext` is built from the session on the server, so no field a client sends can widen
 what a tool may read.
 
-The dashboard page at `/dashboard/ai` is a reference client: `useChat` +
-`DefaultChatTransport`, markdown rendering for assistant text, and status chips for tool calls.
+Successful turns expose a signed, user-bound response handle in message metadata. On the next
+turn the client sends only messages created after that response, and the server verifies the
+handle before using the underlying Responses API `previous_response_id`. This keeps generated
+image payloads out of later request bodies and prevents a client from chaining to another user's
+response. Provider response storage is enabled because native response chaining requires it.
+
+The dashboard page at `/dashboard/ai` follows the AI Elements conversation, reasoning,
+prompt-input, tool-status, and artifact patterns while reusing this repository's shadcn primitives
+and design tokens. Desktop uses a split Chat + Canvas workspace; mobile keeps chat primary and
+opens Canvas as a full-height sheet.
 
 ## Testing
 

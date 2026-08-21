@@ -21,6 +21,7 @@
 - **UI 组件库 (shadcn/ui + Tailwind CSS):** 使用 [shadcn/ui](https://ui.shadcn.com/) 构建，它是一个基于 Radix UI 和 Tailwind CSS 的可访问、可组合的组件库，内置主题支持。
 - **表单处理 (Zod + React Hook Form):** 通过 [Zod](https://zod.dev/) 和 [React Hook Form](https://react-hook-form.com/) 实现强大的、类型安全的表单验证。
 - **文件上传 (Cloudflare R2):** 基于 Cloudflare R2 的安全文件上传系统，支持客户端直传和多种文件类型与大小限制。
+- **Agent-Ready AI 能力 (Vercel AI SDK):** 内置多步 Agent 循环、工具注册表、可组合的 Skill 体系和流式聊天界面。只需注册工具和 Skill 即可构建自己的 Agent，鉴权、限流、传输和 UI 均已就绪。详见 [docs/ai-agent.md](docs/ai-agent.md)。
 - **博客系统 (Content Collections):** 使用 [Content Collections](https://www.content-collections.dev/) 配合原生 Markdown 文件，提供类型安全的博客内容、元数据生成和站点地图输出。
 - **Agent 友好的开发工作流:** 自带一等公民 `saas-cli`、浏览器批准的设备登录、API Key 管理，以及在独立的 Developer Access 工作区中查看和撤销已授权 CLI 会话的能力。
 - **代码质量与验证:** 内置 ESLint、Prettier、Jest 和 Playwright 冒烟测试，用于守住关键链路不回退。
@@ -48,6 +49,7 @@
 | **数据库** | [PostgreSQL](https://www.postgresql.org/)                                                                                                             |
 | **ORM**    | [Drizzle ORM](https://orm.drizzle.team/)                                                                                                              |
 | **支付**   | [Stripe](https://stripe.com/)                                                                                                                         |
+| **AI**     | [Vercel AI SDK](https://ai-sdk.dev/) v7，兼容任意 OpenAI 风格 LLM 端点                                                                                |
 | **邮件**   | [Resend](https://resend.com/), [React Email](https://react.email/)                                                                                    |
 | **表单**   | [React Hook Form](https://react-hook-form.com/), [Zod](https://zod.dev/)                                                                              |
 | **部署**   | [Zeabur](https://zeabur.com/) 或 Docker                                                                                                               |
@@ -89,7 +91,7 @@ cp .env.example .env
 #### 脚手架功能开关
 
 `SITE_CONFIG` 是品牌、联系方式、外部链接、静态资源以及 `emailAuth`、`billing`、
-`uploads` 三个静态功能开关的客户端安全单一配置源。三个功能默认全部启用。若项目
+`uploads`、`ai` 静态功能开关的客户端安全单一配置源。所有功能默认全部启用。若项目
 不需要某项能力，应先在这里关闭，再删除对应环境变量。禁用后，相关导航、页面、API、
 插件和 Server Action 都会同步关闭或拦截。
 
@@ -106,6 +108,9 @@ cp .env.example .env
 | `BETTER_AUTH_SECRET`             | **必需。** 至少 32 个字符的随机会话密钥。          | 使用 `openssl rand -base64 32` 生成                 |
 | `RESEND_API_KEY`                 | 启用 `emailAuth` 时必需。Resend API Key。          | `re_xxxxxxxxxxxxxxxx`                               |
 | `RESEND_EMAIL_FROM`              | 启用 `emailAuth` 时必需。已验证的发件地址。        | `noreply@your-verified-domain.com`                  |
+| `LLM_API_KEY`                    | 启用 `ai` 时必需。LLM 端点的 API Key。             | `sk-...`                                            |
+| `LLM_BASE_URL`                   | 可选的 OpenAI 兼容端点，默认为 OpenAI 官方 API。   | `https://api.openai.com/v1`                         |
+| `AI_DEFAULT_MODEL`               | 可选的聊天模型 id，默认 `gpt-5.6-luna`。           | `gpt-5.6-luna`                                      |
 | `STRIPE_SECRET_KEY`              | 启用 `billing` 时必需。需与环境模式匹配。          | `sk_test_...` 或 `sk_live_...`                      |
 | `STRIPE_ENVIRONMENT`             | Stripe 环境模式，默认为 `test_mode`。              | `test_mode` 或 `live_mode`                          |
 | `STRIPE_WEBHOOK_SECRET`          | 启用 `billing` 时必需。Endpoint 签名密钥。         | `whsec_your_webhook_secret`                         |

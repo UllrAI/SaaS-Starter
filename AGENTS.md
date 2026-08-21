@@ -56,6 +56,7 @@ pnpm stripe:sync-products
 - Auth: Better Auth, magic link via Resend, optional OAuth providers
 - Billing: provider abstraction in `src/lib/billing/provider.ts`, current implementation uses Stripe
 - Storage: Cloudflare R2 with presigned uploads
+- AI: Vercel AI SDK v7 agent loop over any OpenAI-compatible endpoint (`LLM_API_KEY`/`LLM_BASE_URL`), tools and skills registered in `src/lib/ai`, feature-gated by `SITE_CONFIG.features.ai` (see `docs/ai-agent.md`)
 - Content: Content Collections plus repository-managed Markdown
 - Localization: `next-intl`
 
@@ -72,6 +73,8 @@ pnpm stripe:sync-products
 - Business logic: `src/lib`
 - Auth logic: `src/lib/auth`
 - Billing logic: `src/lib/billing`
+- AI agent logic (models, tools, skills, agents): `src/lib/ai`
+- AI chat route: `src/app/api/chat`
 - i18n helpers: `src/lib/i18n`, `src/lib/config/i18n.ts`, `src/lib/config/i18n-routing.ts`
 - Translation catalogs: `src/messages`
 - Database schema and migrations: `src/database`, `src/database/migrations`
@@ -196,3 +199,13 @@ pnpm stripe:sync-products
 ## 11. Commit Policy
 
 - Commit both locale catalogs whenever message keys or copy change.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

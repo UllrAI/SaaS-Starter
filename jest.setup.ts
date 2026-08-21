@@ -489,6 +489,9 @@ Object.assign(global, {
         };
       }
     },
+  // jsdom strips the Node web streams the Vercel AI SDK expects.
+  TransformStream:
+    global.TransformStream || require("stream/web").TransformStream,
 });
 
 // Add URL if not present

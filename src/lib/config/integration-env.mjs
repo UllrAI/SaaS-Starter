@@ -17,7 +17,7 @@ function requireIntegrationValues(integration, values, keys) {
 /**
  * Validates relationships that cannot be expressed by individual env schemas.
  *
- * @param {{emailAuth: boolean, billing: boolean, uploads: boolean}} features
+ * @param {{emailAuth: boolean, billing: boolean, uploads: boolean, ai: boolean}} features
  * @param {Record<string, unknown>} values
  */
 export function validateIntegrationEnv(features, values) {
@@ -69,6 +69,10 @@ export function validateIntegrationEnv(features, values) {
     if (!String(values.STRIPE_WEBHOOK_SECRET).startsWith("whsec_")) {
       throw new Error("STRIPE_WEBHOOK_SECRET must start with whsec_.");
     }
+  }
+
+  if (features.ai) {
+    requireIntegrationValues("AI assistant", values, ["LLM_API_KEY"]);
   }
 
   if (features.uploads) {

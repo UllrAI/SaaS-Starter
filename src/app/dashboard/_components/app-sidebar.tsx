@@ -4,6 +4,7 @@ import { useTranslation } from "@/lib/i18n/translation/client";
 import { LocalizedLink as Link } from "@/components/localized-link";
 import {
   BarChart3,
+  Bot,
   CreditCard,
   Home,
   KeyRound,
@@ -134,6 +135,13 @@ export function AppSidebar() {
         matchMode: "exact",
       },
       {
+        id: "ai",
+        label: <>{t("dashboard_ai_assistant")}</>,
+        url: "/dashboard/ai",
+        icon: Bot,
+        matchMode: "exact",
+      },
+      {
         id: "upload",
         label: <>{t("dashboard_upload")}</>,
         url: "/dashboard/upload",
@@ -165,7 +173,8 @@ export function AppSidebar() {
   ).filter(
     (item) =>
       (SITE_CONFIG.features.uploads || item.id !== "upload") &&
-      (SITE_CONFIG.features.billing || item.id !== "billing"),
+      (SITE_CONFIG.features.billing || item.id !== "billing") &&
+      (SITE_CONFIG.features.ai || item.id !== "ai"),
   );
   const adminNavigation = (
     [

@@ -32,6 +32,8 @@
     "stripe:sync-products": "node --env-file-if-exists=.env --import tsx scripts/sync-stripe-products.ts"
   },
   "dependencies": {
+    "@ai-sdk/openai-compatible": "^3.0.34",
+    "@ai-sdk/react": "^4.0.76",
     "@aws-sdk/client-s3": "^3.1056.0",
     "@aws-sdk/lib-storage": "^3.1056.0",
     "@aws-sdk/s3-request-presigner": "^3.1056.0",
@@ -49,6 +51,7 @@
     "@radix-ui/react-tabs": "^1.1.13",
     "@radix-ui/react-tooltip": "^1.2.8",
     "@t3-oss/env-nextjs": "^0.13.11",
+    "ai": "^7.0.73",
     "better-auth": "^1.6.25",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -112,7 +115,7 @@
     "overrides": {
       "@hono/node-server": "2.0.11",
       "@modelcontextprotocol/sdk": "1.29.0",
-      "ai": "6.0.197",
+      "ai": "7.0.73",
       "body-parser": "2.3.0",
       "brace-expansion@^1.1.0": "1.1.18",
       "brace-expansion@^2.0.0": "2.1.4",

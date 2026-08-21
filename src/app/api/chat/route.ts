@@ -16,6 +16,7 @@ import {
   readJsonBodyWithLimit,
   RequestBodyTooLargeError,
 } from "@/lib/http/request-body";
+import { withSseKeepAlive } from "@/lib/http/sse-keep-alive";
 import { getRequestLocale } from "@/lib/i18n/server-locale";
 import { checkRateLimit } from "@/lib/rate-limit";
 
@@ -118,7 +119,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    return await createAgentUIStreamResponse({
+    const response = await createAgentUIStreamResponse({
       agent,
       uiMessages: parsed.data.messages,
       sendSources: true,
@@ -137,6 +138,7 @@ export async function POST(request: NextRequest) {
         return "The assistant hit an unexpected error. Please try again.";
       },
     });
+    return withSseKeepAlive(response);
   } catch (error) {
     // Rejection before streaming starts, e.g. malformed UI messages.
     console.error("AI chat request failed:", error);

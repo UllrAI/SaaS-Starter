@@ -5,6 +5,14 @@ Routine formatting and test-only maintenance are omitted.
 
 ## Unreleased
 
+## 0.1.9 — 2026-08-22
+
+### AI image streaming reliability
+
+- Added SSE comment heartbeats to keep long-running image generations connected
+  through mobile networks and reverse proxies without changing the AI message
+  protocol or adding partial-image costs.
+
 ## 0.1.8 — 2026-08-22
 
 ### Responses API and AI workspace

@@ -21,6 +21,7 @@ describe("SITE_CONFIG", () => {
       emailAuth: true,
       billing: true,
       uploads: true,
+      ai: true,
     });
   });
 });

@@ -130,6 +130,11 @@ const env = createEnv({
     STRIPE_ENVIRONMENT: z.enum(["test_mode", "live_mode"]).default("test_mode"),
     STRIPE_WEBHOOK_SECRET: optionalCredentialSchema,
 
+    // AI assistant (any OpenAI-compatible endpoint)
+    LLM_API_KEY: optionalCredentialSchema,
+    LLM_BASE_URL: z.string().url().default("https://api.openai.com/v1"),
+    AI_DEFAULT_MODEL: z.string().trim().min(1).default("gpt-5.6-luna"),
+
     // E2E testing
     E2E_DATABASE_URL: databaseUrlSchema.optional(),
     E2E_TEST_MODE: z.enum(["true", "false"]).optional(),
@@ -228,6 +233,11 @@ const env = createEnv({
     STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
     STRIPE_ENVIRONMENT: process.env.STRIPE_ENVIRONMENT,
     STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
+
+    // AI assistant
+    LLM_API_KEY: process.env.LLM_API_KEY,
+    LLM_BASE_URL: process.env.LLM_BASE_URL,
+    AI_DEFAULT_MODEL: process.env.AI_DEFAULT_MODEL,
 
     // E2E testing
     E2E_DATABASE_URL: process.env.E2E_DATABASE_URL,

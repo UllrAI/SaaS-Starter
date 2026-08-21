@@ -64,6 +64,18 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  // The Vercel AI SDK ships ESM-only bundles; listing the packages here also
+  // lets next/jest transform them so agent tools stay unit-testable.
+  transpilePackages: [
+    "ai",
+    "@ai-sdk/openai-compatible",
+    "@ai-sdk/react",
+    "@ai-sdk/provider",
+    "@ai-sdk/provider-utils",
+    // Transitive ESM-only deps of `ai` that Jest must transform too.
+    "@ai-sdk/gateway",
+    "@workflow/serde",
+  ],
   images: {
     remotePatterns: getRemotePatterns(),
   },

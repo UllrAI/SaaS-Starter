@@ -46,6 +46,7 @@ jobs:
       STRIPE_SECRET_KEY: sk_test_ci_placeholder
       STRIPE_ENVIRONMENT: test_mode
       STRIPE_WEBHOOK_SECRET: whsec_ci_placeholder
+      LLM_API_KEY: ci-placeholder-llm-key
       NEXT_PUBLIC_APP_URL: https://example.com
 
     steps:

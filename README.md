@@ -21,6 +21,7 @@ This starter kit provides a comprehensive set of powerful features to help you q
 - **UI Component Library (shadcn/ui + Tailwind CSS):** Built with [shadcn/ui](https://ui.shadcn.com/), an accessible, composable component library based on Radix UI and Tailwind CSS with built-in theme support.
 - **Form Handling (Zod + React Hook Form):** Powerful, type-safe form validation through [Zod](https://zod.dev/) and [React Hook Form](https://react-hook-form.com/).
 - **File Upload (Cloudflare R2):** Secure file upload system based on Cloudflare R2, supporting client-side direct upload with various file type and size restrictions.
+- **Agent-Ready AI Stack (Vercel AI SDK):** Multi-step agent loop with a tool registry, composable skills, and a streaming chat UI. Build your own agent by registering tools and skills — auth, rate limiting, transport, and UI are already wired. See [docs/ai-agent.md](docs/ai-agent.md).
 - **Blog System (Content Collections):** Uses [Content Collections](https://www.content-collections.dev/) with plain Markdown files for type-safe blog content, metadata generation, and sitemap output.
 - **Agent-Friendly Developer Workflow:** Ships with a first-party `saas-cli`, browser-approved device login, API key management, and a dedicated Developer Access workspace for reviewing authorized CLI sessions.
 - **Code Quality & Verification:** Built-in ESLint, Prettier, Jest, and Playwright smoke tests to keep critical flows from regressing.
@@ -48,6 +49,7 @@ This starter kit provides a comprehensive set of powerful features to help you q
 | **Database**        | [PostgreSQL](https://www.postgresql.org/)                                                                                                              |
 | **ORM**             | [Drizzle ORM](https://orm.drizzle.team/)                                                                                                               |
 | **Payments**        | [Stripe](https://stripe.com/)                                                                                                                          |
+| **AI**              | [Vercel AI SDK](https://ai-sdk.dev/) v7, any OpenAI-compatible LLM endpoint                                                                            |
 | **Email**           | [Resend](https://resend.com/), [React Email](https://react.email/)                                                                                     |
 | **Forms**           | [React Hook Form](https://react-hook-form.com/), [Zod](https://zod.dev/)                                                                               |
 | **Deployment**      | [Zeabur](https://zeabur.com/) or Docker                                                                                                                |
@@ -89,8 +91,8 @@ features enabled in `src/lib/config/site.js`.
 #### Starter feature selection
 
 `SITE_CONFIG` is the client-safe source of truth for brand, contact, links,
-assets, and the static `emailAuth`, `billing`, and `uploads` feature switches.
-All three features default to enabled. Disable an unused feature there before
+assets, and the static `emailAuth`, `billing`, `uploads`, and `ai` feature
+switches. All features default to enabled. Disable an unused feature there before
 removing its environment variables. Disabled features are removed from
 navigation and guarded at their pages, APIs, plugins, and server actions.
 
@@ -112,6 +114,9 @@ never be added to `SITE_CONFIG`.
 | `BETTER_AUTH_SECRET`             | **Required.** Random session secret, at least 32 characters.    | Generate with `openssl rand -base64 32`             |
 | `RESEND_API_KEY`                 | Required when `emailAuth` is enabled. Resend API key.           | `re_xxxxxxxxxxxxxxxx`                               |
 | `RESEND_EMAIL_FROM`              | Required when `emailAuth` is enabled. Verified sender.          | `noreply@your-verified-domain.com`                  |
+| `LLM_API_KEY`                    | Required when `ai` is enabled. Key for your LLM endpoint.       | `sk-...`                                            |
+| `LLM_BASE_URL`                   | Optional OpenAI-compatible endpoint; defaults to OpenAI.        | `https://api.openai.com/v1`                         |
+| `AI_DEFAULT_MODEL`               | Optional chat model id; defaults to `gpt-5.6-luna`.             | `gpt-5.6-luna`                                      |
 | `STRIPE_SECRET_KEY`              | Required for billing. Prefer a least-privilege restricted key.  | `rk_test_...` or `rk_live_...`                      |
 | `STRIPE_ENVIRONMENT`             | Stripe mode; defaults to `test_mode`.                           | `test_mode` or `live_mode`                          |
 | `STRIPE_WEBHOOK_SECRET`          | Required when `billing` is enabled. Endpoint signing secret.    | `whsec_your_webhook_secret`                         |

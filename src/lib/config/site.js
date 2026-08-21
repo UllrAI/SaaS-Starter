@@ -6,7 +6,7 @@
  * @property {{support: string, legal: string, privacy: string}} contact
  * @property {{repository: string, issues: string, releases: string, discussions: string, docs: string}} links
  * @property {{openGraphImage: string, twitterAccount: string}} assets
- * @property {{emailAuth: boolean, billing: boolean, uploads: boolean}} features
+ * @property {{emailAuth: boolean, billing: boolean, uploads: boolean, ai: boolean}} features
  * @property {{provider: "stripe"}} billing
  */
 
@@ -42,6 +42,7 @@ const SITE_CONFIG = Object.freeze({
     emailAuth: true,
     billing: true,
     uploads: true,
+    ai: true,
   },
   billing: {
     provider: "stripe",

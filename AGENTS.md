@@ -56,6 +56,7 @@ pnpm stripe:sync-products
 - Auth: Better Auth, magic link via Resend, optional OAuth providers
 - Billing: provider abstraction in `src/lib/billing/provider.ts`, current implementation uses Stripe
 - Storage: Cloudflare R2 with presigned uploads
+- AI: Vercel AI SDK v7 agent loop over any OpenAI-compatible endpoint (`LLM_API_KEY`/`LLM_BASE_URL`), tools and skills registered in `src/lib/ai`, feature-gated by `SITE_CONFIG.features.ai` (see `docs/ai-agent.md`)
 - Content: Content Collections plus repository-managed Markdown
 - Localization: `next-intl`
 
@@ -72,6 +73,8 @@ pnpm stripe:sync-products
 - Business logic: `src/lib`
 - Auth logic: `src/lib/auth`
 - Billing logic: `src/lib/billing`
+- AI agent logic (models, tools, skills, agents): `src/lib/ai`
+- AI chat route: `src/app/api/chat`
 - i18n helpers: `src/lib/i18n`, `src/lib/config/i18n.ts`, `src/lib/config/i18n-routing.ts`
 - Translation catalogs: `src/messages`
 - Database schema and migrations: `src/database`, `src/database/migrations`

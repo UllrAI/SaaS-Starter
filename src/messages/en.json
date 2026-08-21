@@ -984,5 +984,18 @@
   "upload_batch_delete_success": "The selected uploads were deleted.",
   "upload_delete_error": "We couldn't delete the upload. Please try again.",
   "upload_delete_success": "The upload has been deleted.",
-  "header_dashboard": "Dashboard"
+  "header_dashboard": "Dashboard",
+  "dashboard_ai_assistant": "AI Assistant",
+  "ai_chat_page_description": "Chat with the built-in agent. It searches the knowledge base and looks up your account to answer.",
+  "ai_chat_empty_title": "How can I help?",
+  "ai_chat_empty_description": "Ask about the product or your account. The assistant searches published articles and reads the ones that matter before it answers.",
+  "ai_chat_input_placeholder": "Send a message…",
+  "ai_chat_send": "Send",
+  "ai_chat_stop": "Stop",
+  "ai_chat_retry": "Try again",
+  "ai_chat_error_message": "The assistant ran into a problem.",
+  "ai_chat_thinking": "Thinking…",
+  "ai_chat_tool_running": "Running {name}…",
+  "ai_chat_tool_result": "Used {name}",
+  "ai_chat_tool_error": "{name} failed"
 }

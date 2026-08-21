@@ -5,6 +5,21 @@ Routine formatting and test-only maintenance are omitted.
 
 ## Unreleased
 
+## 0.1.7 — 2026-08-21
+
+### Agent-ready AI stack
+
+- Added a Vercel AI SDK v7 agent loop behind a provider-neutral
+  OpenAI-compatible endpoint, configured with `LLM_API_KEY`, `LLM_BASE_URL`,
+  and `AI_DEFAULT_MODEL`.
+- Added the `src/lib/ai` module: a tool registry, a composable skill system,
+  and request-scoped agents whose context is built from the session.
+- Added `POST /api/chat` with session auth, per-user rate limiting, body
+  limits, and masked provider errors, plus a streaming chat page at
+  `/dashboard/ai` localized in English and Simplified Chinese.
+- Gated the whole feature behind `SITE_CONFIG.features.ai`. Deployments that
+  keep it enabled must provide `LLM_API_KEY`.
+
 ## 0.1.6 — 2026-08-20
 
 ### Security

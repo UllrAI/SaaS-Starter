@@ -21,6 +21,7 @@ const contentSecurityPolicy = [
   `script-src 'self' 'unsafe-inline'${isDevelopment ? " 'unsafe-eval'" : ""}${umamiScriptOrigin ? ` ${umamiScriptOrigin}` : ""}`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https:",
+  "media-src 'self' blob: https:",
   "font-src 'self' data:",
   `connect-src 'self' https: wss:${umamiScriptOrigin ? ` ${umamiScriptOrigin}` : ""}`,
   "frame-src 'none'",
@@ -68,7 +69,7 @@ const nextConfig: NextConfig = {
   // lets next/jest transform them so agent tools stay unit-testable.
   transpilePackages: [
     "ai",
-    "@ai-sdk/openai-compatible",
+    "@ai-sdk/openai",
     "@ai-sdk/react",
     "@ai-sdk/provider",
     "@ai-sdk/provider-utils",

@@ -2,6 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { createAgentUIStreamResponse } from "ai";
 import { createAgent, isAgentId } from "@/lib/ai/agents";
+import {
+  DEFAULT_REASONING_EFFORT,
+  REASONING_EFFORTS,
+} from "@/lib/ai/reasoning";
+import {
+  createResponseHandle,
+  readResponseHandle,
+} from "@/lib/ai/response-chain";
 import { getAuthSessionFromHeaders } from "@/lib/auth/session";
 import { SITE_CONFIG } from "@/lib/config/site";
 import {
@@ -19,6 +27,8 @@ const CHAT_RATE_WINDOW_MS = 10 * 60 * 1000;
 const chatRequestSchema = z.object({
   messages: z.array(z.unknown()).min(1).max(MAX_CHAT_MESSAGES),
   agentId: z.string().default("assistant"),
+  reasoningEffort: z.enum(REASONING_EFFORTS).default(DEFAULT_REASONING_EFFORT),
+  responseHandle: z.string().max(512).optional(),
 });
 
 export async function POST(request: NextRequest) {
@@ -71,15 +81,33 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  const previousResponseId = parsed.data.responseHandle
+    ? (readResponseHandle(parsed.data.responseHandle, session.user.id) ??
+      undefined)
+    : undefined;
+  if (parsed.data.responseHandle && !previousResponseId) {
+    return NextResponse.json(
+      { error: "Invalid response handle." },
+      { status: 400 },
+    );
+  }
+
   let agent: ReturnType<typeof createAgent>;
   try {
-    agent = createAgent(parsed.data.agentId, {
-      userId: session.user.id,
-      userName: session.user.name,
-      userEmail: session.user.email,
-      userRole: session.user.role,
-      locale: await getRequestLocale(),
-    });
+    agent = createAgent(
+      parsed.data.agentId,
+      {
+        userId: session.user.id,
+        userName: session.user.name,
+        userEmail: session.user.email,
+        userRole: session.user.role,
+        locale: await getRequestLocale(),
+      },
+      {
+        reasoningEffort: parsed.data.reasoningEffort,
+        previousResponseId,
+      },
+    );
   } catch (error) {
     // Misconfigured model or agent definition: never leak the details.
     console.error("AI agent could not be created:", error);
@@ -93,6 +121,16 @@ export async function POST(request: NextRequest) {
     return await createAgentUIStreamResponse({
       agent,
       uiMessages: parsed.data.messages,
+      sendSources: true,
+      messageMetadata: ({ part }) =>
+        part.type === "finish-step"
+          ? {
+              responseHandle: createResponseHandle(
+                part.response.id,
+                session.user.id,
+              ),
+            }
+          : undefined,
       onError: (error) => {
         console.error("AI chat stream error:", error);
         // Keep provider error details out of the client stream.

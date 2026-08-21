@@ -35,5 +35,9 @@ test("shows the assistant composer to a signed-in user", async ({ page }) => {
 
   await expect(page).toHaveURL(/\/dashboard\/ai$/);
   await expect(page.getByText("How can I help?")).toBeVisible();
-  await expect(page.getByPlaceholder(/Send a message/)).toBeVisible();
+  await expect(page.getByPlaceholder(/Ask, draft, or create/)).toBeVisible();
+  await expect(page.getByLabel("Reasoning effort")).toContainText(
+    "Low reasoning",
+  );
+  await expect(page.getByRole("region", { name: "Canvas" })).toBeVisible();
 });

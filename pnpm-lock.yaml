@@ -41,9 +41,9 @@ overrides:
 importers:
   .:
     dependencies:
-      "@ai-sdk/openai-compatible":
-        specifier: ^3.0.34
-        version: 3.0.34(zod@4.4.3)
+      "@ai-sdk/openai":
+        specifier: ^4.0.45
+        version: 4.0.45(zod@4.4.3)
       "@ai-sdk/react":
         specifier: ^4.0.76
         version: 4.0.76(react@19.2.6)(zod@4.4.3)
@@ -296,10 +296,10 @@ packages:
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
 
-  "@ai-sdk/openai-compatible@3.0.34":
+  "@ai-sdk/openai@4.0.45":
     resolution:
       {
-        integrity: sha512-KTyUuDXaHgKochdT0omCIQapXJi1nyNFnHZkGwssLergL/d0mOriJ8s5fCv7ba+IB1vpDC0LVU6BrXuHAlvctQ==,
+        integrity: sha512-F/zHXTfCaHO0Q5egf8HRdc645Mp/ofLE9NSjl5RwaXfqrqLfiLROE9xScgKf4iziElsjuQYbesPEcW37mmZy3w==,
       }
     engines: { node: ">=22" }
     peerDependencies:
@@ -10572,7 +10572,7 @@ snapshots:
       pkce-challenge: 5.0.1
       zod: 4.4.3
 
-  "@ai-sdk/openai-compatible@3.0.34(zod@4.4.3)":
+  "@ai-sdk/openai@4.0.45(zod@4.4.3)":
     dependencies:
       "@ai-sdk/provider": 4.0.7
       "@ai-sdk/provider-utils": 5.0.28(zod@4.4.3)

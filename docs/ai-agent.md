@@ -12,12 +12,13 @@ src/lib/ai/
 ├── models.ts              # Provider + default model (OpenAI-compatible, env-configurable)
 ├── context.ts             # AgentContext: per-request session data for tools
 ├── tools/                 # One file per tool
-│   ├── get-current-time.ts    # Static tool (no context)
-│   ├── get-account-overview.ts # Context-aware tool factory
-│   └── knowledge-base.ts      # Search + read tools over site content
+│   ├── index.ts           # Tool registry: name → factory, plus buildTools()
+│   ├── get-current-time.ts
+│   ├── get-account-overview.ts
+│   └── knowledge-base.ts  # Search + read tools over site content
 ├── skills/
-│   ├── types.ts           # AgentSkill: instructions + tools bundle
-│   ├── compose.ts         # composeSkills / mergeToolSets
+│   ├── types.ts           # AgentSkill: instructions + tool names
+│   ├── compose.ts         # composeSkills
 │   ├── account-support.ts # Example skill: account questions
 │   ├── knowledge-base.ts  # Example skill: search → read → answer loop
 │   └── index.ts           # Skill registry
@@ -59,11 +60,10 @@ are provider-agnostic.
 
 ## Adding a tool
 
-A tool is a typed function the model can call. Static tools export a `tool()` directly;
-tools that need the signed-in user take the context through a factory:
+Two steps: create the file, then register it.
 
 ```ts
-// src/lib/ai/tools/get-open-invoices.ts
+// 1. src/lib/ai/tools/get-open-invoices.ts
 import { tool } from "ai";
 import { z } from "zod";
 import type { AgentContext } from "../context";
@@ -82,8 +82,17 @@ export function createGetOpenInvoices(context: AgentContext) {
 }
 ```
 
-Attach it to a skill (preferred) or directly to an agent's tool set. Tool names must be unique
-per agent; `mergeToolSets` throws on collisions.
+```ts
+// 2. src/lib/ai/tools/index.ts
+export const agentTools = {
+  // ...existing tools
+  getOpenInvoices: createGetOpenInvoices,
+} satisfies Record<string, (context: AgentContext) => ToolSet[string]>;
+```
+
+Every tool is a factory over `AgentContext`, so tools that need no context simply ignore the
+argument. The registry key is the name the model sees, which means each name is defined exactly
+once and two tools can never collide.
 
 ## Adding a skill
 
@@ -93,20 +102,17 @@ both the knowledge and the capability:
 ```ts
 // src/lib/ai/skills/invoicing.ts
 import type { AgentSkill } from "./types";
-import { createGetOpenInvoices } from "../tools/get-open-invoices";
 
 export const invoicingSkill: AgentSkill = {
   id: "invoicing",
-  description: "Answers questions about the user's invoices.",
   instructions: `Use the getOpenInvoices tool before answering invoice questions; never guess amounts.`,
-  tools: (context) => ({
-    getOpenInvoices: createGetOpenInvoices(context),
-  }),
+  toolNames: ["getOpenInvoices"],
 };
 ```
 
-Register it in `src/lib/ai/skills/index.ts`, then add it to an agent's skill list. Prompt-only
-skills (tone, policies, escalation rules) simply omit `tools`.
+Register it in `src/lib/ai/skills/index.ts`, then add it to an agent's skill list. Skills
+reference tools by registry name, so `toolNames` is type-checked and two skills may share a
+tool without conflict. Prompt-only skills (tone, policies, escalation rules) omit `toolNames`.
 
 ## Adding an agent
 
@@ -115,14 +121,14 @@ Agents are request-scoped `ToolLoopAgent` instances composed from skills:
 ```ts
 // src/lib/ai/agents/support.ts
 export function createSupportAgent(context: AgentContext) {
-  const { instructions, tools } = composeSkills(
-    [agentSkills.accountSupport, invoicingSkill],
-    context,
-  );
+  const { instructions, toolNames } = composeSkills([
+    agentSkills.accountSupport,
+    agentSkills.invoicing,
+  ]);
   return new ToolLoopAgent({
     model: getChatModel(),
     instructions: `You are the support agent. ...\n\n${instructions}`,
-    tools,
+    tools: buildTools(toolNames, context),
     stopWhen: isStepCount(10),
   });
 }
@@ -139,7 +145,11 @@ Add the factory to `agentFactories` in `src/lib/ai/agents/index.ts`; the chat ro
 - Rate limited per user (30 requests / 10 minutes, `ai_chat` scope).
 - Body capped at 512 KB and 80 messages.
 - Streams a UI message response, including tool-call parts the client can render.
-- Provider errors are logged server-side and masked in the stream.
+- Provider errors are logged server-side and masked in the stream; a misconfigured agent
+  answers `500` and an unusable message payload answers `400`, neither leaking details.
+
+`AgentContext` is built from the session on the server, so no field a client sends can widen
+what a tool may read.
 
 The dashboard page at `/dashboard/ai` is a reference client: `useChat` +
 `DefaultChatTransport`, markdown rendering for assistant text, and status chips for tool calls.
@@ -148,6 +158,9 @@ The dashboard page at `/dashboard/ai` is a reference client: `useChat` +
 
 Agent code is unit-testable with Jest. The AI SDK packages are ESM-only, so they are listed in
 `transpilePackages` in `next.config.ts` (which `next/jest` also uses), and `jest.setup.ts`
-polyfills `TransformStream` for jsdom. See `src/lib/ai/skills/compose.test.ts` and
-`src/lib/ai/tools/get-current-time.test.ts` for patterns: call a tool's `execute` directly, and
-test skill composition with plain fake tools.
+polyfills `TransformStream` for jsdom.
+
+Patterns to copy: call a tool's `execute` directly (`tools/*.test.ts`), compose skills without a
+context (`skills/compose.test.ts`), and cover a route by mocking session, rate limit, and agent
+(`src/app/api/chat/route.test.ts`). `e2e/ai-assistant.spec.ts` covers the page and the route's
+rejection paths without calling a model, so it needs no provider credentials.

@@ -1,10 +1,22 @@
 import type { ToolExecutionOptions } from "ai";
-import { getCurrentTime } from "./get-current-time";
+import type { AgentContext } from "../context";
+import { createGetCurrentTime } from "./get-current-time";
 
 const executionOptions = {} as ToolExecutionOptions;
 
-function execute(input: { timeZone?: string }) {
-  return getCurrentTime.execute!(input, executionOptions) as {
+const context: AgentContext = {
+  userId: "user-1",
+  userName: "Ada",
+  userEmail: "ada@example.com",
+  userRole: "user",
+  locale: "en",
+};
+
+function execute(input: { timeZone?: string }, agentContext = context) {
+  return createGetCurrentTime(agentContext).execute!(
+    input,
+    executionOptions,
+  ) as {
     iso?: string;
     timeZone?: string;
     localized?: string;
@@ -24,6 +36,15 @@ describe("getCurrentTime", () => {
     const result = execute({ timeZone: "Asia/Shanghai" });
     expect(result.timeZone).toBe("Asia/Shanghai");
     expect(result.error).toBeUndefined();
+  });
+
+  it("formats using the agent locale rather than a fixed one", () => {
+    const english = execute({ timeZone: "UTC" });
+    const chinese = execute(
+      { timeZone: "UTC" },
+      { ...context, locale: "zh-Hans" },
+    );
+    expect(chinese.localized).not.toBe(english.localized);
   });
 
   it("reports unknown time zones instead of throwing", () => {

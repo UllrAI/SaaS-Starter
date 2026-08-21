@@ -1,5 +1,4 @@
-import type { ToolSet } from "ai";
-import type { AgentContext } from "../context";
+import type { AgentToolName } from "../tools";
 
 /**
  * A skill bundles a system-prompt fragment with the tools it needs.
@@ -8,10 +7,8 @@ import type { AgentContext } from "../context";
  */
 export interface AgentSkill {
   id: string;
-  /** Shown to maintainers only; not sent to the model. */
-  description: string;
   /** Markdown appended to the agent system prompt under a skill heading. */
   instructions: string;
-  /** Tools the skill contributes, built per request from the session context. */
-  tools?: (context: AgentContext) => ToolSet;
+  /** Tools the skill needs, by their name in the tool registry. */
+  toolNames?: AgentToolName[];
 }

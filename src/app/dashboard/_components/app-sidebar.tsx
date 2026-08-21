@@ -43,6 +43,22 @@ type NavigationItem = {
   icon: LucideIcon;
   matchMode?: "exact" | "prefix";
 };
+// Navigation entries whose feature can be switched off in SITE_CONFIG.
+// Anything absent here is always shown.
+const FEATURE_BY_ITEM_ID: Record<string, keyof typeof SITE_CONFIG.features> = {
+  ai: "ai",
+  upload: "uploads",
+  billing: "billing",
+  payments: "billing",
+  subscriptions: "billing",
+  "uploads-management": "uploads",
+};
+
+function isNavigationItemEnabled(item: NavigationItem): boolean {
+  const feature = FEATURE_BY_ITEM_ID[item.id];
+  return !feature || SITE_CONFIG.features[feature];
+}
+
 interface MenuItemProps {
   item: NavigationItem;
   pathname: string;
@@ -170,12 +186,7 @@ export function AppSidebar() {
         matchMode: "exact",
       },
     ] satisfies NavigationItem[]
-  ).filter(
-    (item) =>
-      (SITE_CONFIG.features.uploads || item.id !== "upload") &&
-      (SITE_CONFIG.features.billing || item.id !== "billing") &&
-      (SITE_CONFIG.features.ai || item.id !== "ai"),
-  );
+  ).filter(isNavigationItemEnabled);
   const adminNavigation = (
     [
       {
@@ -214,12 +225,7 @@ export function AppSidebar() {
         matchMode: "exact",
       },
     ] satisfies NavigationItem[]
-  ).filter(
-    (item) =>
-      (SITE_CONFIG.features.billing ||
-        (item.id !== "payments" && item.id !== "subscriptions")) &&
-      (SITE_CONFIG.features.uploads || item.id !== "uploads-management"),
-  );
+  ).filter(isNavigationItemEnabled);
   return (
     <Sidebar collapsible="icon" variant="inset">
       <SidebarHeader

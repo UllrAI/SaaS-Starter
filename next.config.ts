@@ -70,15 +70,11 @@ const nextConfig: NextConfig = {
     "ai",
     "@ai-sdk/openai-compatible",
     "@ai-sdk/react",
-    "@ai-sdk/gateway",
-    "@ai-sdk/mcp",
     "@ai-sdk/provider",
     "@ai-sdk/provider-utils",
-    "@standard-schema/spec",
-    "@vercel/oidc",
+    // Transitive ESM-only deps of `ai` that Jest must transform too.
+    "@ai-sdk/gateway",
     "@workflow/serde",
-    "eventsource-parser",
-    "throttleit",
   ],
   images: {
     remotePatterns: getRemotePatterns(),

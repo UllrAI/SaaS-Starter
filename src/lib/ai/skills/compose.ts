@@ -1,42 +1,21 @@
-import type { ToolSet } from "ai";
-import type { AgentContext } from "../context";
+import type { AgentToolName } from "../tools";
 import type { AgentSkill } from "./types";
 
 export interface ComposedSkills {
   instructions: string;
-  tools: ToolSet;
+  toolNames: AgentToolName[];
 }
 
 /**
- * Merges tool sets, rejecting duplicate names so the model never sees an
- * ambiguous tool table.
+ * Composes the selected skills into one prompt fragment and the set of tool
+ * names they need. Skills may share a tool; it is requested only once.
  */
-export function mergeToolSets(...sets: ToolSet[]): ToolSet {
-  const merged: ToolSet = {};
-  for (const set of sets) {
-    for (const [name, entry] of Object.entries(set)) {
-      if (name in merged) {
-        throw new Error(`Duplicate agent tool "${name}".`);
-      }
-      merged[name] = entry;
-    }
-  }
-  return merged;
-}
+export function composeSkills(skills: AgentSkill[]): ComposedSkills {
+  const instructions = skills
+    .map((skill) => `## Skill: ${skill.id}\n\n${skill.instructions.trim()}`)
+    .join("\n\n");
 
-/**
- * Composes the selected skills into one prompt fragment and one tool set.
- */
-export function composeSkills(
-  skills: AgentSkill[],
-  context: AgentContext,
-): ComposedSkills {
-  const sections = skills.map(
-    (skill) => `## Skill: ${skill.id}\n\n${skill.instructions.trim()}`,
-  );
-  const tools = mergeToolSets(
-    ...skills.map((skill) => skill.tools?.(context) ?? {}),
-  );
+  const toolNames = new Set(skills.flatMap((skill) => skill.toolNames ?? []));
 
-  return { instructions: sections.join("\n\n"), tools };
+  return { instructions, toolNames: [...toolNames] };
 }

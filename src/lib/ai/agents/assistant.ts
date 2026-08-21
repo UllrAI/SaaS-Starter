@@ -4,12 +4,16 @@ import { APP_NAME } from "@/lib/config/constants";
 import type { AgentContext } from "../context";
 import { getChatModel } from "../models";
 import { agentSkills, composeSkills } from "../skills";
-import { mergeToolSets } from "../skills/compose";
-import { getCurrentTime } from "../tools/get-current-time";
+import { buildTools, type AgentToolName } from "../tools";
 
 const MAX_AGENT_STEPS = 10;
 
-const assistantSkills = [agentSkills.accountSupport, agentSkills.knowledgeBase];
+const ASSISTANT_SKILLS = [
+  agentSkills.accountSupport,
+  agentSkills.knowledgeBase,
+];
+// Tools available regardless of the skills above.
+const ASSISTANT_TOOLS: AgentToolName[] = ["getCurrentTime"];
 
 function buildInstructions(context: AgentContext, skillInstructions: string) {
   return `You are the in-app assistant of ${APP_NAME}.
@@ -23,12 +27,12 @@ ${skillInstructions}`;
 // Agents are cheap request-scoped objects: construct one per request so
 // tools close over the authenticated session context.
 export function createAssistantAgent(context: AgentContext) {
-  const { instructions, tools } = composeSkills(assistantSkills, context);
+  const { instructions, toolNames } = composeSkills(ASSISTANT_SKILLS);
 
   return new ToolLoopAgent({
     model: getChatModel(),
     instructions: buildInstructions(context, instructions),
-    tools: mergeToolSets({ getCurrentTime }, tools),
+    tools: buildTools([...ASSISTANT_TOOLS, ...toolNames], context),
     stopWhen: isStepCount(MAX_AGENT_STEPS),
   });
 }

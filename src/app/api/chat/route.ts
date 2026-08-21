@@ -71,13 +71,23 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const agent = createAgent(parsed.data.agentId, {
-    userId: session.user.id,
-    userName: session.user.name,
-    userEmail: session.user.email,
-    userRole: session.user.role,
-    locale: await getRequestLocale(),
-  });
+  let agent: ReturnType<typeof createAgent>;
+  try {
+    agent = createAgent(parsed.data.agentId, {
+      userId: session.user.id,
+      userName: session.user.name,
+      userEmail: session.user.email,
+      userRole: session.user.role,
+      locale: await getRequestLocale(),
+    });
+  } catch (error) {
+    // Misconfigured model or agent definition: never leak the details.
+    console.error("AI agent could not be created:", error);
+    return NextResponse.json(
+      { error: "The assistant is unavailable." },
+      { status: 500 },
+    );
+  }
 
   try {
     return await createAgentUIStreamResponse({

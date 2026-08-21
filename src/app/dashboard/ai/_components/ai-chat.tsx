@@ -21,24 +21,27 @@ import { cn } from "@/lib/utils";
 function ToolCallChip({ part }: { part: ToolUIPart | DynamicToolUIPart }) {
   const { t } = useTranslation();
   const name = getToolOrDynamicToolName(part);
-  const isSettled =
-    part.state === "output-available" || part.state === "output-error";
+  // Only the input states spin; anything else is settled, so a state this UI
+  // does not know about can never leave a spinner running forever.
+  const isRunning =
+    part.state === "input-streaming" || part.state === "input-available";
+  const isError = part.state === "output-error";
 
   return (
     <div className="border-border bg-muted/50 text-muted-foreground my-1 flex w-fit items-center gap-2 rounded-md border px-2 py-1 text-xs">
-      {part.state === "output-error" ? (
+      {isError ? (
         <CircleAlert className="text-destructive size-3.5" />
-      ) : isSettled ? (
-        <Wrench className="size-3.5" />
-      ) : (
+      ) : isRunning ? (
         <Loader2 className="size-3.5 animate-spin" />
+      ) : (
+        <Wrench className="size-3.5" />
       )}
       <span translate="no">
-        {part.state === "output-error"
+        {isError
           ? t("ai_chat_tool_error", { name })
-          : isSettled
-            ? t("ai_chat_tool_result", { name })
-            : t("ai_chat_tool_running", { name })}
+          : isRunning
+            ? t("ai_chat_tool_running", { name })
+            : t("ai_chat_tool_result", { name })}
       </span>
     </div>
   );

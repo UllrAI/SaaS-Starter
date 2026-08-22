@@ -8,7 +8,6 @@ import {
   useMemo,
   useRef,
   useState,
-  useSyncExternalStore,
 } from "react";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport, type FileUIPart } from "ai";
@@ -98,11 +97,18 @@ function subscribeToStoredValues(onChange: () => void) {
 }
 
 function useStoredBoolean(key: string, defaultValue: boolean) {
-  return useSyncExternalStore(
-    subscribeToStoredValues,
-    () => readStoredBoolean(key) ?? defaultValue,
-    () => defaultValue,
-  );
+  const [value, setValue] = useState(defaultValue);
+
+  useEffect(() => {
+    const syncValue = () => {
+      setValue(readStoredBoolean(key) ?? defaultValue);
+    };
+
+    syncValue();
+    return subscribeToStoredValues(syncValue);
+  }, [defaultValue, key]);
+
+  return value;
 }
 
 function readStoredCanvasPercent() {
@@ -116,11 +122,18 @@ function readStoredCanvasPercent() {
 }
 
 function useStoredCanvasPercent() {
-  return useSyncExternalStore(
-    subscribeToStoredValues,
-    readStoredCanvasPercent,
-    () => DEFAULT_CANVAS_PERCENT,
-  );
+  const [value, setValue] = useState(DEFAULT_CANVAS_PERCENT);
+
+  useEffect(() => {
+    const syncValue = () => {
+      setValue(readStoredCanvasPercent());
+    };
+
+    syncValue();
+    return subscribeToStoredValues(syncValue);
+  }, []);
+
+  return value;
 }
 
 function isReasoningEffort(value: unknown): value is ReasoningEffort {

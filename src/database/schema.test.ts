@@ -16,6 +16,9 @@ import {
   apiKeys,
   deviceCodes,
   cliTokens,
+  aiConversations,
+  aiMessages,
+  aiMessageRoleEnum,
 } from "./schema";
 import { Table } from "drizzle-orm/table";
 import { getTableConfig } from "drizzle-orm/pg-core";
@@ -77,6 +80,13 @@ describe("Database Schema", () => {
         "cancelled",
         "cleaning",
         "completed",
+      ]);
+      expect(aiConversations).toBeDefined();
+      expect(aiMessages).toBeDefined();
+      expect(aiMessageRoleEnum.enumValues).toEqual([
+        "system",
+        "user",
+        "assistant",
       ]);
       expect(uploads).toBeDefined();
       expect(apiKeys).toBeDefined();
@@ -1537,6 +1547,22 @@ describe("Database Schema", () => {
       expect(
         configs.find((cfg) => cfg.name === "uploads_fileKey_unique")?.unique,
       ).toBe(true);
+    });
+
+    it("AI chat tables index user history and message ordering", () => {
+      const conversationIndexes = getIndexConfigs(aiConversations).map(
+        (config) => config.name,
+      );
+      const messageIndexes = getIndexConfigs(aiMessages).map(
+        (config) => config.name,
+      );
+
+      expect(conversationIndexes).toContain(
+        "ai_conversations_userId_updatedAt_idx",
+      );
+      expect(messageIndexes).toContain(
+        "ai_messages_conversationId_createdAt_idx",
+      );
     });
 
     it("upload intents index quota and cleanup lookups", () => {

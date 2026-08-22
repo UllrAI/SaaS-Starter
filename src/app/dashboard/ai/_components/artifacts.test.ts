@@ -1,5 +1,5 @@
 import { describe, expect, it } from "@jest/globals";
-import type { AiMessage } from "./chat-types";
+import type { AiMessage } from "@/lib/ai/chat-history-types";
 import { createMarkdownArtifact, extractArtifacts } from "./artifacts";
 
 describe("canvas artifacts", () => {
@@ -64,5 +64,33 @@ describe("canvas artifacts", () => {
       title: "Assistant response",
       content: "First\n\nSecond",
     });
+  });
+
+  it("restores generated images from durable storage URLs", () => {
+    const messages: AiMessage[] = [
+      {
+        id: "a2",
+        role: "assistant",
+        parts: [
+          {
+            type: "tool-generateImage",
+            toolCallId: "tool-3",
+            state: "output-available",
+            providerExecuted: true,
+            input: {},
+            output: { url: "https://cdn.example.com/image.webp" },
+          },
+        ],
+      },
+    ];
+
+    expect(extractArtifacts(messages)).toEqual([
+      {
+        id: "a2:0",
+        kind: "image",
+        url: "https://cdn.example.com/image.webp",
+        mediaType: "image/webp",
+      },
+    ]);
   });
 });

@@ -11,6 +11,7 @@ import {
   primaryKey,
   foreignKey,
   check,
+  jsonb,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 
@@ -25,6 +26,12 @@ export const uploadIntentStatusEnum = pgEnum("upload_intent_status", [
   "cancelled",
   "cleaning",
   "completed",
+]);
+
+export const aiMessageRoleEnum = pgEnum("ai_message_role", [
+  "system",
+  "user",
+  "assistant",
 ]);
 
 export const users = pgTable("users", {
@@ -326,6 +333,51 @@ export const rateLimitBuckets = pgTable(
   (table) => ({
     pk: primaryKey({ columns: [table.scope, table.keyHash] }),
     resetAtIdx: index("rate_limit_buckets_resetAt_idx").on(table.resetAt),
+  }),
+);
+
+export const aiConversations = pgTable(
+  "ai_conversations",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    title: text("title"),
+    createdAt: timestamp("createdAt", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updatedAt", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => ({
+    userUpdatedAtIdx: index("ai_conversations_userId_updatedAt_idx").on(
+      table.userId,
+      table.updatedAt.desc(),
+    ),
+  }),
+);
+
+export const aiMessages = pgTable(
+  "ai_messages",
+  {
+    id: text("id").notNull(),
+    conversationId: uuid("conversationId")
+      .notNull()
+      .references(() => aiConversations.id, { onDelete: "cascade" }),
+    role: aiMessageRoleEnum("role").notNull(),
+    parts: jsonb("parts").$type<unknown[]>().notNull(),
+    metadata: jsonb("metadata").$type<Record<string, unknown> | null>(),
+    createdAt: timestamp("createdAt", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => ({
+    pk: primaryKey({ columns: [table.conversationId, table.id] }),
+    conversationCreatedAtIdx: index(
+      "ai_messages_conversationId_createdAt_idx",
+    ).on(table.conversationId, table.createdAt),
   }),
 );
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "@jest/globals";
-import type { AiMessage } from "./chat-types";
+import type { AiMessage } from "@/lib/ai/chat-history-types";
 import { prepareChatRequest } from "./chat-request";
 
 const firstUser: AiMessage = {
@@ -24,11 +24,13 @@ describe("prepareChatRequest", () => {
     expect(
       prepareChatRequest({
         messages: [firstUser, firstAssistant, secondUser],
+        conversationId: "conversation-1",
         trigger: "submit-message",
         reasoningEffort: "low",
       }),
     ).toEqual({
       messages: [secondUser],
+      conversationId: "conversation-1",
       agentId: "assistant",
       reasoningEffort: "low",
       responseHandle: "resp_1.signature",
@@ -39,11 +41,13 @@ describe("prepareChatRequest", () => {
     expect(
       prepareChatRequest({
         messages: [firstUser],
+        conversationId: "conversation-1",
         trigger: "submit-message",
         reasoningEffort: "medium",
       }),
     ).toEqual({
       messages: [firstUser],
+      conversationId: "conversation-1",
       agentId: "assistant",
       reasoningEffort: "medium",
     });
@@ -60,12 +64,14 @@ describe("prepareChatRequest", () => {
     expect(
       prepareChatRequest({
         messages: [firstUser, firstAssistant, secondUser, secondAssistant],
+        conversationId: "conversation-1",
         trigger: "regenerate-message",
         messageId: "a2",
         reasoningEffort: "high",
       }),
     ).toEqual({
       messages: [secondUser],
+      conversationId: "conversation-1",
       agentId: "assistant",
       reasoningEffort: "high",
       responseHandle: "resp_1.signature",

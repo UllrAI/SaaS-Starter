@@ -27,6 +27,7 @@ describe("AI workspace layout", () => {
     expect(
       shouldOpenDesktopCanvas({
         automaticallyOpen: false,
+        hasArtifacts: false,
         manuallyOpen: false,
         preferredOpen: false,
       }),
@@ -34,6 +35,15 @@ describe("AI workspace layout", () => {
     expect(
       shouldOpenDesktopCanvas({
         automaticallyOpen: false,
+        hasArtifacts: false,
+        manuallyOpen: false,
+        preferredOpen: true,
+      }),
+    ).toBe(false);
+    expect(
+      shouldOpenDesktopCanvas({
+        automaticallyOpen: false,
+        hasArtifacts: true,
         manuallyOpen: false,
         preferredOpen: true,
       }),
@@ -44,6 +54,7 @@ describe("AI workspace layout", () => {
     expect(
       shouldOpenDesktopCanvas({
         automaticallyOpen: false,
+        hasArtifacts: false,
         manuallyOpen: true,
         preferredOpen: false,
       }),
@@ -51,6 +62,7 @@ describe("AI workspace layout", () => {
     expect(
       shouldOpenDesktopCanvas({
         automaticallyOpen: true,
+        hasArtifacts: false,
         manuallyOpen: false,
         preferredOpen: false,
       }),

@@ -277,6 +277,15 @@ export type SpyInstance = jest.SpyInstance<any, any>;
 
 // Setup Web APIs for Node.js environment
 const { TextEncoder, TextDecoder } = require("util");
+const { deserialize, serialize } = require("node:v8");
+const {
+  ReadableStream: WebReadableStream,
+  TransformStream: WebTransformStream,
+  WritableStream: WebWritableStream,
+} = require("node:stream/web");
+
+const structuredClonePolyfill = <T>(value: T): T =>
+  deserialize(serialize(value)) as T;
 
 // Simplified Mock Headers implementation
 class MockHeaders {
@@ -463,35 +472,15 @@ class MockResponse {
 Object.assign(global, {
   TextEncoder,
   TextDecoder,
+  structuredClone: global.structuredClone || structuredClonePolyfill,
   Request: global.Request || class MockRequest {},
   Response: global.Response || MockResponse,
   Headers: global.Headers || MockHeaders,
   fetch: global.fetch || jest.fn(),
-  ReadableStream:
-    global.ReadableStream ||
-    class MockReadableStream {
-      constructor() {}
-      getReader() {
-        return {
-          read: () => Promise.resolve({ done: true }),
-          releaseLock: () => {},
-        };
-      }
-    },
-  WritableStream:
-    global.WritableStream ||
-    class MockWritableStream {
-      constructor() {}
-      getWriter() {
-        return {
-          write: () => Promise.resolve(),
-          close: () => Promise.resolve(),
-        };
-      }
-    },
-  // jsdom strips the Node web streams the Vercel AI SDK expects.
-  TransformStream:
-    global.TransformStream || require("stream/web").TransformStream,
+  // jsdom does not provide the complete Web Streams API the AI SDK expects.
+  ReadableStream: WebReadableStream,
+  WritableStream: WebWritableStream,
+  TransformStream: WebTransformStream,
 });
 
 // Add URL if not present

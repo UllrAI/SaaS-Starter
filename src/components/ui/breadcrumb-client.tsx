@@ -3,7 +3,7 @@
 // Client-only clone of the shadcn breadcrumb to avoid mutating the original file.
 import { useTranslation } from "@/lib/i18n/translation/client";
 import * as React from "react";
-import { Slot } from "@radix-ui/react-slot";
+import { Slot as SlotPrimitive } from "radix-ui";
 import { ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 function Breadcrumb(props: React.ComponentProps<"nav">) {
@@ -44,7 +44,7 @@ function BreadcrumbLink({
 }: React.ComponentProps<"a"> & {
   asChild?: boolean;
 }) {
-  const Comp = asChild ? Slot : "a";
+  const Comp = asChild ? SlotPrimitive.Slot : "a";
   return (
     <Comp
       data-slot="breadcrumb-link"

@@ -143,7 +143,7 @@ export function CanvasPanel({
             >
               <SelectValue />
             </SelectTrigger>
-            <SelectContent align="end">
+            <SelectContent position="popper" align="end">
               {artifacts.map((artifact) => (
                 <SelectItem key={artifact.id} value={artifact.id}>
                   <ArtifactIcon kind={artifact.kind} />

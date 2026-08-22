@@ -71,3 +71,19 @@ describe("AI chat history migration", () => {
     expect(migration).toContain('CONSTRAINT "ai_messages_id_not_empty"');
   });
 });
+
+describe("background task migration", () => {
+  it("adds guarded product state and partial application idempotency", () => {
+    const migration = readMigration("0023_wet_serpent_society.sql");
+
+    expect(migration).toContain('CREATE TYPE "public"."task_run_status"');
+    expect(migration).toContain('CREATE TABLE "task_runs"');
+    expect(migration).toContain('"providerJobId" text');
+    expect(migration).toContain(
+      '"task_runs_scopeKey_kind_idempotencyKey_unique"',
+    );
+    expect(migration).toContain(
+      'WHERE "task_runs"."idempotencyKey" is not null',
+    );
+  });
+});

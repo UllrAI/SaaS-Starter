@@ -1,7 +1,7 @@
 # Zeabur deployment
 
 This repository's production reference deployment uses a Git-backed Zeabur
-service and PostgreSQL.
+Web service, Worker service, and PostgreSQL.
 
 > **Save 10% on a Zeabur server:** Purchase a server at
 > [Zeabur](https://zeabur.com/) and enter referral code `visoar` at checkout.
@@ -87,6 +87,33 @@ uses a different supported header.
 Migrations are a release step, not an application startup hook. This prevents
 multiple replicas from racing on schema changes. The Web service must start
 only after the migration command succeeds.
+
+## Durable Worker service
+
+Create a second Zeabur service from the same repository, release, and
+`docker/Dockerfile` as the Web service. Override only its start command:
+
+```text
+node dist/worker/worker.mjs
+```
+
+Do not wrap the command in `pnpm`; Node must receive SIGTERM directly. Configure
+the Worker with `DATABASE_URL`, optional `JOB_DATABASE_URL`,
+`JOB_DB_POOL_SIZE`, and the credentials required by its handlers. Set the
+platform stop window above `WORKER_GRACEFUL_TIMEOUT_MS` (30 seconds by default).
+The Worker is a required always-on service whenever durable tasks are enabled,
+but its health is intentionally independent from Web readiness.
+
+Run `pnpm db:migrate` before starting either service. It applies committed
+Drizzle migrations, installs/upgrades the separate `pgboss` schema, and creates
+the declared workload queues. Web and Worker runtime connections disable schema
+migration, so their database roles do not need DDL permission. Drizzle is
+restricted to the `public` schema and does not manage pg-boss objects.
+
+For connection capacity, budget the application pool plus the pg-boss pool for
+every replica. A Worker with `DB_POOL_SIZE=5` and `JOB_DB_POOL_SIZE=3` consumes
+up to eight connections. A Web replica uses its application pool and opens its
+small pg-boss pool only after enqueueing work.
 
 ## Runtime probes
 

@@ -15,7 +15,11 @@ const eslintConfig = defineConfig([
     },
   },
   {
-    files: ["jest.config.js", "jest.global-setup.js"],
+    files: [
+      "jest.config.js",
+      "jest.global-setup.js",
+      "jest.jobs-integration.config.js",
+    ],
     rules: {
       "@typescript-eslint/no-require-imports": "off",
     },
@@ -33,6 +37,7 @@ const eslintConfig = defineConfig([
     ".next/**",
     "out/**",
     "build/**",
+    "dist/**",
     "coverage/**",
     "playwright-report/**",
     "test-results/**",

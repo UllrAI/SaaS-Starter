@@ -55,12 +55,19 @@ const env = createEnv({
   server: {
     // Database URL
     DATABASE_URL: databaseUrlSchema,
+    JOB_DATABASE_URL: databaseUrlSchema.optional(),
 
     // Database connection pool settings
     DB_POOL_SIZE: z.coerce.number().int().positive().default(20),
     DB_IDLE_TIMEOUT: z.coerce.number().int().nonnegative().default(300),
     DB_MAX_LIFETIME: z.coerce.number().int().nonnegative().default(14400),
     DB_CONNECT_TIMEOUT: z.coerce.number().int().positive().max(4).default(4),
+    JOB_DB_POOL_SIZE: z.coerce.number().int().positive().max(20).default(3),
+    WORKER_GRACEFUL_TIMEOUT_MS: z.coerce
+      .number()
+      .int()
+      .positive()
+      .default(30000),
     RATE_LIMIT_IP_HEADER: z
       .enum([
         "cf-connecting-ip",
@@ -188,12 +195,15 @@ const env = createEnv({
   runtimeEnv: {
     // Database URL
     DATABASE_URL: process.env.DATABASE_URL,
+    JOB_DATABASE_URL: process.env.JOB_DATABASE_URL,
 
     // Database connection pool settings
     DB_POOL_SIZE: process.env.DB_POOL_SIZE,
     DB_IDLE_TIMEOUT: process.env.DB_IDLE_TIMEOUT,
     DB_MAX_LIFETIME: process.env.DB_MAX_LIFETIME,
     DB_CONNECT_TIMEOUT: process.env.DB_CONNECT_TIMEOUT,
+    JOB_DB_POOL_SIZE: process.env.JOB_DB_POOL_SIZE,
+    WORKER_GRACEFUL_TIMEOUT_MS: process.env.WORKER_GRACEFUL_TIMEOUT_MS,
     RATE_LIMIT_IP_HEADER: process.env.RATE_LIMIT_IP_HEADER,
     BING_SITE_VERIFICATION: process.env.BING_SITE_VERIFICATION,
 

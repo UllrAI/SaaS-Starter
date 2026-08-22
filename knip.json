@@ -13,5 +13,8 @@
   },
   "ignoreIssues": {
     "src/database/tables.ts": ["exports"]
+  },
+  "jest": {
+    "config": ["jest.config.js", "jest.jobs-integration.config.js"]
   }
 }

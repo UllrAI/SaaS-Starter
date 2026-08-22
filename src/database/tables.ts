@@ -18,6 +18,8 @@ import {
   aiConversations,
   aiMessages,
   aiMessageRoleEnum,
+  taskRuns,
+  taskRunStatusEnum,
 } from "./schema";
 
 export {
@@ -40,4 +42,6 @@ export {
   aiConversations,
   aiMessages,
   aiMessageRoleEnum,
+  taskRuns,
+  taskRunStatusEnum,
 };

@@ -1,29 +1,15 @@
 import "server-only";
-import { createOpenAI } from "@ai-sdk/openai";
-import type { LanguageModel } from "ai";
 import env from "@/env";
-import type { GptImage1kSize } from "./image-size";
+import { createAiModels } from "./models.node";
 
 // The Responses API supports reasoning and function tools together. The base
 // URL remains configurable for gateways that implement the OpenAI Responses
 // protocol.
-const llmProvider = createOpenAI({
-  name: "llm",
-  baseURL: env.LLM_BASE_URL,
+const models = createAiModels({
   apiKey: env.LLM_API_KEY,
+  baseUrl: env.LLM_BASE_URL,
+  defaultModel: env.AI_DEFAULT_MODEL,
 });
 
-export function getChatModel(): LanguageModel {
-  return llmProvider.responses(env.AI_DEFAULT_MODEL);
-}
-
-export function getImageGenerationTool(size: GptImage1kSize = "1024x1024") {
-  return llmProvider.tools.imageGeneration({
-    model: "gpt-image-2",
-    quality: "low",
-    size,
-    outputFormat: "webp",
-    outputCompression: 80,
-    partialImages: 0,
-  });
-}
+export const getChatModel = models.getChatModel;
+export const getImageGenerationTool = models.getImageGenerationTool;

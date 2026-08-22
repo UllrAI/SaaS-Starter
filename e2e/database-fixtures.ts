@@ -1,6 +1,7 @@
 import postgres from "postgres";
 
 const E2E_USER_ID_PATTERN = "e2e-%";
+const E2E_TASK_SCOPE_PATTERN = "user:e2e-%";
 const E2E_CLIENT_NAME = "Playwright CLI";
 const MACHINE_AUTH_RATE_LIMIT_SCOPES = [
   "device_code",
@@ -17,6 +18,14 @@ export async function cleanupE2EFixtures(): Promise<void> {
   const sql = postgres(databaseUrl, { max: 1 });
   try {
     await sql.begin(async (transaction) => {
+      await transaction`
+        delete from pgboss.job
+        where group_id like ${E2E_TASK_SCOPE_PATTERN}
+      `;
+      await transaction`
+        delete from task_runs
+        where "scopeKey" like ${E2E_TASK_SCOPE_PATTERN}
+      `;
       await transaction`
         delete from device_codes
         where "clientName" = ${E2E_CLIENT_NAME}

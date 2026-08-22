@@ -4,12 +4,13 @@
   "private": true,
   "packageManager": "pnpm@10.33.0",
   "engines": {
-    "node": ">=22"
+    "node": ">=22.12.0"
   },
   "scripts": {
     "content:build": "node scripts/build-content-collections.mjs",
     "dev": "next dev",
-    "build": "next build && node scripts/prepare-standalone.mjs",
+    "build": "next build && pnpm build:worker && node scripts/prepare-standalone.mjs",
+    "build:worker": "node scripts/build-worker.mjs",
     "start": "node .next/standalone/server.js",
     "saas-cli": "node --import tsx packages/cli/src/index.ts",
     "lint": "eslint .",
@@ -21,7 +22,8 @@
     "test:e2e": "node --env-file-if-exists=.env --import tsx scripts/run-e2e.ts",
     "test:e2e:headed": "node --env-file-if-exists=.env --import tsx scripts/run-e2e.ts --headed",
     "db:generate": "drizzle-kit generate --config=src/database/config.ts",
-    "db:migrate": "drizzle-kit migrate --config=src/database/config.ts",
+    "db:migrate": "node --env-file-if-exists=.env --import tsx scripts/migrate.ts",
+    "db:migrate:app": "drizzle-kit migrate --config=src/database/config.ts",
     "db:push": "drizzle-kit push --config=src/database/config.ts",
     "db:rebaseline": "node --env-file-if-exists=.env --import tsx scripts/rebaseline-drizzle.ts",
     "prettier:check": "prettier --check --ignore-path .gitignore .",
@@ -29,7 +31,12 @@
     "analyze": "ANALYZE=true next build --webpack",
     "analyze:dev": "ANALYZE=true next dev --webpack",
     "set:admin": "node --env-file-if-exists=.env --import tsx scripts/set-admin.ts",
-    "stripe:sync-products": "node --env-file-if-exists=.env --import tsx scripts/sync-stripe-products.ts"
+    "stripe:sync-products": "node --env-file-if-exists=.env --import tsx scripts/sync-stripe-products.ts",
+    "worker:dev": "node --env-file-if-exists=.env --import tsx scripts/worker.ts",
+    "worker:start": "node dist/worker/worker.mjs",
+    "worker:smoke": "node scripts/worker-smoke.mjs",
+    "worker:shutdown-smoke": "node scripts/worker-shutdown-smoke.mjs",
+    "test:jobs:integration": "node --env-file-if-exists=.env --import tsx scripts/run-jobs-integration.ts"
   },
   "dependencies": {
     "@ai-sdk/openai": "^4.0.46",
@@ -53,6 +60,8 @@
     "next-themes": "^0.4.6",
     "nextjs-toploader": "^3.9.17",
     "nuqs": "^2.8.9",
+    "pg": "^8.23.0",
+    "pg-boss": "12.27.0",
     "postgres": "^3.4.9",
     "radix-ui": "^1.6.7",
     "react": "^19.2.6",
@@ -85,9 +94,11 @@
     "@testing-library/react": "^16.3.2",
     "@types/jest": "^30.0.0",
     "@types/node": "^22.20.1",
+    "@types/pg": "^8.23.1",
     "@types/react": "^19.2.15",
     "@types/react-dom": "^19.2.3",
     "drizzle-kit": "^0.31.10",
+    "esbuild": "0.25.12",
     "eslint": "^10.4.0",
     "eslint-config-next": "^16.3.0",
     "eslint-config-prettier": "^10.1.8",

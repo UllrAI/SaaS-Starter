@@ -40,8 +40,8 @@ This directory contains Docker configuration for running the UllrAI Starter appl
    ```
 
    Compose waits for PostgreSQL, applies every committed migration with the
-   one-shot `migrate` service, and starts the application only after migration
-   succeeds.
+   one-shot `migrate` service, and starts the Web and Worker services only after
+   both the application and pg-boss migrations succeed.
 
 3. **Access the application**
    - Application: http://localhost:3000
@@ -55,9 +55,15 @@ This directory contains Docker configuration for running the UllrAI Starter appl
 - **Dependencies**: PostgreSQL
 - **Health check**: Next.js application readiness
 
+### worker
+
+- **Purpose**: Claims and executes durable pg-boss jobs outside the Web process
+- **Entrypoint**: `node dist/worker/worker.mjs` (Node is PID 1)
+- **Shutdown**: Stops claiming, drains active handlers for 30 seconds, then closes both pools
+
 ### migrate
 
-- **Purpose**: Applies committed Drizzle migrations before `app` starts
+- **Purpose**: Applies committed Drizzle migrations and pg-boss schema migrations before runtime services start
 - **Lifecycle**: Exits successfully after migrations complete
 
 ### postgres
@@ -82,8 +88,9 @@ This directory contains Docker configuration for running the UllrAI Starter appl
 2. **Logs**
 
    ```bash
-   # View application logs
+   # View application and Worker logs
    docker compose logs -f app
+   docker compose logs -f worker
 
    # View all services
    docker compose logs -f
@@ -115,6 +122,9 @@ For production deployment:
    or place the container on a private network behind a reverse proxy. The
    proxy must overwrite `RATE_LIMIT_IP_HEADER`; exposing port 3000 publicly
    while trusting a client-supplied header makes IP rate limits bypassable.
+10. **Connection budget**: Budget `DB_POOL_SIZE + JOB_DB_POOL_SIZE` per Worker,
+    and the application pool plus `JOB_DB_POOL_SIZE` for each Web replica that
+    enqueues tasks. The Compose defaults use 8 connections per Worker.
 
 ## Troubleshooting
 

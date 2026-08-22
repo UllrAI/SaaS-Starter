@@ -34,6 +34,15 @@ export const aiMessageRoleEnum = pgEnum("ai_message_role", [
   "assistant",
 ]);
 
+export const taskRunStatusEnum = pgEnum("task_run_status", [
+  "queued",
+  "running",
+  "waiting",
+  "completed",
+  "failed",
+  "cancelled",
+]);
+
 export const users = pgTable("users", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
@@ -379,6 +388,50 @@ export const aiMessages = pgTable(
     conversationCreatedAtIdx: index(
       "ai_messages_conversationId_createdAt_idx",
     ).on(table.conversationId, table.createdAt),
+  }),
+);
+
+export const taskRuns = pgTable(
+  "task_runs",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    kind: text("kind").notNull(),
+    status: taskRunStatusEnum("status").notNull().default("queued"),
+    scopeKey: text("scopeKey").notNull(),
+    idempotencyKey: text("idempotencyKey"),
+    progress: jsonb("progress").$type<Record<string, unknown> | null>(),
+    input: jsonb("input").$type<unknown>(),
+    result: jsonb("result").$type<unknown>(),
+    error: jsonb("error").$type<{
+      code: string;
+      message: string;
+      retryable: boolean;
+      attempt: number;
+    } | null>(),
+    providerJobId: text("providerJobId"),
+    startedAt: timestamp("startedAt", { withTimezone: true }),
+    completedAt: timestamp("completedAt", { withTimezone: true }),
+    createdAt: timestamp("createdAt", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updatedAt", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => ({
+    scopeCreatedAtIdx: index("task_runs_scopeKey_createdAt_idx").on(
+      table.scopeKey,
+      table.createdAt.desc(),
+    ),
+    statusUpdatedAtIdx: index("task_runs_status_updatedAt_idx").on(
+      table.status,
+      table.updatedAt,
+    ),
+    scopeKindIdempotencyUnique: uniqueIndex(
+      "task_runs_scopeKey_kind_idempotencyKey_unique",
+    )
+      .on(table.scopeKey, table.kind, table.idempotencyKey)
+      .where(sql`${table.idempotencyKey} is not null`),
   }),
 );
 

@@ -105,6 +105,9 @@ never be added to `SITE_CONFIG`.
 | Variable Name                    | Description                                                     | Example                                             |
 | :------------------------------- | :-------------------------------------------------------------- | :-------------------------------------------------- |
 | `DATABASE_URL`                   | **Required.** PostgreSQL connection string.                     | `postgresql://user:password@localhost:5432/db_name` |
+| `JOB_DATABASE_URL`               | Optional pg-boss database; defaults to `DATABASE_URL`.          | `postgresql://user:password@localhost:5432/db_name` |
+| `JOB_DB_POOL_SIZE`               | Optional pg-boss pool size per process; defaults to `3`.        | `3`                                                 |
+| `WORKER_GRACEFUL_TIMEOUT_MS`     | Optional Worker SIGTERM drain deadline; defaults to 30 seconds. | `30000`                                             |
 | `RATE_LIMIT_IP_HEADER`           | Optional trusted client-IP header; defaults to Zeabur.          | `x-forwarded-for`                                   |
 | `NEXT_PUBLIC_APP_URL`            | **Required.** Public URL of your deployed app.                  | `http://localhost:3000` or `https://yourdomain.com` |
 | `BING_SITE_VERIFICATION`         | Optional Bing Webmaster `msvalidate.01` verification token.     | Value issued for your deployed hostname             |

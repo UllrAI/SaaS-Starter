@@ -37,6 +37,7 @@ describe("database/config.ts", () => {
     expect(config).toEqual({
       dialect: "postgresql",
       schema: "./src/database/schema.ts",
+      schemaFilter: ["public"],
       out: "./src/database/migrations",
       verbose: true,
       dbCredentials: {
@@ -52,6 +53,7 @@ describe("database/config.ts", () => {
     expect(mockDefineConfig).toHaveBeenCalledWith({
       dialect: "postgresql",
       schema: "./src/database/schema.ts",
+      schemaFilter: ["public"],
       out: "./src/database/migrations",
       verbose: true,
       dbCredentials: {

@@ -326,7 +326,6 @@ export function AiChat() {
     return [...byId.values()];
   }, [automaticArtifacts, manualArtifacts]);
   const desktopCanvasOpen = shouldOpenDesktopCanvas({
-    artifactCount: artifacts.length,
     automaticallyOpen: canvasAutomaticallyOpen,
     manuallyOpen: canvasManuallyOpen,
     preferredOpen: canvasOpenPreference,

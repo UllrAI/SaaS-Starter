@@ -13,7 +13,6 @@ import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { ModeToggle } from "@/components/mode-toggle";
 import { LocaleSwitcher } from "@/components/locale-switcher";
-import { cn } from "@/lib/utils";
 
 interface DashboardPageHeaderProps {
   title: ReactNode;
@@ -22,7 +21,6 @@ interface DashboardPageHeaderProps {
   description?: ReactNode;
   actions?: ReactNode;
   showSidebarTrigger?: boolean;
-  className?: string;
 }
 
 export function DashboardPageHeader({
@@ -32,15 +30,9 @@ export function DashboardPageHeader({
   description,
   actions,
   showSidebarTrigger = true,
-  className,
 }: DashboardPageHeaderProps) {
   return (
-    <header
-      className={cn(
-        "mb-2 flex h-14 shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12",
-        className,
-      )}
-    >
+    <header className="flex h-(--header-height) shrink-0 items-center gap-2 border-b">
       <div className="flex w-full items-center justify-between gap-1 px-4 lg:gap-2 lg:px-6">
         <div className="flex items-center gap-1 lg:gap-2">
           {showSidebarTrigger && (

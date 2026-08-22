@@ -1,7 +1,7 @@
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "./_components/app-sidebar";
 import { cookies } from "next/headers";
-import { Suspense } from "react";
+import { Suspense, type CSSProperties } from "react";
 import { requireAuth } from "@/lib/auth/permissions";
 import { AppProviders } from "@/components/app-providers";
 import {
@@ -44,9 +44,16 @@ export default async function AppLayout({ children }: DashboardLayoutProps) {
   return (
     <AppDocument locale={locale} messages={messages}>
       <AppProviders>
-        <SidebarProvider defaultOpen={defaultSidebarOpen}>
+        <SidebarProvider
+          defaultOpen={defaultSidebarOpen}
+          style={
+            {
+              "--header-height": "calc(var(--spacing) * 12)",
+            } as CSSProperties
+          }
+        >
           <Suspense fallback={<div className="bg-sidebar w-14" />}>
-            <AppSidebar />
+            <AppSidebar variant="inset" />
           </Suspense>
           <SidebarInset className="flex flex-col">{children}</SidebarInset>
         </SidebarProvider>

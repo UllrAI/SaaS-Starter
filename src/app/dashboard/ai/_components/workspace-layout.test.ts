@@ -23,37 +23,33 @@ describe("AI workspace layout", () => {
     expect(canvasPercentFromPointer(0, 0, 0)).toBe(DEFAULT_CANVAS_PERCENT);
   });
 
-  it("keeps an empty canvas closed unless the user opens it now", () => {
+  it("keeps an empty canvas closed by default and restores the user choice", () => {
     expect(
       shouldOpenDesktopCanvas({
-        artifactCount: 0,
         automaticallyOpen: false,
         manuallyOpen: false,
-        preferredOpen: true,
+        preferredOpen: false,
       }),
     ).toBe(false);
     expect(
       shouldOpenDesktopCanvas({
-        artifactCount: 0,
         automaticallyOpen: false,
-        manuallyOpen: true,
+        manuallyOpen: false,
         preferredOpen: true,
       }),
     ).toBe(true);
   });
 
-  it("opens the canvas for existing or newly created artifacts", () => {
+  it("opens the canvas when requested by the current interaction", () => {
     expect(
       shouldOpenDesktopCanvas({
-        artifactCount: 1,
         automaticallyOpen: false,
-        manuallyOpen: false,
-        preferredOpen: true,
+        manuallyOpen: true,
+        preferredOpen: false,
       }),
     ).toBe(true);
     expect(
       shouldOpenDesktopCanvas({
-        artifactCount: 1,
         automaticallyOpen: true,
         manuallyOpen: false,
         preferredOpen: false,

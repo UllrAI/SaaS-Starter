@@ -1,5 +1,6 @@
 "use client";
 
+import type { ComponentProps } from "react";
 import { useTranslation } from "@/lib/i18n/translation/client";
 import { LocalizedLink as Link } from "@/components/localized-link";
 import {
@@ -125,7 +126,7 @@ function SidebarSection({ title, items, pathname }: MenuSectionProps) {
     </SidebarGroup>
   );
 }
-export function AppSidebar() {
+export function AppSidebar(props: ComponentProps<typeof Sidebar>) {
   const { t } = useTranslation();
   const pathname = usePathname();
   const { open } = useSidebar();
@@ -227,7 +228,7 @@ export function AppSidebar() {
     ] satisfies NavigationItem[]
   ).filter(isNavigationItemEnabled);
   return (
-    <Sidebar collapsible="icon" variant="inset">
+    <Sidebar collapsible="icon" {...props}>
       <SidebarHeader
         className={cn(
           "flex flex-row items-center py-3 text-sm font-semibold",

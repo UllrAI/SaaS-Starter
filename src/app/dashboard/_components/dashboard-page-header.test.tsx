@@ -98,6 +98,7 @@ describe("DashboardPageHeader", () => {
   it("should render with required props", () => {
     render(<DashboardPageHeader title="Test Title" />);
 
+    expect(screen.getByRole("banner")).toHaveClass("h-(--header-height)");
     expect(screen.getByTestId("breadcrumb-page")).toHaveTextContent(
       "Test Title",
     );
@@ -200,7 +201,8 @@ describe("DashboardPageHeader", () => {
     render(<DashboardPageHeader title="Test Title" />);
 
     const header = screen.getByRole("banner");
-    expect(header).toHaveClass("mb-2", "flex", "h-14");
+    expect(header).toHaveClass("flex", "h-(--header-height)");
+    expect(header).not.toHaveClass("mb-2");
 
     const breadcrumbPage = screen.getByTestId("breadcrumb-page");
     expect(breadcrumbPage).toHaveClass("font-semibold");

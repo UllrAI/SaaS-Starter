@@ -19,10 +19,9 @@ export default async function AiAssistantPage() {
   return (
     <DashboardPageWrapper
       title={<>{t("dashboard_ai_assistant")}</>}
+      layout="workspace"
       description={<>{t("ai_chat_page_description")}</>}
       actions={<AiResponseDisclaimer message={t("ai_chat_disclaimer")} />}
-      headerClassName="mb-0"
-      mainClassName="flex min-h-0 flex-1 overflow-hidden p-0 sm:px-4"
     >
       <AiChat />
     </DashboardPageWrapper>

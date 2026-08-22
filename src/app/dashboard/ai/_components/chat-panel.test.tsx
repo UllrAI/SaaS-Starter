@@ -187,6 +187,19 @@ describe("ChatPanel", () => {
     expect(onSubmit).not.toHaveBeenCalled();
   });
 
+  it("does not submit Safari's IME confirmation Enter", () => {
+    const { input, onSubmit } = renderComposer();
+
+    fireEvent.keyDown(input, {
+      code: "Enter",
+      isComposing: false,
+      key: "Enter",
+      keyCode: 229,
+    });
+
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
   it("submits Enter outside an IME composition", () => {
     const { input, onSubmit } = renderComposer();
 

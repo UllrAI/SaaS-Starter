@@ -451,6 +451,13 @@ export function ChatPanel({
     t("ai_chat_suggestion_account"),
     t("ai_chat_suggestion_document"),
   ];
+  let latestUserMessageId: string | undefined;
+  for (let index = messages.length - 1; index >= 0; index -= 1) {
+    if (messages[index]?.role === "user") {
+      latestUserMessageId = messages[index].id;
+      break;
+    }
+  }
 
   return (
     <section
@@ -559,7 +566,7 @@ export function ChatPanel({
                     <MessageScrollerItem
                       key={message.id}
                       messageId={message.id}
-                      scrollAnchor={message.role === "user"}
+                      scrollAnchor={message.id === latestUserMessageId}
                     >
                       {message.role === "user" ? (
                         <UserMessage message={message} />
@@ -646,7 +653,8 @@ export function ChatPanel({
               if (
                 event.key === "Enter" &&
                 !event.shiftKey &&
-                !event.nativeEvent.isComposing
+                !event.nativeEvent.isComposing &&
+                event.keyCode !== 229
               ) {
                 event.preventDefault();
                 if (canSubmit) onSubmit();

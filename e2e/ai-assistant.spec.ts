@@ -59,6 +59,8 @@ test("shows the assistant composer to a signed-in user", async ({ page }) => {
   await expect(
     page.getByRole("button", { name: "Expand chat history" }),
   ).toBeVisible();
+  await expect(page.getByRole("region", { name: "Canvas" })).toBeHidden();
+  await page.getByRole("button", { name: "Open canvas" }).click();
   await expect(page.getByRole("region", { name: "Canvas" })).toBeVisible();
   await expect(
     page.getByRole("separator", { name: "Resize canvas" }),

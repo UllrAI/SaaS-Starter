@@ -40,7 +40,7 @@ test("shows the assistant composer to a signed-in user", async ({ page }) => {
     "Low reasoning",
   );
   await expect(
-    page.getByRole("button", { name: "Attach images" }),
+    page.locator('button[aria-label="Attach images"]'),
   ).toBeVisible();
   await expect(page.getByRole("region", { name: "Canvas" })).toBeVisible();
 

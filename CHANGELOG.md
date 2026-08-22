@@ -5,6 +5,15 @@ Routine formatting and test-only maintenance are omitted.
 
 ## Unreleased
 
+## 0.1.12 — 2026-08-22
+
+### AI reference images
+
+- Added image attachments to AI chat with previews, upload progress, retry and removal controls,
+  image-only messages, and durable display in conversation history.
+- Restricted reference images to six PNG, JPEG, or WebP files per message and verified every stored
+  URL belongs to the authenticated user before model access.
+
 ## 0.1.11 — 2026-08-22
 
 ### AI conversation controls and image aspect ratios

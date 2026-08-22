@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useChat } from "@ai-sdk/react";
-import { DefaultChatTransport } from "ai";
+import { DefaultChatTransport, type FileUIPart } from "ai";
+import { useFileUpload } from "@/components/ui/file-upload/use-file-upload";
 import {
   Sheet,
   SheetContent,
@@ -17,11 +18,16 @@ import type {
   AiMessage,
 } from "@/lib/ai/chat-history-types";
 import {
+  AI_IMAGE_INPUT_MAX_FILES,
+  AI_IMAGE_INPUT_MEDIA_TYPES,
+} from "@/lib/ai/image-input";
+import {
   DEFAULT_REASONING_EFFORT,
   REASONING_EFFORTS,
   type ReasoningEffort,
 } from "@/lib/ai/reasoning";
 import { useTranslation } from "@/lib/i18n/translation/client";
+import { SITE_CONFIG } from "@/lib/config/site";
 import { cn } from "@/lib/utils";
 import {
   createMarkdownArtifact,
@@ -196,6 +202,23 @@ export function AiChat() {
       void refreshConversationList();
     },
   });
+  const imageUpload = useFileUpload({
+    acceptedFileTypes: AI_IMAGE_INPUT_MEDIA_TYPES,
+    autoUpload: true,
+    disabled:
+      !SITE_CONFIG.features.uploads ||
+      status === "submitted" ||
+      status === "streaming" ||
+      conversationLoading ||
+      conversationCreating,
+    enableImageCompression: true,
+    imageCompressionQuality: 0.85,
+    imageCompressionMaxHeight: 2048,
+    imageCompressionMaxWidth: 2048,
+    maxFiles: AI_IMAGE_INPUT_MAX_FILES,
+  });
+  const imageUploadItems = imageUpload.items;
+  const removeImage = imageUpload.removeFile;
 
   const automaticArtifacts = useMemo(
     () => extractArtifacts(messages),
@@ -217,6 +240,7 @@ export function AiChat() {
     isBusy ||
     conversationLoading ||
     conversationCreating ||
+    imageUpload.isUploading ||
     historyMutatingId !== undefined;
 
   useEffect(() => {
@@ -301,13 +325,18 @@ export function AiChat() {
     setDesktopCanvasOpen(true);
   }, [automaticArtifacts]);
 
+  const clearImageAttachments = useCallback(() => {
+    imageUploadItems.forEach((item) => removeImage(item.id));
+  }, [imageUploadItems, removeImage]);
+
   const resetConversationView = useCallback(() => {
     setMessages([]);
     setManualArtifacts([]);
     setActiveArtifactId(undefined);
     latestAutomaticArtifactId.current = undefined;
+    clearImageAttachments();
     clearError();
-  }, [clearError, setMessages]);
+  }, [clearError, clearImageAttachments, setMessages]);
 
   const handleSelectConversation = async (conversationId: string) => {
     if (historyDisabled) return;
@@ -446,8 +475,15 @@ export function AiChat() {
 
   const handleSubmit = async (suggestedText?: string) => {
     const text = (suggestedText ?? input).trim();
+    const readyImages = imageUpload.items.filter(
+      (item) => item.status === "success" && item.uploadedFile,
+    );
+    const hasPendingOrFailedImages = imageUpload.items.some(
+      (item) => item.status !== "success",
+    );
     if (
-      !text ||
+      (!text && readyImages.length === 0) ||
+      hasPendingOrFailedImages ||
       historyLoading ||
       isBusy ||
       conversationLoading ||
@@ -476,7 +512,15 @@ export function AiChat() {
       }
     }
 
-    const optimisticTitle = titleFromText(text);
+    const files: FileUIPart[] = readyImages.map(({ uploadedFile }) => ({
+      type: "file",
+      mediaType: uploadedFile!.contentType,
+      filename: uploadedFile!.fileName,
+      url: uploadedFile!.url,
+    }));
+    const optimisticTitle = titleFromText(
+      text || readyImages[0]?.uploadedFile?.fileName || "",
+    );
     setConversations((current) =>
       current.map((conversation) =>
         conversation.id === conversationId
@@ -489,7 +533,18 @@ export function AiChat() {
       ),
     );
     setInput("");
-    void sendMessage({ text }, { body: { reasoningEffort, conversationId } });
+    if (text) {
+      void sendMessage(
+        { text, files },
+        { body: { reasoningEffort, conversationId } },
+      );
+    } else {
+      void sendMessage(
+        { files },
+        { body: { reasoningEffort, conversationId } },
+      );
+    }
+    imageUpload.clearCompleted();
   };
 
   const handleOpenMessage = (message: AiMessage) => {
@@ -564,6 +619,16 @@ export function AiChat() {
         conversationLoading={
           historyLoading || conversationLoading || conversationCreating
         }
+        imageAttachments={imageUpload.items}
+        imageUploadsEnabled={SITE_CONFIG.features.uploads}
+        imageUploadError={
+          Boolean(imageUpload.issue) ||
+          imageUpload.items.some((item) => item.status === "error")
+        }
+        canAddImage={imageUpload.canAddMore && !historyDisabled}
+        onAddImages={(files) => void imageUpload.addFiles(files)}
+        onRemoveImage={imageUpload.removeFile}
+        onRetryImage={(id) => void imageUpload.retryFile(id)}
         onInputChange={setInput}
         onReasoningEffortChange={setReasoningEffort}
         onSubmit={handleSubmit}

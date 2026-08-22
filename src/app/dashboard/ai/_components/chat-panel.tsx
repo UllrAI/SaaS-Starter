@@ -7,13 +7,16 @@ import {
   CircleAlert,
   FileOutput,
   History,
+  ImagePlus,
   Loader2,
   PanelRightOpen,
   Send,
   Sparkles,
   Square,
   Plus,
+  RefreshCcw,
   Wrench,
+  X,
 } from "lucide-react";
 import {
   getToolOrDynamicToolName,
@@ -24,7 +27,9 @@ import {
 } from "ai";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import type { FileUploadItem } from "@/components/ui/file-upload/types";
 import {
   Select,
   SelectContent,
@@ -35,6 +40,10 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { REASONING_EFFORTS, type ReasoningEffort } from "@/lib/ai/reasoning";
 import type { AiMessage } from "@/lib/ai/chat-history-types";
+import {
+  AI_IMAGE_INPUT_MAX_FILES,
+  AI_IMAGE_INPUT_MEDIA_TYPES,
+} from "@/lib/ai/image-input";
 import { useTranslation } from "@/lib/i18n/translation/client";
 
 interface ChatPanelProps {
@@ -46,6 +55,13 @@ interface ChatPanelProps {
   canvasCount: number;
   conversationTitle?: string;
   conversationLoading: boolean;
+  imageAttachments: FileUploadItem[];
+  imageUploadsEnabled: boolean;
+  imageUploadError: boolean;
+  canAddImage: boolean;
+  onAddImages: (files: FileList) => void;
+  onRemoveImage: (id: string) => void;
+  onRetryImage: (id: string) => void;
   onInputChange: (value: string) => void;
   onReasoningEffortChange: (value: ReasoningEffort) => void;
   onSubmit: (text?: string) => void;
@@ -56,6 +72,109 @@ interface ChatPanelProps {
   onNewConversation: () => void;
   onOpenMessage: (message: AiMessage) => void;
   onOpenArtifact: (id: string) => void;
+}
+
+function UserMessage({ message }: { message: AiMessage }) {
+  const { t } = useTranslation();
+  const files = message.parts.filter((part) => part.type === "file");
+  const text = message.parts
+    .filter((part) => part.type === "text")
+    .map((part) => part.text)
+    .join("\n");
+
+  return (
+    <div className="flex min-w-0 justify-end">
+      <div className="bg-muted max-w-[85%] min-w-0 border p-2 text-sm leading-6">
+        {files.length > 0 && (
+          <div className="flex max-w-md flex-wrap justify-end gap-2">
+            {files.map((file, index) => (
+              <a
+                key={`${message.id}-file-${index}`}
+                href={file.url}
+                target="_blank"
+                rel="noreferrer"
+                className="bg-background relative block size-24 shrink-0 overflow-hidden border"
+              >
+                <Image
+                  src={file.url}
+                  alt={file.filename ?? t("ai_chat_reference_image")}
+                  fill
+                  unoptimized
+                  className="object-cover"
+                  sizes="96px"
+                />
+              </a>
+            ))}
+          </div>
+        )}
+        {text && (
+          <div
+            className={
+              files.length > 0
+                ? "mt-2 [overflow-wrap:anywhere] whitespace-pre-wrap"
+                : "[overflow-wrap:anywhere] whitespace-pre-wrap"
+            }
+          >
+            {text}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function ImageAttachmentPreview({
+  item,
+  onRemove,
+  onRetry,
+}: {
+  item: FileUploadItem;
+  onRemove: () => void;
+  onRetry: () => void;
+}) {
+  const { t } = useTranslation();
+  const imageUrl = item.previewUrl ?? item.uploadedFile?.url;
+
+  return (
+    <div className="bg-muted/30 relative size-20 shrink-0 overflow-hidden border">
+      {imageUrl && (
+        <Image
+          src={imageUrl}
+          alt={item.file.name}
+          fill
+          unoptimized
+          className="object-cover"
+          sizes="80px"
+        />
+      )}
+      {(item.status === "queued" || item.status === "uploading") && (
+        <div className="bg-background/70 absolute inset-0 flex flex-col items-center justify-center gap-1">
+          <Loader2 className="size-4 animate-spin" />
+          <span className="text-[10px]">{item.progress}%</span>
+        </div>
+      )}
+      {item.status === "error" && (
+        <button
+          type="button"
+          onClick={onRetry}
+          className="bg-destructive/80 absolute inset-0 flex items-center justify-center text-white"
+          aria-label={t("ai_chat_retry_image_upload", {
+            name: item.file.name,
+          })}
+        >
+          <RefreshCcw className="size-4" />
+        </button>
+      )}
+      <button
+        type="button"
+        onClick={onRemove}
+        className="bg-background/90 hover:bg-background absolute top-1 right-1 flex size-5 items-center justify-center border"
+        aria-label={t("ai_chat_remove_image", { name: item.file.name })}
+      >
+        <X className="size-3" />
+      </button>
+    </div>
+  );
 }
 
 function ReasoningBlock({
@@ -87,7 +206,7 @@ function ReasoningBlock({
         </span>
         <ChevronDown className="size-3.5 transition-transform group-open:rotate-180" />
       </summary>
-      <div className="text-muted-foreground border-l pl-4 whitespace-pre-wrap">
+      <div className="text-muted-foreground border-l pl-4 [overflow-wrap:anywhere] whitespace-pre-wrap">
         {text}
       </div>
     </details>
@@ -129,7 +248,7 @@ function ToolCallRow({
   }
 
   return (
-    <div className="text-muted-foreground my-1 flex w-fit items-center gap-2 py-1 text-xs">
+    <div className="text-muted-foreground my-1 flex w-fit max-w-full min-w-0 items-center gap-2 py-1 text-xs">
       {isError ? (
         <CircleAlert className="text-destructive size-3.5" />
       ) : isRunning ? (
@@ -137,7 +256,7 @@ function ToolCallRow({
       ) : (
         <Wrench className="size-3.5" />
       )}
-      <span translate="no">
+      <span className="min-w-0 [overflow-wrap:anywhere]" translate="no">
         {isError
           ? t("ai_chat_tool_error", { name })
           : isRunning
@@ -163,7 +282,7 @@ function AssistantMessage({
   );
 
   return (
-    <div className="group/message flex gap-3">
+    <div className="group/message flex min-w-0 gap-3">
       <div className="bg-muted mt-0.5 flex size-7 shrink-0 items-center justify-center border">
         <Bot className="size-4" />
       </div>
@@ -173,7 +292,7 @@ function AssistantMessage({
             return (
               <div
                 key={`${message.id}-text-${index}`}
-                className="markdown-content max-w-none [&_h1]:text-xl [&_h2]:text-lg [&_h3]:text-base [&_li]:text-sm [&_p]:mb-3 [&_p]:text-sm [&_pre]:max-w-full [&_pre]:overflow-x-auto [&_pre]:p-4"
+                className="markdown-content max-w-none min-w-0 [overflow-wrap:anywhere] [&_h1]:text-xl [&_h2]:text-lg [&_h3]:text-base [&_li]:text-sm [&_p]:mb-3 [&_p]:text-sm [&_pre]:max-w-full [&_pre]:overflow-x-auto [&_pre]:p-4"
               >
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm]}
@@ -182,6 +301,11 @@ function AssistantMessage({
                       <a {...props} target="_blank" rel="noreferrer">
                         {children}
                       </a>
+                    ),
+                    table: ({ children, ...props }) => (
+                      <div className="max-w-full overflow-x-auto">
+                        <table {...props}>{children}</table>
+                      </div>
                     ),
                   }}
                 >
@@ -215,7 +339,7 @@ function AssistantMessage({
                 href={part.url}
                 target="_blank"
                 rel="noreferrer"
-                className="text-primary mr-2 text-xs underline underline-offset-4"
+                className="text-primary mr-2 text-xs break-all underline underline-offset-4"
               >
                 {part.title ?? part.url}
               </a>
@@ -250,6 +374,13 @@ export function ChatPanel({
   canvasCount,
   conversationTitle,
   conversationLoading,
+  imageAttachments,
+  imageUploadsEnabled,
+  imageUploadError,
+  canAddImage,
+  onAddImages,
+  onRemoveImage,
+  onRetryImage,
   onInputChange,
   onReasoningEffortChange,
   onSubmit,
@@ -263,7 +394,19 @@ export function ChatPanel({
 }: ChatPanelProps) {
   const { t } = useTranslation();
   const bottomRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const isBusy = status === "submitted" || status === "streaming";
+  const imageAttachmentsReady = imageAttachments.every(
+    (item) => item.status === "success",
+  );
+  const hasReadyImage = imageAttachments.some(
+    (item) => item.status === "success",
+  );
+  const canSubmit =
+    !isBusy &&
+    !conversationLoading &&
+    imageAttachmentsReady &&
+    (Boolean(input.trim()) || hasReadyImage);
   const suggestions = [
     t("ai_chat_suggestion_product"),
     t("ai_chat_suggestion_account"),
@@ -277,7 +420,7 @@ export function ChatPanel({
   return (
     <section
       aria-label={t("ai_chat_conversation")}
-      className="bg-background flex min-h-0 flex-col"
+      className="bg-background flex min-h-0 min-w-0 flex-col overflow-hidden"
     >
       <div className="flex h-12 shrink-0 items-center gap-2 border-b px-3">
         <Button
@@ -299,15 +442,15 @@ export function ChatPanel({
           size="icon"
           className="size-8 xl:hidden"
           onClick={onNewConversation}
-          disabled={isBusy || conversationLoading}
+          disabled={isBusy || conversationLoading || !imageAttachmentsReady}
           aria-label={t("ai_history_new")}
         >
           <Plus />
         </Button>
       </div>
 
-      <div className="min-h-0 flex-1 overflow-y-auto">
-        <div className="mx-auto flex min-h-full w-full max-w-3xl flex-col px-4 py-6 sm:px-6">
+      <div className="min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto">
+        <div className="mx-auto flex min-h-full w-full max-w-3xl min-w-0 flex-col px-4 py-6 sm:px-6">
           {conversationLoading ? (
             <div className="text-muted-foreground flex flex-1 items-center justify-center gap-2 text-sm">
               <Loader2 className="size-4 animate-spin" />
@@ -342,17 +485,10 @@ export function ChatPanel({
               </div>
             </div>
           ) : (
-            <div className="space-y-7">
+            <div className="min-w-0 space-y-7">
               {messages.map((message) =>
                 message.role === "user" ? (
-                  <div key={message.id} className="flex justify-end">
-                    <div className="bg-muted max-w-[85%] border px-3 py-2 text-sm leading-6 whitespace-pre-wrap">
-                      {message.parts
-                        .filter((part) => part.type === "text")
-                        .map((part) => part.text)
-                        .join("\n")}
-                    </div>
-                  </div>
+                  <UserMessage key={message.id} message={message} />
                 ) : (
                   <AssistantMessage
                     key={message.id}
@@ -369,12 +505,17 @@ export function ChatPanel({
                 </div>
               )}
               {error && (
-                <div className="border-destructive/30 bg-destructive/5 flex items-center justify-between gap-3 border px-3 py-2 text-sm">
-                  <span className="flex items-center gap-2">
+                <div className="border-destructive/30 bg-destructive/5 flex min-w-0 items-center justify-between gap-3 border px-3 py-2 text-sm">
+                  <span className="flex min-w-0 items-center gap-2 [overflow-wrap:anywhere]">
                     <CircleAlert className="text-destructive size-4" />
                     {t("ai_chat_error_message")}
                   </span>
-                  <Button variant="outline" size="sm" onClick={onRetry}>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="shrink-0"
+                    onClick={onRetry}
+                  >
                     {t("ai_chat_retry")}
                   </Button>
                 </div>
@@ -388,22 +529,42 @@ export function ChatPanel({
         </div>
       </div>
 
-      <div className="bg-background shrink-0 px-3 pb-3 sm:px-5 sm:pb-5">
-        <div className="bg-background focus-within:ring-ring/30 mx-auto max-w-3xl border focus-within:ring-2">
+      <div className="bg-background min-w-0 shrink-0 px-3 pb-3 sm:px-5 sm:pb-5">
+        <div className="bg-background focus-within:ring-ring/30 mx-auto max-w-3xl min-w-0 border focus-within:ring-2">
+          {imageAttachments.length > 0 && (
+            <div
+              className="flex max-w-full gap-2 overflow-x-auto border-b p-2"
+              aria-label={t("ai_chat_reference_images")}
+            >
+              {imageAttachments.map((item) => (
+                <ImageAttachmentPreview
+                  key={item.id}
+                  item={item}
+                  onRemove={() => onRemoveImage(item.id)}
+                  onRetry={() => onRetryImage(item.id)}
+                />
+              ))}
+            </div>
+          )}
+          {imageUploadError && (
+            <p className="text-destructive border-b px-3 py-2 text-xs">
+              {t("ai_chat_image_upload_failed")}
+            </p>
+          )}
           <Textarea
             value={input}
             onChange={(event) => onInputChange(event.currentTarget.value)}
             onKeyDown={(event) => {
               if (event.key === "Enter" && !event.shiftKey) {
                 event.preventDefault();
-                onSubmit();
+                if (canSubmit) onSubmit();
               }
             }}
             placeholder={t("ai_chat_input_placeholder")}
             className="max-h-48 min-h-20 resize-none border-0 px-3 py-3 shadow-none focus-visible:ring-0"
             rows={2}
           />
-          <div className="flex items-center gap-2 border-t px-2 py-2">
+          <div className="flex min-w-0 flex-wrap items-center gap-2 border-t px-2 py-2">
             <Select
               value={reasoningEffort}
               onValueChange={(value) =>
@@ -426,6 +587,42 @@ export function ChatPanel({
                 ))}
               </SelectContent>
             </Select>
+
+            {imageUploadsEnabled && (
+              <>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept={AI_IMAGE_INPUT_MEDIA_TYPES.join(",")}
+                  multiple
+                  className="sr-only"
+                  aria-label={t("ai_chat_attach_images")}
+                  onChange={(event) => {
+                    if (event.currentTarget.files) {
+                      onAddImages(event.currentTarget.files);
+                    }
+                    event.currentTarget.value = "";
+                  }}
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 px-2"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={!canAddImage}
+                  aria-label={t("ai_chat_attach_images")}
+                  title={t("ai_chat_attach_images_hint", {
+                    count: AI_IMAGE_INPUT_MAX_FILES,
+                  })}
+                >
+                  <ImagePlus className="size-3.5" />
+                  <span className="hidden sm:inline">
+                    {t("ai_chat_attach_images")}
+                  </span>
+                </Button>
+              </>
+            )}
 
             <Button
               type="button"
@@ -461,7 +658,7 @@ export function ChatPanel({
                   size="icon"
                   className="size-8"
                   onClick={() => onSubmit()}
-                  disabled={!input.trim()}
+                  disabled={!canSubmit}
                   aria-label={t("ai_chat_send")}
                 >
                   <Send />

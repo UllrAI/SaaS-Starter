@@ -150,7 +150,7 @@ describe("AI chat history storage", () => {
     expect(mockDb.select).toHaveBeenCalledTimes(1);
   });
 
-  it("upserts messages and derives the first conversation title", async () => {
+  it("upserts messages and derives an image-only conversation title", async () => {
     mockDb.select.mockReturnValue(ownedConversationQuery());
     const onConflictDoNothing = jest.fn().mockResolvedValue(undefined);
     const insert = jest.fn().mockReturnValue({
@@ -177,7 +177,14 @@ describe("AI chat history storage", () => {
         {
           id: "message-1",
           role: "user",
-          parts: [{ type: "text", text: "  Plan   a launch  " }],
+          parts: [
+            {
+              type: "file",
+              mediaType: "image/png",
+              filename: "reference-image.png",
+              url: "https://cdn.example.com/reference-image.png",
+            },
+          ],
         },
       ],
     });
@@ -185,7 +192,7 @@ describe("AI chat history storage", () => {
     expect(onConflictDoNothing).toHaveBeenCalledTimes(1);
     expect(update).toHaveBeenCalledWith(mockAiConversations);
     expect(
-      mockSql.mock.calls.some((call) => call.includes("Plan a launch")),
+      mockSql.mock.calls.some((call) => call.includes("reference-image.png")),
     ).toBe(true);
   });
 

@@ -427,6 +427,7 @@ export function useFileUpload({
 
   const removeFile = useCallback((id: string) => {
     activeTasksRef.current.get(id)?.cancel?.();
+    setIssue(null);
 
     setItems((currentItems) => {
       const itemToRemove = currentItems.find((item) => item.id === id);

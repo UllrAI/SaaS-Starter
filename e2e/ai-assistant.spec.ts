@@ -39,12 +39,79 @@ test("shows the assistant composer to a signed-in user", async ({ page }) => {
   await expect(page.getByLabel("Reasoning effort")).toContainText(
     "Low reasoning",
   );
+  await expect(
+    page.getByRole("button", { name: "Attach images" }),
+  ).toBeVisible();
   await expect(page.getByRole("region", { name: "Canvas" })).toBeVisible();
 
   await page.getByRole("button", { name: "Collapse chat history" }).click();
   await expect(
     page.getByRole("button", { name: "Expand chat history" }),
   ).toBeVisible();
+});
+
+test("uploads a reference image and enables an image-only message", async ({
+  page,
+}) => {
+  await loginAs(page, "user");
+
+  const publicUrl = "https://cdn.example.com/reference.png";
+  await page.route("**/api/upload/presigned-url", async (route) => {
+    await route.fulfill({
+      contentType: "application/json",
+      body: JSON.stringify({
+        intentId: "0192f26a-8c1f-7c2f-9ca9-5d3930d2fc75",
+        key: "uploads/user-1/reference.png",
+        presignedUrl:
+          "https://test.r2.cloudflarestorage.com/reference.png?signature=test",
+        protocolVersion: 2,
+        publicUrl,
+        requiredHeaders: {
+          "Content-Type": "image/png",
+          "If-None-Match": "*",
+        },
+      }),
+    });
+  });
+  await page.route(
+    "https://test.r2.cloudflarestorage.com/**",
+    async (route) => {
+      await route.fulfill({ status: 200 });
+    },
+  );
+  await page.route("**/api/upload/complete", async (route) => {
+    const body = route.request().postDataJSON() as {
+      fileName: string;
+      size: number;
+    };
+    await route.fulfill({
+      contentType: "application/json",
+      body: JSON.stringify({
+        file: {
+          key: "uploads/user-1/reference.png",
+          url: publicUrl,
+          fileName: body.fileName,
+          size: body.size,
+          contentType: "image/png",
+        },
+      }),
+    });
+  });
+
+  await page.goto("/dashboard/ai");
+  await page
+    .locator('input[type="file"][aria-label="Attach images"]')
+    .setInputFiles({
+      name: "reference.png",
+      mimeType: "image/png",
+      buffer: Buffer.from(
+        "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=",
+        "base64",
+      ),
+    });
+
+  await expect(page.getByAltText("reference.png")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Send" })).toBeEnabled();
 });
 
 test("archives and restores a conversation", async ({ page }) => {

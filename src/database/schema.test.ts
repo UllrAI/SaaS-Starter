@@ -1563,6 +1563,9 @@ describe("Database Schema", () => {
       expect(messageIndexes).toContain(
         "ai_messages_conversationId_createdAt_idx",
       );
+      expect(
+        getTableConfig(aiMessages).checks.map((constraint) => constraint.name),
+      ).toContain("ai_messages_id_not_empty");
     });
 
     it("upload intents index quota and cleanup lookups", () => {

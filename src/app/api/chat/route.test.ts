@@ -5,6 +5,7 @@ const mockCheckRateLimit = jest.fn();
 const mockCreateAgent = jest.fn();
 const mockCreateAgentUIStreamResponse = jest.fn();
 const mockConsumeStream = jest.fn();
+const mockGenerateId = jest.fn();
 const mockValidateUIMessages = jest.fn();
 const mockCreateResponseHandle = jest.fn();
 const mockReadResponseHandle = jest.fn();
@@ -43,6 +44,7 @@ jest.mock("@/lib/ai/agents", () => ({
 jest.mock("ai", () => ({
   consumeStream: mockConsumeStream,
   createAgentUIStreamResponse: mockCreateAgentUIStreamResponse,
+  generateId: mockGenerateId,
   validateUIMessages: mockValidateUIMessages,
 }));
 
@@ -107,6 +109,7 @@ describe("/api/chat", () => {
     });
     mockCreateAgent.mockReturnValue({ id: "assistant-agent" });
     mockConsumeStream.mockResolvedValue(undefined);
+    mockGenerateId.mockReturnValue("assistant-message-1");
     mockCreateResponseHandle.mockReturnValue("signed-response-handle");
     mockReadResponseHandle.mockReturnValue("resp_previous");
     mockRequireAiConversation.mockResolvedValue(undefined);
@@ -203,6 +206,9 @@ describe("/api/chat", () => {
     ];
     expect(streamArgs.agent).toEqual({ id: "assistant-agent" });
     expect(streamArgs.uiMessages).toEqual(messages);
+    expect(streamArgs).toEqual(
+      expect.objectContaining({ generateMessageId: mockGenerateId }),
+    );
     expect(mockRequireAiConversation).toHaveBeenCalledWith({
       conversationId,
       userId: "user-1",

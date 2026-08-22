@@ -162,20 +162,13 @@ export function AiChat() {
     () =>
       new DefaultChatTransport<AiMessage>({
         api: "/api/chat",
-        prepareSendMessagesRequest: ({
-          messages,
-          trigger,
-          messageId,
-          body,
-        }) => {
+        prepareSendMessagesRequest: ({ messages, body }) => {
           if (typeof body?.conversationId !== "string") {
             throw new Error("A conversation is required.");
           }
           return {
             body: prepareChatRequest({
               messages,
-              trigger,
-              messageId,
               conversationId: body.conversationId,
               reasoningEffort: isReasoningEffort(body.reasoningEffort)
                 ? body.reasoningEffort

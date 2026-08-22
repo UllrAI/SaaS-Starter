@@ -59,4 +59,15 @@ describe("AI chat history migration", () => {
       'CREATE INDEX "ai_conversations_userId_archivedAt_updatedAt_idx"',
     );
   });
+
+  it("moves the legacy shared assistant row after the latest user message", () => {
+    const migration = readMigration("0022_repair-ai-message-order.sql");
+
+    expect(migration).toContain('max("createdAt")');
+    expect(migration).toContain('"assistant_message"."role" = \'assistant\'');
+    expect(migration).toContain('"assistant_message"."id" = \'\'');
+    expect(migration).toContain("interval '1 microsecond'");
+    expect(migration).toContain("'legacy-'");
+    expect(migration).toContain('CONSTRAINT "ai_messages_id_not_empty"');
+  });
 });

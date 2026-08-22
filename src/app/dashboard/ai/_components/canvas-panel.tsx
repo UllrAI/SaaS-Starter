@@ -217,9 +217,18 @@ export function CanvasPanel({
             </div>
           </div>
         ) : activeArtifact.kind === "markdown" ? (
-          <article className="bg-background mx-auto my-6 min-h-[calc(100%-3rem)] w-[min(46rem,calc(100%-3rem))] border px-8 py-10 sm:px-12">
-            <div className="markdown-content max-w-none [&_pre]:max-w-full [&_pre]:overflow-x-auto">
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+          <article className="bg-background mx-auto my-6 min-h-[calc(100%-3rem)] w-[min(46rem,calc(100%-3rem))] min-w-0 border px-8 py-10 sm:px-12">
+            <div className="markdown-content max-w-none min-w-0 [overflow-wrap:anywhere] [&_pre]:max-w-full [&_pre]:overflow-x-auto">
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                components={{
+                  table: ({ children, ...props }) => (
+                    <div className="max-w-full overflow-x-auto">
+                      <table {...props}>{children}</table>
+                    </div>
+                  ),
+                }}
+              >
                 {activeArtifact.content}
               </ReactMarkdown>
             </div>

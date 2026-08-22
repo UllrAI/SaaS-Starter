@@ -52,8 +52,17 @@ function readMessageTitle(message: AiMessage): string | null {
     .replace(/\s+/g, " ")
     .trim();
 
-  if (!text) return null;
-  return Array.from(text).slice(0, MAX_GENERATED_TITLE_LENGTH).join("");
+  const fileName = message.parts
+    .flatMap((part) =>
+      part.type === "file" && part.filename?.trim()
+        ? [part.filename.trim()]
+        : [],
+    )
+    .at(0);
+  const title = text || fileName;
+
+  if (!title) return null;
+  return Array.from(title).slice(0, MAX_GENERATED_TITLE_LENGTH).join("");
 }
 
 async function findOwnedConversation(conversationId: string, userId: string) {

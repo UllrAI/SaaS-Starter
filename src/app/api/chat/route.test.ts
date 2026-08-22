@@ -9,6 +9,7 @@ const mockValidateUIMessages = jest.fn();
 const mockCreateResponseHandle = jest.fn();
 const mockReadResponseHandle = jest.fn();
 const mockRequireAiConversation = jest.fn();
+const mockRequireOwnedAiImageAttachments = jest.fn();
 const mockSaveAiMessages = jest.fn();
 const mockPersistGeneratedImages = jest.fn();
 
@@ -54,6 +55,11 @@ jest.mock("@/lib/ai/chat-history", () => ({
   AiConversationNotFoundError: class AiConversationNotFoundError extends Error {},
   requireAiConversation: mockRequireAiConversation,
   saveAiMessages: mockSaveAiMessages,
+}));
+
+jest.mock("@/lib/ai/chat-attachments", () => ({
+  AiAttachmentValidationError: class AiAttachmentValidationError extends Error {},
+  requireOwnedAiImageAttachments: mockRequireOwnedAiImageAttachments,
 }));
 
 jest.mock("@/lib/ai/generated-image-storage", () => ({
@@ -104,6 +110,7 @@ describe("/api/chat", () => {
     mockCreateResponseHandle.mockReturnValue("signed-response-handle");
     mockReadResponseHandle.mockReturnValue("resp_previous");
     mockRequireAiConversation.mockResolvedValue(undefined);
+    mockRequireOwnedAiImageAttachments.mockResolvedValue(undefined);
     mockSaveAiMessages.mockResolvedValue(undefined);
     mockPersistGeneratedImages.mockImplementation(
       ({ message }: { message: unknown }) => Promise.resolve(message),
@@ -369,6 +376,34 @@ describe("/api/chat", () => {
 
     expect(response.status).toBe(400);
     expect(mockCreateAgentUIStreamResponse).not.toHaveBeenCalled();
+  });
+
+  it("rejects image attachments that are not owned by the current user", async () => {
+    const { AiAttachmentValidationError } =
+      await import("@/lib/ai/chat-attachments");
+    mockRequireOwnedAiImageAttachments.mockRejectedValue(
+      new AiAttachmentValidationError(),
+    );
+
+    const response = await postChat({
+      messages: [
+        {
+          id: "m1",
+          role: "user",
+          parts: [
+            {
+              type: "file",
+              mediaType: "image/png",
+              url: "https://example.com/not-owned.png",
+            },
+          ],
+        },
+      ],
+    });
+
+    expect(response.status).toBe(400);
+    expect(mockCreateAgent).not.toHaveBeenCalled();
+    expect(mockSaveAiMessages).not.toHaveBeenCalled();
   });
 
   it("stores the user message before starting the provider stream", async () => {

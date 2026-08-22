@@ -7,6 +7,10 @@ import {
 } from "ai";
 import { createAgent, isAgentId } from "@/lib/ai/agents";
 import {
+  AiAttachmentValidationError,
+  requireOwnedAiImageAttachments,
+} from "@/lib/ai/chat-attachments";
+import {
   AiConversationNotFoundError,
   requireAiConversation,
   saveAiMessages,
@@ -132,6 +136,21 @@ export async function POST(request: NextRequest) {
       { error: "Invalid chat request." },
       { status: 400 },
     );
+  }
+
+  try {
+    await requireOwnedAiImageAttachments({
+      messages: validatedMessages,
+      userId: session.user.id,
+    });
+  } catch (error) {
+    if (error instanceof AiAttachmentValidationError) {
+      return NextResponse.json(
+        { error: "Invalid chat request." },
+        { status: 400 },
+      );
+    }
+    throw error;
   }
 
   let agent: ReturnType<typeof createAgent>;

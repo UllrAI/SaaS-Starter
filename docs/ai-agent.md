@@ -14,6 +14,7 @@ src/lib/ai/
 ├── artifacts.ts           # Shared Markdown/image/video artifact schema
 ├── chat-history.ts        # User-owned conversations and message persistence
 ├── chat-history-types.ts  # Shared conversation and UIMessage types
+├── chat-attachments.ts    # Ownership and media validation for reference images
 ├── generated-image-storage.ts # Generated-image persistence through R2
 ├── response-chain.ts      # User-bound signed handles for previous_response_id
 ├── context.ts             # AgentContext: per-request session data for tools
@@ -60,6 +61,13 @@ instead of large base64 database values. The server also consumes a separate cop
 stream, so generation and final message persistence continue when the browser refreshes, closes,
 or loses its connection. A process restart remains the execution boundary; deployments that need
 jobs to survive application restarts should move generation to a durable queue.
+
+Users can attach up to six PNG, JPEG, or WebP reference images to each message, including an
+image-only message. The composer uploads them through the existing R2 flow before sending, and the
+durable URLs are stored as UI message file parts. The chat route verifies every URL against an
+upload owned by the authenticated user before passing it to the model, so clients cannot inject
+arbitrary external images or another user's files. The supported formats follow the
+[OpenAI image-input guidance](https://developers.openai.com/api/docs/guides/images-vision).
 
 ## Configuration
 
@@ -178,6 +186,8 @@ Add the factory to `agentFactories` in `src/lib/ai/agents/index.ts`; the chat ro
 - Body capped at 512 KB and 80 messages.
 - Requires a user-owned `conversationId`; another user's or a missing conversation returns `404`.
 - Accepts only `low`, `medium`, or `high` reasoning effort and defaults to `low`.
+- Accepts at most six PNG, JPEG, or WebP reference images per user message and verifies each
+  image against the authenticated user's upload records.
 - Streams a UI message response, including tool-call parts the client can render.
 - Provider errors are logged server-side and masked in the stream; a misconfigured agent
   answers `500` and an unusable message payload answers `400`, neither leaking details.

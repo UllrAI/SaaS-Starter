@@ -46,6 +46,7 @@ describe("/api/ai/conversations", () => {
     mockCreateAiConversation.mockResolvedValue({
       id: "conversation-1",
       title: null,
+      archivedAt: null,
       createdAt: "2026-08-22T00:00:00.000Z",
       updatedAt: "2026-08-22T00:00:00.000Z",
     });
@@ -60,7 +61,18 @@ describe("/api/ai/conversations", () => {
       userId: "user-1",
       offset: 30,
       limit: 20,
+      archived: false,
     });
+  });
+
+  it("lists archived conversations on request", async () => {
+    const { GET } = await import("./route");
+    const response = await GET(request("?archived=true"));
+
+    expect(response.status).toBe(200);
+    expect(mockListAiConversations).toHaveBeenCalledWith(
+      expect.objectContaining({ userId: "user-1", archived: true }),
+    );
   });
 
   it("creates a conversation for the authenticated user", async () => {

@@ -344,6 +344,7 @@ export const aiConversations = pgTable(
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     title: text("title"),
+    archivedAt: timestamp("archivedAt", { withTimezone: true }),
     createdAt: timestamp("createdAt", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -352,10 +353,9 @@ export const aiConversations = pgTable(
       .defaultNow(),
   },
   (table) => ({
-    userUpdatedAtIdx: index("ai_conversations_userId_updatedAt_idx").on(
-      table.userId,
-      table.updatedAt.desc(),
-    ),
+    userArchivedAtUpdatedAtIdx: index(
+      "ai_conversations_userId_archivedAt_updatedAt_idx",
+    ).on(table.userId, table.archivedAt, table.updatedAt.desc()),
   }),
 );
 

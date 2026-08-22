@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { createAgentUIStreamResponse, validateUIMessages } from "ai";
+import {
+  consumeStream,
+  createAgentUIStreamResponse,
+  validateUIMessages,
+} from "ai";
 import { createAgent, isAgentId } from "@/lib/ai/agents";
 import {
   AiConversationNotFoundError,
@@ -9,6 +13,7 @@ import {
 } from "@/lib/ai/chat-history";
 import type { AiMessage } from "@/lib/ai/chat-history-types";
 import { persistGeneratedImages } from "@/lib/ai/generated-image-storage";
+import { selectGptImage1kSize } from "@/lib/ai/image-size";
 import {
   DEFAULT_REASONING_EFFORT,
   REASONING_EFFORTS,
@@ -116,6 +121,19 @@ export async function POST(request: NextRequest) {
     throw error;
   }
 
+  let validatedMessages: AiMessage[];
+  try {
+    validatedMessages = await validateUIMessages<AiMessage>({
+      messages: parsed.data.messages,
+    });
+  } catch (error) {
+    console.error("AI chat messages failed validation:", error);
+    return NextResponse.json(
+      { error: "Invalid chat request." },
+      { status: 400 },
+    );
+  }
+
   let agent: ReturnType<typeof createAgent>;
   try {
     agent = createAgent(
@@ -129,6 +147,7 @@ export async function POST(request: NextRequest) {
       },
       {
         reasoningEffort: parsed.data.reasoningEffort,
+        imageSize: selectGptImage1kSize(validatedMessages),
         previousResponseId,
       },
     );
@@ -138,19 +157,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       { error: "The assistant is unavailable." },
       { status: 500 },
-    );
-  }
-
-  let validatedMessages: AiMessage[];
-  try {
-    validatedMessages = await validateUIMessages<AiMessage>({
-      messages: parsed.data.messages,
-    });
-  } catch (error) {
-    console.error("AI chat messages failed validation:", error);
-    return NextResponse.json(
-      { error: "Invalid chat request." },
-      { status: 400 },
     );
   }
 
@@ -173,6 +179,13 @@ export async function POST(request: NextRequest) {
       agent,
       uiMessages: validatedMessages,
       sendSources: true,
+      consumeSseStream: ({ stream }) =>
+        consumeStream({
+          stream,
+          onError: (error) => {
+            console.error("AI chat background stream error:", error);
+          },
+        }),
       onEnd: async ({ responseMessage }) => {
         const message = await persistGeneratedImages({
           message: responseMessage as AiMessage,

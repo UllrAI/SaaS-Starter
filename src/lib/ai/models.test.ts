@@ -37,4 +37,11 @@ describe("getChatModel", () => {
       partialImages: 0,
     });
   });
+
+  it("supports every application-approved 1K aspect ratio", async () => {
+    const { getImageGenerationTool } = await import("./models");
+
+    expect(getImageGenerationTool("1536x1024").args.size).toBe("1536x1024");
+    expect(getImageGenerationTool("1024x1536").args.size).toBe("1024x1536");
+  });
 });

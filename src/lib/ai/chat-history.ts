@@ -1,6 +1,6 @@
 import "server-only";
 
-import { and, asc, desc, eq, sql } from "drizzle-orm";
+import { and, asc, desc, eq, isNotNull, isNull, sql } from "drizzle-orm";
 import { db } from "@/database";
 import { aiConversations, aiMessages } from "@/database/schema";
 import type {
@@ -25,6 +25,7 @@ function toSummary(
   return {
     id: row.id,
     title: row.title,
+    archivedAt: row.archivedAt?.toISOString() ?? null,
     createdAt: row.createdAt.toISOString(),
     updatedAt: row.updatedAt.toISOString(),
   };
@@ -89,11 +90,19 @@ export async function listAiConversations(params: {
   userId: string;
   offset: number;
   limit: number;
+  archived: boolean;
 }): Promise<AiConversationPage> {
   const rows = await db
     .select()
     .from(aiConversations)
-    .where(eq(aiConversations.userId, params.userId))
+    .where(
+      and(
+        eq(aiConversations.userId, params.userId),
+        params.archived
+          ? isNotNull(aiConversations.archivedAt)
+          : isNull(aiConversations.archivedAt),
+      ),
+    )
     .orderBy(desc(aiConversations.updatedAt), desc(aiConversations.id))
     .limit(params.limit + 1)
     .offset(params.offset);
@@ -102,6 +111,27 @@ export async function listAiConversations(params: {
     conversations: rows.slice(0, params.limit).map(toSummary),
     hasMore: rows.length > params.limit,
   };
+}
+
+export async function setAiConversationArchived(params: {
+  conversationId: string;
+  userId: string;
+  archived: boolean;
+}): Promise<AiConversationSummary | null> {
+  const [conversation] = await db
+    .update(aiConversations)
+    .set({
+      archivedAt: params.archived ? sql<Date>`now()` : null,
+    })
+    .where(
+      and(
+        eq(aiConversations.id, params.conversationId),
+        eq(aiConversations.userId, params.userId),
+      ),
+    )
+    .returning();
+
+  return conversation ? toSummary(conversation) : null;
 }
 
 export async function getAiConversation(params: {

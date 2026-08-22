@@ -1558,7 +1558,7 @@ describe("Database Schema", () => {
       );
 
       expect(conversationIndexes).toContain(
-        "ai_conversations_userId_updatedAt_idx",
+        "ai_conversations_userId_archivedAt_updatedAt_idx",
       );
       expect(messageIndexes).toContain(
         "ai_messages_conversationId_createdAt_idx",

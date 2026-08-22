@@ -5,6 +5,21 @@ Routine formatting and test-only maintenance are omitted.
 
 ## Unreleased
 
+## 0.1.11 — 2026-08-22
+
+### AI conversation controls and image aspect ratios
+
+- Added a collapsible desktop history rail plus reversible conversation
+  archiving and restoration.
+- Kept GPT Image 2 output in the approved 1K tier while selecting square,
+  landscape, or portrait dimensions from the latest user request.
+- Corrected the canvas-open icon direction across the AI workspace.
+- Kept assistant generation and persistence running independently of the
+  browser connection, so closing or refreshing the page no longer drops the
+  completed reply.
+- Moved the AI accuracy notice into the scrollable conversation area with a
+  quieter visual treatment.
+
 ## 0.1.10 — 2026-08-22
 
 ### Persistent AI conversations

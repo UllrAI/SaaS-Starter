@@ -4,6 +4,7 @@ const mockGetAuthSessionFromHeaders = jest.fn();
 const mockCheckRateLimit = jest.fn();
 const mockCreateAgent = jest.fn();
 const mockCreateAgentUIStreamResponse = jest.fn();
+const mockConsumeStream = jest.fn();
 const mockValidateUIMessages = jest.fn();
 const mockCreateResponseHandle = jest.fn();
 const mockReadResponseHandle = jest.fn();
@@ -39,6 +40,7 @@ jest.mock("@/lib/ai/agents", () => ({
 }));
 
 jest.mock("ai", () => ({
+  consumeStream: mockConsumeStream,
   createAgentUIStreamResponse: mockCreateAgentUIStreamResponse,
   validateUIMessages: mockValidateUIMessages,
 }));
@@ -98,6 +100,7 @@ describe("/api/chat", () => {
       info: { limit: 30, remaining: 29, resetAt: 2_000_000_000 },
     });
     mockCreateAgent.mockReturnValue({ id: "assistant-agent" });
+    mockConsumeStream.mockResolvedValue(undefined);
     mockCreateResponseHandle.mockReturnValue("signed-response-handle");
     mockReadResponseHandle.mockReturnValue("resp_previous");
     mockRequireAiConversation.mockResolvedValue(undefined);
@@ -182,7 +185,11 @@ describe("/api/chat", () => {
         userRole: "user",
         locale: "zh-Hans",
       },
-      { reasoningEffort: "low", previousResponseId: undefined },
+      {
+        reasoningEffort: "low",
+        imageSize: "1024x1024",
+        previousResponseId: undefined,
+      },
     );
     const [streamArgs] = mockCreateAgentUIStreamResponse.mock.calls[0] as [
       { agent: unknown; uiMessages: unknown; onError: (e: unknown) => string },
@@ -206,7 +213,11 @@ describe("/api/chat", () => {
     expect(mockCreateAgent).toHaveBeenCalledWith(
       "assistant",
       expect.objectContaining({ userId: "user-1" }),
-      { reasoningEffort: "low", previousResponseId: undefined },
+      {
+        reasoningEffort: "low",
+        imageSize: "1024x1024",
+        previousResponseId: undefined,
+      },
     );
   });
 
@@ -225,7 +236,29 @@ describe("/api/chat", () => {
     expect(mockCreateAgent).toHaveBeenCalledWith(
       "assistant",
       expect.objectContaining({ userId: "user-1" }),
-      { reasoningEffort: "high", previousResponseId: "resp_previous" },
+      {
+        reasoningEffort: "high",
+        imageSize: "1024x1024",
+        previousResponseId: "resp_previous",
+      },
+    );
+  });
+
+  it("selects a 1K landscape image size from the latest request", async () => {
+    await postChat({
+      messages: [
+        {
+          id: "m1",
+          role: "user",
+          parts: [{ type: "text", text: "生成一张横版产品图" }],
+        },
+      ],
+    });
+
+    expect(mockCreateAgent).toHaveBeenCalledWith(
+      "assistant",
+      expect.objectContaining({ userId: "user-1" }),
+      expect.objectContaining({ imageSize: "1536x1024" }),
     );
   });
 
@@ -282,6 +315,26 @@ describe("/api/chat", () => {
       conversationId,
       userId: "user-1",
       messages: [responseMessage],
+    });
+  });
+
+  it("keeps consuming the response when the browser disconnects", async () => {
+    await postChat();
+
+    const [streamArgs] = mockCreateAgentUIStreamResponse.mock.calls[0] as [
+      {
+        consumeSseStream: (options: {
+          stream: ReadableStream<string>;
+        }) => Promise<void>;
+      },
+    ];
+    const stream = new ReadableStream<string>();
+
+    await streamArgs.consumeSseStream({ stream });
+
+    expect(mockConsumeStream).toHaveBeenCalledWith({
+      stream,
+      onError: expect.any(Function),
     });
   });
 

@@ -2,6 +2,7 @@ import "server-only";
 import { ToolLoopAgent, isStepCount } from "ai";
 import { APP_NAME } from "@/lib/config/constants";
 import type { AgentContext } from "../context";
+import type { GptImage1kSize } from "../image-size";
 import { getChatModel, getImageGenerationTool } from "../models";
 import type { ReasoningEffort } from "../reasoning";
 import { agentSkills, composeSkills } from "../skills";
@@ -18,6 +19,7 @@ const ASSISTANT_TOOLS: AgentToolName[] = ["getCurrentTime", "presentArtifact"];
 
 export interface AssistantAgentOptions {
   reasoningEffort: ReasoningEffort;
+  imageSize: GptImage1kSize;
   previousResponseId?: string;
 }
 
@@ -28,7 +30,7 @@ You are talking to ${context.userName} (locale: ${context.locale}). Answer in th
 Be concise and factual. Use tools for anything you cannot know from the conversation, and say so when a question is outside what you or your tools can do.
 When the user asks for a substantial draft, plan, report, or other document, use presentArtifact with Markdown so they can work with it in the canvas.
 Use presentArtifact for image or video URLs only when the URL was supplied by the user or another tool. Never invent a media URL.
-Use generateImage when the user asks you to create an image. Generate at most one image per request; its size and quality are fixed by the application.
+Use generateImage when the user asks you to create an image. Generate at most one image per request. The application limits output to a 1K square, landscape, or portrait size based on the user's latest request.
 
 ${skillInstructions}`;
 }
@@ -42,7 +44,7 @@ export function createAssistantAgent(
   const { instructions, toolNames } = composeSkills(ASSISTANT_SKILLS);
   const tools = {
     ...buildTools([...ASSISTANT_TOOLS, ...toolNames], context),
-    generateImage: getImageGenerationTool(),
+    generateImage: getImageGenerationTool(options.imageSize),
   };
 
   return new ToolLoopAgent({

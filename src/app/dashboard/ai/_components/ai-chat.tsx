@@ -1,6 +1,15 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  type KeyboardEvent,
+  type PointerEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport, type FileUIPart } from "ai";
 import { useFileUpload } from "@/components/ui/file-upload/use-file-upload";
@@ -38,9 +47,81 @@ import { CanvasPanel } from "./canvas-panel";
 import { ChatPanel } from "./chat-panel";
 import { prepareChatRequest } from "./chat-request";
 import { ConversationSidebar } from "./conversation-sidebar";
+import {
+  canvasPercentFromPointer,
+  clampCanvasPercent,
+  DEFAULT_CANVAS_PERCENT,
+  MAX_CANVAS_PERCENT,
+  MIN_CANVAS_PERCENT,
+  shouldOpenDesktopCanvas,
+} from "./workspace-layout";
 
 const HISTORY_PAGE_SIZE = 30;
 const CONVERSATION_QUERY_KEY = "conversation";
+const HISTORY_COLLAPSED_STORAGE_KEY = "ai-workspace-history-collapsed";
+const CANVAS_OPEN_STORAGE_KEY = "ai-workspace-canvas-open";
+const CANVAS_PERCENT_STORAGE_KEY = "ai-workspace-canvas-percent";
+const LAYOUT_PREFERENCE_EVENT = "ai-workspace-layout-preference";
+
+function readStoredValue(key: string) {
+  try {
+    return window.localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function writeStoredValue(key: string, value: string) {
+  try {
+    window.localStorage.setItem(key, value);
+    window.dispatchEvent(new Event(LAYOUT_PREFERENCE_EVENT));
+  } catch {
+    // Layout preferences are non-critical when storage is unavailable.
+  }
+}
+
+function readStoredBoolean(key: string) {
+  const value = readStoredValue(key);
+  if (value === "true") return true;
+  if (value === "false") return false;
+  return undefined;
+}
+
+function subscribeToStoredValues(onChange: () => void) {
+  const handleChange = () => onChange();
+  window.addEventListener("storage", handleChange);
+  window.addEventListener(LAYOUT_PREFERENCE_EVENT, handleChange);
+  return () => {
+    window.removeEventListener("storage", handleChange);
+    window.removeEventListener(LAYOUT_PREFERENCE_EVENT, handleChange);
+  };
+}
+
+function useStoredBoolean(key: string, defaultValue: boolean) {
+  return useSyncExternalStore(
+    subscribeToStoredValues,
+    () => readStoredBoolean(key) ?? defaultValue,
+    () => defaultValue,
+  );
+}
+
+function readStoredCanvasPercent() {
+  const value = readStoredValue(CANVAS_PERCENT_STORAGE_KEY);
+  if (value === null) return DEFAULT_CANVAS_PERCENT;
+
+  const percent = Number(value);
+  return Number.isFinite(percent)
+    ? clampCanvasPercent(percent)
+    : DEFAULT_CANVAS_PERCENT;
+}
+
+function useStoredCanvasPercent() {
+  return useSyncExternalStore(
+    subscribeToStoredValues,
+    readStoredCanvasPercent,
+    () => DEFAULT_CANVAS_PERCENT,
+  );
+}
 
 function isReasoningEffort(value: unknown): value is ReasoningEffort {
   return REASONING_EFFORTS.some((effort) => effort === value);
@@ -122,14 +203,21 @@ export function AiChat() {
   const [historyHasMore, setHistoryHasMore] = useState(false);
   const [historyError, setHistoryError] = useState(false);
   const [historyArchived, setHistoryArchived] = useState(false);
-  const [historyCollapsed, setHistoryCollapsed] = useState(false);
+  const historyCollapsed = useStoredBoolean(
+    HISTORY_COLLAPSED_STORAGE_KEY,
+    false,
+  );
   const [historyMutatingId, setHistoryMutatingId] = useState<string>();
   const [loadedConversationCount, setLoadedConversationCount] = useState(0);
   const [manualArtifacts, setManualArtifacts] = useState<CanvasArtifact[]>([]);
   const [activeArtifactId, setActiveArtifactId] = useState<string>();
-  const [desktopCanvasOpen, setDesktopCanvasOpen] = useState(true);
+  const canvasOpenPreference = useStoredBoolean(CANVAS_OPEN_STORAGE_KEY, false);
+  const [canvasAutomaticallyOpen, setCanvasAutomaticallyOpen] = useState(false);
+  const [canvasManuallyOpen, setCanvasManuallyOpen] = useState(false);
+  const canvasPercent = useStoredCanvasPercent();
   const [mobileCanvasOpen, setMobileCanvasOpen] = useState(false);
   const [mobileHistoryOpen, setMobileHistoryOpen] = useState(false);
+  const workspaceRef = useRef<HTMLDivElement>(null);
   const latestAutomaticArtifactId = useRef<string | undefined>(undefined);
   const conversationRequestId = useRef(0);
 
@@ -224,6 +312,12 @@ export function AiChat() {
     );
     return [...byId.values()];
   }, [automaticArtifacts, manualArtifacts]);
+  const desktopCanvasOpen = shouldOpenDesktopCanvas({
+    artifactCount: artifacts.length,
+    automaticallyOpen: canvasAutomaticallyOpen,
+    manuallyOpen: canvasManuallyOpen,
+    preferredOpen: canvasOpenPreference,
+  });
   const activeConversation = conversations.find(
     (conversation) => conversation.id === activeConversationId,
   );
@@ -278,6 +372,9 @@ export function AiChat() {
         setHistoryHasMore(page.hasMore);
         setConversations(nextConversations);
         setActiveConversationId(detail?.conversation.id);
+        latestAutomaticArtifactId.current = extractArtifacts(
+          detail?.messages ?? [],
+        ).at(-1)?.id;
         setMessages(detail?.messages ?? []);
         replaceConversationUrl(detail?.conversation.id);
         setHistoryError(false);
@@ -315,7 +412,9 @@ export function AiChat() {
 
     latestAutomaticArtifactId.current = latestArtifact.id;
     setActiveArtifactId(latestArtifact.id);
-    setDesktopCanvasOpen(true);
+    if (window.matchMedia("(min-width: 80rem)").matches) {
+      queueMicrotask(() => setCanvasAutomaticallyOpen(true));
+    }
   }, [automaticArtifacts]);
 
   const clearImageAttachments = useCallback(() => {
@@ -326,6 +425,9 @@ export function AiChat() {
     setMessages([]);
     setManualArtifacts([]);
     setActiveArtifactId(undefined);
+    setCanvasAutomaticallyOpen(false);
+    setCanvasManuallyOpen(false);
+    setMobileCanvasOpen(false);
     latestAutomaticArtifactId.current = undefined;
     clearImageAttachments();
     clearError();
@@ -342,6 +444,9 @@ export function AiChat() {
       if (requestId !== conversationRequestId.current) return;
 
       resetConversationView();
+      latestAutomaticArtifactId.current = extractArtifacts(detail.messages).at(
+        -1,
+      )?.id;
       setMessages(detail.messages);
       setActiveConversationId(detail.conversation.id);
       setConversations((current) => {
@@ -455,15 +560,71 @@ export function AiChat() {
   };
 
   const handleToggleHistoryCollapsed = () => {
-    setHistoryCollapsed((current) => !current);
+    writeStoredValue(HISTORY_COLLAPSED_STORAGE_KEY, String(!historyCollapsed));
+  };
+
+  const setPreferredCanvasOpen = (open: boolean) => {
+    setCanvasAutomaticallyOpen(false);
+    setCanvasManuallyOpen(open);
+    writeStoredValue(CANVAS_OPEN_STORAGE_KEY, String(open));
   };
 
   const openCanvasForCurrentViewport = () => {
-    if (window.matchMedia("(min-width: 64rem)").matches) {
-      setDesktopCanvasOpen(true);
+    if (window.matchMedia("(min-width: 80rem)").matches) {
+      setPreferredCanvasOpen(true);
     } else {
       setMobileCanvasOpen(true);
     }
+  };
+
+  const updateCanvasPercent = useCallback((value: number) => {
+    const nextCanvasPercent = clampCanvasPercent(value);
+    writeStoredValue(CANVAS_PERCENT_STORAGE_KEY, String(nextCanvasPercent));
+  }, []);
+
+  const resizeCanvasFromPointer = useCallback(
+    (clientX: number) => {
+      const workspace = workspaceRef.current;
+      if (!workspace) return;
+      const rect = workspace.getBoundingClientRect();
+      updateCanvasPercent(
+        canvasPercentFromPointer(clientX, rect.left, rect.width),
+      );
+    },
+    [updateCanvasPercent],
+  );
+
+  const handleCanvasResizePointerDown = (
+    event: PointerEvent<HTMLDivElement>,
+  ) => {
+    event.currentTarget.setPointerCapture(event.pointerId);
+    resizeCanvasFromPointer(event.clientX);
+  };
+
+  const handleCanvasResizePointerMove = (
+    event: PointerEvent<HTMLDivElement>,
+  ) => {
+    if (!event.currentTarget.hasPointerCapture(event.pointerId)) return;
+    resizeCanvasFromPointer(event.clientX);
+  };
+
+  const handleCanvasResizePointerEnd = (
+    event: PointerEvent<HTMLDivElement>,
+  ) => {
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+  };
+
+  const handleCanvasResizeKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+    event.preventDefault();
+    const change = event.key === "ArrowLeft" ? 2.5 : -2.5;
+    updateCanvasPercent(canvasPercent + change);
+  };
+
+  const resetCanvasPercent = () => {
+    updateCanvasPercent(DEFAULT_CANVAS_PERCENT);
   };
 
   const handleSubmit = async (suggestedText?: string) => {
@@ -584,14 +745,10 @@ export function AiChat() {
   return (
     <div
       className={cn(
-        "grid min-h-0 w-full flex-1 overflow-hidden border-y lg:border",
-        desktopCanvasOpen
-          ? historyCollapsed
-            ? "lg:grid-cols-[minmax(20rem,0.8fr)_minmax(28rem,1.2fr)] xl:grid-cols-[3.5rem_minmax(20rem,0.8fr)_minmax(28rem,1.2fr)]"
-            : "lg:grid-cols-[minmax(20rem,0.8fr)_minmax(28rem,1.2fr)] xl:grid-cols-[14rem_minmax(20rem,0.8fr)_minmax(28rem,1.2fr)]"
-          : historyCollapsed
-            ? "lg:grid-cols-1 xl:grid-cols-[3.5rem_minmax(0,1fr)]"
-            : "lg:grid-cols-1 xl:grid-cols-[14rem_minmax(0,1fr)]",
+        "grid min-h-0 w-full flex-1 overflow-hidden lg:border-x",
+        historyCollapsed
+          ? "xl:grid-cols-[3.5rem_minmax(0,1fr)]"
+          : "xl:grid-cols-[14rem_minmax(0,1fr)]",
       )}
     >
       <ConversationSidebar
@@ -601,54 +758,86 @@ export function AiChat() {
         className="hidden border-r xl:flex"
       />
 
-      <ChatPanel
-        messages={messages}
-        input={input}
-        status={status}
-        error={error}
-        reasoningEffort={reasoningEffort}
-        canvasCount={artifacts.length}
-        conversationTitle={activeConversation?.title ?? undefined}
-        conversationLoading={
-          historyLoading || conversationLoading || conversationCreating
-        }
-        imageAttachments={imageUpload.items}
-        imageUploadsEnabled={SITE_CONFIG.features.uploads}
-        imageUploadError={
-          Boolean(imageUpload.issue) ||
-          imageUpload.items.some((item) => item.status === "error")
-        }
-        canAddImage={imageUpload.canAddMore && !historyDisabled}
-        onAddImages={(files) => void imageUpload.addFiles(files)}
-        onRemoveImage={imageUpload.removeFile}
-        onRetryImage={(id) => void imageUpload.retryFile(id)}
-        onInputChange={setInput}
-        onReasoningEffortChange={setReasoningEffort}
-        onSubmit={handleSubmit}
-        onStop={() => void stop()}
-        onRetry={() => {
-          if (!activeConversationId) return;
-          clearError();
-          void regenerate({
-            body: { reasoningEffort, conversationId: activeConversationId },
-          });
-        }}
-        onOpenCanvas={openCanvasForCurrentViewport}
-        onOpenHistory={() => setMobileHistoryOpen(true)}
-        onNewConversation={handleNewConversation}
-        onOpenMessage={handleOpenMessage}
-        onOpenArtifact={handleOpenArtifact}
-      />
-
-      {desktopCanvasOpen && (
-        <CanvasPanel
-          artifacts={artifacts}
-          activeArtifactId={activeArtifactId}
-          onSelectArtifact={setActiveArtifactId}
-          onClose={() => setDesktopCanvasOpen(false)}
-          className="hidden border-l lg:flex"
+      <div ref={workspaceRef} className="flex min-h-0 min-w-0 overflow-hidden">
+        <ChatPanel
+          messages={messages}
+          input={input}
+          status={status}
+          error={error}
+          reasoningEffort={reasoningEffort}
+          canvasCount={artifacts.length}
+          canvasOpen={desktopCanvasOpen}
+          conversationTitle={activeConversation?.title ?? undefined}
+          conversationLoading={
+            historyLoading || conversationLoading || conversationCreating
+          }
+          imageAttachments={imageUpload.items}
+          imageUploadsEnabled={SITE_CONFIG.features.uploads}
+          imageUploadError={
+            Boolean(imageUpload.issue) ||
+            imageUpload.items.some((item) => item.status === "error")
+          }
+          canAddImage={imageUpload.canAddMore && !historyDisabled}
+          onAddImages={(files) => void imageUpload.addFiles(files)}
+          onRemoveImage={imageUpload.removeFile}
+          onRetryImage={(id) => void imageUpload.retryFile(id)}
+          onInputChange={setInput}
+          onReasoningEffortChange={setReasoningEffort}
+          onSubmit={handleSubmit}
+          onStop={() => void stop()}
+          onRetry={() => {
+            if (!activeConversationId) return;
+            clearError();
+            void regenerate({
+              body: { reasoningEffort, conversationId: activeConversationId },
+            });
+          }}
+          onOpenCanvas={openCanvasForCurrentViewport}
+          onOpenHistory={() => setMobileHistoryOpen(true)}
+          onNewConversation={handleNewConversation}
+          onOpenMessage={handleOpenMessage}
+          onOpenArtifact={handleOpenArtifact}
+          className="min-w-80 flex-1"
         />
-      )}
+
+        {desktopCanvasOpen && (
+          <>
+            <div
+              role="separator"
+              aria-label={t("ai_canvas_resize")}
+              aria-orientation="vertical"
+              aria-valuemin={MIN_CANVAS_PERCENT}
+              aria-valuemax={MAX_CANVAS_PERCENT}
+              aria-valuenow={Math.round(canvasPercent)}
+              tabIndex={0}
+              title={t("ai_canvas_resize_hint")}
+              className="group bg-background focus-visible:ring-ring relative hidden w-2 shrink-0 cursor-col-resize touch-none items-stretch justify-center select-none focus-visible:ring-2 focus-visible:outline-none xl:flex"
+              onPointerDown={handleCanvasResizePointerDown}
+              onPointerMove={handleCanvasResizePointerMove}
+              onPointerUp={handleCanvasResizePointerEnd}
+              onPointerCancel={handleCanvasResizePointerEnd}
+              onDoubleClick={resetCanvasPercent}
+              onKeyDown={handleCanvasResizeKeyDown}
+            >
+              <span className="bg-border group-hover:bg-primary/50 group-focus-visible:bg-primary/50 w-px transition-colors" />
+            </div>
+            <div
+              className="hidden min-w-80 shrink-0 xl:flex"
+              style={{
+                width: `clamp(20rem, ${canvasPercent}%, calc(100% - 20.5rem))`,
+              }}
+            >
+              <CanvasPanel
+                artifacts={artifacts}
+                activeArtifactId={activeArtifactId}
+                onSelectArtifact={setActiveArtifactId}
+                onClose={() => setPreferredCanvasOpen(false)}
+                className="flex h-full w-full"
+              />
+            </div>
+          </>
+        )}
+      </div>
 
       <Sheet open={mobileHistoryOpen} onOpenChange={setMobileHistoryOpen}>
         <SheetContent
@@ -668,7 +857,7 @@ export function AiChat() {
       </Sheet>
 
       <Sheet open={mobileCanvasOpen} onOpenChange={setMobileCanvasOpen}>
-        <SheetContent className="w-full max-w-none gap-0 p-0 sm:max-w-none lg:hidden">
+        <SheetContent className="w-full max-w-none gap-0 p-0 sm:max-w-none xl:hidden">
           <SheetHeader className="sr-only">
             <SheetTitle>{t("ai_canvas_title")}</SheetTitle>
             <SheetDescription>

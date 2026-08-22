@@ -66,7 +66,7 @@ describe("HomePage", () => {
     await expect(generateMetadata()).resolves.toMatchObject({
       title: "Micro SaaS Starter",
       description:
-        "Authentication, billing, agent-ready APIs, CLI device auth, uploads, admin tooling, and Playwright-backed smoke coverage for shipping a SaaS product faster.",
+        "Launch faster with auth, billing, uploads, admin tools, a lightweight built-in agent, and secure API and CLI access for external automation.",
     });
 
     expect(mockCreateLocalizedAlternates).toHaveBeenCalledWith("/", "en");

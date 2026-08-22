@@ -128,13 +128,9 @@ export function CanvasPanel({
       aria-label={t("ai_canvas_title")}
       className={cn("bg-muted/20 min-h-0 flex-col", className)}
     >
-      <header className="bg-background flex h-12 shrink-0 items-center gap-2 border-b px-3 pr-12 lg:pr-3">
-        <div className="text-muted-foreground flex items-center gap-2 text-sm font-medium">
-          {activeArtifact ? (
-            <ArtifactIcon kind={activeArtifact.kind} />
-          ) : (
-            <PanelRightClose className="size-4" />
-          )}
+      <header className="bg-background flex h-12 shrink-0 items-center gap-2 border-b px-3 pr-12 xl:pr-3">
+        <div className="text-muted-foreground mr-auto flex min-w-0 items-center gap-2 text-sm font-medium">
+          {activeArtifact && <ArtifactIcon kind={activeArtifact.kind} />}
           <span>{t("ai_canvas_title")}</span>
         </div>
 
@@ -142,7 +138,7 @@ export function CanvasPanel({
           <Select value={activeArtifact?.id} onValueChange={onSelectArtifact}>
             <SelectTrigger
               size="sm"
-              className="ml-auto max-w-56 border-0 shadow-none"
+              className="max-w-56 border-0 shadow-none"
               aria-label={t("ai_canvas_select_artifact")}
             >
               <SelectValue />

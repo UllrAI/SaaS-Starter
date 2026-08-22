@@ -36,18 +36,42 @@ test("shows the assistant composer to a signed-in user", async ({ page }) => {
   await expect(page).toHaveURL(/\/dashboard\/ai$/);
   await expect(page.getByText("How can I help?")).toBeVisible();
   await expect(page.getByPlaceholder(/Ask, draft, or create/)).toBeVisible();
-  await expect(page.getByLabel("Reasoning effort")).toContainText(
-    "Low reasoning",
-  );
+  await expect(page.getByLabel("Reasoning effort")).toHaveText("Low");
   await expect(
     page.locator('button[aria-label="Attach images"]'),
   ).toBeVisible();
+  await expect(page.getByRole("region", { name: "Canvas" })).toBeHidden();
+
+  await page.getByRole("button", { name: "Open canvas" }).click();
   await expect(page.getByRole("region", { name: "Canvas" })).toBeVisible();
+  const canvasResizeHandle = page.getByRole("separator", {
+    name: "Resize canvas",
+  });
+  await canvasResizeHandle.press("ArrowLeft");
+  await expect(canvasResizeHandle).toHaveAttribute("aria-valuenow", "53");
 
   await page.getByRole("button", { name: "Collapse chat history" }).click();
   await expect(
     page.getByRole("button", { name: "Expand chat history" }),
   ).toBeVisible();
+
+  await page.reload();
+  await expect(
+    page.getByRole("button", { name: "Expand chat history" }),
+  ).toBeVisible();
+  await expect(page.getByRole("region", { name: "Canvas" })).toBeVisible();
+  await expect(
+    page.getByRole("separator", { name: "Resize canvas" }),
+  ).toHaveAttribute("aria-valuenow", "53");
+
+  await page.setViewportSize({ width: 1024, height: 900 });
+  await page.reload();
+  await expect(page.getByRole("button", { name: "Open canvas" })).toBeVisible();
+  await page.getByRole("button", { name: "Open canvas" }).click();
+  await expect(page.getByRole("region", { name: "Canvas" })).toBeVisible();
+  await expect(
+    page.getByRole("separator", { name: "Resize canvas" }),
+  ).toHaveCount(0);
 });
 
 test("uploads a reference image and enables an image-only message", async ({

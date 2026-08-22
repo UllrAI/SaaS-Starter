@@ -4,6 +4,7 @@ import { DashboardPageHeader } from "./dashboard-page-header";
 
 interface DashboardPageWrapperProps {
   title: ReactNode;
+  layout?: "content" | "workspace";
   parentTitle?: ReactNode;
   parentUrl?: string;
   description?: ReactNode;
@@ -15,6 +16,7 @@ interface DashboardPageWrapperProps {
 
 export function DashboardPageWrapper({
   title,
+  layout = "content",
   parentTitle,
   parentUrl,
   description,
@@ -33,7 +35,14 @@ export function DashboardPageWrapper({
         actions={actions}
         showSidebarTrigger={showSidebarTrigger}
       />
-      <main className={cn("flex-1 space-y-6 px-4 py-2", mainClassName)}>
+      <main
+        className={cn(
+          layout === "workspace"
+            ? "flex h-[calc(100svh-var(--header-height))] min-h-0 flex-none overflow-hidden md:h-[calc(100svh-var(--header-height)-1rem)]"
+            : "@container/main flex-1 space-y-4 px-4 py-4 md:space-y-6 md:py-6 lg:px-6",
+          mainClassName,
+        )}
+      >
         {children}
       </main>
     </>

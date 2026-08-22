@@ -93,7 +93,16 @@ describe("DashboardPageWrapper", () => {
 
     const mainElement = screen.getByRole("main");
     expect(mainElement).toBeInTheDocument();
-    expect(mainElement).toHaveClass("flex-1", "space-y-6", "px-4", "py-2");
+    expect(mainElement).toHaveClass(
+      "@container/main",
+      "flex-1",
+      "space-y-4",
+      "px-4",
+      "py-4",
+      "md:space-y-6",
+      "md:py-6",
+      "lg:px-6",
+    );
 
     expect(screen.getByTestId("main-heading")).toHaveTextContent(
       "Main Content",
@@ -112,9 +121,25 @@ describe("DashboardPageWrapper", () => {
 
     expect(screen.getByRole("main")).toHaveClass(
       "flex-1",
-      "space-y-6",
+      "space-y-4",
       "px-4",
-      "py-2",
+      "py-4",
+      "overflow-hidden",
+    );
+  });
+
+  it("uses a viewport-bound layout for workspace pages", () => {
+    render(
+      <DashboardPageWrapper title="Workspace" layout="workspace">
+        <div>Workspace content</div>
+      </DashboardPageWrapper>,
+    );
+
+    expect(screen.getByRole("main")).toHaveClass(
+      "flex",
+      "h-[calc(100svh-var(--header-height))]",
+      "md:h-[calc(100svh-var(--header-height)-1rem)]",
+      "min-h-0",
       "overflow-hidden",
     );
   });

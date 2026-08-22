@@ -35,7 +35,6 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { REASONING_EFFORTS, type ReasoningEffort } from "@/lib/ai/reasoning";
@@ -45,6 +44,7 @@ import {
   AI_IMAGE_INPUT_MEDIA_TYPES,
 } from "@/lib/ai/image-input";
 import { useTranslation } from "@/lib/i18n/translation/client";
+import { cn } from "@/lib/utils";
 
 interface ChatPanelProps {
   messages: AiMessage[];
@@ -53,6 +53,7 @@ interface ChatPanelProps {
   error?: Error;
   reasoningEffort: ReasoningEffort;
   canvasCount: number;
+  canvasOpen: boolean;
   conversationTitle?: string;
   conversationLoading: boolean;
   imageAttachments: FileUploadItem[];
@@ -72,6 +73,7 @@ interface ChatPanelProps {
   onNewConversation: () => void;
   onOpenMessage: (message: AiMessage) => void;
   onOpenArtifact: (id: string) => void;
+  className?: string;
 }
 
 function UserMessage({ message }: { message: AiMessage }) {
@@ -372,6 +374,7 @@ export function ChatPanel({
   error,
   reasoningEffort,
   canvasCount,
+  canvasOpen,
   conversationTitle,
   conversationLoading,
   imageAttachments,
@@ -391,6 +394,7 @@ export function ChatPanel({
   onNewConversation,
   onOpenMessage,
   onOpenArtifact,
+  className,
 }: ChatPanelProps) {
   const { t } = useTranslation();
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -420,7 +424,10 @@ export function ChatPanel({
   return (
     <section
       aria-label={t("ai_chat_conversation")}
-      className="bg-background flex min-h-0 min-w-0 flex-col overflow-hidden"
+      className={cn(
+        "bg-background flex min-h-0 min-w-0 flex-col overflow-hidden",
+        className,
+      )}
     >
       <div className="flex h-12 shrink-0 items-center gap-2 border-b px-3">
         <Button
@@ -436,6 +443,22 @@ export function ChatPanel({
         <span className="min-w-0 flex-1 truncate text-sm font-medium">
           {conversationTitle ?? t("ai_history_untitled")}
         </span>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className={cn("h-8 px-2", canvasOpen && "xl:hidden")}
+          onClick={onOpenCanvas}
+          aria-label={t("ai_canvas_open")}
+        >
+          <PanelRightOpen className="rotate-180" />
+          <span className="hidden sm:inline">{t("ai_canvas_title")}</span>
+          {canvasCount > 0 && (
+            <span className="bg-muted flex min-w-5 items-center justify-center rounded-full px-1 text-xs">
+              {canvasCount}
+            </span>
+          )}
+        </Button>
         <Button
           type="button"
           variant="ghost"
@@ -522,9 +545,6 @@ export function ChatPanel({
               )}
             </div>
           )}
-          <p className="text-muted-foreground/60 mt-6 text-center text-[10px] leading-4">
-            {t("ai_chat_disclaimer")}
-          </p>
           <div ref={bottomRef} />
         </div>
       </div>
@@ -565,29 +585,6 @@ export function ChatPanel({
             rows={2}
           />
           <div className="flex min-w-0 flex-wrap items-center gap-2 border-t px-2 py-2">
-            <Select
-              value={reasoningEffort}
-              onValueChange={(value) =>
-                onReasoningEffortChange(value as ReasoningEffort)
-              }
-            >
-              <SelectTrigger
-                size="sm"
-                className="h-8 border-0 px-2 shadow-none"
-                aria-label={t("ai_chat_reasoning_effort")}
-              >
-                <Sparkles className="size-3.5" />
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent align="start">
-                {REASONING_EFFORTS.map((effort) => (
-                  <SelectItem key={effort} value={effort}>
-                    {t(`ai_chat_reasoning_${effort}`)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
             {imageUploadsEnabled && (
               <>
                 <input
@@ -624,21 +621,28 @@ export function ChatPanel({
               </>
             )}
 
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              className="h-8 px-2"
-              onClick={onOpenCanvas}
+            <Select
+              value={reasoningEffort}
+              onValueChange={(value) =>
+                onReasoningEffortChange(value as ReasoningEffort)
+              }
             >
-              <PanelRightOpen className="rotate-180" />
-              {t("ai_canvas_title")}
-              {canvasCount > 0 && (
-                <span className="bg-muted flex size-5 items-center justify-center rounded-full text-xs">
-                  {canvasCount}
-                </span>
-              )}
-            </Button>
+              <SelectTrigger
+                size="sm"
+                className="h-8 border-0 px-2 shadow-none"
+                aria-label={t("ai_chat_reasoning_effort")}
+              >
+                <Sparkles className="size-3.5" />
+                <span>{t(`ai_chat_reasoning_${reasoningEffort}_short`)}</span>
+              </SelectTrigger>
+              <SelectContent align="start">
+                {REASONING_EFFORTS.map((effort) => (
+                  <SelectItem key={effort} value={effort}>
+                    {t(`ai_chat_reasoning_${effort}`)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
             <div className="ml-auto">
               {isBusy ? (

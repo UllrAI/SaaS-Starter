@@ -375,6 +375,7 @@ export const aiMessages = pgTable(
   },
   (table) => ({
     pk: primaryKey({ columns: [table.conversationId, table.id] }),
+    idNotEmpty: check("ai_messages_id_not_empty", sql`length(${table.id}) > 0`),
     conversationCreatedAtIdx: index(
       "ai_messages_conversationId_createdAt_idx",
     ).on(table.conversationId, table.createdAt),

@@ -25,7 +25,6 @@ describe("prepareChatRequest", () => {
       prepareChatRequest({
         messages: [firstUser, firstAssistant, secondUser],
         conversationId: "conversation-1",
-        trigger: "submit-message",
         reasoningEffort: "low",
       }),
     ).toEqual({
@@ -42,7 +41,6 @@ describe("prepareChatRequest", () => {
       prepareChatRequest({
         messages: [firstUser],
         conversationId: "conversation-1",
-        trigger: "submit-message",
         reasoningEffort: "medium",
       }),
     ).toEqual({
@@ -53,20 +51,12 @@ describe("prepareChatRequest", () => {
     });
   });
 
-  it("regenerates from the response before the target assistant", () => {
-    const secondAssistant: AiMessage = {
-      id: "a2",
-      role: "assistant",
-      metadata: { responseHandle: "resp_2.signature" },
-      parts: [{ type: "text", text: "second answer" }],
-    };
-
+  it("keeps the latest user turn when the SDK retries a failed response", () => {
     expect(
       prepareChatRequest({
-        messages: [firstUser, firstAssistant, secondUser, secondAssistant],
+        // useChat removes the target assistant before preparing a retry.
+        messages: [firstUser, firstAssistant, secondUser],
         conversationId: "conversation-1",
-        trigger: "regenerate-message",
-        messageId: "a2",
         reasoningEffort: "high",
       }),
     ).toEqual({

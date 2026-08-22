@@ -3,6 +3,7 @@ import { z } from "zod";
 import {
   consumeStream,
   createAgentUIStreamResponse,
+  generateId,
   validateUIMessages,
 } from "ai";
 import { createAgent, isAgentId } from "@/lib/ai/agents";
@@ -197,6 +198,7 @@ export async function POST(request: NextRequest) {
     const response = await createAgentUIStreamResponse({
       agent,
       uiMessages: validatedMessages,
+      generateMessageId: generateId,
       sendSources: true,
       consumeSseStream: ({ stream }) =>
         consumeStream({

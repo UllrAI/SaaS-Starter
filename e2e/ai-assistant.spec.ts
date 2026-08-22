@@ -54,6 +54,30 @@ async function createStreamingChatFixture() {
   };
 }
 
+async function createImageChatChunks(publicUrl: string) {
+  const chat = createChat<AiMessage>({ now: "2026-08-22T00:00:00Z" })
+    .user("", {
+      id: "image-user",
+      files: [
+        {
+          filename: "reference.png",
+          mediaType: "image/png",
+          url: publicUrl,
+        },
+      ],
+    })
+    .assistant("Image received.", { id: "image-assistant" });
+  const stream = await chat.transport({ delayMs: 0 }).sendMessages({
+    abortSignal: undefined,
+    chatId: "e2e-image-chat",
+    messageId: undefined,
+    messages: chat.get(1),
+    trigger: "submit-message",
+  });
+
+  return readMessageChunks(stream);
+}
+
 test("rejects unauthenticated chat requests", async ({ page }) => {
   const response = await page.request.post("/api/chat", {
     data: {
@@ -287,6 +311,43 @@ test("uploads a reference image and enables an image-only message", async ({
   await loginAs(page, "user");
 
   const publicUrl = "https://cdn.example.com/reference.png";
+  const chatChunks = await createImageChatChunks(publicUrl);
+  await page.addInitScript((chunks) => {
+    const originalFetch = window.fetch.bind(window);
+
+    window.fetch = async (input, init) => {
+      const requestUrl = new URL(
+        typeof input === "string"
+          ? input
+          : input instanceof URL
+            ? input.href
+            : input.url,
+        window.location.href,
+      );
+      if (requestUrl.pathname !== "/api/chat") {
+        return originalFetch(input, init);
+      }
+
+      const encoder = new TextEncoder();
+      return new Response(
+        new ReadableStream({
+          start(controller) {
+            chunks.forEach((chunk) => {
+              controller.enqueue(encoder.encode(`data: ${chunk}\n\n`));
+            });
+            controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+            controller.close();
+          },
+        }),
+        {
+          headers: {
+            "content-type": "text/event-stream",
+            "x-vercel-ai-ui-message-stream": "v1",
+          },
+        },
+      );
+    };
+  }, chatChunks);
   await page.route("**/api/upload/presigned-url", async (route) => {
     await route.fulfill({
       contentType: "application/json",
@@ -343,6 +404,22 @@ test("uploads a reference image and enables an image-only message", async ({
 
   await expect(page.getByAltText("reference.png")).toBeVisible();
   await expect(page.getByRole("button", { name: "Send" })).toBeEnabled();
+  await page.getByRole("button", { name: "Send" }).click();
+
+  const previewButton = page.getByRole("button", {
+    name: "Preview reference.png",
+  });
+  await expect(previewButton).toBeVisible();
+  await previewButton.click();
+  const previewDialog = page.getByRole("dialog", { name: "reference.png" });
+  await expect(previewDialog).toBeVisible();
+  await expect(
+    previewDialog.getByRole("img", { name: "reference.png" }),
+  ).toBeVisible();
+
+  await page.keyboard.press("Escape");
+  await expect(previewDialog).toBeHidden();
+  await expect(previewButton).toBeFocused();
 });
 
 test("archives and restores a conversation", async ({ page }) => {

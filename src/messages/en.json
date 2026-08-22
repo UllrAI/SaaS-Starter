@@ -996,6 +996,8 @@
   "ai_chat_attach_images_hint": "Attach up to {count} reference images",
   "ai_chat_reference_images": "Reference images",
   "ai_chat_reference_image": "Reference image",
+  "ai_chat_preview_image": "Preview {name}",
+  "ai_chat_image_preview_description": "Full-size preview of {name}.",
   "ai_chat_image_uploading": "Uploading {name}: {progress}%",
   "ai_chat_remove_image": "Remove {name}",
   "ai_chat_retry_image_upload": "Retry upload for {name}",

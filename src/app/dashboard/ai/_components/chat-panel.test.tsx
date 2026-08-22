@@ -175,6 +175,58 @@ describe("ChatPanel", () => {
     await waitFor(() => expect(screen.queryByText("Thinking…")).toBeNull());
   });
 
+  it("previews a user image in an accessible modal", async () => {
+    const imageUrl = "https://cdn.example.com/reference.png";
+    const message: AiMessage = {
+      id: "user-image",
+      role: "user",
+      parts: [
+        {
+          type: "file",
+          filename: "reference.png",
+          mediaType: "image/png",
+          url: imageUrl,
+        },
+      ],
+    };
+
+    render(
+      <ChatPanel
+        {...handlers}
+        messages={[message]}
+        input=""
+        status="ready"
+        reasoningEffort="medium"
+        canvasCount={0}
+        canvasOpen={false}
+        conversationLoading={false}
+        imageAttachments={[]}
+        imageUploadsEnabled={false}
+        imageUploadError={false}
+        canAddImage={false}
+        onInputChange={jest.fn()}
+        onSubmit={jest.fn()}
+      />,
+    );
+
+    expect(screen.queryByRole("link", { name: "reference.png" })).toBeNull();
+    const previewButton = screen.getByRole("button", {
+      name: "Preview reference.png",
+    });
+    fireEvent.click(previewButton);
+
+    expect(screen.getByRole("dialog", { name: "reference.png" })).toBeVisible();
+    expect(screen.getByRole("img", { name: "reference.png" })).toBeVisible();
+
+    fireEvent.keyDown(document, { key: "Escape" });
+    await waitFor(() => {
+      expect(
+        screen.queryByRole("dialog", { name: "reference.png" }),
+      ).toBeNull();
+    });
+    expect(previewButton).toHaveFocus();
+  });
+
   it("does not submit Enter while an IME composition is active", () => {
     const { input, onSubmit } = renderComposer();
 

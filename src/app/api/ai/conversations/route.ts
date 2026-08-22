@@ -11,6 +11,10 @@ import { checkRateLimit } from "@/lib/rate-limit";
 const querySchema = z.object({
   offset: z.coerce.number().int().min(0).default(0),
   limit: z.coerce.number().int().min(1).max(100).default(30),
+  archived: z
+    .enum(["true", "false"])
+    .default("false")
+    .transform((value) => value === "true"),
 });
 
 const CREATE_LIMIT = 30;
@@ -29,6 +33,7 @@ export async function GET(request: NextRequest) {
   const parsed = querySchema.safeParse({
     offset: request.nextUrl.searchParams.get("offset") ?? undefined,
     limit: request.nextUrl.searchParams.get("limit") ?? undefined,
+    archived: request.nextUrl.searchParams.get("archived") ?? undefined,
   });
   if (!parsed.success) {
     return NextResponse.json({ error: "Invalid query." }, { status: 400 });

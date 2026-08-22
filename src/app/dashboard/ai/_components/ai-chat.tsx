@@ -45,14 +45,29 @@ async function readResponse<T>(response: Response): Promise<T> {
   return response.json() as Promise<T>;
 }
 
-async function fetchConversationPage(offset: number) {
+async function fetchConversationPage(offset: number, archived: boolean) {
   const search = new URLSearchParams({
     offset: String(offset),
     limit: String(HISTORY_PAGE_SIZE),
+    archived: String(archived),
   });
   return readResponse<AiConversationPage>(
     await fetch(`/api/ai/conversations?${search}`, { cache: "no-store" }),
   );
+}
+
+async function updateConversationArchive(
+  conversationId: string,
+  archived: boolean,
+) {
+  const payload = await readResponse<{ conversation: AiConversationSummary }>(
+    await fetch(`/api/ai/conversations/${encodeURIComponent(conversationId)}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ archived }),
+    }),
+  );
+  return payload.conversation;
 }
 
 async function fetchConversation(conversationId: string) {
@@ -100,6 +115,9 @@ export function AiChat() {
   const [historyLoadingMore, setHistoryLoadingMore] = useState(false);
   const [historyHasMore, setHistoryHasMore] = useState(false);
   const [historyError, setHistoryError] = useState(false);
+  const [historyArchived, setHistoryArchived] = useState(false);
+  const [historyCollapsed, setHistoryCollapsed] = useState(false);
+  const [historyMutatingId, setHistoryMutatingId] = useState<string>();
   const [loadedConversationCount, setLoadedConversationCount] = useState(0);
   const [manualArtifacts, setManualArtifacts] = useState<CanvasArtifact[]>([]);
   const [activeArtifactId, setActiveArtifactId] = useState<string>();
@@ -111,12 +129,13 @@ export function AiChat() {
 
   const refreshConversationList = useCallback(async () => {
     try {
-      const page = await fetchConversationPage(0);
+      const page = await fetchConversationPage(0, historyArchived);
       setConversations((current) => {
         const active = current.find(
           (conversation) => conversation.id === activeConversationId,
         );
         return active &&
+          Boolean(active.archivedAt) === historyArchived &&
           !page.conversations.some((item) => item.id === active.id)
           ? [active, ...page.conversations]
           : page.conversations;
@@ -131,7 +150,7 @@ export function AiChat() {
       );
       setHistoryError(true);
     }
-  }, [activeConversationId]);
+  }, [activeConversationId, historyArchived]);
 
   const transport = useMemo(
     () =>
@@ -194,7 +213,11 @@ export function AiChat() {
   );
   const isBusy = status === "submitted" || status === "streaming";
   const historyDisabled =
-    historyLoading || isBusy || conversationLoading || conversationCreating;
+    historyLoading ||
+    isBusy ||
+    conversationLoading ||
+    conversationCreating ||
+    historyMutatingId !== undefined;
 
   useEffect(() => {
     let cancelled = false;
@@ -202,11 +225,8 @@ export function AiChat() {
     void (async () => {
       setHistoryLoading(true);
       try {
-        const page = await fetchConversationPage(0);
+        let page = await fetchConversationPage(0, false);
         if (cancelled) return;
-
-        setLoadedConversationCount(page.conversations.length);
-        setHistoryHasMore(page.hasMore);
         const requestedId = new URL(window.location.href).searchParams.get(
           CONVERSATION_QUERY_KEY,
         );
@@ -223,6 +243,12 @@ export function AiChat() {
         }
         if (cancelled) return;
 
+        const archived = Boolean(detail?.conversation.archivedAt);
+        if (archived) {
+          page = await fetchConversationPage(0, true);
+          if (cancelled) return;
+        }
+
         const nextConversations =
           detail &&
           !page.conversations.some(
@@ -230,6 +256,9 @@ export function AiChat() {
           )
             ? [detail.conversation, ...page.conversations]
             : page.conversations;
+        setHistoryArchived(archived);
+        setLoadedConversationCount(page.conversations.length);
+        setHistoryHasMore(page.hasMore);
         setConversations(nextConversations);
         setActiveConversationId(detail?.conversation.id);
         setMessages(detail?.messages ?? []);
@@ -323,13 +352,17 @@ export function AiChat() {
     resetConversationView();
     replaceConversationUrl();
     setMobileHistoryOpen(false);
+    if (historyArchived) void handleToggleArchivedView();
   };
 
   const handleLoadMore = async () => {
     if (historyLoadingMore || !historyHasMore) return;
     setHistoryLoadingMore(true);
     try {
-      const page = await fetchConversationPage(loadedConversationCount);
+      const page = await fetchConversationPage(
+        loadedConversationCount,
+        historyArchived,
+      );
       setConversations((current) => {
         const byId = new Map(current.map((item) => [item.id, item]));
         page.conversations.forEach((item) => byId.set(item.id, item));
@@ -348,6 +381,59 @@ export function AiChat() {
     } finally {
       setHistoryLoadingMore(false);
     }
+  };
+
+  const handleToggleArchivedView = async () => {
+    if (historyDisabled) return;
+
+    const nextArchived = !historyArchived;
+    setHistoryLoading(true);
+    setHistoryError(false);
+    try {
+      const page = await fetchConversationPage(0, nextArchived);
+      setHistoryArchived(nextArchived);
+      setConversations(page.conversations);
+      setLoadedConversationCount(page.conversations.length);
+      setHistoryHasMore(page.hasMore);
+    } catch (viewError) {
+      console.error("AI conversation archive could not be loaded:", viewError);
+      setHistoryError(true);
+    } finally {
+      setHistoryLoading(false);
+    }
+  };
+
+  const handleArchiveConversation = async (
+    conversationId: string,
+    archived: boolean,
+  ) => {
+    if (historyDisabled) return;
+
+    setHistoryMutatingId(conversationId);
+    setHistoryError(false);
+    try {
+      await updateConversationArchive(conversationId, archived);
+      setConversations((current) =>
+        current.filter((conversation) => conversation.id !== conversationId),
+      );
+      setLoadedConversationCount((current) => Math.max(0, current - 1));
+
+      if (activeConversationId === conversationId) {
+        conversationRequestId.current += 1;
+        setActiveConversationId(undefined);
+        resetConversationView();
+        replaceConversationUrl();
+      }
+    } catch (archiveError) {
+      console.error("AI conversation could not be archived:", archiveError);
+      setHistoryError(true);
+    } finally {
+      setHistoryMutatingId(undefined);
+    }
+  };
+
+  const handleToggleHistoryCollapsed = () => {
+    setHistoryCollapsed((current) => !current);
   };
 
   const openCanvasForCurrentViewport = () => {
@@ -436,9 +522,14 @@ export function AiChat() {
     hasMore: historyHasMore,
     disabled: historyDisabled,
     error: historyError,
+    archived: historyArchived,
+    mutatingConversationId: historyMutatingId,
     onNew: handleNewConversation,
     onSelect: (conversationId: string) =>
       void handleSelectConversation(conversationId),
+    onArchive: (conversationId: string, archived: boolean) =>
+      void handleArchiveConversation(conversationId, archived),
+    onToggleArchived: () => void handleToggleArchivedView(),
     onLoadMore: () => void handleLoadMore(),
   };
 
@@ -447,12 +538,18 @@ export function AiChat() {
       className={cn(
         "grid min-h-0 w-full flex-1 overflow-hidden border-y lg:border",
         desktopCanvasOpen
-          ? "lg:grid-cols-[minmax(20rem,0.8fr)_minmax(28rem,1.2fr)] xl:grid-cols-[14rem_minmax(20rem,0.8fr)_minmax(28rem,1.2fr)]"
-          : "lg:grid-cols-1 xl:grid-cols-[14rem_minmax(0,1fr)]",
+          ? historyCollapsed
+            ? "lg:grid-cols-[minmax(20rem,0.8fr)_minmax(28rem,1.2fr)] xl:grid-cols-[3.5rem_minmax(20rem,0.8fr)_minmax(28rem,1.2fr)]"
+            : "lg:grid-cols-[minmax(20rem,0.8fr)_minmax(28rem,1.2fr)] xl:grid-cols-[14rem_minmax(20rem,0.8fr)_minmax(28rem,1.2fr)]"
+          : historyCollapsed
+            ? "lg:grid-cols-1 xl:grid-cols-[3.5rem_minmax(0,1fr)]"
+            : "lg:grid-cols-1 xl:grid-cols-[14rem_minmax(0,1fr)]",
       )}
     >
       <ConversationSidebar
         {...sidebarProps}
+        collapsed={historyCollapsed}
+        onToggleCollapsed={handleToggleHistoryCollapsed}
         className="hidden border-r xl:flex"
       />
 
@@ -504,7 +601,11 @@ export function AiChat() {
             <SheetTitle>{t("ai_history_title")}</SheetTitle>
             <SheetDescription>{t("ai_history_description")}</SheetDescription>
           </SheetHeader>
-          <ConversationSidebar {...sidebarProps} className="flex h-full" />
+          <ConversationSidebar
+            {...sidebarProps}
+            collapsed={false}
+            className="flex h-full"
+          />
         </SheetContent>
       </Sheet>
 

@@ -52,10 +52,14 @@ Substantial Markdown drafts, returned image/video files, and generated images op
 canvas, where users can switch artifacts, copy them, and download them.
 
 Conversations and UI messages are stored under the authenticated user in PostgreSQL. The
-responsive history panel supports creating and switching conversations, and the selected
-conversation is restored from the URL after refresh or sign-in on another device. Generated
-image bytes are moved to the existing R2 upload system before the assistant message is stored,
-so historical canvas results use durable URLs instead of large base64 database values.
+responsive history panel supports creating, switching, archiving, and restoring conversations.
+Its desktop rail can be collapsed, and the selected conversation is restored from the URL after
+refresh or sign-in on another device. Generated image bytes are moved to the existing R2 upload
+system before the assistant message is stored, so historical canvas results use durable URLs
+instead of large base64 database values. The server also consumes a separate copy of each response
+stream, so generation and final message persistence continue when the browser refreshes, closes,
+or loses its connection. A process restart remains the execution boundary; deployments that need
+jobs to survive application restarts should move generation to a durable queue.
 
 ## Configuration
 
@@ -70,9 +74,13 @@ The stack uses the OpenAI Responses protocol so reasoning and function tools wor
 | `AI_DEFAULT_MODEL` | `.env`                                                | Optional; defaults to `gpt-5.6-luna`.    |
 
 The assistant defaults to `low` reasoning; the client may select `low`, `medium`, or `high` per
-request. Image generation is intentionally fixed in code to GPT Image 2, `1024x1024`, low quality,
-WebP output, and at most one built-in tool call per model response. A custom gateway must support
-both the Responses protocol and the OpenAI image-generation built-in tool for that feature to work.
+request. Image generation is intentionally fixed in code to GPT Image 2, low quality, WebP output,
+and at most one built-in tool call per model response. The latest user request selects one of the
+application's 1K presets: `1024x1024`, `1536x1024`, or `1024x1536`; unsupported dimensions are
+mapped to the closest orientation instead of widening the output limit. These presets follow the
+[official GPT Image 2 size guidance](https://developers.openai.com/api/docs/guides/image-generation#size-and-quality-options).
+A custom gateway must support both the Responses protocol and the OpenAI image-generation built-in
+tool for that feature to work.
 
 To use another vendor, change `src/lib/ai/models.ts` only — for example install
 `@ai-sdk/anthropic` and swap `createOpenAI` for `createAnthropic`. Tools, skills, agents, and

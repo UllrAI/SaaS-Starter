@@ -9,6 +9,7 @@ export type AiMessage = UIMessage<AiMessageMetadata>;
 export interface AiConversationSummary {
   id: string;
   title: string | null;
+  archivedAt: string | null;
   createdAt: string;
   updatedAt: string;
 }

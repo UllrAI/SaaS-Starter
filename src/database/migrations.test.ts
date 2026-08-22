@@ -48,4 +48,15 @@ describe("AI chat history migration", () => {
       'FOREIGN KEY ("conversationId") REFERENCES "public"."ai_conversations"("id") ON DELETE cascade',
     );
   });
+
+  it("adds reversible conversation archiving", () => {
+    const migration = readMigration("0021_equal_ser_duncan.sql");
+
+    expect(migration).toContain(
+      'ADD COLUMN "archivedAt" timestamp with time zone',
+    );
+    expect(migration).toContain(
+      'CREATE INDEX "ai_conversations_userId_archivedAt_updatedAt_idx"',
+    );
+  });
 });

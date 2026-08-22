@@ -40,6 +40,52 @@ test("shows the assistant composer to a signed-in user", async ({ page }) => {
     "Low reasoning",
   );
   await expect(page.getByRole("region", { name: "Canvas" })).toBeVisible();
+
+  await page.getByRole("button", { name: "Collapse chat history" }).click();
+  await expect(
+    page.getByRole("button", { name: "Expand chat history" }),
+  ).toBeVisible();
+});
+
+test("archives and restores a conversation", async ({ page }) => {
+  await loginAs(page, "user");
+
+  const created = await page.request.post("/api/ai/conversations");
+  expect(created.status()).toBe(201);
+  const payload = (await created.json()) as {
+    conversation: { id: string };
+  };
+
+  const archived = await page.request.patch(
+    `/api/ai/conversations/${payload.conversation.id}`,
+    { data: { archived: true } },
+  );
+  expect(archived.status()).toBe(200);
+
+  const activePage = await page.request.get(
+    "/api/ai/conversations?archived=false",
+  );
+  const archivedPage = await page.request.get(
+    "/api/ai/conversations?archived=true",
+  );
+  const activePayload = (await activePage.json()) as {
+    conversations: Array<{ id: string }>;
+  };
+  const archivedPayload = (await archivedPage.json()) as {
+    conversations: Array<{ id: string }>;
+  };
+  expect(activePayload.conversations).not.toContainEqual(
+    expect.objectContaining({ id: payload.conversation.id }),
+  );
+  expect(archivedPayload.conversations).toContainEqual(
+    expect.objectContaining({ id: payload.conversation.id }),
+  );
+
+  const restored = await page.request.patch(
+    `/api/ai/conversations/${payload.conversation.id}`,
+    { data: { archived: false } },
+  );
+  expect(restored.status()).toBe(200);
 });
 
 test("restores the same account's conversations in another browser", async ({
@@ -57,12 +103,16 @@ test("restores the same account's conversations in another browser", async ({
   await firstPage.goto(
     `/dashboard/ai?conversation=${encodeURIComponent(payload.conversation.id)}`,
   );
-  await expect(firstPage.locator("aside").getByText("New chat")).toBeVisible();
+  await expect(firstPage).toHaveURL(
+    new RegExp(`conversation=${payload.conversation.id}`),
+  );
 
   const secondPage = await browser.newPage();
   await loginAs(secondPage, "user");
   await secondPage.goto("/dashboard/ai");
-  await expect(secondPage.locator("aside").getByText("New chat")).toBeVisible();
+  await expect(secondPage).toHaveURL(
+    new RegExp(`conversation=${payload.conversation.id}`),
+  );
 
   await firstPage.close();
   await secondPage.close();

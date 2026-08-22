@@ -123,7 +123,7 @@ function ToolCallRow({
             ? t("ai_chat_image_ready")
             : t("ai_chat_artifact_ready")}
         </span>
-        <PanelRightOpen className="text-muted-foreground size-4" />
+        <PanelRightOpen className="text-muted-foreground size-4 rotate-180" />
       </button>
     );
   }
@@ -232,7 +232,7 @@ function AssistantMessage({
             className="text-muted-foreground mt-1 h-7 px-2 opacity-0 transition-opacity group-hover/message:opacity-100 focus-visible:opacity-100"
             onClick={() => onOpenMessage(message)}
           >
-            <PanelRightOpen />
+            <PanelRightOpen className="rotate-180" />
             {t("ai_chat_open_in_canvas")}
           </Button>
         )}
@@ -381,6 +381,9 @@ export function ChatPanel({
               )}
             </div>
           )}
+          <p className="text-muted-foreground/60 mt-6 text-center text-[10px] leading-4">
+            {t("ai_chat_disclaimer")}
+          </p>
           <div ref={bottomRef} />
         </div>
       </div>
@@ -431,7 +434,7 @@ export function ChatPanel({
               className="h-8 px-2"
               onClick={onOpenCanvas}
             >
-              <PanelRightOpen />
+              <PanelRightOpen className="rotate-180" />
               {t("ai_canvas_title")}
               {canvasCount > 0 && (
                 <span className="bg-muted flex size-5 items-center justify-center rounded-full text-xs">
@@ -467,9 +470,6 @@ export function ChatPanel({
             </div>
           </div>
         </div>
-        <p className="text-muted-foreground mx-auto mt-2 max-w-3xl text-center text-[11px]">
-          {t("ai_chat_disclaimer")}
-        </p>
       </div>
     </section>
   );

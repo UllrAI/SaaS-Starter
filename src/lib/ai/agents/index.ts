@@ -1,4 +1,5 @@
 import type { AgentContext } from "../context";
+import type { GptImage1kSize } from "../image-size";
 import type { ReasoningEffort } from "../reasoning";
 import { createAssistantAgent } from "./assistant";
 
@@ -16,6 +17,7 @@ export function isAgentId(value: string): value is AgentId {
 
 export interface CreateAgentOptions {
   reasoningEffort: ReasoningEffort;
+  imageSize: GptImage1kSize;
   previousResponseId?: string;
 }
 

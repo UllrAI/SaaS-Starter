@@ -3,12 +3,14 @@ import { NextRequest } from "next/server";
 
 const mockGetAuthSessionFromHeaders = jest.fn();
 const mockGetAiConversation = jest.fn();
+const mockSetAiConversationArchived = jest.fn();
 
 jest.mock("@/lib/auth/session", () => ({
   getAuthSessionFromHeaders: mockGetAuthSessionFromHeaders,
 }));
 jest.mock("@/lib/ai/chat-history", () => ({
   getAiConversation: mockGetAiConversation,
+  setAiConversationArchived: mockSetAiConversationArchived,
 }));
 jest.mock("@/lib/config/site", () => ({
   SITE_CONFIG: { features: { ai: true } },
@@ -22,6 +24,13 @@ function request() {
   );
 }
 
+function patchRequest(body: unknown) {
+  return {
+    headers: new Headers(),
+    json: jest.fn<() => Promise<unknown>>().mockResolvedValue(body),
+  } as never;
+}
+
 function context(id = conversationId) {
   return { params: Promise.resolve({ conversationId: id }) };
 }
@@ -33,6 +42,10 @@ describe("GET /api/ai/conversations/[conversationId]", () => {
     mockGetAiConversation.mockResolvedValue({
       conversation: { id: conversationId },
       messages: [],
+    });
+    mockSetAiConversationArchived.mockResolvedValue({
+      id: conversationId,
+      archivedAt: "2026-08-22T01:00:00.000Z",
     });
   });
 
@@ -70,5 +83,44 @@ describe("GET /api/ai/conversations/[conversationId]", () => {
 
     expect(response.status).toBe(401);
     expect(mockGetAiConversation).not.toHaveBeenCalled();
+  });
+
+  it("archives an owned conversation", async () => {
+    const { PATCH } = await import("./route");
+    const response = await PATCH(patchRequest({ archived: true }), context());
+
+    expect(response.status).toBe(200);
+    expect(mockSetAiConversationArchived).toHaveBeenCalledWith({
+      conversationId,
+      userId: "user-1",
+      archived: true,
+    });
+  });
+
+  it("does not reveal a missing conversation while archiving", async () => {
+    mockSetAiConversationArchived.mockResolvedValue(null);
+    const { PATCH } = await import("./route");
+    const response = await PATCH(patchRequest({ archived: true }), context());
+
+    expect(response.status).toBe(404);
+  });
+
+  it("rejects malformed archive requests", async () => {
+    const { PATCH } = await import("./route");
+    const response = await PATCH(patchRequest({ archived: "yes" }), context());
+
+    expect(response.status).toBe(400);
+    expect(mockSetAiConversationArchived).not.toHaveBeenCalled();
+  });
+
+  it("rejects oversized archive requests", async () => {
+    const { PATCH } = await import("./route");
+    const response = await PATCH(
+      patchRequest({ archived: true, padding: "x".repeat(1024) }),
+      context(),
+    );
+
+    expect(response.status).toBe(413);
+    expect(mockSetAiConversationArchived).not.toHaveBeenCalled();
   });
 });

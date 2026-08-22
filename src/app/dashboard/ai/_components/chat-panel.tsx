@@ -1,14 +1,14 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
-  Bot,
   ChevronDown,
   CircleAlert,
   FileOutput,
   History,
   ImagePlus,
   Loader2,
+  Maximize2,
   PanelRightOpen,
   Send,
   Sparkles,
@@ -30,6 +30,13 @@ import remarkGfm from "remark-gfm";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import CopyButton from "@/components/ui/copy-button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import type { FileUploadItem } from "@/components/ui/file-upload/types";
 import {
   MessageScroller,
@@ -86,7 +93,18 @@ interface ChatPanelProps {
   className?: string;
 }
 
-function UserMessage({ message }: { message: AiMessage }) {
+interface PreviewImage {
+  name: string;
+  url: string;
+}
+
+function UserMessage({
+  message,
+  onPreviewImage,
+}: {
+  message: AiMessage;
+  onPreviewImage: (image: PreviewImage, trigger: HTMLButtonElement) => void;
+}) {
   const { t } = useTranslation();
   const files = message.parts.filter((part) => part.type === "file");
   const text = message.parts
@@ -99,24 +117,33 @@ function UserMessage({ message }: { message: AiMessage }) {
       <div className="bg-muted max-w-[85%] min-w-0 border p-2 text-sm leading-6">
         {files.length > 0 && (
           <div className="flex max-w-md flex-wrap justify-end gap-2">
-            {files.map((file, index) => (
-              <a
-                key={`${message.id}-file-${index}`}
-                href={file.url}
-                target="_blank"
-                rel="noreferrer"
-                className="bg-background relative block size-24 shrink-0 overflow-hidden border"
-              >
-                <Image
-                  src={file.url}
-                  alt={file.filename ?? t("ai_chat_reference_image")}
-                  fill
-                  unoptimized
-                  className="object-cover"
-                  sizes="96px"
-                />
-              </a>
-            ))}
+            {files.map((file, index) => {
+              const name = file.filename ?? t("ai_chat_reference_image");
+
+              return (
+                <button
+                  key={`${message.id}-file-${index}`}
+                  type="button"
+                  onClick={(event) =>
+                    onPreviewImage({ name, url: file.url }, event.currentTarget)
+                  }
+                  className="bg-background focus-visible:ring-ring group relative block size-24 shrink-0 cursor-zoom-in overflow-hidden border text-left transition-opacity outline-none hover:opacity-90 focus-visible:ring-2 focus-visible:ring-offset-2"
+                  aria-label={t("ai_chat_preview_image", { name })}
+                >
+                  <Image
+                    src={file.url}
+                    alt={name}
+                    fill
+                    unoptimized
+                    className="object-cover"
+                    sizes="96px"
+                  />
+                  <span className="absolute right-1.5 bottom-1.5 flex size-6 items-center justify-center rounded-full bg-black/65 text-white shadow-sm transition-transform group-hover:scale-105 group-focus-visible:scale-105">
+                    <Maximize2 className="size-3.5" aria-hidden="true" />
+                  </span>
+                </button>
+              );
+            })}
           </div>
         )}
         {text && (
@@ -217,8 +244,8 @@ function ReasoningBlock({
   }, [streaming]);
 
   return (
-    <details ref={detailsRef} className="group my-2 text-sm">
-      <summary className="text-muted-foreground hover:text-foreground flex cursor-pointer list-none items-center gap-2 py-1">
+    <details ref={detailsRef} className="group mb-2 text-sm">
+      <summary className="text-muted-foreground hover:text-foreground flex w-fit cursor-pointer list-none items-center gap-1.5 py-1 transition-colors">
         {streaming ? (
           <Loader2 className="size-3.5 animate-spin" />
         ) : (
@@ -229,7 +256,7 @@ function ReasoningBlock({
         </span>
         <ChevronDown className="size-3.5 transition-transform group-open:rotate-180" />
       </summary>
-      <div className="text-muted-foreground border-l pl-4 [overflow-wrap:anywhere] whitespace-pre-wrap">
+      <div className="text-muted-foreground mt-1 border-l pl-3 text-xs leading-5 [overflow-wrap:anywhere] whitespace-pre-wrap">
         {text}
       </div>
     </details>
@@ -312,92 +339,87 @@ function AssistantMessage({
     .join("\n\n");
 
   return (
-    <div className="flex min-w-0 gap-3">
-      <div className="bg-muted mt-0.5 flex size-7 shrink-0 items-center justify-center border">
-        <Bot className="size-4" />
-      </div>
-      <div className="min-w-0 flex-1 text-sm leading-6">
-        {message.parts.map((part, index) => {
-          if (part.type === "text") {
-            return (
-              <div
-                key={`${message.id}-text-${index}`}
-                className="markdown-content max-w-none min-w-0 [overflow-wrap:anywhere] [&_h1]:text-xl [&_h2]:text-lg [&_h3]:text-base [&_li]:text-sm [&_p]:mb-3 [&_p]:text-sm [&_pre]:max-w-full [&_pre]:overflow-x-auto [&_pre]:p-4"
-              >
-                <ReactMarkdown
-                  remarkPlugins={[remarkGfm]}
-                  components={{
-                    a: ({ children, ...props }) => (
-                      <a {...props} target="_blank" rel="noreferrer">
-                        {children}
-                      </a>
-                    ),
-                    table: ({ children, ...props }) => (
-                      <div className="max-w-full overflow-x-auto">
-                        <table {...props}>{children}</table>
-                      </div>
-                    ),
-                  }}
-                >
-                  {part.text}
-                </ReactMarkdown>
-              </div>
-            );
-          }
-          if (part.type === "reasoning") {
-            return (
-              <ReasoningBlock
-                key={`${message.id}-reasoning-${index}`}
-                text={part.text}
-                streaming={part.state === "streaming"}
-              />
-            );
-          }
-          if (isToolUIPart(part)) {
-            return (
-              <ToolCallRow
-                key={part.toolCallId}
-                part={part}
-                onOpenArtifact={() => onOpenArtifact(`${message.id}:${index}`)}
-              />
-            );
-          }
-          if (part.type === "source-url") {
-            return (
-              <a
-                key={part.sourceId}
-                href={part.url}
-                target="_blank"
-                rel="noreferrer"
-                className="text-primary mr-2 text-xs break-all underline underline-offset-4"
-              >
-                {part.title ?? part.url}
-              </a>
-            );
-          }
-          return null;
-        })}
-
-        {hasText && (
-          <div
-            role="group"
-            className="text-muted-foreground mt-1 flex min-h-8 items-center gap-1"
-            aria-label={t("ai_chat_message_actions")}
-          >
-            <CopyButton textToCopy={text} />
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              className="h-8 px-2"
-              onClick={() => onOpenMessage(message)}
+    <div className="min-w-0 text-sm leading-6">
+      {message.parts.map((part, index) => {
+        if (part.type === "text") {
+          return (
+            <div
+              key={`${message.id}-text-${index}`}
+              className="markdown-content max-w-none min-w-0 [overflow-wrap:anywhere] [&_h1]:text-xl [&_h2]:text-lg [&_h3]:text-base [&_li]:text-sm [&_p]:mb-3 [&_p]:text-sm [&_pre]:max-w-full [&_pre]:overflow-x-auto [&_pre]:p-4"
             >
-              <PanelRightOpen className="rotate-180" />
-              {t("ai_chat_open_in_canvas")}
-            </Button>
-          </div>
-        )}
-      </div>
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                components={{
+                  a: ({ children, ...props }) => (
+                    <a {...props} target="_blank" rel="noreferrer">
+                      {children}
+                    </a>
+                  ),
+                  table: ({ children, ...props }) => (
+                    <div className="max-w-full overflow-x-auto">
+                      <table {...props}>{children}</table>
+                    </div>
+                  ),
+                }}
+              >
+                {part.text}
+              </ReactMarkdown>
+            </div>
+          );
+        }
+        if (part.type === "reasoning") {
+          return (
+            <ReasoningBlock
+              key={`${message.id}-reasoning-${index}`}
+              text={part.text}
+              streaming={part.state === "streaming"}
+            />
+          );
+        }
+        if (isToolUIPart(part)) {
+          return (
+            <ToolCallRow
+              key={part.toolCallId}
+              part={part}
+              onOpenArtifact={() => onOpenArtifact(`${message.id}:${index}`)}
+            />
+          );
+        }
+        if (part.type === "source-url") {
+          return (
+            <a
+              key={part.sourceId}
+              href={part.url}
+              target="_blank"
+              rel="noreferrer"
+              className="text-primary mr-2 text-xs break-all underline underline-offset-4"
+            >
+              {part.title ?? part.url}
+            </a>
+          );
+        }
+        return null;
+      })}
+
+      {hasText && (
+        <div
+          role="group"
+          className="text-muted-foreground mt-1 flex min-h-8 items-center gap-1"
+          aria-label={t("ai_chat_message_actions")}
+        >
+          <CopyButton textToCopy={text} />
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="h-8 px-2"
+            onClick={() => onOpenMessage(message)}
+          >
+            <PanelRightOpen className="rotate-180" />
+            {t("ai_chat_open_in_canvas")}
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
@@ -434,6 +456,9 @@ export function ChatPanel({
 }: ChatPanelProps) {
   const { t } = useTranslation();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const previewTriggerRef = useRef<HTMLButtonElement>(null);
+  const [previewImage, setPreviewImage] = useState<PreviewImage | null>(null);
+  const [imagePreviewOpen, setImagePreviewOpen] = useState(false);
   const isBusy = status === "submitted" || status === "streaming";
   const imageAttachmentsReady = imageAttachments.every(
     (item) => item.status === "success",
@@ -522,7 +547,7 @@ export function ChatPanel({
           >
             <MessageScrollerContent
               aria-busy={conversationLoading || isBusy}
-              className="mx-auto w-full max-w-3xl min-w-0 px-4 py-6 sm:px-6"
+              className="mx-auto w-full max-w-3xl min-w-0 px-4 py-6 sm:px-6 xl:max-w-4xl"
             >
               {conversationLoading ? (
                 <div
@@ -569,7 +594,14 @@ export function ChatPanel({
                       scrollAnchor={message.id === latestUserMessageId}
                     >
                       {message.role === "user" ? (
-                        <UserMessage message={message} />
+                        <UserMessage
+                          message={message}
+                          onPreviewImage={(image, trigger) => {
+                            previewTriggerRef.current = trigger;
+                            setPreviewImage(image);
+                            setImagePreviewOpen(true);
+                          }}
+                        />
                       ) : (
                         <AssistantMessage
                           message={message}
@@ -622,7 +654,7 @@ export function ChatPanel({
       </MessageScrollerProvider>
 
       <div className="bg-background min-w-0 shrink-0 px-3 pb-3 sm:px-5 sm:pb-5">
-        <div className="bg-background focus-within:ring-ring/30 mx-auto max-w-3xl min-w-0 border focus-within:ring-2">
+        <div className="bg-background focus-within:ring-ring/30 mx-auto max-w-3xl min-w-0 border focus-within:ring-2 xl:max-w-4xl">
           {imageAttachments.length > 0 && (
             <div
               className="flex max-w-full gap-2 overflow-x-auto border-b p-2"
@@ -753,6 +785,45 @@ export function ChatPanel({
           </div>
         </div>
       </div>
+
+      <Dialog open={imagePreviewOpen} onOpenChange={setImagePreviewOpen}>
+        <DialogContent
+          className="w-[min(92vw,80rem)] max-w-[calc(100%-1rem)] gap-0 overflow-hidden border-black/20 bg-black p-0 text-white shadow-2xl sm:max-w-[min(92vw,80rem)] [&_[data-slot=dialog-close]]:rounded-full [&_[data-slot=dialog-close]]:bg-black/65 [&_[data-slot=dialog-close]]:p-1.5 [&_[data-slot=dialog-close]]:text-white [&_[data-slot=dialog-close]]:opacity-100 [&_[data-slot=dialog-close]]:ring-offset-black"
+          onCloseAutoFocus={(event) => {
+            event.preventDefault();
+            previewTriggerRef.current?.focus();
+          }}
+        >
+          <DialogHeader className="sr-only">
+            <DialogTitle>
+              {previewImage?.name ?? t("ai_chat_reference_image")}
+            </DialogTitle>
+            <DialogDescription>
+              {t("ai_chat_image_preview_description", {
+                name: previewImage?.name ?? t("ai_chat_reference_image"),
+              })}
+            </DialogDescription>
+          </DialogHeader>
+          {previewImage && (
+            <>
+              <div className="relative h-[min(80dvh,56rem)] min-h-64 w-full">
+                <Image
+                  src={previewImage.url}
+                  alt={previewImage.name}
+                  fill
+                  unoptimized
+                  className="object-contain"
+                  sizes="92vw"
+                  priority
+                />
+              </div>
+              <div className="truncate border-t border-white/10 px-4 py-2.5 text-sm text-white/80">
+                {previewImage.name}
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </section>
   );
 }

@@ -996,6 +996,8 @@
   "ai_chat_attach_images_hint": "最多添加 {count} 张参考图片",
   "ai_chat_reference_images": "参考图片",
   "ai_chat_reference_image": "参考图片",
+  "ai_chat_preview_image": "预览{name}",
+  "ai_chat_image_preview_description": "{name}的大图预览。",
   "ai_chat_image_uploading": "正在上传{name}：{progress}%",
   "ai_chat_remove_image": "移除{name}",
   "ai_chat_retry_image_upload": "重试上传{name}",

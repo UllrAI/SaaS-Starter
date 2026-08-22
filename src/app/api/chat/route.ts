@@ -1,7 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { createAgentUIStreamResponse } from "ai";
+import { createAgentUIStreamResponse, validateUIMessages } from "ai";
 import { createAgent, isAgentId } from "@/lib/ai/agents";
+import {
+  AiConversationNotFoundError,
+  requireAiConversation,
+  saveAiMessages,
+} from "@/lib/ai/chat-history";
+import type { AiMessage } from "@/lib/ai/chat-history-types";
+import { persistGeneratedImages } from "@/lib/ai/generated-image-storage";
 import {
   DEFAULT_REASONING_EFFORT,
   REASONING_EFFORTS,
@@ -27,6 +34,7 @@ const CHAT_RATE_WINDOW_MS = 10 * 60 * 1000;
 
 const chatRequestSchema = z.object({
   messages: z.array(z.unknown()).min(1).max(MAX_CHAT_MESSAGES),
+  conversationId: z.uuid(),
   agentId: z.string().default("assistant"),
   reasoningEffort: z.enum(REASONING_EFFORTS).default(DEFAULT_REASONING_EFFORT),
   responseHandle: z.string().max(512).optional(),
@@ -93,6 +101,21 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  try {
+    await requireAiConversation({
+      conversationId: parsed.data.conversationId,
+      userId: session.user.id,
+    });
+  } catch (error) {
+    if (error instanceof AiConversationNotFoundError) {
+      return NextResponse.json(
+        { error: "Conversation not found." },
+        { status: 404 },
+      );
+    }
+    throw error;
+  }
+
   let agent: ReturnType<typeof createAgent>;
   try {
     agent = createAgent(
@@ -118,11 +141,49 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  let validatedMessages: AiMessage[];
+  try {
+    validatedMessages = await validateUIMessages<AiMessage>({
+      messages: parsed.data.messages,
+    });
+  } catch (error) {
+    console.error("AI chat messages failed validation:", error);
+    return NextResponse.json(
+      { error: "Invalid chat request." },
+      { status: 400 },
+    );
+  }
+
+  try {
+    await saveAiMessages({
+      conversationId: parsed.data.conversationId,
+      userId: session.user.id,
+      messages: validatedMessages.filter((message) => message.role === "user"),
+    });
+  } catch (error) {
+    console.error("AI chat message could not be saved:", error);
+    return NextResponse.json(
+      { error: "The conversation could not be saved." },
+      { status: 500 },
+    );
+  }
+
   try {
     const response = await createAgentUIStreamResponse({
       agent,
-      uiMessages: parsed.data.messages,
+      uiMessages: validatedMessages,
       sendSources: true,
+      onEnd: async ({ responseMessage }) => {
+        const message = await persistGeneratedImages({
+          message: responseMessage as AiMessage,
+          userId: session.user.id,
+        });
+        await saveAiMessages({
+          conversationId: parsed.data.conversationId,
+          userId: session.user.id,
+          messages: [message],
+        });
+      },
       messageMetadata: ({ part }) =>
         part.type === "finish-step"
           ? {

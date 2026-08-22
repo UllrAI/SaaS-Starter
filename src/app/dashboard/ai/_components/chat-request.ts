@@ -1,8 +1,9 @@
 import type { ReasoningEffort } from "@/lib/ai/reasoning";
-import type { AiMessage } from "./chat-types";
+import type { AiMessage } from "@/lib/ai/chat-history-types";
 
 interface PrepareChatRequestOptions {
   messages: AiMessage[];
+  conversationId: string;
   trigger: "submit-message" | "regenerate-message";
   messageId?: string;
   reasoningEffort: ReasoningEffort;
@@ -19,6 +20,7 @@ function findLastAssistantIndex(messages: AiMessage[], before: number) {
 
 export function prepareChatRequest({
   messages,
+  conversationId,
   trigger,
   messageId,
   reasoningEffort,
@@ -55,6 +57,7 @@ export function prepareChatRequest({
 
   return {
     messages: requestMessages,
+    conversationId,
     agentId: "assistant",
     reasoningEffort,
     ...(responseHandle ? { responseHandle } : {}),

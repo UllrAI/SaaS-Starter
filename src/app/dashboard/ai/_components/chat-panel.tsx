@@ -6,11 +6,13 @@ import {
   ChevronDown,
   CircleAlert,
   FileOutput,
+  History,
   Loader2,
   PanelRightOpen,
   Send,
   Sparkles,
   Square,
+  Plus,
   Wrench,
 } from "lucide-react";
 import {
@@ -32,8 +34,8 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { REASONING_EFFORTS, type ReasoningEffort } from "@/lib/ai/reasoning";
+import type { AiMessage } from "@/lib/ai/chat-history-types";
 import { useTranslation } from "@/lib/i18n/translation/client";
-import type { AiMessage } from "./chat-types";
 
 interface ChatPanelProps {
   messages: AiMessage[];
@@ -42,12 +44,16 @@ interface ChatPanelProps {
   error?: Error;
   reasoningEffort: ReasoningEffort;
   canvasCount: number;
+  conversationTitle?: string;
+  conversationLoading: boolean;
   onInputChange: (value: string) => void;
   onReasoningEffortChange: (value: ReasoningEffort) => void;
   onSubmit: (text?: string) => void;
   onStop: () => void;
   onRetry: () => void;
   onOpenCanvas: () => void;
+  onOpenHistory: () => void;
+  onNewConversation: () => void;
   onOpenMessage: (message: AiMessage) => void;
   onOpenArtifact: (id: string) => void;
 }
@@ -242,12 +248,16 @@ export function ChatPanel({
   error,
   reasoningEffort,
   canvasCount,
+  conversationTitle,
+  conversationLoading,
   onInputChange,
   onReasoningEffortChange,
   onSubmit,
   onStop,
   onRetry,
   onOpenCanvas,
+  onOpenHistory,
+  onNewConversation,
   onOpenMessage,
   onOpenArtifact,
 }: ChatPanelProps) {
@@ -269,9 +279,41 @@ export function ChatPanel({
       aria-label={t("ai_chat_conversation")}
       className="bg-background flex min-h-0 flex-col"
     >
+      <div className="flex h-12 shrink-0 items-center gap-2 border-b px-3">
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="size-8 xl:hidden"
+          onClick={onOpenHistory}
+          aria-label={t("ai_history_open")}
+        >
+          <History />
+        </Button>
+        <span className="min-w-0 flex-1 truncate text-sm font-medium">
+          {conversationTitle ?? t("ai_history_untitled")}
+        </span>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="size-8 xl:hidden"
+          onClick={onNewConversation}
+          disabled={isBusy || conversationLoading}
+          aria-label={t("ai_history_new")}
+        >
+          <Plus />
+        </Button>
+      </div>
+
       <div className="min-h-0 flex-1 overflow-y-auto">
         <div className="mx-auto flex min-h-full w-full max-w-3xl flex-col px-4 py-6 sm:px-6">
-          {messages.length === 0 ? (
+          {conversationLoading ? (
+            <div className="text-muted-foreground flex flex-1 items-center justify-center gap-2 text-sm">
+              <Loader2 className="size-4 animate-spin" />
+              {t("ai_history_loading_conversation")}
+            </div>
+          ) : messages.length === 0 ? (
             <div className="flex flex-1 flex-col justify-end pb-6 sm:justify-center sm:pb-0">
               <div className="max-w-lg">
                 <div className="bg-muted mb-4 flex size-10 items-center justify-center border">

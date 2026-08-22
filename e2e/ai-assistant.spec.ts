@@ -41,3 +41,29 @@ test("shows the assistant composer to a signed-in user", async ({ page }) => {
   );
   await expect(page.getByRole("region", { name: "Canvas" })).toBeVisible();
 });
+
+test("restores the same account's conversations in another browser", async ({
+  browser,
+}) => {
+  const firstPage = await browser.newPage();
+  await loginAs(firstPage, "user");
+
+  const created = await firstPage.request.post("/api/ai/conversations");
+  expect(created.status()).toBe(201);
+  const payload = (await created.json()) as {
+    conversation: { id: string };
+  };
+
+  await firstPage.goto(
+    `/dashboard/ai?conversation=${encodeURIComponent(payload.conversation.id)}`,
+  );
+  await expect(firstPage.locator("aside").getByText("New chat")).toBeVisible();
+
+  const secondPage = await browser.newPage();
+  await loginAs(secondPage, "user");
+  await secondPage.goto("/dashboard/ai");
+  await expect(secondPage.locator("aside").getByText("New chat")).toBeVisible();
+
+  await firstPage.close();
+  await secondPage.close();
+});

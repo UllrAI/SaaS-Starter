@@ -4,8 +4,12 @@ const mockGetAuthSessionFromHeaders = jest.fn();
 const mockCheckRateLimit = jest.fn();
 const mockCreateAgent = jest.fn();
 const mockCreateAgentUIStreamResponse = jest.fn();
+const mockValidateUIMessages = jest.fn();
 const mockCreateResponseHandle = jest.fn();
 const mockReadResponseHandle = jest.fn();
+const mockRequireAiConversation = jest.fn();
+const mockSaveAiMessages = jest.fn();
+const mockPersistGeneratedImages = jest.fn();
 
 const siteConfig = {
   features: { emailAuth: true, billing: true, uploads: true, ai: true },
@@ -36,11 +40,22 @@ jest.mock("@/lib/ai/agents", () => ({
 
 jest.mock("ai", () => ({
   createAgentUIStreamResponse: mockCreateAgentUIStreamResponse,
+  validateUIMessages: mockValidateUIMessages,
 }));
 
 jest.mock("@/lib/ai/response-chain", () => ({
   createResponseHandle: mockCreateResponseHandle,
   readResponseHandle: mockReadResponseHandle,
+}));
+
+jest.mock("@/lib/ai/chat-history", () => ({
+  AiConversationNotFoundError: class AiConversationNotFoundError extends Error {},
+  requireAiConversation: mockRequireAiConversation,
+  saveAiMessages: mockSaveAiMessages,
+}));
+
+jest.mock("@/lib/ai/generated-image-storage", () => ({
+  persistGeneratedImages: mockPersistGeneratedImages,
 }));
 
 const session = {
@@ -55,6 +70,7 @@ const session = {
 const messages = [
   { id: "m1", role: "user", parts: [{ type: "text", text: "hi" }] },
 ];
+const conversationId = "0192f26a-8c1f-7c2f-9ca9-5d3930d2fc75";
 
 function chatRequest(body: unknown) {
   return {
@@ -63,9 +79,13 @@ function chatRequest(body: unknown) {
   } as never;
 }
 
-async function postChat(body: unknown = { messages }) {
+async function postChat(body: unknown = { messages, conversationId }) {
   const { POST } = await import("./route");
-  return POST(chatRequest(body));
+  const normalizedBody =
+    body && typeof body === "object" && "messages" in body
+      ? { conversationId, ...body }
+      : body;
+  return POST(chatRequest(normalizedBody));
 }
 
 describe("/api/chat", () => {
@@ -80,8 +100,17 @@ describe("/api/chat", () => {
     mockCreateAgent.mockReturnValue({ id: "assistant-agent" });
     mockCreateResponseHandle.mockReturnValue("signed-response-handle");
     mockReadResponseHandle.mockReturnValue("resp_previous");
+    mockRequireAiConversation.mockResolvedValue(undefined);
+    mockSaveAiMessages.mockResolvedValue(undefined);
+    mockPersistGeneratedImages.mockImplementation(
+      ({ message }: { message: unknown }) => Promise.resolve(message),
+    );
     mockCreateAgentUIStreamResponse.mockResolvedValue(
       new Response("stream", { status: 200 }),
+    );
+    mockValidateUIMessages.mockImplementation(
+      ({ messages: inputMessages }: { messages: unknown }) =>
+        Promise.resolve(inputMessages),
     );
   });
 
@@ -160,6 +189,15 @@ describe("/api/chat", () => {
     ];
     expect(streamArgs.agent).toEqual({ id: "assistant-agent" });
     expect(streamArgs.uiMessages).toEqual(messages);
+    expect(mockRequireAiConversation).toHaveBeenCalledWith({
+      conversationId,
+      userId: "user-1",
+    });
+    expect(mockSaveAiMessages).toHaveBeenCalledWith({
+      conversationId,
+      userId: "user-1",
+      messages,
+    });
   });
 
   it("defaults to the assistant agent when none is requested", async () => {
@@ -221,6 +259,32 @@ describe("/api/chat", () => {
     expect(metadata).toEqual({ responseHandle: "signed-response-handle" });
   });
 
+  it("stores the completed assistant message and generated assets", async () => {
+    await postChat();
+
+    const [streamArgs] = mockCreateAgentUIStreamResponse.mock.calls[0] as [
+      {
+        onEnd: (options: { responseMessage: unknown }) => Promise<void>;
+      },
+    ];
+    const responseMessage = {
+      id: "assistant-1",
+      role: "assistant",
+      parts: [{ type: "text", text: "Hello" }],
+    };
+    await streamArgs.onEnd({ responseMessage });
+
+    expect(mockPersistGeneratedImages).toHaveBeenCalledWith({
+      message: responseMessage,
+      userId: "user-1",
+    });
+    expect(mockSaveAiMessages).toHaveBeenLastCalledWith({
+      conversationId,
+      userId: "user-1",
+      messages: [responseMessage],
+    });
+  });
+
   it("masks provider errors surfaced through the stream", async () => {
     await postChat();
 
@@ -246,12 +310,35 @@ describe("/api/chat", () => {
   });
 
   it("returns 400 when the UI messages are rejected before streaming", async () => {
+    mockValidateUIMessages.mockRejectedValue(new Error("invalid ui message"));
+
+    const response = await postChat();
+
+    expect(response.status).toBe(400);
+    expect(mockCreateAgentUIStreamResponse).not.toHaveBeenCalled();
+  });
+
+  it("stores the user message before starting the provider stream", async () => {
     mockCreateAgentUIStreamResponse.mockRejectedValue(
-      new Error("invalid ui message"),
+      new Error("provider unavailable"),
     );
 
     const response = await postChat();
 
     expect(response.status).toBe(400);
+    expect(mockSaveAiMessages).toHaveBeenCalledWith({
+      conversationId,
+      userId: "user-1",
+      messages,
+    });
+  });
+
+  it("does not call the provider when message persistence fails", async () => {
+    mockSaveAiMessages.mockRejectedValue(new Error("database unavailable"));
+
+    const response = await postChat();
+
+    expect(response.status).toBe(500);
+    expect(mockCreateAgentUIStreamResponse).not.toHaveBeenCalled();
   });
 });

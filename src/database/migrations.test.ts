@@ -33,3 +33,19 @@ describe("billing provider migrations", () => {
     expect(migration).not.toContain('DELETE FROM "users"');
   });
 });
+
+describe("AI chat history migration", () => {
+  it("stores user-owned conversations and ordered message payloads", () => {
+    const migration = readMigration("0020_powerful_killraven.sql");
+
+    expect(migration).toContain('CREATE TABLE "ai_conversations"');
+    expect(migration).toContain('CREATE TABLE "ai_messages"');
+    expect(migration).toContain('"parts" jsonb NOT NULL');
+    expect(migration).toContain(
+      'FOREIGN KEY ("userId") REFERENCES "public"."users"("id") ON DELETE cascade',
+    );
+    expect(migration).toContain(
+      'FOREIGN KEY ("conversationId") REFERENCES "public"."ai_conversations"("id") ON DELETE cascade',
+    );
+  });
+});

@@ -12,6 +12,9 @@ src/lib/ai/
 ├── models.ts              # Responses API provider + default model (env-configurable)
 ├── reasoning.ts           # Allowed reasoning effort levels and low default
 ├── artifacts.ts           # Shared Markdown/image/video artifact schema
+├── chat-history.ts        # User-owned conversations and message persistence
+├── chat-history-types.ts  # Shared conversation and UIMessage types
+├── generated-image-storage.ts # Generated-image persistence through R2
 ├── response-chain.ts      # User-bound signed handles for previous_response_id
 ├── context.ts             # AgentContext: per-request session data for tools
 ├── tools/                 # One file per tool
@@ -30,7 +33,8 @@ src/lib/ai/
     ├── assistant.ts       # Default agent definition
     └── index.ts           # Agent registry (resolved by id in the route)
 
-src/app/api/chat/route.ts          # POST /api/chat: auth + rate limit + streaming
+src/app/api/ai/conversations/      # Conversation list, creation, and retrieval
+src/app/api/chat/route.ts          # Auth + persistence + rate limit + streaming
 src/app/dashboard/ai/              # Chat UI (useChat + tool-call rendering)
 ```
 
@@ -46,6 +50,12 @@ The built-in assistant at `/dashboard/ai` is a working Chat + Canvas example com
 answer with a source link). Both run on real data; there are no mocks to remove.
 Substantial Markdown drafts, returned image/video files, and generated images open in the adjacent
 canvas, where users can switch artifacts, copy them, and download them.
+
+Conversations and UI messages are stored under the authenticated user in PostgreSQL. The
+responsive history panel supports creating and switching conversations, and the selected
+conversation is restored from the URL after refresh or sign-in on another device. Generated
+image bytes are moved to the existing R2 upload system before the assistant message is stored,
+so historical canvas results use durable URLs instead of large base64 database values.
 
 ## Configuration
 
@@ -158,6 +168,7 @@ Add the factory to `agentFactories` in `src/lib/ai/agents/index.ts`; the chat ro
 - Session cookie auth; `401` without a signed-in user.
 - Rate limited per user (30 requests / 10 minutes, `ai_chat` scope).
 - Body capped at 512 KB and 80 messages.
+- Requires a user-owned `conversationId`; another user's or a missing conversation returns `404`.
 - Accepts only `low`, `medium`, or `high` reasoning effort and defaults to `low`.
 - Streams a UI message response, including tool-call parts the client can render.
 - Provider errors are logged server-side and masked in the stream; a misconfigured agent
@@ -171,11 +182,14 @@ turn the client sends only messages created after that response, and the server 
 handle before using the underlying Responses API `previous_response_id`. This keeps generated
 image payloads out of later request bodies and prevents a client from chaining to another user's
 response. Provider response storage is enabled because native response chaining requires it.
+The user message is stored before the stream is returned, while the completed assistant message
+is stored by the stream end callback. Regeneration updates the existing assistant message and
+cannot overwrite a message with a different role.
 
 The dashboard page at `/dashboard/ai` follows the AI Elements conversation, reasoning,
 prompt-input, tool-status, and artifact patterns while reusing this repository's shadcn primitives
-and design tokens. Desktop uses a split Chat + Canvas workspace; mobile keeps chat primary and
-opens Canvas as a full-height sheet.
+and design tokens. Wide desktop layouts add persistent history beside the split Chat + Canvas
+workspace; narrower screens open history and Canvas in independent full-height sheets.
 
 ## Testing
 

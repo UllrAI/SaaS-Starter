@@ -1,6 +1,6 @@
 import { getToolOrDynamicToolName, isToolUIPart } from "ai";
 import { artifactSchema } from "@/lib/ai/artifacts";
-import type { AiMessage } from "./chat-types";
+import type { AiMessage } from "@/lib/ai/chat-history-types";
 
 export type CanvasArtifact =
   | {
@@ -19,6 +19,16 @@ export type CanvasArtifact =
     };
 
 function readGeneratedImage(output: unknown) {
+  if (
+    typeof output === "object" &&
+    output !== null &&
+    "url" in output &&
+    typeof output.url === "string" &&
+    output.url.length > 0
+  ) {
+    return output.url;
+  }
+
   if (
     typeof output !== "object" ||
     output === null ||

@@ -5,6 +5,17 @@ Routine formatting and test-only maintenance are omitted.
 
 ## Unreleased
 
+## 0.1.10 — 2026-08-22
+
+### Persistent AI conversations
+
+- Added user-owned AI conversations and messages in PostgreSQL so chat history
+  survives refreshes, sign-outs, and device changes.
+- Added responsive conversation history, new-chat, switching, pagination, and
+  signed Responses API context restoration.
+- Persisted generated images to the existing R2 upload system so historical
+  canvas results remain available without storing base64 payloads in PostgreSQL.
+
 ## 0.1.9 — 2026-08-22
 
 ### AI image streaming reliability

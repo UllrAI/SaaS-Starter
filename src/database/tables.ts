@@ -15,6 +15,9 @@ import {
   deviceCodes,
   cliTokens,
   rateLimitBuckets,
+  aiConversations,
+  aiMessages,
+  aiMessageRoleEnum,
 } from "./schema";
 
 export {
@@ -34,4 +37,7 @@ export {
   deviceCodes,
   cliTokens,
   rateLimitBuckets,
+  aiConversations,
+  aiMessages,
+  aiMessageRoleEnum,
 };

@@ -57,6 +57,7 @@ RUN apk add --no-cache su-exec \
 
 # Copy the self-contained application prepared by the build script
 COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/dist/worker ./dist/worker
 COPY --chmod=755 docker/entrypoint.sh /usr/local/bin/docker-entrypoint
 
 # Set correct permissions

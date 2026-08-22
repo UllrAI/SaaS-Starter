@@ -27,6 +27,8 @@ services:
     restart: "no"
     environment:
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/ullrai_starter
+      JOB_DATABASE_URL: postgresql://postgres:postgres@postgres:5432/ullrai_starter
+      JOB_DB_POOL_SIZE: 3
       SKIP_ENV_VALIDATION: "1"
     depends_on:
       postgres:
@@ -48,12 +50,14 @@ services:
     environment:
       # Database
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/ullrai_starter
+      JOB_DATABASE_URL: postgresql://postgres:postgres@postgres:5432/ullrai_starter
 
       # Database connection pool settings
       DB_POOL_SIZE: 20
       DB_IDLE_TIMEOUT: 300
       DB_MAX_LIFETIME: 14400
       DB_CONNECT_TIMEOUT: 4
+      JOB_DB_POOL_SIZE: 3
       RATE_LIMIT_IP_HEADER: ${RATE_LIMIT_IP_HEADER:-x-forwarded-for}
 
       # Application URL
@@ -108,6 +112,31 @@ services:
       timeout: 5s
       retries: 5
       start_period: 20s
+
+  worker:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    command: ["node", "dist/worker/worker.mjs"]
+    restart: unless-stopped
+    stop_grace_period: 45s
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/ullrai_starter
+      JOB_DATABASE_URL: postgresql://postgres:postgres@postgres:5432/ullrai_starter
+      DB_POOL_SIZE: 5
+      DB_IDLE_TIMEOUT: 300
+      DB_MAX_LIFETIME: 14400
+      DB_CONNECT_TIMEOUT: 4
+      JOB_DB_POOL_SIZE: 3
+      WORKER_GRACEFUL_TIMEOUT_MS: 30000
+      LLM_API_KEY: ${LLM_API_KEY:-}
+      LLM_BASE_URL: ${LLM_BASE_URL:-https://api.openai.com/v1}
+      AI_DEFAULT_MODEL: ${AI_DEFAULT_MODEL:-gpt-5.6-luna}
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    networks:
+      - ullrai-network
 
 volumes:
   postgres_data:

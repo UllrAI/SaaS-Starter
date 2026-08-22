@@ -19,6 +19,8 @@ import {
   aiConversations,
   aiMessages,
   aiMessageRoleEnum,
+  taskRuns,
+  taskRunStatusEnum,
 } from "./schema";
 import { Table } from "drizzle-orm/table";
 import { getTableConfig } from "drizzle-orm/pg-core";
@@ -87,6 +89,15 @@ describe("Database Schema", () => {
         "system",
         "user",
         "assistant",
+      ]);
+      expect(taskRuns).toBeDefined();
+      expect(taskRunStatusEnum.enumValues).toEqual([
+        "queued",
+        "running",
+        "waiting",
+        "completed",
+        "failed",
+        "cancelled",
       ]);
       expect(uploads).toBeDefined();
       expect(apiKeys).toBeDefined();

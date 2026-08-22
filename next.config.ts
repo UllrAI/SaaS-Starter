@@ -76,6 +76,10 @@ const nextConfig: NextConfig = {
     // Transitive ESM-only deps of `ai` that Jest must transform too.
     "@ai-sdk/gateway",
     "@workflow/serde",
+    "pg-boss",
+    "serialize-error",
+    "non-error",
+    "cron-parser",
     "@shadcn/helpers",
     "@shadcn/react",
   ],

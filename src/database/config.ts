@@ -13,6 +13,7 @@ if (protocol !== "postgres:" && protocol !== "postgresql:") {
 export default defineConfig({
   dialect: "postgresql",
   schema: "./src/database/schema.ts",
+  schemaFilter: ["public"],
   out: "./src/database/migrations",
   verbose: true,
   dbCredentials: {

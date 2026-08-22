@@ -100,36 +100,39 @@ cp .env.example .env
 
 #### 环境变量说明
 
-| 变量名                           | 描述                                               | 示例                                                |
-| :------------------------------- | :------------------------------------------------- | :-------------------------------------------------- |
-| `DATABASE_URL`                   | **必需。** PostgreSQL 连接字符串。                 | `postgresql://user:password@localhost:5432/db_name` |
-| `RATE_LIMIT_IP_HEADER`           | **选填。** 可信客户端 IP 请求头，默认适配 Zeabur。 | `x-forwarded-for`                                   |
-| `NEXT_PUBLIC_APP_URL`            | **必需。** 您应用部署后的公开 URL。                | `http://localhost:3000` 或 `https://yourdomain.com` |
-| `BETTER_AUTH_SECRET`             | **必需。** 至少 32 个字符的随机会话密钥。          | 使用 `openssl rand -base64 32` 生成                 |
-| `RESEND_API_KEY`                 | 启用 `emailAuth` 时必需。Resend API Key。          | `re_xxxxxxxxxxxxxxxx`                               |
-| `RESEND_EMAIL_FROM`              | 启用 `emailAuth` 时必需。已验证的发件地址。        | `noreply@your-verified-domain.com`                  |
-| `LLM_API_KEY`                    | 启用 `ai` 时必需。LLM 端点的 API Key。             | `sk-...`                                            |
-| `LLM_BASE_URL`                   | 可选的 OpenAI 兼容端点，默认为 OpenAI 官方 API。   | `https://api.openai.com/v1`                         |
-| `AI_DEFAULT_MODEL`               | 可选的聊天模型 id，默认 `gpt-5.6-luna`。           | `gpt-5.6-luna`                                      |
-| `STRIPE_SECRET_KEY`              | 启用 `billing` 时必需。需与环境模式匹配。          | `sk_test_...` 或 `sk_live_...`                      |
-| `STRIPE_ENVIRONMENT`             | Stripe 环境模式，默认为 `test_mode`。              | `test_mode` 或 `live_mode`                          |
-| `STRIPE_WEBHOOK_SECRET`          | 启用 `billing` 时必需。Endpoint 签名密钥。         | `whsec_your_webhook_secret`                         |
-| `R2_ENDPOINT`                    | 启用 `uploads` 时必需。Cloudflare R2 API 端点。    | `https://<ACCOUNT_ID>.r2.cloudflarestorage.com`     |
-| `R2_ACCESS_KEY_ID`               | 启用 `uploads` 时必需。R2 访问密钥 ID。            | `your_r2_access_key_id`                             |
-| `R2_SECRET_ACCESS_KEY`           | 启用 `uploads` 时必需。R2 秘密访问密钥。           | `your_r2_secret_access_key`                         |
-| `R2_BUCKET_NAME`                 | 启用 `uploads` 时必需。R2 存储桶名称。             | `your_r2_bucket_name`                               |
-| `R2_PUBLIC_URL`                  | 启用 `uploads` 时必需。R2 公共访问 URL。           | `https://your-bucket.your-account.r2.dev`           |
-| `UPLOAD_CLEANUP_SECRET`          | 启用 `uploads` 时必需。32 位以上清理密钥。         | 使用 `openssl rand -base64 32` 生成                 |
-| `UPLOAD_DAILY_QUOTA_BYTES`       | 可选。每用户滚动 24 小时上传额度。                 | `1073741824`（1 GiB）                               |
-| `UPLOAD_TOTAL_QUOTA_BYTES`       | 可选。每用户已存储与预留的总字节额度。             | `5368709120`（5 GiB）                               |
-| `UPLOAD_LEGACY_COMPLETION_SINCE` | 可选。v1 有界兼容窗口的 ISO-8601 开始时间。        | 仅与 `UPLOAD_LEGACY_COMPLETION_UNTIL` 同时设置      |
-| `UPLOAD_LEGACY_COMPLETION_UNTIL` | 可选。v1 有界兼容窗口的 ISO-8601 结束时间。        | 最多晚于对应开始时间 24 小时                        |
-| `GITHUB_CLIENT_ID`               | _可选。_ 用于 GitHub OAuth 的 Client ID。          | `your_github_client_id`                             |
-| `GITHUB_CLIENT_SECRET`           | _可选。_ 用于 GitHub OAuth 的 Client Secret。      | `your_github_client_secret`                         |
-| `GOOGLE_CLIENT_ID`               | _可选。_ 用于 Google OAuth 的 Client ID。          | `your_google_client_id`                             |
-| `GOOGLE_CLIENT_SECRET`           | _可选。_ 用于 Google OAuth 的 Client Secret。      | `your_google_client_secret`                         |
-| `LINKEDIN_CLIENT_ID`             | _可选。_ 用于 LinkedIn OAuth 的 Client ID。        | `your_linkedin_client_id`                           |
-| `LINKEDIN_CLIENT_SECRET`         | _可选。_ 用于 LinkedIn OAuth 的 Client Secret。    | `your_linkedin_client_secret`                       |
+| 变量名                           | 描述                                                 | 示例                                                |
+| :------------------------------- | :--------------------------------------------------- | :-------------------------------------------------- |
+| `DATABASE_URL`                   | **必需。** PostgreSQL 连接字符串。                   | `postgresql://user:password@localhost:5432/db_name` |
+| `JOB_DATABASE_URL`               | 可选。pg-boss 数据库，默认使用 `DATABASE_URL`。      | `postgresql://user:password@localhost:5432/db_name` |
+| `JOB_DB_POOL_SIZE`               | 可选。每进程 pg-boss 连接池大小，默认 `3`。          | `3`                                                 |
+| `WORKER_GRACEFUL_TIMEOUT_MS`     | 可选。Worker 收到 SIGTERM 后的排空时限，默认 30 秒。 | `30000`                                             |
+| `RATE_LIMIT_IP_HEADER`           | **选填。** 可信客户端 IP 请求头，默认适配 Zeabur。   | `x-forwarded-for`                                   |
+| `NEXT_PUBLIC_APP_URL`            | **必需。** 您应用部署后的公开 URL。                  | `http://localhost:3000` 或 `https://yourdomain.com` |
+| `BETTER_AUTH_SECRET`             | **必需。** 至少 32 个字符的随机会话密钥。            | 使用 `openssl rand -base64 32` 生成                 |
+| `RESEND_API_KEY`                 | 启用 `emailAuth` 时必需。Resend API Key。            | `re_xxxxxxxxxxxxxxxx`                               |
+| `RESEND_EMAIL_FROM`              | 启用 `emailAuth` 时必需。已验证的发件地址。          | `noreply@your-verified-domain.com`                  |
+| `LLM_API_KEY`                    | 启用 `ai` 时必需。LLM 端点的 API Key。               | `sk-...`                                            |
+| `LLM_BASE_URL`                   | 可选的 OpenAI 兼容端点，默认为 OpenAI 官方 API。     | `https://api.openai.com/v1`                         |
+| `AI_DEFAULT_MODEL`               | 可选的聊天模型 id，默认 `gpt-5.6-luna`。             | `gpt-5.6-luna`                                      |
+| `STRIPE_SECRET_KEY`              | 启用 `billing` 时必需。需与环境模式匹配。            | `sk_test_...` 或 `sk_live_...`                      |
+| `STRIPE_ENVIRONMENT`             | Stripe 环境模式，默认为 `test_mode`。                | `test_mode` 或 `live_mode`                          |
+| `STRIPE_WEBHOOK_SECRET`          | 启用 `billing` 时必需。Endpoint 签名密钥。           | `whsec_your_webhook_secret`                         |
+| `R2_ENDPOINT`                    | 启用 `uploads` 时必需。Cloudflare R2 API 端点。      | `https://<ACCOUNT_ID>.r2.cloudflarestorage.com`     |
+| `R2_ACCESS_KEY_ID`               | 启用 `uploads` 时必需。R2 访问密钥 ID。              | `your_r2_access_key_id`                             |
+| `R2_SECRET_ACCESS_KEY`           | 启用 `uploads` 时必需。R2 秘密访问密钥。             | `your_r2_secret_access_key`                         |
+| `R2_BUCKET_NAME`                 | 启用 `uploads` 时必需。R2 存储桶名称。               | `your_r2_bucket_name`                               |
+| `R2_PUBLIC_URL`                  | 启用 `uploads` 时必需。R2 公共访问 URL。             | `https://your-bucket.your-account.r2.dev`           |
+| `UPLOAD_CLEANUP_SECRET`          | 启用 `uploads` 时必需。32 位以上清理密钥。           | 使用 `openssl rand -base64 32` 生成                 |
+| `UPLOAD_DAILY_QUOTA_BYTES`       | 可选。每用户滚动 24 小时上传额度。                   | `1073741824`（1 GiB）                               |
+| `UPLOAD_TOTAL_QUOTA_BYTES`       | 可选。每用户已存储与预留的总字节额度。               | `5368709120`（5 GiB）                               |
+| `UPLOAD_LEGACY_COMPLETION_SINCE` | 可选。v1 有界兼容窗口的 ISO-8601 开始时间。          | 仅与 `UPLOAD_LEGACY_COMPLETION_UNTIL` 同时设置      |
+| `UPLOAD_LEGACY_COMPLETION_UNTIL` | 可选。v1 有界兼容窗口的 ISO-8601 结束时间。          | 最多晚于对应开始时间 24 小时                        |
+| `GITHUB_CLIENT_ID`               | _可选。_ 用于 GitHub OAuth 的 Client ID。            | `your_github_client_id`                             |
+| `GITHUB_CLIENT_SECRET`           | _可选。_ 用于 GitHub OAuth 的 Client Secret。        | `your_github_client_secret`                         |
+| `GOOGLE_CLIENT_ID`               | _可选。_ 用于 Google OAuth 的 Client ID。            | `your_google_client_id`                             |
+| `GOOGLE_CLIENT_SECRET`           | _可选。_ 用于 Google OAuth 的 Client Secret。        | `your_google_client_secret`                         |
+| `LINKEDIN_CLIENT_ID`             | _可选。_ 用于 LinkedIn OAuth 的 Client ID。          | `your_linkedin_client_id`                           |
+| `LINKEDIN_CLIENT_SECRET`         | _可选。_ 用于 LinkedIn OAuth 的 Client Secret。      | `your_linkedin_client_secret`                       |
 
 > **提示:** 您可以使用以下命令生成一个安全的密钥：
 > `openssl rand -base64 32`

@@ -784,6 +784,13 @@ const mockIsNull = jest.fn().mockImplementation(
     type: "isNull",
   }),
 );
+const mockInArray = jest
+  .fn()
+  .mockImplementation((column: unknown, values: unknown[]) => ({
+    type: "inArray",
+    column,
+    values,
+  }));
 const mockDrizzleSql = jest
   .fn()
   .mockImplementation(
@@ -800,12 +807,14 @@ jest.mock("drizzle-orm", () => ({
   and: mockAnd,
   gte: mockGte,
   isNull: mockIsNull,
+  inArray: mockInArray,
   sql: mockDrizzleSql,
 }));
 
 // Type-safe environment configuration mock
 type MockEnvironment = {
   DATABASE_URL: string;
+  JOB_DATABASE_URL?: string;
   BETTER_AUTH_SECRET: string;
   NEXT_PUBLIC_APP_URL: string;
   RESEND_API_KEY: string;
@@ -823,6 +832,8 @@ type MockEnvironment = {
   DB_IDLE_TIMEOUT: number;
   DB_MAX_LIFETIME: number;
   DB_CONNECT_TIMEOUT: number;
+  JOB_DB_POOL_SIZE: number;
+  WORKER_GRACEFUL_TIMEOUT_MS: number;
   RATE_LIMIT_IP_HEADER: string;
   UPLOAD_CLEANUP_SECRET: string;
   UPLOAD_DAILY_QUOTA_BYTES: number;
@@ -850,6 +861,8 @@ const mockEnvConfig: MockEnvironment = {
   DB_IDLE_TIMEOUT: 300,
   DB_MAX_LIFETIME: 14400,
   DB_CONNECT_TIMEOUT: 4,
+  JOB_DB_POOL_SIZE: 3,
+  WORKER_GRACEFUL_TIMEOUT_MS: 30000,
   RATE_LIMIT_IP_HEADER: "x-forwarded-for",
   UPLOAD_CLEANUP_SECRET: "mock-upload-cleanup-secret-at-least-32-chars",
   UPLOAD_DAILY_QUOTA_BYTES: 1024 * 1024 * 1024,
@@ -1050,6 +1063,8 @@ jest.mock("./env.js", () => ({
     DB_IDLE_TIMEOUT: 300,
     DB_MAX_LIFETIME: 14400,
     DB_CONNECT_TIMEOUT: 4,
+    JOB_DB_POOL_SIZE: 3,
+    WORKER_GRACEFUL_TIMEOUT_MS: 30000,
     RATE_LIMIT_IP_HEADER: "x-forwarded-for",
     UPLOAD_CLEANUP_SECRET: "mock-upload-cleanup-secret-at-least-32-chars",
     UPLOAD_DAILY_QUOTA_BYTES: 1024 * 1024 * 1024,

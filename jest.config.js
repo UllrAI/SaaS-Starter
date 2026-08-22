@@ -18,6 +18,7 @@ const customJestConfig = {
     "<rootDir>/node_modules/",
     "<rootDir>/.next/",
     "<rootDir>/e2e/",
+    "<rootDir>/integration/",
   ],
   modulePathIgnorePatterns: ["<rootDir>/.next/"],
 };

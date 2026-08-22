@@ -327,6 +327,7 @@ export function AiChat() {
   }, [automaticArtifacts, manualArtifacts]);
   const desktopCanvasOpen = shouldOpenDesktopCanvas({
     automaticallyOpen: canvasAutomaticallyOpen,
+    hasArtifacts: artifacts.length > 0,
     manuallyOpen: canvasManuallyOpen,
     preferredOpen: canvasOpenPreference,
   });
@@ -772,6 +773,7 @@ export function AiChat() {
 
       <div ref={workspaceRef} className="flex min-h-0 min-w-0 overflow-hidden">
         <ChatPanel
+          conversationId={activeConversationId}
           messages={messages}
           input={input}
           status={status}

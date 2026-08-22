@@ -5,16 +5,18 @@ export const MAX_CANVAS_PERCENT = 70;
 
 interface CanvasVisibilityState {
   automaticallyOpen: boolean;
+  hasArtifacts: boolean;
   manuallyOpen: boolean;
   preferredOpen: boolean;
 }
 
 export function shouldOpenDesktopCanvas({
   automaticallyOpen,
+  hasArtifacts,
   manuallyOpen,
   preferredOpen,
 }: CanvasVisibilityState) {
-  return automaticallyOpen || manuallyOpen || preferredOpen;
+  return automaticallyOpen || manuallyOpen || (preferredOpen && hasArtifacts);
 }
 
 export function clampCanvasPercent(value: number) {

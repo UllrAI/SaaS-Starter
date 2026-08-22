@@ -1,8 +1,58 @@
 import { expect, test } from "@playwright/test";
+import { createChat } from "@shadcn/helpers/ai-sdk";
+import type { UIMessageChunk } from "ai";
+import type { AiMessage } from "../src/lib/ai/chat-history-types";
 import { loginAs } from "./helpers/auth";
 
 // These checks never send a message, so no LLM call is made and CI needs no
 // real provider credentials.
+
+async function readMessageChunks(stream: ReadableStream<UIMessageChunk>) {
+  const chunks: string[] = [];
+  const reader = stream.getReader();
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    chunks.push(JSON.stringify(value));
+  }
+  return chunks;
+}
+
+async function createStreamingChatFixture() {
+  const firstPrompt = "Explain the migration in detail";
+  const secondPrompt = "Give me the final conclusion";
+  const firstAnswer = `${Array.from(
+    { length: 120 },
+    (_, index) =>
+      `Migration detail ${index + 1} remains visible while streaming.`,
+  ).join(" ")} Final first-turn marker.`;
+  const secondAnswer = `${Array.from(
+    { length: 40 },
+    (_, index) =>
+      `Conclusion detail ${index + 1} follows the current question.`,
+  ).join(" ")} Final second-turn marker.`;
+  const chat = createChat<AiMessage>({ now: "2026-08-22T00:00:00Z" })
+    .user(firstPrompt, { id: "first-user" })
+    .assistant(firstAnswer, { id: "first-assistant" })
+    .user(secondPrompt, { id: "second-user" })
+    .assistant(secondAnswer, { id: "second-assistant" });
+  const transport = chat.transport({ delayMs: 0 });
+  const send = (messages: AiMessage[]) =>
+    transport.sendMessages({
+      abortSignal: undefined,
+      chatId: "e2e-chat",
+      messageId: undefined,
+      messages,
+      trigger: "submit-message",
+    });
+
+  return {
+    firstChunks: await readMessageChunks(await send(chat.get(1))),
+    firstPrompt,
+    secondChunks: await readMessageChunks(await send(chat.get(3))),
+    secondPrompt,
+  };
+}
 
 test("rejects unauthenticated chat requests", async ({ page }) => {
   const response = await page.request.post("/api/chat", {
@@ -59,6 +109,8 @@ test("shows the assistant composer to a signed-in user", async ({ page }) => {
   await expect(
     page.getByRole("button", { name: "Expand chat history" }),
   ).toBeVisible();
+  await expect(page.getByRole("region", { name: "Canvas" })).toBeHidden();
+  await page.getByRole("button", { name: "Open canvas" }).click();
   await expect(page.getByRole("region", { name: "Canvas" })).toBeVisible();
   await expect(
     page.getByRole("separator", { name: "Resize canvas" }),
@@ -72,6 +124,161 @@ test("shows the assistant composer to a signed-in user", async ({ page }) => {
   await expect(
     page.getByRole("separator", { name: "Resize canvas" }),
   ).toHaveCount(0);
+});
+
+test("keeps the current turn anchored while streaming", async ({ page }) => {
+  await loginAs(page, "user");
+  const fixture = await createStreamingChatFixture();
+
+  await page.addInitScript(
+    ({ firstChunks, firstPrompt, secondChunks, secondPrompt }) => {
+      const originalFetch = window.fetch.bind(window);
+
+      window.fetch = async (input, init) => {
+        const requestUrl = new URL(
+          typeof input === "string"
+            ? input
+            : input instanceof URL
+              ? input.href
+              : input.url,
+          window.location.href,
+        );
+        if (requestUrl.pathname !== "/api/chat") {
+          return originalFetch(input, init);
+        }
+
+        const rawBody =
+          typeof init?.body === "string"
+            ? init.body
+            : input instanceof Request
+              ? await input.clone().text()
+              : "{}";
+        const body = JSON.parse(rawBody) as {
+          messages?: Array<{
+            role: string;
+            parts?: Array<{ type: string; text?: string }>;
+          }>;
+        };
+        const latestUserText = body.messages
+          ?.findLast((message) => message.role === "user")
+          ?.parts?.filter((part) => part.type === "text")
+          .map((part) => part.text ?? "")
+          .join("\n");
+        const chunks =
+          latestUserText === secondPrompt ? secondChunks : firstChunks;
+        if (latestUserText !== firstPrompt && latestUserText !== secondPrompt) {
+          return new Response("Unexpected E2E chat prompt.", { status: 400 });
+        }
+
+        const encoder = new TextEncoder();
+        let chunkIndex = 0;
+        return new Response(
+          new ReadableStream({
+            start(controller) {
+              const enqueueNext = () => {
+                const chunk = chunks[chunkIndex];
+                if (!chunk) {
+                  controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+                  controller.close();
+                  return;
+                }
+
+                controller.enqueue(encoder.encode(`data: ${chunk}\n\n`));
+                chunkIndex += 1;
+                window.setTimeout(enqueueNext, 4);
+              };
+
+              enqueueNext();
+            },
+          }),
+          {
+            headers: {
+              "content-type": "text/event-stream",
+              "x-vercel-ai-ui-message-stream": "v1",
+            },
+          },
+        );
+      };
+    },
+    fixture,
+  );
+
+  await page.setViewportSize({ width: 1280, height: 700 });
+  await page.goto("/dashboard/ai");
+  const composer = page.getByRole("textbox", { name: "Message" });
+  const viewport = page.locator('[data-slot="message-scroller-viewport"]');
+
+  await composer.fill(fixture.firstPrompt);
+  await composer.press("Enter");
+  const stopButton = page.getByRole("button", { name: "Stop" });
+  await expect(page.getByText(/Migration detail 20 remains/)).toBeVisible();
+  await expect(stopButton).toBeVisible();
+  await expect
+    .poll(() =>
+      viewport.evaluate(
+        (element) =>
+          element.scrollHeight - element.scrollTop - element.clientHeight,
+      ),
+    )
+    .toBeLessThan(4);
+
+  await viewport.dispatchEvent("wheel", { deltaY: -1000 });
+  await viewport.evaluate((element) => {
+    element.scrollTop = 0;
+    element.dispatchEvent(new Event("scroll"));
+  });
+  const jumpToLatest = page.getByRole("button", {
+    name: "Jump to latest message",
+  });
+  await expect(jumpToLatest).toBeVisible();
+  await jumpToLatest.click();
+  await expect
+    .poll(() =>
+      viewport.evaluate(
+        (element) =>
+          element.scrollHeight - element.scrollTop - element.clientHeight,
+      ),
+    )
+    .toBeLessThan(4);
+  await expect(page.getByText(/Migration detail 80 remains/)).toBeVisible();
+  await expect(stopButton).toBeVisible();
+  await expect
+    .poll(() =>
+      viewport.evaluate(
+        (element) =>
+          element.scrollHeight - element.scrollTop - element.clientHeight,
+      ),
+    )
+    .toBeLessThan(4);
+  await expect(page.getByText("Final first-turn marker.")).toBeVisible({
+    timeout: 15_000,
+  });
+  await expect(stopButton).toBeHidden();
+
+  await composer.fill(fixture.secondPrompt);
+  await composer.press("Enter");
+  const currentQuestion = viewport.getByText(fixture.secondPrompt, {
+    exact: true,
+  });
+  await expect(page.getByText(/Conclusion detail 1 follows/)).toBeVisible();
+  await expect(currentQuestion).toBeInViewport();
+  await expect(page.getByText("Final second-turn marker.")).toBeVisible({
+    timeout: 15_000,
+  });
+  await expect
+    .poll(() =>
+      viewport.evaluate(
+        (element) =>
+          element.scrollHeight - element.scrollTop - element.clientHeight,
+      ),
+    )
+    .toBeLessThan(4);
+
+  await page.getByRole("button", { name: "New chat", exact: true }).click();
+  await expect(page.getByText("How can I help?")).toBeVisible();
+  await expect
+    .poll(() => viewport.evaluate((element) => element.scrollTop))
+    .toBe(0);
 });
 
 test("uploads a reference image and enables an image-only message", async ({

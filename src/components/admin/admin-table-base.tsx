@@ -130,7 +130,7 @@ export function AdminTableBase<
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder={resolvedFilterPlaceholder} />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent position="popper">
               {filterOptions.map((option) => (
                 <SelectItem key={option.value} value={option.value}>
                   {option.label}

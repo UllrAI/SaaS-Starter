@@ -29,7 +29,16 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import CopyButton from "@/components/ui/copy-button";
 import type { FileUploadItem } from "@/components/ui/file-upload/types";
+import {
+  MessageScroller,
+  MessageScrollerButton,
+  MessageScrollerContent,
+  MessageScrollerItem,
+  MessageScrollerProvider,
+  MessageScrollerViewport,
+} from "@/components/ui/message-scroller";
 import {
   Select,
   SelectContent,
@@ -47,6 +56,7 @@ import { useTranslation } from "@/lib/i18n/translation/client";
 import { cn } from "@/lib/utils";
 
 interface ChatPanelProps {
+  conversationId?: string;
   messages: AiMessage[];
   input: string;
   status: ChatStatus;
@@ -150,9 +160,20 @@ function ImageAttachmentPreview({
         />
       )}
       {(item.status === "queued" || item.status === "uploading") && (
-        <div className="bg-background/70 absolute inset-0 flex flex-col items-center justify-center gap-1">
-          <Loader2 className="size-4 animate-spin" />
-          <span className="text-[10px]">{item.progress}%</span>
+        <div
+          role="status"
+          className="bg-background/70 absolute inset-0 flex flex-col items-center justify-center gap-1"
+        >
+          <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+          <span className="text-[10px]" aria-hidden="true">
+            {item.progress}%
+          </span>
+          <span className="sr-only">
+            {t("ai_chat_image_uploading", {
+              name: item.file.name,
+              progress: item.progress,
+            })}
+          </span>
         </div>
       )}
       {item.status === "error" && (
@@ -203,7 +224,7 @@ function ReasoningBlock({
         ) : (
           <Sparkles className="size-3.5" />
         )}
-        <span>
+        <span aria-live="polite">
           {streaming ? t("ai_chat_thinking") : t("ai_chat_reasoning")}
         </span>
         <ChevronDown className="size-3.5 transition-transform group-open:rotate-180" />
@@ -250,7 +271,10 @@ function ToolCallRow({
   }
 
   return (
-    <div className="text-muted-foreground my-1 flex w-fit max-w-full min-w-0 items-center gap-2 py-1 text-xs">
+    <div
+      role={isError ? "alert" : "status"}
+      className="text-muted-foreground my-1 flex w-fit max-w-full min-w-0 items-center gap-2 py-1 text-xs"
+    >
       {isError ? (
         <CircleAlert className="text-destructive size-3.5" />
       ) : isRunning ? (
@@ -282,9 +306,13 @@ function AssistantMessage({
   const hasText = message.parts.some(
     (part) => part.type === "text" && part.text.trim().length > 0,
   );
+  const text = message.parts
+    .filter((part) => part.type === "text")
+    .map((part) => part.text)
+    .join("\n\n");
 
   return (
-    <div className="group/message flex min-w-0 gap-3">
+    <div className="flex min-w-0 gap-3">
       <div className="bg-muted mt-0.5 flex size-7 shrink-0 items-center justify-center border">
         <Bot className="size-4" />
       </div>
@@ -351,16 +379,23 @@ function AssistantMessage({
         })}
 
         {hasText && (
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            className="text-muted-foreground mt-1 h-7 px-2 opacity-0 transition-opacity group-hover/message:opacity-100 focus-visible:opacity-100"
-            onClick={() => onOpenMessage(message)}
+          <div
+            role="group"
+            className="text-muted-foreground mt-1 flex min-h-8 items-center gap-1"
+            aria-label={t("ai_chat_message_actions")}
           >
-            <PanelRightOpen className="rotate-180" />
-            {t("ai_chat_open_in_canvas")}
-          </Button>
+            <CopyButton textToCopy={text} />
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="h-8 px-2"
+              onClick={() => onOpenMessage(message)}
+            >
+              <PanelRightOpen className="rotate-180" />
+              {t("ai_chat_open_in_canvas")}
+            </Button>
+          </div>
         )}
       </div>
     </div>
@@ -368,6 +403,7 @@ function AssistantMessage({
 }
 
 export function ChatPanel({
+  conversationId,
   messages,
   input,
   status,
@@ -397,7 +433,6 @@ export function ChatPanel({
   className,
 }: ChatPanelProps) {
   const { t } = useTranslation();
-  const bottomRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const isBusy = status === "submitted" || status === "streaming";
   const imageAttachmentsReady = imageAttachments.every(
@@ -416,10 +451,13 @@ export function ChatPanel({
     t("ai_chat_suggestion_account"),
     t("ai_chat_suggestion_document"),
   ];
-
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
-  }, [messages, status]);
+  let latestUserMessageId: string | undefined;
+  for (let index = messages.length - 1; index >= 0; index -= 1) {
+    if (messages[index]?.role === "user") {
+      latestUserMessageId = messages[index].id;
+      break;
+    }
+  }
 
   return (
     <section
@@ -472,82 +510,116 @@ export function ChatPanel({
         </Button>
       </div>
 
-      <div className="min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto">
-        <div className="mx-auto flex min-h-full w-full max-w-3xl min-w-0 flex-col px-4 py-6 sm:px-6">
-          {conversationLoading ? (
-            <div className="text-muted-foreground flex flex-1 items-center justify-center gap-2 text-sm">
-              <Loader2 className="size-4 animate-spin" />
-              {t("ai_history_loading_conversation")}
-            </div>
-          ) : messages.length === 0 ? (
-            <div className="flex flex-1 flex-col justify-end pb-6 sm:justify-center sm:pb-0">
-              <div className="max-w-lg">
-                <div className="bg-muted mb-4 flex size-10 items-center justify-center border">
-                  <Sparkles className="size-5" />
+      <MessageScrollerProvider
+        key={conversationId ?? "new-conversation"}
+        autoScroll
+        defaultScrollPosition="last-anchor"
+      >
+        <MessageScroller className="min-h-0 min-w-0 flex-1">
+          <MessageScrollerViewport
+            aria-label={t("ai_chat_messages")}
+            className="overflow-x-hidden"
+          >
+            <MessageScrollerContent
+              aria-busy={conversationLoading || isBusy}
+              className="mx-auto w-full max-w-3xl min-w-0 px-4 py-6 sm:px-6"
+            >
+              {conversationLoading ? (
+                <div
+                  role="status"
+                  className="text-muted-foreground flex flex-1 items-center justify-center gap-2 text-sm"
+                >
+                  <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+                  {t("ai_history_loading_conversation")}
                 </div>
-                <h2 className="text-xl font-semibold tracking-tight">
-                  {t("ai_chat_empty_title")}
-                </h2>
-                <p className="text-muted-foreground mt-2 text-sm leading-6">
-                  {t("ai_chat_empty_description")}
-                </p>
-                <div className="mt-5 flex flex-wrap gap-2">
-                  {suggestions.map((suggestion) => (
-                    <Button
-                      key={suggestion}
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      className="h-auto min-h-8 text-left whitespace-normal"
-                      onClick={() => onSubmit(suggestion)}
+              ) : messages.length === 0 ? (
+                <div className="flex flex-1 flex-col justify-end pb-6 sm:justify-center sm:pb-0">
+                  <div className="max-w-lg">
+                    <div className="bg-muted mb-4 flex size-10 items-center justify-center border">
+                      <Sparkles className="size-5" />
+                    </div>
+                    <h2 className="text-xl font-semibold tracking-tight">
+                      {t("ai_chat_empty_title")}
+                    </h2>
+                    <p className="text-muted-foreground mt-2 text-sm leading-6">
+                      {t("ai_chat_empty_description")}
+                    </p>
+                    <div className="mt-5 flex flex-wrap gap-2">
+                      {suggestions.map((suggestion) => (
+                        <Button
+                          key={suggestion}
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="h-auto min-h-8 text-left whitespace-normal"
+                          onClick={() => onSubmit(suggestion)}
+                        >
+                          {suggestion}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  {messages.map((message) => (
+                    <MessageScrollerItem
+                      key={message.id}
+                      messageId={message.id}
+                      scrollAnchor={message.id === latestUserMessageId}
                     >
-                      {suggestion}
-                    </Button>
+                      {message.role === "user" ? (
+                        <UserMessage message={message} />
+                      ) : (
+                        <AssistantMessage
+                          message={message}
+                          onOpenMessage={onOpenMessage}
+                          onOpenArtifact={onOpenArtifact}
+                        />
+                      )}
+                    </MessageScrollerItem>
                   ))}
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="min-w-0 space-y-7">
-              {messages.map((message) =>
-                message.role === "user" ? (
-                  <UserMessage key={message.id} message={message} />
-                ) : (
-                  <AssistantMessage
-                    key={message.id}
-                    message={message}
-                    onOpenMessage={onOpenMessage}
-                    onOpenArtifact={onOpenArtifact}
-                  />
-                ),
+                  {status === "submitted" && (
+                    <div
+                      role="status"
+                      className="text-muted-foreground flex items-center gap-3 text-sm"
+                    >
+                      <Loader2
+                        className="size-4 animate-spin"
+                        aria-hidden="true"
+                      />
+                      {t("ai_chat_thinking")}
+                    </div>
+                  )}
+                  {error && (
+                    <div
+                      role="alert"
+                      className="border-destructive/30 bg-destructive/5 flex min-w-0 items-center justify-between gap-3 border px-3 py-2 text-sm"
+                    >
+                      <span className="flex min-w-0 items-center gap-2 [overflow-wrap:anywhere]">
+                        <CircleAlert
+                          className="text-destructive size-4"
+                          aria-hidden="true"
+                        />
+                        {t("ai_chat_error_message")}
+                      </span>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="shrink-0"
+                        onClick={onRetry}
+                      >
+                        {t("ai_chat_retry")}
+                      </Button>
+                    </div>
+                  )}
+                </>
               )}
-              {status === "submitted" && (
-                <div className="text-muted-foreground flex items-center gap-3 text-sm">
-                  <Loader2 className="size-4 animate-spin" />
-                  {t("ai_chat_thinking")}
-                </div>
-              )}
-              {error && (
-                <div className="border-destructive/30 bg-destructive/5 flex min-w-0 items-center justify-between gap-3 border px-3 py-2 text-sm">
-                  <span className="flex min-w-0 items-center gap-2 [overflow-wrap:anywhere]">
-                    <CircleAlert className="text-destructive size-4" />
-                    {t("ai_chat_error_message")}
-                  </span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="shrink-0"
-                    onClick={onRetry}
-                  >
-                    {t("ai_chat_retry")}
-                  </Button>
-                </div>
-              )}
-            </div>
-          )}
-          <div ref={bottomRef} />
-        </div>
-      </div>
+            </MessageScrollerContent>
+          </MessageScrollerViewport>
+          <MessageScrollerButton aria-label={t("ai_chat_scroll_to_latest")} />
+        </MessageScroller>
+      </MessageScrollerProvider>
 
       <div className="bg-background min-w-0 shrink-0 px-3 pb-3 sm:px-5 sm:pb-5">
         <div className="bg-background focus-within:ring-ring/30 mx-auto max-w-3xl min-w-0 border focus-within:ring-2">
@@ -567,7 +639,10 @@ export function ChatPanel({
             </div>
           )}
           {imageUploadError && (
-            <p className="text-destructive border-b px-3 py-2 text-xs">
+            <p
+              role="alert"
+              className="text-destructive border-b px-3 py-2 text-xs"
+            >
               {t("ai_chat_image_upload_failed")}
             </p>
           )}
@@ -575,13 +650,19 @@ export function ChatPanel({
             value={input}
             onChange={(event) => onInputChange(event.currentTarget.value)}
             onKeyDown={(event) => {
-              if (event.key === "Enter" && !event.shiftKey) {
+              if (
+                event.key === "Enter" &&
+                !event.shiftKey &&
+                !event.nativeEvent.isComposing &&
+                event.keyCode !== 229
+              ) {
                 event.preventDefault();
                 if (canSubmit) onSubmit();
               }
             }}
+            aria-label={t("ai_chat_input_label")}
             placeholder={t("ai_chat_input_placeholder")}
-            className="max-h-48 min-h-20 resize-none border-0 px-3 py-3 shadow-none focus-visible:ring-0"
+            className="field-sizing-content max-h-48 min-h-20 resize-none border-0 px-3 py-3 shadow-none focus-visible:ring-0"
             rows={2}
           />
           <div className="flex min-w-0 flex-wrap items-center gap-2 border-t px-2 py-2">
@@ -635,7 +716,7 @@ export function ChatPanel({
                 <Sparkles className="size-3.5" />
                 <span>{t(`ai_chat_reasoning_${reasoningEffort}_short`)}</span>
               </SelectTrigger>
-              <SelectContent align="start">
+              <SelectContent position="popper" align="start">
                 {REASONING_EFFORTS.map((effort) => (
                   <SelectItem key={effort} value={effort}>
                     {t(`ai_chat_reasoning_${effort}`)}

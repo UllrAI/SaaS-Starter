@@ -76,6 +76,8 @@ const nextConfig: NextConfig = {
     // Transitive ESM-only deps of `ai` that Jest must transform too.
     "@ai-sdk/gateway",
     "@workflow/serde",
+    "@shadcn/helpers",
+    "@shadcn/react",
   ],
   images: {
     remotePatterns: getRemotePatterns(),

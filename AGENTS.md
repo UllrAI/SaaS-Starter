@@ -26,6 +26,8 @@ pnpm type-check
 pnpm test
 pnpm test:watch
 pnpm test:coverage
+pnpm test:e2e
+pnpm test:e2e:headed
 pnpm analyze
 pnpm analyze:dev
 pnpm prettier:check
@@ -193,6 +195,13 @@ pnpm stripe:sync-products
   - `pnpm lint`
   - `pnpm type-check`
 - Run `pnpm test` when logic, state handling, routing, validation, billing, auth, or i18n behavior changes.
+- Run `pnpm test:e2e` before opening or updating a PR when user-visible flows,
+  persisted UI state, authentication, routing, or behavior already covered by
+  Playwright changes. Update affected E2E assertions in the same commit as the
+  behavior change.
+- E2E runs must use a dedicated database selected through `E2E_DATABASE_URL`;
+  its database name must contain `e2e` or `test`. Never point E2E at a
+  development, staging, or production database.
 - Run `pnpm build` when changing app structure, configuration, localization behavior, or anything that could affect production compilation.
 - Do not mark work complete without reporting what was verified and what was not.
 

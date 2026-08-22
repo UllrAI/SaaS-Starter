@@ -310,7 +310,7 @@ export function UserManagementTable({
                   <SelectTrigger className="col-span-3">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent position="popper">
                     {userRoleEnum.enumValues.map((role) => (
                       <SelectItem key={role} value={role}>
                         <RoleLabel role={role as UserRole} />

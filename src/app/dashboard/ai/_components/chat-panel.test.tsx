@@ -254,7 +254,7 @@ describe("ChatPanel", () => {
       <ChatPanel
         {...handlers}
         messages={[message]}
-        input=""
+        input="another question"
         status="ready"
         reasoningEffort="medium"
         canvasCount={0}
@@ -277,6 +277,9 @@ describe("ChatPanel", () => {
     // Only the oldest request is answerable; the second one queues behind it.
     expect(screen.getByText("Waiting for the request above.")).toBeVisible();
     expect(screen.getAllByRole("button", { name: "Allow" })).toHaveLength(1);
+    // A new turn would slice past the paused tool call, so sending is blocked
+    // until the approval is answered.
+    expect(screen.getByRole("button", { name: "Send" })).toBeDisabled();
 
     fireEvent.click(screen.getByRole("button", { name: "Don't allow" }));
 
@@ -284,6 +287,46 @@ describe("ChatPanel", () => {
       "approval-1",
       false,
     );
+  });
+
+  it("reports a refusal before the server confirms it", () => {
+    // A refused call sits in `approval-responded` until the stream echoes
+    // `output-denied`; showing a spinner there would claim the opposite.
+    const message: AiMessage = {
+      id: "assistant-denied",
+      role: "assistant",
+      parts: [
+        {
+          type: "tool-saveDocument",
+          toolCallId: "call-1",
+          state: "approval-responded",
+          input: { fileName: "launch-plan.md", content: "# Launch plan" },
+          approval: { id: "approval-1", approved: false },
+        },
+      ],
+    };
+
+    render(
+      <ChatPanel
+        {...handlers}
+        messages={[message]}
+        input=""
+        status="ready"
+        reasoningEffort="medium"
+        canvasCount={0}
+        canvasOpen={false}
+        conversationLoading={false}
+        imageAttachments={[]}
+        imageUploadsEnabled={false}
+        imageUploadError={false}
+        canAddImage={false}
+        onInputChange={jest.fn()}
+        onSubmit={jest.fn()}
+      />,
+    );
+
+    expect(screen.getByText("Skipped saveDocument")).toBeVisible();
+    expect(screen.queryByText("Running saveDocument…")).toBeNull();
   });
 
   it("does not submit Enter while an IME composition is active", () => {

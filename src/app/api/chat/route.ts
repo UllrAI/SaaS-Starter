@@ -5,6 +5,7 @@ import {
   createAgentUIStreamResponse,
   generateId,
   validateUIMessages,
+  type LanguageModelUsage,
 } from "ai";
 import { createAgent, isAgentId } from "@/lib/ai/agents";
 import {
@@ -27,6 +28,11 @@ import {
   createResponseHandle,
   readResponseHandle,
 } from "@/lib/ai/response-chain";
+import {
+  AI_MODEL_UNREPORTED,
+  extractUsageTotals,
+  recordAiUsageEvent,
+} from "@/lib/ai/usage";
 import { getAuthSessionFromHeaders } from "@/lib/auth/session";
 import { SITE_CONFIG } from "@/lib/config/site";
 import {
@@ -195,6 +201,13 @@ export async function POST(request: NextRequest) {
   }
 
   try {
+    // `onEnd` carries `finishReason` but no token counts, so the metadata
+    // callback captures what it lacks: `finish` reports the turn total and
+    // `finish-step` the model that actually served it.
+    const startedAt = Date.now();
+    let usage: LanguageModelUsage | undefined;
+    let responseModelId: string | undefined;
+
     const response = await createAgentUIStreamResponse({
       agent,
       uiMessages: validatedMessages,
@@ -207,7 +220,7 @@ export async function POST(request: NextRequest) {
             console.error("AI chat background stream error:", error);
           },
         }),
-      onEnd: async ({ responseMessage }) => {
+      onEnd: async ({ responseMessage, finishReason }) => {
         const message = await persistGeneratedImages({
           message: responseMessage as AiMessage,
           userId: session.user.id,
@@ -217,16 +230,41 @@ export async function POST(request: NextRequest) {
           userId: session.user.id,
           messages: [message],
         });
+
+        // Accounting must never cost the user their reply.
+        try {
+          await recordAiUsageEvent({
+            userId: session.user.id,
+            conversationId: parsed.data.conversationId,
+            messageId: message.id,
+            agentId: parsed.data.agentId,
+            // The turn total spans every step. Attributing it to one model id
+            // holds only while a single chat model serves the whole loop; per-
+            // step model selection would need per-step rows instead.
+            model: responseModelId ?? AI_MODEL_UNREPORTED,
+            reasoningEffort: parsed.data.reasoningEffort,
+            finishReason,
+            durationMs: Date.now() - startedAt,
+            ...extractUsageTotals(usage),
+          });
+        } catch (error) {
+          console.error("AI chat usage could not be recorded:", error);
+        }
       },
-      messageMetadata: ({ part }) =>
-        part.type === "finish-step"
-          ? {
-              responseHandle: createResponseHandle(
-                part.response.id,
-                session.user.id,
-              ),
-            }
-          : undefined,
+      messageMetadata: ({ part }) => {
+        if (part.type === "finish") {
+          usage = part.totalUsage;
+          return undefined;
+        }
+        if (part.type !== "finish-step") return undefined;
+        responseModelId = part.response.modelId;
+        return {
+          responseHandle: createResponseHandle(
+            part.response.id,
+            session.user.id,
+          ),
+        };
+      },
       onError: (error) => {
         console.error("AI chat stream error:", error);
         // Keep provider error details out of the client stream.

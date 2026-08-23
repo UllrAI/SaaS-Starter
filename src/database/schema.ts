@@ -391,6 +391,48 @@ export const aiMessages = pgTable(
   }),
 );
 
+/**
+ * One row per completed assistant turn. Token columns stay nullable because a
+ * provider may omit any of them; storing 0 for "unknown" would silently
+ * understate cost once these rows drive billing or quota decisions.
+ */
+export const aiUsageEvents = pgTable(
+  "ai_usage_events",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    conversationId: uuid("conversationId")
+      .notNull()
+      .references(() => aiConversations.id, { onDelete: "cascade" }),
+    messageId: text("messageId").notNull(),
+    agentId: text("agentId").notNull(),
+    model: text("model").notNull(),
+    reasoningEffort: text("reasoningEffort").notNull(),
+    inputTokens: integer("inputTokens"),
+    cacheReadTokens: integer("cacheReadTokens"),
+    cacheWriteTokens: integer("cacheWriteTokens"),
+    outputTokens: integer("outputTokens"),
+    reasoningTokens: integer("reasoningTokens"),
+    totalTokens: integer("totalTokens"),
+    finishReason: text("finishReason"),
+    durationMs: integer("durationMs"),
+    createdAt: timestamp("createdAt", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => ({
+    userCreatedAtIdx: index("ai_usage_events_userId_createdAt_idx").on(
+      table.userId,
+      table.createdAt.desc(),
+    ),
+    conversationIdx: index("ai_usage_events_conversationId_idx").on(
+      table.conversationId,
+    ),
+  }),
+);
+
 export const taskRuns = pgTable(
   "task_runs",
   {

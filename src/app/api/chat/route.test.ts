@@ -13,6 +13,8 @@ const mockRequireAiConversation = jest.fn();
 const mockRequireOwnedAiImageAttachments = jest.fn();
 const mockSaveAiMessages = jest.fn();
 const mockPersistGeneratedImages = jest.fn();
+const mockExtractUsageTotals = jest.fn();
+const mockRecordAiUsageEvent = jest.fn();
 
 const siteConfig = {
   features: { emailAuth: true, billing: true, uploads: true, ai: true },
@@ -68,6 +70,12 @@ jest.mock("@/lib/ai/generated-image-storage", () => ({
   persistGeneratedImages: mockPersistGeneratedImages,
 }));
 
+jest.mock("@/lib/ai/usage", () => ({
+  AI_MODEL_UNREPORTED: "unreported",
+  extractUsageTotals: mockExtractUsageTotals,
+  recordAiUsageEvent: mockRecordAiUsageEvent,
+}));
+
 const session = {
   user: {
     id: "user-1",
@@ -118,6 +126,12 @@ describe("/api/chat", () => {
     mockPersistGeneratedImages.mockImplementation(
       ({ message }: { message: unknown }) => Promise.resolve(message),
     );
+    mockExtractUsageTotals.mockReturnValue({
+      inputTokens: 11,
+      outputTokens: 22,
+      totalTokens: 33,
+    });
+    mockRecordAiUsageEvent.mockResolvedValue(undefined);
     mockCreateAgentUIStreamResponse.mockResolvedValue(
       new Response("stream", { status: 200 }),
     );
@@ -329,6 +343,94 @@ describe("/api/chat", () => {
       userId: "user-1",
       messages: [responseMessage],
     });
+  });
+
+  it("records token usage for a completed turn", async () => {
+    await postChat();
+
+    const [streamArgs] = mockCreateAgentUIStreamResponse.mock.calls[0] as [
+      {
+        messageMetadata: (options: { part: unknown }) => unknown;
+        onEnd: (options: {
+          responseMessage: unknown;
+          finishReason: string;
+        }) => Promise<void>;
+      },
+    ];
+    const totalUsage = { inputTokens: 11, outputTokens: 22, totalTokens: 33 };
+
+    // The model is reported per step, the totals only on the final part.
+    streamArgs.messageMetadata({
+      part: {
+        type: "finish-step",
+        response: { id: "resp_new", modelId: "gpt-5.6-luna" },
+      },
+    });
+    streamArgs.messageMetadata({ part: { type: "finish", totalUsage } });
+    await streamArgs.onEnd({
+      responseMessage: { id: "assistant-1", role: "assistant", parts: [] },
+      finishReason: "stop",
+    });
+
+    expect(mockExtractUsageTotals).toHaveBeenCalledWith(totalUsage);
+    expect(mockRecordAiUsageEvent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        userId: "user-1",
+        conversationId,
+        messageId: "assistant-1",
+        agentId: "assistant",
+        model: "gpt-5.6-luna",
+        reasoningEffort: "low",
+        finishReason: "stop",
+        inputTokens: 11,
+        outputTokens: 22,
+        totalTokens: 33,
+      }),
+    );
+  });
+
+  it("falls back to a sentinel when the provider reports no model", async () => {
+    await postChat();
+
+    const [streamArgs] = mockCreateAgentUIStreamResponse.mock.calls[0] as [
+      {
+        onEnd: (options: {
+          responseMessage: unknown;
+          finishReason: string;
+        }) => Promise<void>;
+      },
+    ];
+    // Unattributable spend must stay visible in aggregates, not vanish.
+    await streamArgs.onEnd({
+      responseMessage: { id: "assistant-1", role: "assistant", parts: [] },
+      finishReason: "stop",
+    });
+
+    expect(mockRecordAiUsageEvent).toHaveBeenCalledWith(
+      expect.objectContaining({ model: "unreported" }),
+    );
+  });
+
+  it("does not fail the turn when usage accounting throws", async () => {
+    mockRecordAiUsageEvent.mockRejectedValue(new Error("usage insert failed"));
+    await postChat();
+
+    const [streamArgs] = mockCreateAgentUIStreamResponse.mock.calls[0] as [
+      {
+        onEnd: (options: {
+          responseMessage: unknown;
+          finishReason: string;
+        }) => Promise<void>;
+      },
+    ];
+
+    await expect(
+      streamArgs.onEnd({
+        responseMessage: { id: "assistant-1", role: "assistant", parts: [] },
+        finishReason: "stop",
+      }),
+    ).resolves.toBeUndefined();
+    expect(mockSaveAiMessages).toHaveBeenCalled();
   });
 
   it("keeps consuming the response when the browser disconnects", async () => {

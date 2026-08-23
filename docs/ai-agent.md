@@ -17,6 +17,7 @@ src/lib/ai/
 ├── chat-attachments.ts    # Ownership and media validation for reference images
 ├── generated-image-storage.ts # Generated-image persistence through R2
 ├── response-chain.ts      # User-bound signed handles for previous_response_id
+├── usage.ts               # Per-turn token accounting into ai_usage_events
 ├── context.ts             # AgentContext: per-request session data for tools
 ├── tools/                 # One file per tool
 │   ├── index.ts           # Tool registry: name → factory, plus buildTools()
@@ -208,6 +209,28 @@ The dashboard page at `/dashboard/ai` follows the AI Elements conversation, reas
 prompt-input, tool-status, and artifact patterns while reusing this repository's shadcn primitives
 and design tokens. Wide desktop layouts add persistent history beside the split Chat + Canvas
 workspace; narrower screens open history and Canvas in independent full-height sheets.
+
+## Usage accounting
+
+Every completed assistant turn writes one `ai_usage_events` row: the user, conversation, message,
+agent, model, reasoning effort, token counts, finish reason, and duration. This is the data layer
+for cost attribution, quotas, and usage-based billing — request-count rate limiting cannot express
+that a `high` reasoning turn with image generation costs orders of magnitude more than a lookup.
+
+Two details are easy to get wrong:
+
+- **Usage does not reach `onEnd`.** The AI SDK's stream-end event carries no token counts. They
+  arrive on stream parts, so `src/app/api/chat/route.ts` captures `totalUsage` from the `finish`
+  part and `response.modelId` from `finish-step` into closure variables, then writes one row from
+  `onEnd`. Do not put usage into the `messageMetadata` return value — that is sent to the client.
+- **Aborted turns still cost money.** Tokens spent before a client disconnects are billed, so
+  those turns are recorded too, flagged with `aborted`. Dropping them understates cost precisely
+  where runs are most expensive.
+
+Token columns are nullable throughout. A provider that reports no cache tokens is not the same as
+one reporting zero, and `extractUsageTotals` in `src/lib/ai/usage.ts` preserves that distinction
+rather than defaulting to `0`. Accounting failures are logged and swallowed: a bookkeeping error
+must never cost the user their reply.
 
 ## Testing
 

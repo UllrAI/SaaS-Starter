@@ -10,6 +10,7 @@ This file is the single source of truth for repository-specific agent instructio
 - Check existing patterns before adding new abstractions.
 - Keep user-visible behavior complete. Do not leave mock data, placeholder flows, or half-finished paths.
 - When documentation in this file conflicts with the codebase, verify the codebase and update the documentation to match reality.
+- Read `docs/lessons-learned.md` before non-trivial work. It records counter-intuitive failures this repository has actually hit, which is exactly where prior knowledge tends to be wrong. Add an entry whenever you lose time to a surprise.
 
 ## 2. Development Commands
 

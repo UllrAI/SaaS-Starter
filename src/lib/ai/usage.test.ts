@@ -81,9 +81,9 @@ describe("extractUsageTotals", () => {
     ).toMatchObject({ inputTokens: undefined, outputTokens: undefined });
   });
 
-  it("normalizes fractional and negative counts", () => {
+  it("normalizes fractional counts and rejects negative ones", () => {
     expect(
       extractUsageTotals(usage({ inputTokens: 10.6, outputTokens: -5 })),
-    ).toMatchObject({ inputTokens: 11, outputTokens: 0 });
+    ).toMatchObject({ inputTokens: 11, outputTokens: undefined });
   });
 });

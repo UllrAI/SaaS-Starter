@@ -417,7 +417,6 @@ export const aiUsageEvents = pgTable(
     reasoningTokens: integer("reasoningTokens"),
     totalTokens: integer("totalTokens"),
     finishReason: text("finishReason"),
-    aborted: boolean("aborted").notNull().default(false),
     durationMs: integer("durationMs"),
     createdAt: timestamp("createdAt", { withTimezone: true })
       .notNull()

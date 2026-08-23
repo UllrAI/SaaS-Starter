@@ -1,5 +1,5 @@
 {
-  "id": "c866b4b8-6849-4a11-babf-276e074a78bb",
+  "id": "0febbc88-2fa4-4bdb-8d6e-f0eced542f89",
   "prevId": "ad016ade-bb42-4481-b904-812eca09019c",
   "version": "7",
   "dialect": "postgresql",
@@ -392,13 +392,6 @@
           "type": "text",
           "primaryKey": false,
           "notNull": false
-        },
-        "aborted": {
-          "name": "aborted",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "default": false
         },
         "durationMs": {
           "name": "durationMs",

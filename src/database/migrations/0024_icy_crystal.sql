@@ -13,7 +13,6 @@ CREATE TABLE "ai_usage_events" (
 	"reasoningTokens" integer,
 	"totalTokens" integer,
 	"finishReason" text,
-	"aborted" boolean DEFAULT false NOT NULL,
 	"durationMs" integer,
 	"createdAt" timestamp with time zone DEFAULT now() NOT NULL
 );

@@ -324,10 +324,7 @@ describe("/api/chat", () => {
 
     const [streamArgs] = mockCreateAgentUIStreamResponse.mock.calls[0] as [
       {
-        onEnd: (options: {
-          responseMessage: unknown;
-          isAborted: boolean;
-        }) => Promise<void>;
+        onEnd: (options: { responseMessage: unknown }) => Promise<void>;
       },
     ];
     const responseMessage = {
@@ -335,7 +332,7 @@ describe("/api/chat", () => {
       role: "assistant",
       parts: [{ type: "text", text: "Hello" }],
     };
-    await streamArgs.onEnd({ responseMessage, isAborted: false });
+    await streamArgs.onEnd({ responseMessage });
 
     expect(mockPersistGeneratedImages).toHaveBeenCalledWith({
       message: responseMessage,
@@ -356,7 +353,7 @@ describe("/api/chat", () => {
         messageMetadata: (options: { part: unknown }) => unknown;
         onEnd: (options: {
           responseMessage: unknown;
-          isAborted: boolean;
+          finishReason: string;
         }) => Promise<void>;
       },
     ];
@@ -369,12 +366,10 @@ describe("/api/chat", () => {
         response: { id: "resp_new", modelId: "gpt-5.6-luna" },
       },
     });
-    streamArgs.messageMetadata({
-      part: { type: "finish", totalUsage, finishReason: "stop" },
-    });
+    streamArgs.messageMetadata({ part: { type: "finish", totalUsage } });
     await streamArgs.onEnd({
       responseMessage: { id: "assistant-1", role: "assistant", parts: [] },
-      isAborted: false,
+      finishReason: "stop",
     });
 
     expect(mockExtractUsageTotals).toHaveBeenCalledWith(totalUsage);
@@ -387,7 +382,6 @@ describe("/api/chat", () => {
         model: "gpt-5.6-luna",
         reasoningEffort: "low",
         finishReason: "stop",
-        aborted: false,
         inputTokens: 11,
         outputTokens: 22,
         totalTokens: 33,
@@ -395,26 +389,25 @@ describe("/api/chat", () => {
     );
   });
 
-  it("still records usage when the turn was aborted", async () => {
+  it("falls back to a sentinel when the provider reports no model", async () => {
     await postChat();
 
     const [streamArgs] = mockCreateAgentUIStreamResponse.mock.calls[0] as [
       {
         onEnd: (options: {
           responseMessage: unknown;
-          isAborted: boolean;
+          finishReason: string;
         }) => Promise<void>;
       },
     ];
-    // Tokens are spent whether or not the client stayed connected; skipping
-    // aborted turns would understate cost.
+    // Unattributable spend must stay visible in aggregates, not vanish.
     await streamArgs.onEnd({
       responseMessage: { id: "assistant-1", role: "assistant", parts: [] },
-      isAborted: true,
+      finishReason: "stop",
     });
 
     expect(mockRecordAiUsageEvent).toHaveBeenCalledWith(
-      expect.objectContaining({ aborted: true, model: "unreported" }),
+      expect.objectContaining({ model: "unreported" }),
     );
   });
 
@@ -426,7 +419,7 @@ describe("/api/chat", () => {
       {
         onEnd: (options: {
           responseMessage: unknown;
-          isAborted: boolean;
+          finishReason: string;
         }) => Promise<void>;
       },
     ];
@@ -434,7 +427,7 @@ describe("/api/chat", () => {
     await expect(
       streamArgs.onEnd({
         responseMessage: { id: "assistant-1", role: "assistant", parts: [] },
-        isAborted: false,
+        finishReason: "stop",
       }),
     ).resolves.toBeUndefined();
     expect(mockSaveAiMessages).toHaveBeenCalled();

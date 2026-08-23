@@ -201,12 +201,11 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    // `onEnd` does not carry usage, so the metadata callback captures it here:
-    // `finish` reports the turn total and `finish-step` the model that actually
-    // served it. Both are read back once the stream ends.
+    // `onEnd` carries `finishReason` but no token counts, so the metadata
+    // callback captures what it lacks: `finish` reports the turn total and
+    // `finish-step` the model that actually served it.
     const startedAt = Date.now();
     let usage: LanguageModelUsage | undefined;
-    let finishReason: string | undefined;
     let responseModelId: string | undefined;
 
     const response = await createAgentUIStreamResponse({
@@ -221,7 +220,7 @@ export async function POST(request: NextRequest) {
             console.error("AI chat background stream error:", error);
           },
         }),
-      onEnd: async ({ responseMessage, isAborted }) => {
+      onEnd: async ({ responseMessage, finishReason }) => {
         const message = await persistGeneratedImages({
           message: responseMessage as AiMessage,
           userId: session.user.id,
@@ -232,19 +231,19 @@ export async function POST(request: NextRequest) {
           messages: [message],
         });
 
-        // Accounting must never cost the user their reply. Tokens are spent
-        // even on an aborted turn, so those are recorded too: skipping them
-        // would understate cost exactly when a run is most expensive.
+        // Accounting must never cost the user their reply.
         try {
           await recordAiUsageEvent({
             userId: session.user.id,
             conversationId: parsed.data.conversationId,
             messageId: message.id,
             agentId: parsed.data.agentId,
+            // The turn total spans every step. Attributing it to one model id
+            // holds only while a single chat model serves the whole loop; per-
+            // step model selection would need per-step rows instead.
             model: responseModelId ?? AI_MODEL_UNREPORTED,
             reasoningEffort: parsed.data.reasoningEffort,
             finishReason,
-            aborted: isAborted,
             durationMs: Date.now() - startedAt,
             ...extractUsageTotals(usage),
           });
@@ -255,7 +254,6 @@ export async function POST(request: NextRequest) {
       messageMetadata: ({ part }) => {
         if (part.type === "finish") {
           usage = part.totalUsage;
-          finishReason = part.finishReason;
           return undefined;
         }
         if (part.type !== "finish-step") return undefined;

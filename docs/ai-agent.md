@@ -215,22 +215,29 @@ workspace; narrower screens open history and Canvas in independent full-height s
 Every completed assistant turn writes one `ai_usage_events` row: the user, conversation, message,
 agent, model, reasoning effort, token counts, finish reason, and duration. This is the data layer
 for cost attribution, quotas, and usage-based billing — request-count rate limiting cannot express
-that a `high` reasoning turn with image generation costs orders of magnitude more than a lookup.
+that a `high` reasoning turn costs far more than a lookup.
 
 Two details are easy to get wrong:
 
-- **Usage does not reach `onEnd`.** The AI SDK's stream-end event carries no token counts. They
-  arrive on stream parts, so `src/app/api/chat/route.ts` captures `totalUsage` from the `finish`
-  part and `response.modelId` from `finish-step` into closure variables, then writes one row from
-  `onEnd`. Do not put usage into the `messageMetadata` return value — that is sent to the client.
-- **Aborted turns still cost money.** Tokens spent before a client disconnects are billed, so
-  those turns are recorded too, flagged with `aborted`. Dropping them understates cost precisely
-  where runs are most expensive.
+- **Usage does not reach `onEnd`.** The AI SDK's stream-end event carries `finishReason` but no
+  token counts. Those arrive on stream parts, so `src/app/api/chat/route.ts` captures `totalUsage`
+  from the `finish` part and `response.modelId` from `finish-step` into closure variables, then
+  writes one row from `onEnd`. Do not put usage into the `messageMetadata` return value — that is
+  sent to the client.
+- **The row counts language-model tokens only.** `generateImage` runs as a provider-executed tool,
+  and its image tokens never appear in `LanguageModelUsage`. Image spend is billed but not captured
+  here; costing that feature needs a separate source.
+
+The `model` column records the model that served the final step. That is accurate only while a
+single chat model serves the whole loop, which is today's configuration; introducing per-step model
+selection would require per-step rows instead of one row per turn.
 
 Token columns are nullable throughout. A provider that reports no cache tokens is not the same as
 one reporting zero, and `extractUsageTotals` in `src/lib/ai/usage.ts` preserves that distinction
 rather than defaulting to `0`. Accounting failures are logged and swallowed: a bookkeeping error
-must never cost the user their reply.
+must never cost the user their reply. `messageId` carries no foreign key, and regenerating a turn
+overwrites the message row while leaving a usage row per attempt — sum by user or conversation, not
+by message.
 
 ## Testing
 

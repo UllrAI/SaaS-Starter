@@ -35,14 +35,17 @@ export interface AiUsageEventInput extends AiUsageTotals {
   model: string;
   reasoningEffort: ReasoningEffort;
   finishReason?: string;
-  aborted: boolean;
   durationMs?: number;
 }
 
-/** Keeps a non-finite value (NaN, Infinity) from reaching an integer column. */
+/**
+ * Rejects anything an integer token column cannot honestly hold. A negative or
+ * non-finite count is corrupt rather than zero, and this module treats absent
+ * as absent — see `AiUsageTotals` for why 0 is not a safe stand-in.
+ */
 function toTokenCount(value: number | undefined): number | undefined {
-  return typeof value === "number" && Number.isFinite(value)
-    ? Math.max(0, Math.round(value))
+  return typeof value === "number" && Number.isFinite(value) && value >= 0
+    ? Math.round(value)
     : undefined;
 }
 
@@ -77,7 +80,6 @@ export async function recordAiUsageEvent(
     reasoningTokens: event.reasoningTokens,
     totalTokens: event.totalTokens,
     finishReason: event.finishReason,
-    aborted: event.aborted,
     durationMs: event.durationMs,
   });
 }

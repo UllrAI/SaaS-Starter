@@ -1,11 +1,13 @@
 import "server-only";
 import { ToolLoopAgent, isStepCount } from "ai";
 import { APP_NAME } from "@/lib/config/constants";
+import { SITE_CONFIG } from "@/lib/config/site";
 import type { AgentContext } from "../context";
 import type { GptImage1kSize } from "../image-size";
 import { getChatModel, getImageGenerationTool } from "../models";
 import type { ReasoningEffort } from "../reasoning";
 import { agentSkills, composeSkills } from "../skills";
+import { withToolApprovalSecret } from "../tool-approval";
 import { buildTools, type AgentToolName } from "../tools";
 
 const MAX_AGENT_STEPS = 10;
@@ -41,24 +43,29 @@ export function createAssistantAgent(
   context: AgentContext,
   options: AssistantAgentOptions,
 ) {
-  const { instructions, toolNames } = composeSkills(ASSISTANT_SKILLS);
+  const skills = SITE_CONFIG.features.uploads
+    ? [...ASSISTANT_SKILLS, agentSkills.documentStorage]
+    : ASSISTANT_SKILLS;
+  const { instructions, toolNames } = composeSkills(skills);
   const tools = {
     ...buildTools([...ASSISTANT_TOOLS, ...toolNames], context),
     generateImage: getImageGenerationTool(options.imageSize),
   };
 
-  return new ToolLoopAgent({
-    model: getChatModel(),
-    reasoning: options.reasoningEffort,
-    instructions: buildInstructions(context, instructions),
-    tools,
-    providerOptions: {
-      openai: {
-        maxToolCalls: 1,
-        previousResponseId: options.previousResponseId,
-        store: true,
+  return new ToolLoopAgent(
+    withToolApprovalSecret({
+      model: getChatModel(),
+      reasoning: options.reasoningEffort,
+      instructions: buildInstructions(context, instructions),
+      tools,
+      providerOptions: {
+        openai: {
+          maxToolCalls: 1,
+          previousResponseId: options.previousResponseId,
+          store: true,
+        },
       },
-    },
-    stopWhen: isStepCount(MAX_AGENT_STEPS),
-  });
+      stopWhen: isStepCount(MAX_AGENT_STEPS),
+    }),
+  );
 }

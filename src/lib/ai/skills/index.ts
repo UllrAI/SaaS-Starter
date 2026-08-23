@@ -1,4 +1,5 @@
 import { accountSupportSkill } from "./account-support";
+import { documentStorageSkill } from "./document-storage";
 import { knowledgeBaseSkill } from "./knowledge-base";
 import type { AgentSkill } from "./types";
 
@@ -6,6 +7,7 @@ import type { AgentSkill } from "./types";
 export const agentSkills = {
   accountSupport: accountSupportSkill,
   knowledgeBase: knowledgeBaseSkill,
+  documentStorage: documentStorageSkill,
 } satisfies Record<string, AgentSkill>;
 
 export { composeSkills } from "./compose";

@@ -305,6 +305,127 @@ test("keeps the current turn anchored while streaming", async ({ page }) => {
     .toBe(0);
 });
 
+test("asks before running a write tool and resumes once approved", async ({
+  page,
+}) => {
+  await loginAs(page, "user");
+
+  // The pause and the resume are two separate turns, so the stub answers by
+  // request order rather than by prompt.
+  const approvalChunks = [
+    { type: "start" },
+    { type: "start-step" },
+    {
+      type: "tool-input-available",
+      toolCallId: "call-1",
+      toolName: "saveDocument",
+      input: { fileName: "launch-plan.md", content: "# Launch plan" },
+    },
+    {
+      type: "tool-approval-request",
+      approvalId: "approval-1",
+      toolCallId: "call-1",
+      signature: "e2e-signature",
+    },
+    { type: "finish-step" },
+    { type: "finish" },
+  ].map((chunk) => JSON.stringify(chunk));
+  const resumeChunks = [
+    { type: "start", messageId: "assistant-approval" },
+    {
+      type: "tool-output-available",
+      toolCallId: "call-1",
+      output: { fileName: "launch-plan.md", fileSize: 13, url: "https://x/y" },
+    },
+    { type: "start-step" },
+    { type: "text-start", id: "t1" },
+    { type: "text-delta", id: "t1", delta: "Saved launch-plan.md." },
+    { type: "text-end", id: "t1" },
+    { type: "finish-step" },
+    { type: "finish" },
+  ].map((chunk) => JSON.stringify(chunk));
+
+  await page.addInitScript(
+    ({ approvalChunks, resumeChunks }) => {
+      const originalFetch = window.fetch.bind(window);
+      const requestBodies: string[] = [];
+      (
+        window as unknown as { __chatRequestBodies: string[] }
+      ).__chatRequestBodies = requestBodies;
+
+      window.fetch = async (input, init) => {
+        const requestUrl = new URL(
+          typeof input === "string"
+            ? input
+            : input instanceof URL
+              ? input.href
+              : input.url,
+          window.location.href,
+        );
+        if (requestUrl.pathname !== "/api/chat") {
+          return originalFetch(input, init);
+        }
+
+        const rawBody =
+          typeof init?.body === "string"
+            ? init.body
+            : input instanceof Request
+              ? await input.clone().text()
+              : "{}";
+        requestBodies.push(rawBody);
+        const chunks =
+          requestBodies.length === 1 ? approvalChunks : resumeChunks;
+
+        const encoder = new TextEncoder();
+        return new Response(
+          new ReadableStream({
+            start(controller) {
+              chunks.forEach((chunk) => {
+                controller.enqueue(encoder.encode(`data: ${chunk}\n\n`));
+              });
+              controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+              controller.close();
+            },
+          }),
+          {
+            headers: {
+              "content-type": "text/event-stream",
+              "x-vercel-ai-ui-message-stream": "v1",
+            },
+          },
+        );
+      };
+    },
+    { approvalChunks, resumeChunks },
+  );
+
+  await page.goto("/dashboard/ai");
+  await page
+    .getByPlaceholder(/Ask, draft, or create/)
+    .fill("Save the launch plan");
+  await page.getByRole("button", { name: "Send" }).click();
+
+  await expect(page.getByText("Permission needed")).toBeVisible();
+  await expect(
+    page.getByText(
+      'The assistant wants to run saveDocument on "launch-plan.md". This changes your data.',
+    ),
+  ).toBeVisible();
+
+  await page.getByRole("button", { name: "Allow", exact: true }).click();
+
+  await expect(page.getByText("Saved launch-plan.md.")).toBeVisible();
+  const secondBody = await page.evaluate(
+    () =>
+      (window as unknown as { __chatRequestBodies: string[] })
+        .__chatRequestBodies[1],
+  );
+  // The resume must carry the granted approval; without it the server would
+  // refuse to run the tool.
+  expect(secondBody).toContain('"state":"approval-responded"');
+  expect(secondBody).toContain('"approved":true');
+});
+
 test("uploads a reference image and enables an image-only message", async ({
   page,
 }) => {

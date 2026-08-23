@@ -11,6 +11,7 @@ import {
   Maximize2,
   PanelRightOpen,
   Send,
+  ShieldQuestionMark,
   Sparkles,
   Square,
   Plus,
@@ -61,6 +62,7 @@ import {
 } from "@/lib/ai/image-input";
 import { useTranslation } from "@/lib/i18n/translation/client";
 import { cn } from "@/lib/utils";
+import { findActiveToolApprovalId } from "./tool-approval";
 
 interface ChatPanelProps {
   conversationId?: string;
@@ -90,6 +92,7 @@ interface ChatPanelProps {
   onNewConversation: () => void;
   onOpenMessage: (message: AiMessage) => void;
   onOpenArtifact: (id: string) => void;
+  onRespondToApproval: (approvalId: string, approved: boolean) => void;
   className?: string;
 }
 
@@ -320,14 +323,123 @@ function ToolCallRow({
   );
 }
 
+/** The tool states that carry an `approval` object. */
+type ApprovalToolUIPart = Extract<
+  ToolUIPart | DynamicToolUIPart,
+  { state: "approval-requested" | "approval-responded" | "output-denied" }
+>;
+
+function ToolApprovalCard({
+  part,
+  isActive,
+  disabled,
+  onRespond,
+}: {
+  part: ApprovalToolUIPart;
+  isActive: boolean;
+  disabled: boolean;
+  onRespond: (approvalId: string, approved: boolean) => void;
+}) {
+  const { t } = useTranslation();
+  const name = getToolOrDynamicToolName(part);
+  // Every approval-gated tool so far names the resource it would create. Show
+  // that instead of the raw input: the point of the card is that the user can
+  // tell what is about to happen without reading JSON.
+  const target =
+    part.input && typeof part.input === "object" && "fileName" in part.input
+      ? String((part.input as { fileName: unknown }).fileName)
+      : undefined;
+
+  if (part.state === "approval-requested") {
+    return (
+      <div
+        role="group"
+        aria-label={t("ai_chat_tool_approval_title")}
+        className="bg-muted/40 my-2 min-w-0 border px-3 py-2.5 text-sm"
+      >
+        <div className="flex min-w-0 items-start gap-2.5">
+          <ShieldQuestionMark className="text-muted-foreground mt-0.5 size-4 shrink-0" />
+          <div className="min-w-0 flex-1">
+            <p className="font-medium">{t("ai_chat_tool_approval_title")}</p>
+            <p className="text-muted-foreground mt-0.5 [overflow-wrap:anywhere]">
+              {target
+                ? t("ai_chat_tool_approval_target", { name, target })
+                : t("ai_chat_tool_approval_description", { name })}
+            </p>
+          </div>
+        </div>
+        {isActive ? (
+          <div className="mt-2.5 flex flex-wrap gap-2 pl-6.5">
+            <Button
+              type="button"
+              size="sm"
+              disabled={disabled}
+              onClick={() => onRespond(part.approval.id, true)}
+            >
+              {t("ai_chat_tool_approval_allow")}
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              disabled={disabled}
+              onClick={() => onRespond(part.approval.id, false)}
+            >
+              {t("ai_chat_tool_approval_deny")}
+            </Button>
+          </div>
+        ) : (
+          <p className="text-muted-foreground mt-2 pl-6.5 text-xs">
+            {t("ai_chat_tool_approval_queued")}
+          </p>
+        )}
+      </div>
+    );
+  }
+
+  // A refusal stays in `approval-responded` until the server echoes back
+  // `output-denied`, so this branch reads the answer rather than the state.
+  if (part.state === "output-denied" || !part.approval.approved) {
+    return (
+      <div
+        role="status"
+        className="text-muted-foreground my-1 flex w-fit max-w-full min-w-0 items-center gap-2 py-1 text-xs"
+      >
+        <Wrench className="size-3.5" />
+        <span className="min-w-0 [overflow-wrap:anywhere]" translate="no">
+          {t("ai_chat_tool_denied", { name })}
+        </span>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      role="status"
+      className="text-muted-foreground my-1 flex w-fit max-w-full min-w-0 items-center gap-2 py-1 text-xs"
+    >
+      <Loader2 className="size-3.5 animate-spin" />
+      <span className="min-w-0 [overflow-wrap:anywhere]" translate="no">
+        {t("ai_chat_tool_running", { name })}
+      </span>
+    </div>
+  );
+}
+
 function AssistantMessage({
   message,
+  activeApprovalId,
+  approvalsDisabled,
   onOpenMessage,
   onOpenArtifact,
+  onRespondToApproval,
 }: {
   message: AiMessage;
+  activeApprovalId?: string;
+  approvalsDisabled: boolean;
   onOpenMessage: (message: AiMessage) => void;
   onOpenArtifact: (id: string) => void;
+  onRespondToApproval: (approvalId: string, approved: boolean) => void;
 }) {
   const { t } = useTranslation();
   const hasText = message.parts.some(
@@ -377,6 +489,21 @@ function AssistantMessage({
           );
         }
         if (isToolUIPart(part)) {
+          if (
+            part.state === "approval-requested" ||
+            part.state === "approval-responded" ||
+            part.state === "output-denied"
+          ) {
+            return (
+              <ToolApprovalCard
+                key={part.toolCallId}
+                part={part}
+                isActive={part.approval.id === activeApprovalId}
+                disabled={approvalsDisabled}
+                onRespond={onRespondToApproval}
+              />
+            );
+          }
           return (
             <ToolCallRow
               key={part.toolCallId}
@@ -452,6 +579,7 @@ export function ChatPanel({
   onNewConversation,
   onOpenMessage,
   onOpenArtifact,
+  onRespondToApproval,
   className,
 }: ChatPanelProps) {
   const { t } = useTranslation();
@@ -466,10 +594,14 @@ export function ChatPanel({
   const hasReadyImage = imageAttachments.some(
     (item) => item.status === "success",
   );
+  const activeApprovalId = findActiveToolApprovalId(messages);
   const canSubmit =
     !isBusy &&
     !conversationLoading &&
     imageAttachmentsReady &&
+    // A new turn would slice past the paused tool call and leave it dangling.
+    // The user answers the pending approval first, either way.
+    !activeApprovalId &&
     (Boolean(input.trim()) || hasReadyImage);
   const suggestions = [
     t("ai_chat_suggestion_product"),
@@ -605,8 +737,11 @@ export function ChatPanel({
                       ) : (
                         <AssistantMessage
                           message={message}
+                          activeApprovalId={activeApprovalId}
+                          approvalsDisabled={isBusy}
                           onOpenMessage={onOpenMessage}
                           onOpenArtifact={onOpenArtifact}
+                          onRespondToApproval={onRespondToApproval}
                         />
                       )}
                     </MessageScrollerItem>

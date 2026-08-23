@@ -4,9 +4,13 @@ import {
   consumeStream,
   createAgentUIStreamResponse,
   generateId,
+  InvalidToolApprovalError,
+  InvalidToolApprovalSignatureError,
+  ToolCallNotFoundForApprovalError,
   validateUIMessages,
   type LanguageModelUsage,
 } from "ai";
+
 import { createAgent, isAgentId } from "@/lib/ai/agents";
 import {
   AiAttachmentValidationError,
@@ -267,6 +271,17 @@ export async function POST(request: NextRequest) {
       },
       onError: (error) => {
         console.error("AI chat stream error:", error);
+        // A tool approval the server never signed, or one pointing at a tool
+        // call that does not exist: the client tampered with the transcript.
+        // The loop already refused to execute the tool; say so without hinting
+        // at what would make the forgery pass.
+        if (
+          error instanceof InvalidToolApprovalSignatureError ||
+          error instanceof InvalidToolApprovalError ||
+          error instanceof ToolCallNotFoundForApprovalError
+        ) {
+          return "That approval could not be verified. Please send the request again.";
+        }
         // Keep provider error details out of the client stream.
         return "The assistant hit an unexpected error. Please try again.";
       },

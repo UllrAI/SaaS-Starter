@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, jest } from "@jest/globals";
+import { InvalidToolApprovalSignatureError } from "ai";
 
 const mockGetAuthSessionFromHeaders = jest.fn();
 const mockCheckRateLimit = jest.fn();
@@ -44,6 +45,9 @@ jest.mock("@/lib/ai/agents", () => ({
 }));
 
 jest.mock("ai", () => ({
+  // The approval error classes are real: `route.ts` branches on `instanceof`,
+  // so a stub would silently disable that branch instead of failing here.
+  ...jest.requireActual<typeof import("ai")>("ai"),
   consumeStream: mockConsumeStream,
   createAgentUIStreamResponse: mockCreateAgentUIStreamResponse,
   generateId: mockGenerateId,
@@ -463,6 +467,25 @@ describe("/api/chat", () => {
 
     expect(message).not.toContain("sk-secret");
     expect(message).toBeTruthy();
+  });
+
+  it("reports a forged tool approval without explaining the check", async () => {
+    await postChat();
+
+    const [streamArgs] = mockCreateAgentUIStreamResponse.mock.calls[0] as [
+      { onError: (error: unknown) => string },
+    ];
+    const message = streamArgs.onError(
+      new InvalidToolApprovalSignatureError({
+        approvalId: "approval-1",
+        toolCallId: "call-1",
+        reason: "signature mismatch",
+      }),
+    );
+
+    expect(message).toBe(
+      "That approval could not be verified. Please send the request again.",
+    );
   });
 
   it("returns 500 when the agent cannot be constructed", async () => {

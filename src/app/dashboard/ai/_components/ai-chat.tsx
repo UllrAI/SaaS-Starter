@@ -10,7 +10,11 @@ import {
   useState,
 } from "react";
 import { useChat } from "@ai-sdk/react";
-import { DefaultChatTransport, type FileUIPart } from "ai";
+import {
+  DefaultChatTransport,
+  lastAssistantMessageIsCompleteWithApprovalResponses,
+  type FileUIPart,
+} from "ai";
 import { useFileUpload } from "@/components/ui/file-upload/use-file-upload";
 import {
   Sheet,
@@ -290,8 +294,10 @@ export function AiChat() {
     error,
     regenerate,
     clearError,
+    addToolApprovalResponse,
   } = useChat<AiMessage>({
     transport,
+    sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithApprovalResponses,
     onFinish: () => {
       void refreshConversationList();
     },
@@ -736,6 +742,19 @@ export function AiChat() {
     openCanvasForCurrentViewport();
   };
 
+  const handleRespondToApproval = (approvalId: string, approved: boolean) => {
+    if (!activeConversationId) return;
+    // The continuation request is fired by `sendAutomaticallyWhen`, so it needs
+    // the same body the transport requires of any other send.
+    void addToolApprovalResponse({
+      id: approvalId,
+      approved,
+      options: {
+        body: { reasoningEffort, conversationId: activeConversationId },
+      },
+    });
+  };
+
   const sidebarProps = {
     conversations,
     activeConversationId,
@@ -811,6 +830,7 @@ export function AiChat() {
           onNewConversation={handleNewConversation}
           onOpenMessage={handleOpenMessage}
           onOpenArtifact={handleOpenArtifact}
+          onRespondToApproval={handleRespondToApproval}
           className="min-w-80 flex-1"
         />
 

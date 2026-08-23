@@ -131,6 +131,43 @@ Every tool is a factory over `AgentContext`, so tools that need no context simpl
 argument. The registry key is the name the model sees, which means each name is defined exactly
 once and two tools can never collide.
 
+## Tools that change data
+
+A tool that creates, updates, or deletes anything must set `needsApproval: true`. The dividing
+line is whether the user could undo it: `presentArtifact` only shows a document, so it runs
+freely; `saveDocument` writes an R2 object and consumes storage quota, so it asks first.
+
+```ts
+export function createSaveDocument(context: AgentContext) {
+  return tool({
+    description: "Save a Markdown document to the user's files.",
+    inputSchema: z.object({ fileName: z.string(), content: z.string() }),
+    needsApproval: true,
+    execute: async ({ fileName, content }) => {
+      /* ... */
+    },
+  });
+}
+```
+
+The tool loop then pauses instead of executing, and the stream emits an approval request the UI
+renders as a confirmation card (`ToolApprovalCard` in
+`src/app/dashboard/ai/_components/chat-panel.tsx`). `useChat`'s `addToolApprovalResponse` records
+the answer and `sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithApprovalResponses`
+resumes the loop.
+
+The approval itself travels through the client, so it is signed. `withToolApprovalSecret` in
+`src/lib/ai/tool-approval.ts` attaches an HMAC key derived from `BETTER_AUTH_SECRET` to every
+agent; the SDK signs each approval request and verifies the response before executing the tool.
+**This is not optional.** When no secret is configured the SDK skips verification entirely, and a
+crafted request body can approve its own tool call — the gate becomes decoration. That failure is
+silent, which is why the secret is derived rather than read from a separate environment variable,
+and why `src/lib/ai/tool-approval.test.ts` asserts that an unsigned approval is rejected.
+
+A denied call ends up in the `output-denied` state and the model is told the user refused, so
+tools should still return a plain result object on business failures (quota exhausted, file too
+large) rather than throwing.
+
 ## Adding a skill
 
 A skill bundles a system-prompt fragment with the tools it needs, so one import gives an agent

@@ -483,11 +483,19 @@ Object.assign(global, {
   TransformStream: WebTransformStream,
 });
 
+// jsdom exposes `crypto` without `subtle`, which the AI SDK needs to sign and
+// verify tool approvals. Node's WebCrypto is the same API.
+if (!global.crypto?.subtle) {
+  Object.defineProperty(global, "crypto", {
+    value: require("node:crypto").webcrypto,
+    configurable: true,
+  });
+}
+
 // Add URL if not present
 if (typeof global.URL === "undefined") {
   global.URL = require("url").URL;
 }
-
 if (typeof global.URLSearchParams === "undefined") {
   global.URLSearchParams = require("url").URLSearchParams;
 }

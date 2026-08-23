@@ -67,4 +67,38 @@ describe("prepareChatRequest", () => {
       responseHandle: "resp_1.signature",
     });
   });
+
+  it("resends the paused turn so an approved tool call can resume", () => {
+    // The pause reports a response handle on the same message that holds the
+    // approval; slicing at that handle would send an empty message list.
+    const pausedAssistant: AiMessage = {
+      id: "a2",
+      role: "assistant",
+      metadata: { responseHandle: "resp_2.signature" },
+      parts: [
+        { type: "step-start" },
+        {
+          type: "tool-saveDocument",
+          toolCallId: "call-1",
+          state: "approval-responded",
+          input: { fileName: "notes.md", content: "# Notes" },
+          approval: { id: "approval-1", approved: true },
+        },
+      ],
+    };
+
+    expect(
+      prepareChatRequest({
+        messages: [firstUser, firstAssistant, secondUser, pausedAssistant],
+        conversationId: "conversation-1",
+        reasoningEffort: "low",
+      }),
+    ).toEqual({
+      messages: [secondUser, pausedAssistant],
+      conversationId: "conversation-1",
+      agentId: "assistant",
+      reasoningEffort: "low",
+      responseHandle: "resp_1.signature",
+    });
+  });
 });

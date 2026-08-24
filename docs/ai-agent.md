@@ -168,6 +168,11 @@ A denied call ends up in the `output-denied` state and the model is told the use
 tools should still return a plain result object on business failures (quota exhausted, file too
 large) rather than throwing.
 
+Show the user what a write tool produced. `ToolCallRow` renders `saveDocument`'s output as a link
+to the stored file; without that the transcript reads "Used saveDocument" and the user who just
+granted permission cannot tell where the file went. Because business failures arrive on the same
+`output-available` state, `readSavedDocument` checks the shape instead of assuming it.
+
 ## Adding a skill
 
 A skill bundles a system-prompt fragment with the tools it needs, so one import gives an agent

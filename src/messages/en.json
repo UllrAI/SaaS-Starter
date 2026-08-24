@@ -1035,6 +1035,7 @@
   "ai_chat_message_actions": "Message actions",
   "ai_chat_artifact_ready": "Document ready in canvas",
   "ai_chat_image_ready": "Image ready in canvas",
+  "ai_chat_document_saved": "Saved to your files · {size}",
   "ai_chat_disclaimer": "AI can make mistakes. Check important information.",
   "ai_history_title": "Chat history",
   "ai_history_archived_title": "Archived chats",

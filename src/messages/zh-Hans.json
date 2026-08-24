@@ -1035,6 +1035,7 @@
   "ai_chat_message_actions": "消息操作",
   "ai_chat_artifact_ready": "文档已在画布中生成",
   "ai_chat_image_ready": "图片已在画布中生成",
+  "ai_chat_document_saved": "已存入你的文件 · {size}",
   "ai_chat_disclaimer": "AI 可能会出错，请核对重要信息。",
   "ai_history_title": "聊天记录",
   "ai_history_archived_title": "已归档对话",

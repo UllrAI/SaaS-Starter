@@ -335,7 +335,11 @@ test("asks before running a write tool and resumes once approved", async ({
     {
       type: "tool-output-available",
       toolCallId: "call-1",
-      output: { fileName: "launch-plan.md", fileSize: 13, url: "https://x/y" },
+      output: {
+        fileName: "launch-plan.md",
+        fileSize: 2048,
+        url: "https://cdn.example.com/launch-plan.md",
+      },
     },
     { type: "start-step" },
     { type: "text-start", id: "t1" },
@@ -415,6 +419,11 @@ test("asks before running a write tool and resumes once approved", async ({
   await page.getByRole("button", { name: "Allow", exact: true }).click();
 
   await expect(page.getByText("Saved launch-plan.md.")).toBeVisible();
+  // The saved file has to be reachable from the transcript, not just described.
+  await expect(
+    page.getByRole("link", { name: /launch-plan\.md/ }),
+  ).toHaveAttribute("href", "https://cdn.example.com/launch-plan.md");
+  await expect(page.getByText("Saved to your files · 2 KB")).toBeVisible();
   const secondBody = await page.evaluate(
     () =>
       (window as unknown as { __chatRequestBodies: string[] })

@@ -329,6 +329,94 @@ describe("ChatPanel", () => {
     expect(screen.queryByText("Running saveDocument…")).toBeNull();
   });
 
+  it("links to the file a saved document produced", () => {
+    const message: AiMessage = {
+      id: "assistant-saved",
+      role: "assistant",
+      parts: [
+        {
+          type: "tool-saveDocument",
+          toolCallId: "call-1",
+          state: "output-available",
+          input: { fileName: "launch-plan.md", content: "# Launch plan" },
+          output: {
+            fileName: "launch-plan.md",
+            fileSize: 2048,
+            url: "https://cdn.example.com/launch-plan.md",
+          },
+          approval: { id: "approval-1", approved: true },
+        },
+      ],
+    };
+
+    render(
+      <ChatPanel
+        {...handlers}
+        messages={[message]}
+        input=""
+        status="ready"
+        reasoningEffort="medium"
+        canvasCount={0}
+        canvasOpen={false}
+        conversationLoading={false}
+        imageAttachments={[]}
+        imageUploadsEnabled={false}
+        imageUploadError={false}
+        canAddImage={false}
+        onInputChange={jest.fn()}
+        onSubmit={jest.fn()}
+      />,
+    );
+
+    const link = screen.getByRole("link", { name: /launch-plan\.md/ });
+    expect(link).toHaveAttribute(
+      "href",
+      "https://cdn.example.com/launch-plan.md",
+    );
+    expect(screen.getByText("Saved to your files · 2 KB")).toBeVisible();
+    // The generic tool row would hide where the file went.
+    expect(screen.queryByText("Used saveDocument")).toBeNull();
+  });
+
+  it("falls back to the generic row when a save reports a failure", () => {
+    const message: AiMessage = {
+      id: "assistant-quota",
+      role: "assistant",
+      parts: [
+        {
+          type: "tool-saveDocument",
+          toolCallId: "call-1",
+          state: "output-available",
+          input: { fileName: "launch-plan.md", content: "# Launch plan" },
+          output: { error: "The user's total storage quota is full." },
+          approval: { id: "approval-1", approved: true },
+        },
+      ],
+    };
+
+    render(
+      <ChatPanel
+        {...handlers}
+        messages={[message]}
+        input=""
+        status="ready"
+        reasoningEffort="medium"
+        canvasCount={0}
+        canvasOpen={false}
+        conversationLoading={false}
+        imageAttachments={[]}
+        imageUploadsEnabled={false}
+        imageUploadError={false}
+        canAddImage={false}
+        onInputChange={jest.fn()}
+        onSubmit={jest.fn()}
+      />,
+    );
+
+    expect(screen.getByText("Used saveDocument")).toBeVisible();
+    expect(screen.queryByRole("link")).toBeNull();
+  });
+
   it("does not submit Enter while an IME composition is active", () => {
     const { input, onSubmit } = renderComposer();
 

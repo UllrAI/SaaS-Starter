@@ -4,7 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import {
   ChevronDown,
   CircleAlert,
+  ExternalLink,
   FileOutput,
+  FileText,
   History,
   ImagePlus,
   Loader2,
@@ -60,8 +62,10 @@ import {
   AI_IMAGE_INPUT_MAX_FILES,
   AI_IMAGE_INPUT_MEDIA_TYPES,
 } from "@/lib/ai/image-input";
+import { formatFileSize } from "@/lib/config/upload";
 import { useTranslation } from "@/lib/i18n/translation/client";
 import { cn } from "@/lib/utils";
+import { readSavedDocument } from "./saved-document";
 import { findActiveToolApprovalId } from "./tool-approval";
 
 interface ChatPanelProps {
@@ -281,6 +285,34 @@ function ToolCallRow({
   const isArtifact =
     part.state === "output-available" &&
     (name === "presentArtifact" || name === "generateImage");
+  const savedDocument =
+    part.state === "output-available" && name === "saveDocument"
+      ? readSavedDocument(part.output)
+      : null;
+
+  if (savedDocument) {
+    return (
+      <a
+        href={savedDocument.url}
+        target="_blank"
+        rel="noreferrer"
+        className="bg-muted/40 hover:bg-muted my-2 flex w-full items-center gap-3 border px-3 py-2 text-sm transition-colors"
+      >
+        <FileText className="text-muted-foreground size-4 shrink-0" />
+        <span className="min-w-0 flex-1">
+          <span className="block truncate font-medium" translate="no">
+            {savedDocument.fileName}
+          </span>
+          <span className="text-muted-foreground text-xs">
+            {t("ai_chat_document_saved", {
+              size: formatFileSize(savedDocument.fileSize),
+            })}
+          </span>
+        </span>
+        <ExternalLink className="text-muted-foreground size-4 shrink-0" />
+      </a>
+    );
+  }
 
   if (isArtifact) {
     return (

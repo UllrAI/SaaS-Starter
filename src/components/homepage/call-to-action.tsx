@@ -36,7 +36,7 @@ export function CallToAction({
           </div>
 
           <div className="mx-auto mt-10 max-w-3xl space-y-6">
-            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase">
+            <p className="text-primary text-sm font-semibold">
               <>{t("home_ship_foundation_first")}</>
             </p>
             <h2 className="text-foreground text-4xl font-bold tracking-tight sm:text-5xl">
@@ -60,12 +60,12 @@ export function CallToAction({
             {SITE_CONFIG.features.billing && (
               <Button
                 size="lg"
-                className="group h-14 px-10 text-base font-bold shadow-lg transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-md active:translate-x-[4px] active:translate-y-[4px]"
+                className="h-14 border-2 px-10 text-base font-bold"
                 asChild
               >
                 <Link href="/pricing" locale={locale}>
                   <>{t("home_view_pricing")}</>
-                  <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
             )}

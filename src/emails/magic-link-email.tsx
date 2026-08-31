@@ -52,7 +52,6 @@ const theme = {
   primaryDark: "#14285d",
   primaryForeground: "#f8f8f8",
   link: "#1b3478",
-  shadow: "0 12px 32px rgba(15, 23, 42, 0.08)",
 } as const;
 const styles = {
   body: {
@@ -76,7 +75,6 @@ const styles = {
     border: `1px solid ${theme.border}`,
     borderRadius: "0",
     overflow: "hidden",
-    boxShadow: theme.shadow,
   },
   header: {
     padding: "28px 32px 24px",
@@ -91,8 +89,6 @@ const styles = {
   },
   brand: {
     fontSize: "12px",
-    letterSpacing: "0.08em",
-    textTransform: "uppercase" as const,
     color: theme.primary,
     margin: "0 0 10px 0",
     fontFamily:
@@ -147,8 +143,6 @@ const styles = {
     fontWeight: "600",
     color: theme.foreground,
     margin: "0 0 10px 0",
-    textTransform: "uppercase" as const,
-    letterSpacing: "0.04em",
   },
   detailsLine: {
     fontSize: "14px",

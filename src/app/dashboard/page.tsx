@@ -159,7 +159,7 @@ export default async function HomeRoute() {
       description={<>{t("dashboard_account_summary")}</>}
     >
       <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
-        <Card className="shadow-sm">
+        <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <UserCircle2 className="text-primary h-5 w-5" />
@@ -170,7 +170,7 @@ export default async function HomeRoute() {
           <CardContent className="grid gap-4 md:grid-cols-3">
             {SITE_CONFIG.features.billing && (
               <div className="border-border space-y-2 border p-4">
-                <p className="text-muted-foreground text-xs uppercase">
+                <p className="text-muted-foreground text-xs">
                   {t("dashboard_plan")}
                 </p>
                 <p className="text-lg font-semibold">{subscriptionLabel}</p>
@@ -195,7 +195,7 @@ export default async function HomeRoute() {
             )}
             {SITE_CONFIG.features.uploads && (
               <div className="border-border space-y-2 border p-4">
-                <p className="text-muted-foreground text-xs uppercase">
+                <p className="text-muted-foreground text-xs">
                   {t("dashboard_uploads")}
                 </p>
                 <p className="text-lg font-semibold">{uploadedFileCount}</p>
@@ -208,7 +208,7 @@ export default async function HomeRoute() {
             )}
             {SITE_CONFIG.features.billing && (
               <div className="border-border space-y-2 border p-4">
-                <p className="text-muted-foreground text-xs uppercase">
+                <p className="text-muted-foreground text-xs">
                   {t("dashboard_payments")}
                 </p>
                 <p className="text-lg font-semibold">{paymentCount}</p>
@@ -228,7 +228,7 @@ export default async function HomeRoute() {
           </CardContent>
         </Card>
 
-        <Card className="shadow-sm">
+        <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <ShieldCheck className="text-primary h-5 w-5" />
@@ -255,7 +255,7 @@ export default async function HomeRoute() {
       </div>
 
       <div className="grid gap-4 lg:grid-cols-[1fr_0.9fr]">
-        <Card className="shadow-sm">
+        <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Sparkles className="text-primary h-5 w-5" />
@@ -288,7 +288,7 @@ export default async function HomeRoute() {
         </Card>
 
         {SITE_CONFIG.features.billing && (
-          <Card className="shadow-sm">
+          <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <CreditCard className="text-primary h-5 w-5" />

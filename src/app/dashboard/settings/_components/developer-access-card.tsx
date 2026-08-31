@@ -15,7 +15,7 @@ export function DeveloperAccessCard() {
     <Card>
       <CardHeader>
         <div className="flex items-start gap-3">
-          <div className="bg-primary/10 text-primary rounded-lg p-2">
+          <div className="text-primary">
             <KeyRound className="h-5 w-5" />
           </div>
           <div className="space-y-1.5">

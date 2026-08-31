@@ -118,7 +118,7 @@ function TierActionGetLabel({ tierName }: { tierName: string }) {
   return (
     <>
       {t("billing_get_tier", {
-        expression0: tierName.toUpperCase(),
+        expression0: tierName,
       })}
     </>
   );
@@ -398,14 +398,14 @@ export function PricingSection({ className }: { className?: string }) {
           <TabsList className="bg-muted/50 grid h-11 w-full grid-cols-2 p-1">
             <TabsTrigger
               value="subscription"
-              className="data-[state=active]:bg-background flex items-center gap-2 text-sm font-medium transition-all data-[state=active]:shadow-sm"
+              className="data-[state=active]:border-primary data-[state=active]:bg-background flex items-center gap-2 text-sm font-medium"
             >
               <Calendar className="h-4 w-4" />
               <PaymentModeLabel mode="subscription" />
             </TabsTrigger>
             <TabsTrigger
               value="one_time"
-              className="data-[state=active]:bg-background flex items-center gap-2 text-sm font-medium transition-all data-[state=active]:shadow-sm"
+              className="data-[state=active]:border-primary data-[state=active]:bg-background flex items-center gap-2 text-sm font-medium"
             >
               <CreditCard className="h-4 w-4" />
               <PaymentModeLabel mode="one_time" />
@@ -422,7 +422,7 @@ export function PricingSection({ className }: { className?: string }) {
               className={cn(
                 "cursor-pointer rounded-sm px-4 py-1.5 text-sm font-medium transition-all select-none",
                 billingCycle === "monthly"
-                  ? "bg-background text-foreground shadow-sm"
+                  ? "border-primary bg-background text-foreground"
                   : "text-muted-foreground hover:text-foreground",
               )}
             >
@@ -441,7 +441,7 @@ export function PricingSection({ className }: { className?: string }) {
               className={cn(
                 "cursor-pointer rounded-sm px-4 py-1.5 text-sm font-medium transition-all select-none",
                 billingCycle === "yearly"
-                  ? "bg-background text-foreground shadow-sm"
+                  ? "border-primary bg-background text-foreground"
                   : "text-muted-foreground hover:text-foreground",
               )}
             >
@@ -483,13 +483,13 @@ export function PricingSection({ className }: { className?: string }) {
               className={cn(
                 "relative flex flex-col transition-all duration-300",
                 tier.isPopular
-                  ? "border-primary ring-primary/20 shadow-lg ring-1"
-                  : "hover:border-primary/50 shadow-sm hover:shadow-md",
+                  ? "border-primary border-2"
+                  : "hover:border-primary/50",
               )}
             >
               {tier.isPopular && (
                 <div className="absolute -top-3 left-1/2 z-10 -translate-x-1/2">
-                  <Badge className="bg-primary text-primary-foreground hover:bg-primary px-3 py-1 text-xs font-bold uppercase shadow-sm">
+                  <Badge className="bg-primary text-primary-foreground hover:bg-primary px-3 py-1 text-xs font-semibold">
                     <TierBadgeLabel badge="recommended" />
                   </Badge>
                 </div>
@@ -504,7 +504,7 @@ export function PricingSection({ className }: { className?: string }) {
                 </CardDescription>
                 <div className="mt-6 space-y-2">
                   <div className="flex items-baseline justify-center gap-1">
-                    <span className="text-foreground font-mono text-4xl font-bold tracking-tight">
+                    <span className="text-foreground text-4xl font-bold tracking-tight tabular-nums">
                       {paymentMode === "one_time"
                         ? formatPrice(price, intlLocale, tier.currency)
                         : billingCycle === "monthly"
@@ -522,7 +522,7 @@ export function PricingSection({ className }: { className?: string }) {
                     )}
                   </div>
                   <div className="flex h-5 items-center justify-center">
-                    <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+                    <p className="text-muted-foreground text-xs font-medium">
                       <TierBillingLabel
                         billingCycle={billingCycle}
                         paymentMode={paymentMode}
@@ -574,9 +574,9 @@ export function PricingSection({ className }: { className?: string }) {
                 ) : (
                   <Button
                     className={cn(
-                      "h-11 w-full font-bold shadow-sm transition-all",
+                      "h-11 w-full font-bold",
                       tier.isPopular
-                        ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-md"
+                        ? "bg-primary text-primary-foreground hover:bg-primary/90"
                         : "bg-background hover:bg-accent hover:text-accent-foreground border",
                     )}
                     onClick={() =>
@@ -588,14 +588,14 @@ export function PricingSection({ className }: { className?: string }) {
                     {isLoading ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        <span className="uppercase">
+                        <span>
                           <CheckoutButtonStatusLabel status="processing" />
                         </span>
                       </>
                     ) : !session?.user ? (
                       <>
                         <LogIn className="mr-2 h-4 w-4" />
-                        <span className="uppercase">
+                        <span>
                           <CheckoutButtonStatusLabel status="login_required" />
                         </span>
                       </>

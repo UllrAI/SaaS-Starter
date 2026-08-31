@@ -9,7 +9,6 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { LocalizedLink as Link } from "@/components/localized-link";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -21,7 +20,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Loader2, Sparkles, ArrowRight } from "lucide-react";
+import { Loader2, ArrowRight } from "lucide-react";
 import { SocialLoginButtons } from "@/components/auth/social-login-buttons";
 import type { SocialProvider } from "@/lib/auth/providers";
 import { ReactNode } from "react";
@@ -41,7 +40,6 @@ interface AuthFormField<T extends FieldValues> {
 interface AuthFormConfig {
   title: ReactNode;
   description: ReactNode;
-  badgeText: ReactNode;
   submitButtonText: ReactNode;
   magicLinkLoadingText: ReactNode;
   submitIcon: React.ComponentType<{
@@ -88,21 +86,10 @@ export function AuthFormBase<T extends FieldValues>({
     }
   };
   return (
-    <Card className="bg-background/80 w-full shadow-lg backdrop-blur-sm">
+    <Card className="bg-background w-full border-2">
       <CardHeader className="space-y-4">
-        {/* Welcome Badge */}
-        <div className="flex justify-center">
-          <Badge
-            variant="secondary"
-            className="bg-primary/10 text-primary border-primary/20"
-          >
-            <Sparkles className="mr-1 h-3 w-3" />
-            {config.badgeText}
-          </Badge>
-        </div>
-
         <div className="space-y-2 text-center">
-          <CardTitle className="from-foreground to-foreground/70 bg-gradient-to-r bg-clip-text text-2xl font-bold text-transparent md:text-3xl">
+          <CardTitle className="text-foreground text-2xl font-bold md:text-3xl">
             {config.title}
           </CardTitle>
           <CardDescription className="text-muted-foreground text-sm md:text-base">
@@ -137,7 +124,7 @@ export function AuthFormBase<T extends FieldValues>({
                     <div className="absolute inset-0 flex items-center">
                       <span className="border-border w-full border-t" />
                     </div>
-                    <div className="relative flex justify-center text-xs uppercase">
+                    <div className="relative flex justify-center text-xs">
                       <span className="bg-background text-muted-foreground px-3 font-medium">
                         {t("auth_continue_magic_link")}
                       </span>
@@ -168,7 +155,7 @@ export function AuthFormBase<T extends FieldValues>({
                               type={field.type || "text"}
                               {...formField}
                               disabled={isPending}
-                              className="focus:border-primary/50 h-12 border-2 pl-10 shadow-sm transition-all focus:translate-x-[1px] focus:translate-y-[1px] focus:shadow-none"
+                              className="focus:border-primary h-12 border-2 pl-10"
                             />
                           </div>
                         </FormControl>
@@ -183,7 +170,7 @@ export function AuthFormBase<T extends FieldValues>({
               <Button
                 type="submit"
                 disabled={isPending}
-                className="from-primary to-primary/90 hover:from-primary/90 hover:to-primary text-primary-foreground h-12 w-full cursor-pointer bg-gradient-to-r font-medium shadow transition-all duration-200 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-sm active:translate-x-[4px] active:translate-y-[4px] active:shadow-none"
+                className="text-primary-foreground h-12 w-full cursor-pointer font-medium"
               >
                 {isMagicLinkPending ? (
                   <span className="flex items-center gap-2">

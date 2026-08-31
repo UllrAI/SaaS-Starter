@@ -49,17 +49,17 @@
 }
 
 .markdown-content blockquote {
-  @apply border-border text-muted-foreground bg-muted/30 mb-4 rounded-r border-l-4 py-2 pl-4 italic;
+  @apply border-primary text-muted-foreground bg-muted/30 mb-4 border-l-4 py-2 pl-4;
 }
 
 .markdown-content code {
-  @apply bg-muted rounded px-1.5 py-0.5 font-mono text-sm;
+  @apply bg-muted px-1.5 py-0.5 font-mono text-sm;
   overflow-wrap: anywhere;
   word-break: break-word;
 }
 
 .markdown-content pre {
-  @apply bg-muted mb-4 overflow-x-auto rounded-lg p-6;
+  @apply bg-muted mb-4 overflow-x-auto border p-6;
 }
 
 .markdown-content pre code {
@@ -74,7 +74,7 @@
 }
 
 .markdown-content img {
-  @apply mb-4 h-auto max-w-full rounded-lg;
+  @apply mb-4 h-auto max-w-full border;
 }
 
 .markdown-content table {

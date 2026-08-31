@@ -27,10 +27,7 @@ export function Hero({
                 variant="outline"
                 className="border-primary/30 bg-primary/5 text-primary hover:bg-primary/10 mb-4 inline-flex cursor-default items-center gap-2 border px-4 py-2 font-mono text-sm font-bold transition-colors"
               >
-                <span className="relative flex h-2 w-2">
-                  <span className="bg-primary absolute inline-flex h-full w-full animate-ping rounded-full opacity-75"></span>
-                  <span className="bg-primary relative inline-flex h-2 w-2 rounded-full"></span>
-                </span>
+                <span className="bg-primary h-2 w-2 rounded-full" />
                 <>{t("home_open_source_agent_ready")}</>
               </Badge>
             </div>
@@ -38,7 +35,7 @@ export function Hero({
             {/* Massive Headline */}
             <h1 className="text-foreground mb-6 text-5xl leading-[0.9] font-black tracking-tighter sm:text-6xl lg:text-7xl xl:text-8xl">
               <span className="block">{t("home_ship")}</span>
-              <span className="from-foreground to-foreground/50 block bg-gradient-to-b bg-clip-text pr-1 text-transparent">
+              <span className="text-primary block pr-1">
                 {t("home_micro_saas")}
               </span>
             </h1>
@@ -52,7 +49,7 @@ export function Hero({
             <div className="flex flex-col gap-4 sm:flex-row lg:gap-6">
               <Button
                 size="lg"
-                className="bg-primary text-primary-foreground hover:bg-primary/90 h-14 px-10 text-base font-bold shadow-md transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-lg active:translate-x-[8px] active:translate-y-[8px] lg:h-16 lg:px-12 lg:text-lg"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 h-14 border-2 px-10 text-base font-bold lg:h-16 lg:px-12 lg:text-lg"
                 asChild
               >
                 <Link
@@ -186,7 +183,7 @@ export function Hero({
                 {/* Right: What's Included */}
                 <div className="bg-secondary/5 flex flex-col p-6 text-left sm:p-8 lg:col-span-5">
                   <div className="mb-6 space-y-2">
-                    <div className="text-muted-foreground text-xs font-bold tracking-widest uppercase">
+                    <div className="text-muted-foreground text-xs font-semibold">
                       <>{t("home_whats_included")}</>
                     </div>
                     <div className="flex items-center gap-2">

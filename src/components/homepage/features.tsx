@@ -37,10 +37,10 @@ function FeatureCard({
   };
 }) {
   return (
-    <Card className="group border-border bg-card hover:border-primary h-full border p-6 transition-all">
+    <Card className="border-border bg-card hover:border-primary h-full border p-6 transition-colors">
       <div className="space-y-4">
         <div className="flex items-center justify-between gap-4">
-          <div className="bg-secondary text-primary border-border group-hover:border-primary group-hover:bg-primary group-hover:text-primary-foreground flex h-12 w-12 items-center justify-center border transition-colors">
+          <div className="text-primary flex h-12 w-12 items-center">
             <Icon className="h-6 w-6" />
           </div>
           <Badge variant="outline" className="border-border font-mono text-xs">
@@ -194,8 +194,8 @@ export function Features({
       className="bg-background border-border border-b py-24"
     >
       <SectionContainer>
-        <div className="mx-auto mb-16 max-w-2xl text-center">
-          <Badge className="border-border bg-background/50 mb-4 inline-flex items-center border px-3 py-1 text-sm backdrop-blur-sm">
+        <div className="mb-16 max-w-2xl">
+          <Badge className="border-border bg-background mb-4 inline-flex items-center border px-3 py-1 text-sm">
             <Package2 className="text-muted-foreground mr-2 h-3 w-3" />
             <span className="text-muted-foreground font-mono">
               {t("home_included_modules")}
@@ -229,7 +229,7 @@ export function Features({
               <div className="text-foreground text-4xl font-bold tracking-tighter">
                 {stat.value}
               </div>
-              <div className="text-muted-foreground mt-2 text-sm tracking-widest uppercase">
+              <div className="text-muted-foreground mt-2 text-sm">
                 {stat.label}
               </div>
             </div>

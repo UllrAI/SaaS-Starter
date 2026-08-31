@@ -37,10 +37,10 @@ export function BlogPostMeta({
   const badgeVariant = featured ? "default" : "secondary";
   const isCenter = className?.includes("justify-center");
   const featuredBadgeClasses = isOverlay
-    ? "bg-primary/90 text-primary-foreground border-primary/20 backdrop-blur-sm"
+    ? "bg-primary text-primary-foreground border-primary"
     : "bg-primary/10 text-primary border-primary/20";
   const articleBadgeClasses = isOverlay
-    ? "bg-background/90 text-foreground border-border backdrop-blur-sm"
+    ? "bg-background text-foreground border-border"
     : "bg-muted/50 text-muted-foreground border-muted";
   const intlLocale = resolveIntlLocale(supportedLocale);
   const formattedUpdatedDate = updatedDate

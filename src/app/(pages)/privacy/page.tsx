@@ -120,7 +120,7 @@ export default function PrivacyPage({
         <PageIntro
           className="mb-12"
           badge={
-            <Badge className="border-border bg-background/50 inline-flex items-center border px-3 py-1 text-sm backdrop-blur-sm">
+            <Badge className="border-border bg-background inline-flex items-center border px-3 py-1 text-sm">
               <Shield className="text-muted-foreground mr-2 h-3 w-3" />
               <span className="text-muted-foreground font-mono">
                 {t("legal_privacy_md")}

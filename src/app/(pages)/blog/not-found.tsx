@@ -2,7 +2,6 @@ import { Home, ArrowLeft, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { BackgroundPattern } from "@/components/ui/background-pattern";
 import { ReadingContainer } from "@/components/layout/page-container";
 import { SOURCE_LOCALE } from "@/lib/config/i18n";
 import { getStaticTranslations } from "@/lib/i18n/translation/static";
@@ -10,12 +9,10 @@ import { getStaticTranslations } from "@/lib/i18n/translation/static";
 export default function PagesNotFound() {
   const { t } = getStaticTranslations(SOURCE_LOCALE);
   return (
-    <div className="bg-background relative flex min-h-[60vh] flex-col items-center justify-center overflow-hidden py-16">
-      <BackgroundPattern />
-
+    <div className="bg-background flex min-h-[60vh] flex-col items-center justify-center py-16">
       <ReadingContainer className="relative text-center">
         {/* Status Badge */}
-        <Badge className="border-border bg-background/50 mb-8 inline-flex items-center border px-3 py-1 text-sm backdrop-blur-sm">
+        <Badge className="border-border bg-background mb-8 inline-flex items-center border px-3 py-1 text-sm">
           <Sparkles className="text-muted-foreground mr-2 h-3 w-3" />
           <span className="text-muted-foreground font-mono">
             {t("blog_error_404")}

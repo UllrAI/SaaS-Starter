@@ -52,7 +52,7 @@ export function Header({
   ].filter((item) => SITE_CONFIG.features.billing || item.id !== "nav-pricing");
 
   return (
-    <header className="border-border/40 bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur">
+    <header className="border-border bg-background sticky top-0 z-50 w-full border-b">
       <ShellContainer>
         <div className="flex h-16 items-center justify-between">
           <Link href={homeHref} className="flex items-center gap-2">

@@ -23,8 +23,8 @@ export function Logo({
   const baseClasses = "flex items-center justify-center";
 
   const variantClasses = {
-    default: "h-full w-full rounded-lg bg-primary p-2.5",
-    minimal: "h-full w-full rounded-md bg-primary/10 p-2",
+    default: "h-full w-full bg-primary p-2.5",
+    minimal: "h-full w-full bg-primary/10 p-2",
     "icon-only": "h-full w-full",
   };
 

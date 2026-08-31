@@ -60,27 +60,20 @@ export function ContactMethods({
         return (
           <Card
             key={method.href}
-            className="group shadow-sm transition-all hover:shadow-md"
+            className="hover:border-primary transition-colors"
           >
             <CardHeader>
-              <div className="bg-primary/10 text-primary border-primary/20 mb-4 flex h-12 w-12 items-center justify-center border transition-transform group-hover:scale-110">
+              <div className="text-primary mb-4 flex h-12 w-12 items-center">
                 <Icon className="h-6 w-6" />
               </div>
               <CardTitle className="text-lg">{method.title}</CardTitle>
-              <p className="text-muted-foreground font-mono text-[10px] uppercase">
-                {method.label}
-              </p>
+              <p className="text-muted-foreground text-xs">{method.label}</p>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground mb-4 text-sm">
                 {method.description}
               </p>
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full shadow-xs"
-                asChild
-              >
+              <Button variant="outline" size="sm" className="w-full" asChild>
                 <a
                   href={method.href}
                   className="block font-mono text-xs"

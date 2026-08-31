@@ -2,7 +2,6 @@ import { getServerTranslations } from "@/lib/i18n/translation/server";
 import { getStaticTranslations } from "@/lib/i18n/translation/static";
 import { Sparkles, BookOpen } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { BackgroundPattern } from "@/components/ui/background-pattern";
 import { BlogPostCard } from "@/components/blog/blog-post-card";
 import {
   ReadingContainer,
@@ -80,12 +79,10 @@ export function BlogPageContent({ locale }: { locale: SupportedLocale }) {
   return (
     <>
       {/* Hero Section */}
-      <section className="bg-muted/40 relative overflow-hidden py-16 sm:py-20 lg:py-24">
-        <BackgroundPattern />
-
+      <section className="bg-muted/40 border-border border-b py-16 sm:py-20 lg:py-24">
         <ReadingContainer>
-          <div className="text-center">
-            <Badge className="border-border bg-background/50 mb-4 inline-flex items-center border px-3 py-1 text-sm backdrop-blur-sm sm:mb-6">
+          <div className="max-w-3xl">
+            <Badge className="border-border bg-background mb-4 inline-flex items-center border px-3 py-1 text-sm sm:mb-6">
               <Sparkles className="text-muted-foreground mr-2 h-3 w-3" />
               <span className="text-muted-foreground font-mono">
                 {t("blog_index")}
@@ -106,7 +103,7 @@ export function BlogPageContent({ locale }: { locale: SupportedLocale }) {
         <SectionContainer>
           {sortedPosts.length === 0 ? (
             <div className="py-16 text-center sm:py-20">
-              <div className="bg-muted mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full sm:h-20 sm:w-20">
+              <div className="bg-muted mx-auto mb-6 flex h-16 w-16 items-center justify-center border sm:h-20 sm:w-20">
                 <BookOpen className="text-muted-foreground h-8 w-8 sm:h-10 sm:w-10" />
               </div>
               <h2 className="text-foreground mb-4 text-xl font-semibold sm:text-2xl">
@@ -121,7 +118,7 @@ export function BlogPageContent({ locale }: { locale: SupportedLocale }) {
               {/* Featured Posts */}
               {featuredPosts.length > 0 && (
                 <section>
-                  <div className="mb-6 text-center sm:mb-8">
+                  <div className="mb-6 max-w-2xl sm:mb-8">
                     <h2 className="text-foreground mb-2 text-2xl font-bold tracking-tight sm:text-3xl">
                       {t("blog_featured_posts")}
                     </h2>
@@ -139,7 +136,7 @@ export function BlogPageContent({ locale }: { locale: SupportedLocale }) {
               {regularPosts.length > 0 && (
                 <section>
                   {featuredPosts.length > 0 && (
-                    <div className="mb-6 text-center sm:mb-8">
+                    <div className="mb-6 max-w-2xl sm:mb-8">
                       <h2 className="text-foreground mb-2 text-2xl font-bold tracking-tight sm:text-3xl">
                         {t("blog_all_posts")}
                       </h2>

@@ -270,13 +270,7 @@ export function PaymentStatusContent() {
   // Show loading state while checking status
   if (isLoading || status === null) {
     return (
-      <section className="bg-background relative flex min-h-screen items-center justify-center overflow-hidden">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 -z-10">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(120,119,198,0.03),transparent_50%)]" />
-          <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--border))_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border))_1px,transparent_1px)] bg-[size:4rem_4rem] opacity-20" />
-        </div>
-
+      <section className="bg-background flex min-h-screen items-center justify-center">
         <FocusContainer className="relative">
           <Card className="w-full text-center">
             <CardContent className="pt-6">
@@ -309,13 +303,7 @@ export function PaymentStatusContent() {
   }
   const config = getStatusConfig(status, paymentMode, t);
   return (
-    <section className="bg-background relative flex min-h-screen items-center justify-center overflow-hidden">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(120,119,198,0.03),transparent_50%)]" />
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--border))_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border))_1px,transparent_1px)] bg-[size:4rem_4rem] opacity-20" />
-      </div>
-
+    <section className="bg-background flex min-h-screen items-center justify-center">
       <FocusContainer className="relative">
         {/* Status Badge */}
         <div className="mb-8 text-center">

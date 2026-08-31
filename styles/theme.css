@@ -1,9 +1,5 @@
 :root {
-  /* 
-     Light Mode: "Modern Clean"
-     Crisp, professional, and airy.
-     Designed for readability and a premium SaaS feel.
-  */
+  /* Light: cool, high-contrast canvas with UllrAI indigo as the focal color. */
   --background: oklch(0.99 0.002 240);
   /* Almost pure white with a hint of cool gray for crispness */
   --foreground: oklch(0.15 0.02 240);
@@ -72,28 +68,19 @@
     ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
     "Courier New", monospace;
 
-  /* 
-     Radius: Modern, approachable, polished.
-     0.5rem (8px) is the industry standard for premium SaaS.
-  */
+  /* Square geometry is a defining part of the product language. */
   --radius: 0rem;
 
-  /* 
-     Shadows: Soft, diffused, multi-layered.
-     Creates depth without heaviness.
-  */
+  /* Flat by default. Elevated overlays use a small hard offset shadow. */
   --shadow-color: 240 5% 50%;
-  /* HSL-ish for shadow alpha composition */
-
-  --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-  --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --shadow-md:
-    0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-  --shadow-lg:
-    0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-  --shadow-xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
-  --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+  --shadow-2xs: none;
+  --shadow-xs: none;
+  --shadow-sm: none;
+  --shadow: 2px 2px 0 0 var(--border);
+  --shadow-md: 4px 4px 0 0 var(--border);
+  --shadow-lg: 6px 6px 0 0 var(--border);
+  --shadow-xl: 8px 8px 0 0 var(--border);
+  --shadow-2xl: 12px 12px 0 0 var(--border);
 
   --tracking-normal: 0em;
   /* Inter looks best with normal tracking */
@@ -101,11 +88,7 @@
 }
 
 .dark {
-  /* 
-     Dark Mode: "Midnight Pro"
-     Rich, deep indigo-slate background. 
-     Reduces eye strain while maintaining vibrancy.
-  */
+  /* Dark: deep indigo canvas with the same hierarchy as light mode. */
   --background: oklch(0.12 0.03 260);
   /* Deep Indigo/Slate */
   --foreground: oklch(0.98 0.01 240);
@@ -153,17 +136,15 @@
   --sidebar-border: oklch(0.2 0.04 260);
   --sidebar-ring: oklch(0.6 0.16 265);
 
-  /* Shadows adjustments for dark mode */
   --shadow-color: 0 0% 0%;
-  --shadow-xs: 0 1px 1px 0 rgb(0 0 0 / 0.5);
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.5);
-  --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.5), 0 2px 4px -2px rgb(0 0 0 / 0.5);
-  --shadow-md:
-    0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.5);
-  --shadow-lg:
-    0 20px 25px -5px rgb(0 0 0 / 0.5), 0 8px 10px -6px rgb(0 0 0 / 0.5);
-  --shadow-xl: 0 25px 50px -12px rgb(0 0 0 / 0.5);
-  --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.5);
+  --shadow-2xs: none;
+  --shadow-xs: none;
+  --shadow-sm: none;
+  --shadow: 2px 2px 0 0 var(--border);
+  --shadow-md: 4px 4px 0 0 var(--border);
+  --shadow-lg: 6px 6px 0 0 var(--border);
+  --shadow-xl: 8px 8px 0 0 var(--border);
+  --shadow-2xl: 12px 12px 0 0 var(--border);
 }
 
 @theme inline {

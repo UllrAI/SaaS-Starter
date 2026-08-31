@@ -308,7 +308,7 @@ export function UploadWorkbench() {
         {capabilityCards.map((card) => {
           const Icon = card.icon;
           return (
-            <Card key={card.id} className="shadow-sm">
+            <Card key={card.id}>
               <CardHeader className="space-y-3">
                 <div className="text-primary">
                   <Icon className="h-5 w-5" />
@@ -324,7 +324,7 @@ export function UploadWorkbench() {
       </section>
 
       <section className="grid gap-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]">
-        <Card className="shadow-sm">
+        <Card>
           <CardHeader>
             <CardTitle>{t("uploads_default_uploader_demos")}</CardTitle>
             <CardDescription>
@@ -367,7 +367,7 @@ export function UploadWorkbench() {
           </CardContent>
         </Card>
 
-        <Card className="shadow-sm">
+        <Card>
           <CardHeader>
             <CardTitle>{t("uploads_headless_example")}</CardTitle>
             <CardDescription>
@@ -388,7 +388,7 @@ export function UploadWorkbench() {
         </Card>
       </section>
 
-      <Card className="shadow-sm">
+      <Card>
         <CardHeader>
           <div className="flex items-center gap-2">
             <Server className="text-primary h-5 w-5" />

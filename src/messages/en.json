@@ -1,4 +1,5 @@
 {
+  "common_skip_to_content": "Skip to main content",
   "auth_oauth_login_description": "Choose a connected account to access your dashboard",
   "auth_oauth_signup_description": "Choose a connected account to create your account",
   "auth_sending_magic_link": "Sending magic link...",

@@ -46,7 +46,6 @@ describe("AuthShell", () => {
       "flex-col",
       "items-center",
       "justify-center",
-      "overflow-hidden",
       "bg-background",
     );
 
@@ -86,7 +85,7 @@ describe("AuthShell", () => {
     expect(logoContainer).toHaveAttribute("href", "/");
   });
 
-  it("renders background patterns", () => {
+  it("keeps the authentication background undecorated", () => {
     render(
       <AuthShell>
         <div>Content</div>
@@ -95,11 +94,10 @@ describe("AuthShell", () => {
 
     const mainElement = screen.getByRole("main");
 
-    // Check if background pattern container exists
     const backgroundContainer = mainElement.querySelector(
       ".absolute.inset-0.-z-10",
     );
-    expect(backgroundContainer).toBeInTheDocument();
+    expect(backgroundContainer).not.toBeInTheDocument();
   });
 
   it("renders children in the correct container", () => {

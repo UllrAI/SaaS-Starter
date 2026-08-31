@@ -4,7 +4,6 @@ import { Logo } from "@/components/logo";
 import { LocalizedLink as Link } from "@/components/localized-link";
 import { CompactContainer } from "@/components/layout/page-container";
 import { Button } from "@/components/ui/button";
-import { BackgroundPattern } from "@/components/ui/background-pattern";
 import { APP_NAME } from "@/lib/config/constants";
 import { useTranslation } from "@/lib/i18n/translation/client";
 
@@ -12,8 +11,7 @@ export function AuthShell({ children }: { children: React.ReactNode }) {
   const { t } = useTranslation();
 
   return (
-    <main className="bg-background relative flex min-h-screen flex-col items-center justify-center overflow-hidden">
-      <BackgroundPattern />
+    <main className="bg-background relative flex min-h-screen flex-col items-center justify-center">
       <div className="absolute top-6 left-6">
         <Button asChild variant="ghost" size="sm">
           <Link href="/" className="flex items-center gap-2">

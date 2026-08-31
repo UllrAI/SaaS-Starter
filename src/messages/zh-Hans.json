@@ -1,4 +1,5 @@
 {
+  "common_skip_to_content": "跳转到主要内容",
   "auth_oauth_login_description": "选择一个已关联的账号以访问控制台",
   "auth_oauth_signup_description": "选择一个已关联的账号以创建账户",
   "auth_sending_magic_link": "正在发送魔法链接...",

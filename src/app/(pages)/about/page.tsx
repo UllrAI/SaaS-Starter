@@ -81,7 +81,7 @@ export default function AboutPage({
         <PageIntro
           className="mb-20"
           badge={
-            <Badge className="border-border bg-background/50 inline-flex items-center border px-3 py-1 text-sm backdrop-blur-sm">
+            <Badge className="border-border bg-background inline-flex items-center border px-3 py-1 text-sm">
               <Info className="text-muted-foreground mr-2 h-3 w-3" />
               <span className="text-muted-foreground font-mono">
                 {t("about_readme_md")}
@@ -103,9 +103,9 @@ export default function AboutPage({
           </PageSectionHeading>
 
           <div className="grid gap-6 md:grid-cols-3">
-            <Card className="shadow-sm">
+            <Card>
               <CardHeader>
-                <div className="bg-primary/10 text-primary border-primary/20 mb-4 flex h-12 w-12 items-center justify-center border">
+                <div className="text-primary mb-4 flex h-12 w-12 items-center">
                   <Zap className="h-6 w-6" />
                 </div>
                 <CardTitle>{t("about_practical_workflow_speed")}</CardTitle>
@@ -115,9 +115,9 @@ export default function AboutPage({
               </CardHeader>
             </Card>
 
-            <Card className="shadow-sm">
+            <Card>
               <CardHeader>
-                <div className="bg-primary/10 text-primary border-primary/20 mb-4 flex h-12 w-12 items-center justify-center border">
+                <div className="text-primary mb-4 flex h-12 w-12 items-center">
                   <Shield className="h-6 w-6" />
                 </div>
                 <CardTitle>{t("about_security_boundaries")}</CardTitle>
@@ -127,9 +127,9 @@ export default function AboutPage({
               </CardHeader>
             </Card>
 
-            <Card className="shadow-sm">
+            <Card>
               <CardHeader>
-                <div className="bg-primary/10 text-primary border-primary/20 mb-4 flex h-12 w-12 items-center justify-center border">
+                <div className="text-primary mb-4 flex h-12 w-12 items-center">
                   <Users className="h-6 w-6" />
                 </div>
                 <CardTitle>{t("about_maintainable_defaults")}</CardTitle>
@@ -145,7 +145,7 @@ export default function AboutPage({
           </PageSectionHeading>
 
           <div className="grid gap-6 md:grid-cols-3">
-            <Card className="shadow-sm">
+            <Card>
               <CardHeader>
                 <CardTitle>{t("about_real_checkout_flow")}</CardTitle>
                 <CardDescription>
@@ -154,7 +154,7 @@ export default function AboutPage({
               </CardHeader>
             </Card>
 
-            <Card className="shadow-sm">
+            <Card>
               <CardHeader>
                 <CardTitle>{t("about_protected_app_routes")}</CardTitle>
                 <CardDescription>
@@ -163,7 +163,7 @@ export default function AboutPage({
               </CardHeader>
             </Card>
 
-            <Card className="shadow-sm">
+            <Card>
               <CardHeader>
                 <CardTitle>{t("about_repository_content")}</CardTitle>
                 <CardDescription>
@@ -182,7 +182,7 @@ export default function AboutPage({
           </PageSectionHeading>
 
           <div className="grid gap-6 md:grid-cols-2">
-            <Card className="shadow-sm">
+            <Card>
               <CardHeader>
                 <CardTitle>{t("about_code_over_claims")}</CardTitle>
                 <CardDescription>
@@ -191,7 +191,7 @@ export default function AboutPage({
               </CardHeader>
             </Card>
 
-            <Card className="shadow-sm">
+            <Card>
               <CardHeader>
                 <CardTitle>{t("about_small_reviewable_changes")}</CardTitle>
                 <CardDescription>
@@ -212,7 +212,7 @@ export default function AboutPage({
             <PageIntroDescription className="mb-8 text-lg">
               {t("about_build_saas_product_works_well")}
             </PageIntroDescription>
-            <div className="flex flex-wrap justify-center gap-4">
+            <div className="flex flex-wrap gap-4">
               {SITE_CONFIG.features.billing && (
                 <Button asChild size="lg">
                   <Link href="/pricing" locale={locale}>

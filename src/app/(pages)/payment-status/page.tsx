@@ -12,19 +12,13 @@ import { notFound } from "next/navigation";
 function PaymentStatusSkeleton({ locale }: { locale: SupportedLocale }) {
   const { t } = getStaticTranslations(locale);
   return (
-    <section className="bg-background relative flex min-h-screen items-center justify-center overflow-hidden">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(120,119,198,0.03),transparent_50%)]" />
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--border))_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border))_1px,transparent_1px)] bg-[size:4rem_4rem] opacity-20" />
-      </div>
-
+    <section className="bg-background flex min-h-screen items-center justify-center">
       <SectionContainer className="relative">
         {/* Status Badge Skeleton */}
         <div className="mb-8 text-center">
           <Badge
             variant="outline"
-            className="border-border bg-background/50 text-muted-foreground inline-flex items-center border px-3 py-1 font-mono text-sm backdrop-blur-sm"
+            className="border-border bg-background text-muted-foreground inline-flex items-center border px-3 py-1 text-sm"
           >
             <Clock className="mr-2 h-3 w-3" />
             {t("billing_loading_status")}

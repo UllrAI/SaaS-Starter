@@ -47,10 +47,10 @@ export function BlogPostCard({
   const isFeatured = variant === "featured";
   const hasImage = !!heroImage;
   const cardClasses = cn(
-    "group overflow-hidden backdrop-blur-sm transition-all duration-300",
+    "group overflow-hidden transition-colors duration-200",
     isFeatured
-      ? "bg-background/50 hover:bg-background/80 border-primary/20 border hover:shadow-xl"
-      : "border-border bg-background/50 hover:bg-background/80 hover:shadow-lg",
+      ? "bg-background border-primary border-2"
+      : "border-border bg-background hover:border-primary",
     className,
   );
   const imageHeight = isFeatured ? "h-64 lg:h-80" : "h-48";
@@ -68,7 +68,7 @@ export function BlogPostCard({
             src={heroImage}
             alt={title}
             fill
-            className="object-cover transition-transform duration-300 group-hover:scale-105"
+            className="object-cover"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
           <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent" />
@@ -78,7 +78,7 @@ export function BlogPostCard({
             {featured ? (
               <Badge
                 variant="default"
-                className="bg-primary/90 text-primary-foreground border-primary/20 hover:bg-primary backdrop-blur-sm transition-colors"
+                className="bg-primary text-primary-foreground border-primary"
               >
                 <Sparkles className="mr-1 h-3 w-3" />
                 {t("blog_featured")}
@@ -86,7 +86,7 @@ export function BlogPostCard({
             ) : (
               <Badge
                 variant="secondary"
-                className="bg-background/90 text-foreground border-border hover:bg-background backdrop-blur-sm transition-colors"
+                className="bg-background text-foreground border-border"
               >
                 {t("blog_article")}
               </Badge>
@@ -154,15 +154,10 @@ export function BlogPostCard({
 
         <Link
           href={postHref}
-          className="text-primary hover:text-primary/80 inline-flex items-center gap-2 font-medium transition-all duration-200 group-hover:gap-3"
+          className="text-primary hover:text-primary/80 inline-flex items-center gap-2 font-medium underline-offset-4 hover:underline"
         >
           {readMoreText}
-          <span
-            className="transition-transform group-hover:translate-x-1"
-            translate="no"
-          >
-            →
-          </span>
+          <span translate="no">→</span>
         </Link>
       </CardContent>
     </Card>

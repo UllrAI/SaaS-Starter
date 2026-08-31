@@ -113,7 +113,7 @@ export default function PricingPage({
       <PageIntro
         className="mb-20"
         badge={
-          <Badge className="border-border bg-background/50 inline-flex items-center border px-3 py-1 text-sm backdrop-blur-sm">
+          <Badge className="border-border bg-background inline-flex items-center border px-3 py-1 text-sm">
             <Boxes className="text-muted-foreground mr-2 h-3 w-3" />
             <span className="text-muted-foreground font-mono">
               {t("pricing_starter_pricing")}
@@ -124,7 +124,7 @@ export default function PricingPage({
         <PageIntroHeading>
           {t("pricing_simple_transparent_pricing")}
         </PageIntroHeading>
-        <PageIntroDescription className="mx-auto max-w-3xl">
+        <PageIntroDescription>
           {t("pricing_choose_plan_fits_you_no_hidden")}
         </PageIntroDescription>
       </PageIntro>
@@ -142,9 +142,9 @@ export default function PricingPage({
           {includedCards.map((item) => {
             const Icon = item.icon;
             return (
-              <Card key={item.id} className="shadow-sm">
+              <Card key={item.id}>
                 <CardHeader>
-                  <div className="bg-primary/10 text-primary border-primary/20 mb-4 flex h-12 w-12 items-center justify-center border">
+                  <div className="text-primary mb-4 flex h-12 w-12 items-center">
                     <Icon className="h-6 w-6" />
                   </div>
                   <CardTitle>{item.title}</CardTitle>
@@ -161,7 +161,7 @@ export default function PricingPage({
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-        <Card className="shadow-sm">
+        <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Info className="text-primary h-5 w-5" />
@@ -178,17 +178,17 @@ export default function PricingPage({
           </CardContent>
         </Card>
 
-        <Card className="shadow-sm">
+        <Card>
           <CardHeader>
             <CardTitle>{t("pricing_current_payment_provider")}</CardTitle>
             <CardDescription>{t("pricing_checkout_routes")}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="border-border bg-muted/30 border p-5">
-              <p className="text-muted-foreground text-sm uppercase">
+              <p className="text-muted-foreground text-sm">
                 {t("pricing_provider")}
               </p>
-              <p className="text-foreground mt-2 font-mono text-2xl font-bold uppercase">
+              <p className="text-foreground mt-2 text-2xl font-bold">
                 {PAYMENT_PROVIDER}
               </p>
             </div>

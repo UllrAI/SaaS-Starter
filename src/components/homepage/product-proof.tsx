@@ -66,7 +66,7 @@ export function ProductProof({
               return (
                 <Card key={point.id} className="h-full">
                   <CardContent className="pt-6">
-                    <div className="bg-primary/10 text-primary flex h-10 w-10 items-center justify-center rounded-lg">
+                    <div className="text-primary flex h-10 w-10 items-center">
                       <Icon className="h-5 w-5" aria-hidden="true" />
                     </div>
                     <h3 className="text-foreground mt-5 font-semibold">

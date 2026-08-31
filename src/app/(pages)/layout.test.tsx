@@ -39,6 +39,11 @@ describe("PagesLayout", () => {
 
     const main = screen.getByRole("main");
     expect(main).toHaveClass("flex-1");
+    expect(main).toHaveAttribute("id", "main-content");
     expect(main).toContainElement(screen.getByTestId("layout-child"));
+
+    expect(
+      screen.getByRole("link", { name: "Skip to main content" }),
+    ).toHaveAttribute("href", "#main-content");
   });
 });

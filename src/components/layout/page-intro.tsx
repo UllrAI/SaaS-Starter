@@ -12,10 +12,7 @@ export function PageIntro({
   ...props
 }: PageIntroProps) {
   return (
-    <header
-      className={cn("mx-auto max-w-3xl text-center", className)}
-      {...props}
-    >
+    <header className={cn("max-w-3xl text-left", className)} {...props}>
       {badge ? <div className="mb-6">{badge}</div> : null}
       {children}
     </header>
@@ -32,7 +29,7 @@ export function PageIntroHeading({
   return (
     <Component
       className={cn(
-        "text-foreground mb-6 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl",
+        "text-foreground mb-5 text-4xl font-bold tracking-tight text-balance sm:text-5xl",
         className,
       )}
       {...props}
@@ -45,7 +42,10 @@ export function PageIntroDescription(props: ComponentPropsWithoutRef<"p">) {
 
   return (
     <p
-      className={cn("text-muted-foreground text-xl leading-relaxed", className)}
+      className={cn(
+        "text-muted-foreground max-w-2xl text-lg leading-8",
+        className,
+      )}
       {...rest}
     />
   );

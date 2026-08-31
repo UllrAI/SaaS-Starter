@@ -3,7 +3,6 @@
 import { ArrowLeft, Home, Sparkles } from "lucide-react";
 
 import { LocalizedLink as Link } from "@/components/localized-link";
-import { BackgroundPattern } from "@/components/ui/background-pattern";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/lib/i18n/translation/client";
@@ -12,10 +11,9 @@ export function NotFoundContent() {
   const { t } = useTranslation();
 
   return (
-    <main className="bg-background relative flex min-h-screen flex-col items-center justify-center overflow-hidden">
-      <BackgroundPattern />
+    <main className="bg-background flex min-h-screen flex-col items-center justify-center">
       <div className="relative mx-auto w-full max-w-2xl px-6 text-center">
-        <Badge className="border-border bg-background/50 mb-8 inline-flex items-center border px-3 py-1 text-sm backdrop-blur-sm">
+        <Badge className="border-border bg-background mb-8 inline-flex items-center border px-3 py-1 text-sm">
           <Sparkles className="text-muted-foreground mr-2 h-3 w-3" />
           <span className="text-muted-foreground font-mono">
             {t("common_error_404")}

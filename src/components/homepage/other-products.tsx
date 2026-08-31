@@ -87,12 +87,12 @@ export function OtherProducts({
             return (
               <Card
                 key={product.id}
-                className="group border-border bg-card hover:border-primary relative h-full border p-6 transition-all hover:shadow-[4px_4px_0px_0px_var(--border)]"
+                className="group border-border bg-card hover:border-primary relative h-full border p-6 transition-colors"
               >
                 <CardContent className="p-0">
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="bg-secondary text-primary border-border group-hover:bg-primary group-hover:text-primary-foreground flex h-10 w-10 items-center justify-center border transition-colors">
+                      <div className="text-primary flex h-10 w-10 items-center">
                         <IconComponent className="h-5 w-5" />
                       </div>
                       <div className="flex-1">

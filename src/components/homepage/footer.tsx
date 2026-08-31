@@ -215,7 +215,7 @@ export function Footer({
                     <a
                       key={social.name}
                       href={social.href}
-                      className="border-border bg-background text-muted-foreground hover:text-foreground hover:border-border/80 flex h-9 w-9 items-center justify-center rounded-lg border transition-colors"
+                      className="border-border bg-background text-muted-foreground hover:text-foreground hover:border-primary flex h-9 w-9 items-center justify-center border transition-colors"
                       target="_blank"
                       rel="noopener noreferrer"
                       aria-label={social.name}

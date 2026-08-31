@@ -70,7 +70,7 @@ export default function ContactPage({
         <PageIntro
           className="mb-20"
           badge={
-            <Badge className="border-border bg-background/50 inline-flex items-center border px-3 py-1 text-sm backdrop-blur-sm">
+            <Badge className="border-border bg-background inline-flex items-center border px-3 py-1 text-sm">
               <Mail className="text-muted-foreground mr-2 h-3 w-3" />
               <span className="text-muted-foreground font-mono">
                 {t("contact_md")}
@@ -98,7 +98,7 @@ export default function ContactPage({
           </PageSectionHeading>
 
           <div className="grid gap-6 md:grid-cols-2">
-            <Card className="shadow-sm">
+            <Card>
               <CardHeader>
                 <CardTitle>{t("contact_standard_support")}</CardTitle>
                 <CardDescription>
@@ -133,7 +133,7 @@ export default function ContactPage({
               </CardContent>
             </Card>
 
-            <Card className="shadow-sm">
+            <Card>
               <CardHeader>
                 <CardTitle>{t("contact_premium_support")}</CardTitle>
                 <CardDescription>
@@ -178,7 +178,7 @@ export default function ContactPage({
           </PageSectionHeading>
 
           <div className="grid gap-6 md:grid-cols-2">
-            <Card className="shadow-sm">
+            <Card>
               <CardHeader>
                 <CardTitle className="text-lg">
                   {t("contact_what_average_response_time")}
@@ -191,7 +191,7 @@ export default function ContactPage({
               </CardContent>
             </Card>
 
-            <Card className="shadow-sm">
+            <Card>
               <CardHeader>
                 <CardTitle className="text-lg">
                   {t("contact_do_you_offer_enterprise_support")}
@@ -204,7 +204,7 @@ export default function ContactPage({
               </CardContent>
             </Card>
 
-            <Card className="shadow-sm">
+            <Card>
               <CardHeader>
                 <CardTitle className="text-lg">
                   {t("contact_can_i_schedule_demo")}
@@ -219,7 +219,7 @@ export default function ContactPage({
               </CardContent>
             </Card>
 
-            <Card className="shadow-sm">
+            <Card>
               <CardHeader>
                 <CardTitle className="text-lg">
                   {t("contact_where_can_i_find_documentation")}
@@ -253,7 +253,7 @@ export default function ContactPage({
           </PageSectionHeading>
 
           <div className="grid gap-4 md:grid-cols-3">
-            <Card className="shadow-sm transition-all hover:shadow-md">
+            <Card className="hover:border-primary transition-colors">
               <CardHeader>
                 <CardTitle className="text-base">
                   {t("contact_documentation")}
@@ -271,7 +271,7 @@ export default function ContactPage({
               </CardContent>
             </Card>
 
-            <Card className="shadow-sm transition-all hover:shadow-md">
+            <Card className="hover:border-primary transition-colors">
               <CardHeader>
                 <CardTitle className="text-base">
                   {t("contact_community_forum")}
@@ -293,7 +293,7 @@ export default function ContactPage({
               </CardContent>
             </Card>
 
-            <Card className="shadow-sm transition-all hover:shadow-md">
+            <Card className="hover:border-primary transition-colors">
               <CardHeader>
                 <CardTitle className="text-base">
                   {t("contact_release_notes")}
@@ -329,7 +329,7 @@ export default function ContactPage({
                 COMPANY_NAME,
               })}
             </PageIntroDescription>
-            <div className="flex flex-wrap justify-center gap-4">
+            <div className="flex flex-wrap gap-4">
               {SITE_CONFIG.features.billing && (
                 <Button asChild size="lg">
                   <Link href="/pricing" locale={locale}>

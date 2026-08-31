@@ -1,7 +1,6 @@
 import { getStaticTranslations } from "@/lib/i18n/translation/static";
 import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
-import { BackgroundPattern } from "@/components/ui/background-pattern";
 import { Badge } from "@/components/ui/badge";
 import { ReadingContainer } from "@/components/layout/page-container";
 import { BlogPostMeta } from "./blog-post-meta";
@@ -62,7 +61,7 @@ export function BlogPostHeader({
               <Button
                 variant="ghost"
                 asChild
-                className="bg-background/80 hover:bg-background/90 backdrop-blur-sm transition-colors"
+                className="bg-background/90 hover:bg-background transition-colors"
               >
                 <Link href={backHref}>
                   <ArrowLeft className="mr-2 h-4 w-4" />
@@ -125,9 +124,7 @@ export function BlogPostHeader({
 
   // Non-hero image layout
   return (
-    <section className="bg-background relative overflow-hidden">
-      <BackgroundPattern />
-
+    <section className="bg-background">
       <div className="py-6 md:py-12">
         <ReadingContainer>
           {/* Back button */}
@@ -146,7 +143,7 @@ export function BlogPostHeader({
           </div>
 
           {/* Article header */}
-          <header className="text-center">
+          <header>
             <BlogPostMeta
               publishedDate={publishedDate}
               updatedDate={updatedDate}

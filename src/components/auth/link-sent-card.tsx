@@ -20,9 +20,9 @@ export function LinkSentCard({
 }: LinkSentCardProps) {
   const { t } = useTranslation();
   return (
-    <Card className="bg-muted/30 w-full shadow-md backdrop-blur-sm">
+    <Card className="bg-background w-full border-2">
       <CardHeader className="text-center">
-        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-50">
+        <div className="mx-auto flex h-16 w-16 items-center justify-center border bg-green-50">
           <CheckCircle className="h-8 w-8 text-green-500" />
         </div>
         <CardTitle className="text-xl font-semibold tracking-tight">

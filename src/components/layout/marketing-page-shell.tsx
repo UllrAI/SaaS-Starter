@@ -1,5 +1,4 @@
 import type { ComponentPropsWithoutRef } from "react";
-import { BackgroundPattern } from "@/components/ui/background-pattern";
 import { cn } from "@/lib/utils";
 import { SectionContainer } from "./page-container";
 
@@ -17,9 +16,8 @@ export function MarketingPageShell({
 }: MarketingPageShellProps) {
   return (
     <section className={cn("flex min-h-screen flex-col", className)} {...props}>
-      <div className="bg-background relative grow overflow-hidden">
-        <BackgroundPattern />
-        <div className={cn("relative py-16", contentClassName)}>
+      <div className="bg-background grow">
+        <div className={cn("py-16", contentClassName)}>
           <SectionContainer className={containerClassName}>
             {children}
           </SectionContainer>

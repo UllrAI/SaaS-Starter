@@ -59,10 +59,10 @@ export function RecentUsersChart({ chartData }: RecentUsersChartProps) {
           content={({ active, payload, label }) => {
             if (active && payload && payload.length) {
               return (
-                <div className="bg-background rounded-lg border p-2 shadow-sm">
+                <div className="bg-background border p-2">
                   <div className="grid grid-cols-2 gap-2">
                     <div className="flex flex-col">
-                      <span className="text-muted-foreground text-[0.70rem] uppercase">
+                      <span className="text-muted-foreground text-xs">
                         Date
                       </span>
                       <span className="text-muted-foreground font-bold">
@@ -70,7 +70,7 @@ export function RecentUsersChart({ chartData }: RecentUsersChartProps) {
                       </span>
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-muted-foreground text-[0.70rem] uppercase">
+                      <span className="text-muted-foreground text-xs">
                         New Users
                       </span>
                       <span className="font-bold">{payload[0].value}</span>

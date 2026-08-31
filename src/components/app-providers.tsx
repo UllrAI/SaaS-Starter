@@ -20,7 +20,7 @@ export function AppProviders({ children }: AppProvidersProps) {
         disableTransitionOnChange
       >
         <TooltipProvider>
-          <NextTopLoader color="hsl(var(--primary))" showSpinner={false} />
+          <NextTopLoader color="var(--primary)" showSpinner={false} />
           {children}
           <Toaster />
         </TooltipProvider>

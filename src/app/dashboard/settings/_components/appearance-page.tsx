@@ -119,7 +119,7 @@ export function AppearancePage() {
             {themes.map((themeOption) => (
               <div
                 key={themeOption.value}
-                className="cursor-pointer transition-all hover:scale-105"
+                className="cursor-pointer"
                 onClick={() => setTheme(themeOption.value)}
               >
                 <ThemeCard

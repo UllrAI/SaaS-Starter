@@ -80,15 +80,15 @@ export function RevenueChart({ chartData }: RevenueChartProps) {
           content={({ active, payload, label }) => {
             if (active && payload && payload.length) {
               return (
-                <div className="bg-background rounded-lg border p-2 shadow-sm">
+                <div className="bg-background border p-2">
                   <div className="grid grid-cols-1 gap-2">
                     <div className="flex flex-col">
-                      <span className="text-muted-foreground text-[0.70rem] uppercase">
+                      <span className="text-muted-foreground text-xs">
                         {label}
                       </span>
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-muted-foreground text-[0.70rem] uppercase">
+                      <span className="text-muted-foreground text-xs">
                         {t("admin_settled_usd_revenue")}
                       </span>
                       <span className="font-bold">
@@ -96,7 +96,7 @@ export function RevenueChart({ chartData }: RevenueChartProps) {
                       </span>
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-muted-foreground text-[0.70rem] uppercase">
+                      <span className="text-muted-foreground text-xs">
                         {t("admin_payments_label")}
                       </span>
                       <span className="text-muted-foreground font-bold">

@@ -109,11 +109,6 @@ export function AuthForm({
     ) : (
       <>{t("auth_oauth_signup_description")}</>
     ),
-    badgeText: isLogin ? (
-      <>{t("auth_welcome_back")}</>
-    ) : (
-      <>{t("auth_get_started")}</>
-    ),
     submitButtonText: isLogin ? (
       <>{t("auth_send_magic_link")}</>
     ) : (

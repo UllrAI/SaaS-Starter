@@ -68,7 +68,7 @@ export default function FeaturesPage({
         <PageIntro
           className="mb-20"
           badge={
-            <Badge className="border-border bg-background/50 inline-flex items-center border px-3 py-1 text-sm backdrop-blur-sm">
+            <Badge className="border-border bg-background inline-flex items-center border px-3 py-1 text-sm">
               <Package2 className="text-muted-foreground mr-2 h-3 w-3" />
               <span className="text-muted-foreground font-mono">
                 {t("features_starter_scope")}

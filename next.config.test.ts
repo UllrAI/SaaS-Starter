@@ -6,6 +6,7 @@ import {
   beforeEach,
   afterEach,
 } from "@jest/globals";
+import packageJson from "./package.json";
 
 const mockWithNextIntl = jest.fn(
   (nextConfig: Record<string, unknown>) => nextConfig,
@@ -147,5 +148,72 @@ describe("next.config.ts", () => {
         hostname: "images.unsplash.com",
       },
     ]);
+  });
+  it("defaults deploymentId to the package version", async () => {
+    delete process.env.NEXT_DEPLOYMENT_ID;
+    jest.doMock("@/env", () => ({
+      __esModule: true,
+      default: {
+        R2_PUBLIC_URL: undefined,
+      },
+    }));
+    const getConfig = await importConfig();
+    const nextConfig = await getConfig();
+    expect((nextConfig as any).deploymentId).toBe(
+      packageJson.version.replace(/\./g, "-"),
+    );
+  });
+
+  it("normalises characters next build would reject", async () => {
+    // `next build` only accepts [A-Za-z0-9_-]; a raw semantic version or commit
+    // ref would fail the build outright.
+    process.env.NEXT_DEPLOYMENT_ID = "v1.2.3+build/7";
+    jest.doMock("@/env", () => ({
+      __esModule: true,
+      default: {
+        R2_PUBLIC_URL: undefined,
+      },
+    }));
+    const getConfig = await importConfig();
+    const nextConfig = await getConfig();
+    expect((nextConfig as any).deploymentId).toBe("v1-2-3-build-7");
+    expect((nextConfig as any).deploymentId).toMatch(/^[A-Za-z0-9_-]*$/);
+  });
+
+  it("prefers NEXT_DEPLOYMENT_ID over the package version", async () => {
+    process.env.NEXT_DEPLOYMENT_ID = "release-2026-09-05";
+    jest.doMock("@/env", () => ({
+      __esModule: true,
+      default: {
+        R2_PUBLIC_URL: undefined,
+      },
+    }));
+    const getConfig = await importConfig();
+    const nextConfig = await getConfig();
+    expect((nextConfig as any).deploymentId).toBe("release-2026-09-05");
+  });
+
+  it("resolves the same deploymentId on every load", async () => {
+    // `next build` loads this config in several processes, and the ID compiled
+    // into the client bundle must match the one frozen into the standalone
+    // server. A random or time-based value would break every Server Action.
+    delete process.env.NEXT_DEPLOYMENT_ID;
+    const loadDeploymentId = async () => {
+      jest.doMock("@/env", () => ({
+        __esModule: true,
+        default: {
+          R2_PUBLIC_URL: undefined,
+        },
+      }));
+      const getConfig = await importConfig();
+      return (await getConfig()).deploymentId;
+    };
+
+    const first = await loadDeploymentId();
+    jest.resetModules();
+    const second = await loadDeploymentId();
+
+    expect(first).toBe(second);
+    expect(first).toBeTruthy();
   });
 });

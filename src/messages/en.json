@@ -29,6 +29,8 @@
   "about_practical_workflow_speed": "Practical Workflow Speed",
   "legal_you_may_not_copy_modify_distribute": "You may not copy, modify, or distribute our proprietary content",
   "common_reload": "Reload",
+  "common_deployment_skew_title": "That didn't go through",
+  "common_deployment_skew_description": "The app was updated while this page was open. Reload and try again.",
   "about_starter_focuses_real_saas_foundations": "This starter focuses on real SaaS foundations: authentication, billing, database access, uploads, localization, and operational screens that can be inspected, tested, and extended without replacing placeholder flows first.",
   "admin_current_period": "Current Period",
   "admin_user_growth": "User Growth",

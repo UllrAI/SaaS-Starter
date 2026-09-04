@@ -88,6 +88,45 @@ Migrations are a release step, not an application startup hook. This prevents
 multiple replicas from racing on schema changes. The Web service must start
 only after the migration command succeeds.
 
+## Deployment skew
+
+A Server Action ID is a build artifact. When a new build goes live, a browser tab
+still running the previous one calls IDs the server no longer knows, and the
+request fails with `Failed to find Server Action`. Next.js also rotates these IDs
+on its own at most every 14 days, so the failure is not limited to deploys that
+change the source.
+
+The repository handles this without extra environment variables:
+
+- `next.config.ts` sets `deploymentId` from the `package.json` version. Releases
+  are published as `release/vX.Y.Z` tags matching that version, so the ID changes
+  exactly when a production deployment does. The client compares it against the
+  server on navigation and falls back to a full page load on a mismatch, usually
+  before the user triggers an action at all.
+- `src/lib/deployment-skew.ts` recognises the router error, and
+  `useDeploymentSkewGuard` turns it into a toast that asks for a reload. Retrying
+  is never offered: the old ID is gone for good.
+- `src/app/error.tsx` and `src/app/global-error.tsx` show the same reload path,
+  because `reset()` would re-run the same stale bundle.
+
+The value must stay deterministic. `next build` loads the config in several
+processes, and the ID compiled into the client has to match the one frozen into
+the standalone server, so a random or time-based value would break every Server
+Action call rather than fix anything.
+
+Two optional environment variables cover cases the default does not:
+
+- `NEXT_DEPLOYMENT_ID` overrides the version. Set it where the same version is
+  deployed repeatedly, such as a preview environment tracking a branch;
+  otherwise those deploys share one ID and lose the early reload. Any character
+  outside `[A-Za-z0-9_-]` is replaced with a hyphen, because `next build`
+  rejects the rest — a commit ref works as-is, a raw semantic version does not.
+- `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` pins the key used to encrypt Server
+  Function closures. It is generated per build and baked into the artifact, so
+  replicas of one image already agree. Set it only when the same version is
+  built independently more than once and two such builds serve traffic at the
+  same time.
+
 ## Durable Worker service
 
 Create a second Zeabur service from the same repository, release, and

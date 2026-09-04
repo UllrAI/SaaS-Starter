@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslation } from "@/lib/i18n/translation/client";
+import { useDeploymentSkewGuard } from "@/hooks/use-deployment-skew";
 import { useState, ReactNode, useTransition, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -58,6 +59,7 @@ export function UploadManagementTable({
   const { t } = useTranslation();
   const intlLocale = useIntlLocale();
   const [isPending, startTransition] = useTransition();
+  const guardSkew = useDeploymentSkewGuard();
   const [selectedUpload, setSelectedUpload] = useState<Upload | null>(null);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [uploadToDelete, setUploadToDelete] = useState<Upload | null>(null);
@@ -105,9 +107,12 @@ export function UploadManagementTable({
   const confirmDeleteUpload = async () => {
     if (!uploadToDelete) return;
     startTransition(async () => {
-      const result = await deleteUploadAction({
-        uploadId: uploadToDelete.id,
-      });
+      const result = await guardSkew(() =>
+        deleteUploadAction({
+          uploadId: uploadToDelete.id,
+        }),
+      );
+      if (!result) return;
       if (result.data) {
         toast.success(t("upload_delete_success"));
         setUploadToDelete(null);
@@ -120,9 +125,12 @@ export function UploadManagementTable({
   const handleBatchDelete = async () => {
     if (selectedUploads.size === 0) return;
     startTransition(async () => {
-      const result = await batchDeleteUploadsAction({
-        uploadIds: Array.from(selectedUploads),
-      });
+      const result = await guardSkew(() =>
+        batchDeleteUploadsAction({
+          uploadIds: Array.from(selectedUploads),
+        }),
+      );
+      if (!result) return;
       if (result.data) {
         toast.success(t("upload_batch_delete_success"));
         setSelectedUploads(new Set());

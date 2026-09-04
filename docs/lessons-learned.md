@@ -65,6 +65,16 @@
 
 ## 测试
 
+### 从 `@jest/globals` 导入 `jest` 会让 `jest.mock` 失效
+
+**现象**:测试顶部写了 `jest.mock("sonner", () => ({ toast: { warning: jest.fn() } }))`,断言时却报 `Matcher error: received value must be a mock or spy function`,拿到的是 sonner 的真实实现。
+
+**原因**:`jest.mock` 依赖转译期的 hoisting 被提到 `import` 之前。SWC 的 hoisting 只认**全局** `jest` 标识符;一旦写了 `import { jest } from "@jest/globals"`,`jest` 变成本地绑定,`jest.mock` 就留在原地,注册时被测模块早已加载完毕,mock 不再生效。实测 `jest.isMockFunction(toast.warning)`:导入 `jest` 时为 `false`,用全局 `jest` 时为 `true`。
+
+**正确做法**:只从 `@jest/globals` 取 `describe`/`it`/`expect`/`beforeEach`,`jest` 用全局的。参考 `src/components/auth/social-login-buttons.test.tsx`。
+
+注意 `src/hooks/use-admin-table.test.tsx` 目前正踩这个坑——它的 `use-debounce` mock 从未生效,跑的是真实实现,断言恰好仍然成立。单纯删掉那行 `jest` 导入会让它立刻挂掉(mock 工厂返回的 `jest.fn()` 在模块加载期就被调用,那时还没配 `mockImplementation`),要修得连工厂的默认返回值一起补。
+
 ### jsdom 的 `crypto` 没有 `subtle`
 
 **现象**:AI SDK 的工具审批用例在 jest 里报 `TypeError: Cannot read properties of undefined (reading 'importKey')`,同样的代码在 Node 里跑得好好的。
@@ -76,6 +86,14 @@
 ---
 
 ## Next.js
+
+### `deploymentId` 不接受点号,直接让 `next build` 失败
+
+**现象**:把 `package.json` 的版本号当作 `deploymentId` 写进 `next.config.ts`,`pnpm build` 立刻报 `Invalid \`deploymentId\` configuration: contains invalid characters`,连编译都没开始。lint、type-check、test 全绿,只有 build 会暴露。
+
+**原因**:`next build` 用 `/^[a-zA-Z0-9_-]*$/` 校验这个值(见 `node_modules/next/dist/build/index.js`),而语义化版本天然带点。官方文档只说它用于 version skew 防护,没提字符集限制。
+
+**正确做法**:任何来源的值都先 `.replace(/[^A-Za-z0-9_-]/g, "-")` 再交给 Next。commit ref、带 `+build` 的版本号同理。另外这个值必须是确定性的:`next build` 会在多个进程里各自加载一次 `next.config.ts`,编进客户端的 ID 和固化进 standalone server 的 ID 必须一致,用随机数或时间戳会让每一次 Server Action 调用都 mismatch。
 
 ### 本项目的 Next.js 与训练数据不符
 

@@ -29,6 +29,8 @@
   "about_practical_workflow_speed": "实用的工作流速度",
   "legal_you_may_not_copy_modify_distribute": "您不得复制、修改或分发我们的专有内容",
   "common_reload": "重新加载",
+  "common_deployment_skew_title": "操作没有生效",
+  "common_deployment_skew_description": "页面打开期间站点更新过，刷新后重试。",
   "about_starter_focuses_real_saas_foundations": "此启动模板专注于真实的 SaaS 基础能力：身份认证、账单、数据库访问、上传、本地化和运营界面。这些能力都可以被检查、测试和扩展，无需先替换占位流程。",
   "admin_current_period": "当前周期",
   "admin_user_growth": "用户增长",

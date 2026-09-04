@@ -4,6 +4,7 @@ import { withContentCollections } from "@content-collections/next";
 import createNextIntlPlugin from "next-intl/plugin";
 import { getRemotePatterns } from "./next-images.config";
 import { PERMANENT_REDIRECTS } from "./src/lib/config/redirects";
+import { version as packageVersion } from "./package.json";
 
 const isDevelopment = process.env.NODE_ENV === "development";
 const umamiScriptOrigin = (() => {
@@ -63,8 +64,22 @@ const securityHeaders = [
       ]),
 ];
 
+// Stamping the build with a deployment ID lets the router spot a stale client
+// and fall back to a hard navigation before the user triggers a Server Action
+// the server no longer knows. Releases are tagged `release/vX.Y.Z` to match the
+// package version (see AGENTS.md "Production Promotion"), so that version marks
+// exactly the deployments users see. The value has to be deterministic —
+// `next build` loads this config in several processes and the ID compiled into
+// the client must match the one frozen into the standalone server — and it is
+// normalised because `next build` rejects anything outside [A-Za-z0-9_-].
+const deploymentId = (process.env.NEXT_DEPLOYMENT_ID || packageVersion).replace(
+  /[^A-Za-z0-9_-]/g,
+  "-",
+);
+
 const nextConfig: NextConfig = {
   output: "standalone",
+  deploymentId,
   // The Vercel AI SDK ships ESM-only bundles; listing the packages here also
   // lets next/jest transform them so agent tools stay unit-testable.
   transpilePackages: [

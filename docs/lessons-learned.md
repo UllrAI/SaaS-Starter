@@ -87,17 +87,19 @@
 
 ## Next.js
 
-### `deploymentId` 不接受点号,直接让 `next build` 失败
+### 配 `deploymentId` 会削弱 Next 自带的 skew 检测
 
-**现象**:把 `package.json` 的版本号当作 `deploymentId` 写进 `next.config.ts`,`pnpm build` 立刻报 `Invalid \`deploymentId\` configuration: contains invalid characters`,连编译都没开始。lint、type-check、test 全绿,只有 build 会暴露。
+**现象**:为了让旧页面在新部署后尽早硬跳转,给 `next.config.ts` 加了 `deploymentId`(取 `package.json` 版本号)。看起来一切正常:静态资源带上了 `?dpl=`,HTML 带上了 `data-dpl-id`,lint / type-check / test / build 全绿。实际效果是**比不加更差**。
 
-**原因**:`next build` 用 `/^[a-zA-Z0-9_-]*$/` 校验这个值(见 `node_modules/next/dist/build/index.js`),而语义化版本天然带点。官方文档只说它用于 version skew 防护,没提字符集限制。
+**原因**:两处非直觉行为。
 
-**正确做法**:在 `next.config.ts` 里先 `.replace(/[^A-Za-z0-9_-]/g, "-")` 再交给 Next。
+其一,`getBuildId`(`node_modules/next/dist/build/index.js`)在检测到 `config.deploymentId` 后**不再生成随机 buildId**,直接返回常量 `build-TfctsWXpff2fKS`。实测:配了以后 `.next/BUILD_ID` 是这个常量,不配则是随机 nanoid。
 
-注意这个归一化**管不到 `NEXT_DEPLOYMENT_ID`**:`loadConfig` 在用户配置求值之后无条件执行 `result.deploymentId = process.env.NEXT_DEPLOYMENT_ID`(`node_modules/next/dist/server/config.js`),会把你归一化过的值直接覆盖掉。所以在配置里包一层 env 归一化是死代码,而针对它写的单测会永远绿——它断言的是随后被 Next 丢弃的那一层。该变量的取值必须自己合规。
+其二,客户端的比对键随之切换。`app-index.js` 里 `initialRSCPayload.b ? setNavigationBuildId(b) : setNavigationBuildId(getDeploymentId())`——不配 deploymentId 时比的是每次构建都变的 buildId,配了以后比的是 deploymentId。于是检测粒度从「每次构建」降到「每个版本号」,同版本重建(改环境变量触发的 rebuild、预览环境跟分支、同一 tag 重跑)一次都不会触发,而这恰恰是最需要它的场景——同版本重建**必然**产生新的 Server Action ID,因为 action ID 的 hash salt 就是每次构建随机生成的加密密钥(`serverReferenceHashSalt` in `build/webpack-config.js`)。
 
-另外这个值必须是确定性的:`next build` 会在多个进程里各自加载一次 `next.config.ts`,编进客户端的 ID 和固化进 standalone server 的 ID 必须一致,用随机数或时间戳会让每一次 Server Action 调用都 mismatch。
+**正确做法**:不要配 `deploymentId`,除非能喂给它一个每次构建都变的值(git SHA),而那需要构建时注入。想让同版本重建不产生 skew,对症的是钉住 `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY`——它同时是 action ID 的 hash salt,钉住它等于让同源码重建产出相同的 action ID。
+
+顺带两个记下来省得再查的点:`deploymentId` 只接受 `[a-zA-Z0-9_-]`(`build/index.js` 里的正则),语义化版本号带点会让构建直接失败;以及 `NEXT_DEPLOYMENT_ID` 的优先级和官方文档写的相反——文档说 config 优先,源码里 `loadConfig` 是只要该变量非空就用它覆盖 config 的值。
 
 ### 本项目的 Next.js 与训练数据不符
 

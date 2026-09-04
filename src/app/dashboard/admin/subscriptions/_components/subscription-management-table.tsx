@@ -88,10 +88,12 @@ export function SubscriptionManagementTable({
   const confirmCancelSubscription = async () => {
     if (!cancellingSubscription) return;
     startTransition(async () => {
-      const result = await guardSkew(() =>
-        cancelSubscriptionAction({
-          subscriptionId: cancellingSubscription.subscriptionId,
-        }),
+      const result = await guardSkew(
+        () =>
+          cancelSubscriptionAction({
+            subscriptionId: cancellingSubscription.subscriptionId,
+          }),
+        () => setCancellingSubscription(null),
       );
 
       if (!result) return;

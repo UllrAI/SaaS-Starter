@@ -96,45 +96,47 @@ request fails with `Failed to find Server Action`. Next.js also rotates these ID
 on its own at most every 14 days, so the failure is not limited to deploys that
 change the source.
 
-The repository handles this without extra environment variables:
+Next already catches most of this by itself. Every build gets a random build ID,
+the client compares it against the server on each navigation, and a mismatch
+turns the soft navigation into a full page load — usually before the user
+triggers an action at all.
 
-- `next.config.ts` sets `deploymentId` from the `package.json` version, with the
-  dots stripped because `next build` only accepts `[A-Za-z0-9_-]`. Releases are
-  published as `release/vX.Y.Z` tags matching that version, so the ID changes on
-  every version bump. The client compares it against the server on navigation
-  and falls back to a full page load on a mismatch, usually before the user
-  triggers an action at all. Redeploying the same version — a rebuild triggered
-  by an environment change, a preview environment tracking a branch — produces
-  new Server Action IDs but an unchanged deployment ID, so this early detection
-  does not fire and only the prompt below applies.
-- `src/lib/deployment-skew.ts` recognises the router error, and
-  `useDeploymentSkewGuard` turns it into a toast that asks for a reload. Retrying
-  is never offered: the old ID is gone for good.
-- `src/app/error.tsx` and `src/app/global-error.tsx` show the same reload path,
-  because `reset()` would re-run the same stale bundle. Nothing reaches them
-  today — every Server Action call in the app goes through the guard above, and
-  React reports a rejected `startTransition` through `reportGlobalError` rather
-  than an error boundary. They cover a future `<form action>` or `useActionState`
-  call, which fails through the boundary instead.
+**Do not set `deploymentId` to try to improve on that.** As soon as that option
+is present, `next build` stops generating a random build ID and hardcodes a
+constant (`getBuildId` in `next/dist/build/index.js`), then compares the
+deployment ID instead. Feeding it anything coarser than a per-build value — the
+package version, for instance — detects strictly less than the default already
+does: a rebuild of an unchanged version produces new Server Action IDs but an
+unchanged deployment ID, and nothing fires.
 
-The value must stay deterministic. `next build` loads the config in several
-processes, and the ID compiled into the client has to match the one frozen into
-the standalone server, so a random or time-based value would break every Server
-Action call rather than fix anything.
+What the app adds is the recovery path for the calls that still slip through:
 
-Two optional environment variables cover cases the default does not:
+- `src/lib/deployment-skew.ts` recognises the router error, and `reloadPage()`
+  is the only recovery — the missing ID never comes back, so retrying cannot
+  work.
+- `useDeploymentSkewGuard` (`src/hooks/use-deployment-skew.ts`) wraps a Server
+  Action call and turns a skew into a toast asking for a reload. Callers inside
+  a dialog pass `onSkew` to close it first: Radix traps focus and hides
+  everything outside the dialog from assistive tech, which would leave the
+  prompt unreachable.
+- `src/app/error.tsx` and `src/app/global-error.tsx` offer a reload rather than
+  `reset()`, which would re-run the same stale bundle. They are reachable: React
+  routes a rejected `useTransition` callback to the nearest error boundary, so
+  any future Server Action call that forgets the guard lands there.
 
-- `NEXT_DEPLOYMENT_ID` overrides the version. Set it where the same version is
-  deployed repeatedly, such as a preview environment tracking a branch;
-  otherwise those deploys share one ID and lose the early reload. Next reads
-  this variable itself, after `next.config.ts` has been evaluated, so its value
-  has to satisfy `[A-Za-z0-9_-]` on its own — a commit SHA works, a raw semantic
-  version fails the build.
-- `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` pins the key used to encrypt Server
-  Function closures. It is generated per build and baked into the artifact, so
-  replicas of one image already agree. Set it only when the same version is
-  built independently more than once and two such builds serve traffic at the
-  same time.
+### Server Function encryption key
+
+`NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` is worth knowing about even though this
+repository does not set it. The key doubles as the hash salt for Server Action
+IDs (`serverReferenceHashSalt` in `next/dist/build/webpack-config.js`), so
+pinning it makes two builds of identical source produce identical action IDs —
+which removes skew entirely for rebuilds that do not change the code.
+
+Left unset, the key is generated per build and baked into the artifact. Replicas
+of one image therefore already agree, so multi-instance deployments do not need
+it on their own. Set it when the same source is built more than once and both
+builds serve traffic, or when you want a rebuild to stay compatible with tabs
+opened against the previous one.
 
 ## Durable Worker service
 

@@ -107,10 +107,12 @@ export function UploadManagementTable({
   const confirmDeleteUpload = async () => {
     if (!uploadToDelete) return;
     startTransition(async () => {
-      const result = await guardSkew(() =>
-        deleteUploadAction({
-          uploadId: uploadToDelete.id,
-        }),
+      const result = await guardSkew(
+        () =>
+          deleteUploadAction({
+            uploadId: uploadToDelete.id,
+          }),
+        () => setUploadToDelete(null),
       );
       if (!result) return;
       if (result.data) {
@@ -125,10 +127,12 @@ export function UploadManagementTable({
   const handleBatchDelete = async () => {
     if (selectedUploads.size === 0) return;
     startTransition(async () => {
-      const result = await guardSkew(() =>
-        batchDeleteUploadsAction({
-          uploadIds: Array.from(selectedUploads),
-        }),
+      const result = await guardSkew(
+        () =>
+          batchDeleteUploadsAction({
+            uploadIds: Array.from(selectedUploads),
+          }),
+        () => setIsBatchDeleteConfirmOpen(false),
       );
       if (!result) return;
       if (result.data) {

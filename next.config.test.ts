@@ -6,7 +6,6 @@ import {
   beforeEach,
   afterEach,
 } from "@jest/globals";
-import packageJson from "./package.json";
 
 const mockWithNextIntl = jest.fn(
   (nextConfig: Record<string, unknown>) => nextConfig,
@@ -148,57 +147,5 @@ describe("next.config.ts", () => {
         hostname: "images.unsplash.com",
       },
     ]);
-  });
-  it("derives deploymentId from the package version", async () => {
-    jest.doMock("@/env", () => ({
-      __esModule: true,
-      default: {
-        R2_PUBLIC_URL: undefined,
-      },
-    }));
-    const getConfig = await importConfig();
-    const nextConfig = await getConfig();
-    expect((nextConfig as any).deploymentId).toBe(
-      packageJson.version.replace(/\./g, "-"),
-    );
-  });
-
-  it("keeps deploymentId within the character set next build accepts", async () => {
-    // `next build` rejects anything outside [A-Za-z0-9_-] before compiling, and
-    // a semantic version contains dots. `NEXT_DEPLOYMENT_ID` is not covered
-    // here: Next overwrites `deploymentId` with the raw variable after this
-    // config is loaded, so normalising it here would be dead code.
-    jest.doMock("@/env", () => ({
-      __esModule: true,
-      default: {
-        R2_PUBLIC_URL: undefined,
-      },
-    }));
-    const getConfig = await importConfig();
-    const nextConfig = await getConfig();
-    expect((nextConfig as any).deploymentId).toMatch(/^[A-Za-z0-9_-]+$/);
-  });
-
-  it("resolves the same deploymentId on every load", async () => {
-    // `next build` loads this config in several processes, and the ID compiled
-    // into the client bundle must match the one frozen into the standalone
-    // server. A random or time-based value would break every Server Action.
-    const loadDeploymentId = async () => {
-      jest.doMock("@/env", () => ({
-        __esModule: true,
-        default: {
-          R2_PUBLIC_URL: undefined,
-        },
-      }));
-      const getConfig = await importConfig();
-      return (await getConfig()).deploymentId;
-    };
-
-    const first = await loadDeploymentId();
-    jest.resetModules();
-    const second = await loadDeploymentId();
-
-    expect(first).toBe(second);
-    expect(first).toBeTruthy();
   });
 });

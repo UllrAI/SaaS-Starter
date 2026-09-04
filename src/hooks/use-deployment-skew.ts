@@ -19,6 +19,11 @@ const SKEW_TOAST_ID = "deployment-skew";
  * `undefined` is the skew signal, so this only suits actions that resolve to an
  * object — wrapping one that can legitimately return `undefined`, `false` or
  * `0` would make callers mistake a real result for a skew.
+ *
+ * Pass `onSkew` from anywhere the call happens inside a dialog: Radix traps
+ * focus and marks everything outside the dialog `aria-hidden`, which would put
+ * the reload prompt out of reach for keyboard and screen reader users. The
+ * dialog cannot preserve the user's input across the reload anyway.
  */
 export function useDeploymentSkewGuard() {
   const { t } = useTranslation();
@@ -29,23 +34,26 @@ export function useDeploymentSkewGuard() {
   }, [t]);
 
   return useCallback(
-    async <T>(run: () => Promise<T>): Promise<T | undefined> => {
+    async <T>(
+      run: () => Promise<T>,
+      onSkew?: () => void,
+    ): Promise<T | undefined> => {
       try {
         return await run();
       } catch (error) {
         if (!isDeploymentSkewError(error)) {
           throw error;
         }
+        onSkew?.();
         // Named `t` so the catalog integrity test picks these keys up.
         const t = translateRef.current;
         toast.warning(t("common_deployment_skew_title"), {
           id: SKEW_TOAST_ID,
           description: t("common_deployment_skew_description"),
           duration: Infinity,
-          // Every write action behind this guard sits inside a Radix modal,
-          // which sets `pointer-events: none` on the body while it is open.
-          // Sonner does not re-enable them, so without this the reload button —
-          // the only way out of a skew — would not be clickable.
+          // A dialog closing through `onSkew` restores body pointer events only
+          // after its exit transition, and sonner never sets them itself, so
+          // the reload button needs this to stay clickable in between.
           className: "pointer-events-auto",
           action: {
             label: t("common_reload"),

@@ -68,6 +68,30 @@ describe("useDeploymentSkewGuard", () => {
     expect(mockReloadPage).toHaveBeenCalledTimes(1);
   });
 
+  it("runs onSkew before prompting so the dialog gets out of the way", async () => {
+    const { result } = renderHook(() => useDeploymentSkewGuard());
+    const onSkew = jest.fn();
+
+    await result.current(async () => {
+      throw new UnrecognizedActionError("action not found");
+    }, onSkew);
+
+    expect(onSkew).toHaveBeenCalledTimes(1);
+    expect(mockToastWarning).toHaveBeenCalledTimes(1);
+  });
+
+  it("leaves onSkew alone when the action simply fails", async () => {
+    const { result } = renderHook(() => useDeploymentSkewGuard());
+    const onSkew = jest.fn();
+
+    await expect(
+      result.current(async () => {
+        throw new Error("network down");
+      }, onSkew),
+    ).rejects.toThrow("network down");
+    expect(onSkew).not.toHaveBeenCalled();
+  });
+
   it("rethrows every other failure", async () => {
     const { result } = renderHook(() => useDeploymentSkewGuard());
 

@@ -1,4 +1,10 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
 import { UnrecognizedActionError } from "next/dist/client/components/unrecognized-action-error";
 
 jest.mock("sonner", () => ({
@@ -43,8 +49,9 @@ async function openEditDialog() {
     <UserManagementTable initialData={[user]} initialPagination={pagination} />,
   );
 
-  const buttons = screen.getAllByRole("button");
-  fireEvent.click(buttons[buttons.length - 1]);
+  // Row 0 is the header. The edit button is the only button in a data row.
+  const row = screen.getAllByRole("row")[1];
+  fireEvent.click(within(row).getByRole("button"));
   await screen.findByText("Edit User");
 }
 

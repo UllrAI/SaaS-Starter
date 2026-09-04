@@ -3,6 +3,8 @@
 import { useState, useEffect, useCallback, useRef, useTransition } from "react";
 import { useDebounce } from "use-debounce";
 
+import { useDeploymentSkewGuard } from "@/hooks/use-deployment-skew";
+
 interface Pagination {
   page: number;
   limit: number;
@@ -60,6 +62,7 @@ export function useAdminTable<T>({
 
   const [debouncedSearchTerm] = useDebounce(searchTerm, debounceDelay);
   const [isPending, startTransition] = useTransition();
+  const guardSkew = useDeploymentSkewGuard();
 
   const isInitialMount = useRef(true);
 
@@ -69,7 +72,38 @@ export function useAdminTable<T>({
     queryActionRef.current = queryAction;
   }, [queryAction]);
 
-  // Stable callbacks prevent query-state synchronization loops.
+  const loadPage = useCallback(async () => {
+    setError(false);
+    try {
+      const result = await guardSkew(() =>
+        queryActionRef.current({
+          page: currentPage,
+          limit: initialPagination.limit,
+          search: debouncedSearchTerm,
+          filter: filter,
+        }),
+      );
+      // `undefined` means the deployment moved under this page. The guard has
+      // already prompted for a reload, so keep the rows currently on screen.
+      if (!result) return;
+      setData(result.data);
+      setPagination(result.pagination);
+    } catch (cause) {
+      // Skew is handled by the guard above, so anything landing here is a real
+      // failure worth leaving a trace of.
+      console.error(cause);
+      setError(true);
+    }
+    // Depends on the query inputs, not on the caller's `queryAction`
+    // identity, which is read through a ref instead.
+  }, [
+    currentPage,
+    debouncedSearchTerm,
+    filter,
+    guardSkew,
+    initialPagination.limit,
+  ]);
+
   useEffect(() => {
     // Skip fetch on initial mount if we already have data
     if (isInitialMount.current && initialData.length > 0) {
@@ -81,28 +115,9 @@ export function useAdminTable<T>({
     isInitialMount.current = false;
 
     startTransition(async () => {
-      setError(false);
-      try {
-        const result = await queryActionRef.current({
-          page: currentPage,
-          limit: initialPagination.limit,
-          search: debouncedSearchTerm,
-          filter: filter,
-        });
-        setData(result.data);
-        setPagination(result.pagination);
-      } catch {
-        setError(true);
-      }
+      await loadPage();
     });
-    // Dependencies intentionally contain only stable values.
-  }, [
-    currentPage,
-    debouncedSearchTerm,
-    filter,
-    initialPagination.limit,
-    initialData.length,
-  ]);
+  }, [loadPage, initialData.length]);
 
   // Reset page to 1 when search or filter changes
   const updateSearchTerm = useCallback((term: string) => {
@@ -117,21 +132,9 @@ export function useAdminTable<T>({
 
   const refresh = useCallback(() => {
     startTransition(async () => {
-      setError(false);
-      try {
-        const result = await queryActionRef.current({
-          page: currentPage,
-          limit: initialPagination.limit,
-          search: debouncedSearchTerm,
-          filter: filter,
-        });
-        setData(result.data);
-        setPagination(result.pagination);
-      } catch {
-        setError(true);
-      }
+      await loadPage();
     });
-  }, [currentPage, debouncedSearchTerm, filter, initialPagination.limit]);
+  }, [loadPage]);
 
   return {
     data,

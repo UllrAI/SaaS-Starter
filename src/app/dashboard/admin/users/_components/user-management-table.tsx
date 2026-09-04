@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslation } from "@/lib/i18n/translation/client";
+import { useDeploymentSkewGuard } from "@/hooks/use-deployment-skew";
 import { useState, ReactNode, useTransition, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -80,6 +81,7 @@ export function UserManagementTable({
   const { t } = useTranslation();
   const intlLocale = useIntlLocale();
   const [isPending, startTransition] = useTransition();
+  const guardSkew = useDeploymentSkewGuard();
   const [editingUser, setEditingUser] = useState<UserWithSubscription | null>(
     null,
   );
@@ -129,11 +131,16 @@ export function UserManagementTable({
   const handleUpdateUser = async () => {
     if (!editingUser) return;
     startTransition(async () => {
-      const result = await updateUserAction({
-        id: editingUser.id,
-        name: editingUser.name || undefined,
-        role: editingUser.role as UserRole,
-      });
+      const result = await guardSkew(
+        () =>
+          updateUserAction({
+            id: editingUser.id,
+            name: editingUser.name || undefined,
+            role: editingUser.role as UserRole,
+          }),
+        () => setEditingUser(null),
+      );
+      if (!result) return;
       if (result.data) {
         toast.success(t("admin_user_update_success"));
         setEditingUser(null);
@@ -146,10 +153,15 @@ export function UserManagementTable({
   const handleSetUserDisabled = async (disabled: boolean) => {
     if (!editingUser) return;
     startTransition(async () => {
-      const result = await setUserDisabledAction({
-        id: editingUser.id,
-        disabled,
-      });
+      const result = await guardSkew(
+        () =>
+          setUserDisabledAction({
+            id: editingUser.id,
+            disabled,
+          }),
+        () => setEditingUser(null),
+      );
+      if (!result) return;
       if (result.data) {
         toast.success(
           result.data.disabled ? (

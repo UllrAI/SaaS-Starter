@@ -65,6 +65,16 @@
 
 ## 测试
 
+### 从 `@jest/globals` 导入 `jest` 会让 `jest.mock` 失效
+
+**现象**:测试顶部写了 `jest.mock("sonner", () => ({ toast: { warning: jest.fn() } }))`,断言时却报 `Matcher error: received value must be a mock or spy function`,拿到的是 sonner 的真实实现。
+
+**原因**:`jest.mock` 依赖转译期的 hoisting 被提到 `import` 之前。SWC 的 hoisting 只认**全局** `jest` 标识符;一旦写了 `import { jest } from "@jest/globals"`,`jest` 变成本地绑定,`jest.mock` 就留在原地,注册时被测模块早已加载完毕,mock 不再生效。实测 `jest.isMockFunction(toast.warning)`:导入 `jest` 时为 `false`,用全局 `jest` 时为 `true`。
+
+**正确做法**:只从 `@jest/globals` 取 `describe`/`it`/`expect`/`beforeEach`,`jest` 用全局的。参考 `src/components/auth/social-login-buttons.test.tsx`。
+
+注意 `src/hooks/use-admin-table.test.tsx` 目前正踩这个坑——它的 `use-debounce` mock 从未生效,跑的是真实实现,断言恰好仍然成立。单纯删掉那行 `jest` 导入会让它立刻挂掉(工厂被提升到 `const mockUseDebounce = jest.fn()` 之上执行,报 TDZ 的 `Cannot access 'mockUseDebounce' before initialization`),要修得连工厂的默认返回值一起补。
+
 ### jsdom 的 `crypto` 没有 `subtle`
 
 **现象**:AI SDK 的工具审批用例在 jest 里报 `TypeError: Cannot read properties of undefined (reading 'importKey')`,同样的代码在 Node 里跑得好好的。
@@ -76,6 +86,20 @@
 ---
 
 ## Next.js
+
+### 配 `deploymentId` 会削弱 Next 自带的 skew 检测
+
+**现象**:为了让旧页面在新部署后尽早硬跳转,给 `next.config.ts` 加了 `deploymentId`(取 `package.json` 版本号)。看起来一切正常:静态资源带上了 `?dpl=`,HTML 带上了 `data-dpl-id`,lint / type-check / test / build 全绿。实际效果是**比不加更差**。
+
+**原因**:两处非直觉行为。
+
+其一,`getBuildId`(`node_modules/next/dist/build/index.js`)在检测到 `config.deploymentId` 后**不再生成随机 buildId**,直接返回常量 `build-TfctsWXpff2fKS`。实测:配了以后 `.next/BUILD_ID` 是这个常量,不配则是随机 nanoid。
+
+其二,客户端的比对键随之切换。`app-index.js` 里 `initialRSCPayload.b ? setNavigationBuildId(b) : setNavigationBuildId(getDeploymentId())`——不配 deploymentId 时比的是每次构建都变的 buildId,配了以后比的是 deploymentId。于是检测粒度从「每次构建」降到「每个版本号」,同版本重建(改环境变量触发的 rebuild、预览环境跟分支、同一 tag 重跑)一次都不会触发,而这恰恰是最需要它的场景——同版本重建**必然**产生新的 Server Action ID,因为 action ID 的 hash salt 就是每次构建随机生成的加密密钥(webpack 走 `build/webpack-config.js` 的 `serverReferenceHashSalt`,本仓库默认的 Turbopack 走 `build/turbopack-build/impl.js`,两条路径吃同一个 key)。
+
+**正确做法**:不要配 `deploymentId`,除非能喂给它一个每次构建都变的值(git SHA),而那需要构建时注入。想让同版本重建不产生 skew,对症的是钉住 `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY`——它同时是 action ID 的 hash salt,钉住它等于让同源码重建产出相同的 action ID。
+
+顺带两个记下来省得再查的点:`deploymentId` 只接受 `[a-zA-Z0-9_-]`(`build/index.js` 里的正则),语义化版本号带点会让构建直接失败;以及 `NEXT_DEPLOYMENT_ID` 的优先级和官方文档写的相反——文档说 config 优先,源码里 `loadConfig` 是只要该变量非空就用它覆盖 config 的值。
 
 ### 本项目的 Next.js 与训练数据不符
 

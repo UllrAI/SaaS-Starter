@@ -98,16 +98,24 @@ change the source.
 
 The repository handles this without extra environment variables:
 
-- `next.config.ts` sets `deploymentId` from the `package.json` version. Releases
-  are published as `release/vX.Y.Z` tags matching that version, so the ID changes
-  exactly when a production deployment does. The client compares it against the
-  server on navigation and falls back to a full page load on a mismatch, usually
-  before the user triggers an action at all.
+- `next.config.ts` sets `deploymentId` from the `package.json` version, with the
+  dots stripped because `next build` only accepts `[A-Za-z0-9_-]`. Releases are
+  published as `release/vX.Y.Z` tags matching that version, so the ID changes on
+  every version bump. The client compares it against the server on navigation
+  and falls back to a full page load on a mismatch, usually before the user
+  triggers an action at all. Redeploying the same version — a rebuild triggered
+  by an environment change, a preview environment tracking a branch — produces
+  new Server Action IDs but an unchanged deployment ID, so this early detection
+  does not fire and only the prompt below applies.
 - `src/lib/deployment-skew.ts` recognises the router error, and
   `useDeploymentSkewGuard` turns it into a toast that asks for a reload. Retrying
   is never offered: the old ID is gone for good.
 - `src/app/error.tsx` and `src/app/global-error.tsx` show the same reload path,
-  because `reset()` would re-run the same stale bundle.
+  because `reset()` would re-run the same stale bundle. Nothing reaches them
+  today — every Server Action call in the app goes through the guard above, and
+  React reports a rejected `startTransition` through `reportGlobalError` rather
+  than an error boundary. They cover a future `<form action>` or `useActionState`
+  call, which fails through the boundary instead.
 
 The value must stay deterministic. `next build` loads the config in several
 processes, and the ID compiled into the client has to match the one frozen into
@@ -118,9 +126,10 @@ Two optional environment variables cover cases the default does not:
 
 - `NEXT_DEPLOYMENT_ID` overrides the version. Set it where the same version is
   deployed repeatedly, such as a preview environment tracking a branch;
-  otherwise those deploys share one ID and lose the early reload. Any character
-  outside `[A-Za-z0-9_-]` is replaced with a hyphen, because `next build`
-  rejects the rest — a commit ref works as-is, a raw semantic version does not.
+  otherwise those deploys share one ID and lose the early reload. Next reads
+  this variable itself, after `next.config.ts` has been evaluated, so its value
+  has to satisfy `[A-Za-z0-9_-]` on its own — a commit SHA works, a raw semantic
+  version fails the build.
 - `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` pins the key used to encrypt Server
   Function closures. It is generated per build and baked into the artifact, so
   replicas of one image already agree. Set it only when the same version is

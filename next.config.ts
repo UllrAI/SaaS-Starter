@@ -70,12 +70,12 @@ const securityHeaders = [
 // package version (see AGENTS.md "Production Promotion"), so that version marks
 // exactly the deployments users see. The value has to be deterministic —
 // `next build` loads this config in several processes and the ID compiled into
-// the client must match the one frozen into the standalone server — and it is
-// normalised because `next build` rejects anything outside [A-Za-z0-9_-].
-const deploymentId = (process.env.NEXT_DEPLOYMENT_ID || packageVersion).replace(
-  /[^A-Za-z0-9_-]/g,
-  "-",
-);
+// the client must match the one frozen into the standalone server — and dots
+// are stripped because `next build` rejects anything outside [A-Za-z0-9_-].
+// `NEXT_DEPLOYMENT_ID` still overrides this, but Next applies it itself after
+// this config is loaded, so its value has to satisfy that character set on its
+// own.
+const deploymentId = packageVersion.replace(/[^A-Za-z0-9_-]/g, "-");
 
 const nextConfig: NextConfig = {
   output: "standalone",

@@ -7,6 +7,7 @@ import {
   afterEach,
 } from "@jest/globals";
 import { renderHook, act, waitFor } from "@testing-library/react";
+import { UnrecognizedActionError } from "next/dist/client/components/unrecognized-action-error";
 
 // Mock use-debounce
 const mockUseDebounce = jest.fn();
@@ -658,6 +659,31 @@ describe("useAdminTable", () => {
       await waitFor(() => {
         expect(result.current.error).toBe(true);
       });
+    });
+
+    it("keeps the rows on screen when the deployment moved on", async () => {
+      // A missing Server Action is not a query failure: the guard prompts for a
+      // reload, so the table must not flip to its generic error state and throw
+      // away data the user can still read.
+      mockQueryAction.mockRejectedValueOnce(
+        new UnrecognizedActionError("action not found"),
+      );
+
+      const { result } = renderHook(() =>
+        useAdminTable({
+          queryAction: mockQueryAction,
+          initialData: mockData,
+          initialPagination: mockPagination,
+        }),
+      );
+
+      await act(async () => {
+        result.current.refresh();
+      });
+
+      expect(mockQueryAction).toHaveBeenCalled();
+      expect(result.current.error).toBe(false);
+      expect(result.current.data).toEqual(mockData);
     });
 
     it("should handle string errors", async () => {

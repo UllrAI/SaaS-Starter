@@ -35,7 +35,9 @@ export default function GlobalError({
                 : messages["common_fatal_error_retry"]}
             </p>
             <Button onClick={isSkew ? reloadPage : reset}>
-              {messages["common_reload"]}
+              {isSkew
+                ? messages["common_reload"]
+                : messages["common_try_again"]}
             </Button>
           </div>
         </main>

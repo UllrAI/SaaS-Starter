@@ -15,6 +15,10 @@ const SKEW_TOAST_ID = "deployment-skew";
  * resolves to `undefined`; every other error is rethrown untouched. The
  * returned function keeps a stable identity so callers can list it in effect
  * dependencies without re-running them.
+ *
+ * `undefined` is the skew signal, so this only suits actions that resolve to an
+ * object — wrapping one that can legitimately return `undefined`, `false` or
+ * `0` would make callers mistake a real result for a skew.
  */
 export function useDeploymentSkewGuard() {
   const { t } = useTranslation();
@@ -38,6 +42,11 @@ export function useDeploymentSkewGuard() {
           id: SKEW_TOAST_ID,
           description: t("common_deployment_skew_description"),
           duration: Infinity,
+          // Every write action behind this guard sits inside a Radix modal,
+          // which sets `pointer-events: none` on the body while it is open.
+          // Sonner does not re-enable them, so without this the reload button —
+          // the only way out of a skew — would not be clickable.
+          className: "pointer-events-auto",
           action: {
             label: t("common_reload"),
             onClick: reloadPage,

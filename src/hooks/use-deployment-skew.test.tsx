@@ -27,6 +27,7 @@ const mockReloadPage = reloadPage as jest.MockedFunction<typeof reloadPage>;
 type ToastOptions = {
   description: string;
   duration: number;
+  className: string;
   action: { label: string; onClick: () => void };
 };
 
@@ -59,6 +60,9 @@ describe("useDeploymentSkewGuard", () => {
       ToastOptions,
     ];
     expect(options.duration).toBe(Infinity);
+    // The prompt renders over a Radix modal, which disables pointer events on
+    // the body; without this class its reload button cannot be clicked.
+    expect(options.className).toContain("pointer-events-auto");
 
     options.action.onClick();
     expect(mockReloadPage).toHaveBeenCalledTimes(1);

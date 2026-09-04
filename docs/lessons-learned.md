@@ -93,7 +93,11 @@
 
 **原因**:`next build` 用 `/^[a-zA-Z0-9_-]*$/` 校验这个值(见 `node_modules/next/dist/build/index.js`),而语义化版本天然带点。官方文档只说它用于 version skew 防护,没提字符集限制。
 
-**正确做法**:任何来源的值都先 `.replace(/[^A-Za-z0-9_-]/g, "-")` 再交给 Next。commit ref、带 `+build` 的版本号同理。另外这个值必须是确定性的:`next build` 会在多个进程里各自加载一次 `next.config.ts`,编进客户端的 ID 和固化进 standalone server 的 ID 必须一致,用随机数或时间戳会让每一次 Server Action 调用都 mismatch。
+**正确做法**:在 `next.config.ts` 里先 `.replace(/[^A-Za-z0-9_-]/g, "-")` 再交给 Next。
+
+注意这个归一化**管不到 `NEXT_DEPLOYMENT_ID`**:`loadConfig` 在用户配置求值之后无条件执行 `result.deploymentId = process.env.NEXT_DEPLOYMENT_ID`(`node_modules/next/dist/server/config.js`),会把你归一化过的值直接覆盖掉。所以在配置里包一层 env 归一化是死代码,而针对它写的单测会永远绿——它断言的是随后被 Next 丢弃的那一层。该变量的取值必须自己合规。
+
+另外这个值必须是确定性的:`next build` 会在多个进程里各自加载一次 `next.config.ts`,编进客户端的 ID 和固化进 standalone server 的 ID 必须一致,用随机数或时间戳会让每一次 Server Action 调用都 mismatch。
 
 ### 本项目的 Next.js 与训练数据不符
 

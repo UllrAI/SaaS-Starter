@@ -91,7 +91,8 @@ export function useAdminTable<T>({
     } catch {
       setError(true);
     }
-    // Dependencies intentionally contain only stable values.
+    // Depends on the query inputs, not on the caller's `queryAction`
+    // identity, which is read through a ref instead.
   }, [
     currentPage,
     debouncedSearchTerm,

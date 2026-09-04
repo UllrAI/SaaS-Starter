@@ -92,9 +92,12 @@ only after the migration command succeeds.
 
 A Server Action ID is a build artifact. When a new build goes live, a browser tab
 still running the previous one calls IDs the server no longer knows, and the
-request fails with `Failed to find Server Action`. Next.js also rotates these IDs
-on its own at most every 14 days, so the failure is not limited to deploys that
-change the source.
+request fails with `Failed to find Server Action`.
+
+The IDs are salted with the build's encryption key, which Next caches in
+`.next/cache/.rscinfo` and rotates every 14 days. Container builds start from an
+empty `.next`, so that cache never survives here and **every** build gets fresh
+IDs — whether or not the source changed.
 
 Next already catches most of this by itself. Every build gets a random build ID,
 the client compares it against the server on each navigation, and a mismatch
@@ -119,18 +122,20 @@ What the app adds is the recovery path for the calls that still slip through:
   a dialog pass `onSkew` to close it first: Radix traps focus and hides
   everything outside the dialog from assistive tech, which would leave the
   prompt unreachable.
-- `src/app/error.tsx` and `src/app/global-error.tsx` offer a reload rather than
-  `reset()`, which would re-run the same stale bundle. They are reachable: React
-  routes a rejected `useTransition` callback to the nearest error boundary, so
-  any future Server Action call that forgets the guard lands there.
+- `src/app/error.tsx` offers a reload rather than `reset()`, which would re-run
+  the same stale bundle. It is a live path: React routes a rejected
+  `useTransition` callback to the nearest error boundary, so any future Server
+  Action call that forgets the guard lands there. `src/app/global-error.tsx`
+  carries the same branch defensively — it only renders when a root layout
+  itself throws, and no root layout calls a Server Action today.
 
 ### Server Function encryption key
 
 `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` is worth knowing about even though this
 repository does not set it. The key doubles as the hash salt for Server Action
-IDs (`serverReferenceHashSalt` in `next/dist/build/webpack-config.js`), so
-pinning it makes two builds of identical source produce identical action IDs —
-which removes skew entirely for rebuilds that do not change the code.
+IDs, on the Turbopack build this repository uses as much as on the webpack one,
+so pinning it makes two builds of identical source produce identical action IDs
+— which removes skew entirely for rebuilds that do not change the code.
 
 Left unset, the key is generated per build and baked into the artifact. Replicas
 of one image therefore already agree, so multi-instance deployments do not need

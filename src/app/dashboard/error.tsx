@@ -18,8 +18,8 @@ export default function DashboardError({
     console.error(error);
   }, [error]);
   // Sits below the dashboard root layout, so it still has the intl provider and
-  // the document chrome. `src/app/error.tsx` is above every root layout and has
-  // neither.
+  // the document chrome. An `error.tsx` at `src/app/` would sit above every root
+  // layout and have neither.
   //
   // A stale client cannot be repaired by re-rendering: `reset` would replay the
   // same missing Server Action ID, so the recovery path has to be a reload.

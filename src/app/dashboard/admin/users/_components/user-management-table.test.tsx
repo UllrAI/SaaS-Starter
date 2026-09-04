@@ -33,8 +33,8 @@ const user: UserWithSubscription = {
   banExpires: null,
   createdAt: new Date("2026-01-01T00:00:00Z"),
   updatedAt: new Date("2026-01-01T00:00:00Z"),
-  subscription: null,
-} as unknown as UserWithSubscription;
+  subscriptions: [],
+};
 
 const pagination = { page: 1, limit: 20, total: 1, totalPages: 1 };
 

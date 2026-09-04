@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { UnrecognizedActionError } from "next/dist/client/components/unrecognized-action-error";
 
 import { reloadPage } from "@/lib/deployment-skew";
-import AppError from "./error";
+import DashboardError from "./error";
 
 jest.mock("@/lib/deployment-skew", () => ({
   ...(jest.requireActual("@/lib/deployment-skew") as object),
@@ -11,7 +11,7 @@ jest.mock("@/lib/deployment-skew", () => ({
 
 const mockReloadPage = reloadPage as jest.MockedFunction<typeof reloadPage>;
 
-describe("Error boundary", () => {
+describe("DashboardError", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -19,7 +19,7 @@ describe("Error boundary", () => {
   it("offers a retry for ordinary failures", () => {
     const reset = jest.fn();
 
-    render(<AppError error={new Error("boom")} reset={reset} />);
+    render(<DashboardError error={new Error("boom")} reset={reset} />);
 
     fireEvent.click(screen.getByRole("button", { name: "Try again" }));
     expect(reset).toHaveBeenCalledTimes(1);
@@ -30,7 +30,7 @@ describe("Error boundary", () => {
     const reset = jest.fn();
 
     render(
-      <AppError
+      <DashboardError
         error={new UnrecognizedActionError("action not found")}
         reset={reset}
       />,

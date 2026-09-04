@@ -73,7 +73,7 @@
 
 **正确做法**:只从 `@jest/globals` 取 `describe`/`it`/`expect`/`beforeEach`,`jest` 用全局的。参考 `src/components/auth/social-login-buttons.test.tsx`。
 
-注意 `src/hooks/use-admin-table.test.tsx` 目前正踩这个坑——它的 `use-debounce` mock 从未生效,跑的是真实实现,断言恰好仍然成立。单纯删掉那行 `jest` 导入会让它立刻挂掉(mock 工厂返回的 `jest.fn()` 在模块加载期就被调用,那时还没配 `mockImplementation`),要修得连工厂的默认返回值一起补。
+注意 `src/hooks/use-admin-table.test.tsx` 目前正踩这个坑——它的 `use-debounce` mock 从未生效,跑的是真实实现,断言恰好仍然成立。单纯删掉那行 `jest` 导入会让它立刻挂掉(工厂被提升到 `const mockUseDebounce = jest.fn()` 之上执行,报 TDZ 的 `Cannot access 'mockUseDebounce' before initialization`),要修得连工厂的默认返回值一起补。
 
 ### jsdom 的 `crypto` 没有 `subtle`
 
@@ -95,7 +95,7 @@
 
 其一,`getBuildId`(`node_modules/next/dist/build/index.js`)在检测到 `config.deploymentId` 后**不再生成随机 buildId**,直接返回常量 `build-TfctsWXpff2fKS`。实测:配了以后 `.next/BUILD_ID` 是这个常量,不配则是随机 nanoid。
 
-其二,客户端的比对键随之切换。`app-index.js` 里 `initialRSCPayload.b ? setNavigationBuildId(b) : setNavigationBuildId(getDeploymentId())`——不配 deploymentId 时比的是每次构建都变的 buildId,配了以后比的是 deploymentId。于是检测粒度从「每次构建」降到「每个版本号」,同版本重建(改环境变量触发的 rebuild、预览环境跟分支、同一 tag 重跑)一次都不会触发,而这恰恰是最需要它的场景——同版本重建**必然**产生新的 Server Action ID,因为 action ID 的 hash salt 就是每次构建随机生成的加密密钥(`serverReferenceHashSalt` in `build/webpack-config.js`)。
+其二,客户端的比对键随之切换。`app-index.js` 里 `initialRSCPayload.b ? setNavigationBuildId(b) : setNavigationBuildId(getDeploymentId())`——不配 deploymentId 时比的是每次构建都变的 buildId,配了以后比的是 deploymentId。于是检测粒度从「每次构建」降到「每个版本号」,同版本重建(改环境变量触发的 rebuild、预览环境跟分支、同一 tag 重跑)一次都不会触发,而这恰恰是最需要它的场景——同版本重建**必然**产生新的 Server Action ID,因为 action ID 的 hash salt 就是每次构建随机生成的加密密钥(webpack 走 `build/webpack-config.js` 的 `serverReferenceHashSalt`,本仓库默认的 Turbopack 走 `build/turbopack-build/impl.js`,两条路径吃同一个 key)。
 
 **正确做法**:不要配 `deploymentId`,除非能喂给它一个每次构建都变的值(git SHA),而那需要构建时注入。想让同版本重建不产生 skew,对症的是钉住 `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY`——它同时是 action ID 的 hash salt,钉住它等于让同源码重建产出相同的 action ID。
 

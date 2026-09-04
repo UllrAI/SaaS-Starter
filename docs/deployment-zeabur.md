@@ -95,9 +95,10 @@ still running the previous one calls IDs the server no longer knows, and the
 request fails with `Failed to find Server Action`.
 
 The IDs are salted with the build's encryption key, which Next caches in
-`.next/cache/.rscinfo` and rotates every 14 days. Container builds start from an
-empty `.next`, so that cache never survives here and **every** build gets fresh
-IDs — whether or not the source changed.
+`.next/cache/.rscinfo` and rotates every 14 days. That cache never applies here:
+`getStorageDirectory` (`next/dist/server/cache-dir.js`) returns nothing when it
+detects a container, so **every** build gets a fresh key and fresh IDs — whether
+or not the source changed.
 
 Next already catches most of this by itself. Every build gets a random build ID,
 the client compares it against the server on each navigation, and a mismatch
@@ -122,12 +123,15 @@ What the app adds is the recovery path for the calls that still slip through:
   a dialog pass `onSkew` to close it first: Radix traps focus and hides
   everything outside the dialog from assistive tech, which would leave the
   prompt unreachable.
-- `src/app/error.tsx` offers a reload rather than `reset()`, which would re-run
-  the same stale bundle. It is a live path: React routes a rejected
-  `useTransition` callback to the nearest error boundary, so any future Server
-  Action call that forgets the guard lands there. `src/app/global-error.tsx`
-  carries the same branch defensively — it only renders when a root layout
-  itself throws, and no root layout calls a Server Action today.
+- `src/app/dashboard/error.tsx` offers a reload rather than `reset()`, which
+  would re-run the same stale bundle. React routes a rejected `useTransition`
+  callback to the nearest error boundary, so a Server Action call in the
+  dashboard that forgets the guard lands there. It sits below the dashboard root
+  layout on purpose: `src/app/error.tsx` is above every root layout in this
+  repository — there is no `src/app/layout.tsx`, each route group brings its own
+  — so it renders without the intl provider and without the document chrome.
+  `src/app/global-error.tsx` carries the same branch defensively, for the case
+  where the failure escapes a root layout entirely.
 
 ### Server Function encryption key
 

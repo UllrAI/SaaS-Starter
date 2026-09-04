@@ -101,12 +101,13 @@ nothing when `is-docker` matches — `/.dockerenv` exists, or `/proc/self/cgroup
 mentions docker — so **every** build gets a fresh key and fresh IDs, whether or
 not the source changed.
 
-Next catches part of this by itself. Every build gets a random build ID, and the
-client compares it against the server whenever it fetches an RSC payload: a
-mismatch on a navigation turns it into a full page load. It only helps where a
-navigation happens, though. Nothing compares build IDs while the user stays on
-one page — paging or searching an admin table is a Server Action call, not a
-navigation — so the recovery path below is what covers those.
+Next catches part of this by itself. Every build gets a random build ID, and a
+mismatch on a navigation turns the soft navigation into a full page load. That
+only helps where a navigation happens. A Server Action response carries the
+build ID too, but the client only acts on it when the action redirects — it
+discards the stale flight data so the redirect becomes a full page load. Paging
+or searching an admin table redirects nowhere, and a skew fails at the 404
+before any of this is read, so the recovery path below is what covers it.
 
 **Do not set `deploymentId` to try to improve on that.** As soon as that option
 is present, `next build` stops generating a random build ID and hardcodes a
@@ -135,8 +136,9 @@ What the app adds is the recovery path for the calls that still slip through:
 - `src/app/global-error.tsx` catches whatever escapes a root layout. It reads
   `messages/en.json` and renders its own `<html>`, because at that point there
   is no provider and no document left. This repository has no
-  `src/app/layout.tsx` — each route group brings its own root layout — so a
-  segment-level `src/app/error.tsx` would sit above all of them, render without
+  `src/app/layout.tsx`; four branches carry their own root layout instead
+  (`(auth)`, `(pages)`, `[locale]` and `dashboard`), so a segment-level
+  `src/app/error.tsx` would sit above all of them, render without
   the provider its translations need, and throw from its own fallback. React
   hands the fallback's error to the next boundary up, which would replace the
   original failure with that one; the file was removed rather than left in that

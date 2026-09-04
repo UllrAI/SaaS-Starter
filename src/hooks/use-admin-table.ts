@@ -88,7 +88,10 @@ export function useAdminTable<T>({
       if (!result) return;
       setData(result.data);
       setPagination(result.pagination);
-    } catch {
+    } catch (error) {
+      // Skew is handled by the guard above, so anything landing here is a real
+      // failure worth leaving a trace of.
+      console.error(error);
       setError(true);
     }
     // Depends on the query inputs, not on the caller's `queryAction`

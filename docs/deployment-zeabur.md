@@ -95,15 +95,18 @@ still running the previous one calls IDs the server no longer knows, and the
 request fails with `Failed to find Server Action`.
 
 The IDs are salted with the build's encryption key, which Next caches in
-`.next/cache/.rscinfo` and rotates every 14 days. That cache never applies here:
-`getStorageDirectory` (`next/dist/server/cache-dir.js`) returns nothing when it
-detects a container, so **every** build gets a fresh key and fresh IDs — whether
-or not the source changed.
+`.next/cache/.rscinfo` and rotates every 14 days at build time. That cache never
+applies here: `getStorageDirectory` (`next/dist/server/cache-dir.js`) returns
+nothing when `is-docker` matches — `/.dockerenv` exists, or `/proc/self/cgroup`
+mentions docker — so **every** build gets a fresh key and fresh IDs, whether or
+not the source changed.
 
-Next already catches most of this by itself. Every build gets a random build ID,
-the client compares it against the server on each navigation, and a mismatch
-turns the soft navigation into a full page load — usually before the user
-triggers an action at all.
+Next catches part of this by itself. Every build gets a random build ID, and the
+client compares it against the server whenever it fetches an RSC payload: a
+mismatch on a navigation turns it into a full page load. It only helps where a
+navigation happens, though. Nothing compares build IDs while the user stays on
+one page — paging or searching an admin table is a Server Action call, not a
+navigation — so the recovery path below is what covers those.
 
 **Do not set `deploymentId` to try to improve on that.** As soon as that option
 is present, `next build` stops generating a random build ID and hardcodes a
@@ -127,11 +130,17 @@ What the app adds is the recovery path for the calls that still slip through:
   would re-run the same stale bundle. React routes a rejected `useTransition`
   callback to the nearest error boundary, so a Server Action call in the
   dashboard that forgets the guard lands there. It sits below the dashboard root
-  layout on purpose: `src/app/error.tsx` is above every root layout in this
-  repository — there is no `src/app/layout.tsx`, each route group brings its own
-  — so it renders without the intl provider and without the document chrome.
-  `src/app/global-error.tsx` carries the same branch defensively, for the case
-  where the failure escapes a root layout entirely.
+  layout on purpose, where the intl provider and the document chrome still
+  exist.
+- `src/app/global-error.tsx` catches whatever escapes a root layout. It reads
+  `messages/en.json` and renders its own `<html>`, because at that point there
+  is no provider and no document left. This repository has no
+  `src/app/layout.tsx` — each route group brings its own root layout — so a
+  segment-level `src/app/error.tsx` would sit above all of them, render without
+  the provider its translations need, and throw from its own fallback. React
+  hands the fallback's error to the next boundary up, which would replace the
+  original failure with that one; the file was removed rather than left in that
+  state.
 
 ### Server Function encryption key
 

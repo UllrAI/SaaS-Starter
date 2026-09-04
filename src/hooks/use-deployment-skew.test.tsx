@@ -68,7 +68,7 @@ describe("useDeploymentSkewGuard", () => {
     expect(mockReloadPage).toHaveBeenCalledTimes(1);
   });
 
-  it("runs onSkew before prompting so the dialog gets out of the way", async () => {
+  it("closes the dialog and still prompts", async () => {
     const { result } = renderHook(() => useDeploymentSkewGuard());
     const onSkew = jest.fn();
 

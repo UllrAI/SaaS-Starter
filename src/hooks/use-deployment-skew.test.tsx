@@ -25,6 +25,7 @@ const mockToastWarning = toast.warning as jest.MockedFunction<
 const mockReloadPage = reloadPage as jest.MockedFunction<typeof reloadPage>;
 
 type ToastOptions = {
+  id: string;
   description: string;
   duration: number;
   className: string;
@@ -60,12 +61,29 @@ describe("useDeploymentSkewGuard", () => {
       ToastOptions,
     ];
     expect(options.duration).toBe(Infinity);
+    // A fixed id collapses repeated skews into one prompt instead of stacking.
+    expect(options.id).toBe("deployment-skew");
     // The prompt renders over a Radix modal, which disables pointer events on
     // the body; without this class its reload button cannot be clicked.
     expect(options.className).toContain("pointer-events-auto");
 
     options.action.onClick();
     expect(mockReloadPage).toHaveBeenCalledTimes(1);
+  });
+
+  it("reuses one prompt when several calls skew", async () => {
+    const { result } = renderHook(() => useDeploymentSkewGuard());
+    const skew = async () => {
+      throw new UnrecognizedActionError("action not found");
+    };
+
+    await result.current(skew);
+    await result.current(skew);
+
+    const ids = mockToastWarning.mock.calls.map(
+      ([, options]) => (options as ToastOptions).id,
+    );
+    expect(ids).toEqual(["deployment-skew", "deployment-skew"]);
   });
 
   it("closes the dialog and still prompts", async () => {

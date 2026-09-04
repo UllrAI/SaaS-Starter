@@ -40,9 +40,14 @@ const mockPagination = {
 
 describe("useAdminTable", () => {
   let mockQueryAction: jest.Mock;
+  let consoleError: jest.SpiedFunction<typeof console.error>;
 
   beforeEach(() => {
     jest.clearAllMocks();
+
+    // Several cases below reject on purpose, and the hook logs those. Keep the
+    // spy so the logging stays assertable without flooding the test output.
+    consoleError = jest.spyOn(console, "error").mockImplementation(() => {});
 
     // Setup mock query action
     mockQueryAction = jest.fn();
@@ -57,6 +62,7 @@ describe("useAdminTable", () => {
 
   afterEach(() => {
     jest.resetAllMocks();
+    jest.restoreAllMocks();
   });
 
   describe("Initial State and Setup", () => {
@@ -659,6 +665,7 @@ describe("useAdminTable", () => {
       await waitFor(() => {
         expect(result.current.error).toBe(true);
       });
+      expect(consoleError).toHaveBeenCalledWith(error);
     });
 
     it("keeps the rows on screen when the deployment moved on", async () => {
@@ -684,6 +691,8 @@ describe("useAdminTable", () => {
       expect(mockQueryAction).toHaveBeenCalled();
       expect(result.current.error).toBe(false);
       expect(result.current.data).toEqual(mockData);
+      // A skew is handled by the guard, not by the generic failure path.
+      expect(consoleError).not.toHaveBeenCalled();
     });
 
     it("should handle string errors", async () => {

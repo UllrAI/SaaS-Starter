@@ -24,8 +24,10 @@ export default function DashboardError({
   // A stale client cannot be repaired by re-rendering: `reset` would replay the
   // same missing Server Action ID, so the recovery path has to be a reload.
   const isSkew = isDeploymentSkewError(error);
+  // The wrapper is a `div`, not a `main`: the dashboard layout already renders
+  // this boundary inside `SidebarInset`, which is a `main` itself.
   return (
-    <main className="flex min-h-[60vh] items-center justify-center p-6">
+    <div className="flex min-h-[60vh] items-center justify-center p-6">
       <div className="max-w-md space-y-4 text-center">
         <h1 className="text-2xl font-semibold">
           {isSkew
@@ -41,6 +43,6 @@ export default function DashboardError({
           {isSkew ? t("common_reload") : t("common_try_again")}
         </Button>
       </div>
-    </main>
+    </div>
   );
 }

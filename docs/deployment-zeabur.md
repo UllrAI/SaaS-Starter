@@ -104,10 +104,10 @@ not the source changed.
 Next catches part of this by itself. Every build gets a random build ID, and a
 mismatch on a navigation turns the soft navigation into a full page load. That
 only helps where a navigation happens. A Server Action response carries the
-build ID too, but the client only acts on it when the action redirects — it
-discards the stale flight data so the redirect becomes a full page load. Paging
-or searching an admin table redirects nowhere, and a skew fails at the 404
-before any of this is read, so the recovery path below is what covers it.
+build ID too, and the client compares it on any RSC response: on a mismatch it
+drops the flight data, which turns the follow-up into a full page load. None of
+that reaches a skewed call, though — the 404 is thrown before the RSC body is
+ever parsed — so the recovery path below is what covers it.
 
 **Do not set `deploymentId` to try to improve on that.** As soon as that option
 is present, `next build` stops generating a random build ID and hardcodes a
@@ -132,7 +132,8 @@ What the app adds is the recovery path for the calls that still slip through:
   callback to the nearest error boundary, so a Server Action call in the
   dashboard that forgets the guard lands there. It sits below the dashboard root
   layout on purpose, where the intl provider and the document chrome still
-  exist.
+  exist — which also means a failure thrown by that layout itself passes it by
+  and goes to `global-error.tsx`.
 - `src/app/global-error.tsx` catches whatever escapes a root layout. It reads
   `messages/en.json` and renders its own `<html>`, because at that point there
   is no provider and no document left. This repository has no
@@ -143,6 +144,11 @@ What the app adds is the recovery path for the calls that still slip through:
   hands the fallback's error to the next boundary up, which would replace the
   original failure with that one; the file was removed rather than left in that
   state.
+- Only `dashboard` has a working segment-level boundary. `(auth)`, `(pages)` and
+  `[locale]` fall straight through to `global-error.tsx`, which is English-only
+  and unstyled. That is not a regression — the deleted `src/app/error.tsx` never
+  rendered either — but it is a gap. Closing it means one `error.tsx` per root
+  layout, so they render inside the provider the way the dashboard one does.
 
 ### Server Function encryption key
 
@@ -150,13 +156,24 @@ What the app adds is the recovery path for the calls that still slip through:
 repository does not set it. The key doubles as the hash salt for Server Action
 IDs, on the Turbopack build this repository uses as much as on the webpack one,
 so pinning it makes two builds of identical source produce identical action IDs
-— which removes skew entirely for rebuilds that do not change the code.
+— which removes action ID skew for rebuilds that do not change the code. The
+build ID still changes every build, so an old tab's first RSC navigation is
+still forced into a full page load.
 
 Left unset, the key is generated per build and baked into the artifact. Replicas
 of one image therefore already agree, so multi-instance deployments do not need
 it on their own. Set it when the same source is built more than once and both
 builds serve traffic, or when you want a rebuild to stay compatible with tabs
 opened against the previous one.
+
+Two things to get right before setting it. It is a secret, not a feature flag:
+it encrypts the arguments a Server Action closes over. And it has to be present
+**at build time**, not only at runtime — the server reads
+`process.env.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` in preference to the key baked
+into the manifest (`getActionEncryptionKey` in
+`next/dist/server/app-render/encryption-utils.js`), so injecting it only
+into the running container gives the runtime a different key than the build
+used and every Server Action call fails to decrypt its bound arguments.
 
 ## Durable Worker service
 

@@ -173,7 +173,10 @@ it encrypts the arguments a Server Action closes over. And it has to be present
 into the manifest (`getActionEncryptionKey` in
 `next/dist/server/app-render/encryption-utils.js`), so injecting it only
 into the running container gives the runtime a different key than the build
-used and every Server Action call fails to decrypt its bound arguments.
+used. Every Server Action that closes over bound arguments then fails to
+decrypt them. Actions defined at module scope, which is all of this
+repository's, take no bound arguments and would keep working — which makes
+the mistake easy to miss until an action that does need them is added.
 
 ## Durable Worker service
 

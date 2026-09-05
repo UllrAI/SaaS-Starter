@@ -111,8 +111,20 @@ For the v0.1.15 move from Neon, stop Web and Worker writes before taking the fin
 with `pg_restore --no-owner --no-acl --exit-on-error`, compare every application
 and queue table count, and apply committed migrations. Switch both services’
 `DATABASE_URL` and Worker `JOB_DATABASE_URL` to the internal Zeabur URL before
-restarting them from the released commit. Never run the two databases as active
+deploying them from the released commit. Never run the two databases as active
 writers simultaneously.
+
+A manually suspended Zeabur service ignores Git-triggered deployments. After the
+tag workflow has successfully moved `prod`, explicitly run `npx zeabur@latest
+service redeploy --id <service-id> --env-id <environment-id> -y -i=false` for each
+suspended application service. Verify the resulting deployment SHA matches the
+tag and `suspendedAt` is cleared. Use **redeploy**, which builds current `prod`,
+rather than restarting an old image. Ordinary releases keep the services running
+and do not require this one-time resume step.
+
+Create the target database with the original encoding and locale provider before
+restoring. This deployment preserves UTF8 and the PostgreSQL builtin `C.UTF-8`
+locale; the Zeabur template’s default libc `en_US.utf8` would change text sorting.
 
 Retain the old database and the final dump for rollback until the new release
 is verified. After new writes begin, rollback requires moving those writes back

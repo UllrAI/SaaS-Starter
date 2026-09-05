@@ -108,13 +108,14 @@ parsed. The app handles that case with its error boundaries:
   inside `startTransition` without a try/catch, and React routes the rejection
   to the nearest boundary. `useAdminTable` rethrows a skew for the same reason
   instead of showing its generic load error.
-- `src/app/global-error.tsx` catches whatever escapes a root layout. It reads
-  `messages/en.json` and renders its own `<html>` because no provider exists at
-  that point. There is no `src/app/layout.tsx`; each of `(auth)`, `(pages)`,
-  `[locale]` and `dashboard` carries its own root layout, so a segment-level
-  `src/app/error.tsx` would render outside every provider and throw from its
-  own fallback. Only `dashboard` has a localized boundary today; the other
-  branches fall through to `global-error.tsx`.
+- Every Server Action call site lives under that boundary, so
+  `src/app/global-error.tsx` does not special-case a skew. It catches whatever
+  escapes a root layout, reads `messages/en.json` and renders its own `<html>`
+  because no provider exists at that point. There is no `src/app/layout.tsx`;
+  each of `(auth)`, `(pages)`, `[locale]` and `dashboard` carries its own root
+  layout, so a segment-level `src/app/error.tsx` would render outside every
+  provider and throw from its own fallback. Only `dashboard` has a localized
+  boundary today; the other branches fall through to `global-error.tsx`.
 
 **Do not set `deploymentId` to try to improve on that.** With the option
 present, `next build` stops generating a random build ID and compares the

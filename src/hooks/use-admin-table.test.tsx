@@ -1,12 +1,12 @@
 import { describe, it, expect, beforeEach, afterEach } from "@jest/globals";
-import { renderHook, act, waitFor } from "@testing-library/react";
+import { renderHook, act, screen, waitFor } from "@testing-library/react";
 import { UnrecognizedActionError } from "next/dist/client/components/unrecognized-action-error";
 import { Component, type ReactNode } from "react";
 
 // `jest.mock` is hoisted above every import, so the factory cannot reference a
-// module-level variable; the default passes the value through undebounced.
+// module-level variable. `beforeEach` installs the implementation.
 jest.mock("use-debounce", () => ({
-  useDebounce: jest.fn((value: unknown, delay: number) => [value, delay]),
+  useDebounce: jest.fn(),
 }));
 
 // Import after mocks are set up
@@ -698,7 +698,7 @@ describe("useAdminTable", () => {
       });
 
       expect(mockQueryAction).toHaveBeenCalled();
-      expect(document.body.textContent).toBe("boundary");
+      expect(await screen.findByText("boundary")).toBeInTheDocument();
     });
 
     it("should handle string errors", async () => {

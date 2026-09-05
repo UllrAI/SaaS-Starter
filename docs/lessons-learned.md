@@ -73,7 +73,7 @@
 
 **正确做法**:只从 `@jest/globals` 取 `describe`/`it`/`expect`/`beforeEach`,`jest` 用全局的。参考 `src/components/auth/social-login-buttons.test.tsx`。
 
-修复时注意工厂会被提升到所有模块级 `const` 之前执行,`jest.mock("x", () => ({ fn: mockFn }))` 会报 TDZ 的 `Cannot access 'mockFn' before initialization`。把默认实现写进工厂,再从被 mock 的模块里 import 出来断言,参考 `src/hooks/use-admin-table.test.tsx`。
+修复时注意工厂会被提升到所有模块级 `const` 之前执行,`jest.mock("x", () => ({ fn: mockFn }))` 会报 TDZ 的 `Cannot access 'mockFn' before initialization`。工厂里直接写 `jest.fn()`,再从被 mock 的模块 import 出来设实现和断言,参考 `src/hooks/use-admin-table.test.tsx`。
 
 ### jsdom 的 `crypto` 没有 `subtle`
 

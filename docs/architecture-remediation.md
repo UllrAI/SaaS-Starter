@@ -48,7 +48,9 @@ immutable compliance ledger.
 
 1. Configure the GitHub `production` environment secret `PRODUCTION_DATABASE_URL`.
    Set `PRODUCTION_JOB_DATABASE_URL` only for a separate queue database. The runner
-   must be able to reach those databases. Missing credentials block promotion.
+   reaches the private Zeabur PostgreSQL through the dedicated SSH tunnel described
+   in [the deployment runbook](deployment-zeabur.md#migration-network-access).
+   Missing credentials or tunnel access block promotion.
 2. Deploy Web and Worker from the same release commit and Dockerfile. Give the Worker the four R2
    credentials and the same upload quotas as Web, so it can finalize media and
    remove deleted/abandoned objects. No model credentials are needed for media

@@ -136,3 +136,11 @@
 ### Drizzle 客户端上的底层 postgres.js JSON fixture
 
 Drizzle 配置过序列化器的底层 sql 连接中，直接用 `tx.json(array)` 写集成测试临时表可能把数组送到字符串编码器。此时显式 `JSON.stringify(value)` 并在参数后加 `::jsonb`，不要误判为数据库迁移失败。
+
+### 跨环境数据库校验需要统一会话时区
+
+**现象**：同一个 PostgreSQL dump 恢复到本机和 Zeabur 后，表行数一致，但含时间字段的整行 JSON 哈希不同。
+
+**原因**：本机 PostgreSQL 默认 `Asia/Shanghai`，Zeabur 默认 `UTC`；`row_to_json` 将相同的 `timestamptz` 按当前会话时区渲染。
+
+**正确做法**：比较恢复前后数据哈希时，两端先执行 `SET timezone='UTC'`，再比较排序后的行哈希；不能把显示时区差异当成数据丢失。

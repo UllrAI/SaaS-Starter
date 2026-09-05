@@ -22,6 +22,7 @@
     "test:e2e": "node --env-file-if-exists=.env --import tsx scripts/run-e2e.ts",
     "test:e2e:headed": "node --env-file-if-exists=.env --import tsx scripts/run-e2e.ts --headed",
     "db:generate": "drizzle-kit generate --config=src/database/config.ts",
+    "db:backup": "node scripts/backup-database.mjs",
     "db:migrate": "node --env-file-if-exists=.env --import tsx scripts/migrate.ts",
     "db:migrate:app": "drizzle-kit migrate --config=src/database/config.ts",
     "db:push": "drizzle-kit push --config=src/database/config.ts",

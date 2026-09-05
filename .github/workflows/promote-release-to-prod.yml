@@ -72,7 +72,11 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.PRODUCTION_DATABASE_URL }}
           JOB_DATABASE_URL: ${{ secrets.PRODUCTION_JOB_DATABASE_URL }}
-        run: pnpm db:migrate
+          MIGRATION_SSH_HOST: ${{ vars.MIGRATION_SSH_HOST }}
+          MIGRATION_DB_HOST: ${{ vars.MIGRATION_DB_HOST }}
+          MIGRATION_SSH_KEY: ${{ secrets.MIGRATION_SSH_KEY }}
+          MIGRATION_SSH_KNOWN_HOSTS: ${{ secrets.MIGRATION_SSH_KNOWN_HOSTS }}
+        run: bash scripts/with-production-database.sh pnpm db:migrate
 
       - name: Promote tagged commit to prod
         env:

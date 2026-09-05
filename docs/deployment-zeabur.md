@@ -49,7 +49,7 @@ The production binding checked for v0.1.15 is:
 | Web               | `SaaS-Starter` (`685407f976c734490a6f4770`), branch `prod`        |
 | Worker            | `saas-starter-worker` (`6a89be709c1441c21a54c777`), branch `prod` |
 | Public origin     | `https://starter.ullrai.com`                                      |
-| Database          | External Neon PostgreSQL; both services use the same database     |
+| Database          | Zeabur `postgresql` (`6a9b9779727467881985b9ab`), PostgreSQL 17   |
 | User storage      | Private R2 bucket `saas-starter` in the UllrAi account            |
 
 Web uses the Docker entrypoint and default `node server.js`, port `web:8080`,
@@ -61,14 +61,78 @@ logs to verify Worker health; Web readiness does not cover it.
 The Worker requires the same four R2 credentials and upload quotas as Web.
 There is no additional always-on migration service: GitHub Actions uses the
 `production` environment's `PRODUCTION_DATABASE_URL` for the one-shot release
-step. A separate `PRODUCTION_JOB_DATABASE_URL` is only needed when queues use a
-different database. Keep secrets in platform stores, never in these documents.
+step through an SSH tunnel. Web and Worker use the same `saas_starter` database
+at `postgresql.zeabur.internal:5432`; the `saas` login owns that database and is
+not a PostgreSQL superuser. The database has no public port forwarding. Its
+`data` volume mounts `/var/lib/postgresql/data`, with `PGDATA` below that volume.
+Keep secrets in platform stores, never in these documents.
+
+### Migration network access
+
+The release workflow opens an SSH tunnel to the existing Zeabur server, runs
+`pnpm db:migrate`, then closes the tunnel even if migrations fail. Configure the
+GitHub `production` environment as follows:
+
+| Setting                            | Value                                                                 |
+| ---------------------------------- | --------------------------------------------------------------------- |
+| Variable `MIGRATION_SSH_HOST`      | Zeabur server SSH host                                                |
+| Variable `MIGRATION_DB_HOST`       | PostgreSQL Kubernetes Service ClusterIP on that server                |
+| Secret `MIGRATION_SSH_KEY`         | Dedicated Ed25519 private key                                         |
+| Secret `MIGRATION_SSH_KNOWN_HOSTS` | Server host key verified through the Zeabur administrative connection |
+| Secret `PRODUCTION_DATABASE_URL`   | Database-owner URL using `127.0.0.1:55432/saas_starter`               |
+
+Provision a `saas-migrator` SSH account on the server with public-key-only
+authentication, `AllowTcpForwarding local`, `PermitOpen <database-cluster-ip>:5432`,
+`ForceCommand /bin/false`, and no TTY, agent forwarding, or X11 forwarding. Its
+authorized key is restricted to that same database destination. This account
+cannot run shell commands or access other services. Keep PostgreSQL on the same
+server as the SSH endpoint; SSH encrypts the external part of the connection.
+
+The Service ClusterIP survives pod restarts. If the database service is deleted
+and recreated, update both `MIGRATION_DB_HOST` and the SSH destination restriction.
+Rotate the dedicated key by replacing the authorized key and GitHub secret
+together. Do not put Zeabur account credentials or a server administration key
+in GitHub Actions. Forks must provision this tunnel before their first tag release.
+
+For a separate queue database, `PRODUCTION_JOB_DATABASE_URL` must also be reachable
+from the release runner. The reference deployment uses one database, so leave
+that secret unset.
 
 For ordinary releases, the only manual Git operation after merge/Quality is
 pushing the version tag. Both Zeabur Git triggers watch `prod`; do not manually
 redeploy one service from `main` or override it with a static image tag. The
 v0.1.15 public-to-private cutover additionally requires draining old writers
 and disabling the old R2 public domain before reopening traffic.
+
+## Database cutover and recovery
+
+For the v0.1.15 move from Neon, stop Web and Worker writes before taking the final
+`pg_dump --format=custom --no-owner --no-acl`. Restore into the new Zeabur database
+with `pg_restore --no-owner --no-acl --exit-on-error`, compare every application
+and queue table count, and apply committed migrations. Switch both services’
+`DATABASE_URL` and Worker `JOB_DATABASE_URL` to the internal Zeabur URL before
+restarting them from the released commit. Never run the two databases as active
+writers simultaneously.
+
+Retain the old database and the final dump for rollback until the new release
+is verified. After new writes begin, rollback requires moving those writes back
+or restoring a current backup; changing a URL to the old snapshot would lose data.
+The old Neon database is not part of the runtime or release pipeline.
+
+Zeabur automatic backups require a paid subscription on this account. Instead,
+[`database-backup.yml`](../.github/workflows/database-backup.yml) runs daily at
+19:17 UTC (03:17 Asia/Shanghai) and supports manual dispatch. It takes a consistent
+PostgreSQL 17 custom-format dump through the same restricted tunnel and uploads
+it to private R2 bucket `saas-starter-db-backups`. A bucket lifecycle rule expires
+`postgresql/` backups after 30 days. No public domain or `r2.dev` access is enabled.
+
+Set repository variable `PRODUCTION_BACKUP_ENABLED=true` and production environment
+variable `R2_BACKUP_BUCKET`. Store `R2_BACKUP_ENDPOINT`, `R2_BACKUP_ACCESS_KEY_ID`,
+and `R2_BACKUP_SECRET_ACCESS_KEY` as production environment secrets. Forks must
+configure these settings before enabling the schedule. Check failed Actions runs
+and periodically download a backup with authenticated S3 access and restore it
+into a disposable database. Daily dumps provide a recovery point of up to 24 hours;
+they are not point-in-time recovery.
 
 ## Using the workflow in a fork
 
@@ -104,7 +168,7 @@ it manually. Publish production changes only through `release/vX.Y.Z` tags.
    successful PR run alone does not satisfy the release gate. Confirm both
    services still track the expected repository and `prod`, and their variables
    match `.env.example`.
-3. Configure `PRODUCTION_DATABASE_URL` in the GitHub `production` environment.
+3. Configure the database secret and migration tunnel settings described above.
    Set `PRODUCTION_JOB_DATABASE_URL` only when queues use another database. The
    release workflow runs `pnpm db:migrate` after Quality verification and before promotion.
 4. Fetch the default branch, check out the verified merge commit, then create

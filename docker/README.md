@@ -25,9 +25,9 @@ This directory contains Docker configuration for running the UllrAI Starter appl
    `RESEND_EMAIL_FROM` to an address on a domain verified in Resend. Set
    a second generated value in `UPLOAD_CLEANUP_SECRET`. Set
    `NEXT_PUBLIC_APP_URL` to the exact public origin used to access the build;
-   production SEO metadata is generated from this value at build time. Set
-   `R2_PUBLIC_URL` before building so the storage hostname is included in the
-   Next.js image optimization allowlist.
+   production SEO metadata is generated from this value at build time. Keep the
+   upload bucket private and configure the four R2 credentials for both Web and
+   Worker. User files use authenticated downloads and do not need a public CDN.
    `RATE_LIMIT_IP_HEADER` defaults to Zeabur's `x-forwarded-for`. Override it
    only when your trusted ingress uses a different supported header; never
    trust a header passed through directly from the public internet.
@@ -113,8 +113,10 @@ For production deployment:
 4. **Network**: Use proper network configuration
 5. **Health Checks**: Ensure all services have appropriate health checks
 6. **Secrets**: Use Docker secrets or external secret management
-7. **Upload cleanup**: Schedule an authenticated `POST` to
-   `/api/internal/uploads/cleanup` once per day
+7. **File maintenance**: Keep the Worker running with R2 credentials. It retries
+   AI media finalization, abandoned uploads, and requested file deletions.
+   For existing public buckets, follow the cutover in
+   [architecture remediation](../docs/architecture-remediation.md).
 8. **Upload protocol rollout**: Set `UPLOAD_LEGACY_COMPLETION_SINCE` and
    `UPLOAD_LEGACY_COMPLETION_UNTIL` only for the bounded v1-to-v2 rollout
    window, then remove both after the cutoff

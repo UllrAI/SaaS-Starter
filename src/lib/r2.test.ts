@@ -11,7 +11,6 @@ process.env.R2_ENDPOINT = "https://mock-endpoint.r2.cloudflarestorage.com";
 process.env.R2_ACCESS_KEY_ID = "mock-access-key";
 process.env.R2_SECRET_ACCESS_KEY = "mock-secret-key";
 process.env.R2_BUCKET_NAME = "mock-bucket";
-process.env.R2_PUBLIC_URL = "https://mock-public-url.com";
 
 const mockSend = jest.fn<(...args: unknown[]) => Promise<unknown>>();
 const mockGetSignedUrl = jest.fn<(...args: unknown[]) => Promise<string>>();

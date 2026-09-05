@@ -1063,7 +1063,6 @@ jest.mock("./env.js", () => ({
     R2_ACCESS_KEY_ID: "mock-access-key",
     R2_SECRET_ACCESS_KEY: "mock-secret-key",
     R2_BUCKET_NAME: "mock-bucket",
-    R2_PUBLIC_URL: "https://mock-public-url.com",
     STRIPE_SECRET_KEY: "sk_test_mock_api_key",
     STRIPE_ENVIRONMENT: "test_mode",
     STRIPE_WEBHOOK_SECRET: "whsec_mock_webhook_secret",

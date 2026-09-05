@@ -22,8 +22,8 @@ when upgrading an existing public bucket.
 
 ## Promotion model
 
-Configure the production Zeabur service to deploy the `prod` branch. It must not
-deploy direct pushes to the default development branch.
+Configure both production Zeabur services to deploy the `prod` branch. Neither
+service should deploy direct pushes to the default development branch.
 
 Pushing a `release/vX.Y.Z` tag matching the version in `package.json` triggers
 [`promote-release-to-prod.yml`](../.github/workflows/promote-release-to-prod.yml).
@@ -36,6 +36,39 @@ The current default branch is `main`.
 The workflow requests `contents: write` and `actions: read`; the repository's default workflow
 permissions can remain read-only. Organization policies and any ruleset
 protecting `prod` must still permit this workflow to update the branch.
+
+## Reference deployment
+
+The production binding checked for v0.1.15 is:
+
+| Item              | Configuration                                                     |
+| ----------------- | ----------------------------------------------------------------- |
+| GitHub repository | `UllrAI/SaaS-Starter` (ID `1005988967`)                           |
+| Zeabur project    | `SaaS-Starter` (`684d4c992091f0ee0a4c210c`)                       |
+| Environment       | `production` (`684d4c994d7e8de26fcf49d9`)                         |
+| Web               | `SaaS-Starter` (`685407f976c734490a6f4770`), branch `prod`        |
+| Worker            | `saas-starter-worker` (`6a89be709c1441c21a54c777`), branch `prod` |
+| Public origin     | `https://starter.ullrai.com`                                      |
+| Database          | External Neon PostgreSQL; both services use the same database     |
+| User storage      | Private R2 bucket `saas-starter` in the UllrAi account            |
+
+Web uses the Docker entrypoint and default `node server.js`, port `web:8080`,
+and HTTP readiness at `/api/ready`. Worker overrides the image arguments with
+`node dist/worker/worker.mjs`, has no HTTP port or domain, and uses a 25-second
+application drain timeout. Check `worker_ready`, queue metrics, and shutdown
+logs to verify Worker health; Web readiness does not cover it.
+
+The Worker requires the same four R2 credentials and upload quotas as Web.
+There is no additional always-on migration service: GitHub Actions uses the
+`production` environment's `PRODUCTION_DATABASE_URL` for the one-shot release
+step. A separate `PRODUCTION_JOB_DATABASE_URL` is only needed when queues use a
+different database. Keep secrets in platform stores, never in these documents.
+
+For ordinary releases, the only manual Git operation after merge/Quality is
+pushing the version tag. Both Zeabur Git triggers watch `prod`; do not manually
+redeploy one service from `main` or override it with a static image tag. The
+v0.1.15 public-to-private cutover additionally requires draining old writers
+and disabling the old R2 public domain before reopening traffic.
 
 ## Using the workflow in a fork
 
@@ -65,21 +98,28 @@ it manually. Publish production changes only through `release/vX.Y.Z` tags.
 
 ## Release order
 
-1. Merge only a reviewed commit into the default branch with green CI.
-2. Confirm the service variables match `.env.example`.
+1. Update `package.json` to the next unused release version in a PR, revise the
+   release notes, and merge only after review and green CI.
+2. Wait for Quality to pass on the exact merge commit on the default branch; a
+   successful PR run alone does not satisfy the release gate. Confirm both
+   services still track the expected repository and `prod`, and their variables
+   match `.env.example`.
 3. Configure `PRODUCTION_DATABASE_URL` in the GitHub `production` environment.
    Set `PRODUCTION_JOB_DATABASE_URL` only when queues use another database. The
    release workflow runs `pnpm db:migrate` after Quality verification and before promotion.
-4. Update the version in `package.json`, then create an annotated
-   `release/vX.Y.Z` tag using the same version on that commit and push it:
+4. Fetch the default branch, check out the verified merge commit, then create
+   an annotated `release/vX.Y.Z` tag matching its `package.json` and push it:
 
    ```bash
    git tag -a release/v1.2.3 -m "Release v1.2.3"
    git push origin release/v1.2.3
    ```
 
-5. Wait for the promotion workflow to move `prod`.
-6. Wait for the Zeabur build and runtime deployment to succeed.
+5. Wait for the promotion workflow to finish migrations and move `prod`; verify
+   that the tag commit and `prod` are identical.
+6. Wait for both Zeabur deployments and verify each deployment reports that same
+   commit SHA. Web and Worker build the same release and Dockerfile separately;
+   their image digests are not expected to be identical.
 7. Verify `GET /api/health` and `GET /api/ready`.
 8. Inspect build and runtime logs for errors.
 9. Exercise English and Simplified Chinese marketing URLs, authentication

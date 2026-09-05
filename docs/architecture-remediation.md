@@ -49,7 +49,7 @@ immutable compliance ledger.
 1. Configure the GitHub `production` environment secret `PRODUCTION_DATABASE_URL`.
    Set `PRODUCTION_JOB_DATABASE_URL` only for a separate queue database. The runner
    must be able to reach those databases. Missing credentials block promotion.
-2. Deploy Web and Worker from the same image. Give the Worker the four R2
+2. Deploy Web and Worker from the same release commit and Dockerfile. Give the Worker the four R2
    credentials and the same upload quotas as Web, so it can finalize media and
    remove deleted/abandoned objects. No model credentials are needed for media
    retries; the Worker does not replay an interrupted AI generation.

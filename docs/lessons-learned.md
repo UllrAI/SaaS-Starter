@@ -144,3 +144,11 @@ Drizzle 配置过序列化器的底层 sql 连接中，直接用 `tx.json(array)
 **原因**：本机 PostgreSQL 默认 `Asia/Shanghai`，Zeabur 默认 `UTC`；`row_to_json` 将相同的 `timestamptz` 按当前会话时区渲染。
 
 **正确做法**：比较恢复前后数据哈希时，两端先执行 `SET timezone='UTC'`，再比较排序后的行哈希；不能把显示时区差异当成数据丢失。
+
+### Zeabur 暂停服务会跳过 Git 自动部署
+
+**现象**：迁库时暂停 Web 和 Worker，release workflow 成功将 `prod` 推进后，Zeabur 仍停在 `SUSPENDED`，没有生成新部署。
+
+**原因**：手动暂停状态会阻止 Git trigger 创建部署，更新分支本身不会恢复服务。
+
+**正确做法**：一次性切换完成且 `prod` 已指向发布提交后，对暂停的服务执行 `service redeploy`，核对新部署 SHA 和 `suspendedAt=null`。普通 `restart` 可能恢复旧镜像；后续日常 tag 发布应保持服务运行。

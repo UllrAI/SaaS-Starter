@@ -1,7 +1,6 @@
 "use client";
 
 import { useTranslation } from "@/lib/i18n/translation/client";
-import { useDeploymentSkewGuard } from "@/hooks/use-deployment-skew";
 import { useState, ReactNode, useTransition, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -42,7 +41,6 @@ export function SubscriptionManagementTable({
   const { t } = useTranslation();
   const intlLocale = useIntlLocale();
   const [isPending, startTransition] = useTransition();
-  const guardSkew = useDeploymentSkewGuard();
   const [cancellingSubscription, setCancellingSubscription] =
     useState<SubscriptionWithUser | null>(null);
   const querySubscriptions = useCallback(
@@ -88,15 +86,10 @@ export function SubscriptionManagementTable({
   const confirmCancelSubscription = async () => {
     if (!cancellingSubscription) return;
     startTransition(async () => {
-      const result = await guardSkew(
-        () =>
-          cancelSubscriptionAction({
-            subscriptionId: cancellingSubscription.subscriptionId,
-          }),
-        () => setCancellingSubscription(null),
-      );
+      const result = await cancelSubscriptionAction({
+        subscriptionId: cancellingSubscription.subscriptionId,
+      });
 
-      if (!result) return;
       if (result.data) {
         toast.success(t("subscription_cancel_success"));
         setCancellingSubscription(null);

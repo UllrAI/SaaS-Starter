@@ -73,7 +73,7 @@
 
 **正确做法**:只从 `@jest/globals` 取 `describe`/`it`/`expect`/`beforeEach`,`jest` 用全局的。参考 `src/components/auth/social-login-buttons.test.tsx`。
 
-注意 `src/hooks/use-admin-table.test.tsx` 目前正踩这个坑——它的 `use-debounce` mock 从未生效,跑的是真实实现,断言恰好仍然成立。单纯删掉那行 `jest` 导入会让它立刻挂掉(工厂被提升到 `const mockUseDebounce = jest.fn()` 之上执行,报 TDZ 的 `Cannot access 'mockUseDebounce' before initialization`),要修得连工厂的默认返回值一起补。
+修复时注意工厂会被提升到所有模块级 `const` 之前执行,`jest.mock("x", () => ({ fn: mockFn }))` 会报 TDZ 的 `Cannot access 'mockFn' before initialization`。把默认实现写进工厂,再从被 mock 的模块里 import 出来断言,参考 `src/hooks/use-admin-table.test.tsx`。
 
 ### jsdom 的 `crypto` 没有 `subtle`
 

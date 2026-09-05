@@ -1,3 +1,8 @@
+import {
+  databaseUrlSchema,
+  databaseEnvFields,
+  modelEnvFields,
+} from "./src/lib/config/runtime-env.mjs";
 import { createEnv } from "@t3-oss/env-nextjs";
 import { z } from "zod";
 import { validateIntegrationEnv } from "./src/lib/config/integration-env.mjs";
@@ -26,14 +31,6 @@ const appOriginSchema = z
     return url.origin;
   });
 
-const databaseUrlSchema = z
-  .string()
-  .url()
-  .refine(
-    (value) => ["postgres:", "postgresql:"].includes(new URL(value).protocol),
-    "DATABASE_URL must use the postgres or postgresql protocol",
-  );
-
 const optionalCredentialSchema = z.preprocess(
   (value) =>
     typeof value === "string" && value.trim() === "" ? undefined : value,
@@ -53,21 +50,7 @@ const env = createEnv({
 
   // Server-side environment variables
   server: {
-    // Database URL
-    DATABASE_URL: databaseUrlSchema,
-    JOB_DATABASE_URL: databaseUrlSchema.optional(),
-
-    // Database connection pool settings
-    DB_POOL_SIZE: z.coerce.number().int().positive().default(20),
-    DB_IDLE_TIMEOUT: z.coerce.number().int().nonnegative().default(300),
-    DB_MAX_LIFETIME: z.coerce.number().int().nonnegative().default(14400),
-    DB_CONNECT_TIMEOUT: z.coerce.number().int().positive().max(4).default(4),
-    JOB_DB_POOL_SIZE: z.coerce.number().int().positive().max(20).default(3),
-    WORKER_GRACEFUL_TIMEOUT_MS: z.coerce
-      .number()
-      .int()
-      .positive()
-      .default(30000),
+    ...databaseEnvFields(20),
     RATE_LIMIT_IP_HEADER: z
       .enum([
         "cf-connecting-ip",
@@ -102,7 +85,6 @@ const env = createEnv({
     R2_ACCESS_KEY_ID: optionalCredentialSchema,
     R2_SECRET_ACCESS_KEY: optionalCredentialSchema,
     R2_BUCKET_NAME: optionalCredentialSchema,
-    R2_PUBLIC_URL: z.string().url().optional(),
     UPLOAD_CLEANUP_SECRET: z
       .string()
       .min(32, "UPLOAD_CLEANUP_SECRET must be at least 32 characters")
@@ -137,10 +119,12 @@ const env = createEnv({
     STRIPE_ENVIRONMENT: z.enum(["test_mode", "live_mode"]).default("test_mode"),
     STRIPE_WEBHOOK_SECRET: optionalCredentialSchema,
 
+    AI_DAILY_TOKEN_LIMIT: z.coerce.number().int().positive().default(2_000_000),
+    AI_DAILY_IMAGE_LIMIT: z.coerce.number().int().nonnegative().default(10),
+
     // AI assistant (OpenAI Responses-compatible endpoint)
     LLM_API_KEY: optionalCredentialSchema,
-    LLM_BASE_URL: z.string().url().default("https://api.openai.com/v1"),
-    AI_DEFAULT_MODEL: z.string().trim().min(1).default("gpt-5.6-luna"),
+    ...modelEnvFields,
 
     // E2E testing
     E2E_DATABASE_URL: databaseUrlSchema.optional(),
@@ -225,7 +209,6 @@ const env = createEnv({
     R2_ACCESS_KEY_ID: process.env.R2_ACCESS_KEY_ID,
     R2_SECRET_ACCESS_KEY: process.env.R2_SECRET_ACCESS_KEY,
     R2_BUCKET_NAME: process.env.R2_BUCKET_NAME,
-    R2_PUBLIC_URL: process.env.R2_PUBLIC_URL,
     UPLOAD_CLEANUP_SECRET: process.env.UPLOAD_CLEANUP_SECRET,
     UPLOAD_DAILY_QUOTA_BYTES: process.env.UPLOAD_DAILY_QUOTA_BYTES,
     UPLOAD_TOTAL_QUOTA_BYTES: process.env.UPLOAD_TOTAL_QUOTA_BYTES,
@@ -243,6 +226,9 @@ const env = createEnv({
     STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
     STRIPE_ENVIRONMENT: process.env.STRIPE_ENVIRONMENT,
     STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
+
+    AI_DAILY_TOKEN_LIMIT: process.env.AI_DAILY_TOKEN_LIMIT,
+    AI_DAILY_IMAGE_LIMIT: process.env.AI_DAILY_IMAGE_LIMIT,
 
     // AI assistant
     LLM_API_KEY: process.env.LLM_API_KEY,

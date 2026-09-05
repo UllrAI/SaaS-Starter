@@ -1,9 +1,10 @@
-import { afterAll, beforeAll, describe, expect, it } from "@jest/globals";
+import { afterAll, beforeAll, describe, expect, it, jest } from "@jest/globals";
+import { randomUUID } from "node:crypto";
 import { eq } from "drizzle-orm";
 import { PgBoss } from "pg-boss";
 import { z } from "zod";
 import { createDatabaseClient } from "@/database/client";
-import { taskRuns } from "@/database/schema";
+import { taskRuns, taskDispatches } from "@/database/schema";
 import { defineJob } from "@/lib/jobs/definition";
 import { JobQueue } from "@/lib/jobs/queue";
 import { ensureProviderJobSubmitted } from "@/lib/tasks/provider-submission";
@@ -165,6 +166,123 @@ afterAll(async () => {
 }, 30_000);
 
 describe("background jobs with PostgreSQL", () => {
+  it("rolls back new acceptance when a scope already has 100 unfinished tasks", async () => {
+    const scopeKey = `${scopePrefix}:capacity`;
+    try {
+      await database.db.insert(taskRuns).values(
+        Array.from({ length: 100 }, () => ({
+          kind: "integration.capacity",
+          scopeKey,
+          input: {},
+        })),
+      );
+      await expect(
+        createTask(scopeKey, { mode: "success", delayMs: 0 }),
+      ).rejects.toThrow(/Too many unfinished tasks/);
+      expect(
+        await database.db
+          .select()
+          .from(taskRuns)
+          .where(eq(taskRuns.scopeKey, scopeKey)),
+      ).toHaveLength(100);
+    } finally {
+      await database.db.delete(taskRuns).where(eq(taskRuns.scopeKey, scopeKey));
+    }
+  });
+
+  it("recovers acceptance when queue delivery fails after the DB commit", async () => {
+    const delivery = jest
+      .spyOn(workerA, "dispatchPending")
+      .mockRejectedValueOnce(new Error("queue connection unavailable"));
+    const accepted = await createTask(`${scopePrefix}:outbox`, {
+      mode: "success",
+      delayMs: 0,
+    });
+    delivery.mockRestore();
+    const [dispatch] = await database.db
+      .select()
+      .from(taskDispatches)
+      .where(eq(taskDispatches.taskRunId, accepted.taskRun.id));
+    expect(dispatch.payload).toEqual(accepted.taskRun.input);
+    expect(dispatch.id).toBe(accepted.taskRun.dispatchId);
+    await waitForTask(accepted.taskRun.id, ["completed"]);
+    expect(calls.get(accepted.taskRun.id)).toBe(1);
+  });
+
+  it("recovers delivery acknowledged by the queue but not by the dispatcher", async () => {
+    const enqueue = workerA.enqueue.bind(workerA);
+    const uncertain = jest
+      .spyOn(workerA, "enqueue")
+      .mockImplementationOnce(async (...args) => {
+        await enqueue(...args);
+        throw new Error("connection lost before acknowledgement");
+      });
+    const accepted = await createTask(`${scopePrefix}:uncertain`, {
+      mode: "success",
+      delayMs: 0,
+    });
+    uncertain.mockRestore();
+    await waitForTask(accepted.taskRun.id, ["completed"]);
+    expect(calls.get(accepted.taskRun.id)).toBe(1);
+  });
+
+  it("rejects a reused idempotency key with different accepted input", async () => {
+    const scope = `${scopePrefix}:input-conflict`;
+    const first = await createTask(
+      scope,
+      { mode: "success", delayMs: 0 },
+      "key",
+    );
+    await expect(createTask(scope, { mode: "fail" }, "key")).rejects.toThrow(
+      /different input/,
+    );
+    await waitForTask(first.taskRun.id, ["completed"]);
+    expect((await getTaskRun(database.db, first.taskRun.id))?.input).toEqual({
+      mode: "success",
+      delayMs: 0,
+    });
+  });
+
+  it("reconciles a supervisor terminal state even when the handler never finishes", async () => {
+    const { taskRun } = await createTaskRun(database.db, {
+      kind: queueName,
+      scopeKey: `${scopePrefix}:supervisor`,
+      input: { mode: "success", delayMs: 0 },
+    });
+    const id = randomUUID();
+    await database.db
+      .update(taskRuns)
+      .set({ dispatchId: id, status: "running" })
+      .where(eq(taskRuns.id, taskRun.id));
+    await database.db.insert(taskDispatches).values({
+      id,
+      taskRunId: taskRun.id,
+      kind: queueName,
+      scopeKey: taskRun.scopeKey,
+      payload: taskRun.input,
+      sentAt: new Date(),
+    });
+    const boss = await workerA.start();
+    await boss.send(
+      queueName,
+      {
+        taskRunId: taskRun.id,
+        scopeKey: taskRun.scopeKey,
+        payload: taskRun.input,
+      },
+      { id, startAfter: new Date(Date.now() + 3_600_000) },
+    );
+    await boss
+      .getDb()
+      .executeSql(
+        "UPDATE pgboss.job SET state = 'failed', completed_on = now() WHERE id = $1",
+        [id],
+      );
+    const result = await waitForTask(taskRun.id, ["failed"]);
+    expect(result.error?.code).toBe("QUEUE_JOB_TERMINATED");
+    expect(calls.get(taskRun.id)).toBeUndefined();
+  });
+
   it("deduplicates task creation in the application and queue layers", async () => {
     const scopeKey = `${scopePrefix}:dedup`;
     const [first, second] = await Promise.all([

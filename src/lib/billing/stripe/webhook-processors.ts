@@ -10,7 +10,6 @@ import {
   lockPaymentAdjustmentScope,
   reconcilePaymentAfterDispute,
   revokeProductEntitlementByPaymentId,
-  suspendSubscriptionAccess,
   type Tx,
   updatePaymentStatus,
   upsertPayment,
@@ -405,13 +404,13 @@ export async function processInvoice(
 export async function processRefund(
   charge: Stripe.Charge,
   paymentReferences: string[],
-  eventCreatedAt: Date,
+  _eventCreatedAt: Date,
   tx: Tx,
 ): Promise<void> {
   const paymentId = await lockPaymentAdjustmentScope(paymentReferences, tx);
   const isFullRefund =
     charge.refunded && charge.amount_refunded >= charge.amount;
-  const [payment] = await updatePaymentStatus(
+  await updatePaymentStatus(
     paymentId,
     isFullRefund ? "refunded" : "partially_refunded",
     tx,
@@ -419,20 +418,13 @@ export async function processRefund(
 
   if (isFullRefund) {
     await revokeProductEntitlementByPaymentId(paymentId, "refunded", tx);
-    if (payment?.subscriptionId) {
-      await suspendSubscriptionAccess(
-        payment.subscriptionId,
-        eventCreatedAt,
-        tx,
-      );
-    }
   }
 }
 
 export async function processDispute(
   dispute: Stripe.Dispute,
   paymentReferences: string[],
-  eventCreatedAt: Date,
+  _eventCreatedAt: Date,
   tx: Tx,
 ): Promise<void> {
   if (dispute.status.startsWith("warning_") || dispute.status === "prevented") {
@@ -440,11 +432,8 @@ export async function processDispute(
   }
 
   const paymentId = await lockPaymentAdjustmentScope(paymentReferences, tx);
-  const [payment] = await updatePaymentStatus(paymentId, "disputed", tx);
+  await updatePaymentStatus(paymentId, "disputed", tx);
   await revokeProductEntitlementByPaymentId(paymentId, "disputed", tx);
-  if (payment?.subscriptionId) {
-    await suspendSubscriptionAccess(payment.subscriptionId, eventCreatedAt, tx);
-  }
 }
 
 export async function processClosedDispute(
@@ -486,13 +475,7 @@ export async function processClosedDispute(
 
   if (reconciledStatus === "refunded") {
     await revokeProductEntitlementByPaymentId(paymentId, "refunded", tx);
-    if (payment.subscriptionId) {
-      await suspendSubscriptionAccess(
-        payment.subscriptionId,
-        eventCreatedAt,
-        tx,
-      );
-    }
+
     return;
   }
 

@@ -1069,5 +1069,21 @@
   "ai_canvas_resize": "调整画布宽度",
   "ai_canvas_resize_hint": "拖动可调整画布宽度，双击恢复默认。",
   "ai_canvas_download": "下载",
-  "ai_canvas_close": "关闭画布"
+  "ai_canvas_close": "关闭画布",
+  "files_my_files": "我的文件",
+  "files_refresh": "刷新",
+  "files_private_notice": "文件仅自己可访问。删除后立即停止访问，存储空间将在清理完成后释放。",
+  "files_error": "无法更新文件，请刷新后重试。",
+  "files_empty": "暂无文件。",
+  "files_delete": "删除",
+  "files_delete_named": "删除 {name}",
+  "files_previous": "上一页",
+  "files_next": "下一页",
+  "ai_chat_image_saving": "图片正在保存，请稍后刷新。如果存储已满，请先到文件页删除不再需要的文件。",
+  "ai_chat_load_older": "加载更早的消息",
+  "ai_budget_reached": "AI 用量已达到限额。请等待较早的用量超出 24 小时统计窗口后重试。",
+  "ai_run_conflict": "回复正在生成，或此请求已被接收。请稍后刷新对话。",
+  "ai_conversation_changed": "此对话已被其他请求更新，请刷新后继续。",
+  "ai_context_full": "此对话已达到上下文上限，请新建对话继续。",
+  "ai_chat_image_deleted": "已删除此图片。"
 }

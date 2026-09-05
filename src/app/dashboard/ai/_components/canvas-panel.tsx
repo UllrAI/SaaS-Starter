@@ -87,7 +87,9 @@ function downloadArtifact(artifact: CanvasArtifact, fallbackTitle: string) {
     anchor.href = objectUrl;
     anchor.download = `${title}.md`;
   } else {
-    anchor.href = artifact.url;
+    anchor.href = artifact.url.startsWith("/api/files/content?key=")
+      ? `${artifact.url}&download=1`
+      : artifact.url;
     anchor.download = `${title}.${getMediaExtension(artifact)}`;
     anchor.rel = "noreferrer";
   }

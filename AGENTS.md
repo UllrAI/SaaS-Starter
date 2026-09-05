@@ -158,7 +158,7 @@ pnpm stripe:sync-products
 
 ## 7. Data, Billing, and Security
 
-- Validate environment variables only through `env.js`.
+- Validate Web environment variables through `env.js`; Worker reads its process subset through `src/lib/jobs/worker-env.ts`. Shared database/model rules belong in `src/lib/config/runtime-env.mjs`.
 - Database CLI configuration may validate only `DATABASE_URL` so a one-shot
   migrator does not require unrelated application credentials.
 - Keep server and client environment variables separated and validated.
@@ -187,8 +187,7 @@ pnpm stripe:sync-products
   updates `prod`. Do not push or merge directly into `prod`.
 - Resolve the default branch dynamically in release automation. The current
   branch is `main`, but forks may use `master` or another name.
-- Run production migrations as a dedicated release step before pushing the
-  release tag.
+- The release workflow verifies Quality for the exact default-branch SHA and runs production migrations as a dedicated step before updating `prod`. Configure the `production` environment database secrets before releasing.
 
 ## 10. Testing and Verification
 

@@ -8,6 +8,11 @@ import {
   readJsonBodyWithLimit,
   RequestBodyTooLargeError,
 } from "@/lib/http/request-body";
+import {
+  TaskInputConflictError,
+  TaskCapacityError,
+} from "@/lib/tasks/repository";
+import { checkRateLimit } from "@/lib/rate-limit";
 import { createBackgroundTask } from "@/lib/tasks/service";
 import { getUserScopeKey, serializeTaskRun } from "@/lib/tasks/types";
 
@@ -24,6 +29,18 @@ export async function POST(request: NextRequest) {
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  const limit = await checkRateLimit({
+    scope: "background_tasks",
+    key: session.user.id,
+    limit: 30,
+    windowMs: 60_000,
+  });
+  if (!limit.allowed)
+    return NextResponse.json(
+      { error: "Too many task requests." },
+      { status: 429 },
+    );
 
   let body: unknown;
   try {
@@ -58,6 +75,10 @@ export async function POST(request: NextRequest) {
       },
     );
   } catch (error) {
+    if (error instanceof TaskCapacityError)
+      return NextResponse.json({ error: error.message }, { status: 429 });
+    if (error instanceof TaskInputConflictError)
+      return NextResponse.json({ error: error.message }, { status: 409 });
     console.error("Failed to create background task", error);
     return NextResponse.json(
       { error: "Background task service is unavailable." },

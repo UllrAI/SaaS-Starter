@@ -15,9 +15,11 @@ src/lib/ai/
 ├── chat-history.ts        # User-owned conversations and message persistence
 ├── chat-history-types.ts  # Shared conversation and UIMessage types
 ├── chat-attachments.ts    # Ownership and media validation for reference images
-├── generated-image-storage.ts # Generated-image persistence through R2
-├── response-chain.ts      # User-bound signed handles for previous_response_id
-├── usage.ts               # Per-turn token accounting into ai_usage_events
+├── runs.ts                # Durable admission, response and usage transaction
+├── finalize.ts            # Retryable generated-image persistence
+├── transcript.ts          # Server-owned history and approval validation
+├── response-chain.ts      # User/conversation-bound signed handles for previous_response_id
+├── usage.ts               # Provider usage normalization
 ├── context.ts             # AgentContext: per-request session data for tools
 ├── tools/                 # One file per tool
 │   ├── index.ts           # Tool registry: name → factory, plus buildTools()
@@ -56,17 +58,19 @@ canvas, where users can switch artifacts, copy them, and download them.
 Conversations and UI messages are stored under the authenticated user in PostgreSQL. The
 responsive history panel supports creating, switching, archiving, and restoring conversations.
 Its desktop rail can be collapsed, and the selected conversation is restored from the URL after
-refresh or sign-in on another device. Generated image bytes are moved to the existing R2 upload
-system before the assistant message is stored, so historical canvas results use durable URLs
-instead of large base64 database values. The server also consumes a separate copy of each response
-stream, so generation and final message persistence continue when the browser refreshes, closes,
-or loses its connection. A process restart remains the execution boundary; deployments that need
-jobs to survive application restarts should move generation to a durable queue.
+refresh or sign-in on another device. History is paginated in batches of 80 messages.
+The server accepts one new message or approval decision with a parent ID and derives the
+provider response handle from stored history. Each user may have one running response.
+A three-minute abort, five-step limit, and 4096 output-token limit bound each run.
+The response, pending media message, and usage commit together. The Worker retries R2
+storage independently; stale media retries cannot overwrite a later reply. A process
+killed before that transaction leaves a reserved interrupted run and is not automatically
+replayed. See [architecture recovery and deployment](architecture-remediation.md).
 
 Users can attach up to six PNG, JPEG, or WebP reference images to each message, including an
 image-only message. The composer uploads them through the existing R2 flow before sending, and the
 durable URLs are stored as UI message file parts. The chat route verifies every URL against an
-upload owned by the authenticated user before passing it to the model, so clients cannot inject
+upload owned by the authenticated user and issues short-lived signed reads before passing it to the model, so clients cannot inject
 arbitrary external images or another user's files. The supported formats follow the
 [OpenAI image-input guidance](https://developers.openai.com/api/docs/guides/images-vision).
 
@@ -75,12 +79,14 @@ arbitrary external images or another user's files. The supported formats follow 
 The stack uses the OpenAI Responses protocol so reasoning and function tools work together.
 `LLM_BASE_URL` remains configurable for gateways that implement the Responses API.
 
-| Setting            | Where                                                 | Notes                                    |
-| :----------------- | :---------------------------------------------------- | :--------------------------------------- |
-| Feature switch     | `SITE_CONFIG.features.ai` in `src/lib/config/site.js` | Gates the nav item, page, and API route. |
-| `LLM_API_KEY`      | `.env`                                                | Required while the feature is enabled.   |
-| `LLM_BASE_URL`     | `.env`                                                | Optional Responses API base URL.         |
-| `AI_DEFAULT_MODEL` | `.env`                                                | Optional; defaults to `gpt-5.6-luna`.    |
+| Setting                | Where                                                 | Notes                                                                         |
+| :--------------------- | :---------------------------------------------------- | :---------------------------------------------------------------------------- |
+| Feature switch         | `SITE_CONFIG.features.ai` in `src/lib/config/site.js` | Gates the nav item, page, and API route.                                      |
+| `LLM_API_KEY`          | `.env`                                                | Required while the feature is enabled.                                        |
+| `LLM_BASE_URL`         | `.env`                                                | Optional Responses API base URL.                                              |
+| `AI_DAILY_TOKEN_LIMIT` | `.env`                                                | Rolling 24h admission allowance, default 2,000,000; reserves 400,000 per run. |
+| `AI_DAILY_IMAGE_LIMIT` | `.env`                                                | Rolling 24h image allowance, default 10.                                      |
+| `AI_DEFAULT_MODEL`     | `.env`                                                | Optional; defaults to `gpt-5.6-luna`.                                         |
 
 The assistant defaults to `low` reasoning; the client may select `low`, `medium`, or `high` per
 request. Image generation is intentionally fixed in code to GPT Image 2, low quality, WebP output,
@@ -94,6 +100,10 @@ tool for that feature to work.
 To use another vendor, change `src/lib/ai/models.ts` only — for example install
 `@ai-sdk/anthropic` and swap `createOpenAI` for `createAnthropic`. Tools, skills, agents, and
 routes remain provider-agnostic.
+
+Mutating tools must be idempotent using the authenticated user, conversation ID, and SDK
+`toolCallId`. Approval signatures establish consent, not exactly-once execution. Uploads
+disabled means both document storage and image generation are unavailable.
 
 ## Adding a tool
 

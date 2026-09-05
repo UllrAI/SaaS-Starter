@@ -29,7 +29,14 @@ export function readSavedDocument(output: unknown): SavedDocument | null {
   // The URL is rendered as a link, so anything but HTTP(S) is dropped rather
   // than trusted: `javascript:` in an href would execute on click.
   try {
-    const { protocol } = new URL(url);
+    if (
+      !url.startsWith("/api/files/content?key=") &&
+      !/^https?:\/\//i.test(url)
+    )
+      return null;
+    const { protocol } = new URL(url, "https://app.invalid");
+    if (url.startsWith("/") && !url.startsWith("/api/files/content?key="))
+      return null;
     if (protocol !== "https:" && protocol !== "http:") {
       return null;
     }

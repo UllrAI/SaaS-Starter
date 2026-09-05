@@ -1,6 +1,6 @@
 import "server-only";
 
-import { and, asc, desc, eq, isNotNull, isNull, sql } from "drizzle-orm";
+import { and, desc, eq, isNotNull, isNull, sql } from "drizzle-orm";
 import { db } from "@/database";
 import { aiConversations, aiMessages } from "@/database/schema";
 import type {
@@ -146,6 +146,7 @@ export async function setAiConversationArchived(params: {
 export async function getAiConversation(params: {
   conversationId: string;
   userId: string;
+  before?: string;
 }): Promise<AiConversationDetail | null> {
   const conversation = await findOwnedConversation(
     params.conversationId,
@@ -156,12 +157,21 @@ export async function getAiConversation(params: {
   const messages = await db
     .select()
     .from(aiMessages)
-    .where(eq(aiMessages.conversationId, conversation.id))
-    .orderBy(asc(aiMessages.createdAt), asc(aiMessages.id));
+    .where(
+      and(
+        eq(aiMessages.conversationId, conversation.id),
+        params.before
+          ? sql`(${aiMessages.createdAt}, ${aiMessages.id}) < (select "createdAt", id from ai_messages where "conversationId" = ${conversation.id} and id = ${params.before})`
+          : undefined,
+      ),
+    )
+    .orderBy(desc(aiMessages.createdAt), desc(aiMessages.id))
+    .limit(81);
 
   return {
     conversation: toSummary(conversation),
-    messages: messages.map(toMessage),
+    messages: messages.slice(0, 80).reverse().map(toMessage),
+    hasMore: messages.length > 80,
   };
 }
 
@@ -213,6 +223,7 @@ export async function saveAiMessages(params: {
       await insert.onConflictDoUpdate({
         target: [aiMessages.conversationId, aiMessages.id],
         set: {
+          runId: null,
           role: message.role,
           parts: message.parts,
           metadata: message.metadata ?? null,

@@ -1,6 +1,9 @@
 import { randomUUID } from "node:crypto";
 import { PgBoss, type JobResult, type JobWithMetadata } from "pg-boss";
 import { z } from "zod";
+import { and, eq, gt, inArray, isNull } from "drizzle-orm";
+import { taskDispatches, taskRuns } from "@/database/schema";
+import { scheduleTaskContinuation } from "@/lib/tasks/dispatch";
 import type { AppDatabase } from "@/database/client";
 import {
   getTaskRun,
@@ -50,6 +53,9 @@ export class JobQueue {
   readonly #schema: string;
   #startPromise: Promise<PgBoss> | null = null;
   #startAttempted = false;
+  #reconcileCursor = new Map<string, string>();
+  #maintenanceTimers: ReturnType<typeof setInterval>[] = [];
+  #maintenance = new Set<Promise<void>>();
 
   constructor(
     config: JobQueueConfig,
@@ -105,6 +111,139 @@ export class JobQueue {
     });
   }
 
+  async dispatchPending<Name extends string, Schema extends z.ZodType, Result>(
+    db: AppDatabase,
+    definition: JobDefinition<Name, Schema, Result>,
+  ): Promise<void> {
+    const rows = await db
+      .select()
+      .from(taskDispatches)
+      .where(
+        and(
+          eq(taskDispatches.kind, definition.name),
+          isNull(taskDispatches.sentAt),
+        ),
+      )
+      .orderBy(taskDispatches.createdAt)
+      .limit(100);
+    for (const row of rows) {
+      const task = await getTaskRun(db, row.taskRunId);
+      if (
+        !task ||
+        task.dispatchId !== row.id ||
+        ["completed", "failed", "cancelled"].includes(task.status)
+      ) {
+        await db.delete(taskDispatches).where(eq(taskDispatches.id, row.id));
+        continue;
+      }
+      await this.enqueue(
+        definition,
+        {
+          taskRunId: row.taskRunId,
+          scopeKey: row.scopeKey,
+          payload: definition.schema.parse(row.payload),
+        },
+        { jobId: row.id, startAfter: row.startAfter },
+      );
+      await db
+        .update(taskDispatches)
+        .set({ sentAt: new Date() })
+        .where(eq(taskDispatches.id, row.id));
+    }
+  }
+
+  async reconcileTasks(db: AppDatabase, kind: string): Promise<void> {
+    const boss = await this.start();
+    const tasks = await db
+      .select()
+      .from(taskRuns)
+      .where(
+        and(
+          eq(taskRuns.kind, kind),
+          inArray(taskRuns.status, ["queued", "running", "waiting"]),
+          this.#reconcileCursor.has(kind)
+            ? gt(taskRuns.id, this.#reconcileCursor.get(kind)!)
+            : undefined,
+        ),
+      )
+      .orderBy(taskRuns.id)
+      .limit(100);
+    if (tasks.length === 100) this.#reconcileCursor.set(kind, tasks.at(-1)!.id);
+    else this.#reconcileCursor.delete(kind);
+    for (const task of tasks) {
+      if (!task.dispatchId) {
+        // Adopt in-flight jobs from the pre-outbox release, including polls
+        // whose payload differs from the original task input.
+        const { rows } = await boss.getDb().executeSql(
+          `SELECT id, data, start_after AS "startAfter", created_on AS "createdAt"
+           FROM ${this.#schema}.job WHERE name = $1 AND data->>'taskRunId' = $2
+           ORDER BY created_on DESC LIMIT 1`,
+          [kind, task.id],
+        );
+        const legacy = rows[0] as
+          | { id: string; data: JobEnvelope; startAfter: Date; createdAt: Date }
+          | undefined;
+        if (!legacy && task.status !== "queued") continue;
+        await db.transaction(async (tx) => {
+          const id = legacy?.id ?? task.id;
+          const [adopted] = await tx
+            .update(taskRuns)
+            .set({ dispatchId: id })
+            .where(and(eq(taskRuns.id, task.id), isNull(taskRuns.dispatchId)))
+            .returning();
+          if (adopted)
+            await tx
+              .insert(taskDispatches)
+              .values({
+                id,
+                taskRunId: task.id,
+                kind,
+                scopeKey: task.scopeKey,
+                payload: legacy?.data.payload ?? task.input,
+                startAfter: legacy?.startAfter,
+                sentAt: legacy ? legacy.createdAt : null,
+              })
+              .onConflictDoNothing();
+        });
+        continue;
+      }
+      const [dispatch] = await db
+        .select()
+        .from(taskDispatches)
+        .where(eq(taskDispatches.id, task.dispatchId));
+      if (!dispatch?.sentAt) continue;
+      const job = await boss.getJobById(kind, dispatch.id);
+      if (
+        job &&
+        !["failed", "cancelled"].includes(job.state) &&
+        !(job.state === "completed" && task.status !== "waiting")
+      )
+        continue;
+      // A missing job after confirmed delivery has exceeded queue retention.
+      if (!job && Date.now() - dispatch.sentAt.getTime() < 60_000) continue;
+      await db
+        .update(taskRuns)
+        .set({
+          status: "failed",
+          completedAt: new Date(),
+          updatedAt: new Date(),
+          error: {
+            code: "QUEUE_JOB_TERMINATED",
+            message: "Background execution ended before completion.",
+            retryable: false,
+            attempt: job ? job.retryCount + 1 : 0,
+          },
+        })
+        .where(
+          and(
+            eq(taskRuns.id, task.id),
+            eq(taskRuns.dispatchId, dispatch.id),
+            inArray(taskRuns.status, ["queued", "running", "waiting"]),
+          ),
+        );
+    }
+  }
+
   async cancel(name: string, taskRunId: string): Promise<void> {
     const boss = await this.start();
     await boss.cancel(name, taskRunId);
@@ -115,27 +254,44 @@ export class JobQueue {
 
     for (const definition of jobDefinitions) {
       await this.registerWorker(db, definition);
-      const [stats] = await boss.getQueueStats(definition.name, {
-        force: true,
-      });
-      const { rows } = await boss.getDb().executeSql(
-        `SELECT MIN(created_on) AS "oldestCreatedOn"
+    }
+    const report = async () => {
+      for (const definition of jobDefinitions) {
+        const [stats] = await boss.getQueueStats(definition.name, {
+          force: true,
+        });
+        const { rows } = await boss.getDb().executeSql(
+          `SELECT MIN(created_on) AS "oldestCreatedOn"
          FROM ${this.#schema}.job
          WHERE name = $1 AND state IN ('created', 'retry')`,
-        [definition.name],
+          [definition.name],
+        );
+        const oldest = rows[0]?.oldestCreatedOn
+          ? new Date(rows[0].oldestCreatedOn as string | Date)
+          : null;
+        log("info", {
+          event: "queue_metrics",
+          jobName: definition.name,
+          backlog: stats?.readyCount ?? 0,
+          oldestPendingAgeSeconds: oldest
+            ? Math.max(0, Math.floor((Date.now() - oldest.getTime()) / 1000))
+            : 0,
+        });
+      }
+    };
+    await report();
+    const timer = setInterval(() => {
+      const running = report().catch((error) =>
+        log("error", {
+          event: "queue_metrics_failed",
+          error: toError(error).message,
+        }),
       );
-      const oldest = rows[0]?.oldestCreatedOn
-        ? new Date(rows[0].oldestCreatedOn as string | Date)
-        : null;
-      log("info", {
-        event: "queue_ready",
-        jobName: definition.name,
-        backlog: stats?.readyCount ?? 0,
-        oldestPendingAgeSeconds: oldest
-          ? Math.max(0, Math.floor((Date.now() - oldest.getTime()) / 1000))
-          : 0,
-      });
-    }
+      this.#maintenance.add(running);
+      void running.finally(() => this.#maintenance.delete(running));
+    }, 60_000);
+    timer.unref();
+    this.#maintenanceTimers.push(timer);
   }
 
   async registerWorker<Name extends string, Schema extends z.ZodType, Result>(
@@ -143,6 +299,31 @@ export class JobQueue {
     definition: JobDefinition<Name, Schema, Result>,
   ): Promise<void> {
     const boss = await this.start();
+    let busy = false;
+    const maintain = async () => {
+      if (busy) return;
+      busy = true;
+      try {
+        await this.dispatchPending(db, definition);
+        await this.reconcileTasks(db, definition.name);
+      } catch (error) {
+        log("error", {
+          event: "dispatch_retry",
+          jobName: definition.name,
+          error: toError(error).message,
+        });
+      } finally {
+        busy = false;
+      }
+    };
+    const timer = setInterval(() => {
+      const running = maintain();
+      this.#maintenance.add(running);
+      void running.finally(() => this.#maintenance.delete(running));
+    }, 1000);
+    timer.unref();
+    this.#maintenanceTimers.push(timer);
+    await maintain();
     const workOptions = {
       batchSize: 1,
       includeMetadata: true,
@@ -183,6 +364,9 @@ export class JobQueue {
     const attempt = job.retryCount + 1;
     let taskRun = await getTaskRun(db, taskRunId);
 
+    if (taskRun?.dispatchId && taskRun.dispatchId !== job.id)
+      return { id: job.id, status: "completed" };
+
     if (
       !taskRun ||
       taskRun.scopeKey !== scopeKey ||
@@ -206,6 +390,7 @@ export class JobQueue {
       taskRun =
         (await transitionTaskRun(db, {
           taskRunId,
+          dispatchId: taskRun?.dispatchId ? job.id : undefined,
           from: ["waiting"],
           to: "queued",
         })) ?? (await getTaskRun(db, taskRunId));
@@ -215,6 +400,7 @@ export class JobQueue {
       taskRun =
         (await transitionTaskRun(db, {
           taskRunId,
+          dispatchId: taskRun?.dispatchId ? job.id : undefined,
           from: ["queued"],
           to: "running",
           patch: { startedAt: taskRun.startedAt ?? new Date() },
@@ -243,6 +429,7 @@ export class JobQueue {
       };
       await transitionTaskRun(db, {
         taskRunId,
+        dispatchId: taskRun?.dispatchId ? job.id : undefined,
         from: ["running"],
         to: "failed",
         patch: { error, completedAt: new Date() },
@@ -270,28 +457,16 @@ export class JobQueue {
       updateProgress: async (progress) =>
         (await updateTaskRunProgress(db, taskRunId, progress)) !== null,
       scheduleContinuation: async (nextPayload, startAfter) => {
-        const waiting = await transitionTaskRun(db, {
+        return scheduleTaskContinuation(db, {
           taskRunId,
-          from: ["running"],
-          to: "waiting",
+          scopeKey,
+          kind: definition.name,
+          payload: definition.schema.parse(nextPayload),
+          dispatchId: randomUUID(),
+          currentDispatchId: job.id,
+          startAfter,
+          from: "running",
         });
-        if (!waiting) return false;
-
-        try {
-          await this.enqueue(
-            definition,
-            { taskRunId, scopeKey, payload: nextPayload },
-            { jobId: randomUUID(), startAfter },
-          );
-          return true;
-        } catch (error) {
-          await transitionTaskRun(db, {
-            taskRunId,
-            from: ["waiting"],
-            to: "queued",
-          });
-          throw error;
-        }
       },
       submitProviderJob: async (submit) => {
         try {
@@ -329,6 +504,7 @@ export class JobQueue {
       const result = await definition.handler(payload.data, context);
       const completed = await transitionTaskRun(db, {
         taskRunId,
+        dispatchId: taskRun?.dispatchId ? job.id : undefined,
         from: ["running"],
         to: "completed",
         patch: { result, progress: null, error: null, completedAt: new Date() },
@@ -355,6 +531,7 @@ export class JobQueue {
       if (permanent || retriesExhausted) {
         await transitionTaskRun(db, {
           taskRunId,
+          dispatchId: taskRun?.dispatchId ? job.id : undefined,
           from: ["running"],
           to: "failed",
           patch: { error, completedAt: new Date() },
@@ -384,6 +561,9 @@ export class JobQueue {
   }
 
   async stop(timeoutMs: number): Promise<void> {
+    this.#maintenanceTimers.forEach(clearInterval);
+    this.#maintenanceTimers = [];
+    await Promise.allSettled(this.#maintenance);
     if (!this.#startAttempted) return;
     await this.#boss.stop({ close: true, graceful: true, timeout: timeoutMs });
     this.#startPromise = null;

@@ -1069,5 +1069,21 @@
   "ai_canvas_resize": "Resize canvas",
   "ai_canvas_resize_hint": "Drag to resize the canvas. Double-click to reset.",
   "ai_canvas_download": "Download",
-  "ai_canvas_close": "Close canvas"
+  "ai_canvas_close": "Close canvas",
+  "files_my_files": "My files",
+  "files_refresh": "Refresh",
+  "files_private_notice": "Files are private. Deleting a file removes access immediately; storage space is released after cleanup.",
+  "files_error": "Files could not be updated. Refresh and try again.",
+  "files_empty": "No files yet.",
+  "files_delete": "Delete",
+  "files_delete_named": "Delete {name}",
+  "files_previous": "Previous",
+  "files_next": "Next",
+  "ai_chat_image_saving": "The image is being saved. Refresh in a moment. If your storage is full, delete unused files on the Files page first.",
+  "ai_chat_load_older": "Load earlier messages",
+  "ai_budget_reached": "Your AI allowance has been reached. Try again after earlier usage leaves the 24-hour window.",
+  "ai_run_conflict": "A response is running or this request was already accepted. Wait a moment, then refresh the conversation.",
+  "ai_conversation_changed": "This conversation changed in another request. Refresh it before continuing.",
+  "ai_context_full": "This conversation has reached its context limit. Start a new chat to continue.",
+  "ai_chat_image_deleted": "This saved image was deleted."
 }

@@ -6,6 +6,7 @@ module.exports = createJestConfig({
   testEnvironment: "node",
   testMatch: ["<rootDir>/integration/jobs/**/*.test.ts"],
   moduleNameMapper: {
+    "^@/env$": "<rootDir>/env.js",
     "^@/(.*)$": "<rootDir>/src/$1",
   },
   maxWorkers: 1,

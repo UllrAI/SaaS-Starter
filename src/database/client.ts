@@ -1,5 +1,6 @@
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
+import { utcConnectionOptions } from "./connection-options";
 import * as tables from "./tables";
 
 export interface DatabaseClientOptions {
@@ -18,7 +19,7 @@ export function createDatabaseClient(options: DatabaseClientOptions) {
     max_lifetime: options.maxLifetime ?? 14_400,
     connect_timeout: options.connectTimeout ?? 4,
     debug: options.debug ?? false,
-    connection: { TimeZone: "UTC" },
+    ...utcConnectionOptions,
     onnotice: options.debug ? console.log : () => {},
   });
 
@@ -30,3 +31,6 @@ export function createDatabaseClient(options: DatabaseClientOptions) {
 }
 
 export type AppDatabase = ReturnType<typeof createDatabaseClient>["db"];
+
+type AppTransaction = Parameters<Parameters<AppDatabase["transaction"]>[0]>[0];
+export type DatabaseExecutor = AppDatabase | AppTransaction;

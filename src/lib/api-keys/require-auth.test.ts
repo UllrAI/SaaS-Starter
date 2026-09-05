@@ -1,3 +1,5 @@
+const mockUserRateLimit = jest.fn();
+jest.mock("@/lib/rate-limit", () => ({ checkRateLimit: mockUserRateLimit }));
 import { beforeEach, describe, expect, it, jest } from "@jest/globals";
 
 const mockValidateApiKey = jest.fn();
@@ -23,6 +25,10 @@ jest.mock("@/lib/device-auth/token-service", () => ({
 describe("requireAuth", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockUserRateLimit.mockResolvedValue({
+      allowed: true,
+      info: { limit: 60, remaining: 59, resetAt: 123 },
+    });
     mockUpdateLastUsedAt.mockResolvedValue(undefined);
     mockUpdateCliTokenLastUsed.mockResolvedValue(undefined);
   });
@@ -92,7 +98,11 @@ describe("requireAuth", () => {
       userId: "user-2",
       authMethod: "cli_token",
       cliTokenId: "cli-1",
+      rateLimitInfo: { limit: 60, remaining: 59, resetAt: 123 },
     });
+    expect(mockUserRateLimit).toHaveBeenCalledWith(
+      expect.objectContaining({ scope: "machine_user", key: "user-2" }),
+    );
     expect(mockUpdateCliTokenLastUsed).toHaveBeenCalledWith("cli-1");
   });
 

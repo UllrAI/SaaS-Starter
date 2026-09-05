@@ -22,6 +22,41 @@ const entitlement: ProductEntitlement = {
 };
 
 describe("billing access", () => {
+  it("keeps provider status separate from a local refund or dispute restriction", () => {
+    expect(
+      resolveBillingAccess({ ...subscription, accessRestricted: true }, null)
+        .kind,
+    ).toBe("free");
+    expect(
+      canManageSubscription({ ...subscription, accessRestricted: true }),
+    ).toBe(true);
+  });
+  it("bounds active renewal grace and never extends trial or cancellation access", () => {
+    const end = new Date("2030-01-01T00:00:00Z");
+    const soon = new Date(end.getTime() + 60_000);
+    const late = new Date(end.getTime() + 86_400_001);
+    expect(resolveBillingAccess(subscription, null, soon).kind).toBe(
+      "subscription",
+    );
+    expect(resolveBillingAccess(subscription, null, late).kind).toBe("free");
+    expect(
+      resolveBillingAccess({ ...subscription, status: "trialing" }, null, soon)
+        .kind,
+    ).toBe("free");
+    expect(
+      resolveBillingAccess(
+        { ...subscription, status: "scheduled_cancel" },
+        null,
+        soon,
+      ).kind,
+    ).toBe("free");
+    expect(
+      resolveBillingAccess(
+        { ...subscription, currentPeriodEnd: undefined },
+        null,
+      ).kind,
+    ).toBe("free");
+  });
   it("prefers a currently accessible subscription", () => {
     expect(resolveBillingAccess(subscription, entitlement).kind).toBe(
       "subscription",

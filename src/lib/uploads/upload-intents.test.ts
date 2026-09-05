@@ -58,7 +58,8 @@ jest.mock("@/env", () => ({
 
 const mockDeleteFile = jest.fn() as any;
 jest.mock("@/lib/r2", () => ({
-  buildR2PublicUrl: (key: string) => `https://cdn.example.com/${key}`,
+  buildR2PublicUrl: (key: string) =>
+    `/api/files/content?key=${encodeURIComponent(key)}`,
   deleteFile: mockDeleteFile,
 }));
 

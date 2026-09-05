@@ -13,9 +13,12 @@ const mockReadResponseHandle = jest.fn();
 const mockRequireAiConversation = jest.fn();
 const mockRequireOwnedAiImageAttachments = jest.fn();
 const mockSaveAiMessages = jest.fn();
-const mockPersistGeneratedImages = jest.fn();
+const mockFinalizeAiRun = jest.fn();
+const mockCompleteAiRun = jest.fn();
+const mockBeginAiRun = jest.fn();
+const mockFailAiRun = jest.fn();
+const mockGetAiConversation = jest.fn();
 const mockExtractUsageTotals = jest.fn();
-const mockRecordAiUsageEvent = jest.fn();
 
 const siteConfig = {
   features: { emailAuth: true, billing: true, uploads: true, ai: true },
@@ -63,21 +66,28 @@ jest.mock("@/lib/ai/chat-history", () => ({
   AiConversationNotFoundError: class AiConversationNotFoundError extends Error {},
   requireAiConversation: mockRequireAiConversation,
   saveAiMessages: mockSaveAiMessages,
+  getAiConversation: mockGetAiConversation,
 }));
 
 jest.mock("@/lib/ai/chat-attachments", () => ({
   AiAttachmentValidationError: class AiAttachmentValidationError extends Error {},
   requireOwnedAiImageAttachments: mockRequireOwnedAiImageAttachments,
+  resolveAiImageAttachments: async (messages: unknown) => messages,
 }));
 
-jest.mock("@/lib/ai/generated-image-storage", () => ({
-  persistGeneratedImages: mockPersistGeneratedImages,
+jest.mock("@/lib/uploads/server-storage", () => ({ storeFile: jest.fn() }));
+jest.mock("@/lib/ai/finalize", () => ({ finalizeAiRun: mockFinalizeAiRun }));
+jest.mock("@/lib/ai/runs", () => ({
+  beginAiRun: mockBeginAiRun,
+  completeAiRun: mockCompleteAiRun,
+  failAiRun: mockFailAiRun,
+  AiRunConflictError: class AiRunConflictError extends Error {},
+  AiBudgetExceededError: class AiBudgetExceededError extends Error {},
 }));
 
 jest.mock("@/lib/ai/usage", () => ({
   AI_MODEL_UNREPORTED: "unreported",
   extractUsageTotals: mockExtractUsageTotals,
-  recordAiUsageEvent: mockRecordAiUsageEvent,
 }));
 
 const session = {
@@ -105,7 +115,11 @@ async function postChat(body: unknown = { messages, conversationId }) {
   const { POST } = await import("./route");
   const normalizedBody =
     body && typeof body === "object" && "messages" in body
-      ? { conversationId, ...body }
+      ? {
+          conversationId,
+          requestId: "d465fa00-9330-4a81-b30c-f79149332dda",
+          ...body,
+        }
       : body;
   return POST(chatRequest(normalizedBody));
 }
@@ -127,15 +141,19 @@ describe("/api/chat", () => {
     mockRequireAiConversation.mockResolvedValue(undefined);
     mockRequireOwnedAiImageAttachments.mockResolvedValue(undefined);
     mockSaveAiMessages.mockResolvedValue(undefined);
-    mockPersistGeneratedImages.mockImplementation(
-      ({ message }: { message: unknown }) => Promise.resolve(message),
-    );
+    mockGetAiConversation.mockResolvedValue({ messages: [] });
+    mockBeginAiRun.mockResolvedValue({
+      run: { id: "run-1" },
+      allowImageGeneration: true,
+    });
+    mockCompleteAiRun.mockResolvedValue(undefined);
+    mockFinalizeAiRun.mockResolvedValue(undefined);
+    mockFailAiRun.mockResolvedValue(undefined);
     mockExtractUsageTotals.mockReturnValue({
       inputTokens: 11,
       outputTokens: 22,
       totalTokens: 33,
     });
-    mockRecordAiUsageEvent.mockResolvedValue(undefined);
     mockCreateAgentUIStreamResponse.mockResolvedValue(
       new Response("stream", { status: 200 }),
     );
@@ -208,6 +226,7 @@ describe("/api/chat", () => {
       "assistant",
       {
         userId: "user-1",
+        conversationId,
         userName: "Ada",
         userEmail: "ada@example.com",
         userRole: "user",
@@ -216,6 +235,7 @@ describe("/api/chat", () => {
       {
         reasoningEffort: "low",
         imageSize: "1024x1024",
+        allowImageGeneration: true,
         previousResponseId: undefined,
       },
     );
@@ -247,15 +267,27 @@ describe("/api/chat", () => {
       {
         reasoningEffort: "low",
         imageSize: "1024x1024",
+        allowImageGeneration: true,
         previousResponseId: undefined,
       },
     );
   });
 
   it("passes a selected reasoning effort and verified response chain", async () => {
+    mockGetAiConversation.mockResolvedValue({
+      messages: [
+        {
+          id: "a0",
+          role: "assistant",
+          parts: [],
+          metadata: { responseHandle: "resp_previous.signature" },
+        },
+      ],
+    });
     const response = await postChat({
       messages,
       reasoningEffort: "high",
+      parentMessageId: "a0",
       responseHandle: "resp_previous.signature",
     });
 
@@ -263,6 +295,7 @@ describe("/api/chat", () => {
     expect(mockReadResponseHandle).toHaveBeenCalledWith(
       "resp_previous.signature",
       "user-1",
+      conversationId,
     );
     expect(mockCreateAgent).toHaveBeenCalledWith(
       "assistant",
@@ -270,6 +303,7 @@ describe("/api/chat", () => {
       {
         reasoningEffort: "high",
         imageSize: "1024x1024",
+        allowImageGeneration: true,
         previousResponseId: "resp_previous",
       },
     );
@@ -293,7 +327,7 @@ describe("/api/chat", () => {
     );
   });
 
-  it("rejects an invalid response handle", async () => {
+  it("ignores client supplied response handles", async () => {
     mockReadResponseHandle.mockReturnValue(null);
 
     const response = await postChat({
@@ -301,8 +335,8 @@ describe("/api/chat", () => {
       responseHandle: "forged.signature",
     });
 
-    expect(response.status).toBe(400);
-    expect(mockCreateAgent).not.toHaveBeenCalled();
+    expect(response.status).toBe(200);
+    expect(mockReadResponseHandle).not.toHaveBeenCalled();
   });
 
   it("signs the Responses API id into assistant message metadata", async () => {
@@ -319,7 +353,11 @@ describe("/api/chat", () => {
       part: { type: "finish-step", response: { id: "resp_new" } },
     });
 
-    expect(mockCreateResponseHandle).toHaveBeenCalledWith("resp_new", "user-1");
+    expect(mockCreateResponseHandle).toHaveBeenCalledWith(
+      "resp_new",
+      "user-1",
+      conversationId,
+    );
     expect(metadata).toEqual({ responseHandle: "signed-response-handle" });
   });
 
@@ -338,15 +376,15 @@ describe("/api/chat", () => {
     };
     await streamArgs.onEnd({ responseMessage });
 
-    expect(mockPersistGeneratedImages).toHaveBeenCalledWith({
-      message: responseMessage,
-      userId: "user-1",
-    });
-    expect(mockSaveAiMessages).toHaveBeenLastCalledWith({
-      conversationId,
-      userId: "user-1",
-      messages: [responseMessage],
-    });
+    expect(mockCompleteAiRun).toHaveBeenCalledWith(
+      "run-1",
+      responseMessage,
+      expect.objectContaining({ userId: "user-1" }),
+    );
+    expect(mockFinalizeAiRun).toHaveBeenCalled();
+    expect(mockCompleteAiRun.mock.invocationCallOrder[0]).toBeLessThan(
+      mockFinalizeAiRun.mock.invocationCallOrder[0],
+    );
   });
 
   it("records token usage for a completed turn", async () => {
@@ -377,7 +415,9 @@ describe("/api/chat", () => {
     });
 
     expect(mockExtractUsageTotals).toHaveBeenCalledWith(totalUsage);
-    expect(mockRecordAiUsageEvent).toHaveBeenCalledWith(
+    expect(mockCompleteAiRun).toHaveBeenCalledWith(
+      "run-1",
+      expect.any(Object),
       expect.objectContaining({
         userId: "user-1",
         conversationId,
@@ -410,13 +450,15 @@ describe("/api/chat", () => {
       finishReason: "stop",
     });
 
-    expect(mockRecordAiUsageEvent).toHaveBeenCalledWith(
+    expect(mockCompleteAiRun).toHaveBeenCalledWith(
+      "run-1",
+      expect.any(Object),
       expect.objectContaining({ model: "unreported" }),
     );
   });
 
-  it("does not fail the turn when usage accounting throws", async () => {
-    mockRecordAiUsageEvent.mockRejectedValue(new Error("usage insert failed"));
+  it("keeps the durable response when media finalization fails", async () => {
+    mockFinalizeAiRun.mockRejectedValue(new Error("R2 unavailable"));
     await postChat();
 
     const [streamArgs] = mockCreateAgentUIStreamResponse.mock.calls[0] as [
@@ -544,7 +586,7 @@ describe("/api/chat", () => {
 
     const response = await postChat();
 
-    expect(response.status).toBe(400);
+    expect(response.status).toBe(500);
     expect(mockSaveAiMessages).toHaveBeenCalledWith({
       conversationId,
       userId: "user-1",

@@ -1,7 +1,5 @@
-import { drizzle } from "drizzle-orm/postgres-js";
-import postgres from "postgres";
+import { createDatabaseClient } from "./client";
 import env from "@/env";
-import * as tables from "./tables";
 import {
   getConnectionConfig,
   validateDatabaseConfig,
@@ -18,11 +16,16 @@ if (process.env.NODE_ENV === "development") {
   validateDatabaseConfig();
 }
 
-// Set up the SQL client with dynamic configuration
-const sql = postgres(databaseUrl, connectionConfig);
-
-// Initialize the database with drizzle and schema
-export const db = drizzle(sql, { schema: { ...tables } });
+const database = createDatabaseClient({
+  url: databaseUrl,
+  max: connectionConfig.max,
+  idleTimeout: connectionConfig.idle_timeout,
+  maxLifetime: connectionConfig.max_lifetime,
+  connectTimeout: connectionConfig.connect_timeout,
+  debug: "debug" in connectionConfig ? connectionConfig.debug : false,
+});
+const { sql } = database;
+export const db = database.db;
 
 export async function checkDatabaseReadiness(timeoutMs = 4_000): Promise<void> {
   const query = sql`select 1`;
@@ -45,6 +48,4 @@ export async function checkDatabaseReadiness(timeoutMs = 4_000): Promise<void> {
 }
 
 // Graceful shutdown function for cleanup
-export const closeDatabase = async () => {
-  await sql.end({ timeout: 5 });
-};
+export const closeDatabase = database.close;

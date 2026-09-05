@@ -9,7 +9,7 @@ import { ensureBillingCustomerId } from "@/lib/billing/customer";
 import { assertTrustedBillingUrl } from "@/lib/billing/url";
 import { getAuthSessionFromHeaders } from "@/lib/auth/session";
 import { getProductTierById } from "@/lib/config/products";
-import { hasCurrentSubscriptionAccess } from "@/lib/billing/access";
+import { canManageSubscription } from "@/lib/billing/access";
 import {
   readJsonBodyWithLimit,
   RequestBodyTooLargeError,
@@ -109,7 +109,7 @@ export async function POST(request: NextRequest) {
     if (paymentMode === "subscription") {
       const existingSubscription = await getUserSubscription(session.user.id);
 
-      if (hasCurrentSubscriptionAccess(existingSubscription)) {
+      if (canManageSubscription(existingSubscription)) {
         const { portalUrl } = await billing.createCustomerPortalUrl(
           existingSubscription.customerId,
         );

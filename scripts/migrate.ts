@@ -1,6 +1,7 @@
 import { spawn } from "node:child_process";
 import { migrateJobQueue } from "@/lib/jobs/queue";
-import { loadWorkerEnv } from "@/lib/jobs/worker-env";
+import { z } from "zod";
+import { databaseEnvFields } from "@/lib/config/runtime-env.mjs";
 
 function run(command: string, args: string[]): Promise<void> {
   return new Promise((resolve, reject) => {
@@ -24,12 +25,12 @@ function run(command: string, args: string[]): Promise<void> {
 }
 
 async function main(): Promise<void> {
-  const workerEnv = loadWorkerEnv();
+  const workerEnv = z.object(databaseEnvFields(5)).parse(process.env);
   const pnpmCommand = process.platform === "win32" ? "pnpm.cmd" : "pnpm";
 
   await run(pnpmCommand, ["db:migrate:app"]);
   await migrateJobQueue({
-    connectionString: workerEnv.JOB_DATABASE_URL,
+    connectionString: workerEnv.JOB_DATABASE_URL ?? workerEnv.DATABASE_URL,
     poolSize: workerEnv.JOB_DB_POOL_SIZE,
   });
 

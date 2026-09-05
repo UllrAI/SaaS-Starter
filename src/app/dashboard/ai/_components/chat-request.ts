@@ -26,30 +26,15 @@ export function prepareChatRequest({
   conversationId,
   reasoningEffort,
 }: PrepareChatRequestOptions) {
-  let responseIndex = -1;
-  for (let index = messages.length - 1; index >= 0; index -= 1) {
-    const message = messages[index];
-    if (
-      message?.role === "assistant" &&
-      message.metadata?.responseHandle &&
-      !hasUnfinishedToolApproval(message)
-    ) {
-      responseIndex = index;
-      break;
-    }
-  }
-
-  const responseHandle =
-    responseIndex >= 0
-      ? messages[responseIndex]?.metadata?.responseHandle
-      : undefined;
-  const requestMessages = messages.slice(responseIndex + 1);
-
+  const message = messages.at(-1);
+  const approving =
+    message?.role === "assistant" && hasUnfinishedToolApproval(message);
   return {
-    messages: requestMessages,
+    requestId: crypto.randomUUID(),
+    messages: message ? [message] : [],
+    parentMessageId: approving ? message.id : (messages.at(-2)?.id ?? null),
     conversationId,
     agentId: "assistant",
     reasoningEffort,
-    ...(responseHandle ? { responseHandle } : {}),
   };
 }

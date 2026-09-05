@@ -1,28 +1,28 @@
 import { z } from "zod";
 
-const databaseUrlSchema = z
-  .url()
-  .refine(
-    (value) => ["postgres:", "postgresql:"].includes(new URL(value).protocol),
-    "must use the postgres or postgresql protocol",
-  );
+import {
+  databaseEnvFields,
+  modelEnvFields,
+} from "@/lib/config/runtime-env.mjs";
 
 const workerEnvSchema = z.object({
-  DATABASE_URL: databaseUrlSchema,
-  JOB_DATABASE_URL: databaseUrlSchema.optional(),
-  DB_POOL_SIZE: z.coerce.number().int().positive().max(50).default(5),
-  DB_IDLE_TIMEOUT: z.coerce.number().int().nonnegative().default(300),
-  DB_MAX_LIFETIME: z.coerce.number().int().nonnegative().default(14_400),
-  DB_CONNECT_TIMEOUT: z.coerce.number().int().positive().max(10).default(4),
-  JOB_DB_POOL_SIZE: z.coerce.number().int().positive().max(20).default(3),
-  WORKER_GRACEFUL_TIMEOUT_MS: z.coerce
+  ...databaseEnvFields(5),
+  R2_ENDPOINT: z.url().optional(),
+  R2_ACCESS_KEY_ID: z.string().optional(),
+  R2_SECRET_ACCESS_KEY: z.string().optional(),
+  R2_BUCKET_NAME: z.string().optional(),
+  UPLOAD_DAILY_QUOTA_BYTES: z.coerce
     .number()
     .int()
     .positive()
-    .default(30_000),
+    .default(1024 * 1024 * 1024),
+  UPLOAD_TOTAL_QUOTA_BYTES: z.coerce
+    .number()
+    .int()
+    .positive()
+    .default(5 * 1024 * 1024 * 1024),
   LLM_API_KEY: z.string().trim().min(1).optional(),
-  LLM_BASE_URL: z.url().default("https://api.openai.com/v1"),
-  AI_DEFAULT_MODEL: z.string().trim().min(1).default("gpt-5.6-luna"),
+  ...modelEnvFields,
 });
 
 export function loadWorkerEnv(source: NodeJS.ProcessEnv = process.env) {

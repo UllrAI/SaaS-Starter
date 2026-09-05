@@ -8,7 +8,7 @@ import {
   desc,
   eq,
   ilike,
-  inArray,
+  isNull,
   like,
   not,
   or,
@@ -20,10 +20,7 @@ import { uploads, users } from "@/database/schema";
 import { requireAdmin } from "@/lib/auth/permissions";
 import { SITE_CONFIG } from "@/lib/config/site";
 import { IntegrationDisabledError } from "@/lib/config/integrations";
-import {
-  deleteFile as deleteFileFromR2,
-  deleteFiles as deleteFilesFromR2,
-} from "@/lib/r2";
+import { requestFileDeletion } from "@/lib/uploads/deletion";
 
 import { adminAction } from "./shared";
 
@@ -43,7 +40,7 @@ export async function getUploads({
   assertUploadsEnabled();
   await requireAdmin();
 
-  const conditions: (SQLWrapper | undefined)[] = [];
+  const conditions: (SQLWrapper | undefined)[] = [isNull(uploads.deletedAt)];
   if (search) {
     conditions.push(
       or(
@@ -127,55 +124,47 @@ function assertUploadsEnabled() {
   }
 }
 
-const deleteUploadSchema = z.object({ uploadId: z.string() });
+const deleteUploadSchema = z.object({ uploadId: z.uuid() });
 
 export const deleteUploadAction = adminAction
   .schema(deleteUploadSchema)
-  .action(async ({ parsedInput: { uploadId } }) => {
+  .action(async ({ parsedInput: { uploadId }, ctx }) => {
     assertUploadsEnabled();
-    const [upload] = await db
-      .select({ fileKey: uploads.fileKey })
-      .from(uploads)
-      .where(eq(uploads.id, uploadId))
-      .limit(1);
-
-    if (!upload) throw new Error("Upload not found");
-    const deleteResult = await deleteFileFromR2(upload.fileKey);
-    if (!deleteResult.success) {
-      throw new Error(deleteResult.error || "Failed to delete file from R2.");
-    }
-
-    await db.delete(uploads).where(eq(uploads.id, uploadId));
+    const deleted = await requestFileDeletion(db, [uploadId], ctx.user);
+    if (!deleted.length) throw new Error("Upload not found");
+    console.info(
+      JSON.stringify({
+        component: "admin-audit",
+        action: "files_deletion_requested",
+        actorId: ctx.user.id,
+        targetIds: [uploadId],
+      }),
+    );
     revalidatePath("/dashboard/admin/uploads");
-    return { success: true, message: "Upload deleted successfully." };
+    return { success: true, message: "Upload deletion scheduled." };
   });
 
 const batchDeleteUploadsSchema = z.object({
-  uploadIds: z.array(z.string()).min(1),
+  uploadIds: z.array(z.uuid()).min(1).max(100),
 });
 
 export const batchDeleteUploadsAction = adminAction
   .schema(batchDeleteUploadsSchema)
-  .action(async ({ parsedInput: { uploadIds } }) => {
+  .action(async ({ parsedInput: { uploadIds }, ctx }) => {
     assertUploadsEnabled();
-    const records = await db
-      .select({ id: uploads.id, fileKey: uploads.fileKey })
-      .from(uploads)
-      .where(inArray(uploads.id, uploadIds));
-
-    if (records.length === 0) throw new Error("No uploads found to delete.");
-
-    const deleteResult = await deleteFilesFromR2(
-      records.map((record) => record.fileKey),
+    const records = await requestFileDeletion(db, uploadIds, ctx.user);
+    if (!records.length) throw new Error("No uploads found to delete.");
+    console.info(
+      JSON.stringify({
+        component: "admin-audit",
+        action: "files_deletion_requested",
+        actorId: ctx.user.id,
+        targetIds: records.map((record) => record.id),
+      }),
     );
-    if (!deleteResult.success) {
-      throw new Error(deleteResult.error || "Failed to delete files from R2.");
-    }
-
-    await db.delete(uploads).where(inArray(uploads.id, uploadIds));
     revalidatePath("/dashboard/admin/uploads");
     return {
       success: true,
-      message: `Successfully deleted ${records.length} file(s).`,
+      message: `Scheduled deletion of ${records.length} file(s).`,
     };
   });

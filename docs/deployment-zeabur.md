@@ -15,25 +15,124 @@ The runtime entrypoint also drops to the unprivileged `nextjs` user when a
 hosting security context starts the container as root. Verify PID 1 after
 deployment instead of assuming the Dockerfile `USER` directive was preserved.
 
-Both `NEXT_PUBLIC_APP_URL` and `R2_PUBLIC_URL` are required build arguments.
-Zeabur injects their service-variable values into the multi-stage Docker build;
-the build fails closed when either value is missing.
+`NEXT_PUBLIC_APP_URL` is the required build argument. User uploads use a private
+R2 bucket and authenticated application URLs, so no public storage origin is
+compiled into the image. Follow the [private-file cutover](architecture-remediation.md#deployment-requirements)
+when upgrading an existing public bucket.
 
 ## Promotion model
 
-Configure the production Zeabur service to deploy the `prod` branch. It must not
-deploy direct pushes to the default development branch.
+Configure both production Zeabur services to deploy the `prod` branch. Neither
+service should deploy direct pushes to the default development branch.
 
 Pushing a `release/vX.Y.Z` tag matching the version in `package.json` triggers
 [`promote-release-to-prod.yml`](../.github/workflows/promote-release-to-prod.yml).
 The workflow reads the repository's default branch from GitHub instead of
 hardcoding its name, verifies that the tagged commit is reachable from that
-branch, and then moves `prod` to the tagged commit with a guarded force push.
+branch, verifies successful Quality for that exact SHA, applies production migrations
+once, and then moves `prod` to the tagged commit with a guarded force push.
 The current default branch is `main`.
 
-The workflow requests only `contents: write`; the repository's default workflow
+The workflow requests `contents: write` and `actions: read`; the repository's default workflow
 permissions can remain read-only. Organization policies and any ruleset
 protecting `prod` must still permit this workflow to update the branch.
+
+## Reference deployment
+
+The production binding checked for v0.1.15 is:
+
+| Item              | Configuration                                                     |
+| ----------------- | ----------------------------------------------------------------- |
+| GitHub repository | `UllrAI/SaaS-Starter` (ID `1005988967`)                           |
+| Zeabur project    | `SaaS-Starter` (`684d4c992091f0ee0a4c210c`)                       |
+| Environment       | `production` (`684d4c994d7e8de26fcf49d9`)                         |
+| Web               | `SaaS-Starter` (`685407f976c734490a6f4770`), branch `prod`        |
+| Worker            | `saas-starter-worker` (`6a89be709c1441c21a54c777`), branch `prod` |
+| Public origin     | `https://starter.ullrai.com`                                      |
+| Database          | Zeabur `postgresql` (`6a9b9779727467881985b9ab`), PostgreSQL 17   |
+| User storage      | Private R2 bucket `saas-starter` in the UllrAi account            |
+
+Web uses the Docker entrypoint and default `node server.js`, port `web:8080`,
+and HTTP readiness at `/api/ready`. Worker overrides the image arguments with
+`node dist/worker/worker.mjs`, has no HTTP port or domain, and uses a 25-second
+application drain timeout. Check `worker_ready`, queue metrics, and shutdown
+logs to verify Worker health; Web readiness does not cover it.
+
+The Worker requires the same four R2 credentials and upload quotas as Web.
+There is no additional always-on migration service: GitHub Actions uses the
+`production` environment's `PRODUCTION_DATABASE_URL` for the one-shot release
+step through an SSH tunnel. Web and Worker use the same `saas_starter` database
+at `postgresql.zeabur.internal:5432`; the `saas` login owns that database and is
+not a PostgreSQL superuser. The database has no public port forwarding. Its
+`data` volume mounts `/var/lib/postgresql/data`, with `PGDATA` below that volume.
+Keep secrets in platform stores, never in these documents.
+
+### Migration network access
+
+The release workflow opens an SSH tunnel to the existing Zeabur server, runs
+`pnpm db:migrate`, then closes the tunnel even if migrations fail. Configure the
+GitHub `production` environment as follows:
+
+| Setting                            | Value                                                                 |
+| ---------------------------------- | --------------------------------------------------------------------- |
+| Variable `MIGRATION_SSH_HOST`      | Zeabur server SSH host                                                |
+| Variable `MIGRATION_DB_HOST`       | PostgreSQL Kubernetes Service ClusterIP on that server                |
+| Secret `MIGRATION_SSH_KEY`         | Dedicated Ed25519 private key                                         |
+| Secret `MIGRATION_SSH_KNOWN_HOSTS` | Server host key verified through the Zeabur administrative connection |
+| Secret `PRODUCTION_DATABASE_URL`   | Database-owner URL using `127.0.0.1:55432/saas_starter`               |
+
+Provision a `saas-migrator` SSH account on the server with public-key-only
+authentication, `AllowTcpForwarding local`, `PermitOpen <database-cluster-ip>:5432`,
+`ForceCommand /bin/false`, and no TTY, agent forwarding, or X11 forwarding. Its
+authorized key is restricted to that same database destination. This account
+cannot run shell commands or access other services. Keep PostgreSQL on the same
+server as the SSH endpoint; SSH encrypts the external part of the connection.
+
+The Service ClusterIP survives pod restarts. If the database service is deleted
+and recreated, update both `MIGRATION_DB_HOST` and the SSH destination restriction.
+Rotate the dedicated key by replacing the authorized key and GitHub secret
+together. Do not put Zeabur account credentials or a server administration key
+in GitHub Actions. Forks must provision this tunnel before their first tag release.
+
+For a separate queue database, `PRODUCTION_JOB_DATABASE_URL` must also be reachable
+from the release runner. The reference deployment uses one database, so leave
+that secret unset.
+
+For ordinary releases, the only manual Git operation after merge/Quality is
+pushing the version tag. Both Zeabur Git triggers watch `prod`; do not manually
+redeploy one service from `main` or override it with a static image tag. The
+v0.1.15 public-to-private cutover additionally requires draining old writers
+and disabling the old R2 public domain before reopening traffic.
+
+## Database cutover and recovery
+
+For the v0.1.15 move from Neon, stop Web and Worker writes before taking the final
+`pg_dump --format=custom --no-owner --no-acl`. Restore into the new Zeabur database
+with `pg_restore --no-owner --no-acl --exit-on-error`, compare every application
+and queue table count, and apply committed migrations. Switch both services’
+`DATABASE_URL` and Worker `JOB_DATABASE_URL` to the internal Zeabur URL before
+restarting them from the released commit. Never run the two databases as active
+writers simultaneously.
+
+Retain the old database and the final dump for rollback until the new release
+is verified. After new writes begin, rollback requires moving those writes back
+or restoring a current backup; changing a URL to the old snapshot would lose data.
+The old Neon database is not part of the runtime or release pipeline.
+
+Zeabur automatic backups require a paid subscription on this account. Instead,
+[`database-backup.yml`](../.github/workflows/database-backup.yml) runs daily at
+19:17 UTC (03:17 Asia/Shanghai) and supports manual dispatch. It takes a consistent
+PostgreSQL 17 custom-format dump through the same restricted tunnel and uploads
+it to private R2 bucket `saas-starter-db-backups`. A bucket lifecycle rule expires
+`postgresql/` backups after 30 days. No public domain or `r2.dev` access is enabled.
+
+Set repository variable `PRODUCTION_BACKUP_ENABLED=true` and production environment
+variable `R2_BACKUP_BUCKET`. Store `R2_BACKUP_ENDPOINT`, `R2_BACKUP_ACCESS_KEY_ID`,
+and `R2_BACKUP_SECRET_ACCESS_KEY` as production environment secrets. Forks must
+configure these settings before enabling the schedule. Check failed Actions runs
+and periodically download a backup with authenticated S3 access and restore it
+into a disposable database. Daily dumps provide a recovery point of up to 24 hours;
+they are not point-in-time recovery.
 
 ## Using the workflow in a fork
 
@@ -54,7 +153,8 @@ named `main` or `master`:
 4. Keep regular development and CI on the default branch. If the fork renames
    that branch, update the branch filter in `.github/workflows/quality.yml`;
    the promotion workflow itself needs no change.
-5. Keep the workflow's `contents: write` permission. If `prod` is protected,
+5. Configure the `production` environment database secrets and network access
+   from GitHub Actions, and keep `contents: write` and `actions: read`. If `prod` is protected,
    allow this workflow to update it with a force-with-lease push.
 
 Treat `prod` as workflow-owned state: do not merge pull requests into it or push
@@ -62,19 +162,28 @@ it manually. Publish production changes only through `release/vX.Y.Z` tags.
 
 ## Release order
 
-1. Merge only a reviewed commit into the default branch with green CI.
-2. Confirm the service variables match `.env.example`.
-3. Run `pnpm db:migrate` once against the production `DATABASE_URL`.
-4. Update the version in `package.json`, then create an annotated
-   `release/vX.Y.Z` tag using the same version on that commit and push it:
+1. Update `package.json` to the next unused release version in a PR, revise the
+   release notes, and merge only after review and green CI.
+2. Wait for Quality to pass on the exact merge commit on the default branch; a
+   successful PR run alone does not satisfy the release gate. Confirm both
+   services still track the expected repository and `prod`, and their variables
+   match `.env.example`.
+3. Configure the database secret and migration tunnel settings described above.
+   Set `PRODUCTION_JOB_DATABASE_URL` only when queues use another database. The
+   release workflow runs `pnpm db:migrate` after Quality verification and before promotion.
+4. Fetch the default branch, check out the verified merge commit, then create
+   an annotated `release/vX.Y.Z` tag matching its `package.json` and push it:
 
    ```bash
    git tag -a release/v1.2.3 -m "Release v1.2.3"
    git push origin release/v1.2.3
    ```
 
-5. Wait for the promotion workflow to move `prod`.
-6. Wait for the Zeabur build and runtime deployment to succeed.
+5. Wait for the promotion workflow to finish migrations and move `prod`; verify
+   that the tag commit and `prod` are identical.
+6. Wait for both Zeabur deployments and verify each deployment reports that same
+   commit SHA. Web and Worker build the same release and Dockerfile separately;
+   their image digests are not expected to be identical.
 7. Verify `GET /api/health` and `GET /api/ready`.
 8. Inspect build and runtime logs for errors.
 9. Exercise English and Simplified Chinese marketing URLs, authentication
@@ -169,7 +278,10 @@ database or schema is unavailable.
 
 ## Scheduled maintenance
 
-Call the upload cleanup endpoint once per day:
+The Worker finalizes pending AI media, removes tombstoned files, and cleans
+abandoned uploads every five seconds. Supply its R2 credentials and upload quotas
+from the same configuration as Web. The existing cleanup endpoint can also be
+called on demand:
 
 ```bash
 curl -fsS -X POST \

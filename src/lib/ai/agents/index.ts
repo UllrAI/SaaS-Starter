@@ -19,6 +19,7 @@ export interface CreateAgentOptions {
   reasoningEffort: ReasoningEffort;
   imageSize: GptImage1kSize;
   previousResponseId?: string;
+  allowImageGeneration?: boolean;
 }
 
 export function createAgent(

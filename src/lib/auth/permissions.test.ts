@@ -105,10 +105,8 @@ describe("Auth Permissions", () => {
 
       const { requireAuth } = await import("./permissions");
 
-      await expect(requireAuth()).rejects.toThrow(
-        `NEXT_REDIRECT: ${expectedLoginRedirect}`,
-      );
-      expect(mockRedirect).toHaveBeenCalledWith(expectedLoginRedirect);
+      await expect(requireAuth()).rejects.toThrow("Auth service unavailable");
+      expect(mockRedirect).not.toHaveBeenCalled();
     });
 
     it("should handle network timeout gracefully", async () => {
@@ -121,9 +119,7 @@ describe("Auth Permissions", () => {
 
       const { requireAuth } = await import("./permissions");
 
-      await expect(requireAuth()).rejects.toThrow(
-        `NEXT_REDIRECT: ${expectedLoginRedirect}`,
-      );
+      await expect(requireAuth()).rejects.toThrow("Timeout");
     });
   });
 
@@ -362,9 +358,9 @@ describe("Auth Permissions", () => {
       );
 
       const { getCurrentUser } = await import("./permissions");
-      const result = await getCurrentUser();
-
-      expect(result).toBeNull();
+      await expect(getCurrentUser()).rejects.toThrow(
+        "Auth service unavailable",
+      );
     });
   });
 

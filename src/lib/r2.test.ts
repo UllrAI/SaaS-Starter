@@ -11,7 +11,6 @@ process.env.R2_ENDPOINT = "https://mock-endpoint.r2.cloudflarestorage.com";
 process.env.R2_ACCESS_KEY_ID = "mock-access-key";
 process.env.R2_SECRET_ACCESS_KEY = "mock-secret-key";
 process.env.R2_BUCKET_NAME = "mock-bucket";
-process.env.R2_PUBLIC_URL = "https://mock-public-url.com";
 
 const mockSend = jest.fn<(...args: unknown[]) => Promise<unknown>>();
 const mockGetSignedUrl = jest.fn<(...args: unknown[]) => Promise<string>>();
@@ -59,14 +58,6 @@ describe("R2 storage", () => {
     expect(getR2Client()).toBeDefined();
   });
 
-  it("normalizes public URLs", async () => {
-    const { buildR2PublicUrl } = await import("./r2");
-
-    expect(
-      buildR2PublicUrl("/uploads/user/file.jpg", "https://cdn.example/"),
-    ).toBe("https://cdn.example/uploads/user/file.jpg");
-  });
-
   describe("createPresignedUrl", () => {
     const input = {
       key: "uploads/user-123/upload-id.jpeg",
@@ -80,8 +71,7 @@ describe("R2 storage", () => {
       await expect(createPresignedUrl(input)).resolves.toEqual({
         success: true,
         presignedUrl: "https://mock-presigned-url.com",
-        publicUrl:
-          "https://mock-public-url.com/uploads/user-123/upload-id.jpeg",
+        publicUrl: "/api/files/content?key=uploads%2Fuser-123%2Fupload-id.jpeg",
         key: "uploads/user-123/upload-id.jpeg",
       });
       expect(mockPutObjectCommand).toHaveBeenCalledWith({

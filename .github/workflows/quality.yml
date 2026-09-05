@@ -33,6 +33,7 @@ jobs:
           --health-retries 10
     env:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/saas_e2e
+      JOBS_TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/saas_e2e
       E2E_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/saas_e2e
       BETTER_AUTH_SECRET: ci-only-secret-at-least-32-characters
       RESEND_API_KEY: re_ci_placeholder
@@ -41,7 +42,6 @@ jobs:
       R2_ACCESS_KEY_ID: ci-placeholder
       R2_SECRET_ACCESS_KEY: ci-placeholder
       R2_BUCKET_NAME: ci-placeholder
-      R2_PUBLIC_URL: https://cdn.example.com
       UPLOAD_CLEANUP_SECRET: ci-only-upload-cleanup-secret-32-chars
       STRIPE_SECRET_KEY: sk_test_ci_placeholder
       STRIPE_ENVIRONMENT: test_mode
@@ -75,5 +75,9 @@ jobs:
       - run: pnpm dead-code:check
       - run: pnpm type-check
       - run: pnpm test --runInBand
+      - run: pnpm test:jobs:integration
+      - run: pnpm build:worker
+      - run: pnpm worker:smoke
+      - run: pnpm worker:shutdown-smoke
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm test:e2e

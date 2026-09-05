@@ -1,8 +1,4 @@
-import "server-only";
-
 import type { LanguageModelUsage } from "ai";
-import { db } from "@/database";
-import { aiUsageEvents } from "@/database/schema";
 import type { ReasoningEffort } from "./reasoning";
 
 /**
@@ -61,25 +57,4 @@ export function extractUsageTotals(
     reasoningTokens: toTokenCount(usage?.outputTokenDetails?.reasoningTokens),
     totalTokens: toTokenCount(usage?.totalTokens),
   };
-}
-
-export async function recordAiUsageEvent(
-  event: AiUsageEventInput,
-): Promise<void> {
-  await db.insert(aiUsageEvents).values({
-    userId: event.userId,
-    conversationId: event.conversationId,
-    messageId: event.messageId,
-    agentId: event.agentId,
-    model: event.model,
-    reasoningEffort: event.reasoningEffort,
-    inputTokens: event.inputTokens,
-    cacheReadTokens: event.cacheReadTokens,
-    cacheWriteTokens: event.cacheWriteTokens,
-    outputTokens: event.outputTokens,
-    reasoningTokens: event.reasoningTokens,
-    totalTokens: event.totalTokens,
-    finishReason: event.finishReason,
-    durationMs: event.durationMs,
-  });
 }

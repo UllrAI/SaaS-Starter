@@ -174,11 +174,14 @@ async function updateConversationArchive(
   return payload.conversation;
 }
 
-async function fetchConversation(conversationId: string) {
+async function fetchConversation(conversationId: string, before?: string) {
   return readResponse<AiConversationDetail>(
-    await fetch(`/api/ai/conversations/${encodeURIComponent(conversationId)}`, {
-      cache: "no-store",
-    }),
+    await fetch(
+      `/api/ai/conversations/${encodeURIComponent(conversationId)}${before ? `?before=${encodeURIComponent(before)}` : ""}`,
+      {
+        cache: "no-store",
+      },
+    ),
   );
 }
 
@@ -214,6 +217,8 @@ export function AiChat() {
   );
   const [activeConversationId, setActiveConversationId] = useState<string>();
   const [historyLoading, setHistoryLoading] = useState(true);
+  const [messagesHaveMore, setMessagesHaveMore] = useState(false);
+  const [olderMessagesLoading, setOlderMessagesLoading] = useState(false);
   const [conversationLoading, setConversationLoading] = useState(false);
   const [conversationCreating, setConversationCreating] = useState(false);
   const [historyLoadingMore, setHistoryLoadingMore] = useState(false);
@@ -395,6 +400,7 @@ export function AiChat() {
           detail?.messages ?? [],
         ).at(-1)?.id;
         setMessages(detail?.messages ?? []);
+        setMessagesHaveMore(detail?.hasMore ?? false);
         replaceConversationUrl(detail?.conversation.id);
         setHistoryError(false);
       } catch (initializationError) {
@@ -442,6 +448,7 @@ export function AiChat() {
 
   const resetConversationView = useCallback(() => {
     setMessages([]);
+    setMessagesHaveMore(false);
     setManualArtifacts([]);
     setActiveArtifactId(undefined);
     setCanvasAutomaticallyOpen(false);
@@ -451,6 +458,31 @@ export function AiChat() {
     clearImageAttachments();
     clearError();
   }, [clearError, clearImageAttachments, setMessages]);
+
+  const handleLoadOlderMessages = async () => {
+    if (
+      !activeConversationId ||
+      !messages[0] ||
+      historyDisabled ||
+      olderMessagesLoading
+    )
+      return;
+    const requestId = conversationRequestId.current;
+    setOlderMessagesLoading(true);
+    try {
+      const detail = await fetchConversation(
+        activeConversationId,
+        messages[0].id,
+      );
+      if (requestId !== conversationRequestId.current) return;
+      setMessages((current) => [...detail.messages, ...current]);
+      setMessagesHaveMore(detail.hasMore ?? false);
+    } catch {
+      setHistoryError(true);
+    } finally {
+      setOlderMessagesLoading(false);
+    }
+  };
 
   const handleSelectConversation = async (conversationId: string) => {
     if (historyDisabled) return;
@@ -467,6 +499,7 @@ export function AiChat() {
         -1,
       )?.id;
       setMessages(detail.messages);
+      setMessagesHaveMore(detail.hasMore ?? false);
       setActiveConversationId(detail.conversation.id);
       setConversations((current) => {
         const selectedIndex = current.findIndex(
@@ -794,6 +827,8 @@ export function AiChat() {
         <ChatPanel
           conversationId={activeConversationId}
           messages={messages}
+          onLoadOlder={messagesHaveMore ? handleLoadOlderMessages : undefined}
+          olderMessagesLoading={olderMessagesLoading}
           input={input}
           status={status}
           error={error}

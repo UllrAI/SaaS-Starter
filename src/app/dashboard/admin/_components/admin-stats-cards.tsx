@@ -5,27 +5,7 @@ import { formatFileSize } from "@/lib/config/upload";
 import { resolveIntlLocale } from "@/lib/locale";
 import { CreditCard, Shield, TrendingUp, Upload, Users } from "lucide-react";
 import { SITE_CONFIG } from "@/lib/config/site";
-export interface AdminStats {
-  users: {
-    total: number;
-    verified: number;
-    admins: number;
-  };
-  subscriptions: {
-    total: number;
-    active: number;
-    canceled: number;
-  };
-  payments: {
-    total: number;
-    totalRevenue: number;
-    successful: number;
-  };
-  uploads: {
-    total: number;
-    totalSize: number;
-  };
-}
+import type { AdminStats } from "@/lib/admin/types";
 interface AdminStatsCardsProps {
   stats: AdminStats;
   locale: string;

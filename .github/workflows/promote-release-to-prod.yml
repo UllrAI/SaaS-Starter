@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: write
+  actions: read
 
 concurrency:
   group: promote-release-to-prod
@@ -15,7 +16,8 @@ concurrency:
 jobs:
   promote:
     runs-on: ubuntu-24.04
-    timeout-minutes: 5
+    timeout-minutes: 15
+    environment: production
 
     steps:
       - name: Checkout full history
@@ -41,6 +43,40 @@ jobs:
             echo "::error::${RELEASE_TAG} does not match package.json version ${package_version}"
             exit 1
           fi
+
+      - name: Verify the exact release commit passed Quality
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PRIMARY_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          set -euo pipefail
+          release_commit="$(git rev-parse HEAD)"
+          git merge-base --is-ancestor "$release_commit" "origin/$PRIMARY_BRANCH"
+          passed="$(gh api --method GET "repos/$GITHUB_REPOSITORY/actions/workflows/quality.yml/runs" \
+            -f head_sha="$release_commit" -f branch="$PRIMARY_BRANCH" -f event=push \
+            --jq '.workflow_runs | sort_by(.run_number) | last | .conclusion == "success"')"
+          if [ "$passed" != "true" ]; then
+            echo "::error::The release commit has not passed Quality on the default branch."
+            exit 1
+          fi
+
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6
+        with:
+          version: 10.33.0
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Apply release migrations once before promotion
+        env:
+          DATABASE_URL: ${{ secrets.PRODUCTION_DATABASE_URL }}
+          JOB_DATABASE_URL: ${{ secrets.PRODUCTION_JOB_DATABASE_URL }}
+          MIGRATION_SSH_HOST: ${{ vars.MIGRATION_SSH_HOST }}
+          MIGRATION_DB_HOST: ${{ vars.MIGRATION_DB_HOST }}
+          MIGRATION_SSH_KEY: ${{ secrets.MIGRATION_SSH_KEY }}
+          MIGRATION_SSH_KNOWN_HOSTS: ${{ secrets.MIGRATION_SSH_KNOWN_HOSTS }}
+        run: bash scripts/with-production-database.sh pnpm db:migrate
 
       - name: Promote tagged commit to prod
         env:

@@ -19,26 +19,21 @@ export interface AuthUser {
  * Note: This function should only be used in server components
  */
 export async function getCurrentUser(): Promise<AuthUser | null> {
-  try {
-    // This will only work in server components where headers are available
-    const { headers } = await import("next/headers");
-    const session = await getAuthSessionFromHeaders(await headers());
+  // Session infrastructure failures must reach the error boundary.
+  const { headers } = await import("next/headers");
+  const session = await getAuthSessionFromHeaders(await headers());
 
-    if (!session?.user) {
-      return null;
-    }
-
-    return {
-      id: session.user.id,
-      name: session.user.name,
-      email: session.user.email,
-      role: (session.user as { role?: UserRole }).role || "user",
-      image: session.user.image || undefined,
-    };
-  } catch {
-    // Handle cases where this is called in client-side context
+  if (!session?.user) {
     return null;
   }
+
+  return {
+    id: session.user.id,
+    name: session.user.name,
+    email: session.user.email,
+    role: (session.user as { role?: UserRole }).role || "user",
+    image: session.user.image || undefined,
+  };
 }
 
 /**

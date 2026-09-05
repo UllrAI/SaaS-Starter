@@ -52,9 +52,18 @@ export async function GET(
   const resolved = await readOwnedConversationRequest(request, params);
   if ("response" in resolved) return resolved.response;
 
+  const before = z
+    .string()
+    .min(1)
+    .max(200)
+    .optional()
+    .safeParse(request.nextUrl.searchParams.get("before") ?? undefined);
+  if (!before.success)
+    return NextResponse.json({ error: "Invalid cursor." }, { status: 400 });
   const detail = await getAiConversation({
     conversationId: resolved.conversationId,
     userId: resolved.userId,
+    ...(before.data ? { before: before.data } : {}),
   });
   if (!detail) {
     return NextResponse.json(

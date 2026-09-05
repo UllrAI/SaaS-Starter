@@ -32,7 +32,8 @@ describe("prepareChatRequest", () => {
       conversationId: "conversation-1",
       agentId: "assistant",
       reasoningEffort: "low",
-      responseHandle: "resp_1.signature",
+      parentMessageId: "a1",
+      requestId: expect.any(String),
     });
   });
 
@@ -48,6 +49,8 @@ describe("prepareChatRequest", () => {
       conversationId: "conversation-1",
       agentId: "assistant",
       reasoningEffort: "medium",
+      parentMessageId: null,
+      requestId: expect.any(String),
     });
   });
 
@@ -64,7 +67,8 @@ describe("prepareChatRequest", () => {
       conversationId: "conversation-1",
       agentId: "assistant",
       reasoningEffort: "high",
-      responseHandle: "resp_1.signature",
+      parentMessageId: "a1",
+      requestId: expect.any(String),
     });
   });
 
@@ -94,11 +98,12 @@ describe("prepareChatRequest", () => {
         reasoningEffort: "low",
       }),
     ).toEqual({
-      messages: [secondUser, pausedAssistant],
+      messages: [pausedAssistant],
       conversationId: "conversation-1",
       agentId: "assistant",
       reasoningEffort: "low",
-      responseHandle: "resp_1.signature",
+      parentMessageId: "a2",
+      requestId: expect.any(String),
     });
   });
 });

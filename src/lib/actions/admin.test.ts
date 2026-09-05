@@ -97,6 +97,10 @@ const mockRequireAdmin = jest.fn();
 
 const mockCancelSubscription = jest.fn();
 
+const mockRequestFileDeletion = jest.fn();
+jest.mock("@/lib/uploads/deletion", () => ({
+  requestFileDeletion: mockRequestFileDeletion,
+}));
 const mockDeleteFileFromR2 = jest.fn();
 const mockDeleteFilesFromR2 = jest.fn();
 
@@ -147,6 +151,7 @@ jest.mock("@/database/schema", () => ({
 }));
 
 jest.mock("drizzle-orm", () => ({
+  isNull: jest.fn(),
   eq: mockEq,
   desc: mockDesc,
   asc: mockAsc,
@@ -1187,126 +1192,45 @@ describe("Admin Actions", () => {
     });
   });
 
-  describe("deleteUploadAction", () => {
-    it("should delete upload successfully", async () => {
-      const mockUpload = { fileKey: "files/test.jpg" };
-
-      mockDb.select.mockReturnValue({
-        from: jest.fn().mockReturnValue({
-          where: jest.fn().mockReturnValue({
-            limit: jest.fn().mockResolvedValue([mockUpload]),
-          }),
-        }),
-      });
-
-      mockDeleteFileFromR2.mockResolvedValue({ success: true });
-
+  describe("upload deletion", () => {
+    it("records deletion without depending on object storage availability", async () => {
+      mockRequestFileDeletion.mockResolvedValue([{ id: "upload1" }]);
       const { deleteUploadAction } = await import("./admin/uploads");
-
+      const user = { id: "admin", role: "admin" };
       const result = await deleteUploadAction({
         parsedInput: { uploadId: "upload1" },
+        ctx: { user },
       });
-
-      expect(mockDeleteFileFromR2).toHaveBeenCalledWith("files/test.jpg");
-      expect(result).toEqual({
-        success: true,
-        message: "Upload deleted successfully.",
-      });
+      expect(mockRequestFileDeletion).toHaveBeenCalledWith(
+        mockDb,
+        ["upload1"],
+        user,
+      );
+      expect(result.success).toBe(true);
+      expect(mockDeleteFileFromR2).not.toHaveBeenCalled();
       expect(mockRevalidatePath).toHaveBeenCalledWith(
         "/dashboard/admin/uploads",
       );
     });
-
-    it("should throw error when upload not found", async () => {
-      mockDb.select.mockReturnValue({
-        from: jest.fn().mockReturnValue({
-          where: jest.fn().mockReturnValue({
-            limit: jest.fn().mockResolvedValue([]),
-          }),
-        }),
-      });
-
+    it("rejects unavailable files", async () => {
+      mockRequestFileDeletion.mockResolvedValue([]);
       const { deleteUploadAction } = await import("./admin/uploads");
-
       await expect(
         deleteUploadAction({
-          parsedInput: { uploadId: "nonexistent" },
+          parsedInput: { uploadId: "missing" },
+          ctx: { user: { id: "admin", role: "admin" } },
         }),
       ).rejects.toThrow("Upload not found");
     });
-  });
-
-  describe("batchDeleteUploadsAction", () => {
-    it("should batch delete uploads successfully", async () => {
-      const mockUploads = [
-        { id: "upload1", fileKey: "files/test1.jpg" },
-        { id: "upload2", fileKey: "files/test2.jpg" },
-      ];
-
-      mockDb.select.mockReturnValue({
-        from: jest.fn().mockReturnValue({
-          where: jest.fn().mockResolvedValue(mockUploads),
-        }),
-      });
-
-      mockDeleteFilesFromR2.mockResolvedValue({ success: true });
-
+    it("records bounded batch deletion", async () => {
+      mockRequestFileDeletion.mockResolvedValue([{ id: "one" }, { id: "two" }]);
       const { batchDeleteUploadsAction } = await import("./admin/uploads");
-
-      const result = await batchDeleteUploadsAction({
-        parsedInput: { uploadIds: ["upload1", "upload2"] },
-      });
-
-      expect(mockDeleteFilesFromR2).toHaveBeenCalledWith([
-        "files/test1.jpg",
-        "files/test2.jpg",
-      ]);
-      expect(result).toEqual({
-        success: true,
-        message: "Successfully deleted 2 file(s).",
-      });
-      expect(mockRevalidatePath).toHaveBeenCalledWith(
-        "/dashboard/admin/uploads",
-      );
-    });
-
-    it("should throw error when no uploads found", async () => {
-      mockDb.select.mockReturnValue({
-        from: jest.fn().mockReturnValue({
-          where: jest.fn().mockResolvedValue([]),
+      expect(
+        await batchDeleteUploadsAction({
+          parsedInput: { uploadIds: ["one", "two"] },
+          ctx: { user: { id: "admin", role: "admin" } },
         }),
-      });
-
-      const { batchDeleteUploadsAction } = await import("./admin/uploads");
-
-      await expect(
-        batchDeleteUploadsAction({
-          parsedInput: { uploadIds: ["nonexistent"] },
-        }),
-      ).rejects.toThrow("No uploads found to delete.");
-    });
-
-    it("should throw error when R2 deletion fails", async () => {
-      const mockUploads = [{ id: "upload1", fileKey: "files/test1.jpg" }];
-
-      mockDb.select.mockReturnValue({
-        from: jest.fn().mockReturnValue({
-          where: jest.fn().mockResolvedValue(mockUploads),
-        }),
-      });
-
-      mockDeleteFilesFromR2.mockResolvedValue({
-        success: false,
-        error: "R2 service unavailable",
-      });
-
-      const { batchDeleteUploadsAction } = await import("./admin/uploads");
-
-      await expect(
-        batchDeleteUploadsAction({
-          parsedInput: { uploadIds: ["upload1"] },
-        }),
-      ).rejects.toThrow("R2 service unavailable");
+      ).toEqual({ success: true, message: "Scheduled deletion of 2 file(s)." });
     });
   });
 
@@ -1564,7 +1488,7 @@ describe("Admin Actions", () => {
       // Test with no search and fileType "all" to test empty conditions
       await getUploads({ search: "", fileType: "all" });
 
-      expect(mockQuery.where).toHaveBeenCalledWith(undefined);
+      expect(mockQuery.where).toHaveBeenCalledWith("and-condition");
     });
   });
 });

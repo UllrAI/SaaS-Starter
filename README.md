@@ -127,7 +127,6 @@ never be added to `SITE_CONFIG`.
 | `R2_ACCESS_KEY_ID`               | Required when `uploads` is enabled. R2 access key ID.           | `your_r2_access_key_id`                             |
 | `R2_SECRET_ACCESS_KEY`           | Required when `uploads` is enabled. R2 secret key.              | `your_r2_secret_access_key`                         |
 | `R2_BUCKET_NAME`                 | Required when `uploads` is enabled. R2 bucket name.             | `your_r2_bucket_name`                               |
-| `R2_PUBLIC_URL`                  | Required when `uploads` is enabled. Public bucket URL.          | `https://your-bucket.your-account.r2.dev`           |
 | `UPLOAD_CLEANUP_SECRET`          | Required when `uploads` is enabled. 32+ character secret.       | Generate with `openssl rand -base64 32`             |
 | `UPLOAD_DAILY_QUOTA_BYTES`       | Optional rolling 24-hour upload quota per user.                 | `1073741824` (1 GiB)                                |
 | `UPLOAD_TOTAL_QUOTA_BYTES`       | Optional total stored and reserved bytes per user.              | `5368709120` (5 GiB)                                |
@@ -507,12 +506,11 @@ see [the Zeabur deployment guide](docs/deployment-zeabur.md#using-the-workflow-i
    workflow to pass.
 2. Configure every required variable from `.env.example`. Set
    `NEXT_PUBLIC_APP_URL` to the final HTTPS origin before building because
-   canonical URLs and client configuration are compiled from it. Set
-   `R2_PUBLIC_URL` before building so Next.js includes the storage hostname in
-   its image optimization allowlist.
-3. Run `pnpm db:migrate` once as a dedicated release command against the
-   production `DATABASE_URL`. Do not attach migrations to every web process
-   startup.
+   canonical URLs and client configuration are compiled from it. Keep the user
+   upload bucket private; see [private-file cutover](docs/architecture-remediation.md#deployment-requirements).
+3. Set `PRODUCTION_DATABASE_URL` in the GitHub `production` environment, plus
+   `PRODUCTION_JOB_DATABASE_URL` for a separate queue database. The release
+   workflow checks the exact SHA's Quality result and runs migrations before promotion.
 4. Update the version in `package.json`, then tag that commit with an annotated
    `release/vX.Y.Z` tag using the same version and push it:
 

@@ -18,6 +18,7 @@ export interface Subscription {
   customerId: string;
   subscriptionId: string;
   status: SubscriptionStatus;
+  accessRestricted?: boolean;
   tierId: string;
   currentPeriodStart?: Date | null;
   currentPeriodEnd?: Date | null;

@@ -7,7 +7,16 @@ import {
   users,
   webhookEvents,
 } from "@/database/tables";
-import { and, count, desc, eq, isNull, max, sql } from "drizzle-orm";
+import {
+  and,
+  count,
+  desc,
+  eq,
+  isNull,
+  max,
+  sql,
+  getTableColumns,
+} from "drizzle-orm";
 import type { PgTransaction } from "drizzle-orm/pg-core";
 import type { PostgresJsQueryResultHKT } from "drizzle-orm/postgres-js";
 import type { Subscription, SubscriptionStatus } from "@/types/billing";
@@ -143,61 +152,6 @@ export async function upsertPayment(data: UpsertPaymentData, tx?: Tx) {
     throw new Error(
       `Payment ${data.paymentId} conflicts with existing immutable payment data.`,
     );
-  }
-
-  return rows;
-}
-
-export async function suspendSubscriptionAccess(
-  subscriptionId: string,
-  eventCreatedAt: Date,
-  tx?: Tx,
-) {
-  const dbase = getDb(tx);
-  const applySuspension = () =>
-    dbase
-      .update(subscriptions)
-      .set({
-        status: "unpaid",
-        lastWebhookCreatedAt: eventCreatedAt,
-        updatedAt: new Date(),
-      })
-      .where(
-        and(
-          eq(subscriptions.subscriptionId, subscriptionId),
-          sql`${subscriptions.lastWebhookCreatedAt} is null or ${subscriptions.lastWebhookCreatedAt} <= ${eventCreatedAt}`,
-        ),
-      )
-      .returning();
-  let rows = await applySuspension();
-
-  if (rows.length === 0) {
-    const [existingSubscription] = await dbase
-      .select({
-        id: subscriptions.id,
-        lastWebhookCreatedAt: subscriptions.lastWebhookCreatedAt,
-      })
-      .from(subscriptions)
-      .where(eq(subscriptions.subscriptionId, subscriptionId))
-      .limit(1);
-
-    if (!existingSubscription) {
-      throw new Error(
-        `Subscription ${subscriptionId} is not available for a billing adjustment yet.`,
-      );
-    }
-
-    if (
-      !existingSubscription.lastWebhookCreatedAt ||
-      existingSubscription.lastWebhookCreatedAt <= eventCreatedAt
-    ) {
-      rows = await applySuspension();
-      if (rows.length === 0) {
-        throw new Error(
-          `Subscription ${subscriptionId} changed during its billing adjustment.`,
-        );
-      }
-    }
   }
 
   return rows;
@@ -468,7 +422,14 @@ export async function getUserSubscription(
   userId: string,
 ): Promise<Subscription | null> {
   const userSubscriptions = await db
-    .select()
+    .select({
+      ...getTableColumns(subscriptions),
+      accessRestricted: sql<boolean>`exists (
+        select 1 from ${payments}
+        where ${payments.subscriptionId} = ${subscriptions.subscriptionId}
+          and ${payments.status} in ('refunded', 'disputed')
+      )`,
+    })
     .from(subscriptions)
     .where(eq(subscriptions.userId, userId))
     .orderBy(desc(subscriptions.createdAt)); // Order by creation date descending for deterministic behavior
@@ -481,6 +442,7 @@ export async function getUserSubscription(
       subscriptionId: subscription.subscriptionId,
       status: subscription.status as SubscriptionStatus,
       tierId: subscription.productId,
+      accessRestricted: subscription.accessRestricted,
       currentPeriodStart: subscription.currentPeriodStart,
       currentPeriodEnd: subscription.currentPeriodEnd,
       canceledAt: subscription.canceledAt,

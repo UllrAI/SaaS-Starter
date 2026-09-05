@@ -1,24 +1,6 @@
 import env from "@/env";
 
-const utcTimestamp = {
-  to: 1114,
-  from: [1114],
-  serialize: (value: Date | string) =>
-    (value instanceof Date ? value : new Date(value))
-      .toISOString()
-      .replace("T", " ")
-      .replace("Z", ""),
-  parse: (value: string) => new Date(`${value.replace(" ", "T")}Z`),
-};
-
-const utcConnectionOptions = {
-  connection: {
-    TimeZone: "UTC",
-  },
-  types: {
-    utcTimestamp,
-  },
-};
+import { utcConnectionOptions } from "@/database/connection-options";
 
 /**
  * Detects if the application is running in a serverless environment

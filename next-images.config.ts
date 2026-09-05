@@ -1,5 +1,3 @@
-import env from "./env";
-
 type RemotePattern = {
   protocol: "https";
   hostname: string;
@@ -12,34 +10,7 @@ const CONTENT_IMAGE_PATTERNS: RemotePattern[] = [
   },
 ];
 
-function resolveR2Hostname(url: string | undefined): string | undefined {
-  if (!url) {
-    return undefined;
-  }
-
-  try {
-    return new URL(url).hostname;
-  } catch {
-    console.error(
-      "\x1b[33m%s\x1b[0m",
-      "Warning: Invalid R2_PUBLIC_URL found in environment variables. Skipping R2 remote pattern.",
-    );
-    return undefined;
-  }
-}
-
+// Private user files are rendered unoptimized through their authenticated URL.
 export function getRemotePatterns(): RemotePattern[] {
-  const r2Hostname = resolveR2Hostname(env.R2_PUBLIC_URL);
-
-  if (!r2Hostname) {
-    return [...CONTENT_IMAGE_PATTERNS];
-  }
-
-  return [
-    ...CONTENT_IMAGE_PATTERNS,
-    {
-      protocol: "https",
-      hostname: r2Hostname,
-    },
-  ];
+  return [...CONTENT_IMAGE_PATTERNS];
 }

@@ -1,21 +1,8 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import { UnrecognizedActionError } from "next/dist/client/components/unrecognized-action-error";
 
-import { reloadPage } from "@/lib/deployment-skew";
 import GlobalError from "./global-error";
 
-jest.mock("@/lib/deployment-skew", () => ({
-  ...(jest.requireActual("@/lib/deployment-skew") as object),
-  reloadPage: jest.fn(),
-}));
-
-const mockReloadPage = reloadPage as jest.MockedFunction<typeof reloadPage>;
-
 describe("GlobalError", () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
   it("renders a provider-independent fallback and retries", () => {
     const reset = jest.fn();
 
@@ -26,24 +13,5 @@ describe("GlobalError", () => {
     ).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Try again" }));
     expect(reset).toHaveBeenCalledTimes(1);
-  });
-
-  it("reloads instead of resetting when the deployment moved on", () => {
-    const reset = jest.fn();
-
-    render(
-      <GlobalError
-        error={new UnrecognizedActionError("action not found")}
-        reset={reset}
-      />,
-    );
-
-    expect(
-      screen.getByRole("heading", { name: "That didn't go through" }),
-    ).toBeInTheDocument();
-    // `reset` would re-run the same stale bundle, so it must not be offered.
-    fireEvent.click(screen.getByRole("button", { name: "Reload" }));
-    expect(mockReloadPage).toHaveBeenCalledTimes(1);
-    expect(reset).not.toHaveBeenCalled();
   });
 });

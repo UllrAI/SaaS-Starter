@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef, useTransition } from "react";
 import { useDebounce } from "use-debounce";
 
-import { useDeploymentSkewGuard } from "@/hooks/use-deployment-skew";
+import { isDeploymentSkewError } from "@/lib/deployment-skew";
 
 interface Pagination {
   page: number;
@@ -62,7 +62,6 @@ export function useAdminTable<T>({
 
   const [debouncedSearchTerm] = useDebounce(searchTerm, debounceDelay);
   const [isPending, startTransition] = useTransition();
-  const guardSkew = useDeploymentSkewGuard();
 
   const isInitialMount = useRef(true);
 
@@ -75,34 +74,24 @@ export function useAdminTable<T>({
   const loadPage = useCallback(async () => {
     setError(false);
     try {
-      const result = await guardSkew(() =>
-        queryActionRef.current({
-          page: currentPage,
-          limit: initialPagination.limit,
-          search: debouncedSearchTerm,
-          filter: filter,
-        }),
-      );
-      // `undefined` means the deployment moved under this page. The guard has
-      // already prompted for a reload, so keep the rows currently on screen.
-      if (!result) return;
+      const result = await queryActionRef.current({
+        page: currentPage,
+        limit: initialPagination.limit,
+        search: debouncedSearchTerm,
+        filter: filter,
+      });
       setData(result.data);
       setPagination(result.pagination);
     } catch (cause) {
-      // Skew is handled by the guard above, so anything landing here is a real
-      // failure worth leaving a trace of.
+      // A stale bundle cannot recover by retrying; let the dashboard error
+      // boundary offer the reload instead of showing a generic load error.
+      if (isDeploymentSkewError(cause)) throw cause;
       console.error(cause);
       setError(true);
     }
     // Depends on the query inputs, not on the caller's `queryAction`
     // identity, which is read through a ref instead.
-  }, [
-    currentPage,
-    debouncedSearchTerm,
-    filter,
-    guardSkew,
-    initialPagination.limit,
-  ]);
+  }, [currentPage, debouncedSearchTerm, filter, initialPagination.limit]);
 
   useEffect(() => {
     // Skip fetch on initial mount if we already have data

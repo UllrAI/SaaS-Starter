@@ -1,22 +1,29 @@
-import {
-  describe,
-  it,
-  expect,
-  jest,
-  beforeEach,
-  afterEach,
-} from "@jest/globals";
-import { renderHook, act, waitFor } from "@testing-library/react";
+import { describe, it, expect, beforeEach, afterEach } from "@jest/globals";
+import { renderHook, act, screen, waitFor } from "@testing-library/react";
 import { UnrecognizedActionError } from "next/dist/client/components/unrecognized-action-error";
+import { Component, type ReactNode } from "react";
 
-// Mock use-debounce
-const mockUseDebounce = jest.fn();
+// `jest.mock` is hoisted above every import, so the factory cannot reference a
+// module-level variable. `beforeEach` installs the implementation.
 jest.mock("use-debounce", () => ({
-  useDebounce: mockUseDebounce,
+  useDebounce: jest.fn(),
 }));
 
 // Import after mocks are set up
+import { useDebounce } from "use-debounce";
 import { useAdminTable } from "./use-admin-table";
+
+const mockUseDebounce = useDebounce as unknown as jest.Mock;
+
+class Boundary extends Component<{ children: ReactNode }, { caught: boolean }> {
+  state = { caught: false };
+  static getDerivedStateFromError() {
+    return { caught: true };
+  }
+  render() {
+    return this.state.caught ? <p>boundary</p> : this.props.children;
+  }
+}
 
 // Mock data types for testing
 interface TestDataItem {
@@ -668,20 +675,22 @@ describe("useAdminTable", () => {
       expect(consoleError).toHaveBeenCalledWith(error);
     });
 
-    it("keeps the rows on screen when the deployment moved on", async () => {
-      // A missing Server Action is not a query failure: the guard prompts for a
-      // reload, so the table must not flip to its generic error state and throw
-      // away data the user can still read.
+    it("hands a deployment skew to the nearest error boundary", async () => {
+      // A missing Server Action cannot be fixed by retrying, so it must not be
+      // swallowed into the generic load error; the dashboard boundary offers
+      // the reload instead.
       mockQueryAction.mockRejectedValueOnce(
         new UnrecognizedActionError("action not found"),
       );
 
-      const { result } = renderHook(() =>
-        useAdminTable({
-          queryAction: mockQueryAction,
-          initialData: mockData,
-          initialPagination: mockPagination,
-        }),
+      const { result } = renderHook(
+        () =>
+          useAdminTable({
+            queryAction: mockQueryAction,
+            initialData: mockData,
+            initialPagination: mockPagination,
+          }),
+        { wrapper: Boundary },
       );
 
       await act(async () => {
@@ -689,10 +698,7 @@ describe("useAdminTable", () => {
       });
 
       expect(mockQueryAction).toHaveBeenCalled();
-      expect(result.current.error).toBe(false);
-      expect(result.current.data).toEqual(mockData);
-      // A skew is handled by the guard, not by the generic failure path.
-      expect(consoleError).not.toHaveBeenCalled();
+      expect(await screen.findByText("boundary")).toBeInTheDocument();
     });
 
     it("should handle string errors", async () => {

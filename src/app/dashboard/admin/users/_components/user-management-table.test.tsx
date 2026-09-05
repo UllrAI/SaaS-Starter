@@ -1,3 +1,4 @@
+import { Component, type ReactNode } from "react";
 import {
   fireEvent,
   render,
@@ -8,7 +9,7 @@ import {
 import { UnrecognizedActionError } from "next/dist/client/components/unrecognized-action-error";
 
 jest.mock("sonner", () => ({
-  toast: { success: jest.fn(), error: jest.fn(), warning: jest.fn() },
+  toast: { success: jest.fn(), error: jest.fn() },
 }));
 
 jest.mock("@/lib/actions/admin/users", () => ({
@@ -44,9 +45,26 @@ const user: UserWithSubscription = {
 
 const pagination = { page: 1, limit: 20, total: 1, totalPages: 1 };
 
+// Stands in for `src/app/dashboard/error.tsx`, the boundary that wraps every
+// admin page in the real tree.
+class Boundary extends Component<{ children: ReactNode }, { caught: boolean }> {
+  state = { caught: false };
+  static getDerivedStateFromError() {
+    return { caught: true };
+  }
+  render() {
+    return this.state.caught ? <p>boundary</p> : this.props.children;
+  }
+}
+
 async function openEditDialog() {
   render(
-    <UserManagementTable initialData={[user]} initialPagination={pagination} />,
+    <Boundary>
+      <UserManagementTable
+        initialData={[user]}
+        initialPagination={pagination}
+      />
+    </Boundary>,
   );
 
   // Row 0 is the header. The edit button is the only button in a data row.
@@ -55,19 +73,21 @@ async function openEditDialog() {
   await screen.findByText("Edit User");
 }
 
-describe("UserManagementTable deployment skew", () => {
+describe("UserManagementTable action failures", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    (getUsers as jest.Mock).mockResolvedValue({
-      data: [user],
-      pagination,
-    });
+    jest.spyOn(console, "error").mockImplementation(() => {});
+    (getUsers as jest.Mock).mockResolvedValue({ data: [user], pagination });
   });
 
-  it("closes the dialog and prompts for a reload", async () => {
-    // Without the dialog closing first, Radix keeps focus trapped and marks
-    // everything outside it `aria-hidden` — including the toast that carries
-    // the only way out.
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it("hands a deployment skew to the error boundary", async () => {
+    // The action is awaited inside `startTransition` without a try/catch on
+    // purpose: React routes the rejection to the nearest boundary, which is
+    // where the reload prompt lives.
     mockUpdateUser.mockRejectedValue(
       new UnrecognizedActionError("action not found"),
     );
@@ -75,12 +95,7 @@ describe("UserManagementTable deployment skew", () => {
     await openEditDialog();
     fireEvent.click(screen.getByRole("button", { name: /save changes/i }));
 
-    await waitFor(() => {
-      expect(toast.warning).toHaveBeenCalledTimes(1);
-    });
-    await waitFor(() => {
-      expect(screen.queryByText("Edit User")).not.toBeInTheDocument();
-    });
+    expect(await screen.findByText("boundary")).toBeInTheDocument();
     expect(toast.success).not.toHaveBeenCalled();
     expect(toast.error).not.toHaveBeenCalled();
   });
@@ -96,7 +111,6 @@ describe("UserManagementTable deployment skew", () => {
     await waitFor(() => {
       expect(toast.error).toHaveBeenCalledTimes(1);
     });
-    expect(toast.warning).not.toHaveBeenCalled();
     // A real failure leaves the dialog open so the edit can be retried.
     expect(screen.getByText("Edit User")).toBeInTheDocument();
   });

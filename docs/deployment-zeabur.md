@@ -92,91 +92,44 @@ only after the migration command succeeds.
 
 A Server Action ID is a build artifact. When a new build goes live, a browser tab
 still running the previous one calls IDs the server no longer knows, and the
-request fails with `Failed to find Server Action`.
+request fails with `Failed to find Server Action`. Every build gets fresh IDs:
+Next salts them with a per-build key, and its 14-day key cache is disabled
+inside Docker.
 
-The IDs are salted with the build's encryption key, which Next caches in
-`.next/cache/.rscinfo` and rotates every 14 days at build time. That cache never
-applies here: `getStorageDirectory` (`next/dist/server/cache-dir.js`) returns
-nothing when `is-docker` matches — `/.dockerenv` exists, or `/proc/self/cgroup`
-mentions docker — so **every** build gets a fresh key and fresh IDs, whether or
-not the source changed.
+Next already forces a full page load when it notices a build ID mismatch on a
+navigation or on a Server Action response. A skewed action call itself is the
+one case that slips through, because the 404 is thrown before any response is
+parsed. The app handles that case with its error boundaries:
 
-Next catches part of this by itself. Every build gets a random build ID, and a
-mismatch on a navigation turns the soft navigation into a full page load. That
-only helps where a navigation happens. A Server Action response carries the
-build ID too, and the client compares it on any RSC response: on a mismatch it
-drops the flight data, which turns the follow-up into a full page load. None of
-that reaches a skewed call, though — the 404 is thrown before the RSC body is
-ever parsed — so the recovery path below is what covers it.
+- `src/lib/deployment-skew.ts` recognises the router error. The missing ID never
+  comes back, so `reloadPage()` is the only recovery; `reset()` would re-run the
+  same stale bundle.
+- `src/app/dashboard/error.tsx` offers that reload. A Server Action is awaited
+  inside `startTransition` without a try/catch, and React routes the rejection
+  to the nearest boundary. `useAdminTable` rethrows a skew for the same reason
+  instead of showing its generic load error.
+- Every Server Action call site lives under that boundary, so
+  `src/app/global-error.tsx` does not special-case a skew. It catches whatever
+  escapes a root layout, reads `messages/en.json` and renders its own `<html>`
+  because no provider exists at that point. There is no `src/app/layout.tsx`;
+  each of `(auth)`, `(pages)`, `[locale]` and `dashboard` carries its own root
+  layout, so a segment-level `src/app/error.tsx` would render outside every
+  provider and throw from its own fallback. Only `dashboard` has a localized
+  boundary today; the other branches fall through to `global-error.tsx`.
 
-**Do not set `deploymentId` to try to improve on that.** As soon as that option
-is present, `next build` stops generating a random build ID and hardcodes a
-constant (`getBuildId` in `next/dist/build/index.js`), then compares the
-deployment ID instead. Feeding it anything coarser than a per-build value — the
-package version, for instance — detects strictly less than the default already
-does: a rebuild of an unchanged version produces new Server Action IDs but an
-unchanged deployment ID, and nothing fires.
+**Do not set `deploymentId` to try to improve on that.** With the option
+present, `next build` stops generating a random build ID and compares the
+deployment ID instead, so anything coarser than a per-build value (the package
+version, for instance) detects strictly less than the default. See
+`docs/lessons-learned.md`.
 
-What the app adds is the recovery path for the calls that still slip through:
-
-- `src/lib/deployment-skew.ts` recognises the router error, and `reloadPage()`
-  is the only recovery — the missing ID never comes back, so retrying cannot
-  work.
-- `useDeploymentSkewGuard` (`src/hooks/use-deployment-skew.ts`) wraps a Server
-  Action call and turns a skew into a toast asking for a reload. Callers inside
-  a dialog pass `onSkew` to close it first: Radix traps focus and hides
-  everything outside the dialog from assistive tech, which would leave the
-  prompt unreachable.
-- `src/app/dashboard/error.tsx` offers a reload rather than `reset()`, which
-  would re-run the same stale bundle. React routes a rejected `useTransition`
-  callback to the nearest error boundary, so a Server Action call in the
-  dashboard that forgets the guard lands there. It sits below the dashboard root
-  layout on purpose, where the intl provider and the document chrome still
-  exist — which also means a failure thrown by that layout itself passes it by
-  and goes to `global-error.tsx`.
-- `src/app/global-error.tsx` catches whatever escapes a root layout. It reads
-  `messages/en.json` and renders its own `<html>`, because at that point there
-  is no provider and no document left. This repository has no
-  `src/app/layout.tsx`; four branches carry their own root layout instead
-  (`(auth)`, `(pages)`, `[locale]` and `dashboard`), so a segment-level
-  `src/app/error.tsx` would sit above all of them, render without
-  the provider its translations need, and throw from its own fallback. React
-  hands the fallback's error to the next boundary up, which would replace the
-  original failure with that one; the file was removed rather than left in that
-  state.
-- Only `dashboard` has a working segment-level boundary. `(auth)`, `(pages)` and
-  `[locale]` fall straight through to `global-error.tsx`, which is English-only
-  and unstyled. That is not a regression — the deleted `src/app/error.tsx` never
-  rendered either — but it is a gap. Closing it means one `error.tsx` per root
-  layout, so they render inside the provider the way the dashboard one does.
-
-### Server Function encryption key
-
-`NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` is worth knowing about even though this
-repository does not set it. The key doubles as the hash salt for Server Action
-IDs, on the Turbopack build this repository uses as much as on the webpack one,
-so pinning it makes two builds of identical source produce identical action IDs
-— which removes action ID skew for rebuilds that do not change the code. The
-build ID still changes every build, so an old tab's first RSC navigation is
-still forced into a full page load.
-
-Left unset, the key is generated per build and baked into the artifact. Replicas
-of one image therefore already agree, so multi-instance deployments do not need
-it on their own. Set it when the same source is built more than once and both
-builds serve traffic, or when you want a rebuild to stay compatible with tabs
-opened against the previous one.
-
-Two things to get right before setting it. It is a secret, not a feature flag:
-it encrypts the arguments a Server Action closes over. And it has to be present
-**at build time**, not only at runtime — the server reads
-`process.env.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` in preference to the key baked
-into the manifest (`getActionEncryptionKey` in
-`next/dist/server/app-render/encryption-utils.js`), so injecting it only
-into the running container gives the runtime a different key than the build
-used. Every Server Action that closes over bound arguments then fails to
-decrypt them. Actions defined at module scope, which is all of this
-repository's, take no bound arguments and would keep working — which makes
-the mistake easy to miss until an action that does need them is added.
+`NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` is not set here either. It doubles as the
+hash salt for action IDs, so pinning it makes rebuilds of identical source keep
+their IDs. Set it only when the same source is built more than once and both
+builds serve traffic, and set it **at build time**: the runtime prefers the
+environment variable over the key baked into the manifest, so a key injected
+only into the container cannot decrypt the bound arguments of any Server Action
+that closes over them.
 
 ## Durable Worker service
 

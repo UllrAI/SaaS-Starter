@@ -269,5 +269,8 @@ export const uploadCompleteRequestSchema = z.object({
   contentType: z.string().min(1, "Content type cannot be empty."),
   size: z.number().positive("File size must be positive."),
   key: z.string().min(1, "Upload key cannot be empty."),
-  url: z.url("Upload URL must be valid."),
+  url: z.union([
+    z.url("Upload URL must be valid."),
+    z.string().regex(/^\/api\/files\/content\?key=[^#]+$/),
+  ]),
 });

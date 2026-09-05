@@ -6,7 +6,6 @@ const mockLockBillingProductScope = jest.fn();
 const mockLockPaymentAdjustmentScope = jest.fn();
 const mockReconcilePaymentAfterDispute = jest.fn();
 const mockRevokeProductEntitlementByPaymentId = jest.fn();
-const mockSuspendSubscriptionAccess = jest.fn();
 const mockUpdatePaymentStatus = jest.fn();
 const mockUpsertPayment = jest.fn();
 const mockUpsertSubscription = jest.fn();
@@ -19,7 +18,6 @@ jest.mock("@/lib/database/subscription", () => ({
   lockPaymentAdjustmentScope: mockLockPaymentAdjustmentScope,
   reconcilePaymentAfterDispute: mockReconcilePaymentAfterDispute,
   revokeProductEntitlementByPaymentId: mockRevokeProductEntitlementByPaymentId,
-  suspendSubscriptionAccess: mockSuspendSubscriptionAccess,
   updatePaymentStatus: mockUpdatePaymentStatus,
   upsertPayment: mockUpsertPayment,
   upsertSubscription: mockUpsertSubscription,
@@ -580,11 +578,6 @@ describe("Stripe webhook processors", () => {
     expect(mockUpdatePaymentStatus).toHaveBeenCalledWith(
       "pi_123",
       "disputed",
-      tx,
-    );
-    expect(mockSuspendSubscriptionAccess).toHaveBeenCalledWith(
-      "sub_123",
-      createdAt,
       tx,
     );
   });

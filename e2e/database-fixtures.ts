@@ -7,6 +7,8 @@ const MACHINE_AUTH_RATE_LIMIT_SCOPES = [
   "device_code",
   "device_pending",
   "device_refresh",
+  "machine_user",
+  "background_tasks",
 ];
 
 export async function cleanupE2EFixtures(): Promise<void> {

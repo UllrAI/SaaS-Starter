@@ -22,4 +22,5 @@ export interface AiConversationPage {
 export interface AiConversationDetail {
   conversation: AiConversationSummary;
   messages: AiMessage[];
+  hasMore?: boolean;
 }

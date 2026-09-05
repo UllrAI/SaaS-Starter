@@ -34,7 +34,10 @@ reference.
 
 Use an application idempotency key when the business operation is idempotent.
 The partial unique index on `(scopeKey, kind, idempotencyKey)` resolves concurrent
-requests without a check-then-insert race. Queue job IDs prevent duplicate queue
+requests without a check-then-insert race. Reusing the key with different input returns 409.
+Task acceptance and a `task_dispatches` outbox row commit in one transaction; the Worker
+retries delivery after queue or Web failures. Each scope may have at most 100 unfinished
+tasks, and the example route applies a user request limit. Queue job IDs prevent duplicate queue
 rows independently. `scopeKey` is `user:<id>` in V1 and is also assigned as the
 pg-boss group and singleton key. `groupConcurrency` expresses tenant fairness;
 the singleton queue policy closes concurrent-claim races at a limit of one. It
@@ -45,9 +48,9 @@ does not implement provider rate limits, quotas, or billing.
 Product state follows these guarded transitions:
 
 ```text
-queued  -> running | cancelled
+queued  -> running | failed | cancelled
 running -> waiting | completed | failed | cancelled
-waiting -> queued | cancelled
+waiting -> queued | failed | cancelled
 ```
 
 Every transition is a conditional `UPDATE ... WHERE status IN (...)`. Terminal
@@ -61,7 +64,7 @@ never expose raw pg-boss records.
 At each meaningful handler boundary, check `context.isCancelled()`. Persist
 progress only for useful steps, not tokens or tight polling loops. For providers
 that take minutes, call `context.scheduleContinuation(payload, startAfter)`
-after submitting. It moves the task to `waiting`, enqueues a delayed claim, and
+after submitting. It atomically moves the task to `waiting` and writes a delayed dispatch intent, then
 lets the current handler finish so the Worker slot is released. Provider
 webhooks can call `enqueueBackgroundTaskContinuation()` with a stable provider
 event UUID to deduplicate the same typed continuation without polling in a
@@ -78,8 +81,8 @@ remote acceptance and local persistence.
 ## Operations and tests
 
 Worker logs are structured JSON and include the job name, task ID, scope,
-attempt, retry limit, and structured error. Startup logs include queue backlog
-and oldest pending age. SIGTERM stops new claims, drains active handlers within
+attempt, retry limit, and structured error. Logs report queue backlog and oldest pending age every minute. A periodic reconciler
+repairs product state after queue retry exhaustion or supervisor termination. SIGTERM stops new claims, drains active handlers within
 `WORKER_GRACEFUL_TIMEOUT_MS`, closes pg-boss and the application database, then
 exits.
 

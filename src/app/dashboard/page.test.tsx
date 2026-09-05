@@ -31,6 +31,7 @@ describe("Dashboard Home Page", () => {
     mockGetUserSubscription.mockResolvedValue({
       tierId: "pro",
       status: "active",
+      currentPeriodEnd: new Date(Date.now() + 86_400_000).toISOString(),
     });
     mockGetUserProductEntitlement.mockResolvedValue(null);
     mockGetUserPayments.mockResolvedValue([

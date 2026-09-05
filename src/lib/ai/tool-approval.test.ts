@@ -53,16 +53,52 @@ function createHarness() {
   return { executed, tools, model };
 }
 
-async function createAgent() {
+async function createAgent(
+  scope = { userId: "user-1", conversationId: "conversation-1" },
+) {
   const { withToolApprovalSecret } = await import("./tool-approval");
   const { executed, tools, model } = createHarness();
   const agent = new ToolLoopAgent(
-    withToolApprovalSecret({ model, tools, stopWhen: isStepCount(3) }),
+    withToolApprovalSecret({ model, tools, stopWhen: isStepCount(3) }, scope),
   );
   return { agent, executed };
 }
 
 describe("tool approval", () => {
+  it.each([
+    { userId: "user-2", conversationId: "conversation-1" },
+    { userId: "user-1", conversationId: "conversation-2" },
+  ])(
+    "rejects a signed approval replayed in a different scope: %j",
+    async (scope) => {
+      const signer = await createAgent();
+      const first = await signer.agent.generate({ prompt: "save my notes" });
+      const approvalId = first.content.find(
+        (part) => part.type === "tool-approval-request",
+      )?.approvalId;
+      const verifier = await createAgent(scope);
+      await expect(
+        verifier.agent.generate({
+          messages: [
+            { role: "user", content: "save my notes" },
+            first.response.messages[0],
+            {
+              role: "tool",
+              content: [
+                {
+                  type: "tool-approval-response",
+                  approvalId: approvalId!,
+                  approved: true,
+                },
+              ],
+            },
+          ],
+        }),
+      ).rejects.toThrow(/signature/i);
+      expect(verifier.executed).toEqual([]);
+    },
+  );
+
   it("pauses a needsApproval tool and issues a signed request", async () => {
     const { agent, executed } = await createAgent();
 

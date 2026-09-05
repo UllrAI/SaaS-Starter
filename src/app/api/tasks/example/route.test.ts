@@ -1,3 +1,6 @@
+jest.mock("@/lib/rate-limit", () => ({
+  checkRateLimit: jest.fn(async () => ({ allowed: true })),
+}));
 import { beforeEach, describe, expect, it, jest } from "@jest/globals";
 import { NextRequest } from "next/server";
 

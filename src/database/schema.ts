@@ -376,6 +376,7 @@ export const aiMessages = pgTable(
       .notNull()
       .references(() => aiConversations.id, { onDelete: "cascade" }),
     role: aiMessageRoleEnum("role").notNull(),
+    runId: uuid("runId"),
     parts: jsonb("parts").$type<unknown[]>().notNull(),
     metadata: jsonb("metadata").$type<Record<string, unknown> | null>(),
     createdAt: timestamp("createdAt", { withTimezone: true })
@@ -399,6 +400,7 @@ export const aiMessages = pgTable(
 export const aiUsageEvents = pgTable(
   "ai_usage_events",
   {
+    runId: uuid("runId"),
     id: uuid("id").primaryKey().defaultRandom(),
     userId: text("userId")
       .notNull()
@@ -423,6 +425,7 @@ export const aiUsageEvents = pgTable(
       .defaultNow(),
   },
   (table) => ({
+    runUnique: uniqueIndex("ai_usage_events_runId_unique").on(table.runId),
     userCreatedAtIdx: index("ai_usage_events_userId_createdAt_idx").on(
       table.userId,
       table.createdAt.desc(),
@@ -451,6 +454,7 @@ export const taskRuns = pgTable(
       attempt: number;
     } | null>(),
     providerJobId: text("providerJobId"),
+    dispatchId: uuid("dispatchId"),
     startedAt: timestamp("startedAt", { withTimezone: true }),
     completedAt: timestamp("completedAt", { withTimezone: true }),
     createdAt: timestamp("createdAt", { withTimezone: true })
@@ -481,6 +485,7 @@ export const uploadIntents = pgTable(
   "upload_intents",
   {
     id: uuid("id").primaryKey().defaultRandom(),
+    sourceKey: text("sourceKey"),
     userId: text("userId")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
@@ -513,6 +518,9 @@ export const uploadIntents = pgTable(
     fileKeyUnique: uniqueIndex("upload_intents_fileKey_unique").on(
       table.fileKey,
     ),
+    sourceKeyUnique: uniqueIndex("upload_intents_source_key_unique")
+      .on(table.userId, table.sourceKey)
+      .where(sql`${table.status} in ('pending', 'completed')`),
     userStatusExpiresAtIdx: index(
       "upload_intents_userId_status_expiresAt_idx",
     ).on(table.userId, table.status, table.expiresAt),
@@ -532,11 +540,12 @@ export const uploads = pgTable(
     userId: text("userId")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
+    deletedAt: timestamp("deletedAt", { withTimezone: true }),
     uploadIntentId: uuid("uploadIntentId").references(() => uploadIntents.id, {
       onDelete: "set null",
     }),
     fileKey: text("fileKey").notNull(), // Key in R2 storage
-    url: text("url").notNull(), // Public access URL
+    url: text("url").notNull(), // Authenticated application URL
     fileName: text("fileName").notNull(), // Original file name
     fileSize: integer("fileSize").notNull(), // File size in bytes
     contentType: text("contentType").notNull(), // MIME type
@@ -558,4 +567,71 @@ export const uploads = pgTable(
       fileKeyUnique: uniqueIndex("uploads_fileKey_unique").on(table.fileKey),
     };
   },
+);
+
+export const taskDispatches = pgTable(
+  "task_dispatches",
+  {
+    id: uuid("id").primaryKey(),
+    taskRunId: uuid("taskRunId")
+      .notNull()
+      .references(() => taskRuns.id, { onDelete: "cascade" }),
+    kind: text("kind").notNull(),
+    scopeKey: text("scopeKey").notNull(),
+    payload: jsonb("payload").$type<unknown>().notNull(),
+    startAfter: timestamp("startAfter", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    sentAt: timestamp("sentAt", { withTimezone: true }),
+    createdAt: timestamp("createdAt", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => ({
+    pendingIdx: index("task_dispatches_pending_idx")
+      .on(table.kind, table.createdAt)
+      .where(sql`${table.sentAt} is null`),
+    taskIdx: index("task_dispatches_taskRunId_idx").on(table.taskRunId),
+  }),
+);
+
+export const aiRuns = pgTable(
+  "ai_runs",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    conversationId: uuid("conversationId")
+      .notNull()
+      .references(() => aiConversations.id, { onDelete: "cascade" }),
+    requestKey: text("requestKey").notNull(),
+    status: text("status").notNull().default("running"),
+    reservedTokens: integer("reservedTokens").notNull(),
+    totalTokens: integer("totalTokens"),
+    imageCount: integer("imageCount").notNull().default(0),
+    response: jsonb("response").$type<unknown>(),
+    usage: jsonb("usage").$type<Record<string, unknown>>(),
+    finalizedAt: timestamp("finalizedAt", { withTimezone: true }),
+    finalizationRetryAt: timestamp("finalizationRetryAt", {
+      withTimezone: true,
+    })
+      .notNull()
+      .defaultNow(),
+    expiresAt: timestamp("expiresAt", { withTimezone: true }).notNull(),
+    createdAt: timestamp("createdAt", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => ({
+    requestUnique: uniqueIndex("ai_runs_conversation_request_unique").on(
+      table.conversationId,
+      table.requestKey,
+    ),
+    userCreatedIdx: index("ai_runs_user_created_idx").on(
+      table.userId,
+      table.createdAt,
+    ),
+    pendingIdx: index("ai_runs_pending_idx").on(table.status, table.createdAt),
+  }),
 );

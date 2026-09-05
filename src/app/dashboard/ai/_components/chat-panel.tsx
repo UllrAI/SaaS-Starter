@@ -65,12 +65,15 @@ import {
 import { formatFileSize } from "@/lib/config/upload";
 import { useTranslation } from "@/lib/i18n/translation/client";
 import { cn } from "@/lib/utils";
+import { getChatErrorKey } from "./chat-error";
 import { readSavedDocument } from "./saved-document";
 import { findActiveToolApprovalId } from "./tool-approval";
 
 interface ChatPanelProps {
   conversationId?: string;
   messages: AiMessage[];
+  onLoadOlder?: () => void;
+  olderMessagesLoading?: boolean;
   input: string;
   status: ChatStatus;
   error?: Error;
@@ -289,6 +292,36 @@ function ToolCallRow({
     part.state === "output-available" && name === "saveDocument"
       ? readSavedDocument(part.output)
       : null;
+
+  if (
+    name === "generateImage" &&
+    part.state === "output-available" &&
+    part.output &&
+    typeof part.output === "object" &&
+    "storageStatus" in part.output
+  ) {
+    return (
+      <div
+        role="status"
+        className="text-muted-foreground my-2 space-y-2 text-sm"
+      >
+        <p>
+          {t(
+            part.output.storageStatus === "deleted"
+              ? "ai_chat_image_deleted"
+              : "ai_chat_image_saving",
+          )}
+        </p>
+        <button
+          type="button"
+          className="underline"
+          onClick={() => window.location.reload()}
+        >
+          {t("files_refresh")}
+        </button>
+      </div>
+    );
+  }
 
   if (savedDocument) {
     return (
@@ -584,6 +617,8 @@ function AssistantMessage({
 }
 
 export function ChatPanel({
+  onLoadOlder,
+  olderMessagesLoading,
   conversationId,
   messages,
   input,
@@ -751,6 +786,15 @@ export function ChatPanel({
                 </div>
               ) : (
                 <>
+                  {onLoadOlder && (
+                    <Button
+                      variant="outline"
+                      disabled={olderMessagesLoading || isBusy}
+                      onClick={onLoadOlder}
+                    >
+                      {t("ai_chat_load_older")}
+                    </Button>
+                  )}
                   {messages.map((message) => (
                     <MessageScrollerItem
                       key={message.id}
@@ -800,7 +844,7 @@ export function ChatPanel({
                           className="text-destructive size-4"
                           aria-hidden="true"
                         />
-                        {t("ai_chat_error_message")}
+                        {t(getChatErrorKey(error))}
                       </span>
                       <Button
                         variant="outline"

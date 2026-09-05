@@ -11,6 +11,7 @@ const mockUploads = {
 jest.mock("@/database", () => ({ db: mockDb }));
 jest.mock("@/database/schema", () => ({ uploads: mockUploads }));
 jest.mock("drizzle-orm", () => ({
+  isNull: jest.fn(),
   and: jest.fn((...values: unknown[]) => values),
   eq: jest.fn((column: unknown, value: unknown) => [column, value]),
   inArray: jest.fn((column: unknown, values: unknown[]) => [column, values]),
@@ -75,7 +76,7 @@ describe("AI chat image attachment validation", () => {
         userId: "user-1",
         messages: [imageMessage(url)],
       }),
-    ).resolves.toBeUndefined();
+    ).resolves.toBeDefined();
   });
 
   it("rejects an arbitrary URL or another user's upload", async () => {
@@ -163,6 +164,6 @@ describe("AI chat image attachment validation", () => {
           },
         ],
       }),
-    ).resolves.toBeUndefined();
+    ).resolves.toBeDefined();
   });
 });

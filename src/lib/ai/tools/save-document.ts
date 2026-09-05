@@ -1,14 +1,11 @@
-import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { tool } from "ai";
 import { z } from "zod";
-import { getUploadConfig } from "@/lib/config/integrations";
 import { isFileSizeAllowed } from "@/lib/config/upload";
-import { getR2Client } from "@/lib/r2";
+import { storeFile } from "@/lib/uploads/server-storage";
 import {
-  completeUploadIntent,
-  createUploadIntent,
   UploadQuotaExceededError,
-} from "@/lib/uploads/upload-intents";
+  UploadFileDeletedError,
+} from "@/lib/uploads/repository";
 import type { AgentContext } from "../context";
 
 const DOCUMENT_CONTENT_TYPE = "text/markdown";
@@ -27,7 +24,7 @@ function toMarkdownFileName(fileName: string) {
 export function createSaveDocument(context: AgentContext) {
   return tool({
     description:
-      "Save a Markdown document to the user's files. Use it only when the user asks to save, export, or keep a document; use presentArtifact to merely show one. The saved file counts against the user's storage quota and the user cannot delete it themselves.",
+      "Save a Markdown document to the user's files. Use it only when the user asks to save, export, or keep a document; use presentArtifact to merely show one. The saved file counts against the user's storage quota and can be deleted from the Files page.",
     inputSchema: z.object({
       fileName: z
         .string()
@@ -43,47 +40,34 @@ export function createSaveDocument(context: AgentContext) {
         .describe("The full Markdown body of the document."),
     }),
     needsApproval: true,
-    execute: async ({ fileName, content }) => {
+    execute: async ({ fileName, content }, { toolCallId }) => {
       const body = Buffer.from(content, "utf8");
       if (!isFileSizeAllowed(body.byteLength)) {
         return { error: "The document is too large to save." };
       }
 
-      const documentName = toMarkdownFileName(fileName);
-      let intent;
+      let record;
       try {
-        intent = await createUploadIntent({
+        record = await storeFile({
           userId: context.userId,
-          fileName: documentName,
-          fileSize: body.byteLength,
+          identity: `document:${context.conversationId}:${toolCallId}`,
+          fileName: toMarkdownFileName(fileName),
           contentType: DOCUMENT_CONTENT_TYPE,
+          body,
         });
       } catch (error) {
-        if (error instanceof UploadQuotaExceededError) {
+        if (error instanceof UploadFileDeletedError)
           return {
-            error: `The user's ${error.quota} storage quota is full, so the document was not saved.`,
+            error:
+              "This file was deleted. Ask to save it again as a new document.",
           };
-        }
+        if (error instanceof UploadQuotaExceededError)
+          return {
+            error:
+              "Storage allowance reached. Delete unused files and try again.",
+          };
         throw error;
       }
-
-      await getR2Client().send(
-        new PutObjectCommand({
-          Bucket: getUploadConfig().bucketName,
-          Key: intent.fileKey,
-          Body: body,
-          ContentLength: body.byteLength,
-          ContentType: DOCUMENT_CONTENT_TYPE,
-        }),
-      );
-
-      const record = await completeUploadIntent({
-        intentId: intent.id,
-        userId: context.userId,
-        key: intent.fileKey,
-        contentLength: body.byteLength,
-        contentType: DOCUMENT_CONTENT_TYPE,
-      });
 
       return {
         fileName: record.fileName,

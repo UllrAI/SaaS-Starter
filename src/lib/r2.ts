@@ -1,10 +1,12 @@
 import {
   S3Client,
+  GetObjectCommand,
   HeadObjectCommand,
   PutObjectCommand,
   DeleteObjectCommand,
   DeleteObjectsCommand,
 } from "@aws-sdk/client-s3";
+import { buildFileUrl } from "./uploads/url";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { getUploadConfig } from "@/lib/config/integrations";
 import {
@@ -85,7 +87,7 @@ export async function createPresignedUrl({
     });
 
     // Generate public URL
-    const publicUrl = buildR2PublicUrl(key);
+    const publicUrl = buildFileUrl(key);
 
     return {
       success: true,
@@ -105,11 +107,6 @@ export async function createPresignedUrl({
 export interface R2ObjectMetadata {
   contentLength: number;
   contentType: string;
-}
-
-export function buildR2PublicUrl(key: string, baseUrl?: string): string {
-  const resolvedBaseUrl = baseUrl ?? getUploadConfig().publicUrl;
-  return `${resolvedBaseUrl.replace(/\/+$/, "")}/${key.replace(/^\/+/, "")}`;
 }
 
 export async function getObjectMetadata(
@@ -216,4 +213,20 @@ export async function deleteFiles(
       error: error instanceof Error ? error.message : "Failed to delete files",
     };
   }
+}
+
+export async function getFileReadUrl(
+  key: string,
+  download = false,
+): Promise<string> {
+  const config = getUploadConfig();
+  return getSignedUrl(
+    getR2Client(),
+    new GetObjectCommand({
+      Bucket: config.bucketName,
+      Key: key,
+      ...(download ? { ResponseContentDisposition: "attachment" } : {}),
+    }),
+    { expiresIn: 300 },
+  );
 }

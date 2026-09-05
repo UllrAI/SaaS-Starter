@@ -1,0 +1,2 @@
+ALTER TABLE "upload_intents" ADD COLUMN "sourceKey" text;--> statement-breakpoint
+CREATE UNIQUE INDEX "upload_intents_source_key_unique" ON "upload_intents" USING btree ("userId","sourceKey") WHERE "upload_intents"."status" in ('pending', 'completed');

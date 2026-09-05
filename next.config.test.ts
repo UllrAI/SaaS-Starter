@@ -89,45 +89,11 @@ describe("next.config.ts", () => {
     expect(mockWithNextIntl).toHaveBeenCalledTimes(1);
   });
 
-  it("should handle invalid R2_PUBLIC_URL gracefully", async () => {
-    jest.doMock("@/env", () => ({
-      __esModule: true,
-      default: {
-        R2_PUBLIC_URL: "invalid-url",
-      },
-    }));
-
+  it("does not route private storage through the public image optimizer", async () => {
     const getConfig = await importConfig();
-    const nextConfig = await getConfig();
-    expect(consoleErrorSpy).toHaveBeenCalledWith(
-      "\x1b[33m%s\x1b[0m",
-      "Warning: Invalid R2_PUBLIC_URL found in environment variables. Skipping R2 remote pattern.",
-    );
-    expect((nextConfig as any).images.remotePatterns).not.toContainEqual({
-      protocol: "https",
-      hostname: "invalid-url",
-    });
-  });
-
-  it("should include R2 hostname in remotePatterns if R2_PUBLIC_URL is valid", async () => {
-    process.env.R2_PUBLIC_URL = "https://valid-r2.example.com";
-    jest.doMock("@/env", () => ({
-      __esModule: true,
-      default: {
-        R2_PUBLIC_URL: "https://valid-r2.example.com",
-      },
-    }));
-    const getConfig = await importConfig();
-    const nextConfig = await getConfig();
-    expect((nextConfig as any).images.remotePatterns).toEqual([
-      {
-        protocol: "https",
-        hostname: "images.unsplash.com",
-      },
-      {
-        protocol: "https",
-        hostname: "valid-r2.example.com",
-      },
+    const config = await getConfig();
+    expect(config.images?.remotePatterns).toEqual([
+      { protocol: "https", hostname: "images.unsplash.com" },
     ]);
   });
 

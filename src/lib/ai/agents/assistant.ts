@@ -1,5 +1,5 @@
 import "server-only";
-import { ToolLoopAgent, isStepCount } from "ai";
+import { ToolLoopAgent, isStepCount, type ToolSet } from "ai";
 import { APP_NAME } from "@/lib/config/constants";
 import { SITE_CONFIG } from "@/lib/config/site";
 import type { AgentContext } from "../context";
@@ -10,7 +10,7 @@ import { agentSkills, composeSkills } from "../skills";
 import { withToolApprovalSecret } from "../tool-approval";
 import { buildTools, type AgentToolName } from "../tools";
 
-const MAX_AGENT_STEPS = 10;
+import { AI_MAX_STEPS, AI_MAX_OUTPUT_TOKENS } from "../limits";
 
 const ASSISTANT_SKILLS = [
   agentSkills.accountSupport,
@@ -23,6 +23,7 @@ export interface AssistantAgentOptions {
   reasoningEffort: ReasoningEffort;
   imageSize: GptImage1kSize;
   previousResponseId?: string;
+  allowImageGeneration?: boolean;
 }
 
 function buildInstructions(context: AgentContext, skillInstructions: string) {
@@ -47,25 +48,46 @@ export function createAssistantAgent(
     ? [...ASSISTANT_SKILLS, agentSkills.documentStorage]
     : ASSISTANT_SKILLS;
   const { instructions, toolNames } = composeSkills(skills);
-  const tools = {
+  const tools: ToolSet = {
     ...buildTools([...ASSISTANT_TOOLS, ...toolNames], context),
-    generateImage: getImageGenerationTool(options.imageSize),
+    ...(SITE_CONFIG.features.uploads && options.allowImageGeneration !== false
+      ? { generateImage: getImageGenerationTool(options.imageSize) }
+      : {}),
   };
 
   return new ToolLoopAgent(
-    withToolApprovalSecret({
-      model: getChatModel(),
-      reasoning: options.reasoningEffort,
-      instructions: buildInstructions(context, instructions),
-      tools,
-      providerOptions: {
-        openai: {
-          maxToolCalls: 1,
-          previousResponseId: options.previousResponseId,
-          store: true,
+    withToolApprovalSecret(
+      {
+        model: getChatModel(),
+        reasoning: options.reasoningEffort,
+        instructions:
+          buildInstructions(context, instructions) +
+          (!("generateImage" in tools)
+            ? "\nImage generation is currently unavailable. Do not offer to generate images."
+            : ""),
+        tools,
+        providerOptions: {
+          openai: {
+            maxToolCalls: 1,
+            previousResponseId: options.previousResponseId,
+            store: true,
+          },
         },
+        prepareStep: ({ steps }) => ({
+          activeTools: Object.keys(tools).filter(
+            (name) =>
+              name !== "generateImage" ||
+              !steps.some((step) =>
+                step.toolCalls.some(
+                  (call) => call.toolName === "generateImage",
+                ),
+              ),
+          ),
+        }),
+        maxOutputTokens: AI_MAX_OUTPUT_TOKENS,
+        stopWhen: isStepCount(AI_MAX_STEPS),
       },
-      stopWhen: isStepCount(MAX_AGENT_STEPS),
-    }),
+      context,
+    ),
   );
 }

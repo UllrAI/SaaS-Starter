@@ -5,7 +5,13 @@ import {
   validateCliToken,
   updateCliTokenLastUsed,
 } from "@/lib/device-auth/token-service";
-import { API_KEY_PREFIX, CLI_TOKEN_PREFIX } from "@/lib/machine-auth/constants";
+import { checkRateLimit as checkUserRateLimit } from "@/lib/rate-limit";
+import {
+  API_KEY_PREFIX,
+  CLI_TOKEN_PREFIX,
+  DEFAULT_API_RATE_LIMIT,
+  RATE_LIMIT_WINDOW_MS,
+} from "@/lib/machine-auth/constants";
 import { MachineAuthError } from "@/lib/machine-auth/error";
 import type { RateLimitInfo } from "./types";
 
@@ -17,6 +23,23 @@ export type ApiAuthContext = {
   rateLimit?: number;
   rateLimitInfo?: RateLimitInfo;
 };
+
+async function limitMachineUser(userId: string) {
+  const result = await checkUserRateLimit({
+    scope: "machine_user",
+    key: userId,
+    limit: DEFAULT_API_RATE_LIMIT,
+    windowMs: RATE_LIMIT_WINDOW_MS,
+  });
+  if (!result.allowed)
+    throw new MachineAuthError({
+      code: "RATE_LIMIT_EXCEEDED",
+      message: "Rate limit exceeded. Please try again later.",
+      status: 429,
+      details: result.info,
+    });
+  return result.info;
+}
 
 export async function requireAuth(
   request: NextRequest,
@@ -44,6 +67,7 @@ export async function requireAuth(
       });
     }
 
+    await limitMachineUser(result.userId);
     const rateLimitInfo = await checkRateLimit(
       result.apiKeyId,
       result.rateLimit,
@@ -71,14 +95,17 @@ export async function requireAuth(
       });
     }
 
+    const rateLimitInfo = await limitMachineUser(result.userId);
     void Promise.resolve(updateCliTokenLastUsed(result.cliTokenId)).catch(
-      () => {},
+      (error) =>
+        console.error("Failed to update CLI token usage timestamp:", error),
     );
 
     return {
       userId: result.userId,
       authMethod: "cli_token",
       cliTokenId: result.cliTokenId,
+      rateLimitInfo,
     };
   }
 

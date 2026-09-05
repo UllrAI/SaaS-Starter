@@ -243,6 +243,7 @@ export function ServerUploadPanel() {
             >
               {file.contentType.startsWith("image/") ? (
                 <Image
+                  unoptimized
                   src={file.url}
                   alt={file.fileName}
                   fill

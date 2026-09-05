@@ -121,7 +121,6 @@ cp .env.example .env
 | `R2_ACCESS_KEY_ID`               | 启用 `uploads` 时必需。R2 访问密钥 ID。              | `your_r2_access_key_id`                             |
 | `R2_SECRET_ACCESS_KEY`           | 启用 `uploads` 时必需。R2 秘密访问密钥。             | `your_r2_secret_access_key`                         |
 | `R2_BUCKET_NAME`                 | 启用 `uploads` 时必需。R2 存储桶名称。               | `your_r2_bucket_name`                               |
-| `R2_PUBLIC_URL`                  | 启用 `uploads` 时必需。R2 公共访问 URL。             | `https://your-bucket.your-account.r2.dev`           |
 | `UPLOAD_CLEANUP_SECRET`          | 启用 `uploads` 时必需。32 位以上清理密钥。           | 使用 `openssl rand -base64 32` 生成                 |
 | `UPLOAD_DAILY_QUOTA_BYTES`       | 可选。每用户滚动 24 小时上传额度。                   | `1073741824`（1 GiB）                               |
 | `UPLOAD_TOTAL_QUOTA_BYTES`       | 可选。每用户已存储与预留的总字节额度。               | `5368709120`（5 GiB）                               |
@@ -461,10 +460,11 @@ Docker 构建。
 
 1. 将通过审查的 commit 合并到默认分支，并等待 Quality workflow 通过。
 2. 配置 `.env.example` 中的全部必需变量。构建前必须把 `NEXT_PUBLIC_APP_URL`
-   设置为最终 HTTPS Origin，因为 canonical URL 与客户端配置会在构建时写入；同时设置
-   `R2_PUBLIC_URL`，让 Next.js 把存储域名加入图片优化白名单。
-3. 使用生产 `DATABASE_URL` 把 `pnpm db:migrate` 作为一次性发布命令执行；不要挂在
-   每个 Web 进程的启动钩子上。
+   设置为最终 HTTPS Origin，因为 canonical URL 与客户端配置会在构建时写入。
+   用户文件使用私有桶，升级时按[私有文件切换说明](docs/architecture-remediation.md#deployment-requirements)操作。
+3. 在 GitHub `production` 环境配置 `PRODUCTION_DATABASE_URL`；队列使用独立数据库时
+   再设置 `PRODUCTION_JOB_DATABASE_URL`。发布流程核验精确 SHA 的 Quality 成功后，
+   自动执行一次迁移，再更新生产分支。
 4. 更新 `package.json` 中的版本，然后在该 commit 上创建版本一致的
    `release/vX.Y.Z` 附注标签（annotated tag）并推送：
 

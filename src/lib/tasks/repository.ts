@@ -1,5 +1,6 @@
 import { and, eq, inArray, isNull } from "drizzle-orm";
-import type { AppDatabase } from "@/database/client";
+import { isDeepStrictEqual } from "node:util";
+import type { DatabaseExecutor } from "@/database/client";
 import { taskRuns } from "@/database/schema";
 import type { TaskRun, TaskRunError, TaskRunStatus } from "./types";
 
@@ -23,16 +24,16 @@ const ALLOWED_TASK_TRANSITIONS: Record<
   TaskRunStatus,
   readonly TaskRunStatus[]
 > = {
-  queued: ["running", "cancelled"],
+  queued: ["running", "failed", "cancelled"],
   running: ["waiting", "completed", "failed", "cancelled"],
-  waiting: ["queued", "cancelled"],
+  waiting: ["queued", "failed", "cancelled"],
   completed: [],
   failed: [],
   cancelled: [],
 };
 
 export async function createTaskRun(
-  db: AppDatabase,
+  db: DatabaseExecutor,
   input: CreateTaskRunInput,
 ): Promise<{ taskRun: TaskRun; created: boolean }> {
   const [created] = await db
@@ -70,11 +71,16 @@ export async function createTaskRun(
     throw new Error("Idempotent task creation lost its winning row.");
   }
 
+  if (
+    !isDeepStrictEqual(existing.input, JSON.parse(JSON.stringify(input.input)))
+  ) {
+    throw new TaskInputConflictError();
+  }
   return { taskRun: existing, created: false };
 }
 
 export async function getTaskRun(
-  db: AppDatabase,
+  db: DatabaseExecutor,
   taskRunId: string,
 ): Promise<TaskRun | null> {
   const [taskRun] = await db
@@ -86,7 +92,7 @@ export async function getTaskRun(
 }
 
 export async function getOwnedTaskRun(
-  db: AppDatabase,
+  db: DatabaseExecutor,
   taskRunId: string,
   scopeKey: string,
 ): Promise<TaskRun | null> {
@@ -99,9 +105,10 @@ export async function getOwnedTaskRun(
 }
 
 export async function transitionTaskRun(
-  db: AppDatabase,
+  db: DatabaseExecutor,
   input: {
     taskRunId: string;
+    dispatchId?: string;
     from: readonly TaskRunStatus[];
     to: TaskRunStatus;
     patch?: TransitionPatch;
@@ -129,6 +136,9 @@ export async function transitionTaskRun(
       and(
         eq(taskRuns.id, input.taskRunId),
         inArray(taskRuns.status, [...input.from]),
+        input.dispatchId
+          ? eq(taskRuns.dispatchId, input.dispatchId)
+          : undefined,
       ),
     )
     .returning();
@@ -136,7 +146,7 @@ export async function transitionTaskRun(
 }
 
 export async function cancelTaskRun(
-  db: AppDatabase,
+  db: DatabaseExecutor,
   taskRunId: string,
 ): Promise<TaskRun | null> {
   return transitionTaskRun(db, {
@@ -148,7 +158,7 @@ export async function cancelTaskRun(
 }
 
 export async function updateTaskRunProgress(
-  db: AppDatabase,
+  db: DatabaseExecutor,
   taskRunId: string,
   progress: Record<string, unknown>,
 ): Promise<TaskRun | null> {
@@ -161,7 +171,7 @@ export async function updateTaskRunProgress(
 }
 
 export async function setProviderJobIdIfAbsent(
-  db: AppDatabase,
+  db: DatabaseExecutor,
   taskRunId: string,
   providerJobId: string,
 ): Promise<string | null> {
@@ -182,4 +192,18 @@ export async function setProviderJobIdIfAbsent(
   }
 
   return (await getTaskRun(db, taskRunId))?.providerJobId ?? null;
+}
+
+export class TaskInputConflictError extends Error {
+  constructor() {
+    super("The idempotency key was already used with different input.");
+  }
+}
+
+export class TaskCapacityError extends Error {
+  constructor() {
+    super(
+      "Too many unfinished tasks. Wait for existing work or cancel unused tasks.",
+    );
+  }
 }

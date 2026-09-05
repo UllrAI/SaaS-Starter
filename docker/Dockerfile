@@ -21,15 +21,12 @@ COPY . .
 
 # Set environment to production for build
 ARG NEXT_PUBLIC_APP_URL
-ARG R2_PUBLIC_URL
 ENV NODE_ENV=production
 ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
-ENV R2_PUBLIC_URL=$R2_PUBLIC_URL
 ENV SKIP_ENV_VALIDATION=1
 
 # Build the Next.js application
 RUN test -n "$NEXT_PUBLIC_APP_URL" \
-  && test -n "$R2_PUBLIC_URL" \
   && pnpm run build
 
 # One-shot database migration image. It intentionally contains development

@@ -176,6 +176,20 @@
       "when": 1787461190942,
       "tag": "0024_icy_crystal",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1788577582829,
+      "tag": "0025_shocking_blue_blade",
+      "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1788579705003,
+      "tag": "0026_outgoing_rocket_racer",
+      "breakpoints": true
     }
   ]
 }

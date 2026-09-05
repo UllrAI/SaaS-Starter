@@ -335,6 +335,7 @@ export function UploadManagementTable({
             <div className="space-y-4 py-4">
               {selectedUpload.contentType.startsWith("image/") && (
                 <Image
+                  unoptimized
                   src={selectedUpload.url}
                   alt={selectedUpload.fileName}
                   width={400}

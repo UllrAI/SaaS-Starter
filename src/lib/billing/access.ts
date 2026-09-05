@@ -15,8 +15,15 @@ export function hasCurrentSubscriptionAccess(
   subscription: Subscription | null,
   now = new Date(),
 ): subscription is Subscription {
-  if (!subscription) return false;
-  if (ACCESS_STATUSES.has(subscription.status)) return true;
+  if (!subscription || subscription.accessRestricted) return false;
+  if (ACCESS_STATUSES.has(subscription.status)) {
+    const graceMs = subscription.status === "active" ? 24 * 60 * 60 * 1000 : 0;
+    return Boolean(
+      subscription.currentPeriodEnd &&
+      new Date(subscription.currentPeriodEnd).getTime() + graceMs >
+        now.getTime(),
+    );
+  }
 
   return (
     subscription.status === "canceled" &&

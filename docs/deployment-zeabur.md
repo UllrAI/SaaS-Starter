@@ -15,9 +15,10 @@ The runtime entrypoint also drops to the unprivileged `nextjs` user when a
 hosting security context starts the container as root. Verify PID 1 after
 deployment instead of assuming the Dockerfile `USER` directive was preserved.
 
-Both `NEXT_PUBLIC_APP_URL` and `R2_PUBLIC_URL` are required build arguments.
-Zeabur injects their service-variable values into the multi-stage Docker build;
-the build fails closed when either value is missing.
+`NEXT_PUBLIC_APP_URL` is the required build argument. User uploads use a private
+R2 bucket and authenticated application URLs, so no public storage origin is
+compiled into the image. Follow the [private-file cutover](architecture-remediation.md#deployment-requirements)
+when upgrading an existing public bucket.
 
 ## Promotion model
 
@@ -28,10 +29,11 @@ Pushing a `release/vX.Y.Z` tag matching the version in `package.json` triggers
 [`promote-release-to-prod.yml`](../.github/workflows/promote-release-to-prod.yml).
 The workflow reads the repository's default branch from GitHub instead of
 hardcoding its name, verifies that the tagged commit is reachable from that
-branch, and then moves `prod` to the tagged commit with a guarded force push.
+branch, verifies successful Quality for that exact SHA, applies production migrations
+once, and then moves `prod` to the tagged commit with a guarded force push.
 The current default branch is `main`.
 
-The workflow requests only `contents: write`; the repository's default workflow
+The workflow requests `contents: write` and `actions: read`; the repository's default workflow
 permissions can remain read-only. Organization policies and any ruleset
 protecting `prod` must still permit this workflow to update the branch.
 
@@ -54,7 +56,8 @@ named `main` or `master`:
 4. Keep regular development and CI on the default branch. If the fork renames
    that branch, update the branch filter in `.github/workflows/quality.yml`;
    the promotion workflow itself needs no change.
-5. Keep the workflow's `contents: write` permission. If `prod` is protected,
+5. Configure the `production` environment database secrets and network access
+   from GitHub Actions, and keep `contents: write` and `actions: read`. If `prod` is protected,
    allow this workflow to update it with a force-with-lease push.
 
 Treat `prod` as workflow-owned state: do not merge pull requests into it or push
@@ -64,7 +67,9 @@ it manually. Publish production changes only through `release/vX.Y.Z` tags.
 
 1. Merge only a reviewed commit into the default branch with green CI.
 2. Confirm the service variables match `.env.example`.
-3. Run `pnpm db:migrate` once against the production `DATABASE_URL`.
+3. Configure `PRODUCTION_DATABASE_URL` in the GitHub `production` environment.
+   Set `PRODUCTION_JOB_DATABASE_URL` only when queues use another database. The
+   release workflow runs `pnpm db:migrate` after Quality verification and before promotion.
 4. Update the version in `package.json`, then create an annotated
    `release/vX.Y.Z` tag using the same version on that commit and push it:
 
@@ -169,7 +174,10 @@ database or schema is unavailable.
 
 ## Scheduled maintenance
 
-Call the upload cleanup endpoint once per day:
+The Worker finalizes pending AI media, removes tombstoned files, and cleans
+abandoned uploads every five seconds. Supply its R2 credentials and upload quotas
+from the same configuration as Web. The existing cleanup endpoint can also be
+called on demand:
 
 ```bash
 curl -fsS -X POST \

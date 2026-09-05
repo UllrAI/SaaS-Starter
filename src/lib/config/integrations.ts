@@ -56,7 +56,6 @@ export function getUploadConfig() {
       "R2_SECRET_ACCESS_KEY",
     ),
     bucketName: requireValue(env.R2_BUCKET_NAME, "R2_BUCKET_NAME"),
-    publicUrl: requireValue(env.R2_PUBLIC_URL, "R2_PUBLIC_URL"),
   };
 }
 

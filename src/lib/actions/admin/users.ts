@@ -150,6 +150,16 @@ export const updateUserAction = adminAction
     }
 
     await db.update(users).set(input).where(eq(users.id, input.id));
+    console.info(
+      JSON.stringify({
+        component: "admin-audit",
+        action: "user_updated",
+        actorId: ctx.user.id,
+        targetId: input.id,
+        role: input.role,
+        nameChanged: input.name !== undefined,
+      }),
+    );
     revalidatePath("/dashboard/admin/users");
     return { success: true, message: "User updated successfully." };
   });
@@ -191,6 +201,15 @@ export const setUserDisabledAction = adminAction
       }
     });
 
+    console.info(
+      JSON.stringify({
+        component: "admin-audit",
+        action: "user_disabled_changed",
+        actorId: ctx.user.id,
+        targetId: input.id,
+        disabled: input.disabled,
+      }),
+    );
     revalidatePath("/dashboard/admin/users");
     return { success: true, disabled: input.disabled };
   });

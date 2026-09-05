@@ -38,12 +38,12 @@ services:
 
   # Next.js Application
   app:
-    build:
+    image: ullrai-starter:local
+    build: &application-build
       context: ..
       dockerfile: docker/Dockerfile
       args:
         NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:?Set NEXT_PUBLIC_APP_URL to the public deployment origin}
-        R2_PUBLIC_URL: ${R2_PUBLIC_URL:?Set R2_PUBLIC_URL to the public R2 origin}
     restart: unless-stopped
     ports:
       - "127.0.0.1:3000:3000"
@@ -83,12 +83,17 @@ services:
       R2_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID:?Set R2_ACCESS_KEY_ID}
       R2_SECRET_ACCESS_KEY: ${R2_SECRET_ACCESS_KEY:?Set R2_SECRET_ACCESS_KEY}
       R2_BUCKET_NAME: ${R2_BUCKET_NAME:?Set R2_BUCKET_NAME}
-      R2_PUBLIC_URL: ${R2_PUBLIC_URL:?Set R2_PUBLIC_URL}
       UPLOAD_CLEANUP_SECRET: ${UPLOAD_CLEANUP_SECRET:?Set UPLOAD_CLEANUP_SECRET}
       UPLOAD_DAILY_QUOTA_BYTES: ${UPLOAD_DAILY_QUOTA_BYTES:-1073741824}
       UPLOAD_TOTAL_QUOTA_BYTES: ${UPLOAD_TOTAL_QUOTA_BYTES:-5368709120}
       UPLOAD_LEGACY_COMPLETION_SINCE: ${UPLOAD_LEGACY_COMPLETION_SINCE:-}
       UPLOAD_LEGACY_COMPLETION_UNTIL: ${UPLOAD_LEGACY_COMPLETION_UNTIL:-}
+
+      LLM_API_KEY: ${LLM_API_KEY:?Set LLM_API_KEY}
+      LLM_BASE_URL: ${LLM_BASE_URL:-https://api.openai.com/v1}
+      AI_DEFAULT_MODEL: ${AI_DEFAULT_MODEL:-gpt-5.6-luna}
+      AI_DAILY_TOKEN_LIMIT: ${AI_DAILY_TOKEN_LIMIT:-2000000}
+      AI_DAILY_IMAGE_LIMIT: ${AI_DAILY_IMAGE_LIMIT:-10}
 
       # Payment provider (configure with your Stripe credentials)
       STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:?Set STRIPE_SECRET_KEY}
@@ -114,9 +119,8 @@ services:
       start_period: 20s
 
   worker:
-    build:
-      context: ..
-      dockerfile: docker/Dockerfile
+    image: ullrai-starter:local
+    build: *application-build
     command: ["node", "dist/worker/worker.mjs"]
     restart: unless-stopped
     stop_grace_period: 45s
@@ -129,6 +133,12 @@ services:
       DB_CONNECT_TIMEOUT: 4
       JOB_DB_POOL_SIZE: 3
       WORKER_GRACEFUL_TIMEOUT_MS: 30000
+      R2_ENDPOINT: ${R2_ENDPOINT:?Set R2_ENDPOINT}
+      R2_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID:?Set R2_ACCESS_KEY_ID}
+      R2_SECRET_ACCESS_KEY: ${R2_SECRET_ACCESS_KEY:?Set R2_SECRET_ACCESS_KEY}
+      R2_BUCKET_NAME: ${R2_BUCKET_NAME:?Set R2_BUCKET_NAME}
+      UPLOAD_DAILY_QUOTA_BYTES: ${UPLOAD_DAILY_QUOTA_BYTES:-1073741824}
+      UPLOAD_TOTAL_QUOTA_BYTES: ${UPLOAD_TOTAL_QUOTA_BYTES:-5368709120}
       LLM_API_KEY: ${LLM_API_KEY:-}
       LLM_BASE_URL: ${LLM_BASE_URL:-https://api.openai.com/v1}
       AI_DEFAULT_MODEL: ${AI_DEFAULT_MODEL:-gpt-5.6-luna}

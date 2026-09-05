@@ -1,5 +1,5 @@
 // lib/admin/stats.ts
-import type { AdminStats } from "@/app/dashboard/admin/_components/admin-stats-cards";
+import type { AdminStats } from "./types";
 import { db } from "@/database";
 import { users, subscriptions, payments, uploads } from "@/database/schema";
 import { and, count, sum, desc, eq, inArray, gte, sql } from "drizzle-orm";

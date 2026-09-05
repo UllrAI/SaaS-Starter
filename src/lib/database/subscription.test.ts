@@ -90,6 +90,7 @@ jest.mock("@/database/tables", () => ({
 }));
 
 jest.mock("drizzle-orm", () => ({
+  getTableColumns: (table: unknown) => table,
   and: mockAnd,
   count: mockCount,
   eq: mockEq,
@@ -609,51 +610,6 @@ describe("Database Subscription Functions", () => {
     });
   });
 
-  describe("suspendSubscriptionAccess", () => {
-    it("marks only non-newer subscription state as unpaid", async () => {
-      const returning = jest.fn().mockResolvedValue([{ id: "subscription-1" }]);
-      const where = jest.fn().mockReturnValue({ returning });
-      const set = jest.fn().mockReturnValue({ where });
-      mockDb.update.mockReturnValue({ set });
-      const { suspendSubscriptionAccess } = await import("./subscription");
-      const eventCreatedAt = new Date("2026-07-24T00:00:00Z");
-
-      await suspendSubscriptionAccess("subscription-1", eventCreatedAt);
-
-      expect(set).toHaveBeenCalledWith(
-        expect.objectContaining({
-          status: "unpaid",
-          lastWebhookCreatedAt: eventCreatedAt,
-        }),
-      );
-      expect(mockSql).toHaveBeenCalled();
-    });
-
-    it("retries when the subscription record has not arrived yet", async () => {
-      const returning = jest.fn().mockResolvedValue([]);
-      mockDb.update.mockReturnValue({
-        set: jest.fn().mockReturnValue({
-          where: jest.fn().mockReturnValue({ returning }),
-        }),
-      });
-      mockDb.select.mockReturnValue({
-        from: jest.fn().mockReturnValue({
-          where: jest.fn().mockReturnValue({
-            limit: jest.fn().mockResolvedValue([]),
-          }),
-        }),
-      });
-      const { suspendSubscriptionAccess } = await import("./subscription");
-
-      await expect(
-        suspendSubscriptionAccess(
-          "subscription-missing",
-          new Date("2026-07-24T00:00:00Z"),
-        ),
-      ).rejects.toThrow("not available for a billing adjustment yet");
-    });
-  });
-
   describe("lockPaymentAdjustmentScope", () => {
     it("takes the product transaction lock before locking the payment", async () => {
       const paymentLimit = jest
@@ -985,6 +941,7 @@ describe("Database Subscription Functions", () => {
           subscriptionId: "sub-123-1",
           productId: "product-123",
           status: "active",
+          currentPeriodEnd: new Date(Date.now() + 86_400_000),
           createdAt: new Date("2024-01-02"),
         },
         {
@@ -993,6 +950,7 @@ describe("Database Subscription Functions", () => {
           subscriptionId: "sub-123-2",
           productId: "product-123",
           status: "active",
+          currentPeriodEnd: new Date(Date.now() + 86_400_000),
           createdAt: new Date("2024-01-01"),
         },
       ];
@@ -1114,6 +1072,7 @@ describe("Database Subscription Functions", () => {
           subscriptionId: "sub-trialing",
           productId: "product-123",
           status: "trialing",
+          currentPeriodEnd: new Date(Date.now() + 86_400_000),
           createdAt: new Date("2024-01-03"),
         },
         {
@@ -1122,6 +1081,7 @@ describe("Database Subscription Functions", () => {
           subscriptionId: "sub-active",
           productId: "product-123",
           status: "active",
+          currentPeriodEnd: new Date(Date.now() + 86_400_000),
           createdAt: new Date("2024-01-02"),
         },
         {

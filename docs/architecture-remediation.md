@@ -23,17 +23,17 @@ flowchart LR
 
 ## Resolved boundaries
 
-| Finding                          | Implementation                                                                                                                                                                                                                                        | Regression coverage                                                                                                                           |
-| -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| F1: task acceptance and delivery | Task and outbox commit together; periodic dispatch uses stable job IDs; terminal queue failures reconcile product state; continuation changes payload and dispatch ID atomically.                                                                     | DB commit followed by delivery failure; queue acceptance with lost acknowledgement; supervisor failure; two Workers and delayed continuation. |
-| F2: idempotency input mismatch   | Reuse compares normalized accepted input and rejects a different payload with 409.                                                                                                                                                                    | Concurrent duplicates and changed payload against PostgreSQL.                                                                                 |
-| F3: replayable tool approvals    | Signatures bind user and conversation; server validates pending decisions against stored messages. Storage effects use stable conversation/tool-call/content identity and conditional PUT.                                                            | Real SDK signature checks, conversation-bound handles, transcript tampering/replay, concurrent storage retries after uncertain PUT.           |
-| F4: AI lifetime and accounting   | One active run per user; three-minute abort; five steps; 4096 output tokens per step; rolling admission reservations. Response, pending message and usage commit together before R2. Worker retries media and guards against overwriting a later run. | Concurrent admission, request deduplication, retained unknown reservations, R2 outage, stale/concurrent media finalizers.                     |
-| F5: subscription restriction     | Provider status stays provider-owned. Access is denied while any linked payment is refunded or disputed. Management remains available. Active renewal grace is limited to 24 hours.                                                                   | Provider refresh cannot clear a disputed payment; resolution restores access; grace and cancellation bounds.                                  |
-| F6: private and deletable files  | Owner/admin authorization precedes five-minute signed GET; personal list/delete endpoints; immediate tombstone and asynchronous physical removal; generated links and historical records use authenticated URLs.                                      | Owner isolation, deletion retries, browser list/download/delete, migration of Unicode/reserved-character URLs.                                |
-| F7: authoritative conversations  | Client sends one new message or decision plus parent ID. Server rebuilds history, checks stale parents and duplicate IDs, derives provider handles from stored data, and paginates history.                                                           | Forged history, stale tabs, cross-conversation handles and history pagination.                                                                |
-| F8: feature dependencies         | Disabling uploads removes document storage and image generation; image allowance removes the image tool; a completed image call removes it from subsequent steps.                                                                                     | Actual agent configuration matrix.                                                                                                            |
-| F9: verification and promotion   | Quality runs DB integration and Worker checks. Release requires successful Quality for the exact default-branch SHA and successful one-shot migrations before updating prod.                                                                          | Full local checks plus the same commands in Quality.                                                                                          |
+| Finding                          | Implementation                                                                                                                                                                                                                                                                                        | Regression coverage                                                                                                                           |
+| -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| F1: task acceptance and delivery | Task and outbox commit together; periodic dispatch uses stable job IDs; terminal queue failures reconcile product state; continuation changes payload and dispatch ID atomically.                                                                                                                     | DB commit followed by delivery failure; queue acceptance with lost acknowledgement; supervisor failure; two Workers and delayed continuation. |
+| F2: idempotency input mismatch   | Reuse compares normalized accepted input and rejects a different payload with 409.                                                                                                                                                                                                                    | Concurrent duplicates and changed payload against PostgreSQL.                                                                                 |
+| F3: replayable tool approvals    | Signatures bind user and conversation; server validates pending decisions against stored messages. Storage effects use stable conversation/tool-call/content identity and conditional PUT.                                                                                                            | Real SDK signature checks, conversation-bound handles, transcript tampering/replay, concurrent storage retries after uncertain PUT.           |
+| F4: AI lifetime and accounting   | One active run per user; three-minute abort; five steps; 4096 output tokens per step; rolling admission reservations. Response, pending message and accounting payload commit before R2. Usage-event writes and media finalization retry independently; late finalizers cannot overwrite a later run. | Concurrent admission, request deduplication, retained unknown reservations, R2 outage, stale/concurrent media finalizers.                     |
+| F5: subscription restriction     | Provider status stays provider-owned. Access is denied while any linked payment is refunded or disputed. Management remains available. Active renewal grace is limited to 24 hours.                                                                                                                   | Provider refresh cannot clear a disputed payment; resolution restores access; grace and cancellation bounds.                                  |
+| F6: private and deletable files  | Owner/admin authorization precedes five-minute signed GET; personal list/delete endpoints; immediate tombstone and asynchronous physical removal; generated links and historical records use authenticated URLs.                                                                                      | Owner isolation, deletion retries, browser list/download/delete, migration of Unicode/reserved-character URLs.                                |
+| F7: authoritative conversations  | Client sends one new message or decision plus parent ID. Server rebuilds history, checks stale parents and duplicate IDs, derives provider handles from stored data, and paginates history.                                                                                                           | Forged history, stale tabs, cross-conversation handles and history pagination.                                                                |
+| F8: feature dependencies         | Disabling uploads removes document storage and image generation; image allowance removes the image tool; a completed image call removes it from subsequent steps.                                                                                                                                     | Actual agent configuration matrix.                                                                                                            |
+| F9: verification and promotion   | Quality runs DB integration and Worker checks. Release requires successful Quality for the exact default-branch SHA and successful one-shot migrations before updating prod.                                                                                                                          | Full local checks plus the same commands in Quality.                                                                                          |
 
 Web and Worker now use one database client factory and the same UTC timestamp
 codec. Shared runtime fields live in `src/lib/config/runtime-env.mjs`; each
@@ -96,3 +96,34 @@ providers. Unit/SDK and PostgreSQL integration tests inject external failures;
 E2E exercises the production build with isolated fixtures and simulated provider
 streams. Production promotion and bucket access still need the deployment
 configuration above.
+
+## AI Worker follow-up (#91), reviewed 2026-10-01
+
+The outbox acceptance/delivery and generic Worker are already implemented; #91's
+original queue-delivery gap no longer needs another dispatcher. The October
+follow-up shares a Node-safe AI run repository between Web and Worker, adds
+queryable accounting failures/retries, keeps measured partial usage on a real
+SDK abort, and adds PostgreSQL active-run constraints. These changes prepare
+handoff but do not move model generation out of the Web request.
+
+Remaining implementation boundaries are a dedicated `ai.response.generate` Job,
+atomic transcript/run/task acceptance, Node-safe agent/tools and attachment reads,
+stable assistant identity, batched append-only events with cursor replay, owned
+run/status/stream/cancel APIs, and frontend reconnect/stop states. A run record or
+retryable media finalizer alone does not satisfy reconnectable generation.
+
+The current configurable Responses gateway has no verified idempotent submission
+or lookup contract in this repository. The Worker must durably mark provider
+submission before invoking it and use a stable run key; after an ambiguous crash,
+it must enter controlled failure/manual retry unless that gateway's deduplication
+and lookup are verified. Generic pg-boss retries must never blindly repeat paid
+model/image calls. Keep the existing no-replay guarantee until that boundary is
+implemented, then test crashes before submit, after remote acceptance, and before
+final-message commit with a delayed local provider.
+
+Acceptance remains open: close-tab completion, refresh/cursor replay, Web restart
+independence, explicit cancel with late-result no-op, Worker kill/recovery,
+R2-before-event persistence, cross-user 404s, and English/Chinese states. Deploy
+schema, then the generation-aware Worker, then Web handoff, with a real production
+smoke after review. No production promotion or paid provider call was made in this
+follow-up.

@@ -1,5 +1,9 @@
 import { createDatabaseClient } from "@/database/client";
 import { createAiModels } from "@/lib/ai/models.node";
+import {
+  retryPendingAiUsage,
+  reportAiAccountingHealth,
+} from "@/lib/ai/run-repository";
 import { finalizePendingAiRuns } from "@/lib/ai/finalize";
 import { createFileStorage } from "@/lib/uploads/store";
 import { createUploadRepository } from "@/lib/uploads/repository";
@@ -102,7 +106,13 @@ async function main(): Promise<void> {
         deleteObject,
       )
     : null;
+  let lastAccountingReport = 0;
   const maintain = async () => {
+    await retryPendingAiUsage(database.db);
+    if (Date.now() - lastAccountingReport >= 60_000) {
+      await reportAiAccountingHealth(database.db);
+      lastAccountingReport = Date.now();
+    }
     await finalizePendingAiRuns(database.db, storeFile);
     if (uploads) {
       await uploads.recoverStaleUploadCleanupClaims();

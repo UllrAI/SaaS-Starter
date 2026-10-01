@@ -8,7 +8,6 @@ import {
   InvalidToolApprovalSignatureError,
   ToolCallNotFoundForApprovalError,
   validateUIMessages,
-  type LanguageModelUsage,
 } from "ai";
 
 import { createAgent, isAgentId } from "@/lib/ai/agents";
@@ -48,7 +47,7 @@ import {
   createResponseHandle,
   readResponseHandle,
 } from "@/lib/ai/response-chain";
-import { AI_MODEL_UNREPORTED, extractUsageTotals } from "@/lib/ai/usage";
+import { AI_MODEL_UNREPORTED, createAiUsageCollector } from "@/lib/ai/usage";
 import { getAuthSessionFromHeaders } from "@/lib/auth/session";
 import { SITE_CONFIG } from "@/lib/config/site";
 import {
@@ -216,6 +215,7 @@ export async function POST(request: NextRequest) {
       if (previousResponseId) responseIndex = index;
       break;
     }
+    const imageSize = selectGptImage1kSize(validatedMessages);
     const agent = createAgent(
       parsed.data.agentId,
       {
@@ -228,7 +228,7 @@ export async function POST(request: NextRequest) {
       },
       {
         reasoningEffort: parsed.data.reasoningEffort,
-        imageSize: selectGptImage1kSize(validatedMessages),
+        imageSize,
         previousResponseId,
         allowImageGeneration: accepted.allowImageGeneration,
       },
@@ -239,11 +239,9 @@ export async function POST(request: NextRequest) {
       messages: validatedMessages.slice(-1),
     });
     validatedMessages = validatedMessages.slice(responseIndex + 1);
-    // `onEnd` carries `finishReason` but no token counts, so the metadata
-    // callback captures what it lacks: `finish` reports the turn total and
-    // `finish-step` the model that actually served it.
+    // Completed steps remain measurable when abort prevents a final finish.
     const startedAt = Date.now();
-    let usage: LanguageModelUsage | undefined;
+    const usage = createAiUsageCollector();
     let responseModelId: string | undefined;
 
     validatedMessages = await resolveAiImageAttachments(
@@ -274,7 +272,7 @@ export async function POST(request: NextRequest) {
           await failAiRun(accepted.run.id, true).catch(console.error);
         }
       },
-      onEnd: async ({ responseMessage, finishReason }) => {
+      onEnd: async ({ responseMessage, finishReason, isAborted }) => {
         const message = responseMessage as AiMessage;
         await completeAiRun(accepted.run.id, message, {
           userId: session.user.id,
@@ -285,7 +283,11 @@ export async function POST(request: NextRequest) {
           reasoningEffort: parsed.data.reasoningEffort,
           finishReason,
           durationMs: Date.now() - startedAt,
-          ...extractUsageTotals(usage),
+          ...usage.totals(),
+          aborted: isAborted,
+          usageComplete:
+            usage.isComplete() && !isAborted && finishReason !== "error",
+          imageSize,
         });
         try {
           await finalizeAiRun(db, accepted.run.id, storeFile);
@@ -294,10 +296,7 @@ export async function POST(request: NextRequest) {
         }
       },
       messageMetadata: ({ part }) => {
-        if (part.type === "finish") {
-          usage = part.totalUsage;
-          return undefined;
-        }
+        usage.capture(part);
         if (part.type !== "finish-step") return undefined;
         responseModelId = part.response.modelId;
         return {

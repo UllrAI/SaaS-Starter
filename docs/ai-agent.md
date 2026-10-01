@@ -15,7 +15,8 @@ src/lib/ai/
 ├── chat-history.ts        # User-owned conversations and message persistence
 ├── chat-history-types.ts  # Shared conversation and UIMessage types
 ├── chat-attachments.ts    # Ownership and media validation for reference images
-├── runs.ts                # Durable admission, response and usage transaction
+├── runs.ts                # Web wrapper over the Node-safe run repository
+├── run-repository.ts      # Admission, response persistence and accounting recovery
 ├── finalize.ts            # Retryable generated-image persistence
 ├── transcript.ts          # Server-owned history and approval validation
 ├── response-chain.ts      # User/conversation-bound signed handles for previous_response_id
@@ -62,8 +63,9 @@ refresh or sign-in on another device. History is paginated in batches of 80 mess
 The server accepts one new message or approval decision with a parent ID and derives the
 provider response handle from stored history. Each user may have one running response.
 A three-minute abort, five-step limit, and 4096 output-token limit bound each run.
-The response, pending media message, and usage commit together. The Worker retries R2
-storage independently; stale media retries cannot overwrite a later reply. A process
+The response, pending media message, and an accounting payload commit together.
+Usage-event insertion is retried separately, so a bookkeeping failure cannot roll back the reply.
+The Worker retries accounting and R2 storage independently; stale media retries cannot overwrite a later reply. A process
 killed before that transaction leaves a reserved interrupted run and is not automatically
 replayed. See [architecture recovery and deployment](architecture-remediation.md).
 
@@ -264,32 +266,56 @@ workspace; narrower screens open history and Canvas in independent full-height s
 
 ## Usage accounting
 
-Every completed assistant turn writes one `ai_usage_events` row: the user, conversation, message,
-agent, model, reasoning effort, token counts, finish reason, and duration. This is the data layer
-for cost attribution, quotas, and usage-based billing — request-count rate limiting cannot express
-that a `high` reasoning turn costs far more than a lookup.
+Every reported assistant attempt writes one `ai_usage_events` row, including aborted attempts:
+user, conversation, message, agent, model, reasoning effort, language token counts, finish reason,
+duration, abort/completeness flags, and independent image accounting. Aggregate by user or
+conversation, not by message: approval continuations and regeneration can reuse a message ID.
 
-Two details are easy to get wrong:
+`createAiUsageCollector` reads `finish-step` usage incrementally and uses `finish.totalUsage`
+once if it arrives. An abort can therefore retain completed-step usage without inventing tokens
+for the interrupted step. `usageComplete=false` means a lower bound, not the final bill; the run
+retains its conservative token and image reservations. Missing token fields remain NULL.
+`model` is the final completed step's model, accurate while a single model serves the loop.
+Usage values never travel in `messageMetadata` to the client.
 
-- **Usage does not reach `onEnd`.** The AI SDK's stream-end event carries `finishReason` but no
-  token counts. Those arrive on stream parts, so `src/app/api/chat/route.ts` captures `totalUsage`
-  from the `finish` part and `response.modelId` from `finish-step` into closure variables, then
-  writes one row from `onEnd`. Do not put usage into the `messageMetadata` return value — that is
-  sent to the client.
-- **The row counts language-model tokens only.** `generateImage` runs as a provider-executed tool,
-  and its image tokens never appear in `LanguageModelUsage`. Image spend is billed but not captured
-  here; costing that feature needs a separate source.
+The pinned `@ai-sdk/openai` image tool output exposes only `{ result }`, not separate image usage.
+`imageAttempts` and `generatedImages` count new tool calls, excluding earlier calls in an approval
+continuation. `estimatedImageOutputCostMicrousd` estimates successful GPT Image 2 / low / WebP
+output at $0.006 for 1024x1024 and $0.005 for either 1K rectangle, using the
+[official image cost table](https://developers.openai.com/api/docs/guides/image-generation#calculating-costs)
+verified 2026-10-01. `imageCostBasis` snapshots that assumption. This is output cost only: input
+text/images, uncertain attempts, cache behavior, and gateway markups remain outside the estimate.
+Do not use the estimate as an invoice. Historical image fields remain NULL; no fabricated backfill.
 
-The `model` column records the model that served the final step. That is accurate only while a
-single chat model serves the whole loop, which is today's configuration; introducing per-step model
-selection would require per-step rows instead of one row per turn.
+Reply persistence stores the accounting payload on `ai_runs` with `accountingStatus=pending`.
+A second transaction inserts the usage event with a unique `runId` and marks it recorded.
+A failure increments `accountingFailures`, schedules a retry after one minute, and leaves the
+reply intact. Worker maintenance retries due rows in batches of 20, independently of R2 availability.
+If the database also rejects the failure counter, the structured
+`ai-accounting/failure_counter_unavailable` log is the remaining signal.
 
-Token columns are nullable throughout. A provider that reports no cache tokens is not the same as
-one reporting zero, and `extractUsageTotals` in `src/lib/ai/usage.ts` preserves that distinction
-rather than defaulting to `0`. Accounting failures are logged and swallowed: a bookkeeping error
-must never cost the user their reply. `messageId` carries no foreign key, and regenerating a turn
-overwrites the message row while leaving a usage row per attempt — sum by user or conversation, not
-by message.
+The Worker emits `ai-accounting/health` once per minute: all pending rows and
+`oldestPendingAgeSeconds`, cumulative `failuresTotal`, and
+`unreportedLast24Hours` / `partialUsageLast24Hours` for runs created in the trailing
+24 hours. Pending backlog remains visible even when older than that window.
+Alert on growing pending count/age or write failures. Unreported terminal runs identify requests
+that ended without a usable accounting payload, including process death; they retain reservations.
+Counters are queryable even after recovery:
+
+```sql
+SELECT "accountingStatus", count(*) AS runs, sum("accountingFailures") AS failures
+FROM ai_runs
+WHERE "createdAt" >= now() - interval '24 hours'
+GROUP BY "accountingStatus";
+```
+
+Admission uses a user-scoped PostgreSQL transaction lock plus partial unique indexes for both
+user and conversation active runs. A stale run is changed to interrupted before new admission;
+completion and cleanup update only that run ID while it is running. A late former owner cannot
+write a response or release its successor. The existing 409 message is localized in both catalogs.
+
+Generation still runs in the Web process. Node-safe admission/accounting repositories are shared
+with Worker maintenance, but full generation handoff and cursor replay remain tracked in #91.
 
 ## Testing
 

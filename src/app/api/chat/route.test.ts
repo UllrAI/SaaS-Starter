@@ -18,7 +18,6 @@ const mockCompleteAiRun = jest.fn();
 const mockBeginAiRun = jest.fn();
 const mockFailAiRun = jest.fn();
 const mockGetAiConversation = jest.fn();
-const mockExtractUsageTotals = jest.fn();
 
 const siteConfig = {
   features: { emailAuth: true, billing: true, uploads: true, ai: true },
@@ -85,11 +84,6 @@ jest.mock("@/lib/ai/runs", () => ({
   AiBudgetExceededError: class AiBudgetExceededError extends Error {},
 }));
 
-jest.mock("@/lib/ai/usage", () => ({
-  AI_MODEL_UNREPORTED: "unreported",
-  extractUsageTotals: mockExtractUsageTotals,
-}));
-
 const session = {
   user: {
     id: "user-1",
@@ -104,14 +98,18 @@ const messages = [
 ];
 const conversationId = "0192f26a-8c1f-7c2f-9ca9-5d3930d2fc75";
 
-function chatRequest(body: unknown) {
+function chatRequest(body: unknown, signal?: AbortSignal) {
   return {
     headers: new Headers(),
+    signal,
     json: jest.fn<() => Promise<unknown>>().mockResolvedValue(body),
   } as never;
 }
 
-async function postChat(body: unknown = { messages, conversationId }) {
+async function postChat(
+  body: unknown = { messages, conversationId },
+  signal?: AbortSignal,
+) {
   const { POST } = await import("./route");
   const normalizedBody =
     body && typeof body === "object" && "messages" in body
@@ -121,10 +119,84 @@ async function postChat(body: unknown = { messages, conversationId }) {
           ...body,
         }
       : body;
-  return POST(chatRequest(normalizedBody));
+  return POST(chatRequest(normalizedBody, signal));
 }
 
 describe("/api/chat", () => {
+  it("rejects a concurrent request before message writes and provider work", async () => {
+    const { AiRunConflictError } = await import("@/lib/ai/runs");
+    mockBeginAiRun.mockRejectedValueOnce(
+      new AiRunConflictError("Another response is still running."),
+    );
+    const response = await postChat();
+    expect(response.status).toBe(409);
+    expect(await response.json()).toMatchObject({ code: "ai_run_conflict" });
+    expect(mockSaveAiMessages).not.toHaveBeenCalled();
+    expect(mockCreateAgentUIStreamResponse).not.toHaveBeenCalled();
+    expect(mockFailAiRun).not.toHaveBeenCalled();
+  });
+
+  it("connects request abort and records completed-step usage as incomplete", async () => {
+    const controller = new AbortController();
+    await postChat({ messages, conversationId }, controller.signal);
+    const args = mockCreateAgentUIStreamResponse.mock.calls[0][0] as {
+      abortSignal: AbortSignal;
+      messageMetadata: (options: { part: unknown }) => unknown;
+      onEnd: (options: {
+        responseMessage: unknown;
+        isAborted: boolean;
+      }) => Promise<void>;
+    };
+    args.messageMetadata({
+      part: {
+        type: "finish-step",
+        response: { id: "resp_step", modelId: "test" },
+        usage: { inputTokens: 10, outputTokens: 4, totalTokens: 14 },
+      },
+    });
+    controller.abort();
+    expect(args.abortSignal.aborted).toBe(true);
+    await args.onEnd({
+      responseMessage: {
+        id: "partial",
+        role: "assistant",
+        parts: [{ type: "text", text: "Partial answer" }],
+      },
+      isAborted: true,
+    });
+    expect(mockCompleteAiRun).toHaveBeenCalledWith(
+      "run-1",
+      expect.any(Object),
+      expect.objectContaining({
+        aborted: true,
+        usageComplete: false,
+        totalTokens: 14,
+      }),
+    );
+  });
+
+  it("releases only the accepted run when stream consumption throws", async () => {
+    await postChat();
+    const args = mockCreateAgentUIStreamResponse.mock.calls[0][0] as {
+      consumeSseStream: (input: {
+        stream: ReadableStream<string>;
+      }) => Promise<void>;
+    };
+    mockConsumeStream.mockRejectedValueOnce(new Error("stream failed"));
+    await expect(
+      args.consumeSseStream({ stream: new ReadableStream<string>() }),
+    ).rejects.toThrow("stream failed");
+    expect(mockFailAiRun).toHaveBeenCalledWith("run-1", true);
+  });
+
+  it("releases admission when agent setup fails before provider work", async () => {
+    mockCreateAgent.mockImplementationOnce(() => {
+      throw new Error("setup failed");
+    });
+    expect((await postChat()).status).toBe(500);
+    expect(mockFailAiRun).toHaveBeenCalledWith("run-1", false);
+  });
+
   beforeEach(() => {
     jest.clearAllMocks();
     siteConfig.features.ai = true;
@@ -149,11 +221,6 @@ describe("/api/chat", () => {
     mockCompleteAiRun.mockResolvedValue(undefined);
     mockFinalizeAiRun.mockResolvedValue(undefined);
     mockFailAiRun.mockResolvedValue(undefined);
-    mockExtractUsageTotals.mockReturnValue({
-      inputTokens: 11,
-      outputTokens: 22,
-      totalTokens: 33,
-    });
     mockCreateAgentUIStreamResponse.mockResolvedValue(
       new Response("stream", { status: 200 }),
     );
@@ -414,7 +481,6 @@ describe("/api/chat", () => {
       finishReason: "stop",
     });
 
-    expect(mockExtractUsageTotals).toHaveBeenCalledWith(totalUsage);
     expect(mockCompleteAiRun).toHaveBeenCalledWith(
       "run-1",
       expect.any(Object),

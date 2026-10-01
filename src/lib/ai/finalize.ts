@@ -1,4 +1,4 @@
-import { and, eq, isNull, lte, sql } from "drizzle-orm";
+import { and, eq, inArray, isNotNull, isNull, lte, sql } from "drizzle-orm";
 import { getToolOrDynamicToolName, isToolUIPart } from "ai";
 import type { AppDatabase } from "@/database/client";
 import { aiMessages, aiRuns } from "@/database/schema";
@@ -73,7 +73,7 @@ export async function finalizeAiRun(
       and(
         eq(aiRuns.id, runId),
         isNull(aiRuns.finalizedAt),
-        eq(aiRuns.status, "completed"),
+        inArray(aiRuns.status, ["completed", "aborted", "failed"]),
       ),
     );
   if (!run?.response || !run.usage) return;
@@ -106,7 +106,8 @@ export async function finalizePendingAiRuns(
     .from(aiRuns)
     .where(
       and(
-        eq(aiRuns.status, "completed"),
+        inArray(aiRuns.status, ["completed", "aborted", "failed"]),
+        isNotNull(aiRuns.response),
         isNull(aiRuns.finalizedAt),
         lte(aiRuns.finalizationRetryAt, new Date()),
       ),

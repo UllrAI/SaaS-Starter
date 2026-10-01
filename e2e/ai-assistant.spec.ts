@@ -1,3 +1,5 @@
+import { randomUUID } from "node:crypto";
+import postgres from "postgres";
 import { expect, test } from "@playwright/test";
 import { createChat } from "@shadcn/helpers/ai-sdk";
 import type { UIMessageChunk } from "ai";
@@ -621,4 +623,47 @@ test("restores the same account's conversations in another browser", async ({
 
   await firstPage.close();
   await secondPage.close();
+});
+
+test("rejects concurrent chat writes without touching the transcript", async ({
+  page,
+}) => {
+  const user = await loginAs(page, "user");
+  const created = await page.request.post("/api/ai/conversations");
+  expect(created.status()).toBe(201);
+  const { conversation } = await created.json();
+  const sql = postgres(process.env.E2E_DATABASE_URL!, { max: 1 });
+  const runId = randomUUID();
+  try {
+    await sql`insert into ai_runs (id, "userId", "conversationId", "requestKey", "reservedTokens", "expiresAt") values (${runId}, ${user.id}, ${conversation.id}, ${randomUUID()}, 400000, now() + interval '3 minutes')`;
+    const responses = await Promise.all(
+      [1, 2].map((index) =>
+        page.request.post("/api/chat", {
+          data: {
+            conversationId: conversation.id,
+            requestId: randomUUID(),
+            messages: [
+              {
+                id: `concurrent-${index}`,
+                role: "user",
+                parts: [{ type: "text", text: "Do not call a paid provider" }],
+              },
+            ],
+          },
+        }),
+      ),
+    );
+    for (const response of responses) {
+      expect(response.status()).toBe(409);
+      expect(await response.json()).toMatchObject({ code: "ai_run_conflict" });
+    }
+    const [count] =
+      await sql`select count(*)::int as count from ai_messages where "conversationId" = ${conversation.id}`;
+    expect(count.count).toBe(0);
+    const [active] = await sql`select status from ai_runs where id = ${runId}`;
+    expect(active.status).toBe("running");
+  } finally {
+    await sql`delete from ai_conversations where id = ${conversation.id}`;
+    await sql.end({ timeout: 5 });
+  }
 });

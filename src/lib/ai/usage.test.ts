@@ -1,6 +1,10 @@
 import { describe, expect, it } from "@jest/globals";
 import type { LanguageModelUsage } from "ai";
-import { extractUsageTotals } from "./usage";
+import {
+  createAiUsageCollector,
+  imageUsageForMessage,
+  extractUsageTotals,
+} from "./usage";
 
 function usage(overrides: Partial<LanguageModelUsage>): LanguageModelUsage {
   return {
@@ -85,5 +89,81 @@ describe("extractUsageTotals", () => {
     expect(
       extractUsageTotals(usage({ inputTokens: 10.6, outputTokens: -5 })),
     ).toMatchObject({ inputTokens: 11, outputTokens: undefined });
+  });
+});
+
+describe("incremental accounting", () => {
+  it("does not double count step usage when a final total arrives", () => {
+    const collector = createAiUsageCollector();
+    collector.capture({
+      type: "finish-step",
+      usage: usage({ inputTokens: 10, outputTokens: 3, totalTokens: 13 }),
+    });
+    collector.capture({
+      type: "finish-step",
+      usage: usage({ inputTokens: 20, outputTokens: 4, totalTokens: 24 }),
+    });
+    expect(collector.totals().totalTokens).toBe(37);
+    collector.capture({
+      type: "finish",
+      totalUsage: usage({ totalTokens: 37 }),
+    });
+    expect(collector.totals().totalTokens).toBe(37);
+    expect(collector.isComplete()).toBe(true);
+  });
+  it("keeps a partially unreported field unknown", () => {
+    const collector = createAiUsageCollector();
+    collector.capture({
+      type: "finish-step",
+      usage: usage({ totalTokens: 13, inputTokens: 10 }),
+    });
+    collector.capture({
+      type: "finish-step",
+      usage: usage({ inputTokens: 20 }),
+    });
+    expect(collector.totals()).toMatchObject({
+      inputTokens: 30,
+      totalTokens: undefined,
+    });
+    expect(collector.isComplete()).toBe(false);
+  });
+  it("counts new image attempts and estimates successful output independently from language tokens", () => {
+    const message = {
+      id: "assistant",
+      role: "assistant" as const,
+      parts: [
+        {
+          type: "tool-generateImage" as const,
+          state: "output-available" as const,
+          toolCallId: "old",
+          input: {},
+          output: { url: "/api/files/content?key=old" },
+        },
+        {
+          type: "tool-generateImage" as const,
+          state: "output-available" as const,
+          toolCallId: "new",
+          input: {},
+          output: { result: "base64" },
+        },
+        {
+          type: "tool-generateImage" as const,
+          state: "output-error" as const,
+          toolCallId: "failed",
+          input: {},
+          errorText: "Failed",
+        },
+      ],
+    };
+    expect(
+      imageUsageForMessage(message, "1536x1024", new Set(["old"])),
+    ).toMatchObject({
+      imageAttempts: 2,
+      generatedImages: 1,
+      estimatedImageOutputCostMicrousd: 5000,
+    });
+    expect(
+      imageUsageForMessage(message, undefined).estimatedImageOutputCostMicrousd,
+    ).toBeUndefined();
   });
 });

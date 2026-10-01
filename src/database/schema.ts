@@ -393,8 +393,8 @@ export const aiMessages = pgTable(
 );
 
 /**
- * One row per completed assistant turn. Token columns stay nullable because a
- * provider may omit any of them; storing 0 for "unknown" would silently
+ * One row per reported assistant attempt, including aborts. Token columns stay
+ * nullable because a provider may omit any of them; storing 0 for "unknown" would silently
  * understate cost once these rows drive billing or quota decisions.
  */
 export const aiUsageEvents = pgTable(
@@ -418,6 +418,15 @@ export const aiUsageEvents = pgTable(
     outputTokens: integer("outputTokens"),
     reasoningTokens: integer("reasoningTokens"),
     totalTokens: integer("totalTokens"),
+    aborted: boolean("aborted").notNull().default(false),
+    usageComplete: boolean("usageComplete").notNull().default(true),
+    imageAttempts: integer("imageAttempts"),
+    generatedImages: integer("generatedImages"),
+    imageSize: text("imageSize"),
+    estimatedImageOutputCostMicrousd: integer(
+      "estimatedImageOutputCostMicrousd",
+    ),
+    imageCostBasis: text("imageCostBasis"),
     finishReason: text("finishReason"),
     durationMs: integer("durationMs"),
     createdAt: timestamp("createdAt", { withTimezone: true })
@@ -612,6 +621,11 @@ export const aiRuns = pgTable(
     imageCount: integer("imageCount").notNull().default(0),
     response: jsonb("response").$type<unknown>(),
     usage: jsonb("usage").$type<Record<string, unknown>>(),
+    accountingStatus: text("accountingStatus").notNull().default("unreported"),
+    accountingFailures: integer("accountingFailures").notNull().default(0),
+    accountingRetryAt: timestamp("accountingRetryAt", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
     finalizedAt: timestamp("finalizedAt", { withTimezone: true }),
     finalizationRetryAt: timestamp("finalizationRetryAt", {
       withTimezone: true,
@@ -624,6 +638,12 @@ export const aiRuns = pgTable(
       .defaultNow(),
   },
   (table) => ({
+    activeUserUnique: uniqueIndex("ai_runs_active_user_unique")
+      .on(table.userId)
+      .where(sql`${table.status} = 'running'`),
+    activeConversationUnique: uniqueIndex("ai_runs_active_conversation_unique")
+      .on(table.conversationId)
+      .where(sql`${table.status} = 'running'`),
     requestUnique: uniqueIndex("ai_runs_conversation_request_unique").on(
       table.conversationId,
       table.requestKey,

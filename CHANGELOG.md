@@ -5,6 +5,22 @@ Routine formatting and test-only maintenance are omitted.
 
 ## Unreleased
 
+## 0.1.16 — 2026-10-01
+
+### AI accounting reliability
+
+- Preserve completed-step token usage and partial replies when a response is
+  aborted, while retaining reservations for unreported spend.
+- Persist replies before usage-event insertion and retry failed accounting in
+  the Worker with idempotent writes and structured health metrics.
+- Enforce one active run per user and conversation in PostgreSQL, and record
+  image attempts, successful outputs, and a separate output-only cost estimate.
+- Record the October SEO review and the evidence still needed for follow-up.
+
+Migration `0027` adds accounting recovery fields and active-run constraints;
+historical image accounting remains unknown. Model generation still runs in
+Web; full Worker handoff remains tracked in #91.
+
 ## 0.1.12 — 2026-08-22
 
 ### AI reference images

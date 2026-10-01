@@ -1,0 +1,24 @@
+{
+  "pageviews": 134,
+  "visitors": 58,
+  "visits": 64,
+  "bounces": 51,
+  "totaltime": 849,
+  "_source": "clean-reaggregated-from-events",
+  "_dropped": {
+    "visitor_count": 0,
+    "event_count": 0,
+    "sample_referrers": []
+  },
+  "_total_raw": {
+    "visitors": 58,
+    "events": 152,
+    "sessions_after_split": 64
+  },
+  "_query": {
+    "website": "f059d8b7-d9a7-4972-9d1c-d7bf6187b769",
+    "start": "2026-08-04",
+    "end": "2026-09-01",
+    "clean": true
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "events": [
+    {
+      "eventName": "pricing_view",
+      "count": 5
+    },
+    {
+      "eventName": "signup_click",
+      "count": 5
+    },
+    {
+      "eventName": "github_source_click",
+      "count": 1
+    }
+  ],
+  "_source": "metrics?type=event (all event names)",
+  "_query": {
+    "website": "f059d8b7-d9a7-4972-9d1c-d7bf6187b769",
+    "start": "2026-09-01",
+    "end": "2026-09-29"
+  }
+}

@@ -141,3 +141,63 @@ alone.
 | 2026-09-30 | Six complete weeks of developer-guide impressions, CTR, and position                   |
 | 2026-11-04 | Twelve weeks of cluster impressions, non-brand queries, top-20 pages, assisted signups |
 | 2026-11-10 | 90-day authority campaign: qualified referring domains and referral conversions        |
+
+## 2026-10-01 review
+
+Read-only sources: GSC `sc-domain:ullrai.com`, filtered to
+`https://starter.ullrai.com/`; Umami dedicated production website
+`f059d8b7-d9a7-4972-9d1c-d7bf6187b769`. GSC final data currently ends on
+2026-09-28; September 29–30 are not treated as zero. The comparable 28-day
+periods are 2026-09-01–09-28 and 2026-08-04–08-31. Umami uses the same dates
+with an exclusive end boundary. Raw aggregate responses are retained in
+`docs/seo-review-data/2026-10-01/`; no account credentials or visitor-level data.
+
+| GSC page / metric                            |   Current |             Previous |
+| -------------------------------------------- | --------: | -------------------: |
+| All starter pages: impressions               |       130 |                   77 |
+| All starter pages: clicks / CTR              |    0 / 0% |               0 / 0% |
+| All starter pages: average position          |      6.75 |                37.47 |
+| English guide: impressions                   |        14 |                   15 |
+| English guide: average position              |      6.36 |                19.27 |
+| Chinese guide: impressions                   |         9 |                    4 |
+| Chinese guide: average position              |      5.00 |                 5.25 |
+| Architecture hub: impressions / position     | 14 / 6.57 |             1 / 9.00 |
+| Machine-auth spoke: impressions / position   | 6 / 31.00 | No returned page row |
+| Stripe billing spoke: impressions / position |  9 / 7.22 |           30 / 65.00 |
+
+Both guide locales still have zero clicks. The complete six-week post-release
+window 2026-08-13–09-23 versus 2026-07-02–08-12 shows English guide impressions
+12 versus 27 and position 12.25 versus 16.93; Chinese impressions 12 versus 1,
+position 5.08 versus 5.00. The latest 28-day ranking improvement is encouraging,
+but English reach has not grown and CTR has not improved. Sparse impressions and
+privacy-filtered empty query rows prevent non-brand or query-intent conclusions.
+The aggregate position shift also reflects a changing mix of pages; it is not
+proof that every page improved. No guide rewrite is warranted from this sample.
+
+Umami clean event reaggregation reports 57 visitors / 57 visits / 90 pageviews
+versus 58 / 64 / 134. The previous window includes days before the dedicated
+property was created on August 12, so it is not a complete comparable baseline.
+No spam events were removed in either result. Current hostname metrics contain
+only `starter.ullrai.com`. Current event counts are `pricing_view=5`,
+`signup_click=5`, `github_source_click=1`; these are site-wide counts, not
+article-attributed conversions or assisted signups. GSC clicks and Umami visits
+remain separate measurements.
+
+Production HTML fetched on October 1 with a browser user agent returns 200 in
+both guide locales: one H1, self-canonical, en/zh-Hans/x-default alternates,
+and Article/Breadcrumb data in the Next.js script bootstrap. Organization/WebSite
+JSON-LD is directly present. This verifies emitted data, not a Google Rich Results
+validation or indexing freshness check. Search-tool cached HTML still shows an
+older duplicate-H1 version; it is not used to contradict the live response.
+
+- #63: six-week review completed; retain observation because clicks/CTR remain
+  unproven. Combine its next sample with the November 4 cluster review.
+- #66: published cluster remains in place; November 4 review still needs
+  non-brand queries, top-20 pages, and article-attributed conversion evidence.
+- #62: [existing upstream PR #227](https://github.com/xcomptek/awesome-saas-boilerplates/pull/227)
+  is OPEN, non-draft, with no reviews/comments or merge as of October 1. Outcome
+  remains submitted, not accepted. No new outreach was sent. November 10 still
+  requires qualified referring domains and referral conversion evidence.
+- #67: retain the November 10 combined review. Do not combine search clicks,
+  visits, or external backlink estimates into one traffic total. This review did
+  not fetch Bing or fresh referring-domain data, so no change is claimed there.

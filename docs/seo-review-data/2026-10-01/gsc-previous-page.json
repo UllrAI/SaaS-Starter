@@ -1,0 +1,114 @@
+{
+  "data": {
+    "rows": [
+      {
+        "keys": ["https://starter.ullrai.com/"],
+        "clicks": 0,
+        "impressions": 10,
+        "ctr": 0,
+        "position": 29.4
+      },
+      {
+        "keys": ["https://starter.ullrai.com/about"],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 7
+      },
+      {
+        "keys": ["https://starter.ullrai.com/blog"],
+        "clicks": 0,
+        "impressions": 2,
+        "ctr": 0,
+        "position": 11.5
+      },
+      {
+        "keys": [
+          "https://starter.ullrai.com/blog/agent-friendly-saas-template"
+        ],
+        "clicks": 0,
+        "impressions": 2,
+        "ctr": 0,
+        "position": 40
+      },
+      {
+        "keys": [
+          "https://starter.ullrai.com/blog/creem-nextjs-billing-production-guide"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 9
+      },
+      {
+        "keys": [
+          "https://starter.ullrai.com/blog/nextjs-16-saas-starter-architecture"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 9
+      },
+      {
+        "keys": [
+          "https://starter.ullrai.com/blog/saas-starter-kit-developer-guide"
+        ],
+        "clicks": 0,
+        "impressions": 15,
+        "ctr": 0,
+        "position": 19.266666666666666
+      },
+      {
+        "keys": [
+          "https://starter.ullrai.com/blog/stripe-nextjs-billing-production-guide"
+        ],
+        "clicks": 0,
+        "impressions": 30,
+        "ctr": 0,
+        "position": 65
+      },
+      {
+        "keys": ["https://starter.ullrai.com/contact"],
+        "clicks": 0,
+        "impressions": 3,
+        "ctr": 0,
+        "position": 5.666666666666667
+      },
+      {
+        "keys": ["https://starter.ullrai.com/pricing"],
+        "clicks": 0,
+        "impressions": 3,
+        "ctr": 0,
+        "position": 50.666666666666664
+      },
+      {
+        "keys": ["https://starter.ullrai.com/privacy"],
+        "clicks": 0,
+        "impressions": 2,
+        "ctr": 0,
+        "position": 7.5
+      },
+      {
+        "keys": ["https://starter.ullrai.com/terms"],
+        "clicks": 0,
+        "impressions": 3,
+        "ctr": 0,
+        "position": 6.333333333333333
+      },
+      {
+        "keys": [
+          "https://starter.ullrai.com/zh-Hans/blog/saas-starter-kit-developer-guide"
+        ],
+        "clicks": 0,
+        "impressions": 4,
+        "ctr": 0,
+        "position": 5.25
+      }
+    ],
+    "responseAggregationType": "byPage",
+    "metadata": {
+      "firstIncompleteDate": null,
+      "firstIncompleteHour": null
+    }
+  }
+}

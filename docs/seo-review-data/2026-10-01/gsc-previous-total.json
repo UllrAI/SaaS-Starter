@@ -1,0 +1,18 @@
+{
+  "data": {
+    "rows": [
+      {
+        "keys": [],
+        "clicks": 0,
+        "impressions": 77,
+        "ctr": 0,
+        "position": 37.467532467532465
+      }
+    ],
+    "responseAggregationType": "byPage",
+    "metadata": {
+      "firstIncompleteDate": null,
+      "firstIncompleteHour": null
+    }
+  }
+}

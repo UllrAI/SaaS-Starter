@@ -1,0 +1,29 @@
+{
+  "data": {
+    "rows": [
+      {
+        "keys": [
+          "https://starter.ullrai.com/blog/saas-starter-kit-developer-guide"
+        ],
+        "clicks": 0,
+        "impressions": 27,
+        "ctr": 0,
+        "position": 16.925925925925924
+      },
+      {
+        "keys": [
+          "https://starter.ullrai.com/zh-Hans/blog/saas-starter-kit-developer-guide"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 5
+      }
+    ],
+    "responseAggregationType": "byPage",
+    "metadata": {
+      "firstIncompleteDate": null,
+      "firstIncompleteHour": null
+    }
+  }
+}

@@ -62,19 +62,12 @@ jobs:
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile
-      - run: pnpm db:generate
-      - name: Verify committed migration history
-        run: |
-          if [ -n "$(git status --porcelain -- src/database/migrations)" ]; then
-            git status --short -- src/database/migrations
-            exit 1
-          fi
-      - run: pnpm db:migrate
       - run: pnpm prettier:check
       - run: pnpm lint
       - run: pnpm dead-code:check
       - run: pnpm type-check
       - run: pnpm test --runInBand
+      # Database suites initialize only the disposable service database.
       - run: pnpm test:jobs:integration
       - run: pnpm build:worker
       - run: pnpm worker:smoke

@@ -145,6 +145,10 @@
 
 Drizzle 配置过序列化器的底层 sql 连接中，直接用 `tx.json(array)` 写集成测试临时表可能把数组送到字符串编码器。此时显式 `JSON.stringify(value)` 并在参数后加 `::jsonb`，不要误判为数据库迁移失败。同一连接直接传 `Date` 也会落到字符串编码器；底层 SQL fixture 使用 `date.toISOString()` 和 `::timestamptz`，业务代码继续使用 Drizzle 的类型映射。
 
+### Queue migration 不能提前加载生成后的文章模块
+
+Job catalog 同时用于 Worker 和一次性数据库迁移。AI job 若在模块加载时引入 agent/tools，会间接要求尚未生成的 `content-collections`，全新 checkout 的迁移会失败，本地已 build 的工作区却正常。仅在真正执行生成任务时加载 agent，并用移走 `.content-collections` 的迁移检查复验；不能用在 CI 提前 build 内容来掩盖依赖边界。
+
 ### 跨环境数据库校验需要统一会话时区
 
 **现象**：同一个 PostgreSQL dump 恢复到本机和 Zeabur 后，表行数一致，但含时间字段的整行 JSON 哈希不同。

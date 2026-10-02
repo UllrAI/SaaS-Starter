@@ -27,7 +27,6 @@ import {
 } from "./usage";
 import type { AiMessage } from "./chat-history-types";
 import type { createWorkerAiRuntime } from "./runtime.node";
-import { isAgentId } from "./agents";
 
 type Runtime = ReturnType<typeof createWorkerAiRuntime>;
 let worker: { db: AppDatabase; runtime: Runtime } | undefined;
@@ -44,6 +43,8 @@ export async function executeAiGeneration(
   runId: string,
   context: JobHandlerContext,
 ) {
+  // Queue migrations read this job definition before content is built.
+  const { isAgentId } = await import("./agents");
   const [accepted] = await db.select().from(aiRuns).where(eq(aiRuns.id, runId));
   if (!accepted || !["queued", "running"].includes(accepted.status))
     return null;

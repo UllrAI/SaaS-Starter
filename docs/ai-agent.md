@@ -37,6 +37,7 @@ src/lib/ai/
 │   ├── compose.ts         # composeSkills
 │   ├── account-support.ts # Example skill: account questions
 │   ├── knowledge-base.ts  # Example skill: search → read → answer loop
+│   ├── document-storage.ts # Approved document storage
 │   └── index.ts           # Skill registry
 └── agents/
     ├── assistant.ts       # Default agent definition
@@ -56,11 +57,12 @@ hands `ai.generate` to the Node Worker, which rechecks current ownership, ban st
 then builds the same `ToolLoopAgent` and consumes `createAgentUIStream` independently of Web.
 The agent calls the model, executes approved tools and loops until completion or `isStepCount`.
 
-The built-in assistant at `/dashboard/ai` is a working Chat + Canvas example composed from two skills:
+The built-in assistant at `/dashboard/ai` is a working Chat + Canvas example composed from three skills:
 `account-support` (looks up the signed-in user's profile and subscription) and
 `knowledge-base` (a search → read → answer loop over the site's published articles — ask it
 "does this product support API keys?" and watch it search, open the matching article, and
-answer with a source link). Both run on real data; there are no mocks to remove.
+answer with a source link), plus `document-storage` for approved document writes.
+These skills run on real data; there are no mocks to remove.
 Substantial Markdown drafts, returned image/video files, and generated images open in the adjacent
 canvas, where users can switch artifacts, copy them, and download them.
 

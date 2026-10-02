@@ -7,10 +7,6 @@ const siteConfig = {
   features: { emailAuth: true, billing: true, uploads: true, ai: true },
 };
 
-jest.mock("@/lib/database/subscription", () => ({
-  getUserSubscription: mockGetUserSubscription,
-}));
-
 jest.mock("@/lib/config/site", () => ({
   get SITE_CONFIG() {
     return siteConfig;
@@ -29,10 +25,9 @@ const executionOptions = {} as ToolExecutionOptions;
 
 async function runTool(agentContext = context) {
   const { createGetAccountOverview } = await import("./get-account-overview");
-  return (await createGetAccountOverview(agentContext).execute!(
-    {},
-    executionOptions,
-  )) as {
+  return (await createGetAccountOverview(agentContext, {
+    getUserSubscription: mockGetUserSubscription,
+  }).execute!({}, executionOptions)) as {
     profile: { name: string; email: string; role: string };
     billingEnabled: boolean;
     subscription: {

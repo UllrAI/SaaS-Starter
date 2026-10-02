@@ -23,4 +23,6 @@ export interface AiConversationDetail {
   conversation: AiConversationSummary;
   messages: AiMessage[];
   hasMore?: boolean;
+  latestRun?: import("./durable-types").AiRunSummary | null;
+  activeRun?: import("./durable-types").AiRunSummary | null;
 }

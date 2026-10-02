@@ -1,60 +1,33 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import {
-  consumeStream,
-  createAgentUIStreamResponse,
-  generateId,
-  InvalidToolApprovalError,
-  InvalidToolApprovalSignatureError,
-  ToolCallNotFoundForApprovalError,
-  validateUIMessages,
-} from "ai";
-
-import { createAgent, isAgentId } from "@/lib/ai/agents";
+import { validateUIMessages } from "ai";
+import { isAgentId } from "@/lib/ai/agents";
 import {
   AiAttachmentValidationError,
   requireOwnedAiImageAttachments,
-  resolveAiImageAttachments,
 } from "@/lib/ai/chat-attachments";
 import {
   AiConversationNotFoundError,
   requireAiConversation,
-  getAiConversation,
-  saveAiMessages,
 } from "@/lib/ai/chat-history";
 import type { AiMessage } from "@/lib/ai/chat-history-types";
-import { db } from "@/database";
-import { storeFile } from "@/lib/uploads/server-storage";
-import { finalizeAiRun } from "@/lib/ai/finalize";
+import { aiRunSummary } from "@/lib/ai/durable-runs";
 import {
   beginAiRun,
-  completeAiRun,
-  failAiRun,
   AiBudgetExceededError,
   AiRunConflictError,
 } from "@/lib/ai/runs";
-import {
-  mergeAiTranscript,
-  AiTranscriptConflictError,
-} from "@/lib/ai/transcript";
-import { AI_RUN_TIMEOUT_MS, AI_MAX_CONTEXT_BYTES } from "@/lib/ai/limits";
-import { selectGptImage1kSize } from "@/lib/ai/image-size";
+import { AiTranscriptConflictError } from "@/lib/ai/transcript";
 import {
   DEFAULT_REASONING_EFFORT,
   REASONING_EFFORTS,
 } from "@/lib/ai/reasoning";
-import {
-  createResponseHandle,
-  readResponseHandle,
-} from "@/lib/ai/response-chain";
-import { AI_MODEL_UNREPORTED, createAiUsageCollector } from "@/lib/ai/usage";
 import { getAuthSessionFromHeaders } from "@/lib/auth/session";
 import { SITE_CONFIG } from "@/lib/config/site";
 import {
   readJsonBodyWithLimit,
   RequestBodyTooLargeError,
 } from "@/lib/http/request-body";
-import { withSseKeepAlive } from "@/lib/http/sse-keep-alive";
 import { getRequestLocale } from "@/lib/i18n/server-locale";
 import { checkRateLimit } from "@/lib/rate-limit";
 
@@ -63,14 +36,21 @@ const MAX_CHAT_MESSAGES = 80;
 const CHAT_RATE_LIMIT = 30;
 const CHAT_RATE_WINDOW_MS = 10 * 60 * 1000;
 
-const chatRequestSchema = z.object({
-  messages: z.array(z.unknown()).min(1).max(MAX_CHAT_MESSAGES),
-  conversationId: z.uuid(),
-  requestId: z.uuid(),
-  agentId: z.string().default("assistant"),
-  reasoningEffort: z.enum(REASONING_EFFORTS).default(DEFAULT_REASONING_EFFORT),
-  parentMessageId: z.string().min(1).max(200).nullable().default(null),
-});
+const chatRequestSchema = z
+  .object({
+    messages: z.array(z.unknown()).max(MAX_CHAT_MESSAGES).default([]),
+    retryRunId: z.uuid().optional(),
+    conversationId: z.uuid(),
+    requestId: z.uuid(),
+    agentId: z.string().default("assistant"),
+    reasoningEffort: z
+      .enum(REASONING_EFFORTS)
+      .default(DEFAULT_REASONING_EFFORT),
+    parentMessageId: z.string().min(1).max(200).nullable().default(null),
+  })
+  .refine((data) =>
+    data.retryRunId ? data.messages.length === 0 : data.messages.length > 0,
+  );
 
 export async function POST(request: NextRequest) {
   if (!SITE_CONFIG.features.ai) {
@@ -139,9 +119,11 @@ export async function POST(request: NextRequest) {
 
   let validatedMessages: AiMessage[];
   try {
-    validatedMessages = await validateUIMessages<AiMessage>({
-      messages: parsed.data.messages,
-    });
+    validatedMessages = parsed.data.retryRunId
+      ? []
+      : await validateUIMessages<AiMessage>({
+          messages: parsed.data.messages,
+        });
   } catch (error) {
     console.error("AI chat messages failed validation:", error);
     return NextResponse.json(
@@ -165,8 +147,6 @@ export async function POST(request: NextRequest) {
     throw error;
   }
 
-  let runId: string | undefined;
-  let providerStarted = false;
   try {
     const accepted = await beginAiRun({
       userId: session.user.id,
@@ -174,159 +154,16 @@ export async function POST(request: NextRequest) {
       messages: validatedMessages,
       parentMessageId: parsed.data.parentMessageId,
       requestId: parsed.data.requestId,
+      ...(parsed.data.retryRunId ? { retryRunId: parsed.data.retryRunId } : {}),
+      agentId: parsed.data.agentId,
+      reasoningEffort: parsed.data.reasoningEffort,
+      locale: await getRequestLocale(),
     });
-    runId = accepted.run.id;
-    const detail = await getAiConversation({
-      userId: session.user.id,
-      conversationId: parsed.data.conversationId,
+    return NextResponse.json(aiRunSummary(accepted.run), {
+      status: 202,
+      headers: { "Cache-Control": "private, no-store" },
     });
-    if (!detail)
-      throw new AiTranscriptConflictError("Conversation unavailable.");
-    if (detail.hasMore)
-      throw new AiTranscriptConflictError(
-        "Conversation context is full. Start a new conversation.",
-        "ai_context_full",
-      );
-    validatedMessages = mergeAiTranscript(
-      detail.messages,
-      validatedMessages,
-      parsed.data.parentMessageId,
-    );
-    if (
-      Buffer.byteLength(JSON.stringify(validatedMessages), "utf8") >
-      AI_MAX_CONTEXT_BYTES
-    )
-      throw new AiTranscriptConflictError(
-        "Conversation context is full. Start a new conversation.",
-        "ai_context_full",
-      );
-    let previousResponseId: string | undefined;
-    let responseIndex = -1;
-    for (let index = validatedMessages.length - 2; index >= 0; index--) {
-      const candidate = validatedMessages[index];
-      if (candidate.role !== "assistant" || !candidate.metadata?.responseHandle)
-        continue;
-      previousResponseId =
-        readResponseHandle(
-          candidate.metadata.responseHandle,
-          session.user.id,
-          parsed.data.conversationId,
-        ) ?? undefined;
-      if (previousResponseId) responseIndex = index;
-      break;
-    }
-    const imageSize = selectGptImage1kSize(validatedMessages);
-    const agent = createAgent(
-      parsed.data.agentId,
-      {
-        userId: session.user.id,
-        conversationId: parsed.data.conversationId,
-        userName: session.user.name,
-        userEmail: session.user.email,
-        userRole: session.user.role,
-        locale: await getRequestLocale(),
-      },
-      {
-        reasoningEffort: parsed.data.reasoningEffort,
-        imageSize,
-        previousResponseId,
-        allowImageGeneration: accepted.allowImageGeneration,
-      },
-    );
-    await saveAiMessages({
-      conversationId: parsed.data.conversationId,
-      userId: session.user.id,
-      messages: validatedMessages.slice(-1),
-    });
-    validatedMessages = validatedMessages.slice(responseIndex + 1);
-    // Completed steps remain measurable when abort prevents a final finish.
-    const startedAt = Date.now();
-    const usage = createAiUsageCollector();
-    let responseModelId: string | undefined;
-
-    validatedMessages = await resolveAiImageAttachments(
-      validatedMessages,
-      session.user.id,
-    );
-    providerStarted = true;
-    const response = await createAgentUIStreamResponse({
-      abortSignal: request.signal
-        ? AbortSignal.any([
-            request.signal,
-            AbortSignal.timeout(AI_RUN_TIMEOUT_MS),
-          ])
-        : AbortSignal.timeout(AI_RUN_TIMEOUT_MS),
-      agent,
-      uiMessages: validatedMessages,
-      generateMessageId: generateId,
-      sendSources: true,
-      consumeSseStream: async ({ stream }) => {
-        try {
-          await consumeStream({
-            stream,
-            onError: (error) => {
-              console.error("AI chat background stream error:", error);
-            },
-          });
-        } finally {
-          await failAiRun(accepted.run.id, true).catch(console.error);
-        }
-      },
-      onEnd: async ({ responseMessage, finishReason, isAborted }) => {
-        const message = responseMessage as AiMessage;
-        await completeAiRun(accepted.run.id, message, {
-          userId: session.user.id,
-          conversationId: parsed.data.conversationId,
-          messageId: message.id,
-          agentId: parsed.data.agentId,
-          model: responseModelId ?? AI_MODEL_UNREPORTED,
-          reasoningEffort: parsed.data.reasoningEffort,
-          finishReason,
-          durationMs: Date.now() - startedAt,
-          ...usage.totals(),
-          aborted: isAborted,
-          usageComplete:
-            usage.isComplete() && !isAborted && finishReason !== "error",
-          imageSize,
-        });
-        try {
-          await finalizeAiRun(db, accepted.run.id, storeFile);
-        } catch (error) {
-          console.error("AI response saved; finalization will retry:", error);
-        }
-      },
-      messageMetadata: ({ part }) => {
-        usage.capture(part);
-        if (part.type !== "finish-step") return undefined;
-        responseModelId = part.response.modelId;
-        return {
-          responseHandle: createResponseHandle(
-            part.response.id,
-            session.user.id,
-            parsed.data.conversationId,
-          ),
-        };
-      },
-      onError: (error) => {
-        console.error("AI chat stream error:", error);
-        // A tool approval the server never signed, or one pointing at a tool
-        // call that does not exist: the client tampered with the transcript.
-        // The loop already refused to execute the tool; say so without hinting
-        // at what would make the forgery pass.
-        if (
-          error instanceof InvalidToolApprovalSignatureError ||
-          error instanceof InvalidToolApprovalError ||
-          error instanceof ToolCallNotFoundForApprovalError
-        ) {
-          return "That approval could not be verified. Please send the request again.";
-        }
-        // Keep provider error details out of the client stream.
-        return "The assistant hit an unexpected error. Please try again.";
-      },
-    });
-    return withSseKeepAlive(response);
   } catch (error) {
-    if (runId) await failAiRun(runId, providerStarted).catch(console.error);
     if (error instanceof AiBudgetExceededError)
       return NextResponse.json(
         { code: "ai_budget_reached", error: "Daily AI allowance reached." },

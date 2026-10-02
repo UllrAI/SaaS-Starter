@@ -1,3 +1,5 @@
+import type { Subscription } from "@/types/billing";
+import type { createFileStorage } from "@/lib/uploads/store";
 import type { ToolSet } from "ai";
 import type { AgentContext } from "../context";
 import { createGetAccountOverview } from "./get-account-overview";
@@ -5,6 +7,11 @@ import { createGetCurrentTime } from "./get-current-time";
 import { createReadArticle, createSearchKnowledgeBase } from "./knowledge-base";
 import { createPresentArtifact } from "./present-artifact";
 import { createSaveDocument } from "./save-document";
+
+export interface AgentToolDependencies {
+  getUserSubscription(userId: string): Promise<Subscription | null>;
+  storeFile: ReturnType<typeof createFileStorage>;
+}
 
 /**
  * The tool registry. Each key is the name the model sees, so every tool name
@@ -23,15 +30,22 @@ export const agentTools = {
   readArticle: createReadArticle,
   presentArtifact: createPresentArtifact,
   saveDocument: createSaveDocument,
-} satisfies Record<string, (context: AgentContext) => ToolSet[string]>;
+} satisfies Record<
+  string,
+  (
+    context: AgentContext,
+    dependencies: AgentToolDependencies,
+  ) => ToolSet[string]
+>;
 
 export type AgentToolName = keyof typeof agentTools;
 
 export function buildTools(
   names: Iterable<AgentToolName>,
   context: AgentContext,
+  dependencies: AgentToolDependencies,
 ): ToolSet {
   return Object.fromEntries(
-    [...names].map((name) => [name, agentTools[name](context)]),
+    [...names].map((name) => [name, agentTools[name](context, dependencies)]),
   );
 }

@@ -615,6 +615,17 @@ export const aiRuns = pgTable(
       .notNull()
       .references(() => aiConversations.id, { onDelete: "cascade" }),
     requestKey: text("requestKey").notNull(),
+    taskRunId: uuid("taskRunId").references(() => taskRuns.id, {
+      onDelete: "set null",
+    }),
+    assistantMessageId: text("assistantMessageId"),
+    input:
+      jsonb("input").$type<
+        import("@/lib/ai/durable-types").AiGenerationInput
+      >(),
+    providerStartedAt: timestamp("providerStartedAt", { withTimezone: true }),
+    cancelRequestedAt: timestamp("cancelRequestedAt", { withTimezone: true }),
+    lastEventId: integer("lastEventId").notNull().default(0),
     status: text("status").notNull().default("running"),
     reservedTokens: integer("reservedTokens").notNull(),
     totalTokens: integer("totalTokens"),
@@ -640,10 +651,10 @@ export const aiRuns = pgTable(
   (table) => ({
     activeUserUnique: uniqueIndex("ai_runs_active_user_unique")
       .on(table.userId)
-      .where(sql`${table.status} = 'running'`),
+      .where(sql`${table.status} in ('queued', 'running')`),
     activeConversationUnique: uniqueIndex("ai_runs_active_conversation_unique")
       .on(table.conversationId)
-      .where(sql`${table.status} = 'running'`),
+      .where(sql`${table.status} in ('queued', 'running')`),
     requestUnique: uniqueIndex("ai_runs_conversation_request_unique").on(
       table.conversationId,
       table.requestKey,
@@ -653,5 +664,22 @@ export const aiRuns = pgTable(
       table.createdAt,
     ),
     pendingIdx: index("ai_runs_pending_idx").on(table.status, table.createdAt),
+  }),
+);
+
+export const aiRunEvents = pgTable(
+  "ai_run_events",
+  {
+    runId: uuid("runId")
+      .notNull()
+      .references(() => aiRuns.id, { onDelete: "cascade" }),
+    sequence: integer("sequence").notNull(),
+    chunk: jsonb("chunk").$type<import("ai").UIMessageChunk>().notNull(),
+    createdAt: timestamp("createdAt", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => ({
+    pk: primaryKey({ columns: [table.runId, table.sequence] }),
   }),
 );

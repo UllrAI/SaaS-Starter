@@ -1,7 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it, jest } from "@jest/globals";
 import { readFile } from "node:fs/promises";
 import { randomUUID } from "node:crypto";
-import { eq, and } from "drizzle-orm";
+import { eq, and, desc } from "drizzle-orm";
 import { createDatabaseClient } from "@/database/client";
 import {
   users,
@@ -17,6 +17,7 @@ import {
 import { S3Client } from "@aws-sdk/client-s3";
 import { createFileStorage } from "@/lib/uploads/store";
 import { finalizeAiRun } from "@/lib/ai/finalize";
+import { claimAiRun } from "@/lib/ai/durable-runs";
 import {
   requestFileDeletion,
   cleanupDeletedFiles,
@@ -55,6 +56,31 @@ const storageConfig = {
 };
 const fileStorage = createFileStorage(mockDatabase.db, storageConfig);
 
+async function acceptanceInput() {
+  const [last] = await mockDatabase.db
+    .select()
+    .from(aiMessages)
+    .where(eq(aiMessages.conversationId, conversationId))
+    .orderBy(desc(aiMessages.createdAt), desc(aiMessages.id))
+    .limit(1);
+  return {
+    userId,
+    conversationId,
+    messages: [
+      {
+        id: randomUUID(),
+        role: "user" as const,
+        parts: [{ type: "text" as const, text: "hello" }],
+      },
+    ],
+    parentMessageId: last?.id ?? null,
+    requestId: randomUUID(),
+    agentId: "assistant",
+    reasoningEffort: "low" as const,
+    locale: "en" as const,
+  };
+}
+
 beforeAll(async () => {
   await mockDatabase.db.insert(users).values(
     [userId, otherId].map((id) => ({
@@ -79,6 +105,26 @@ afterAll(async () => {
 });
 
 describe("architecture consistency against PostgreSQL", () => {
+  it("preserves unknown paid usage when migrating a Web-owned active run", async () => {
+    const migration = await readFile(
+      "src/database/migrations/0028_careful_blue_blade.sql",
+      "utf8",
+    );
+    const backfill = migration.slice(migration.indexOf('UPDATE "ai_runs"'));
+    await mockDatabase.sql.begin(async (tx) => {
+      await tx`create temporary table ai_runs on commit drop as select * from public.ai_runs where false`;
+      const id = randomUUID();
+      const createdAt = new Date("2026-10-01T00:00:00Z");
+      await tx`insert into ai_runs (id, status, "createdAt", "reservedTokens", "providerStartedAt") values (${id}, 'running', ${createdAt.toISOString()}::timestamptz, 400000, null)`;
+      await tx.unsafe(backfill);
+      const [run] =
+        await tx`select "providerStartedAt", "reservedTokens" from ai_runs where id = ${id}`;
+      expect(new Date(run.providerStartedAt).toISOString()).toBe(
+        createdAt.toISOString(),
+      );
+      expect(run.reservedTokens).toBe(400000);
+    });
+  });
   it("migrates existing private file links with Unicode and reserved key characters", async () => {
     const migration = await readFile(
       "src/database/migrations/0025_shocking_blue_blade.sql",
@@ -111,15 +157,9 @@ describe("architecture consistency against PostgreSQL", () => {
     });
   });
 
-  it("serializes AI admission, rejects repeated requests and retains unknown reservations", async () => {
+  it("serializes AI admission, reuses exact requests and retains unknown reservations", async () => {
     const { beginAiRun, failAiRun } = await import("@/lib/ai/runs");
-    const input = {
-      userId,
-      conversationId,
-      messages: [],
-      parentMessageId: null,
-      requestId: randomUUID(),
-    };
+    const input = await acceptanceInput();
     const results = await Promise.allSettled([
       beginAiRun(input),
       beginAiRun({ ...input, requestId: randomUUID() }),
@@ -131,28 +171,25 @@ describe("architecture consistency against PostgreSQL", () => {
       .select()
       .from(aiRuns)
       .where(eq(aiRuns.userId, userId));
-    await expect(
-      beginAiRun({ ...input, requestId: run.requestKey }),
-    ).rejects.toThrow(/already accepted/);
+    expect(
+      (await beginAiRun({ ...input, requestId: run.requestKey })).run.id,
+    ).toBe(run.id);
+    await claimAiRun(mockDatabase.db, run.id);
     await failAiRun(run.id, true);
-    const next = await beginAiRun({ ...input, requestId: randomUUID() });
+    const next = await beginAiRun(await acceptanceInput());
     expect(next.allowImageGeneration).toBe(false);
+    await claimAiRun(mockDatabase.db, next.run.id);
     await failAiRun(next.run.id, true);
-    await expect(
-      beginAiRun({ ...input, requestId: randomUUID() }),
-    ).rejects.toThrow(/allowance/);
+    await expect(beginAiRun(await acceptanceInput())).rejects.toThrow(
+      /allowance/,
+    );
     await mockDatabase.db.delete(aiRuns).where(eq(aiRuns.userId, userId));
   });
 
   it("retains image allowance when completion usage is unknown", async () => {
     const { beginAiRun, completeAiRun } = await import("@/lib/ai/runs");
-    const { run } = await beginAiRun({
-      userId,
-      conversationId,
-      messages: [],
-      parentMessageId: null,
-      requestId: randomUUID(),
-    });
+    const { run } = await beginAiRun(await acceptanceInput());
+    await claimAiRun(mockDatabase.db, run.id);
     await completeAiRun(
       run.id,
       { id: "unknown-response", role: "assistant", parts: [] },
@@ -176,13 +213,8 @@ describe("architecture consistency against PostgreSQL", () => {
 
   it("stores output and accounting before media work, and a stale retry cannot overwrite a newer reply", async () => {
     const { beginAiRun, completeAiRun } = await import("@/lib/ai/runs");
-    const { run } = await beginAiRun({
-      userId,
-      conversationId,
-      messages: [],
-      parentMessageId: null,
-      requestId: randomUUID(),
-    });
+    const { run } = await beginAiRun(await acceptanceInput());
+    await claimAiRun(mockDatabase.db, run.id);
     const message: AiMessage = {
       id: "a-media",
       role: "assistant",
@@ -193,6 +225,13 @@ describe("architecture consistency against PostgreSQL", () => {
           state: "output-available",
           input: {},
           output: { result: Buffer.from("image").toString("base64") },
+        },
+        {
+          type: "tool-saveDocument",
+          toolCallId: "save-1",
+          state: "approval-requested",
+          input: { fileName: "notes.md", content: "notes" },
+          approval: { id: "signed-approval" },
         },
       ],
     };
@@ -216,9 +255,9 @@ describe("architecture consistency against PostgreSQL", () => {
       .select()
       .from(aiMessages)
       .where(eq(aiMessages.id, message.id));
-    expect(stored.parts).toEqual([
+    expect(stored.parts[0]).toEqual(
       expect.objectContaining({ output: { storageStatus: "pending" } }),
-    ]);
+    );
     expect(
       await mockDatabase.db
         .select()
@@ -228,10 +267,27 @@ describe("architecture consistency against PostgreSQL", () => {
     const newer = await beginAiRun({
       userId,
       conversationId,
-      messages: [],
+      messages: [
+        {
+          ...message,
+          parts: stored.parts.map((part) =>
+            part.type === "tool-saveDocument"
+              ? {
+                  ...part,
+                  state: "approval-responded" as const,
+                  approval: { id: "signed-approval", approved: true },
+                }
+              : part,
+          ) as AiMessage["parts"],
+        },
+      ],
       parentMessageId: message.id,
       requestId: randomUUID(),
+      agentId: "assistant",
+      reasoningEffort: "low",
+      locale: "en",
     });
+    await claimAiRun(mockDatabase.db, newer.run.id);
     const newerMessage: AiMessage = {
       id: message.id,
       role: "assistant",

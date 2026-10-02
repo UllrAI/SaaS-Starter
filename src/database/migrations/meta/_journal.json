@@ -197,6 +197,13 @@
       "when": 1790821220588,
       "tag": "0027_wandering_gargoyle",
       "breakpoints": true
+    },
+    {
+      "idx": 28,
+      "version": "7",
+      "when": 1790950376032,
+      "tag": "0028_careful_blue_blade",
+      "breakpoints": true
     }
   ]
 }

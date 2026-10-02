@@ -3,6 +3,7 @@ const errorKeys = new Set([
   "ai_run_conflict",
   "ai_conversation_changed",
   "ai_context_full",
+  "ai_run_interrupted",
 ]);
 
 export function getChatErrorKey(error: Error): string {

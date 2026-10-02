@@ -76,6 +76,8 @@ interface ChatPanelProps {
   olderMessagesLoading?: boolean;
   input: string;
   status: ChatStatus;
+  reconnecting?: boolean;
+  runStopped?: boolean;
   error?: Error;
   reasoningEffort: ReasoningEffort;
   canvasCount: number;
@@ -623,6 +625,8 @@ export function ChatPanel({
   messages,
   input,
   status,
+  reconnecting = false,
+  runStopped = false,
   error,
   reasoningEffort,
   canvasCount,
@@ -822,7 +826,12 @@ export function ChatPanel({
                       )}
                     </MessageScrollerItem>
                   ))}
-                  {status === "submitted" && (
+                  {reconnecting && (
+                    <p role="status" className="text-muted-foreground text-sm">
+                      {t("ai_chat_reconnecting")}
+                    </p>
+                  )}
+                  {status === "submitted" && !reconnecting && (
                     <div
                       role="status"
                       className="text-muted-foreground flex items-center gap-3 text-sm"
@@ -833,6 +842,11 @@ export function ChatPanel({
                       />
                       {t("ai_chat_thinking")}
                     </div>
+                  )}
+                  {runStopped && !isBusy && (
+                    <p role="status" className="text-muted-foreground text-sm">
+                      {t("ai_run_stopped")}
+                    </p>
                   )}
                   {error && (
                     <div
@@ -851,6 +865,7 @@ export function ChatPanel({
                         size="sm"
                         className="shrink-0"
                         onClick={onRetry}
+                        disabled={isBusy || conversationLoading}
                       >
                         {t("ai_chat_retry")}
                       </Button>

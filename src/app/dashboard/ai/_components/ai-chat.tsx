@@ -11,7 +11,6 @@ import {
 } from "react";
 import { useChat } from "@ai-sdk/react";
 import {
-  DefaultChatTransport,
   lastAssistantMessageIsCompleteWithApprovalResponses,
   type FileUIPart,
 } from "ai";
@@ -35,7 +34,6 @@ import {
 } from "@/lib/ai/image-input";
 import {
   DEFAULT_REASONING_EFFORT,
-  REASONING_EFFORTS,
   type ReasoningEffort,
 } from "@/lib/ai/reasoning";
 import { useTranslation } from "@/lib/i18n/translation/client";
@@ -48,7 +46,10 @@ import {
 } from "./artifacts";
 import { CanvasPanel } from "./canvas-panel";
 import { ChatPanel } from "./chat-panel";
-import { prepareChatRequest } from "./chat-request";
+import { DurableChatTransport } from "./durable-chat-transport";
+import { restoreRetryMessages } from "./chat-retry";
+import { hasUnfinishedToolApproval } from "./chat-request";
+import type { AiRunSummary } from "@/lib/ai/durable-types";
 import { ConversationSidebar } from "./conversation-sidebar";
 import {
   canvasPercentFromPointer,
@@ -138,10 +139,6 @@ function useStoredCanvasPercent() {
   }, []);
 
   return value;
-}
-
-function isReasoningEffort(value: unknown): value is ReasoningEffort {
-  return REASONING_EFFORTS.some((effort) => effort === value);
 }
 
 async function readResponse<T>(response: Response): Promise<T> {
@@ -268,27 +265,18 @@ export function AiChat() {
     }
   }, [activeConversationId, historyArchived]);
 
+  const [reconnecting, setReconnecting] = useState(false);
+  const [cancelError, setCancelError] = useState<Error>();
+  const [latestRun, setLatestRun] = useState<AiRunSummary>();
   const transport = useMemo(
     () =>
-      new DefaultChatTransport<AiMessage>({
-        api: "/api/chat",
-        prepareSendMessagesRequest: ({ messages, body }) => {
-          if (typeof body?.conversationId !== "string") {
-            throw new Error("A conversation is required.");
-          }
-          return {
-            body: prepareChatRequest({
-              messages,
-              conversationId: body.conversationId,
-              reasoningEffort: isReasoningEffort(body.reasoningEffort)
-                ? body.reasoningEffort
-                : DEFAULT_REASONING_EFFORT,
-            }),
-          };
-        },
+      new DurableChatTransport({
+        onReconnecting: setReconnecting,
+        onRunAccepted: setLatestRun,
       }),
     [],
   );
+  useEffect(() => () => transport.disconnect(), [transport]);
 
   const {
     messages,
@@ -305,6 +293,20 @@ export function AiChat() {
     sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithApprovalResponses,
     onFinish: () => {
       void refreshConversationList();
+      if (activeConversationId && transport.currentRunId) {
+        const requestId = conversationRequestId.current;
+        const finishedRunId = transport.currentRunId ?? latestRun?.runId;
+        void fetchConversation(activeConversationId)
+          .then((detail) => {
+            if (requestId !== conversationRequestId.current) return;
+            setLatestRun((current) =>
+              current && current.runId !== finishedRunId
+                ? current
+                : (detail.latestRun ?? undefined),
+            );
+          })
+          .catch(() => setHistoryError(true));
+      }
     },
   });
   const imageUpload = useFileUpload({
@@ -400,6 +402,12 @@ export function AiChat() {
           detail?.messages ?? [],
         ).at(-1)?.id;
         setMessages(detail?.messages ?? []);
+        setLatestRun(detail?.latestRun ?? undefined);
+        if (detail?.activeRun) {
+          void sendMessage(undefined, {
+            body: { resumeRunId: detail.activeRun.runId },
+          });
+        }
         setMessagesHaveMore(detail?.hasMore ?? false);
         replaceConversationUrl(detail?.conversation.id);
         setHistoryError(false);
@@ -418,7 +426,7 @@ export function AiChat() {
     return () => {
       cancelled = true;
     };
-  }, [setMessages]);
+  }, [sendMessage, setMessages]);
 
   useEffect(() => {
     const refreshOnFocus = () => void refreshConversationList();
@@ -448,6 +456,7 @@ export function AiChat() {
 
   const resetConversationView = useCallback(() => {
     setMessages([]);
+    setLatestRun(undefined);
     setMessagesHaveMore(false);
     setManualArtifacts([]);
     setActiveArtifactId(undefined);
@@ -457,6 +466,7 @@ export function AiChat() {
     latestAutomaticArtifactId.current = undefined;
     clearImageAttachments();
     clearError();
+    setCancelError(undefined);
   }, [clearError, clearImageAttachments, setMessages]);
 
   const handleLoadOlderMessages = async () => {
@@ -499,6 +509,12 @@ export function AiChat() {
         -1,
       )?.id;
       setMessages(detail.messages);
+      setLatestRun(detail.latestRun ?? undefined);
+      if (detail.activeRun) {
+        void sendMessage(undefined, {
+          body: { resumeRunId: detail.activeRun.runId },
+        });
+      }
       setMessagesHaveMore(detail.hasMore ?? false);
       setActiveConversationId(detail.conversation.id);
       setConversations((current) => {
@@ -698,7 +714,10 @@ export function AiChat() {
       return;
     }
 
+    conversationRequestId.current += 1;
     clearError();
+    setCancelError(undefined);
+    setLatestRun(undefined);
     let conversationId = activeConversationId;
     if (!conversationId) {
       setConversationCreating(true);
@@ -777,6 +796,10 @@ export function AiChat() {
 
   const handleRespondToApproval = (approvalId: string, approved: boolean) => {
     if (!activeConversationId) return;
+    conversationRequestId.current += 1;
+    setLatestRun(undefined);
+    clearError();
+    setCancelError(undefined);
     // The continuation request is fired by `sendAutomaticallyWhen`, so it needs
     // the same body the transport requires of any other send.
     void addToolApprovalResponse({
@@ -831,7 +854,22 @@ export function AiChat() {
           olderMessagesLoading={olderMessagesLoading}
           input={input}
           status={status}
-          error={error}
+          reconnecting={reconnecting}
+          error={
+            cancelError ??
+            error ??
+            (latestRun && ["failed", "interrupted"].includes(latestRun.status)
+              ? new Error(
+                  JSON.stringify({
+                    code:
+                      latestRun.status === "interrupted"
+                        ? "ai_run_interrupted"
+                        : "ai_chat_error_message",
+                  }),
+                )
+              : undefined)
+          }
+          runStopped={latestRun?.status === "aborted"}
           reasoningEffort={reasoningEffort}
           canvasCount={artifacts.length}
           canvasOpen={desktopCanvasOpen}
@@ -852,13 +890,67 @@ export function AiChat() {
           onInputChange={setInput}
           onReasoningEffortChange={setReasoningEffort}
           onSubmit={handleSubmit}
-          onStop={() => void stop()}
+          onStop={() => {
+            void transport
+              .cancel()
+              .then(() => stop())
+              .catch(() => {
+                setCancelError(new Error("ai_chat_error_message"));
+              });
+          }}
           onRetry={() => {
-            if (!activeConversationId) return;
+            if (!activeConversationId || isBusy || conversationLoading) return;
             clearError();
-            void regenerate({
-              body: { reasoningEffort, conversationId: activeConversationId },
-            });
+            setCancelError(undefined);
+            if (!latestRun) {
+              const body = {
+                reasoningEffort,
+                conversationId: activeConversationId,
+              };
+              const latestMessage = messages.at(-1);
+              if (
+                latestMessage?.role === "assistant" &&
+                hasUnfinishedToolApproval(latestMessage)
+              ) {
+                void sendMessage(undefined, { body });
+              } else {
+                void regenerate({ body });
+              }
+              return;
+            }
+            setConversationLoading(true);
+            void (async () => {
+              try {
+                const run = await readResponse<
+                  AiRunSummary & { retryMessage: AiMessage | null }
+                >(
+                  await fetch(
+                    `/api/ai/runs/${encodeURIComponent(latestRun.runId)}`,
+                    { cache: "no-store" },
+                  ),
+                );
+                const retryMessage = run.retryMessage;
+                if (!retryMessage) throw new Error("Run input is unavailable.");
+                setMessages((current) =>
+                  restoreRetryMessages(
+                    current,
+                    retryMessage,
+                    run.assistantMessageId,
+                  ),
+                );
+                setLatestRun(undefined);
+                void sendMessage(undefined, {
+                  body: {
+                    retryRunId: run.runId,
+                    conversationId: activeConversationId,
+                  },
+                });
+              } catch {
+                setCancelError(new Error("ai_chat_error_message"));
+              } finally {
+                setConversationLoading(false);
+              }
+            })();
           }}
           onOpenCanvas={openCanvasForCurrentViewport}
           onOpenHistory={() => setMobileHistoryOpen(true)}

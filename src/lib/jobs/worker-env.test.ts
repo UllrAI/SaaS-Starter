@@ -28,6 +28,24 @@ describe("worker environment", () => {
     expect(env.WORKER_GRACEFUL_TIMEOUT_MS).toBe(45_000);
   });
 
+  it("requires matching authentication and model credentials when AI is enabled", () => {
+    const source = { DATABASE_URL: "postgresql://localhost/test" };
+    expect(() => loadWorkerEnv(source, { aiEnabled: true })).toThrow(
+      "BETTER_AUTH_SECRET and LLM_API_KEY",
+    );
+    expect(
+      loadWorkerEnv(
+        {
+          ...source,
+          BETTER_AUTH_SECRET: "x".repeat(32),
+          LLM_API_KEY: "test-key",
+        },
+        { aiEnabled: true },
+      ).LLM_API_KEY,
+    ).toBe("test-key");
+    expect(() => loadWorkerEnv(source, { aiEnabled: false })).not.toThrow();
+  });
+
   it("rejects non-PostgreSQL and invalid pool configuration", () => {
     expect(() =>
       loadWorkerEnv({ DATABASE_URL: "mysql://localhost/app" }),

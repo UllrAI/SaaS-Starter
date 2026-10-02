@@ -1,13 +1,9 @@
-import { describe, expect, it, jest } from "@jest/globals";
+import { describe, expect, it } from "@jest/globals";
 import { isStepCount, tool, ToolLoopAgent, type ModelMessage } from "ai";
 import { MockLanguageModelV4 } from "ai/test";
 import { z } from "zod";
 
-jest.mock("server-only", () => ({}));
-jest.mock("@/env", () => ({
-  __esModule: true,
-  default: { BETTER_AUTH_SECRET: "test-secret-that-is-at-least-32-characters" },
-}));
+const secret = "test-secret-that-is-at-least-32-characters";
 
 const usage = { inputTokens: 1, outputTokens: 1, totalTokens: 2 };
 
@@ -59,7 +55,11 @@ async function createAgent(
   const { withToolApprovalSecret } = await import("./tool-approval");
   const { executed, tools, model } = createHarness();
   const agent = new ToolLoopAgent(
-    withToolApprovalSecret({ model, tools, stopWhen: isStepCount(3) }, scope),
+    withToolApprovalSecret(
+      { model, tools, stopWhen: isStepCount(3) },
+      scope,
+      secret,
+    ),
   );
   return { agent, executed };
 }

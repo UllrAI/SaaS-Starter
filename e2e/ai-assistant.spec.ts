@@ -1,13 +1,12 @@
 import { randomUUID } from "node:crypto";
 import postgres from "postgres";
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import { createChat } from "@shadcn/helpers/ai-sdk";
 import type { UIMessageChunk } from "ai";
 import type { AiMessage } from "../src/lib/ai/chat-history-types";
 import { loginAs } from "./helpers/auth";
 
-// These checks never send a message, so no LLM call is made and CI needs no
-// real provider credentials.
+// UI fixtures and the local Worker provider below never call a paid model.
 
 async function readMessageChunks(stream: ReadableStream<UIMessageChunk>) {
   const chunks: string[] = [];
@@ -78,6 +77,103 @@ async function createImageChatChunks(publicUrl: string) {
   });
 
   return readMessageChunks(stream);
+}
+
+async function installChatFixture(
+  page: Page,
+  fixture: {
+    turns: Array<{
+      chunks: string[];
+      prompt?: string;
+      rejection?: { status: number; code: string };
+    }>;
+    delayMs?: number;
+  },
+) {
+  await page.addInitScript(({ turns, delayMs = 0 }) => {
+    const originalFetch = window.fetch.bind(window);
+    const requestBodies: string[] = [];
+    const streams = new Map<string, string[]>();
+    (
+      window as unknown as { __chatRequestBodies: string[] }
+    ).__chatRequestBodies = requestBodies;
+    window.fetch = async (input, init) => {
+      const url = new URL(
+        typeof input === "string"
+          ? input
+          : input instanceof URL
+            ? input.href
+            : input.url,
+        window.location.href,
+      );
+      if (url.pathname === "/api/chat") {
+        const rawBody =
+          typeof init?.body === "string"
+            ? init.body
+            : input instanceof Request
+              ? await input.clone().text()
+              : "{}";
+        const turn = turns[requestBodies.length];
+        requestBodies.push(rawBody);
+        if (!turn)
+          return new Response("Unexpected fixture turn", { status: 400 });
+        const body = JSON.parse(rawBody) as {
+          messages?: Array<{
+            role: string;
+            parts?: Array<{ type: string; text?: string }>;
+          }>;
+        };
+        const prompt = body.messages
+          ?.findLast((message) => message.role === "user")
+          ?.parts?.filter((part) => part.type === "text")
+          .map((part) => part.text ?? "")
+          .join("\n");
+        if (turn.prompt && prompt !== turn.prompt)
+          return new Response("Unexpected fixture prompt", { status: 400 });
+        if (turn.rejection)
+          return Response.json(
+            { code: turn.rejection.code },
+            { status: turn.rejection.status },
+          );
+        const runId = `fixture-${requestBodies.length}`;
+        streams.set(runId, turn.chunks);
+        return Response.json({ runId, status: "running" }, { status: 202 });
+      }
+      const runId = url.pathname.match(
+        /^\/api\/ai\/runs\/(fixture-\d+)\/stream$/,
+      )?.[1];
+      if (!runId) return originalFetch(input, init);
+      const chunks = streams.get(runId);
+      if (!chunks)
+        return new Response("Fixture stream missing", { status: 404 });
+      const encoder = new TextEncoder();
+      let chunkIndex = Number(url.searchParams.get("cursor") ?? 0);
+      return new Response(
+        new ReadableStream({
+          start(controller) {
+            const enqueueNext = () => {
+              if (init?.signal?.aborted) {
+                controller.close();
+                return;
+              }
+              const chunk = chunks[chunkIndex];
+              if (!chunk) {
+                controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+                controller.close();
+                return;
+              }
+              controller.enqueue(
+                encoder.encode(`id: ${++chunkIndex}\ndata: ${chunk}\n\n`),
+              );
+              window.setTimeout(enqueueNext, delayMs);
+            };
+            enqueueNext();
+          },
+        }),
+        { headers: { "content-type": "text/event-stream" } },
+      );
+    };
+  }, fixture);
 }
 
 test("rejects unauthenticated chat requests", async ({ page }) => {
@@ -156,78 +252,13 @@ test("keeps the current turn anchored while streaming", async ({ page }) => {
   await loginAs(page, "user");
   const fixture = await createStreamingChatFixture();
 
-  await page.addInitScript(
-    ({ firstChunks, firstPrompt, secondChunks, secondPrompt }) => {
-      const originalFetch = window.fetch.bind(window);
-
-      window.fetch = async (input, init) => {
-        const requestUrl = new URL(
-          typeof input === "string"
-            ? input
-            : input instanceof URL
-              ? input.href
-              : input.url,
-          window.location.href,
-        );
-        if (requestUrl.pathname !== "/api/chat") {
-          return originalFetch(input, init);
-        }
-
-        const rawBody =
-          typeof init?.body === "string"
-            ? init.body
-            : input instanceof Request
-              ? await input.clone().text()
-              : "{}";
-        const body = JSON.parse(rawBody) as {
-          messages?: Array<{
-            role: string;
-            parts?: Array<{ type: string; text?: string }>;
-          }>;
-        };
-        const latestUserText = body.messages
-          ?.findLast((message) => message.role === "user")
-          ?.parts?.filter((part) => part.type === "text")
-          .map((part) => part.text ?? "")
-          .join("\n");
-        const chunks =
-          latestUserText === secondPrompt ? secondChunks : firstChunks;
-        if (latestUserText !== firstPrompt && latestUserText !== secondPrompt) {
-          return new Response("Unexpected E2E chat prompt.", { status: 400 });
-        }
-
-        const encoder = new TextEncoder();
-        let chunkIndex = 0;
-        return new Response(
-          new ReadableStream({
-            start(controller) {
-              const enqueueNext = () => {
-                const chunk = chunks[chunkIndex];
-                if (!chunk) {
-                  controller.enqueue(encoder.encode("data: [DONE]\n\n"));
-                  controller.close();
-                  return;
-                }
-
-                controller.enqueue(encoder.encode(`data: ${chunk}\n\n`));
-                chunkIndex += 1;
-                window.setTimeout(enqueueNext, 4);
-              };
-
-              enqueueNext();
-            },
-          }),
-          {
-            headers: {
-              "content-type": "text/event-stream",
-              "x-vercel-ai-ui-message-stream": "v1",
-            },
-          },
-        );
-      };
-    },
-    fixture,
-  );
+  await installChatFixture(page, {
+    turns: [
+      { chunks: fixture.firstChunks, prompt: fixture.firstPrompt },
+      { chunks: fixture.secondChunks, prompt: fixture.secondPrompt },
+    ],
+    delayMs: 4,
+  });
 
   await page.setViewportSize({ width: 1280, height: 700 });
   await page.goto("/dashboard/ai");
@@ -307,7 +338,7 @@ test("keeps the current turn anchored while streaming", async ({ page }) => {
     .toBe(0);
 });
 
-test("asks before running a write tool and resumes once approved", async ({
+test("preserves tool approval when continuation admission fails and retries", async ({
   page,
 }) => {
   await loginAs(page, "user");
@@ -351,59 +382,13 @@ test("asks before running a write tool and resumes once approved", async ({
     { type: "finish" },
   ].map((chunk) => JSON.stringify(chunk));
 
-  await page.addInitScript(
-    ({ approvalChunks, resumeChunks }) => {
-      const originalFetch = window.fetch.bind(window);
-      const requestBodies: string[] = [];
-      (
-        window as unknown as { __chatRequestBodies: string[] }
-      ).__chatRequestBodies = requestBodies;
-
-      window.fetch = async (input, init) => {
-        const requestUrl = new URL(
-          typeof input === "string"
-            ? input
-            : input instanceof URL
-              ? input.href
-              : input.url,
-          window.location.href,
-        );
-        if (requestUrl.pathname !== "/api/chat") {
-          return originalFetch(input, init);
-        }
-
-        const rawBody =
-          typeof init?.body === "string"
-            ? init.body
-            : input instanceof Request
-              ? await input.clone().text()
-              : "{}";
-        requestBodies.push(rawBody);
-        const chunks =
-          requestBodies.length === 1 ? approvalChunks : resumeChunks;
-
-        const encoder = new TextEncoder();
-        return new Response(
-          new ReadableStream({
-            start(controller) {
-              chunks.forEach((chunk) => {
-                controller.enqueue(encoder.encode(`data: ${chunk}\n\n`));
-              });
-              controller.enqueue(encoder.encode("data: [DONE]\n\n"));
-              controller.close();
-            },
-          }),
-          {
-            headers: {
-              "content-type": "text/event-stream",
-              "x-vercel-ai-ui-message-stream": "v1",
-            },
-          },
-        );
-      };
-    },
-    { approvalChunks, resumeChunks },
-  );
+  await installChatFixture(page, {
+    turns: [
+      { chunks: approvalChunks },
+      { chunks: [], rejection: { status: 429, code: "ai_budget_reached" } },
+      { chunks: resumeChunks },
+    ],
+  });
 
   await page.goto("/dashboard/ai");
   await page
@@ -419,6 +404,10 @@ test("asks before running a write tool and resumes once approved", async ({
   ).toBeVisible();
 
   await page.getByRole("button", { name: "Allow", exact: true }).click();
+  await expect(
+    page.getByRole("button", { name: "Try again", exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Try again", exact: true }).click();
 
   await expect(page.getByText("Saved launch-plan.md.")).toBeVisible();
   // The saved file has to be reachable from the transcript, not just described.
@@ -435,6 +424,14 @@ test("asks before running a write tool and resumes once approved", async ({
   // refuse to run the tool.
   expect(secondBody).toContain('"state":"approval-responded"');
   expect(secondBody).toContain('"approved":true');
+  const retryBody = await page.evaluate(
+    () =>
+      (window as unknown as { __chatRequestBodies: string[] })
+        .__chatRequestBodies[2],
+  );
+  expect(retryBody).toContain('"state":"approval-responded"');
+  expect(retryBody).toContain('"approved":true');
+  expect(retryBody).not.toContain('"retryRunId"');
 });
 
 test("uploads a reference image and enables an image-only message", async ({
@@ -444,42 +441,7 @@ test("uploads a reference image and enables an image-only message", async ({
 
   const publicUrl = "https://cdn.example.com/reference.png";
   const chatChunks = await createImageChatChunks(publicUrl);
-  await page.addInitScript((chunks) => {
-    const originalFetch = window.fetch.bind(window);
-
-    window.fetch = async (input, init) => {
-      const requestUrl = new URL(
-        typeof input === "string"
-          ? input
-          : input instanceof URL
-            ? input.href
-            : input.url,
-        window.location.href,
-      );
-      if (requestUrl.pathname !== "/api/chat") {
-        return originalFetch(input, init);
-      }
-
-      const encoder = new TextEncoder();
-      return new Response(
-        new ReadableStream({
-          start(controller) {
-            chunks.forEach((chunk) => {
-              controller.enqueue(encoder.encode(`data: ${chunk}\n\n`));
-            });
-            controller.enqueue(encoder.encode("data: [DONE]\n\n"));
-            controller.close();
-          },
-        }),
-        {
-          headers: {
-            "content-type": "text/event-stream",
-            "x-vercel-ai-ui-message-stream": "v1",
-          },
-        },
-      );
-    };
-  }, chatChunks);
+  await installChatFixture(page, { turns: [{ chunks: chatChunks }] });
   await page.route("**/api/upload/presigned-url", async (route) => {
     await route.fulfill({
       contentType: "application/json",

@@ -9,7 +9,11 @@ are already wired.
 
 ```
 src/lib/ai/
-├── models.ts              # Responses API provider + default model (env-configurable)
+├── models.node.ts              # Responses API provider + default model (env-configurable)
+├── runtime.node.ts        # Database/storage/model dependencies for the Node Worker
+├── generation-worker.ts  # Durable ai.generate job; bounded SDK consumption
+├── durable-runs.ts       # Owned run state, batched events, cancellation and reconciliation
+├── event-stream.ts       # Cursor replay; browser disconnect ends only this subscriber
 ├── reasoning.ts           # Allowed reasoning effort levels and low default
 ├── artifacts.ts           # Shared Markdown/image/video artifact schema
 ├── chat-history.ts        # User-owned conversations and message persistence
@@ -39,14 +43,18 @@ src/lib/ai/
     └── index.ts           # Agent registry (resolved by id in the route)
 
 src/app/api/ai/conversations/      # Conversation list, creation, and retrieval
-src/app/api/chat/route.ts          # Auth + persistence + rate limit + streaming
+src/app/api/chat/route.ts          # Auth + rate limit + transactional admission (202)
+src/app/api/ai/runs/[runId]/       # Owned state, cursor SSE replay and explicit cancel
 src/app/dashboard/ai/              # Chat UI (useChat + tool-call rendering)
 ```
 
-Request flow: the chat route authenticates the session, builds an `AgentContext`, resolves an
-agent factory from the registry, and returns `createAgentUIStreamResponse`. The agent is a
-`ToolLoopAgent`: it calls the model, executes tool calls, and loops until the model finishes
-or `isStepCount` stops it.
+Request flow: Web authenticates and validates one new user message or signed approval decision.
+One PostgreSQL transaction merges server-owned history and accepts the message, `ai_runs` row,
+task, and existing dispatch outbox. `POST /api/chat` returns `202` with a stable run and assistant
+message ID; retrying the request ID returns the accepted run. The existing pg-boss dispatcher
+hands `ai.generate` to the Node Worker, which rechecks current ownership, ban state and attachments,
+then builds the same `ToolLoopAgent` and consumes `createAgentUIStream` independently of Web.
+The agent calls the model, executes approved tools and loops until completion or `isStepCount`.
 
 The built-in assistant at `/dashboard/ai` is a working Chat + Canvas example composed from two skills:
 `account-support` (looks up the signed-in user's profile and subscription) and
@@ -61,18 +69,35 @@ responsive history panel supports creating, switching, archiving, and restoring 
 Its desktop rail can be collapsed, and the selected conversation is restored from the URL after
 refresh or sign-in on another device. History is paginated in batches of 80 messages.
 The server accepts one new message or approval decision with a parent ID and derives the
-provider response handle from stored history. Each user may have one running response.
-A three-minute abort, five-step limit, and 4096 output-token limit bound each run.
-The response, pending media message, and an accounting payload commit together.
-Usage-event insertion is retried separately, so a bookkeeping failure cannot roll back the reply.
-The Worker retries accounting and R2 storage independently; stale media retries cannot overwrite a later reply. A process
-killed before that transaction leaves a reserved interrupted run and is not automatically
-replayed. See [architecture recovery and deployment](architecture-remediation.md).
+provider response handle from stored history. Each user and conversation may have one queued
+or running response. Execution has a three-minute abort, five-step limit and 4096 output-token
+limit. The Worker batches UI chunks into PostgreSQL every 100 ms or 64 chunks; generated image
+bytes are stored in R2 before their event exposes an authenticated URL. Storage outages expose
+an explicit pending result and retain the recoverable image only in the owned run record.
+
+`GET /api/ai/runs/{runId}/stream?cursor=0` replays standard SDK SSE chunks with monotonic event
+IDs, then follows new events. Cursor reconnects skip already received events. Refresh rebuilds
+from persisted history and replays the active run; history and active ownership share a consistent
+snapshot. Closing a tab or restarting Web has no effect on generation. Terminal chunks remain
+hidden until the final message, status and accounting payload commit. Accounting and R2 retries
+remain independent, and stale media finalizers cannot overwrite a later reply.
+
+Stop calls the owned `/cancel` endpoint, immediately cancels the task, stores the latest durable
+partial answer and publishes an abort. The Worker observes cancellation and aborts the SDK;
+late callbacks may record incomplete usage but cannot replace the stopped answer. Approval
+requests complete their current run and release the Worker slot; the signed decision is admitted
+as a new run extending the same assistant message.
+
+The provider invocation marker commits before model execution. Worker crashes after this marker
+become `interrupted` with a manual retry; replay restores saved output, not an interrupted remote
+model call. The queue may retry preparation before this marker, but never blindly repeats an
+ambiguous, potentially paid call. Worker maintenance reconciles expired or terminated tasks and
+retains conservative unknown-usage reservations. See [deployment and recovery](architecture-remediation.md).
 
 Users can attach up to six PNG, JPEG, or WebP reference images to each message, including an
 image-only message. The composer uploads them through the existing R2 flow before sending, and the
-durable URLs are stored as UI message file parts. The chat route verifies every URL against an
-upload owned by the authenticated user and issues short-lived signed reads before passing it to the model, so clients cannot inject
+durable URLs are stored as UI message file parts. Web verifies every URL against an
+upload owned by the authenticated user and Worker revalidates ownership before issuing short-lived signed reads to the model, so clients cannot inject
 arbitrary external images or another user's files. The supported formats follow the
 [OpenAI image-input guidance](https://developers.openai.com/api/docs/guides/images-vision).
 
@@ -88,6 +113,8 @@ The stack uses the OpenAI Responses protocol so reasoning and function tools wor
 | `LLM_BASE_URL`         | `.env`                                                | Optional Responses API base URL.                                              |
 | `AI_DAILY_TOKEN_LIMIT` | `.env`                                                | Rolling 24h admission allowance, default 2,000,000; reserves 400,000 per run. |
 | `AI_DAILY_IMAGE_LIMIT` | `.env`                                                | Rolling 24h image allowance, default 10.                                      |
+| `BETTER_AUTH_SECRET`   | Web and Worker                                        | Must match so approval signatures and response handles survive handoff.       |
+| `JOB_DATABASE_URL`     | Web and Worker                                        | Same existing pg-boss queue; defaults to the application database.            |
 | `AI_DEFAULT_MODEL`     | `.env`                                                | Optional; defaults to `gpt-5.6-luna`.                                         |
 
 The assistant defaults to `low` reasoning; the client may select `low`, `medium`, or `high` per
@@ -99,7 +126,7 @@ mapped to the closest orientation instead of widening the output limit. These pr
 A custom gateway must support both the Responses protocol and the OpenAI image-generation built-in
 tool for that feature to work.
 
-To use another vendor, change `src/lib/ai/models.ts` only — for example install
+To use another vendor, change `src/lib/ai/models.node.ts` only — for example install
 `@ai-sdk/anthropic` and swap `createOpenAI` for `createAnthropic`. Tools, skills, agents, and
 routes remain provider-agnostic.
 
@@ -207,25 +234,33 @@ tool without conflict. Prompt-only skills (tone, policies, escalation rules) omi
 
 ## Adding an agent
 
-Agents are request-scoped `ToolLoopAgent` instances composed from skills:
+Agents are run-scoped `ToolLoopAgent` instances composed from skills:
 
 ```ts
 // src/lib/ai/agents/support.ts
 export function createSupportAgent(
   context: AgentContext,
   options: CreateAgentOptions,
+  dependencies: AgentDependencies,
 ) {
   const { instructions, toolNames } = composeSkills([
     agentSkills.accountSupport,
     agentSkills.invoicing,
   ]);
-  return new ToolLoopAgent({
-    model: getChatModel(),
-    reasoning: options.reasoningEffort,
-    instructions: `You are the support agent. ...\n\n${instructions}`,
-    tools: buildTools(toolNames, context),
-    stopWhen: isStepCount(10),
-  });
+  return new ToolLoopAgent(
+    withToolApprovalSecret(
+      {
+        model: dependencies.models.getChatModel(),
+        maxRetries: 0,
+        reasoning: options.reasoningEffort,
+        instructions: `You are the support agent. ...\n\n${instructions}`,
+        tools: buildTools(toolNames, context, dependencies),
+        stopWhen: isStepCount(AI_MAX_STEPS),
+      },
+      context,
+      dependencies.approvalSecret,
+    ),
+  );
 }
 ```
 
@@ -234,7 +269,7 @@ Add the factory to `agentFactories` in `src/lib/ai/agents/index.ts`; the chat ro
 
 ## The chat API
 
-`POST /api/chat` expects a Vercel AI SDK UI message payload (`useChat` sends it automatically):
+`POST /api/chat` expects one new UI message or approval decision, `conversationId`, UUID `requestId`, and the last persisted `parentMessageId`. The dashboard durable transport prepares this payload:
 
 - Session cookie auth; `401` without a signed-in user.
 - Rate limited per user (30 requests / 10 minutes, `ai_chat` scope).
@@ -243,21 +278,25 @@ Add the factory to `agentFactories` in `src/lib/ai/agents/index.ts`; the chat ro
 - Accepts only `low`, `medium`, or `high` reasoning effort and defaults to `low`.
 - Accepts at most six PNG, JPEG, or WebP reference images per user message and verifies each
   image against the authenticated user's upload records.
-- Streams a UI message response, including tool-call parts the client can render.
-- Provider errors are logged server-side and masked in the stream; a misconfigured agent
-  answers `500` and an unusable message payload answers `400`, neither leaking details.
+- Returns `202` JSON `{ id, runId, conversationId, assistantMessageId, status }`.
+- Unusable payloads return `400`; changed history or concurrent admission returns `409`; budget exhaustion returns `429`.
+- Owned `GET /api/ai/runs/{runId}` exposes state; `/stream?cursor=N` replays events; `POST /cancel` stops execution. Missing or another user’s run returns `404`.
+- Provider failures are logged inside Worker and exposed as controlled stream codes, without upstream details.
 
-`AgentContext` is built from the session on the server, so no field a client sends can widen
+`AgentContext` is rebuilt from the current database profile and owned conversation inside Worker, so no field a client sends can widen
 what a tool may read.
 
 Successful turns expose a signed, user-bound response handle in message metadata. On the next
-turn the client sends only messages created after that response, and the server verifies the
-handle before using the underlying Responses API `previous_response_id`. This keeps generated
-image payloads out of later request bodies and prevents a client from chaining to another user's
+turn the client sends one new message and the server derives and verifies the chain from stored
+history before using Responses API `previous_response_id`. Clients cannot chain to another user's
 response. Provider response storage is enabled because native response chaining requires it.
-The user message is stored before the stream is returned, while the completed assistant message
-is stored by the stream end callback. Regeneration updates the existing assistant message and
-cannot overwrite a message with a different role.
+Approval continuations extend their existing assistant ID; ordinary turns receive a stable new ID. Explicit Retry/regenerate sends only
+`{ conversationId, requestId, retryRunId }`: the server requires the latest owned terminal run
+and derives its original message, approvals and options from the accepted snapshot. A changed
+conversation rejects with `409`; an explicit retry may incur a new provider charge. The state
+endpoint supplies `retryMessage` to restore the SDK continuation state, and conversation detail
+includes `latestRun` so failure and Retry survive refresh. Legacy runs without an accepted
+snapshot can be followed by a new user message but cannot reconstruct a signed approval retry.
 
 The dashboard page at `/dashboard/ai` follows the AI Elements conversation, reasoning,
 prompt-input, tool-status, and artifact patterns while reusing this repository's shadcn primitives
@@ -310,12 +349,10 @@ GROUP BY "accountingStatus";
 ```
 
 Admission uses a user-scoped PostgreSQL transaction lock plus partial unique indexes for both
-user and conversation active runs. A stale run is changed to interrupted before new admission;
-completion and cleanup update only that run ID while it is running. A late former owner cannot
-write a response or release its successor. The existing 409 message is localized in both catalogs.
-
-Generation still runs in the Web process. Node-safe admission/accounting repositories are shared
-with Worker maintenance, but full generation handoff and cursor replay remain tracked in #91.
+user and conversation queued/running runs. Execution timeout starts when Worker claims the run,
+so queue waiting does not consume model runtime. Completion and cleanup affect only that run ID;
+a former owner cannot write a response or release its successor. Run IDs and cursor streams are
+owned resources; browser disconnection is separate from explicit cancellation.
 
 ## Testing
 
@@ -324,6 +361,10 @@ Agent code is unit-testable with Jest. The AI SDK packages are ESM-only, so they
 polyfills `TransformStream` for jsdom.
 
 Patterns to copy: call a tool's `execute` directly (`tools/*.test.ts`), compose skills without a
-context (`skills/compose.test.ts`), and cover a route by mocking session, rate limit, and agent
+context (`skills/compose.test.ts`), and cover admission by mocking session, rate limit, and the repository
 (`src/app/api/chat/route.test.ts`). `e2e/ai-assistant.spec.ts` covers the page and the route's
-rejection paths without calling a model, so it needs no provider credentials.
+rejection paths. `e2e/ai-durable-run.spec.ts` runs a local deterministic Responses-compatible server
+and real bundled Worker to exercise close-tab completion, refresh, Web restart, Stop, crash and
+manual retry without paid calls. `pnpm test:jobs:integration` exercises real SDK chunk consumption,
+PostgreSQL transactions, cursors, media recovery and approval ownership against a dedicated test
+database.

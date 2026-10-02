@@ -1,15 +1,26 @@
-import { and, eq, gte, sql } from "drizzle-orm";
+import { isDeepStrictEqual } from "node:util";
+import { randomUUID } from "node:crypto";
+import { generateId } from "ai";
+import { and, desc, eq, gte, inArray, sql } from "drizzle-orm";
 import type { AppDatabase } from "@/database/client";
 import {
   aiConversations,
   aiRuns,
   aiMessages,
   aiUsageEvents,
+  taskRuns,
+  taskDispatches,
 } from "@/database/schema";
-import { withoutImageBytes } from "./finalize";
+import { withoutImageBytes, restoreStoredImageOutputs } from "./finalize";
 import type { AiMessage } from "./chat-history-types";
 import { imageUsageForMessage, type AiUsageEventInput } from "./usage";
-import { AI_RUN_TIMEOUT_MS, AI_RUN_TOKEN_RESERVATION } from "./limits";
+import {
+  AI_RUN_TIMEOUT_MS,
+  AI_RUN_TOKEN_RESERVATION,
+  AI_MAX_CONTEXT_BYTES,
+} from "./limits";
+import { mergeAiTranscript, AiTranscriptConflictError } from "./transcript";
+import { AI_GENERATION_JOB, type AiGenerationInput } from "./durable-types";
 
 export class AiRunConflictError extends Error {}
 export class AiBudgetExceededError extends Error {}
@@ -23,52 +34,68 @@ export async function beginAiRun(
     messages: AiMessage[];
     parentMessageId: string | null;
     requestId: string;
+    retryRunId?: string;
+    agentId: string;
+    reasoningEffort: AiGenerationInput["reasoningEffort"];
+    locale: AiGenerationInput["locale"];
   },
 ) {
-  const requestKey = input.requestId;
   return db.transaction(async (tx) => {
     await tx.execute(
       sql`select pg_advisory_xact_lock(hashtextextended(${"ai:" + input.userId}, 0))`,
     );
     const [conversation] = await tx
-      .select({ id: aiConversations.id })
+      .select()
       .from(aiConversations)
       .where(
         and(
           eq(aiConversations.id, input.conversationId),
           eq(aiConversations.userId, input.userId),
         ),
-      );
+      )
+      .for("update");
     if (!conversation)
       throw new AiRunConflictError("Conversation unavailable.");
-    await tx
-      .update(aiRuns)
-      .set({ status: "interrupted" })
-      .where(
-        and(
-          eq(aiRuns.userId, input.userId),
-          eq(aiRuns.status, "running"),
-          sql`${aiRuns.expiresAt} < now()`,
-        ),
-      );
     const [previous] = await tx
       .select()
       .from(aiRuns)
       .where(
         and(
           eq(aiRuns.conversationId, input.conversationId),
-          eq(aiRuns.requestKey, requestKey),
+          eq(aiRuns.requestKey, input.requestId),
         ),
       );
-    if (previous)
-      throw new AiRunConflictError(
-        "This request was already accepted. Reload the conversation.",
-      );
+    let request = {
+      message:
+        input.messages[0]?.role === "user"
+          ? { ...input.messages[0], metadata: undefined }
+          : input.messages[0],
+      parentMessageId: input.parentMessageId,
+      agentId: input.agentId,
+      reasoningEffort: input.reasoningEffort,
+      ...(input.retryRunId ? { retryRunId: input.retryRunId } : {}),
+    };
+    if (previous) {
+      if (
+        input.retryRunId
+          ? previous.input?.request.retryRunId !== input.retryRunId
+          : !isDeepStrictEqual(
+              previous.input?.request,
+              JSON.parse(JSON.stringify(request)),
+            )
+      )
+        throw new AiRunConflictError(
+          "This request ID was already used with different input.",
+        );
+      return {
+        run: previous,
+        allowImageGeneration: previous.input?.allowImageGeneration ?? false,
+      };
+    }
     const [usage] = await tx
       .select({
         tokens: sql<number>`coalesce(sum(coalesce(${aiRuns.totalTokens}, ${aiRuns.reservedTokens})), 0)`,
         images: sql<number>`coalesce(sum(${aiRuns.imageCount}), 0)`,
-        active: sql<number>`count(*) filter (where ${aiRuns.status} = 'running')`,
       })
       .from(aiRuns)
       .where(
@@ -77,31 +104,184 @@ export async function beginAiRun(
           gte(aiRuns.createdAt, sql<Date>`now() - interval '24 hours'`),
         ),
       );
-    // One active run per user also serializes approvals and image reservations.
-    if (Number(usage.active) > 0)
+    const [active] = await tx
+      .select({ id: aiRuns.id })
+      .from(aiRuns)
+      .where(
+        and(
+          eq(aiRuns.userId, input.userId),
+          inArray(aiRuns.status, ["queued", "running"]),
+        ),
+      )
+      .limit(1);
+    if (active)
       throw new AiRunConflictError("Another response is still running.");
     if (Number(usage.tokens) + AI_RUN_TOKEN_RESERVATION > limits.tokenLimit)
       throw new AiBudgetExceededError("Daily AI allowance reached.");
+    const rows = await tx
+      .select()
+      .from(aiMessages)
+      .where(eq(aiMessages.conversationId, conversation.id))
+      .orderBy(desc(aiMessages.createdAt), desc(aiMessages.id))
+      .limit(81);
+    if (!input.retryRunId && rows.length > 80)
+      throw new AiTranscriptConflictError(
+        "Conversation context is full. Start a new conversation.",
+        "ai_context_full",
+      );
+    const history = rows.reverse().map((row) => ({
+      id: row.id,
+      role: row.role,
+      parts: row.parts as AiMessage["parts"],
+      ...(row.metadata ? { metadata: row.metadata } : {}),
+    }));
+    let source: typeof aiRuns.$inferSelect | undefined;
+    let messages: AiMessage[];
+    if (input.retryRunId) {
+      const [latestRun] = await tx
+        .select()
+        .from(aiRuns)
+        .where(eq(aiRuns.conversationId, conversation.id))
+        .orderBy(desc(aiRuns.createdAt), desc(aiRuns.id))
+        .limit(1);
+      source = latestRun;
+      const latestMessage = rows.at(-1);
+      if (
+        !source ||
+        source.id !== input.retryRunId ||
+        !source.input ||
+        !["completed", "failed", "aborted", "interrupted"].includes(
+          source.status,
+        ) ||
+        !latestMessage ||
+        ![source.assistantMessageId, source.input.messages.at(-1)?.id].includes(
+          latestMessage.id,
+        )
+      )
+        throw new AiTranscriptConflictError(
+          "The conversation changed. Reload it before retrying.",
+        );
+      messages = source.input.messages;
+      request = { ...source.input.request, retryRunId: source.id };
+      if (messages.at(-1)?.role === "user") {
+        await tx
+          .delete(aiMessages)
+          .where(
+            and(
+              eq(aiMessages.conversationId, conversation.id),
+              eq(aiMessages.id, source.assistantMessageId!),
+            ),
+          );
+      }
+    } else {
+      messages = mergeAiTranscript(
+        history,
+        input.messages,
+        input.parentMessageId,
+      );
+    }
+    if (
+      Buffer.byteLength(JSON.stringify(messages), "utf8") > AI_MAX_CONTEXT_BYTES
+    )
+      throw new AiTranscriptConflictError(
+        "Conversation context is full. Start a new conversation.",
+        "ai_context_full",
+      );
+    const last = messages.at(-1)!;
+    const assistantMessageId =
+      source?.assistantMessageId ??
+      (last.role === "assistant" ? last.id : generateId());
+    const allowImageGeneration = Number(usage.images) < limits.imageLimit;
+    const runInput: AiGenerationInput = {
+      messages,
+      request,
+      agentId: source?.input?.agentId ?? input.agentId,
+      reasoningEffort: source?.input?.reasoningEffort ?? input.reasoningEffort,
+      locale: input.locale,
+      allowImageGeneration,
+    };
+    const taskId = randomUUID();
+    const runId = randomUUID();
+    const scopeKey = `user:${input.userId}`;
+    await tx.insert(taskRuns).values({
+      id: taskId,
+      kind: AI_GENERATION_JOB,
+      scopeKey,
+      idempotencyKey: input.requestId,
+      input: { runId },
+      dispatchId: taskId,
+    });
     const [run] = await tx
       .insert(aiRuns)
       .values({
+        id: runId,
         userId: input.userId,
         conversationId: input.conversationId,
-        requestKey,
+        requestKey: input.requestId,
+        taskRunId: taskId,
+        assistantMessageId,
+        input: runInput,
+        status: "queued",
         reservedTokens: AI_RUN_TOKEN_RESERVATION,
-        imageCount: Number(usage.images) < limits.imageLimit ? 1 : 0,
+        imageCount: allowImageGeneration ? 1 : 0,
         expiresAt: new Date(Date.now() + AI_RUN_TIMEOUT_MS + 30_000),
       })
       .returning();
-    return {
-      run,
-      allowImageGeneration: Number(usage.images) < limits.imageLimit,
-    };
+    await tx
+      .insert(aiMessages)
+      .values({
+        id: last.id,
+        conversationId: conversation.id,
+        role: last.role,
+        parts: last.parts,
+        metadata: last.metadata ?? null,
+        ...(last.role === "assistant" ? { runId } : {}),
+      })
+      .onConflictDoUpdate({
+        target: [aiMessages.conversationId, aiMessages.id],
+        set: {
+          parts: last.parts,
+          metadata: last.metadata ?? null,
+          ...(last.role === "assistant" ? { runId } : {}),
+        },
+      });
+    const title =
+      last.role === "user"
+        ? last.parts
+            .flatMap((part) =>
+              part.type === "text"
+                ? [part.text]
+                : part.type === "file" && part.filename
+                  ? [part.filename]
+                  : [],
+            )
+            .join(" ")
+            .replace(/\s+/g, " ")
+            .trim()
+            .slice(0, 80)
+        : null;
+    await tx
+      .update(aiConversations)
+      .set({
+        updatedAt: sql`now()`,
+        ...(title
+          ? { title: sql`coalesce(${aiConversations.title}, ${title})` }
+          : {}),
+      })
+      .where(eq(aiConversations.id, conversation.id));
+    await tx.insert(taskDispatches).values({
+      id: taskId,
+      taskRunId: taskId,
+      kind: AI_GENERATION_JOB,
+      scopeKey,
+      payload: { runId },
+    });
+    return { run, allowImageGeneration };
   });
 }
 
 // Persist the response and accounting together before optional media work.
-// The Worker only finalizes optional media; it never re-executes the model.
+// Optional media and usage insertion retry independently of model execution.
 export async function completeAiRun(
   db: AppDatabase,
   runId: string,
@@ -109,6 +289,26 @@ export async function completeAiRun(
   usage: AiUsageEventInput,
 ) {
   await db.transaction(async (tx) => {
+    const [current] = await tx
+      .select()
+      .from(aiRuns)
+      .where(eq(aiRuns.id, runId))
+      .for("update");
+    const cancelled =
+      current?.status === "aborted" &&
+      current.cancelRequestedAt !== null &&
+      current.usage === null;
+    if (!current || (current.status !== "running" && !cancelled)) return;
+    if (cancelled) {
+      // Retain the snapshot committed by Stop. The late SDK callback may add
+      // measured usage, but it cannot publish new output after cancellation.
+      usage = { ...usage, aborted: true, usageComplete: false };
+      response = (current.response as AiMessage) ?? {
+        id: current.assistantMessageId!,
+        role: "assistant",
+        parts: [],
+      };
+    }
     const [run] = await tx
       .update(aiRuns)
       .set({
@@ -117,17 +317,17 @@ export async function completeAiRun(
           : usage.finishReason === "error"
             ? "failed"
             : "completed",
-        response,
+        response: cancelled ? current.response : response,
         usage: { ...usage },
         totalTokens:
           usage.usageComplete === false ? null : (usage.totalTokens ?? null),
         accountingStatus: "pending",
       })
-      .where(and(eq(aiRuns.id, runId), eq(aiRuns.status, "running")))
+      .where(eq(aiRuns.id, runId))
       .returning();
     if (!run) return;
     const [previous] = await tx
-      .select({ parts: aiMessages.parts })
+      .select({ parts: aiMessages.parts, runId: aiMessages.runId })
       .from(aiMessages)
       .where(
         and(
@@ -135,15 +335,22 @@ export async function completeAiRun(
           eq(aiMessages.id, response.id),
         ),
       );
+    if (previous)
+      response = restoreStoredImageOutputs(response, {
+        id: response.id,
+        role: "assistant",
+        parts: previous.parts as AiMessage["parts"],
+      });
     const imageCalls = (parts: AiMessage["parts"]) =>
       new Set(
         parts.flatMap((part) =>
           part.type === "tool-generateImage" ? [part.toolCallId] : [],
         ),
       );
-    const previousCalls = imageCalls(
-      (previous?.parts ?? []) as AiMessage["parts"],
+    const original = current.input?.messages.find(
+      (message) => message.id === response.id && message.role === "assistant",
     );
+    const previousCalls = imageCalls(original?.parts ?? []);
     const imageUsage = imageUsageForMessage(
       response,
       usage.imageSize,
@@ -165,6 +372,7 @@ export async function completeAiRun(
             : newImageCalls,
       })
       .where(eq(aiRuns.id, run.id));
+    if (cancelled) return;
     const pending = withoutImageBytes(response);
     await tx
       .insert(aiMessages)
@@ -203,7 +411,9 @@ export async function failAiRun(
       status: "failed",
       ...(!providerStarted ? { totalTokens: 0, imageCount: 0 } : {}),
     })
-    .where(and(eq(aiRuns.id, runId), eq(aiRuns.status, "running")));
+    .where(
+      and(eq(aiRuns.id, runId), inArray(aiRuns.status, ["queued", "running"])),
+    );
 }
 
 export async function recordPendingAiUsage(db: AppDatabase, runId: string) {

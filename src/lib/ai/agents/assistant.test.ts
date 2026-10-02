@@ -1,4 +1,5 @@
 jest.mock("@/lib/config/constants", () => ({ APP_NAME: "Test" }));
+import { createAiModels } from "../models.node";
 import { createAssistantAgent } from "./assistant";
 
 const mockSettings = jest.fn();
@@ -18,10 +19,6 @@ jest.mock("@/lib/config/site", () => ({
     },
   },
 }));
-jest.mock("../models", () => ({
-  getChatModel: () => ({}),
-  getImageGenerationTool: () => ({}),
-}));
 jest.mock("../tools", () => ({
   buildTools: (names: string[]) =>
     Object.fromEntries(names.map((name) => [name, {}])),
@@ -29,6 +26,19 @@ jest.mock("../tools", () => ({
 jest.mock("../tool-approval", () => ({
   withToolApprovalSecret: (settings: unknown) => settings,
 }));
+
+const dependencies = {
+  models: createAiModels({
+    apiKey: "test",
+    baseUrl: "https://example.com/v1",
+    defaultModel: "test",
+  }),
+  approvalSecret: "test-secret-that-is-at-least-32-characters",
+  getUserSubscription: async () => null,
+  storeFile: async () => {
+    throw new Error("unused storage");
+  },
+};
 
 const context = {
   userId: "user",
@@ -42,33 +52,46 @@ it.each([true, false])(
   "registers storage tools only when uploads=%s",
   (enabled) => {
     mockFeatures.uploads = enabled;
-    createAssistantAgent(context, {
-      reasoningEffort: "low",
-      imageSize: "1024x1024",
-    });
+    createAssistantAgent(
+      context,
+      {
+        reasoningEffort: "low",
+        imageSize: "1024x1024",
+      },
+      dependencies,
+    );
     const settings = mockSettings.mock.lastCall![0];
     expect("generateImage" in settings.tools).toBe(enabled);
     expect("saveDocument" in settings.tools).toBe(enabled);
+    expect(settings.maxRetries).toBe(0);
     expect(settings.maxOutputTokens).toBeGreaterThan(0);
   },
 );
 it("removes image generation when the image allowance is exhausted", () => {
   mockFeatures.uploads = true;
-  createAssistantAgent(context, {
-    reasoningEffort: "low",
-    imageSize: "1024x1024",
-    allowImageGeneration: false,
-  });
+  createAssistantAgent(
+    context,
+    {
+      reasoningEffort: "low",
+      imageSize: "1024x1024",
+      allowImageGeneration: false,
+    },
+    dependencies,
+  );
   expect(mockSettings.mock.lastCall![0].tools).not.toHaveProperty(
     "generateImage",
   );
 });
 it("removes image generation after its first call in the agent loop", () => {
   mockFeatures.uploads = true;
-  createAssistantAgent(context, {
-    reasoningEffort: "low",
-    imageSize: "1024x1024",
-  });
+  createAssistantAgent(
+    context,
+    {
+      reasoningEffort: "low",
+      imageSize: "1024x1024",
+    },
+    dependencies,
+  );
   const settings = mockSettings.mock.lastCall![0];
   expect(
     settings.prepareStep({

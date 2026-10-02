@@ -2,7 +2,7 @@
 slug: saas-starter-kit-developer-guide
 title: UllrAI SaaS Starter Kit 开发者文档
 publishedDate: 2025-06-23
-updatedDate: 2026-08-12
+updatedDate: 2026-10-02
 author: admin
 excerpt: >-
   从 Next.js 16、Better Auth、Stripe、Drizzle、PostgreSQL 和 R2 出发，完整搭建、验证并发布支持 API 与 CLI 的生产级 SaaS。
@@ -23,13 +23,13 @@ featured: true
 heroImage: https://images.unsplash.com/photo-1561886362-a2b38ce83470?q=80&w=1674&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D
 ---
 
-本文已按 v0.1.3 的实际代码路径更新，覆盖 Next.js 16 App Router、Better Auth、Stripe 支付、PostgreSQL 与 Drizzle、Cloudflare R2 上传、多语言营销页、API Key，以及浏览器批准的 CLI 设备登录。请把它作为实现地图，并用仓库现有的 lint、类型检查、测试和构建命令验证每次改动。
+本文于 2026 年 10 月 2 日按 v0.1.16 的实际代码路径核对，覆盖 Next.js 16 App Router、Better Auth、Stripe 支付、PostgreSQL 与 Drizzle、Cloudflare R2 上传、多语言营销页、API Key，以及浏览器批准的 CLI 设备登录。请把它作为实现地图，并用仓库现有的 lint、类型检查、测试和构建命令验证每次改动。
 
 ## 1. 项目概览
 
 ### 1.1. 项目简介
 
-**UllrAI SaaS Starter Kit** 是一个免费、开源、生产就绪的全栈 SaaS 入门套件。它集成了现代 Web 开发中备受推崇的技术和实践，旨在帮助开发者以前所未有的速度启动下一个 SaaS 项目，让您专注于业务逻辑而非基础架构的搭建。
+**UllrAI SaaS Starter Kit** 是一个免费、开源、生产就绪的全栈 SaaS 入门套件。它提供可用的认证、计费、私有上传和多语言应用结构，方便在现有边界上开发产品。
 
 - **核心功能**：提供身份验证、支付订阅、数据库管理、文件上传、内容管理等 SaaS 应用的核心功能。
 - **Agent 友好定位**：同一套代码同时服务浏览器用户、API、终端自动化，以及 agent（OpenClaw、Codex、Claude Code 等）工作流。
@@ -37,7 +37,7 @@ heroImage: https://images.unsplash.com/photo-1561886362-a2b38ce83470?q=80&w=1674
 - **适用场景**：
   - 快速搭建需要用户登录和付费订阅功能的全栈 SaaS 应用。
   - 作为学习现代全栈 Web 开发技术的实践项目。
-  - 为企业级项目提供一个稳定、可扩展的初始脚手架。
+  - 在现有权限和计费边界上启动产品。
   - 独立开发者或小型团队快速验证商业想法。
 
 ### 1.2. 快速开始
@@ -45,8 +45,8 @@ heroImage: https://images.unsplash.com/photo-1561886362-a2b38ce83470?q=80&w=1674
 1.**克隆项目**
 
 ```bash
-git clone https://github.com/ullrai/saas-starter.git
-cd saas-starter
+git clone https://github.com/UllrAI/SaaS-Starter.git
+cd SaaS-Starter
 ```
 
 2.**安装依赖**
@@ -66,7 +66,7 @@ cp .env.example .env
 确保本地 PostgreSQL 数据库已启动，然后执行：
 
 ```bash
-pnpm db:push
+pnpm db:migrate
 ```
 
 5.**运行开发服务器**
@@ -75,13 +75,14 @@ pnpm db:push
 pnpm dev
 ```
 
-应用将在 `http://localhost:3000` 上运行。
+应用将在 `http://localhost:3000` 上运行。按 `package.json` 使用 Node.js ≥22.12.0 和 pnpm 10.33.0。持久后台任务需要在另一个终端运行 `pnpm worker:dev`，详见 [Worker 说明](https://github.com/UllrAI/SaaS-Starter/blob/main/docs/background-jobs.md)。
 
 ### 1.3. 特性列表
 
 - **现代框架**: Next.js 16 (App Router, RSC), React 19, TypeScript
 - **UI**: Tailwind CSS v4, shadcn/ui, Lucide Icons, Dark/Light Mode
 - **认证**: Better-Auth (魔法链接, OAuth - Google/GitHub/LinkedIn)
+- **AI 与持久任务**: 可选 AI 助手、类型化工具与 PostgreSQL/pg-boss 后台执行，详见 [AI 说明](https://github.com/UllrAI/SaaS-Starter/blob/main/docs/ai-agent.md) 和 [Worker 说明](https://github.com/UllrAI/SaaS-Starter/blob/main/docs/background-jobs.md)。
 - **机器认证**: API Key、浏览器批准的 CLI 设备登录、CLI 会话查看、版本化 `/api/v1/*` 接口
 - **数据库**: PostgreSQL + Drizzle ORM (类型安全查询, 迁移管理)
 - **支付订阅**: Stripe 集成 (一次性支付, 订阅, 客户门户, Webhooks)
@@ -90,13 +91,11 @@ pnpm dev
 - **邮件服务**: Resend + React Email (事务性邮件模板)
 - **表单处理**: React Hook Form + Zod (类型安全的表单验证)
 - **代码质量**: ESLint、Prettier、Jest、Playwright 冒烟测试
-- **管理后台**: 通用的数据管理后台，可轻松扩展以管理任何数据库表
+- **管理后台**: 用户、支付、订阅、上传的独立管理页面
 - **Agent 友好工作流**: 内置一等公民 `saas-cli`、API 校验与已授权设备管理能力
 - **部署**: Zeabur 参考部署与独立 Docker 镜像
 
 ### 1.4. 技术架构图
-
-[![技术架构图](https://mermaid.ink/img/pako:eNqNVF1rE0EU_SvD9CWFfLVpttkNCPlok7RNW5Nqwd08TLM32TW7O8vsrGkaAoJYRFAr-OiDfROEKvigRdBfs43-C2c3aUiNaId9mLlzzrl37rnsELepDljBXUZcAx2UNQeJ5flHk4CGx2_eXz37Mv7wEcWKjPY9YMsanqDCVVAngBZKJO6g4nAXjnnyoYcKrjvKT2Dg6JqzoHsfWBssFFx-Dl59mlcsCiXUANLmqAnsETBUorZLHXC4FyUpqRq-V0MxzyB620n5ZhwdENPqm44uSmvl_5Aq7NdQg_ocvNRUr9DmJnUmYmU1OHspXvfr8bef31-3_lny1buvwY8nV29fBM_P5ysuh2n2GvVIcEMtM_PkxIIwMl_MRnS9qcb2qce7DJp3d5bn7yOVgs-NqOIQW1GLwDmwRBhdgO6TgS16MkNX1RIDsBdwG7ZozgxVUxvgiectwJqcMtKFGXBLLVnU1zsWYYAaqzc6E24WuhOcPg0uLscX5-OzUxQr1Zs35mRb3YaBxwk3262pwbqXOmSm8CXKt6PWCevptO-ktpp7u8h0UMXkC25GPKQTTiasv5dViRyJmhmi6mqF0q4FKaFY9Y9SO6bTA73mXKtXQ_ghHBmU9qZjkZ_5zwfCywLqmJalLHXkTtzjjPZAWcpkMtN9om_q3FBW3eP8PGlzSiK6fnvS1ixT-vak6jVJkm5Pqk1Jcvs_b8Jx8Xswdaxw5kMc28DESIkjHoZyGuYG2KBhRWx16BDf4qHzI0FzifOAUhsrHWJ5gsqo3zVmJ98VPkLZJGKE7Gt1JqwEVqK-w7EiRxJYGeJjrGRW0snsejqdFV9OXsusZuN4gJVsLrkmy7Ik56TMmiRJK6M4PomSppO59ezoN9CxiYY?type=png)](https://mermaid.live/edit#pako:eNqNVF1rE0EU_SvD9CWFfLVpttkNCPlok7RNW5Nqwd08TLM32TW7O8vsrGkaAoJYRFAr-OiDfROEKvigRdBfs43-C2c3aUiNaId9mLlzzrl37rnsELepDljBXUZcAx2UNQeJ5flHk4CGx2_eXz37Mv7wEcWKjPY9YMsanqDCVVAngBZKJO6g4nAXjnnyoYcKrjvKT2Dg6JqzoHsfWBssFFx-Dl59mlcsCiXUANLmqAnsETBUorZLHXC4FyUpqRq-V0MxzyB620n5ZhwdENPqm44uSmvl_5Aq7NdQg_ocvNRUr9DmJnUmYmU1OHspXvfr8bef31-3_lny1buvwY8nV29fBM_P5ysuh2n2GvVIcEMtM_PkxIIwMl_MRnS9qcb2qce7DJp3d5bn7yOVgs-NqOIQW1GLwDmwRBhdgO6TgS16MkNX1RIDsBdwG7ZozgxVUxvgiectwJqcMtKFGXBLLVnU1zsWYYAaqzc6E24WuhOcPg0uLscX5-OzUxQr1Zs35mRb3YaBxwk3262pwbqXOmSm8CXKt6PWCevptO-ktpp7u8h0UMXkC25GPKQTTiasv5dViRyJmhmi6mqF0q4FKaFY9Y9SO6bTA73mXKtXQ_ghHBmU9qZjkZ_5zwfCywLqmJalLHXkTtzjjPZAWcpkMtN9om_q3FBW3eP8PGlzSiK6fnvS1ixT-vak6jVJkm5Pqk1Jcvs_b8Jx8Xswdaxw5kMc28DESIkjHoZyGuYG2KBhRWx16BDf4qHzI0FzifOAUhsrHWJ5gsqo3zVmJ98VPkLZJGKE7Gt1JqwEVqK-w7EiRxJYGeJjrGRW0snsejqdFV9OXsusZuN4gJVsLrkmy7Ik56TMmiRJK6M4PomSppO59ezoN9CxiYY)
 
 ```mermaid
 graph TD
@@ -144,11 +143,11 @@ SaaS-Starter-main/
 ├── src/                  # 所有应用程序源代码
 │   ├── app/              # Next.js App Router 核心目录
 │   │   ├── (auth)/       # 认证相关页面 (登录、注册)
-│   │   ├── (dashboard)/  # 受保护的仪表盘页面
+│   │   ├── dashboard/    # 受保护的仪表盘页面
 │   │   ├── (pages)/      # 公开页面 (首页、关于、博客等)
 │   │   ├── api/          # API 路由
-│   │   ├── layout.tsx    # 根布局
-│   │   └── not-found.tsx # 全局 404 页面
+│   │   ├── [locale]/     # 本地化营销根布局与页面
+│   │   └── global-error.tsx # 根级错误页面
 │   ├── components/       # React 组件
 │   │   ├── admin/        # 管理后台相关组件
 │   │   ├── auth/         # 认证流程组件
@@ -184,13 +183,10 @@ SaaS-Starter-main/
 
 #### 2.2.1. 入口文件和启动流程
 
-- **`src/app/layout.tsx`**: 项目的根布局，包裹所有页面。它负责：
-  - 设置 HTML `lang` 属性和字体变量。
-  - 集成 `ThemeProvider` 实现深色/浅色模式。
-  - 集成 `NextTopLoader` 提供页面加载进度条。
-  - 集成 `Toaster` 用于全局通知。
-  - 向应用提供请求语言和 next-intl 消息。
-- **`proxy.ts`**: 在请求到达页面之前运行，是实现路由保护的核心。
+- **根布局**: `src/app/(pages)/layout.tsx`、`src/app/[locale]/layout.tsx`、`src/app/(auth)/layout.tsx` 和 `src/app/dashboard/layout.tsx` 共用 `src/components/layout/app-document.tsx`，负责 HTML、字体、语言消息、结构化数据与可选分析。
+  - 公开布局使用 `src/providers/marketing-providers.tsx` 提供主题。
+  - 认证与 dashboard 布局使用 `src/components/app-providers.tsx` 提供主题、导航加载条、通知和客户端状态 providers。
+- **`src/proxy.ts`**: 在请求到达页面之前运行，是实现路由保护的核心。
   - 检查用户会话 Cookie。
   - 如果用户未登录但访问 `/dashboard/*`，重定向到 `/login`。
   - 规范化带语言前缀的营销 URL，并转发当前语言。
@@ -202,8 +198,9 @@ SaaS-Starter-main/
 
 项目的配置高度集中化，便于维护和扩展。
 
-- **环境变量 (`env.js`)**: 使用 `@t3-oss/env-nextjs` 强制校验环境变量。所有环境变量（如 API 密钥、数据库 URL）必须在 `.env` 文件中定义，并通过 `env.js` 进行类型安全访问。这避免了运行时因缺少环境变量而导致的错误。
-- **应用常量 (`src/lib/config/constants.ts`)**: 存放应用名称、描述、联系邮箱等不会频繁更改的硬编码值。
+- **环境变量 (`env.js`)**: 使用 `@t3-oss/env-nextjs` 强制校验环境变量。Web 按已启用功能校验变量；Worker 在 `src/lib/jobs/worker-env.ts` 校验所需子集，迁移命令只需要数据库配置。使用 `.env.example` 核对配置。
+- **功能开关 (`src/lib/config/site.js`)**: 配置邮件认证、计费、上传、AI、品牌和仓库链接。禁用的集成无需其凭据。
+- **应用常量 (`src/lib/config/constants.ts`)**: 从 `SITE_CONFIG` 导出名称、联系邮箱、仓库链接和支付提供商。
 - **产品套餐 (`src/lib/config/products.ts`)**: 统一定义内部套餐和价格。Stripe 测试与生产 Price ID 分别保存在 `src/lib/billing/stripe/prices.ts`，并由产品目录同步命令生成。
 - **用户角色 (`src/lib/config/roles.ts`)**: 定义了用户角色及其层级关系（`user`, `admin`, `super_admin`）。`hasRole` 等辅助函数提供了统一的权限检查逻辑。
 - **文件上传 (`src/lib/config/upload.ts`)**: 集中管理文件上传的所有规则，包括最大文件大小、允许的文件类型等。所有上传路径（客户端和服务器端）都共享此配置，确保规则一致性。
@@ -228,12 +225,12 @@ SaaS-Starter-main/
 #### 2.2.5. 构建和打包流程
 
 - **`next.config.ts`**: Next.js 的核心配置文件。
-  - 配置了 `images.remotePatterns`，允许从 Unsplash 和 Cloudflare R2 加载图片。
+  - 通过 `next-images.config.ts` 配置 `images.remotePatterns`。私有上传使用应用鉴权地址，并跳过服务端图片优化。
   - 集成了 `@next/bundle-analyzer`。当环境变量 `ANALYZE` 设置为 `true` 时，运行 `pnpm analyze` 会在构建后生成并打开包体积分析报告，帮助开发者优化前端资源大小。
 - **`package.json`**:
-  - `dev`: 启动开发服务器，开启了 Next.js 16 的 `--turbo` 模式以加快本地编译速度。
-  - `build`: 为生产环境构建应用。
-  - `start`: 启动生产服务器。
+  - `dev`: 运行 `next dev`，使用框架默认的 Turbopack 开发模式。
+  - `build`: 构建 Next.js、打包 Worker 并准备 standalone 产物。
+  - `start`: 运行准备好的 standalone 服务；先执行 `pnpm build`。
 
 ---
 
@@ -242,23 +239,23 @@ SaaS-Starter-main/
 ### 3.1. 环境搭建
 
 1. **安装工具**:
-   - Node.js v20.x 或更高版本。
-   - pnpm (`npm install -g pnpm`)。
+   - Node.js 22.12.0 或更高版本。
+   - pnpm (`npm install -g pnpm@10.33.0`)。
    - PostgreSQL 数据库 (推荐使用 Docker: `docker run --name my-postgres -e POSTGRES_PASSWORD=mysecretpassword -p 5432:5432 -d postgres`)。
 1. **克隆和安装**:
    ```bash
-   git clone https://github.com/ullrai/saas-starter.git
-   cd saas-starter
+   git clone https://github.com/UllrAI/SaaS-Starter.git
+   cd SaaS-Starter
    pnpm install
    ```
 1. **配置环境变量**:
    - 复制 `.env.example` 到 `.env`。
    - 生成一个安全的 `BETTER_AUTH_SECRET`: `openssl rand -base64 32`。
    - 填入您的 PostgreSQL `DATABASE_URL`。
-   - 在 `.env` 中配置 Stripe Secret Key 与 Webhook Endpoint Secret，以及 Resend、Cloudflare R2 所需凭据。
+   - 在 `.env` 中配置已启用集成需要的 Stripe、Resend、私有 R2 和 AI 接口凭据。对照 `.env.example` 与功能开关核对，不必填写已禁用集成。
 1. **数据库设置**:
-   - **开发环境**: `pnpm db:push` 会将 `src/database/schema.ts` 的更改直接同步到数据库，适合快速迭代。
-   - **共享环境**: 使用 `pnpm db:generate` 生成并提交 SQL 迁移，部署代码后，再针对目标 `DATABASE_URL` 执行一次 `pnpm db:migrate`。
+   - **可丢弃或个人开发数据库**: `pnpm db:push` 直接同步 `src/database/schema.ts`。全新环境使用已提交的应用与队列迁移时，执行 `pnpm db:migrate`。
+   - **共享环境**: 使用 `pnpm db:generate` 生成并提交 SQL 迁移；新 Web 与 Worker 启动前，对目标 `DATABASE_URL` 执行一次 `pnpm db:migrate`。详见后文发布流程。
 
 ### 3.2. 开发流程
 
@@ -269,7 +266,7 @@ SaaS-Starter-main/
    - 或导出 `SAAS_CLI_API_KEY=ssk_...` 给脚本和 agent 调用
 1. **修改数据库**:
    - 编辑 `src/database/schema.ts`。
-   - 运行 `pnpm db:push` 同步变更。
+   - 仅在可丢弃或个人数据库上使用 `pnpm db:push` 迭代；共享改动前用 `pnpm db:generate` 生成可提交迁移。
 1. **创建新页面**:
    - 营销页放在 `src/app/(pages)`；受保护页面放在 `src/app/dashboard`，并创建对应的 `page.tsx`。
 1. **创建 API 路由**:
@@ -304,14 +301,13 @@ SaaS-Starter-main/
 
 - **核心配置**: `src/lib/auth/server.ts`
   - 配置了 Drizzle 数据库适配器。
-  - 动态加载社交登录提供商 (Google, GitHub, LinkedIn)，只有在 `.env` 中提供了对应的 `CLIENT_ID` 和 `SECRET` 时才会启用。
-  - 集成了 `magicLink` 插件，并配置了使用 Resend 发送邮件。
+  - 动态加载社交登录提供商 (Google, GitHub, LinkedIn)，只有在 `.env` 中提供了对应提供商的 `CLIENT_ID` 和 `CLIENT_SECRET` 时才会启用。
+  - 在 `SITE_CONFIG.features.emailAuth` 开启时启用 `magicLink` 插件，并通过 Resend 发送邮件。
 - **API 路由**: `src/app/api/auth/[...all]/route.ts`
-  - 这是一个动态路由，捕获所有 `better-auth` 的认证请求（如 `/api/auth/magic-link`, `/api/auth/google/login` 等），并交由 `auth.handler` 处理。
+  - 该 catch-all 通过 `toNextJsHandler(auth.handler)` 转发 Better Auth 请求，浏览器 admin POST 入口被禁用。调用 `authClient.signIn.magicLink` 或 `authClient.signIn.social`，不要自行拼接提供商登录路径。
 - **客户端**: `src/lib/auth/client.ts`
   - 提供了在客户端组件中与认证系统交互的方法，如 `signIn`, `signOut`, `useSession` 等。
 - **认证流程 (Magic Link 魔法链接)**:
-  [![魔法链接](https://mermaid.ink/img/pako:eNp1k-1r00Acx_-V415NaNN2fVh74ETqA4KysYc30je35NaGJrl6SUQtBVeUVXHasQ1ZrYjCQBxL3ZvOWde_ppe0_4WXnh1ldiGQu-P7uXy_97tfFapUIxBBmzxxiaWSOzouMmwWLDB-Kpg5uqpXsOWAdZuwWet5Qyfig23AvW9-4yw47oC5265TukeZeWMWsUrYU8JCwm_v8Ldf-eF3QSw_mCleITaxtFA8qnuDXlcioXKiDo1FFxelDwSG_T3--kiIA--Un3eD-jnf7gWHPX5xMCGkVDDSCQLLS6trIIYregwL4zETF3U1auhWeUJI4RQR7H_xG02__cb_2PUPGkHrFVijZWL9B0j_wlbnzD-t8w-7o5dbMgmY481jSYH1lYeX6SURFWyYDIF_zMm-3-6M9vr--yPJX8kvxTKuFAx-nQhfErk2-v2708lVbBgbWC3fckJbNxVFufYERj_eDTtb0n8E8MYn3vs9-NMadj5fQaZr4_WDC0-qQJ7Ssk6AqNFoe4d7Ld7c5Y2fIKZhu7RBMdNgBBaZrkHkMJdEoEmYicMprI7LD50SMUkBIjHUyCZ2DacAC1ZNYOLmPKbUnJCMusUSRJvYsMXMrWjYmdz0y1UmzpywPHUtB6L5xHgPiKrwGUTJRFxJL8TjafFmc6nkfDoCn0OUziqpXC6XyWUzyVQmk0nUIvDF-K9xJbsgNETTHcoeyQ4bN1rtLzk3Xew?type=png)](https://mermaid.live/edit#pako:eNp1k-1r00Acx_-V415NaNN2fVh74ETqA4KysYc30je35NaGJrl6SUQtBVeUVXHasQ1ZrYjCQBxL3ZvOWde_ppe0_4WXnh1ldiGQu-P7uXy_97tfFapUIxBBmzxxiaWSOzouMmwWLDB-Kpg5uqpXsOWAdZuwWet5Qyfig23AvW9-4yw47oC5265TukeZeWMWsUrYU8JCwm_v8Ldf-eF3QSw_mCleITaxtFA8qnuDXlcioXKiDo1FFxelDwSG_T3--kiIA--Un3eD-jnf7gWHPX5xMCGkVDDSCQLLS6trIIYregwL4zETF3U1auhWeUJI4RQR7H_xG02__cb_2PUPGkHrFVijZWL9B0j_wlbnzD-t8w-7o5dbMgmY481jSYH1lYeX6SURFWyYDIF_zMm-3-6M9vr--yPJX8kvxTKuFAx-nQhfErk2-v2708lVbBgbWC3fckJbNxVFufYERj_eDTtb0n8E8MYn3vs9-NMadj5fQaZr4_WDC0-qQJ7Ssk6AqNFoe4d7Ld7c5Y2fIKZhu7RBMdNgBBaZrkHkMJdEoEmYicMprI7LD50SMUkBIjHUyCZ2DacAC1ZNYOLmPKbUnJCMusUSRJvYsMXMrWjYmdz0y1UmzpywPHUtB6L5xHgPiKrwGUTJRFxJL8TjafFmc6nkfDoCn0OUziqpXC6XyWUzyVQmk0nUIvDF-K9xJbsgNETTHcoeyQ4bN1rtLzk3Xew)
 
   ```mermaid
   sequenceDiagram
@@ -321,12 +317,12 @@ SaaS-Starter-main/
       participant Resend as 邮件服务
 
       User->>Client: 输入邮箱并点击登录
-      Client->>Server: POST /api/auth/magic-link
+      Client->>Server: POST /api/auth/sign-in/magic-link
       Server->>Server: 生成有时效的 Token
       Server->>Resend: 请求发送邮件 (含 Token URL)
       Resend-->>User: 发送魔法链接邮件
       User->>User: 点击邮件中的链接
-      Client->>Server: GET /api/auth/callback?token=...
+      Client->>Server: GET /api/auth/magic-link/verify?token=...
       Server->>Server: 验证 Token, 创建会话
       Server-->>Client: 设置会话 Cookie 并重定向到 /dashboard
   ```
@@ -338,7 +334,7 @@ SaaS-Starter-main/
 - **迁移管理**:
   - 项目维护一套提交到仓库的迁移历史，位于 `src/database/migrations`。
   - `pnpm db:generate`: 基于 `schema.ts` 的变化生成 SQL 迁移文件。
-  - `pnpm db:push`: 仅限开发，直接将 schema 同步到数据库，会丢失历史记录。
+  - `pnpm db:push`: 仅限可丢弃或个人开发数据库，直接同步 schema，不生成可提交迁移。
   - `pnpm db:migrate`: 对 `DATABASE_URL` 指向的数据库应用已提交的迁移文件。
 
 ### 4.3. 支付与订阅 (Stripe)
@@ -351,10 +347,9 @@ SaaS-Starter-main/
   - `/api/billing/webhooks/stripe`: 接收来自 Stripe 的 Webhook 事件，用于更新订阅状态、记录付款等。
 - **Webhook 处理**: `src/lib/billing/stripe/webhook.ts`
   - **安全**: 使用 Stripe 官方 SDK 验证原始请求体和 `Stripe-Signature` 请求头，再处理事件。
-  - **幂等性**: 在 `webhook_events` 表中记录已处理的事件 ID，防止同一事件被重复处理。
-  - **事务性**: 所有数据库操作都在一个事务中完成，确保数据一致性。
+  - **幂等性**: 在业务变更的同一事务中认领 `webhook_events` 的平台事件 ID，重复投递不会重复修改业务数据。
+  - **事务性**: 事件处理与业务变更在同一事务提交；必要的支付平台读取在事务前执行。详见 [Webhook 说明](https://github.com/UllrAI/SaaS-Starter/blob/main/docs/webhooks.zh-CN.md)。
 - **支付流程图**:
-  [![支付流程图](https://mermaid.ink/img/pako:eNp1U11rE0EU_SvDPCWQJqn5aDIPfTAFn8RAWwTJy3T3Nlm6u7POzoo1BKwgDbWBCLG0VoT2qSgmedCKBvXPZDbJv3B2txtqTZaF3Zl7zj1n7tzbxBrTARPswlMPbA02DFrn1KrZKHwcyoWhGQ61Bdp2gS_ar5gGqA91kexf-u3vk88DlKhyFbbrqErrkFzE2gT-DHjA8j905NGFPLtamJwDhG7iYOBiZX09EiVo8uqHPByhGn4AAlVNatdwjIwgChtJEVR9tLmFMtQxMjuGaSp3Ga0B2h7zREyJkEH6QJYE6lQAqtzAVNx1DWbPFQLUyi2FON82N--kvGV5-qcnzz8uws4dB4ckaHbYkf33svtWtoeRFvJ7g_HodHbx7W45Ir-yf-y3uxFoqcnHsNNgbA8lYgdpjVmOCQL05H-FiEmzT8fTwcHky2_Z7aTQtD-Uv96Nf74Zj66XUhIb99EWp7ZLNaGKlkT--Vf_ZDjpXakmmfYvZ6evJ0fX_suDJVf7z_EzDt23guK4ggrPxSlc54aOieAepLAF3KLBEjfDXsGiARbUMFG_OuxSzxRBX7QUTXXVE8asmMmZV29gsktNV608R1f3fTMD810Otg68wjxbYHKvEObApImfY5JbzaYLa9lsQb2lcj4XRPcxKZTS-XK5XCyXirl8sVhcbaXwi1A1my6tKQzohmD8YTR74Qi2_gLtEE8s?type=png)](https://mermaid.live/edit#pako:eNp1U11rE0EU_SvDPCWQJqn5aDIPfTAFn8RAWwTJy3T3Nlm6u7POzoo1BKwgDbWBCLG0VoT2qSgmedCKBvXPZDbJv3B2txtqTZaF3Zl7zj1n7tzbxBrTARPswlMPbA02DFrn1KrZKHwcyoWhGQ61Bdp2gS_ar5gGqA91kexf-u3vk88DlKhyFbbrqErrkFzE2gT-DHjA8j905NGFPLtamJwDhG7iYOBiZX09EiVo8uqHPByhGn4AAlVNatdwjIwgChtJEVR9tLmFMtQxMjuGaSp3Ga0B2h7zREyJkEH6QJYE6lQAqtzAVNx1DWbPFQLUyi2FON82N--kvGV5-qcnzz8uws4dB4ckaHbYkf33svtWtoeRFvJ7g_HodHbx7W45Ir-yf-y3uxFoqcnHsNNgbA8lYgdpjVmOCQL05H-FiEmzT8fTwcHky2_Z7aTQtD-Uv96Nf74Zj66XUhIb99EWp7ZLNaGKlkT--Vf_ZDjpXakmmfYvZ6evJ0fX_suDJVf7z_EzDt23guK4ggrPxSlc54aOieAepLAF3KLBEjfDXsGiARbUMFG_OuxSzxRBX7QUTXXVE8asmMmZV29gsktNV608R1f3fTMD810Otg68wjxbYHKvEObApImfY5JbzaYLa9lsQb2lcj4XRPcxKZTS-XK5XCyXirl8sVhcbaXwi1A1my6tKQzohmD8YTR74Qi2_gLtEE8s)
 
   ```mermaid
   sequenceDiagram
@@ -386,8 +381,6 @@ SaaS-Starter-main/
 
 **流程图**:
 
-[![签名上传](https://mermaid.ink/img/pako:eNqNU21rUzEY_Sshn1Zoe7u-rTcfBlIRBMXSrV_kfgm9aXfhvpneK2opqJtsa9c5RAdSqToUncO1A3Fit_lnmtz2X5g2W6nrBoYQkifnnJwnyVOFRUcnEMEKeeATu0huGrhMsaXZQDQXU88oGi62PVCoEDobvWWYpOCaDtYJBbgC2OEe3zgODjpBb63f-zlLWCL0oYTyd01W_8jefgU3crdngfn4CJQ1HV8vmZgSEZAgOY7sRBYXp89HYPh0kzf2Fd7Y5Y1Tvrs-cTANm2FNPA-_bQ06z8BccNRj7YbCPn1h3ZehMGCts2BznW03gpP9K_VkUgjk7i0tAwW7huKPNxWXkopRtoke8akJ5gadY370vP-r3j_5UMjfCUkxyZ6SkT4Gvw_6vVP2aksmwl6s8jdd3jy8RMrHEZC6w7214PsZ22kCoS1R-XhkSnfw5zVrta-AnYvN3My1hEv5jzzkCsvi5lo_-PZnmaC0HZo28q_6OWxjh9Xf_8czObacZx3LNYlHxLO0B91VGIZlaugQedQnYWgRauHRElZHmhr0VohFNIjEVCcl7JueBjW7Jmjim913HOuCSR2_vAJRCZsVsfJdHXsX1TCJUmILL1nHtz2I4upYA6IqfARRYj4WTS3EYinRM2oyEU-F4WOIUploUlXVtJpJJ5LpdHq-FoZPxqfGopkFgSG64Tn0rqzCcTHW_gKzZHRj?type=png)](https://mermaid.live/edit#pako:eNqNU21rUzEY_Sshn1Zoe7u-rTcfBlIRBMXSrV_kfgm9aXfhvpneK2opqJtsa9c5RAdSqToUncO1A3Fit_lnmtz2X5g2W6nrBoYQkifnnJwnyVOFRUcnEMEKeeATu0huGrhMsaXZQDQXU88oGi62PVCoEDobvWWYpOCaDtYJBbgC2OEe3zgODjpBb63f-zlLWCL0oYTyd01W_8jefgU3crdngfn4CJQ1HV8vmZgSEZAgOY7sRBYXp89HYPh0kzf2Fd7Y5Y1Tvrs-cTANm2FNPA-_bQ06z8BccNRj7YbCPn1h3ZehMGCts2BznW03gpP9K_VkUgjk7i0tAwW7huKPNxWXkopRtoke8akJ5gadY370vP-r3j_5UMjfCUkxyZ6SkT4Gvw_6vVP2aksmwl6s8jdd3jy8RMrHEZC6w7214PsZ22kCoS1R-XhkSnfw5zVrta-AnYvN3My1hEv5jzzkCsvi5lo_-PZnmaC0HZo28q_6OWxjh9Xf_8czObacZx3LNYlHxLO0B91VGIZlaugQedQnYWgRauHRElZHmhr0VohFNIjEVCcl7JueBjW7Jmjim913HOuCSR2_vAJRCZsVsfJdHXsX1TCJUmILL1nHtz2I4upYA6IqfARRYj4WTS3EYinRM2oyEU-F4WOIUploUlXVtJpJJ5LpdHq-FoZPxqfGopkFgSG64Tn0rqzCcTHW_gKzZHRj)
-
 ```mermaid
 sequenceDiagram
     participant User
@@ -398,12 +391,16 @@ sequenceDiagram
     User->>FileUploader: 选择/拖拽文件
     FileUploader->>FileUploader: 客户端验证 (类型/大小), 图片压缩
     FileUploader->>Server: POST /api/upload/presigned-url (请求上传URL)
-    Server->>Server: 验证身份和文件元数据
+    Server->>Server: 验证身份、元数据、配额并预留 upload intent
     Server->>R2: 请求预签名 URL
     R2-->>Server: 返回预签名 URL
     Server-->>FileUploader: 返回预签名 URL
-    FileUploader->>R2: PUT (直接上传文件)
+    FileUploader->>R2: PUT (携带要求的 Content-Type 和 If-None-Match 请求头)
     R2-->>FileUploader: 上传成功
+    FileUploader->>Server: POST /api/upload/complete (intent 和元数据)
+    Server->>R2: HEAD 对象，验证大小和类型
+    Server->>Server: 完成 intent 并记录归属文件
+    Server-->>FileUploader: 确认已完成文件
     FileUploader->>FileUploader: onUploadComplete 回调
 ```
 
@@ -412,8 +409,6 @@ sequenceDiagram
 此模式允许在存储前进行服务器端处理。
 
 **流程图**:
-
-[![服务器端上传](https://mermaid.ink/img/pako:eNp1ks9LIzEUx_-V4Z1caDu1P8ZODoLUyx5kpe5J5hI6aR2YmcymM4tr6UEQthTFZauCWvyxp2WV2os_sLr-M02c_S8206BUxRCSvJfP-z7y8ppQpTYBBA3yJSJ-lcw7uM6wZ_maHAFmoVN1AuyHWtl1iNxwQ-P9X6J9_Xh2occbB6J3_pZdIuwrYQkrelu8c8r3f2tzix_fgpVcApVdGtk1FzMiHQpSq8qZnp1Vgkhb_LT0WdNx4OhR4FJs643xRVpZ2pQXuaGTJNBrlHlpG4f4g5JSChNS__5sxhfr8e3ZaHjPf26Kve-j4dUrtpJDmrhc53fbo7uT-G93Eqrk0hNqo5uORET7B-8cv5Mw7g_4_S5vD8TuQGz1-W33BShJ9VxJPuzwwyMl-TjsiqMepKDOHBtQyCKSAo8wDycmNBMNC8IV4hELkDzapIZlFSyw_JYMk2VeptR7imQ0qq8AqmG3Ia0okBV6-vJnLyO-TViZRn4IKJ8fawBqwqq0prOZ4kw2W5SzZBbyuWIKvgEqljIF0zQNs2TkC4ZhTLdSsDbOms2UZiRDbCekbEG12rjjWv8BwdH1ng?type=png)](https://mermaid.live/edit#pako:eNp1ks9LIzEUx_-V4Z1caDu1P8ZODoLUyx5kpe5J5hI6aR2YmcymM4tr6UEQthTFZauCWvyxp2WV2os_sLr-M02c_S8206BUxRCSvJfP-z7y8ppQpTYBBA3yJSJ-lcw7uM6wZ_maHAFmoVN1AuyHWtl1iNxwQ-P9X6J9_Xh2occbB6J3_pZdIuwrYQkrelu8c8r3f2tzix_fgpVcApVdGtk1FzMiHQpSq8qZnp1Vgkhb_LT0WdNx4OhR4FJs643xRVpZ2pQXuaGTJNBrlHlpG4f4g5JSChNS__5sxhfr8e3ZaHjPf26Kve-j4dUrtpJDmrhc53fbo7uT-G93Eqrk0hNqo5uORET7B-8cv5Mw7g_4_S5vD8TuQGz1-W33BShJ9VxJPuzwwyMl-TjsiqMepKDOHBtQyCKSAo8wDycmNBMNC8IV4hELkDzapIZlFSyw_JYMk2VeptR7imQ0qq8AqmG3Ia0okBV6-vJnLyO-TViZRn4IKJ8fawBqwqq0prOZ4kw2W5SzZBbyuWIKvgEqljIF0zQNs2TkC4ZhTLdSsDbOms2UZiRDbCekbEG12rjjWv8BwdH1ng)
 
 ```mermaid
 sequenceDiagram
@@ -432,7 +427,7 @@ sequenceDiagram
 ### 4.5. 博客与内容管理 (Content Collections)
 
 - **内容管线**: 使用 `Content Collections` 为 `content/` 目录下的 Markdown 和 JSON 内容建立索引。
-- **编写方式**: 直接编辑 `content/blog/*.md` 博客文章，并在 `content/authors/*.json` 中维护作者信息。
+- **编写方式**: 直接编辑 `content/blog/<locale>/*.md` 博客文章，并在 `content/authors/*.json` 中维护作者信息。
 - **内容读取**:
   - `content-collections.ts` 定义内容 schema 和生成的集合。
   - `src/app/(pages)/blog/page.tsx`: 博客列表页，读取所有索引后的文章。
@@ -440,11 +435,11 @@ sequenceDiagram
 
 ### 4.6. 管理后台 (Admin Dashboard)
 
-提供了一套强大的、可扩展的数据管理系统。
+各业务域都有独立管理页面与权限受控的操作。
 
 - **模块化管理页面**: 提供用户、支付、订阅、上传等独立后台页面，便于按业务域演进功能。
 - **统一权限控制**: 后台操作统一受管理员权限校验保护。
-- **Server Actions**: 管理端读写通过 `src/lib/actions/admin.ts` 中的类型安全 Server Actions 完成，无需额外 API 路由。
+- **Server Actions**: 用户、支付、订阅和上传分别使用 `src/lib/actions/admin/` 下的业务模块，并复用 `shared.ts` 的权限校验。
 
 ---
 
@@ -455,11 +450,11 @@ sequenceDiagram
 - **添加新页面**: 在 `src/app/(pages)` 或 `src/app/dashboard` 中创建新路由。
 - **添加新后台管理表**:
   1. 在 `src/database/schema.ts` 中定义新表。
-  1. 在 `src/lib/actions/admin.ts` 中添加对应查询/变更逻辑。
+  1. 在 `src/lib/actions/admin/` 下添加业务模块，复用 `shared.ts` 的 `adminAction` 权限校验。
   1. 在 `src/app/dashboard/admin/` 下新增对应管理页面并在 `src/app/dashboard/_components/app-sidebar.tsx` 中添加导航链接。
 - **添加新支付提供商**:
   1. 在 `src/lib/billing/` 下创建新的提供商实现文件，需遵循 `src/lib/billing/provider.ts` 的 `PaymentProvider` 接口。
-  1. 在 `src/lib/billing/index.ts` 中修改 `PAYMENT_PROVIDER` 逻辑以切换到新提供商。
+  1. 在 `src/lib/billing/index.ts` 注册实现，再更新 `src/lib/config/site.js` 的 `SITE_CONFIG.billing.provider` 及其类型。
 - **自定义邮件模板**: 在 `src/emails/` 目录下创建或修改 React Email 组件。
 - **自定义 UI 组件**: 在 `src/components/ui/` 中修改 `shadcn/ui` 组件或添加新组件。
 
@@ -473,6 +468,8 @@ sequenceDiagram
 | `/api/billing/webhooks/stripe` | POST      | 接收 Stripe Webhook 事件。        |
 | `/api/upload/presigned-url`    | POST      | 为客户端直传获取预签名 URL。      |
 | `/api/upload/server-upload`    | POST      | 服务器端代理上传文件。            |
+| `/api/upload/complete`         | POST      | 验证对象并完成 upload intent。    |
+| `/api/upload/cancel`           | POST      | 取消 intent 并释放预留配额。      |
 | `/api/payment-status`          | GET       | 查询支付状态。                    |
 
 ### 5.3. Hook 和事件
@@ -491,7 +488,7 @@ sequenceDiagram
 - **框架**: 使用 `Jest`、`React Testing Library` 和 `Playwright`。
 - **配置文件**: `jest.config.js`、`jest.setup.ts`、`playwright.config.ts`。
 - **单元与集成覆盖**: Jest 覆盖 UI 组件、路由处理器、hooks、认证辅助函数、计费逻辑、上传逻辑和 dashboard 页面。
-- **浏览器冒烟覆盖**: Playwright 当前覆盖 dashboard 登录重定向、已登录 dashboard 访问、admin 权限拦截，以及 locale 路由规范化。
+- **浏览器覆盖**: Playwright 覆盖认证、管理员权限、locale 路由、机器认证、私有文件、AI 和后台任务。必须使用独立的 `E2E_DATABASE_URL`，数据库名称包含 `e2e` 或 `test`。
 - **示例**:
   - 单元/组件: `src/components/forms/auth-form.test.tsx`
   - 页面: `src/app/dashboard/page.test.tsx`
@@ -504,8 +501,8 @@ sequenceDiagram
 
 ### 6.2. 代码质量保障
 
-- **ESLint**: 配置在 `.eslintrc.json` 中，遵循 `eslint-config-next` 最佳实践。
-- **Prettier**: 与 ESLint 集成，并使用 `prettier-plugin-tailwindcss` 自动排序 Tailwind CSS 类。
+- **ESLint**: 配置在 `eslint.config.mjs` 中，采用 flat config 和 `eslint-config-next`。
+- **Prettier**: 独立运行，`eslint-config-prettier` 关闭冲突规则，`prettier-plugin-tailwindcss` 自动排序 Tailwind CSS 类。
 - **运行检查**: `pnpm lint` 和 `pnpm prettier:check`。
 - **自动格式化**: `pnpm prettier:format`。
 
@@ -521,9 +518,9 @@ sequenceDiagram
 
 ### 7.1. 典型使用场景
 
-- **企业级 SaaS**: 作为新项目的起点，集成了企业所需的用户管理、角色权限、支付和审计日志（通过 webhook events）等基础。
-- **AI 应用**: 快速搭建需要用户登录和按用量/订阅付费的 AI 工具。文件上传功能可用于处理用户数据。
-- **内容付费平台**: 博客和内容管理系统结合支付功能，可轻松扩展为付费内容平台。
+- **企业级 SaaS**: 作为新项目的起点，提供用户管理、角色权限和支付。Webhook 记录用于计费事件去重，不是通用审计日志。
+- **AI 应用**: 构建有登录、订阅计费和用户 AI 请求配额的工具；按用量计费需要自己的产品规则。文件上传功能可用于处理用户数据。
+- **内容付费平台**: 已有公开博客与计费；付费内容的访问权限需要按产品需求实现。
 - **内部工具**: 利用其强大的管理后台和数据管理能力，快速搭建公司内部的数据管理工具或仪表盘。
 
 ---
@@ -550,14 +547,14 @@ sequenceDiagram
 
 ### 8.2. 配置选项
 
-所有必需和可选的环境变量都在 `README.md` 的环境配置部分有详细说明。请务必完整填写 `.env` 文件。
+通过 `.env.example`、`env.js` 和 [README](https://github.com/UllrAI/SaaS-Starter#readme) 核对变量与功能开关，只配置已启用集成的凭据。
 
 ### 8.3. 工具函数
 
 `src/lib/utils.ts` 中提供了一些实用的工具函数：
 
 - `cn(...inputs)`: 安全地合并 Tailwind CSS 类名，并解决冲突。
-- `formatCurrency(amount, currency)`: 将以分为单位的金额格式化为货币字符串。
+- `formatCurrency(amount, currency, locale)`: 将以分为单位的金额格式化为货币字符串。
 - `calculateReadingTime(text)`: 根据文本内容计算预计阅读时间。
 
 ---
@@ -568,7 +565,7 @@ sequenceDiagram
 
 - **包管理器**: 项目使用 `pnpm`，请确保您已全局安装。`pnpm` 利用其内容寻址存储来节省磁盘空间并加快安装速度。
 - **版本锁定**: `pnpm-lock.yaml` 文件锁定了所有依赖项及其子依赖项的精确版本，确保了团队成员和不同部署环境之间的一致性。
-- **依赖更新**: 推荐使用 `pnpm up --latest` 来安全地更新依赖项，并关注主要版本的变更日志。
+- **依赖更新**: 查看发行说明后有针对性地升级依赖。主要版本升级可能改变框架或 SDK 行为；合并前运行仓库检查，并提交更新后的 lockfile。
 
 ---
 
@@ -576,47 +573,44 @@ sequenceDiagram
 
 ### 10.1. 性能优化
 
-- **代码分割**: 对大型组件使用 `next/dynamic` 进行动态导入，如 `src/app/dashboard/settings/_components/settings.tsx` 中对每个设置页面的动态导入。
-- **图片优化**: 优先使用 Next.js 的 `<Image>` 组件，它会自动进行图片大小优化、格式转换（如 WebP）和懒加载。
+- **代码分割**: 当前设置页在 `src/app/dashboard/settings/page.tsx` 组合各个 tab。只有实际包体积或加载耗时需要时才添加动态导入。
+- **图片优化**: 公共图片可使用 Next.js `<Image>`。私有上传预览使用 `unoptimized`，由浏览器携带会话 cookie 请求鉴权文件路由。
 - **服务器组件**: 尽可能使用 React Server Components (RSC) 来获取数据和执行逻辑，减少发送到客户端的 JavaScript 代码量。
 - **数据库查询**: 避免在循环中执行数据库查询。利用 Drizzle ORM 的 join 和批量操作能力来减少数据库往返次数。
 
 ### 10.2. 安全考虑
 
 - **环境变量**: **绝不**将 `.env` 文件提交到 Git 仓库。生产值应存储在 Zeabur 服务变量或同等的密钥管理工具中。
-- **路由保护**: `proxy.ts` 是第一道防线，但**必须**在 Server Actions 和 API 路由中使用 `requireAuth`、`requireAdmin` 等函数进行后端权限验证。
-- **SQL 注入**: 使用 Drizzle ORM 可以有效防止 SQL 注入攻击，因为它会自动参数化查询。
-- **XSS**: Next.js 和 React 默认会对 JSX 内容进行转义，防止跨站脚本攻击。处理用户生成的内容时，请使用成熟的库（如 `DOMPurify`）进行清理。
+- **路由保护**: `src/proxy.ts` 是第一道防线，但**必须**在 Server Actions 和 API 路由中使用 `requireAuth`、`requireAdmin` 等函数进行后端权限验证。
+- **SQL 注入**: 使用 Drizzle ORM 可以有效防止 SQL 注入攻击，前提是使用参数化查询 API；不要将未经验证的输入拼接到 raw SQL。
+- **XSS**: React 会转义文本节点，博客渲染不启用原始 HTML。新增原始 HTML 渲染路径时需要明确验证与清理。
 - **Webhook 安全**: `src/lib/billing/stripe/webhook.ts` 中的签名验证是确保 Webhook 请求来源可信的关键。
 
 ### 10.3. 部署指南
 
-生产参考环境使用 **Zeabur**。
+生产参考使用 Zeabur Web 与 Worker 服务，两者都跟踪 `prod`。
+默认分支用于开发和审查。服务配置、迁移网络访问、备份与恢复以
+[部署 runbook](https://github.com/UllrAI/SaaS-Starter/blob/main/docs/deployment-zeabur.md)
+为准。
 
-> **Zeabur 服务器九折优惠：**前往 [Zeabur](https://zeabur.com/) 购买服务器，并在
-> 结账时输入推荐码 `visoar`，即可享受 10% 折扣。
+1. 将审查后的发布提交合并到默认分支，并等待 Quality 在该确切 SHA 上通过。
+1. 按 `.env.example` 配置 Web 与 Worker 变量，按 runbook 配置 GitHub `production` 环境数据库 secrets 和迁移隧道设置。
+1. 在该提交上创建并推送与其 `package.json` 版本一致的 `release/vX.Y.Z` 附注标签。
+1. 晋升 workflow 验证标签与 Quality，单次执行生产迁移，然后更新 `prod`。常规发布无需再手动迁移，也不要直接 push 到 `prod`。
+1. 等待两个 Zeabur 服务部署同一个发布 SHA。检查 Web `/api/health`、`/api/ready`，以及 Worker 就绪和运行日志。
+1. 验证两种语言 URL、认证重定向和已登录 Dashboard 会话。
 
-将 Zeabur 的部署分支设为 `prod`，不要让日常开发使用的默认分支（本仓库为 `main`）
-push 直接触发生产部署。只有 `release/*` tag 对应的 commit 位于仓库默认分支历史中时，
-workflow 才会将 `prod` 更新到该 commit。
-
-1. 将通过审查的 commit 合并到默认分支，并等待 CI 通过。
-1. 根据 `.env.example` 配置全部必需的服务变量。
-1. 使用生产 `DATABASE_URL` 单独执行一次 `pnpm db:migrate`。
-1. 在该 commit 上创建并推送 `release/*` 附注标签（annotated tag）。
-1. 等待分支更新 workflow 与随后触发的 Zeabur 部署成功。
-1. 使用 `/api/ready` 做数据库就绪检查，并查看构建及运行日志。
-1. 验证两种语言 URL、认证重定向以及已登录 Dashboard 会话。
+迁移先于新应用进程执行，不放在每个副本的启动命令中。旧版本仍提供服务时，迁移需要兼容其读写。
 
 ---
 
 ## 11. 社区与生态
 
-部署前，请对照 [Next.js 16 架构指南](/blog/nextjs-16-saas-starter-architecture)、[Stripe 生产级支付指南](/blog/stripe-nextjs-billing-production-guide) 与 [API Key、OAuth 和设备流选型指南](/blog/api-keys-oauth-device-flow-saas-agents)，再检查[功能边界](/zh-Hans/features)、验证[价格与结账行为](/zh-Hans/pricing)，并从 [GitHub 源码](https://github.com/ullrai/saas-starter)完整克隆项目，而不是脱离上下文复制零散代码。
+部署前，请对照 [Next.js 16 架构指南](/blog/nextjs-16-saas-starter-architecture)、[Stripe 生产级支付指南](/blog/stripe-nextjs-billing-production-guide) 与 [API Key、OAuth 和设备流选型指南](/blog/api-keys-oauth-device-flow-saas-agents)，再检查[功能边界](/zh-Hans/features)、验证[价格与结账行为](/zh-Hans/pricing)，并从 [GitHub 源码](https://github.com/UllrAI/SaaS-Starter)完整克隆项目，而不是脱离上下文复制零散代码。
 
 ### 11.1. 社区资源
 
-- **官方仓库**: [UllrAI SaaS Starter on GitHub](https://github.com/ullrai/saas-starter)
+- **官方仓库**: [UllrAI SaaS Starter on GitHub](https://github.com/UllrAI/SaaS-Starter)
 - **问题与讨论**: 使用 GitHub Issues 提交 Bug 报告和功能请求。
 - **主要依赖文档**:
   - [Next.js](https://nextjs.org/docs)
@@ -648,7 +642,7 @@ A: 直接编辑 `content/blog/` 中的 Markdown 文件，并在需要时更新 `
 
 **Q: 文件上传失败，提示 CORS 错误。**
 
-A: 这是最常见的文件上传问题。请确保您已在 Cloudflare R2 存储桶的设置中正确配置了 CORS 策略，允许来自您部署域名和 `http://localhost:3000` 的 `PUT` 和 `GET` 请求。
+A: 这是最常见的文件上传问题。请确保您已在 Cloudflare R2 存储桶的设置中正确配置了 CORS 策略，允许来自部署域名和 `http://localhost:3000` 的上传 `PUT`，包括要求的 `Content-Type` 与 `If-None-Match` 请求头。存储桶保持私有；浏览器下载使用应用鉴权地址。
 
 **Q: 如何设置第一个管理员账户？**
 
@@ -662,4 +656,4 @@ A: 系统不会自动设置管理员。您需要：
 A: 请检查以下几点：
 
 1. 确保您在 `.env` 文件中正确填写了对应社交平台的 `CLIENT_ID` 和 `CLIENT_SECRET`。
-1. 确保在社交平台（如 Google Cloud Console, GitHub Developer Settings）的 OAuth 应用配置中，已将 `http://localhost:3000/api/auth/[provider]/callback` 和您生产域名的回调 URL 添加到授权回调 URL 列表中。
+1. 确保在社交平台（如 Google Cloud Console, GitHub Developer Settings）的 OAuth 应用配置中，已将 `http://localhost:3000/api/auth/callback/<provider>` 和您生产域名的回调 URL 添加到授权回调 URL 列表中。

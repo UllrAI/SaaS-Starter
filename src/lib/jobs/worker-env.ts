@@ -21,11 +21,15 @@ const workerEnvSchema = z.object({
     .int()
     .positive()
     .default(5 * 1024 * 1024 * 1024),
+  BETTER_AUTH_SECRET: z.string().min(32).optional(),
   LLM_API_KEY: z.string().trim().min(1).optional(),
   ...modelEnvFields,
 });
 
-export function loadWorkerEnv(source: NodeJS.ProcessEnv = process.env) {
+export function loadWorkerEnv(
+  source: NodeJS.ProcessEnv = process.env,
+  options: { aiEnabled?: boolean } = {},
+) {
   const parsed = workerEnvSchema.safeParse(source);
   if (!parsed.success) {
     throw new Error(
@@ -33,6 +37,14 @@ export function loadWorkerEnv(source: NodeJS.ProcessEnv = process.env) {
     );
   }
 
+  if (
+    options.aiEnabled &&
+    (!parsed.data.BETTER_AUTH_SECRET || !parsed.data.LLM_API_KEY)
+  ) {
+    throw new Error(
+      "AI Worker requires BETTER_AUTH_SECRET and LLM_API_KEY while the AI feature is enabled.",
+    );
+  }
   return {
     ...parsed.data,
     JOB_DATABASE_URL: parsed.data.JOB_DATABASE_URL ?? parsed.data.DATABASE_URL,

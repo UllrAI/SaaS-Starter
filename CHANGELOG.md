@@ -5,6 +5,20 @@ Routine formatting and test-only maintenance are omitted.
 
 ## Unreleased
 
+## 0.1.17 — 2026-10-02
+
+### Durable AI execution
+
+- Move AI generation into the Node Worker with atomic task handoff, resumable
+  SSE events, explicit cancellation, and durable quota settlement.
+- Preserve unknown provider usage after interrupted execution and avoid
+  automatically repeating potentially paid model calls.
+- Complete the SEO implementation fixes reviewed in #114.
+
+Migration `0028` adds the run event log and Worker handoff fields. Apply the
+migration, deploy the generation-aware Worker, then deploy Web from this release.
+Web and Worker must share their existing model and authentication credentials.
+
 ## 0.1.16 — 2026-10-01
 
 ### Security

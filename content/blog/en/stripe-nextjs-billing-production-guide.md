@@ -2,6 +2,7 @@
 slug: stripe-nextjs-billing-production-guide
 title: "Stripe Billing with Next.js: Production Checkout and Webhook Guide"
 publishedDate: 2026-08-12
+updatedDate: 2026-10-02
 author: admin
 excerpt: >-
   Implement Stripe checkout, subscriptions, one-time purchases, idempotent webhooks, catalog sync, and production release checks in a Next.js SaaS.
@@ -86,4 +87,4 @@ Do not log provider secrets, full webhook headers, or customer payment data duri
 
 Add a new tier by extending the typed product catalog and its tests, not by accepting arbitrary product IDs from the client. Add a new provider by implementing the application contract and preserving validation, ownership, and idempotency boundaries.
 
-For the surrounding application structure, see the [Next.js 16 SaaS starter architecture](/blog/nextjs-16-saas-starter-architecture) and the [complete developer guide](/blog/saas-starter-kit-developer-guide).
+For the surrounding application structure, see the [Next.js 16 SaaS starter architecture](/blog/nextjs-16-saas-starter-architecture) and the [complete developer guide](/blog/saas-starter-kit-developer-guide). Inspect the billing implementation in the [source repository](https://github.com/UllrAI/SaaS-Starter) before adapting it to your product.

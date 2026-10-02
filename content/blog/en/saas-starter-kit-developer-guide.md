@@ -2,7 +2,7 @@
 slug: saas-starter-kit-developer-guide
 title: UllrAI SaaS Starter Kit Developer Documentation
 publishedDate: 2025-06-24
-updatedDate: 2026-08-12
+updatedDate: 2026-10-02
 author: admin
 excerpt: >-
   Build and deploy a production-ready Next.js 16 SaaS with Better Auth, Stripe, Drizzle, PostgreSQL, R2, i18n, tests, and agent-ready APIs.
@@ -23,13 +23,13 @@ featured: true
 heroImage: https://images.unsplash.com/photo-1561886362-a2b38ce83470?q=80&w=1674&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D
 ---
 
-Updated for v0.1.3, this guide follows the current production paths in the repository: Next.js 16 App Router, Better Auth, Stripe billing, PostgreSQL with Drizzle, Cloudflare R2 uploads, localized marketing pages, API keys, and browser-approved CLI device authentication. Use it as an implementation map, then verify every change with the repository's own lint, type-check, test, and build commands.
+Checked against v0.1.16 on October 2, 2026, this guide follows the current production paths in the repository: Next.js 16 App Router, Better Auth, Stripe billing, PostgreSQL with Drizzle, Cloudflare R2 uploads, localized marketing pages, API keys, and browser-approved CLI device authentication. Use it as an implementation map, then verify every change with the repository's own lint, type-check, test, and build commands.
 
 ## 1. Project Overview
 
 ### 1.1. Project Introduction
 
-**UllrAI SaaS Starter Kit** is a free, open-source, production-ready full-stack SaaS starter kit. It integrates the most respected technologies and practices in modern web development, designed to help developers launch their next SaaS project at unprecedented speed, allowing you to focus on business logic rather than infrastructure setup.
+**UllrAI SaaS Starter Kit** is a free, open-source, production-ready full-stack SaaS starter kit. It provides working authentication, billing, private uploads, and a localized application structure so you can build your product on existing boundaries.
 
 - **Core Features**: Provides authentication, payment subscriptions, database management, file uploads, content management, and other core SaaS application features.
 - **Agent-Friendly Positioning**: Built for browser users, APIs, local automation, and agent (OpenClaw, Codex, Claude Code, etc.) workflows from the same codebase.
@@ -37,7 +37,7 @@ Updated for v0.1.3, this guide follows the current production paths in the repos
 - **Use Cases**:
   - Quickly build full-stack SaaS applications requiring user login and paid subscription features.
   - As a practical project for learning modern full-stack web development technologies.
-  - Provide a stable, scalable initial scaffold for enterprise-level projects.
+  - Use the existing permission and billing boundaries as a starting point for a product.
   - Independent developers or small teams quickly validate business ideas.
 
 ### 1.2. Quick Start
@@ -45,8 +45,8 @@ Updated for v0.1.3, this guide follows the current production paths in the repos
 1.**Clone the project**
 
 ```bash
-git clone https://github.com/ullrai/saas-starter.git
-cd saas-starter
+git clone https://github.com/UllrAI/SaaS-Starter.git
+cd SaaS-Starter
 ```
 
 2.**Install dependencies**
@@ -66,7 +66,7 @@ cp .env.example .env
 Make sure your local PostgreSQL database is running, then execute:
 
 ```bash
-pnpm db:push
+pnpm db:migrate
 ```
 
 5.**Run development server**
@@ -75,13 +75,14 @@ pnpm db:push
 pnpm dev
 ```
 
-The application will run at `http://localhost:3000`.
+The application will run at `http://localhost:3000`. Use Node.js ≥22.12.0 and pnpm 10.33.0 as declared in `package.json`. In a second terminal, run `pnpm worker:dev` for durable background tasks. See the [Worker runbook](https://github.com/UllrAI/SaaS-Starter/blob/main/docs/background-jobs.md).
 
 ### 1.3. Feature List
 
 - **Modern Framework**: Next.js 16 (App Router, RSC), React 19, TypeScript
 - **UI**: Tailwind CSS v4, shadcn/ui, Lucide Icons, Dark/Light Mode
 - **Authentication**: Better-Auth (Magic Link, OAuth - Google/GitHub/LinkedIn)
+- **AI and durable tasks**: Optional AI assistant, typed tools, and PostgreSQL/pg-boss background execution; see the [AI guide](https://github.com/UllrAI/SaaS-Starter/blob/main/docs/ai-agent.md) and [Worker runbook](https://github.com/UllrAI/SaaS-Starter/blob/main/docs/background-jobs.md).
 - **Machine Auth**: API keys, browser-approved CLI device login, CLI session review, versioned `/api/v1/*` endpoints
 - **Database**: PostgreSQL + Drizzle ORM (Type-safe queries, Migration management)
 - **Payment Subscriptions**: Stripe integration (One-time payments, Subscriptions, Customer portal, Webhooks)
@@ -90,13 +91,11 @@ The application will run at `http://localhost:3000`.
 - **Email Service**: Resend + React Email (Transactional email templates)
 - **Form Handling**: React Hook Form + Zod (Type-safe form validation)
 - **Code Quality**: ESLint, Prettier, Jest, Playwright smoke tests
-- **Admin Dashboard**: Generic data management dashboard, easily extensible to manage any database table
+- **Admin Dashboard**: Dedicated users, payments, subscriptions, and uploads management pages
 - **Agent-Friendly Workflow**: First-party `saas-cli`, API verification, and management surfaces for authorized devices
 - **Deployment**: Zeabur reference deployment and standalone Docker image
 
 ### 1.4. Technical Architecture Diagram
-
-[![Technical Architecture Diagram](https://mermaid.ink/img/pako:eNqNk1tPwjAUx79K09cRkuVSLqsv-g1MfDBkw8TEB1rOHGMd2zLWQkhCmAlKXP7bFr6F09Ol59d-_Z_Tt8N6DhoCVlSHoA3IqmKCU3-JOHy2hHhLUWOZ-_Ek1pj1Qv-KCWp7vdfJlsIe20g-kXGXGjQpIqQiEpMUpGOGJB9JGhCdhRJJWnNwCuI_gdWCTfZH5pB6Cri_7j6Fz5vF-Ow3SrqLAHaMvBVSLGj0bYG6vWm0LcSgBm0A6ZKjmzJdLlFmQgQZ8VsXuPFd4x4GzWfH6VpXILdvuJBsWKjXIW3ywQoTqPRNWDcnW3UqaEpGOzBW-a6V7N3x0wIgqtd6I3_sxJ6-77jEtJXHBhJ47QvqUpEVX6VCRBKrn2RfqDgvQU-XfgQsG3RFgNpj4Hx2v4DH7ZPQR2X8aRlQdGWKoKGbWXhQZJG3k4LhlDVs6Rf6QFyS6qYWWKGV4jZp4rJPJ1kVWJA6wPdg0r3qWANyf7K5yJT3rn7-Acr4J7o)](https://mermaid.live/edit#pako:eNqNk1tPwjAUx79K09cRkuVSLqsv-g1MfDBkw8TEB1rOHGMd2zLWQkhCmAlKXP7bFr6F09Ol59d-_Z_Tt8N6DhoCVlSHoA3IqmKCU3-JOHy2hHhLUWOZ-_Ek1pj1Qv-KCWp7vdfJlsIe20g-kXGXGjQpIqQiEpMUpGOGJB9JGhCdhRJJWnNwCuI_gdWCTfZH5pB6Cri_7j6Fz5vF-Ow3SrqLAHaMvBVSLGj0bYG6vWm0LcSgBm0A6ZKjmzJdLlFmQgQZ8VsXuPFd4x4GzWfH6VpXILdvuJBsWKjXIW3ywQoTqPRNWDcnW3UqaEpGOzBW-a6V7N3x0wIgqtd6I3_sxJ6-77jEtJXHBhJ47QvqUpEVX6VCRBKrn2RfqDgvQU-XfgQsG3RFgNpj4Hx2v4DH7ZPQR2X8aRlQdGWKoKGbWXhQZJG3k4LhlDVs6Rf6QFyS6qYWWKGV4jZp4rJPJ1kVWJA6wPdg0r3qWANyf7K5yJT3rn7-Acr4J7o)
 
 ```mermaid
 graph TD
@@ -144,11 +143,11 @@ SaaS-Starter-main/
 ├── src/                  # All application source code
 │   ├── app/              # Next.js App Router core directory
 │   │   ├── (auth)/       # Authentication-related pages (login, signup)
-│   │   ├── (dashboard)/  # Protected dashboard pages
+│   │   ├── dashboard/    # Protected dashboard pages
 │   │   ├── (pages)/      # Public pages (home, about, blog, etc.)
 │   │   ├── api/          # API routes
-│   │   ├── layout.tsx    # Root layout
-│   │   └── not-found.tsx # Global 404 page
+│   │   ├── [locale]/     # Localized marketing root layout and pages
+│   │   └── global-error.tsx # Root error fallback
 │   ├── components/       # React components
 │   │   ├── admin/        # Admin dashboard components
 │   │   ├── auth/         # Authentication flow components
@@ -184,13 +183,10 @@ SaaS-Starter-main/
 
 #### 2.2.1. Entry Files and Startup Flow
 
-- **`src/app/layout.tsx`**: The project's root layout that wraps all pages. It handles:
-  - Setting HTML `lang` attribute and font variables.
-  - Integrating `ThemeProvider` for dark/light mode.
-  - Integrating `NextTopLoader` for page loading progress.
-  - Integrating `Toaster` for global notifications.
-  - Providing the request locale and next-intl messages to the application.
-- **`proxy.ts`**: Runs before requests reach pages, core for route protection.
+- **Root layouts**: `src/app/(pages)/layout.tsx`, `src/app/[locale]/layout.tsx`, `src/app/(auth)/layout.tsx`, and `src/app/dashboard/layout.tsx` use `src/components/layout/app-document.tsx` for HTML, fonts, locale messages, structured data, and optional analytics.
+  - Public layouts use `src/providers/marketing-providers.tsx` for theme support.
+  - Auth and dashboard layouts use `src/components/app-providers.tsx` for theme support, the navigation loader, notifications, and client state providers.
+- **`src/proxy.ts`**: Runs before requests reach pages, core for route protection.
   - Checks user session cookies.
   - Redirects to `/login` if user is not logged in but accessing `/dashboard/*`.
   - Canonicalizes locale-prefixed marketing URLs and forwards the active locale.
@@ -202,8 +198,9 @@ SaaS-Starter-main/
 
 The project's configuration is highly centralized for easy maintenance and extension.
 
-- **Environment Variables (`env.js`)**: Uses `@t3-oss/env-nextjs` to enforce environment variable validation. All environment variables (like API keys and database URLs) are defined in `.env` and accessed through `env.js` for type safety. This prevents runtime errors due to missing environment variables.
-- **Application Constants (`src/lib/config/constants.ts`)**: Stores app name, description, contact email, and other hardcoded values that don't change frequently.
+- **Environment Variables (`env.js`)**: Uses `@t3-oss/env-nextjs` to enforce environment variable validation. Web variables are validated against enabled features. The Worker validates its own subset in `src/lib/jobs/worker-env.ts`; migration commands only require database configuration. Use `.env.example` as the configuration checklist.
+- **Feature switches (`src/lib/config/site.js`)**: Enable email auth, billing, uploads, and AI, and configure brand and repository links. Disabled integrations do not require their credentials.
+- **Application Constants (`src/lib/config/constants.ts`)**: Exports names, contact addresses, repository links, and the billing provider from `SITE_CONFIG`.
 - **Product Plans (`src/lib/config/products.ts`)**: Centrally defines internal tiers and prices. Stripe test and live Price IDs are isolated in `src/lib/billing/stripe/prices.ts` and generated by the catalog sync command.
 - **User Roles (`src/lib/config/roles.ts`)**: Defines user roles and their hierarchical relationships (`user`, `admin`, `super_admin`). Helper functions like `hasRole` provide unified permission checking logic.
 - **File Upload (`src/lib/config/upload.ts`)**: Centrally manages all file upload rules, including maximum file size, allowed file types, etc. All upload paths (client and server-side) share this configuration, ensuring rule consistency.
@@ -228,12 +225,12 @@ The project uses Next.js App Router and leverages Route Groups for logical page 
 #### 2.2.5. Build and Packaging Process
 
 - **`next.config.ts`**: Next.js core configuration file.
-  - Configures `images.remotePatterns` to allow loading images from Unsplash and Cloudflare R2.
+  - Configures `images.remotePatterns` through `next-images.config.ts`. Private uploads are served through authenticated application URLs and skip server-side image optimization.
   - Integrates `@next/bundle-analyzer`. When `ANALYZE` environment variable is set to `true`, running `pnpm analyze` generates and opens bundle size analysis report after build, helping developers optimize frontend resource size.
 - **`package.json`**:
-  - `dev`: Starts development server with Next.js 16's `--turbo` mode for faster local compilation.
-  - `build`: Builds production application.
-  - `start`: Starts production server.
+  - `dev`: Runs `next dev`, using the framework's default Turbopack development mode.
+  - `build`: Builds Next.js, bundles the Worker, and prepares the standalone output.
+  - `start`: Runs the prepared standalone server; run `pnpm build` first.
 
 ---
 
@@ -242,23 +239,23 @@ The project uses Next.js App Router and leverages Route Groups for logical page 
 ### 3.1. Environment Setup
 
 1. **Install Tools**:
-   - Node.js v20.x or higher.
-   - pnpm (`npm install -g pnpm`).
+   - Node.js 22.12.0 or higher.
+   - pnpm (`npm install -g pnpm@10.33.0`).
    - PostgreSQL database (recommended using Docker: `docker run --name my-postgres -e POSTGRES_PASSWORD=mysecretpassword -p 5432:5432 -d postgres`).
 1. **Clone and Install**:
    ```bash
-   git clone https://github.com/ullrai/saas-starter.git
-   cd saas-starter
+   git clone https://github.com/UllrAI/SaaS-Starter.git
+   cd SaaS-Starter
    pnpm install
    ```
 1. **Configure Environment Variables**:
    - Copy `.env.example` to `.env`.
    - Generate a secure `BETTER_AUTH_SECRET`: `openssl rand -base64 32`.
    - Fill in your PostgreSQL `DATABASE_URL`.
-   - Configure a Stripe secret key and webhook endpoint secret, plus credentials for Resend and Cloudflare R2, in `.env`.
+   - Configure the credentials required by enabled integrations in `.env`: Stripe, Resend, private R2, and the AI endpoint. Review `.env.example` and feature switches rather than filling disabled integrations.
 1. **Database Setup**:
-   - **Development**: `pnpm db:push` synchronizes changes from `database/schema.ts` directly to the database, suitable for rapid iteration.
-   - **Shared environments**: generate and commit SQL migrations with `pnpm db:generate`, deploy the code, then run `pnpm db:migrate` once against the target `DATABASE_URL`.
+   - **Disposable or personal development databases**: `pnpm db:push` synchronizes `src/database/schema.ts` directly. For a fresh environment using the committed application and queue migrations, use `pnpm db:migrate`.
+   - **Shared environments**: generate and commit SQL migrations with `pnpm db:generate`; apply them once against the target `DATABASE_URL` before starting the new Web and Worker release. See the release procedure below.
 
 ### 3.2. Development Workflow
 
@@ -268,14 +265,14 @@ The project uses Next.js App Router and leverages Route Groups for logical page 
    - `pnpm saas-cli -- auth status --base-url http://localhost:3000`
    - Or export `SAAS_CLI_API_KEY=ssk_...` for scripts and agent calls
 1. **Modify Database**:
-   - Edit `database/schema.ts`.
-   - Run `pnpm db:push` to sync changes.
+   - Edit `src/database/schema.ts`.
+   - Use `pnpm db:push` only for disposable/personal iteration; generate committed migrations with `pnpm db:generate` before sharing the change.
 1. **Create New Pages**:
    - Create marketing routes in `src/app/(pages)` and protected routes in `src/app/dashboard`.
 1. **Create API Routes**:
-   - Create new folders and `route.ts` files in the `app/api` directory.
+   - Create new folders and `route.ts` files in the `src/app/api` directory.
 1. **Create Server Actions**:
-   - Create new files in the `lib/actions` directory using the `"use server";` directive.
+   - Create new files in the `src/lib/actions` directory using the `"use server";` directive.
 1. **Code Checking**:
    - Run `pnpm lint` to check code style.
    - Run `pnpm prettier:format` to format code.
@@ -304,14 +301,13 @@ This starter kit uses the `better-auth` library to provide a complete authentica
 
 - **Core Configuration**: `src/lib/auth/server.ts`
   - Configures Drizzle database adapter.
-  - Dynamically loads social login providers (Google, GitHub, LinkedIn), only enabled when corresponding `CLIENT_ID` and `SECRET` are provided in `.env`.
-  - Integrates `magicLink` plugin and configures using Resend for email sending.
-- **API Route**: `app/api/auth/[...all]/route.ts`
-  - This is a dynamic route that captures all `better-auth` authentication requests (like `/api/auth/magic-link`, `/api/auth/google/login`, etc.) and hands them to `auth.handler`.
+  - Dynamically loads social login providers (Google, GitHub, LinkedIn), only enabled when corresponding provider `CLIENT_ID` and `CLIENT_SECRET` are provided in `.env`.
+  - Enables the `magicLink` plugin and Resend delivery when `SITE_CONFIG.features.emailAuth` is true.
+- **API Route**: `src/app/api/auth/[...all]/route.ts`
+  - This catch-all forwards Better Auth requests through `toNextJsHandler(auth.handler)`; browser admin POST endpoints are disabled. Use `authClient.signIn.magicLink` or `authClient.signIn.social` rather than inventing provider-specific login paths.
 - **Client**: `src/lib/auth/client.ts`
   - Provides methods for interacting with the authentication system in client components, like `signIn`, `signOut`, `useSession`, etc.
 - **Authentication Flow (Magic Link)**:
-  [![Magic Link](https://mermaid.ink/img/pako:eNp1k-1r00Acx_-V415NaNN2fVh74ETqA4KysYc30je35NaGJrl6SUQtBVeUVXHasQ1ZrYjCQBxL3ZvOWde_ppe0_4WXnh1ldiGQu-P7uXy_97tfFapUIxBBmzxxiaWSOzouMmwWLDB-Kpg5uqpXsOWAdZuwWet5Qyfig23AvW9-4yw47oC5265TukeZeWMWsUrYU8JCwm_v8Ldf-eF3QSw_mCleITaxtFA8qnuDXlcioXKiDo1FFxelDwSG_T3--kiIA--Un3eD-jnf7gWHPX5xMCGkVDDSCQLLS6trIIYregwL4zETF3U1auhWeUJI4RQR7H_xG02__cb_2PUPGkHrFVijZWL9B0j_wlbnzD-t8w-7o5dbMgmY481jSYH1lYeX6SURFWyYDIF_zMm-3-6M9vr--yPJX8kvxTKuFAx-nQhfErk2-v2708lVbBgbWC3fckJbNxVFufYERj_eDTtb0n8E8MYn3vs9-NMadj5fQaZr4_WDC0-qQJ7Ssk6AqNFoe4d7Ld7c5Y2fIKZhu7RBMdNgBBaZrkHkMJdEoEmYicMprI7LD50SMUkBIjHUyCZ2DacAC1ZNYOLmPKbUnJCMusUSRJvYsMXMrWjYmdz0y1UmzpywPHUtB6L5xHgPiKrwGUTJRFxJL8TjafFmc6nkfDoCn0OUziqpXC6XyWUzyVQmk0nUIvDF-K9xJbsgNETTHcoeyQ4bN1rtLzk3Xew)](https://mermaid.live/edit#pako:eNp1k-1r00Acx_-V415NaNN2fVh74ETqA4KysYc30je35NaGJrl6SUQtBVeUVXHasQ1ZrYjCQBxL3ZvOWde_ppe0_4WXnh1ldiGQu-P7uXy_97tfFapUIxBBmzxxiaWSOzouMmwWLDB-Kpg5uqpXsOWAdZuwWet5Qyfig23AvW9-4yw47oC5265TukeZeWMWsUrYU8JCwm_v8Ldf-eF3QSw_mCleITaxtFA8qnuDXlcioXKiDo1FFxelDwSG_T3--kiIA--Un3eD-jnf7gWHPX5xMCGkVDDSCQLLS6trIIYregwL4zETF3U1auhWeUJI4RQR7H_xG02__cb_2PUPGkHrFVijZWL9B0j_wlbnzD-t8w-7o5dbMgmY481jSYH1lYeX6SURFWyYDIF_zMm-3-6M9vr--yPJX8kvxTKuFAx-nQhfErk2-v2708lVbBgbWC3fckJbNxVFufYERj_eDTtb0n8E8MYn3vs9-NMadj5fQaZr4_WDC0-qQJ7Ssk6AqNFoe4d7Ld7c5Y2fIKZhu7RBMdNgBBaZrkHkMJdEoEmYicMprI7LD50SMUkBIjHUyCZ2DacAC1ZNYOLmPKbUnJCMusUSRJvYsMXMrWjYmdz0y1UmzpywPHUtB6L5xHgPiKrwGUTJRFxJL8TjafFmc6nkfDoCn0OUziqpXC6XyWUzyVQmk0nUIvDF-K9xJbsgNETTHcoeyQ4bN1rtLzk3Xew)
 
   ```mermaid
   sequenceDiagram
@@ -321,24 +317,24 @@ This starter kit uses the `better-auth` library to provide a complete authentica
       participant Resend as Email Service
 
       User->>Client: Enter email and click login
-      Client->>Server: POST /api/auth/magic-link
+      Client->>Server: POST /api/auth/sign-in/magic-link
       Server->>Server: Generate time-limited Token
       Server->>Resend: Request to send email (with Token URL)
       Resend-->>User: Send magic link email
       User->>User: Click link in email
-      Client->>Server: GET /api/auth/callback?token=...
+      Client->>Server: GET /api/auth/magic-link/verify?token=...
       Server->>Server: Verify Token, create session
       Server-->>Client: Set session Cookie and redirect to /dashboard
   ```
 
 ### 4.2. Database & ORM (Drizzle)
 
-- **Schema Definition**: `database/schema.ts` is the single source of truth for all database tables, defining table structures, relationships, and constraints using Drizzle ORM syntax.
-- **Client Initialization**: `database/index.ts` initializes the Drizzle client and applies different connection pool configurations based on environment (Serverless or traditional server) (`src/lib/database/connection.ts`).
+- **Schema Definition**: `src/database/schema.ts` is the single source of truth for all database tables, defining table structures, relationships, and constraints using Drizzle ORM syntax.
+- **Client Initialization**: `src/database/index.ts` initializes the Drizzle client and applies different connection pool configurations based on environment (Serverless or traditional server) (`src/lib/database/connection.ts`).
 - **Migration Management**:
   - The project maintains a single committed migration history in `src/database/migrations`.
   - `pnpm db:generate`: Generate SQL migration files based on changes in `schema.ts`.
-  - `pnpm db:push`: Development only, directly syncs schema to database, loses history.
+  - `pnpm db:push`: Disposable/personal development only; syncs schema without generating a committed migration.
   - `pnpm db:migrate`: Apply committed migration files to the database selected by `DATABASE_URL`.
 
 ### 4.3. Payment & Subscriptions (Stripe)
@@ -351,10 +347,9 @@ This starter kit uses the `better-auth` library to provide a complete authentica
   - `/api/billing/webhooks/stripe`: Receives webhook events from Stripe for updating subscription status, recording payments, etc.
 - **Webhook Handling**: `src/lib/billing/stripe/webhook.ts`
   - **Security**: Uses Stripe's official SDK to verify the raw request body and `Stripe-Signature` header before processing any event.
-  - **Idempotency**: Records processed event IDs in `webhook_events` table to prevent duplicate processing of the same event.
-  - **Transactional**: All database operations are completed in one transaction, ensuring data consistency.
+  - **Idempotency**: Claims the provider event ID in `webhook_events` inside the same transaction as business changes; duplicate deliveries do not repeat the changes.
+  - **Transactional**: Event processing and durable business changes are committed together. Required provider reads happen before the database transaction. See the [webhook runbook](https://github.com/UllrAI/SaaS-Starter/blob/main/docs/webhooks.md).
 - **Payment Flow**:
-  [![Payment Flow](https://mermaid.ink/img/pako:eNp1U11rE0EU_SvDPCWQJqn5aDIPfTAFn8RAWwTJy3T3Nlm6u7POzoo1BKwgDbWBCLG0VoT2qSgmedCKBvXPZDbJv3B2txtqTZaF3Zl7zj1n7tzbxBrTARPswlMPbA02DFrn1KrZKHwcyoWhGQ61Bdp2gS_ar5gGqA91kexf-u3vk88DlKhyFbbrqErrkFzE2gT-DHjA8j905NGFPLtamJwDhG7iYOBiZX09EiVo8uqHPByhGn4AAlVNatdwjIwgChtJEVR9tLmFMtQxMjuGaSp3Ga0B2h7zREyJkEH6QJYE6lQAqtzAVNx1DWbPFQLUyi2FON82N--kvGV5-qcnzz8uws4dB4ckaHbYkf33svtWtoeRFvJ7g_HodHbx7W45Ir-yf-y3uxFoqcnHsNNgbA8lYgdpjVmOCQL05H-FiEmzT8fTwcHky2_Z7aTQtD-Uv96Nf74Zj66XUhIb99EWp7ZLNaGKlkT--Vf_ZDjpXakmmfYvZ6evJ0fX_suDJVf7z_EzDt23guK4ggrPxSlc54aOieAepLAF3KLBEjfDXsGiARbUMFG_OuxSzxRBX7QUTXXVE8asmMmZV29gsktNV608R1f3fTMD810Otg68wjxbYHKvEObApImfY5JbzaYLa9lsQb2lcj4XRPcxKZTS-XK5XCyXirl8sVhcbaXwi1A1my6tKQzohmD8YTR74Qi2_gLtEE8s)](https://mermaid.live/edit#pako:eNp1U11rE0EU_SvDPCWQJqn5aDIPfTAFn8RAWwTJy3T3Nlm6u7POzoo1BKwgDbWBCLG0VoT2qSgmedCKBvXPZDbJv3B2txtqTZaF3Zl7zj1n7tzbxBrTARPswlMPbA02DFrn1KrZKHwcyoWhGQ61Bdp2gS_ar5gGqA91kexf-u3vk88DlKhyFbbrqErrkFzE2gT-DHjA8j905NGFPLtamJwDhG7iYOBiZX09EiVo8uqHPByhGn4AAlVNatdwjIwgChtJEVR9tLmFMtQxMjuGaSp3Ga0B2h7zREyJkEH6QJYE6lQAqtzAVNx1DWbPFQLUyi2FON82N--kvGV5-qcnzz8uws4dB4ckaHbYkf33svtWtoeRFvJ7g_HodHbx7W45Ir-yf-y3uxFoqcnHsNNgbA8lYgdpjVmOCQL05H-FiEmzT8fTwcHky2_Z7aTQtD-Uv96Nf74Zj66XUhIb99EWp7ZLNaGKlkT--Vf_ZDjpXakmmfYvZ6evJ0fX_suDJVf7z_EzDt23guK4ggrPxSlc54aOieAepLAF3KLBEjfDXsGiARbUMFG_OuxSzxRBX7QUTXXVE8asmMmZV29gsktNV608R1f3fTMD810Otg68wjxbYHKvEObApImfY5JbzaYLa9lsQb2lcj4XRPcxKZTS-XK5XCyXirl8sVhcbaXwi1A1my6tKQzohmD8YTR74Qi2_gLtEE8s)
 
   ```mermaid
   sequenceDiagram
@@ -386,8 +381,6 @@ This is the default method used by the `FileUploader` component, offering better
 
 **Flow Diagram**:
 
-[![Presigned Upload](https://mermaid.ink/img/pako:eNqNU21rUzEY_Sshn1Zoe7u-rTcfBlIRBMXSrV_kfgm9aXfhvpneK2opqJtsa9c5RAdSqToUncO1A3Fit_lnmtz2X5g2W6nrBoYQkifnnJwnyVOFRUcnEMEKeeATu0huGrhMsaXZQDQXU88oGi62PVCoEDobvWWYpOCaDtYJBbgC2OEe3zgODjpBb63f-zlLWCL0oYTyd01W_8jefgU3crdngfn4CJQ1HV8vmZgSEZAgOY7sRBYXp89HYPh0kzf2Fd7Y5Y1Tvrs-cTANm2FNPA-_bQ06z8BccNRj7YbCPn1h3ZehMGCts2BznW03gpP9K_VkUgjk7i0tAwW7huKPNxWXkopRtoke8akJ5gadY370vP-r3j_5UMjfCUkxyZ6SkT4Gvw_6vVP2aksmwl6s8jdd3jy8RMrHEZC6w7214PsZ22kCoS1R-XhkSnfw5zVrta-AnYvN3My1hEv5jzzkCsvi5lo_-PZnmaC0HZo28q_6OWxjh9Xf_8czObacZx3LNYlHxLO0B91VGIZlaugQedQnYWgRauHRElZHmhr0VohFNIjEVCcl7JueBjW7Jmjim913HOuCSR2_vAJRCZsVsfJdHXsX1TCJUmILL1nHtz2I4upYA6IqfARRYj4WTS3EYinRM2oyEU-F4WOIUploUlXVtJpJJ5LpdHq-FoZPxqfGopkFgSG64Tn0rqzCcTHW_gKzZHRj)](https://mermaid.live/edit#pako:eNqNU21rUzEY_Sshn1Zoe7u-rTcfBlIRBMXSrV_kfgm9aXfhvpneK2opqJtsa9c5RAdSqToUncO1A3Fit_lnmtz2X5g2W6nrBoYQkifnnJwnyVOFRUcnEMEKeeATu0huGrhMsaXZQDQXU88oGi62PVCoEDobvWWYpOCaDtYJBbgC2OEe3zgODjpBb63f-zlLWCL0oYTyd01W_8jefgU3crdngfn4CJQ1HV8vmZgSEZAgOY7sRBYXp89HYPh0kzf2Fd7Y5Y1Tvrs-cTANm2FNPA-_bQ06z8BccNRj7YbCPn1h3ZehMGCts2BznW03gpP9K_VkUgjk7i0tAwW7huKPNxWXkopRtoke8akJ5gadY370vP-r3j_5UMjfCUkxyZ6SkT4Gvw_6vVP2aksmwl6s8jdd3jy8RMrHEZC6w7214PsZ22kCoS1R-XhkSnfw5zVrta-AnYvN3My1hEv5jzzkCsvi5lo_-PZnmaC0HZo28q_6OWxjh9Xf_8czObacZx3LNYlHxLO0B91VGIZlaugQedQnYWgRauHRElZHmhr0VohFNIjEVCcl7JueBjW7Jmjim913HOuCSR2_vAJRCZsVsfJdHXsX1TCJUmILL1nHtz2I4upYA6IqfARRYj4WTS3EYinRM2oyEU-F4WOIUploUlXVtJpJJ5LpdHq-FoZPxqfGopkFgSG64Tn0rqzCcTHW_gKzZHRj)
-
 ```mermaid
 sequenceDiagram
     participant User
@@ -398,12 +391,16 @@ sequenceDiagram
     User->>FileUploader: Select/drag files
     FileUploader->>FileUploader: Client-side validation (type/size), image compression
     FileUploader->>Server: POST /api/upload/presigned-url (request upload URL)
-    Server->>Server: Verify identity and file metadata
+    Server->>Server: Verify identity, metadata, quota and reserve upload intent
     Server->>R2: Request presigned URL
     R2-->>Server: Return presigned URL
     Server-->>FileUploader: Return presigned URL
-    FileUploader->>R2: PUT (direct file upload)
+    FileUploader->>R2: PUT (required Content-Type and If-None-Match headers)
     R2-->>FileUploader: Upload success
+    FileUploader->>Server: POST /api/upload/complete (intent and metadata)
+    Server->>R2: HEAD object to verify size and type
+    Server->>Server: Complete intent and record owned file
+    Server-->>FileUploader: Confirm completed file
     FileUploader->>FileUploader: onUploadComplete callback
 ```
 
@@ -412,8 +409,6 @@ sequenceDiagram
 This mode allows server-side processing before storage.
 
 **Flow Diagram**:
-
-[![Server-side Upload](https://mermaid.ink/img/pako:eNp1ks9LIzEUx_-V4Z1caDu1P8ZODoLUyx5kpe5J5hI6aR2YmcymM4tr6UEQthTFZauCWvyxp2WV2os_sLr-M02c_S8206BUxRCSvJfP-z7y8ppQpTYBBA3yJSJ-lcw7uM6wZ_maHAFmoVN1AuyHWtl1iNxwQ-P9X6J9_Xh2occbB6J3_pZdIuwrYQkrelu8c8r3f2tzix_fgpVcApVdGtk1FzMiHQpSq8qZnp1Vgkhb_LT0WdNx4OhR4FJs643xRVpZ2pQXuaGTJNBrlHlpG4f4g5JSChNS__5sxhfr8e3ZaHjPf26Kve-j4dUrtpJDmrhc53fbo7uT-G93Eqrk0hNqo5uORET7B-8cv5Mw7g_4_S5vD8TuQGz1-W33BShJ9VxJPuzwwyMl-TjsiqMepKDOHBtQyCKSAo8wDycmNBMNC8IV4hELkDzapIZlFSyw_JYMk2VeptR7imQ0qq8AqmG3Ia0okBV6-vJnLyO-TViZRn4IKJ8fawBqwqq0prOZ4kw2W5SzZBbyuWIKvgEqljIF0zQNs2TkC4ZhTLdSsDbOms2UZiRDbCekbEG12rjjWv8BwdH1ng)](https://mermaid.live/edit#pako:eNp1ks9LIzEUx_-V4Z1caDu1P8ZODoLUyx5kpe5J5hI6aR2YmcymM4tr6UEQthTFZauCWvyxp2WV2os_sLr-M02c_S8206BUxRCSvJfP-z7y8ppQpTYBBA3yJSJ-lcw7uM6wZ_maHAFmoVN1AuyHWtl1iNxwQ-P9X6J9_Xh2occbB6J3_pZdIuwrYQkrelu8c8r3f2tzix_fgpVcApVdGtk1FzMiHQpSq8qZnp1Vgkhb_LT0WdNx4OhR4FJs643xRVpZ2pQXuaGTJNBrlHlpG4f4g5JSChNS__5sxhfr8e3ZaHjPf26Kve-j4dUrtpJDmrhc53fbo7uT-G93Eqrk0hNqo5uORET7B-8cv5Mw7g_4_S5vD8TuQGz1-W33BShJ9VxJPuzwwyMl-TjsiqMepKDOHBtQyCKSAo8wDycmNBMNC8IV4hELkDzapIZlFSyw_JYMk2VeptR7imQ0qq8AqmG3Ia0okBV6-vJnLyO-TViZRn4IKJ8fawBqwqq0prOZ4kw2W5SzZBbyuWIKvgEqljIF0zQNs2TkC4ZhTLdSsDbOms2UZiRDbCekbEG12rjjWv8BwdH1ng)
 
 ```mermaid
 sequenceDiagram
@@ -432,7 +427,7 @@ sequenceDiagram
 ### 4.5. Blog & Content Management (Content Collections)
 
 - **Content Pipeline**: Uses `Content Collections` to index repository-managed Markdown and JSON content under the `content/` directory.
-- **Authoring Workflow**: Blog posts are edited directly in `content/blog/*.md`, while author data lives in `content/authors/*.json`.
+- **Authoring Workflow**: Blog posts are edited directly in `content/blog/<locale>/*.md`, while author data lives in `content/authors/*.json`.
 - **Content Reading**:
   - `content-collections.ts` defines the content schema and generated collections.
   - `src/app/(pages)/blog/page.tsx`: Blog list page, reads all indexed articles.
@@ -440,11 +435,11 @@ sequenceDiagram
 
 ### 4.6. Admin Dashboard
 
-Provides a powerful, extensible data management system.
+Each business domain has its own management page and guarded actions.
 
 - **Modular management pages**: Includes dedicated admin pages for users, payments, subscriptions, and uploads to keep each business domain isolated.
 - **Unified permission guard**: All admin operations are protected by admin-level authorization checks.
-- **Server Actions**: Management reads/writes are handled by type-safe Server Actions in `src/lib/actions/admin.ts`, without adding extra API routes.
+- **Server Actions**: Users, payments, subscriptions, and uploads use domain actions in `src/lib/actions/admin/`, guarded by `shared.ts`.
 
 ---
 
@@ -454,12 +449,12 @@ Provides a powerful, extensible data management system.
 
 - **Add New Pages**: Create new routes in `src/app/(pages)` or `src/app/dashboard`.
 - **Add New Admin Management Tables**:
-  1. Define new table in `database/schema.ts`.
-  1. Add corresponding query/mutation logic in `src/lib/actions/admin.ts`.
+  1. Define new table in `src/database/schema.ts`.
+  1. Add a focused domain action module under `src/lib/actions/admin/` and reuse the `adminAction` guard from `shared.ts`.
   1. Create a dedicated management page under `src/app/dashboard/admin/` and add its navigation in `src/app/dashboard/_components/app-sidebar.tsx`.
 - **Add New Payment Provider**:
   1. Create new provider implementation file under `src/lib/billing/`, must follow `PaymentProvider` interface in `src/lib/billing/provider.ts`.
-  1. Modify `PAYMENT_PROVIDER` logic in `src/lib/billing/index.ts` to switch to new provider.
+  1. Register it in `src/lib/billing/index.ts`, then update `SITE_CONFIG.billing.provider` and its type in `src/lib/config/site.js`.
 - **Customize Email Templates**: Create or modify React Email components in `src/emails/` directory.
 - **Customize UI Components**: Modify `shadcn/ui` components or add new ones in `src/components/ui/`.
 
@@ -473,6 +468,8 @@ Provides a powerful, extensible data management system.
 | `/api/billing/webhooks/stripe` | POST      | Receive Stripe webhook events.                    |
 | `/api/upload/presigned-url`    | POST      | Get presigned URL for client-side direct upload.  |
 | `/api/upload/server-upload`    | POST      | Server-side proxy file upload.                    |
+| `/api/upload/complete`         | POST      | Verify the object and commit its upload intent.   |
+| `/api/upload/cancel`           | POST      | Cancel an intent and release reserved quota.      |
 | `/api/payment-status`          | GET       | Query payment status.                             |
 
 ### 5.3. Hooks and Events
@@ -491,7 +488,7 @@ Provides a powerful, extensible data management system.
 - **Frameworks**: Uses `Jest`, `React Testing Library`, and `Playwright`.
 - **Configuration Files**: `jest.config.js`, `jest.setup.ts`, `playwright.config.ts`.
 - **Unit and integration coverage**: Jest covers UI components, route handlers, hooks, auth helpers, billing helpers, upload logic, and dashboard pages.
-- **Browser smoke coverage**: Playwright currently exercises dashboard auth redirects, authenticated dashboard access, admin gating, and locale canonicalization in a real browser.
+- **Browser coverage**: Playwright exercises authentication, admin permissions, locale routing, machine auth, private files, AI, and background task flows using a dedicated `E2E_DATABASE_URL` whose database name contains `e2e` or `test`.
 - **Examples**:
   - Unit/component: `src/components/forms/auth-form.test.tsx`
   - Page: `src/app/dashboard/page.test.tsx`
@@ -504,8 +501,8 @@ Provides a powerful, extensible data management system.
 
 ### 6.2. Code Quality Assurance
 
-- **ESLint**: Configured in `.eslintrc.json`, follows `eslint-config-next` best practices.
-- **Prettier**: Integrated with ESLint, uses `prettier-plugin-tailwindcss` to auto-sort Tailwind CSS classes.
+- **ESLint**: Configured in `eslint.config.mjs` using the flat config and `eslint-config-next`.
+- **Prettier**: Runs separately from ESLint; `eslint-config-prettier` disables conflicting rules, and `prettier-plugin-tailwindcss` is used to auto-sort Tailwind CSS classes.
 - **Run Checks**: `pnpm lint` and `pnpm prettier:check`.
 - **Auto Format**: `pnpm prettier:format`.
 
@@ -521,9 +518,9 @@ Provides a powerful, extensible data management system.
 
 ### 7.1. Typical Use Cases
 
-- **Enterprise SaaS**: As starting point for new projects, integrates user management, role permissions, payments, and audit logs (through webhook events) needed by enterprises.
-- **AI Applications**: Quickly build AI tools requiring user login and usage/subscription-based payments. File upload functionality can be used for processing user data.
-- **Paid Content Platforms**: Blog and content management system combined with payment functionality can easily be extended to paid content platforms.
+- **Enterprise SaaS**: As starting point for new projects, provides user management, role permissions, and payments. Webhook records deduplicate billing events; they are not a general audit log.
+- **AI Applications**: Build AI tools with login, subscription billing, and per-user AI admission limits. Usage-based billing requires your own product rules. File upload functionality can be used for processing user data.
+- **Paid Content Platforms**: Public blog content and billing are available; paid-content authorization needs to be implemented for your product.
 - **Internal Tools**: Leverage powerful admin dashboard and data management capabilities to quickly build company internal data management tools or dashboards.
 
 ---
@@ -550,14 +547,14 @@ Provides a powerful, extensible data management system.
 
 ### 8.2. Configuration Options
 
-All required and optional environment variables are detailed in the environment configuration section of `README.md`. Be sure to completely fill out the `.env` file.
+Use `.env.example`, `env.js`, and [README](https://github.com/UllrAI/SaaS-Starter#readme) for required variables and feature gates. Configure credentials only for enabled integrations.
 
 ### 8.3. Utility Functions
 
 `src/lib/utils.ts` provides some useful utility functions:
 
 - `cn(...inputs)`: Safely merge Tailwind CSS class names and resolve conflicts.
-- `formatCurrency(amount, currency)`: Format amounts in cents to currency strings.
+- `formatCurrency(amount, currency, locale)`: Format amounts in cents to currency strings.
 - `calculateReadingTime(text)`: Calculate estimated reading time based on text content.
 
 ---
@@ -568,7 +565,7 @@ All required and optional environment variables are detailed in the environment 
 
 - **Package Manager**: Project uses `pnpm`, ensure you have it installed globally. `pnpm` leverages content-addressable storage to save disk space and speed up installations.
 - **Version Locking**: `pnpm-lock.yaml` file locks exact versions of all dependencies and their sub-dependencies, ensuring consistency across team members and different deployment environments.
-- **Dependency Updates**: Recommend using `pnpm up --latest` to safely update dependencies, and pay attention to major version change logs.
+- **Dependency Updates**: Review release notes and update dependencies deliberately. Major upgrades can change framework and SDK behavior; run repository checks before merging, and commit the updated lockfile.
 
 ---
 
@@ -576,47 +573,44 @@ All required and optional environment variables are detailed in the environment 
 
 ### 10.1. Performance Optimization
 
-- **Code Splitting**: Use `next/dynamic` for dynamic imports of large components, like dynamic imports for each settings page in `src/app/dashboard/settings/_components/settings.tsx`.
-- **Image Optimization**: Prioritize using Next.js `<Image>` component, which automatically performs image size optimization, format conversion (like WebP), and lazy loading.
+- **Code Splitting**: Settings currently compose their tabs in `src/app/dashboard/settings/page.tsx`. Add dynamic imports only when measured bundle size or load time justifies them.
+- **Image Optimization**: Use Next.js `<Image>` for public images. Private upload previews use `unoptimized` so the browser sends its session cookie to the authenticated file route.
 - **Server Components**: Use React Server Components (RSC) as much as possible for data fetching and logic execution, reducing JavaScript code sent to client.
 - **Database Queries**: Avoid executing database queries in loops. Leverage Drizzle ORM's join and batch operation capabilities to reduce database round trips.
 
 ### 10.2. Security Considerations
 
 - **Environment Variables**: **Never** commit `.env` files to Git. Store production values in Zeabur's service variables or an equivalent secret manager.
-- **Route Protection**: `proxy.ts` is the first line of defense, but **must** use functions like `requireAuth`, `requireAdmin` in Server Actions and API routes for backend permission verification.
-- **SQL Injection**: Using Drizzle ORM effectively prevents SQL injection attacks because it automatically parameterizes queries.
-- **XSS**: Next.js and React escape JSX content by default, preventing cross-site scripting attacks. When handling user-generated content, use mature libraries (like `DOMPurify`) for sanitization.
+- **Route Protection**: `src/proxy.ts` is the first line of defense, but **must** use functions like `requireAuth`, `requireAdmin` in Server Actions and API routes for backend permission verification.
+- **SQL Injection**: Using Drizzle ORM effectively prevents SQL injection attacks when using its parameterized query API. Do not interpolate untrusted input into raw SQL.
+- **XSS**: React escapes text nodes; the blog renderer does not enable raw HTML. Any new raw-HTML rendering path needs explicit validation and sanitization.
 - **Webhook Security**: Signature verification in `src/lib/billing/stripe/webhook.ts` is key to ensuring webhook requests come from trusted sources.
 
 ### 10.3. Deployment Guide
 
-The production reference deployment uses **Zeabur**.
+The production reference uses Zeabur Web and Worker services tracking `prod`.
+The default branch is for development and review. Follow the
+[deployment runbook](https://github.com/UllrAI/SaaS-Starter/blob/main/docs/deployment-zeabur.md)
+for service configuration, migration network access, backups, and recovery.
 
-> **Save 10% on a Zeabur server:** Purchase a server at
-> [Zeabur](https://zeabur.com/) and enter referral code `visoar` at checkout.
-
-Configure Zeabur to deploy the `prod` branch, not direct pushes to the default
-development branch (`main` in this repository). A `release/*` tag promotes its
-commit to `prod` only when that commit belongs to the default branch.
-
-1. Merge a reviewed commit into the default branch and wait for CI.
-1. Configure the required service variables from `.env.example`.
-1. Run `pnpm db:migrate` once against the production `DATABASE_URL`.
-1. Push an annotated `release/*` tag on that commit.
-1. Wait for the promotion workflow and the subsequent Zeabur deployment.
-1. Use `/api/ready` for database-backed readiness and inspect build and runtime logs.
+1. Merge the reviewed release commit into the default branch and wait for Quality on that exact SHA.
+1. Configure Web and Worker variables from `.env.example`, and the GitHub `production` environment database secrets and migration tunnel settings from the runbook.
+1. Create and push an annotated `release/vX.Y.Z` tag matching that commit's `package.json` version.
+1. The promotion workflow verifies the tag and Quality, applies production migrations once, then updates `prod`. Do not separately run a routine manual production migration or push directly to `prod`.
+1. Wait for both Zeabur services to deploy the same released SHA. Check Web `/api/health` and `/api/ready`, plus Worker readiness and runtime logs.
 1. Verify both locale URL variants, authentication redirects, and an authenticated Dashboard session.
+
+Migrations precede the new application processes; they do not run in every replica's startup command. Changes must remain compatible with the previous release while it is still serving traffic.
 
 ---
 
 ## 11. Community & Ecosystem
 
-Before deploying, compare the [Next.js 16 architecture guide](/blog/nextjs-16-saas-starter-architecture), the [Stripe billing production guide](/blog/stripe-nextjs-billing-production-guide), and the [API key, OAuth, and device-flow guide](/blog/api-keys-oauth-device-flow-saas-agents). Then inspect the [feature boundaries](/features), review [pricing behavior](/pricing), and clone the [GitHub source](https://github.com/ullrai/saas-starter) instead of copying isolated snippets out of context.
+Before deploying, compare the [Next.js 16 architecture guide](/blog/nextjs-16-saas-starter-architecture), the [Stripe billing production guide](/blog/stripe-nextjs-billing-production-guide), and the [API key, OAuth, and device-flow guide](/blog/api-keys-oauth-device-flow-saas-agents). Then inspect the [feature boundaries](/features), review [pricing behavior](/pricing), and clone the [GitHub source](https://github.com/UllrAI/SaaS-Starter) instead of copying isolated snippets out of context.
 
 ### 11.1. Community Resources
 
-- **Official Repository**: [UllrAI SaaS Starter on GitHub](https://github.com/ullrai/saas-starter)
+- **Official Repository**: [UllrAI SaaS Starter on GitHub](https://github.com/UllrAI/SaaS-Starter)
 - **Issues & Discussions**: Use GitHub Issues to submit bug reports and feature requests.
 - **Main Dependency Documentation**:
   - [Next.js](https://nextjs.org/docs)
@@ -648,7 +642,7 @@ A: Add or edit Markdown files in `content/blog/` and update author JSON in `cont
 
 **Q: File upload fails with CORS error.**
 
-A: This is the most common file upload issue. Make sure you have correctly configured CORS policy in your Cloudflare R2 bucket settings, allowing `PUT` and `GET` requests from your deployment domain and `http://localhost:3000`.
+A: This is the most common file upload issue. Make sure you have correctly configured CORS policy in your Cloudflare R2 bucket settings, allowing the upload `PUT` from your deployment domain and `http://localhost:3000`, including the required `Content-Type` and `If-None-Match` headers. Keep the bucket private; browser downloads use authenticated app URLs.
 
 **Q: How to set up the first admin account?**
 
@@ -662,4 +656,4 @@ A: The system doesn't automatically set up admins. You need to:
 A: Please check the following:
 
 1. Make sure you correctly filled in the corresponding social platform's `CLIENT_ID` and `CLIENT_SECRET` in the `.env` file.
-1. Make sure in the social platform's OAuth app configuration (like Google Cloud Console, GitHub Developer Settings), you've added `http://localhost:3000/api/auth/[provider]/callback` and your production domain's callback URL to the authorized callback URL list.
+1. Make sure in the social platform's OAuth app configuration (like Google Cloud Console, GitHub Developer Settings), you've added `http://localhost:3000/api/auth/callback/<provider>` and your production domain's callback URL to the authorized callback URL list.

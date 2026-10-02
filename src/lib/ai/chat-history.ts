@@ -2,13 +2,15 @@ import "server-only";
 
 import { and, desc, eq, isNotNull, isNull, sql } from "drizzle-orm";
 import { db } from "@/database";
-import { aiConversations, aiMessages } from "@/database/schema";
+import { aiConversations, aiMessages, aiRuns } from "@/database/schema";
 import type {
   AiConversationDetail,
   AiConversationPage,
   AiConversationSummary,
   AiMessage,
 } from "./chat-history-types";
+
+import { aiRunSummary } from "./durable-runs";
 
 const MAX_GENERATED_TITLE_LENGTH = 80;
 
@@ -148,31 +150,54 @@ export async function getAiConversation(params: {
   userId: string;
   before?: string;
 }): Promise<AiConversationDetail | null> {
-  const conversation = await findOwnedConversation(
-    params.conversationId,
-    params.userId,
+  // History and active ownership must come from one snapshot: otherwise a
+  // completion between the queries can replay an already-persisted answer.
+  return db.transaction(
+    async (tx) => {
+      const [conversation] = await tx
+        .select()
+        .from(aiConversations)
+        .where(
+          and(
+            eq(aiConversations.id, params.conversationId),
+            eq(aiConversations.userId, params.userId),
+          ),
+        )
+        .limit(1);
+      if (!conversation) return null;
+      const messages = await tx
+        .select()
+        .from(aiMessages)
+        .where(
+          and(
+            eq(aiMessages.conversationId, conversation.id),
+            params.before
+              ? sql`(${aiMessages.createdAt}, ${aiMessages.id}) < (select "createdAt", id from ai_messages where "conversationId" = ${conversation.id} and id = ${params.before})`
+              : undefined,
+          ),
+        )
+        .orderBy(desc(aiMessages.createdAt), desc(aiMessages.id))
+        .limit(81);
+      const [latestRun] = await tx
+        .select()
+        .from(aiRuns)
+        .where(eq(aiRuns.conversationId, conversation.id))
+        .orderBy(desc(aiRuns.createdAt), desc(aiRuns.id))
+        .limit(1);
+      const active =
+        latestRun && ["queued", "running"].includes(latestRun.status)
+          ? latestRun
+          : null;
+      return {
+        conversation: toSummary(conversation),
+        messages: messages.slice(0, 80).reverse().map(toMessage),
+        hasMore: messages.length > 80,
+        latestRun: latestRun ? aiRunSummary(latestRun) : null,
+        activeRun: active ? aiRunSummary(active) : null,
+      };
+    },
+    { isolationLevel: "repeatable read" },
   );
-  if (!conversation) return null;
-
-  const messages = await db
-    .select()
-    .from(aiMessages)
-    .where(
-      and(
-        eq(aiMessages.conversationId, conversation.id),
-        params.before
-          ? sql`(${aiMessages.createdAt}, ${aiMessages.id}) < (select "createdAt", id from ai_messages where "conversationId" = ${conversation.id} and id = ${params.before})`
-          : undefined,
-      ),
-    )
-    .orderBy(desc(aiMessages.createdAt), desc(aiMessages.id))
-    .limit(81);
-
-  return {
-    conversation: toSummary(conversation),
-    messages: messages.slice(0, 80).reverse().map(toMessage),
-    hasMore: messages.length > 80,
-  };
 }
 
 export async function requireAiConversation(params: {

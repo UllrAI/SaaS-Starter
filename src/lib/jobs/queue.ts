@@ -253,7 +253,12 @@ export class JobQueue {
     const boss = await this.start();
 
     for (const definition of jobDefinitions) {
-      await this.registerWorker(db, definition);
+      // Each worker validates its own schema before invoking the handler. Erase
+      // the catalog union here; individual job exports retain typed payloads.
+      await this.registerWorker(
+        db,
+        definition as JobDefinition<string, z.ZodType, unknown>,
+      );
     }
     const report = async () => {
       for (const definition of jobDefinitions) {

@@ -1,5 +1,9 @@
+import { SITE_CONFIG } from "@/lib/config/site";
 import { createDatabaseClient } from "@/database/client";
 import { createAiModels } from "@/lib/ai/models.node";
+import { createWorkerAiRuntime } from "@/lib/ai/runtime.node";
+import { configureAiGenerationWorker } from "@/lib/ai/generation-worker";
+import { reconcileAiRuns } from "@/lib/ai/durable-runs";
 import {
   retryPendingAiUsage,
   reportAiAccountingHealth,
@@ -14,7 +18,9 @@ import { JobQueue } from "@/lib/jobs/queue";
 import { loadWorkerEnv } from "@/lib/jobs/worker-env";
 
 async function main(): Promise<void> {
-  const workerEnv = loadWorkerEnv();
+  const workerEnv = loadWorkerEnv(process.env, {
+    aiEnabled: SITE_CONFIG.features.ai && process.env.WORKER_SMOKE_TEST !== "1",
+  });
   const database = createDatabaseClient({
     url: workerEnv.DATABASE_URL,
     max: workerEnv.DB_POOL_SIZE,
@@ -43,16 +49,6 @@ async function main(): Promise<void> {
     { supervise: true },
   );
 
-  try {
-    await queue.registerWorkers(database.db);
-  } catch (error) {
-    await Promise.allSettled([
-      queue.stop(workerEnv.WORKER_GRACEFUL_TIMEOUT_MS),
-      database.close(),
-    ]);
-    throw error;
-  }
-
   let maintenance: Promise<void> | undefined;
   const storageConfigured =
     workerEnv.R2_ENDPOINT &&
@@ -69,6 +65,30 @@ async function main(): Promise<void> {
         UPLOAD_TOTAL_QUOTA_BYTES: workerEnv.UPLOAD_TOTAL_QUOTA_BYTES,
       }
     : null;
+  if (SITE_CONFIG.features.ai && workerEnv.BETTER_AUTH_SECRET) {
+    configureAiGenerationWorker(
+      database.db,
+      createWorkerAiRuntime(database.db, {
+        model: {
+          apiKey: workerEnv.LLM_API_KEY,
+          baseUrl: workerEnv.LLM_BASE_URL,
+          defaultModel: workerEnv.AI_DEFAULT_MODEL,
+        },
+        approvalSecret: workerEnv.BETTER_AUTH_SECRET,
+        ...(storageConfig ? { storage: storageConfig } : {}),
+      }),
+    );
+  }
+  try {
+    await queue.registerWorkers(database.db);
+  } catch (error) {
+    await Promise.allSettled([
+      queue.stop(workerEnv.WORKER_GRACEFUL_TIMEOUT_MS),
+      database.close(),
+    ]);
+    throw error;
+  }
+
   const storeFile = storageConfig
     ? createFileStorage(database.db, storageConfig)
     : async () => {
@@ -108,6 +128,7 @@ async function main(): Promise<void> {
     : null;
   let lastAccountingReport = 0;
   const maintain = async () => {
+    await reconcileAiRuns(database.db);
     await retryPendingAiUsage(database.db);
     if (Date.now() - lastAccountingReport >= 60_000) {
       await reportAiAccountingHealth(database.db);

@@ -1,16 +1,17 @@
-import "server-only";
 import { createHmac } from "node:crypto";
-import env from "@/env";
 
 // Derived instead of read from a dedicated env var: when the secret is unset
 // the SDK skips signature verification entirely (see
 // `validateApprovedToolApprovals` in ai/dist/index.js), so a forgotten
 // variable would silently turn the approval gate into decoration.
-function getToolApprovalSecret(scope: {
-  userId: string;
-  conversationId: string;
-}) {
-  return createHmac("sha256", env.BETTER_AUTH_SECRET)
+function getToolApprovalSecret(
+  scope: {
+    userId: string;
+    conversationId: string;
+  },
+  secret: string,
+) {
+  return createHmac("sha256", secret)
     .update(
       JSON.stringify(["ai-tool-approval", scope.userId, scope.conversationId]),
     )
@@ -28,9 +29,10 @@ function getToolApprovalSecret(scope: {
 export function withToolApprovalSecret<T extends object>(
   settings: T,
   scope: { userId: string; conversationId: string },
+  secret: string,
 ): T {
   return {
     ...settings,
-    experimental_toolApprovalSecret: getToolApprovalSecret(scope),
+    experimental_toolApprovalSecret: getToolApprovalSecret(scope, secret),
   } as T;
 }

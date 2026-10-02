@@ -304,30 +304,12 @@ curl -fsS -X POST \
 Store `UPLOAD_CLEANUP_SECRET` only in the platform secret store. Do not place it
 in a public build argument or repository file. Each call drains up to five
 100-intent batches. A response with `batches: 5` and `scanned: 500` means the
-queue reached the per-run safety cap; schedule the endpoint more frequently
-until a later response reports a partial batch. Cancelled uploads release quota
+queue reached the per-run safety cap; repeat the manual call until a later
+response reports a partial batch. Cancelled uploads release quota
 immediately, while their cleanup tombstones remain for a second object deletion
-24 hours later so late signed PUTs cannot leave an orphan. With a daily
-schedule, expired objects may remain until a later eligible daily run. A
-tombstone that becomes eligible just after the fixed run can wait through one
-additional daily cycle, while expired intents stop counting toward quota
-immediately.
-
-The repository includes an opt-in `.github/workflows/production-maintenance.yml`
-schedule for hosts without a native cron facility. To enable it, set the
-repository variable `PRODUCTION_MAINTENANCE_ENABLED=true`, set
-`PRODUCTION_APP_URL` to the public HTTPS origin, and add the same
-`UPLOAD_CLEANUP_SECRET` value as an Actions secret. Deployments that do not set
-the enable flag skip the job safely.
-
-GitHub schedules run only from the default branch and are best-effort. Scheduled
-workflows are disabled by default in forks, may be delayed or dropped under
-load, and are disabled after 60 days without activity in a public repository.
-Confirm the workflow is enabled and monitor its latest successful run. Use a
-platform or external scheduler when execution timing is an SLA. See GitHub's
-[schedule event documentation](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule)
-and
-[workflow enablement guidance](https://docs.github.com/en/actions/managing-workflow-runs-and-deployments/managing-workflow-runs/disabling-and-enabling-a-workflow).
+24 hours later so late signed PUTs cannot leave an orphan. Expired intents stop
+counting toward quota immediately. The Worker owns recurring cleanup; GitHub
+Actions does not schedule a duplicate production upload-cleanup job.
 
 ## Locale and SEO checks
 

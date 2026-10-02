@@ -45,6 +45,14 @@
 
 **当前修复**:聊天路由已连接请求 signal 与三分钟超时；流结束后持久 run 会结束或保留未知用量。`isAborted` 有意义的前提是接上 `abortSignal`。判断一个回调字段是否可达,要沿 SDK 的 runtime 反查它的触发条件,而不是看类型签名上有没有。
 
+### SDK 的 `resumeStream()` 不恢复已有助手消息
+
+**现象**：刷新页面后重连工具审批的后续运行，已有工具输入会丢失，返回的工具结果无法更新原来的卡片。
+
+**原因**：`ai@7` 的 `resumeStream()` 创建空的助手消息状态，不使用会话末尾助手消息的 snapshot。审批后续流只发送工具结果，不能自行重建审批前的输入。
+
+**正确做法**：当前前端通过 `sendMessage(undefined, { body: { resumeRunId } })` 接续已接受的运行。持久 transport 识别 `resumeRunId` 后直接读取事件，不再次提交生成；SDK 则保留末尾助手消息的状态，用稳定消息 ID 更新原来的工具卡片。`durable-chat-transport.test.ts` 用真实 SDK 验证恢复后的输入与输出都保留。
+
 ### 手工调用回调的单测证明不了该路径可达
 
 **现象**:测试绿的功能上线后从不触发。
@@ -135,7 +143,11 @@
 
 ### Drizzle 客户端上的底层 postgres.js JSON fixture
 
-Drizzle 配置过序列化器的底层 sql 连接中，直接用 `tx.json(array)` 写集成测试临时表可能把数组送到字符串编码器。此时显式 `JSON.stringify(value)` 并在参数后加 `::jsonb`，不要误判为数据库迁移失败。
+Drizzle 配置过序列化器的底层 sql 连接中，直接用 `tx.json(array)` 写集成测试临时表可能把数组送到字符串编码器。此时显式 `JSON.stringify(value)` 并在参数后加 `::jsonb`，不要误判为数据库迁移失败。同一连接直接传 `Date` 也会落到字符串编码器；底层 SQL fixture 使用 `date.toISOString()` 和 `::timestamptz`，业务代码继续使用 Drizzle 的类型映射。
+
+### Queue migration 不能提前加载生成后的文章模块
+
+Job catalog 同时用于 Worker 和一次性数据库迁移。AI job 若在模块加载时引入 agent/tools，会间接要求尚未生成的 `content-collections`，全新 checkout 的迁移会失败，本地已 build 的工作区却正常。仅在真正执行生成任务时加载 agent，并用移走 `.content-collections` 的迁移检查复验；不能用在 CI 提前 build 内容来掩盖依赖边界。
 
 ### 跨环境数据库校验需要统一会话时区
 

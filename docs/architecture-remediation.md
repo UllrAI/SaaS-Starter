@@ -12,7 +12,7 @@ flowchart LR
   Outbox --> Queue[pg-boss]
   Queue --> Worker[Node Worker]
   Worker --> DB
-  Web --> Agent[Bounded streaming AI run]
+  Worker --> Agent[Bounded streaming AI run]
   Agent --> DB
   DB --> Media[Retryable media finalization]
   Media --> R2[Private R2 bucket]
@@ -51,10 +51,14 @@ immutable compliance ledger.
    reaches the private Zeabur PostgreSQL through the dedicated SSH tunnel described
    in [the deployment runbook](deployment-zeabur.md#migration-network-access).
    Missing credentials or tunnel access block promotion.
-2. Deploy Web and Worker from the same release commit and Dockerfile. Give the Worker the four R2
-   credentials and the same upload quotas as Web, so it can finalize media and
-   remove deleted/abandoned objects. No model credentials are needed for media
-   retries; the Worker does not replay an interrupted AI generation.
+2. Deploy Web and Worker from the same release commit and Dockerfile. The AI Worker
+   requires `LLM_API_KEY`, the same `LLM_BASE_URL`/model settings and
+   `BETTER_AUTH_SECRET` as Web. Give it the four R2 credentials and the same upload
+   quotas when uploads are enabled. Apply migration 0028, start the generation-aware
+   Worker, then deploy Web handoff. The migration marks existing Web-owned running
+   requests as potentially invoked so their unknown usage reservations survive
+   reconciliation. The Worker never automatically repeats a model
+   invocation whose outcome is unknown.
 3. Disable public bucket access, custom public domains, and `r2.dev` for the user
    upload bucket. Code and SQL cannot revoke an already-public object URL. For
    an existing deployment, pause uploads and drain in-flight Web requests while
@@ -97,33 +101,26 @@ E2E exercises the production build with isolated fixtures and simulated provider
 streams. Production promotion and bucket access still need the deployment
 configuration above.
 
-## AI Worker follow-up (#91), reviewed 2026-10-01
+## Durable AI generation (#91), completed 2026-10-02
 
-The outbox acceptance/delivery and generic Worker are already implemented; #91's
-original queue-delivery gap no longer needs another dispatcher. The October
-follow-up shares a Node-safe AI run repository between Web and Worker, adds
-queryable accounting failures/retries, keeps measured partial usage on a real
-SDK abort, and adds PostgreSQL active-run constraints. These changes prepare
-handoff but do not move model generation out of the Web request.
+Web accepts one validated message or approval decision and commits the authoritative
+transcript, run, task and dispatch outbox together. It returns a run ID rather than
+holding a model connection. The existing Node Worker executes `ai.generate` with
+Node-safe agents, tools and owned attachments. Stable assistant IDs and batched,
+append-only UI events allow owned SSE subscriptions to resume from an event cursor;
+closing a tab only disconnects the subscription. Explicit Stop cancels the task and
+retains partial output. Final status, message and accounting commit before terminal
+events become visible. Generated image bytes remain in private storage or a retryable
+run snapshot and are never exposed in the event log.
 
-Remaining implementation boundaries are a dedicated `ai.response.generate` Job,
-atomic transcript/run/task acceptance, Node-safe agent/tools and attachment reads,
-stable assistant identity, batched append-only events with cursor replay, owned
-run/status/stream/cancel APIs, and frontend reconnect/stop states. A run record or
-retryable media finalizer alone does not satisfy reconnectable generation.
+The configurable Responses gateway has no verified idempotent submission/lookup
+contract. A durable invocation marker is committed before the external call. A
+Worker crash after that marker produces a controlled interrupted run with manual
+retry, preserving unknown usage reservations. Queue delivery retries before the
+marker remain safe; they do not repeat potentially paid generations.
 
-The current configurable Responses gateway has no verified idempotent submission
-or lookup contract in this repository. The Worker must durably mark provider
-submission before invoking it and use a stable run key; after an ambiguous crash,
-it must enter controlled failure/manual retry unless that gateway's deduplication
-and lookup are verified. Generic pg-boss retries must never blindly repeat paid
-model/image calls. Keep the existing no-replay guarantee until that boundary is
-implemented, then test crashes before submit, after remote acceptance, and before
-final-message commit with a delayed local provider.
-
-Acceptance remains open: close-tab completion, refresh/cursor replay, Web restart
-independence, explicit cancel with late-result no-op, Worker kill/recovery,
-R2-before-event persistence, cross-user 404s, and English/Chinese states. Deploy
-schema, then the generation-aware Worker, then Web handoff, with a real production
-smoke after review. No production promotion or paid provider call was made in this
-follow-up.
+Unit/SDK, PostgreSQL and production-build browser coverage verify atomic admission,
+repeat requests, cursor replay, completion while a tab is closed, explicit cancel,
+late-result suppression, interrupted execution and media persistence. Deployment
+and paid-provider production smoke are separate operational steps; this change does
+not promote production.

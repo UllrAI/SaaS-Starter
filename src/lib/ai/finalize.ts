@@ -61,6 +61,53 @@ export function withoutImageBytes(message: AiMessage): AiMessage {
   return pending;
 }
 
+// Media retries may finish after an approval continuation takes ownership of
+// the message. Merge only its existing image call outputs, never old text or
+// approval state. A later response which removed the call remains untouched.
+export function restoreStoredImageOutputs(
+  message: AiMessage,
+  stored: AiMessage,
+): AiMessage {
+  const merged = structuredClone(message);
+  for (const part of merged.parts) {
+    if (
+      !isToolUIPart(part) ||
+      part.state !== "output-available" ||
+      getToolOrDynamicToolName(part) !== "generateImage"
+    )
+      continue;
+    const saved = stored.parts.find(
+      (candidate) =>
+        isToolUIPart(candidate) &&
+        candidate.toolCallId === part.toolCallId &&
+        candidate.state === "output-available" &&
+        getToolOrDynamicToolName(candidate) === "generateImage",
+    );
+    if (
+      !saved ||
+      !isToolUIPart(saved) ||
+      saved.state !== "output-available" ||
+      !saved.output ||
+      typeof saved.output !== "object" ||
+      !(
+        "url" in saved.output ||
+        ("storageStatus" in saved.output &&
+          saved.output.storageStatus === "deleted")
+      )
+    )
+      continue;
+    const output = part.output;
+    if (
+      output &&
+      typeof output === "object" &&
+      ("result" in output ||
+        ("storageStatus" in output && output.storageStatus === "pending"))
+    )
+      part.output = saved.output;
+  }
+  return merged;
+}
+
 export async function finalizeAiRun(
   db: AppDatabase,
   runId: string,
@@ -73,23 +120,47 @@ export async function finalizeAiRun(
       and(
         eq(aiRuns.id, runId),
         isNull(aiRuns.finalizedAt),
-        inArray(aiRuns.status, ["completed", "aborted", "failed"]),
+        inArray(aiRuns.status, [
+          "completed",
+          "aborted",
+          "failed",
+          "interrupted",
+        ]),
       ),
     );
-  if (!run?.response || !run.usage) return;
+  if (!run?.response) return;
   const message = run.response as AiMessage;
   const stored = await persistMessageImages(message, run.userId, storeFile);
   await db.transaction(async (tx) => {
-    await tx
-      .update(aiMessages)
-      .set({ parts: stored.parts })
+    const [current] = await tx
+      .select()
+      .from(aiMessages)
       .where(
         and(
           eq(aiMessages.conversationId, run.conversationId),
           eq(aiMessages.id, message.id),
-          eq(aiMessages.runId, run.id),
         ),
+      )
+      .for("update");
+    if (current) {
+      const merged = restoreStoredImageOutputs(
+        {
+          id: current.id,
+          role: current.role,
+          parts: current.parts as AiMessage["parts"],
+        },
+        stored,
       );
+      await tx
+        .update(aiMessages)
+        .set({ parts: merged.parts })
+        .where(
+          and(
+            eq(aiMessages.conversationId, run.conversationId),
+            eq(aiMessages.id, message.id),
+          ),
+        );
+    }
     await tx
       .update(aiRuns)
       .set({ finalizedAt: new Date(), response: null })
@@ -106,7 +177,12 @@ export async function finalizePendingAiRuns(
     .from(aiRuns)
     .where(
       and(
-        inArray(aiRuns.status, ["completed", "aborted", "failed"]),
+        inArray(aiRuns.status, [
+          "completed",
+          "aborted",
+          "failed",
+          "interrupted",
+        ]),
         isNotNull(aiRuns.response),
         isNull(aiRuns.finalizedAt),
         lte(aiRuns.finalizationRetryAt, new Date()),

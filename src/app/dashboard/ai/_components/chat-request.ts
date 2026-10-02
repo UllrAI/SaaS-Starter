@@ -15,7 +15,7 @@ interface PrepareChatRequestOptions {
  * to see it again: the approval the user just granted lives in its parts. Using
  * its handle would slice it out of the request and send nothing at all.
  */
-function hasUnfinishedToolApproval(message: AiMessage) {
+export function hasUnfinishedToolApproval(message: AiMessage) {
   return message.parts.some(
     (part) => isToolUIPart(part) && part.state === "approval-responded",
   );

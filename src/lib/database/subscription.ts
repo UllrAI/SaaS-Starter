@@ -1,3 +1,4 @@
+import { getUserSubscriptionFromDatabase } from "./subscription-read";
 import { db } from "@/database";
 import * as schema from "@/database/schema";
 import {
@@ -7,24 +8,11 @@ import {
   users,
   webhookEvents,
 } from "@/database/tables";
-import {
-  and,
-  count,
-  desc,
-  eq,
-  isNull,
-  max,
-  sql,
-  getTableColumns,
-} from "drizzle-orm";
+import { and, count, desc, eq, isNull, max, sql } from "drizzle-orm";
 import type { PgTransaction } from "drizzle-orm/pg-core";
 import type { PostgresJsQueryResultHKT } from "drizzle-orm/postgres-js";
 import type { Subscription, SubscriptionStatus } from "@/types/billing";
 import { getProductTierById } from "@/lib/config/products";
-import {
-  canManageSubscription,
-  hasCurrentSubscriptionAccess,
-} from "@/lib/billing/access";
 import { ExtractTablesWithRelations } from "drizzle-orm";
 
 export type Tx = PgTransaction<
@@ -421,64 +409,7 @@ export async function findUserByCustomerId(customerId: string, tx?: Tx) {
 export async function getUserSubscription(
   userId: string,
 ): Promise<Subscription | null> {
-  const userSubscriptions = await db
-    .select({
-      ...getTableColumns(subscriptions),
-      accessRestricted: sql<boolean>`exists (
-        select 1 from ${payments}
-        where ${payments.subscriptionId} = ${subscriptions.subscriptionId}
-          and ${payments.status} in ('refunded', 'disputed')
-      )`,
-    })
-    .from(subscriptions)
-    .where(eq(subscriptions.userId, userId))
-    .orderBy(desc(subscriptions.createdAt)); // Order by creation date descending for deterministic behavior
-
-  const mappedSubscriptions: Subscription[] = userSubscriptions.map(
-    (subscription) => ({
-      id: subscription.id,
-      userId: subscription.userId,
-      customerId: subscription.customerId,
-      subscriptionId: subscription.subscriptionId,
-      status: subscription.status as SubscriptionStatus,
-      tierId: subscription.productId,
-      accessRestricted: subscription.accessRestricted,
-      currentPeriodStart: subscription.currentPeriodStart,
-      currentPeriodEnd: subscription.currentPeriodEnd,
-      canceledAt: subscription.canceledAt,
-    }),
-  );
-
-  const now = new Date();
-  const accessibleSubscriptions = mappedSubscriptions.filter((subscription) =>
-    hasCurrentSubscriptionAccess(subscription, now),
-  );
-  const manageableSubscriptions = mappedSubscriptions.filter(
-    (subscription) =>
-      !hasCurrentSubscriptionAccess(subscription, now) &&
-      canManageSubscription(subscription),
-  );
-
-  if (accessibleSubscriptions.length > 1) {
-    console.warn(
-      `User ${userId} has ${accessibleSubscriptions.length} currently accessible subscriptions. ` +
-        "This may indicate a data consistency issue. Returning the most recent one.",
-      {
-        userId,
-        subscriptionIds: accessibleSubscriptions.map(
-          ({ subscriptionId }) => subscriptionId,
-        ),
-        statuses: accessibleSubscriptions.map(({ status }) => status),
-      },
-    );
-  }
-
-  return (
-    accessibleSubscriptions[0] ??
-    manageableSubscriptions[0] ??
-    mappedSubscriptions[0] ??
-    null
-  );
+  return getUserSubscriptionFromDatabase(db, userId);
 }
 
 export async function getUserPayments(userId: string, limit: number = 10) {

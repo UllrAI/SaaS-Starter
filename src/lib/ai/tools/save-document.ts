@@ -1,7 +1,7 @@
 import { tool } from "ai";
 import { z } from "zod";
 import { isFileSizeAllowed } from "@/lib/config/upload";
-import { storeFile } from "@/lib/uploads/server-storage";
+import type { createFileStorage } from "@/lib/uploads/store";
 import {
   UploadQuotaExceededError,
   UploadFileDeletedError,
@@ -21,7 +21,10 @@ function toMarkdownFileName(fileName: string) {
   return `${base || "document"}.md`;
 }
 
-export function createSaveDocument(context: AgentContext) {
+export function createSaveDocument(
+  context: AgentContext,
+  dependencies: { storeFile: ReturnType<typeof createFileStorage> },
+) {
   return tool({
     description:
       "Save a Markdown document to the user's files. Use it only when the user asks to save, export, or keep a document; use presentArtifact to merely show one. The saved file counts against the user's storage quota and can be deleted from the Files page.",
@@ -48,7 +51,7 @@ export function createSaveDocument(context: AgentContext) {
 
       let record;
       try {
-        record = await storeFile({
+        record = await dependencies.storeFile({
           userId: context.userId,
           identity: `document:${context.conversationId}:${toolCallId}`,
           fileName: toMarkdownFileName(fileName),

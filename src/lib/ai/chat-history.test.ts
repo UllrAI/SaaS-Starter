@@ -38,6 +38,7 @@ jest.mock("drizzle-orm", () => ({
   and: jest.fn((...values: unknown[]) => values),
   asc: jest.fn((value: unknown) => value),
   desc: jest.fn((value: unknown) => value),
+  inArray: jest.fn((column: unknown, values: unknown[]) => [column, values]),
   eq: jest.fn((column: unknown, value: unknown) => [column, value]),
   isNotNull: mockIsNotNull,
   isNull: mockIsNull,
@@ -67,6 +68,9 @@ function ownedConversationQuery(result = [conversation]) {
 describe("AI chat history storage", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockDb.transaction.mockImplementation(
+      async (task: (tx: typeof mockDb) => unknown) => task(mockDb),
+    );
     mockSql.mockImplementation(
       (strings: TemplateStringsArray, ...values: unknown[]) => ({
         strings,

@@ -6,9 +6,10 @@ import {
   expect,
   it,
 } from "@jest/globals";
+import { claimAiRun, reconcileAiRuns } from "@/lib/ai/durable-runs";
 import { finalizePendingAiRuns } from "@/lib/ai/finalize";
 import { randomUUID } from "node:crypto";
-import { and, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import { createDatabaseClient } from "@/database/client";
 import {
   aiConversations,
@@ -16,6 +17,7 @@ import {
   aiRuns,
   aiUsageEvents,
   users,
+  taskRuns,
 } from "@/database/schema";
 import {
   beginAiRun,
@@ -31,14 +33,32 @@ const database = createDatabaseClient({
 const userId = `ai-runs-${randomUUID()}`;
 const limits = { tokenLimit: 2_000_000, imageLimit: 10 };
 let conversationId: string;
-const accept = () =>
-  beginAiRun(database.db, limits, {
+const accept = async () => {
+  const [last] = await database.db
+    .select()
+    .from(aiMessages)
+    .where(eq(aiMessages.conversationId, conversationId))
+    .orderBy(desc(aiMessages.createdAt), desc(aiMessages.id))
+    .limit(1);
+  const accepted = await beginAiRun(database.db, limits, {
     userId,
     conversationId,
-    messages: [],
-    parentMessageId: null,
+    messages: [
+      {
+        id: randomUUID(),
+        role: "user",
+        parts: [{ type: "text", text: "hello" }],
+      },
+    ],
+    parentMessageId: last?.id ?? null,
+    agentId: "assistant",
+    reasoningEffort: "low",
+    locale: "en",
     requestId: randomUUID(),
   });
+  await claimAiRun(database.db, accepted.run.id);
+  return accepted;
+};
 beforeAll(async () => {
   await database.db.insert(users).values({
     id: userId,
@@ -63,6 +83,9 @@ afterEach(async () => {
     .delete(aiMessages)
     .where(eq(aiMessages.conversationId, conversationId));
   await database.db.delete(aiRuns).where(eq(aiRuns.userId, userId));
+  await database.db
+    .delete(taskRuns)
+    .where(eq(taskRuns.scopeKey, `user:${userId}`));
 });
 afterAll(async () => {
   await database.db.delete(users).where(eq(users.id, userId));
@@ -79,6 +102,7 @@ describe("durable AI admission and accounting", () => {
       .update(aiRuns)
       .set({ expiresAt: new Date(Date.now() - 1000) })
       .where(eq(aiRuns.id, old.value.run.id));
+    await reconcileAiRuns(database.db);
     const next = await accept();
     await failAiRun(database.db, old.value.run.id, true);
     await completeAiRun(

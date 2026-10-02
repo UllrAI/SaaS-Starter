@@ -3,7 +3,6 @@ import type { ToolExecutionOptions } from "ai";
 import type { AgentContext } from "../context";
 
 const mockStoreFile = jest.fn();
-jest.mock("@/lib/uploads/server-storage", () => ({ storeFile: mockStoreFile }));
 import { UploadQuotaExceededError } from "@/lib/uploads/repository";
 
 const context: AgentContext = {
@@ -19,10 +18,10 @@ const executionOptions = { toolCallId: "call-1" } as ToolExecutionOptions;
 
 async function runTool(input: { fileName: string; content: string }) {
   const { createSaveDocument } = await import("./save-document");
-  return (await createSaveDocument(context).execute!(
-    input,
-    executionOptions,
-  )) as { fileName: string; fileSize: number; url: string } | { error: string };
+  return (await createSaveDocument(context, { storeFile: mockStoreFile })
+    .execute!(input, executionOptions)) as
+    | { fileName: string; fileSize: number; url: string }
+    | { error: string };
 }
 
 describe("saveDocument", () => {
@@ -37,7 +36,9 @@ describe("saveDocument", () => {
 
   it("requires approval before it can run", async () => {
     const { createSaveDocument } = await import("./save-document");
-    expect(createSaveDocument(context).needsApproval).toBe(true);
+    expect(
+      createSaveDocument(context, { storeFile: mockStoreFile }).needsApproval,
+    ).toBe(true);
   });
 
   it("stores the document under the session user and returns its URL", async () => {

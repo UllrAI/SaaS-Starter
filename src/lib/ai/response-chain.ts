@@ -1,6 +1,4 @@
-import "server-only";
 import { createHmac, timingSafeEqual } from "node:crypto";
-import env from "@/env";
 
 const SIGNATURE_BYTES = 32;
 
@@ -8,8 +6,9 @@ function signResponseId(
   responseId: string,
   userId: string,
   conversationId: string,
+  secret: string,
 ) {
-  return createHmac("sha256", env.BETTER_AUTH_SECRET)
+  return createHmac("sha256", secret)
     .update(userId)
     .update("\0")
     .update(conversationId)
@@ -22,10 +21,14 @@ export function createResponseHandle(
   responseId: string,
   userId: string,
   conversationId: string,
+  secret: string,
 ) {
-  const signature = signResponseId(responseId, userId, conversationId).toString(
-    "base64url",
-  );
+  const signature = signResponseId(
+    responseId,
+    userId,
+    conversationId,
+    secret,
+  ).toString("base64url");
   return `${responseId}.${signature}`;
 }
 
@@ -33,6 +36,7 @@ export function readResponseHandle(
   handle: string,
   userId: string,
   conversationId: string,
+  secret: string,
 ) {
   const separatorIndex = handle.lastIndexOf(".");
   if (separatorIndex <= 0) {
@@ -53,7 +57,12 @@ export function readResponseHandle(
     return null;
   }
 
-  const expectedSignature = signResponseId(responseId, userId, conversationId);
+  const expectedSignature = signResponseId(
+    responseId,
+    userId,
+    conversationId,
+    secret,
+  );
   return timingSafeEqual(receivedSignature, expectedSignature)
     ? responseId
     : null;

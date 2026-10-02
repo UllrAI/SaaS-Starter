@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Script from "next/script";
 import env from "@/env";
 import { createMetadataDefaults } from "@/lib/metadata";
+import { ArticleLink } from "@/components/blog/article-link";
 import { BlogPostHeader } from "@/components/blog/blog-post-header";
 import { ReadingContainer } from "@/components/layout/page-container";
 import { Button } from "@/components/ui/button";
@@ -242,7 +243,21 @@ export async function BlogPostPageContent({
       <section className="bg-background py-12 sm:py-16">
         <ReadingContainer>
           <article className="prose prose-base prose-slate dark:prose-invert markdown-content sm:prose-lg mx-auto max-w-none [&_pre]:max-w-full [&_pre]:overflow-x-auto">
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              components={{
+                a: ({ href, title, children }) => (
+                  <ArticleLink
+                    href={href}
+                    title={title}
+                    slug={slug}
+                    locale={locale}
+                  >
+                    {children}
+                  </ArticleLink>
+                ),
+              }}
+            >
               {post.content}
             </ReactMarkdown>
           </article>

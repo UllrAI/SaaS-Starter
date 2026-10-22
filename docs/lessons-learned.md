@@ -129,6 +129,14 @@
 
 **正确做法**：安全发布时为 CI、迁移和备份固定已核实的补丁版本，并检查 setup 日志和线上容器的实际版本；仅把 Docker 镜像改好不能证明测试也跑在该版本。
 
+### `ubuntu-latest` 漂移会让现有 Playwright 无法安装
+
+**现象**：同一发布补丁的 PR Quality 全绿，合并后却在安装 Chromium 时失败：Playwright 1.60.0 不支持 `ubuntu26.04-x64`。
+
+**原因**：`ubuntu-latest` 在 runner 滚动更新期间可分配不同 Ubuntu 版本，PR 与合并提交并不保证使用相同系统。
+
+**正确做法**：Quality 固定到当前 Playwright 支持的 `ubuntu-24.04`；在明确验证浏览器依赖支持后再升级 runner。
+
 ### 让 agent 跑验证前,先让它读项目脚本
 
 **现象**:agent 自行执行 `npx tsc`、`eslint .` 之类的通用命令,得出「没有错误」或一堆假错误的结论。

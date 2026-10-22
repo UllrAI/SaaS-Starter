@@ -5,6 +5,14 @@ Routine formatting and test-only maintenance are omitted.
 
 ## Unreleased
 
+## 0.1.18 — 2026-10-22
+
+### Security
+
+- Pin the Docker build, migration, Web, and Worker runtimes to Node.js 22.23.4
+  for the [October 21 security release](https://nodejs.org/en/blog/vulnerability/october-2026-security-releases),
+  including the Brotli decoder, DNS, and TLS fixes.
+
 ## 0.1.17 — 2026-10-02
 
 ### Durable AI execution

@@ -11,6 +11,13 @@ that file in place: the multi-stage image serves only the prepared Next.js
 standalone output instead of shipping the build toolchain and development
 dependencies in the Web runtime.
 
+Both the build/migration stages and runtime stage pin `node:22.23.4-alpine`,
+the Node.js 22 security release from October 21, 2026. Update both `FROM` lines
+together for future patches. A floating major tag or a restart of an existing
+image does not verify remediation: rebuild both application images, confirm
+the new deployments are running, and inspect `process.version` inside each
+service container.
+
 The runtime entrypoint also drops to the unprivileged `nextjs` user when a
 hosting security context starts the container as root. Verify PID 1 after
 deployment instead of assuming the Dockerfile `USER` directive was preserved.

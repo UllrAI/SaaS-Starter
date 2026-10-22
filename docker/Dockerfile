@@ -1,5 +1,5 @@
 # Use official Node.js runtime as base image
-FROM node:22-alpine AS base
+FROM node:22.23.4-alpine AS base
 
 # Install pnpm
 RUN npm install -g pnpm@10.33.0
@@ -39,7 +39,7 @@ USER node
 CMD ["pnpm", "db:migrate"]
 
 # Production image
-FROM node:22-alpine AS runner
+FROM node:22.23.4-alpine AS runner
 WORKDIR /app
 
 LABEL "language"="nodejs"

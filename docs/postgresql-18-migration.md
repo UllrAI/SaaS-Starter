@@ -4,8 +4,9 @@ This runbook prepares the existing production-only deployment to move from the
 standalone business PostgreSQL 17.11 instance to shared PostgreSQL 18.6. It is a
 logical restore across major versions, not an in-place image/volume replacement.
 The Coolify control database is separate and must not be used or changed.
-Production Web/Worker connections remain on PG17 until the coordinator explicitly
-runs the final cutover. No staging environment is introduced.
+The coordinator must complete the final restore and connection switch before
+publishing `v0.1.21`; merging this preparation alone does not change live Web/Worker
+connections. No staging environment is introduced.
 
 ## Compatibility and preparation
 

@@ -13,9 +13,9 @@ source project or the owner explicitly requests a new environment.
 - Project / environment: `SaaS-Starter / production`.
 - Applications: `saas-starter` and `saas-starter-worker`.
 - Public origin: `https://starter.ullrai.com`.
-- Temporary acceptance alias: `https://starter-preview.ullrai.com`, with noindex.
-  This alias serves the same production deployment; it is not staging. Remove
-  its Coolify binding and DNS record immediately after final acceptance.
+- The temporary acceptance alias was removed after cutover, including its
+  Coolify binding and Cloudflare DNS. Create future acceptance aliases only when
+  needed and remove them immediately after validation. They are not staging.
 - Database and login: `saas_starter_prod`.
 - Private upload bucket: existing `saas-starter`.
 
@@ -94,11 +94,24 @@ Before cutover, restore a source custom-format dump and compare all application
 and queue tables, sequence state, extensions and ownership. Final cutover stops
 both old writers, takes a final dump, restores it as the new owner, verifies data,
 then starts only the new Web/Worker and changes DNS. Keep old Zeabur resources
-suspended and the final dump until recovery is no longer needed. They are not
-automatically deleted. After target writes begin, switching to the old snapshot
+suspended and the final dump until recovery is no longer needed. The old database
+login `saas` is also fenced with `NOLOGIN` and its sessions were closed. Re-enable
+that login only as part of a deliberate database rollback after reconciling target
+writes and stopping the target writers. Old resources are not automatically deleted. After target writes begin, switching to the old snapshot
 would lose data; restore or reconcile current target data before reverting.
 
 For rollback, use a previously verified SHA image for **both** services and check
 schema compatibility first. Database rollback is separate from image rollback.
 Periodically restore an R2 backup into a disposable database and verify it before
 calling the backup healthy. Do not restore over another project's database.
+
+## Migration acceptance — 2026-11-01
+
+Release `v0.1.19` was deployed through the gated release workflow. The final
+source dump matched the restored production database across all 34 application
+and queue tables and sequence state. A private R2 backup was independently
+restored into a disposable database and verified. Web and Worker run as UID 1001;
+Web readiness and Worker startup/queue checks passed. The public origin, both
+locale pages, login/anonymous-session handling, protected-route redirect, static
+JavaScript, robots and sitemap were checked after cutover. Cloudflare remains
+proxied and validates the origin certificate with Full (strict).

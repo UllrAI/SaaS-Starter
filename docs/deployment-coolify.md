@@ -68,29 +68,37 @@ the public readiness endpoint responds.
 
 ## Database and backups
 
-PostgreSQL 18.6 is the prepared shared-business upgrade target. CI, actual-image
-smoke tests and the logical-backup client now use this version. Production remains
-on the existing PG17.11 resource until the coordinated final restore and connection
-switch; this PR does not cut over traffic or start another real Worker. Follow
-[the PostgreSQL 18 runbook](postgresql-18-migration.md) for the tested restore,
-locale, isolation, backup and rollback requirements.
+Release `v0.1.21` targets `Infrastructure / production / postgres-18`, the
+shared PostgreSQL 18.6 business resource with the verified vector-capable image.
+CI, actual-image smoke tests and the logical-backup client use PostgreSQL 18.6.
+Before publishing this release, complete the coordinated final restore and runtime /
+CI connection switch in [the PostgreSQL 18 runbook](postgresql-18-migration.md).
+Merging or passing Quality alone does not cut over the live database.
 
-`Infrastructure / production / postgres-17` is a separate PostgreSQL 17.11
-business resource, not Coolify's internal database. It has a 1 GiB memory limit.
-Compatible future projects reuse this instance with separate databases and roles.
-The SaaS database preserves UTF8 and builtin `C.UTF-8` locale. Its owner has
-no superuser, create-role or create-database privileges. PUBLIC cannot connect.
-Other projects use different databases and roles; this provides logical isolation,
-not a separate failure or resource boundary.
+The shared resource has a 2 GiB memory / 1.5 CPU limit and an operator-managed
+connection budget; do not change global settings from a project deployment.
+Compatible future projects reuse it with isolated databases and roles. SaaS
+preserves UTF8 and builtin `C.UTF-8`, with the original collation/ctype metadata,
+and requires only `plpgsql`, not vector. Its owner has no superuser, create-role
+or create-database privileges. PUBLIC cannot connect. Other projects use different
+databases and roles; this is logical isolation, not a separate failure boundary.
 
-PostgreSQL has no public port. `postgres-ci-tunnel` exposes only host loopback
-`127.0.0.1:5433`, forwarding to the stable Docker DNS name of the database.
-The `saas-migrator` SSH account permits only a local TCP forward to that endpoint:
-no shell, TTY, agent or X11 forwarding. The verified host key is pinned in GitHub.
-CI forwards local 55432 through SSH and closes it after the one-shot migration.
-Docker container IP changes do not require changing CI or SSH restrictions.
+PostgreSQL has no public port. The existing shared PG18 CI tunnel exposes only
+host loopback `127.0.0.1:5434` and forwards to the database's stable Docker DNS.
+The reused `saas-migrator` SSH account permits only that local TCP forward, with
+no shell, TTY, agent or X11 forwarding. Keep the verified host key pinned in GitHub.
+CI uses local port 55432 and closes it after the one-shot migration. The coordinator
+updates the existing production URL secrets and `MIGRATION_DB_PORT` during cutover;
+normal releases reuse them without creating another key/account/tunnel.
 
-Coolify backs up `saas_starter_prod` daily at 19:17 UTC to the existing private
+The former business `postgres-17` resource and its `127.0.0.1:5433` tunnel are
+historical recovery resources after cutover, not a target for new deployments.
+Fence only the old SaaS login until the operator has confirmed and cleaned every
+other PG17 consumer. The operator stops the whole old instance separately while
+retaining its volume and backups. Never stop the separate Coolify control database.
+
+The shared PG18 schedule backs up `saas_starter_prod` with the other business
+databases daily at 19:37 UTC to the existing private
 `coolify-backups` R2 storage, retaining 7 local and 30 remote daily backups.
 When adding another database, extend this schedule's database list and verify a
 restore. Do not back up only the default `postgres` database. The old per-project

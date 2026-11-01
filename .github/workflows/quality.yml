@@ -67,6 +67,7 @@ jobs:
       - run: pnpm dead-code:check
       - run: pnpm type-check
       - run: pnpm test --runInBand
+      - run: python3 -m unittest discover -s scripts -p 'test_deploy_coolify.py'
       # Database suites initialize only the disposable service database.
       - run: pnpm test:jobs:integration
       - run: pnpm build:worker
@@ -74,3 +75,14 @@ jobs:
       - run: pnpm worker:shutdown-smoke
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm test:e2e
+
+  deploy-staging:
+    if: github.event_name == 'push'
+    needs: validate
+    permissions:
+      contents: read
+      packages: write
+    uses: ./.github/workflows/deploy-coolify.yml
+    with:
+      environment: staging
+    secrets: inherit

@@ -1,0 +1,83 @@
+name: Deploy tested images to Coolify
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: coolify-${{ inputs.environment }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    environment: ${{ inputs.environment }}
+    services:
+      postgres:
+        image: postgres:17.11
+        env:
+          POSTGRES_DB: saas_image_test
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d saas_image_test"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6
+        with:
+          version: 10.33.0
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 22.23.4
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Build and verify the Web and Worker images
+        env:
+          APP_URL: ${{ vars.APP_URL }}
+          NEXT_PUBLIC_UMAMI_SCRIPT_URL: ${{ vars.NEXT_PUBLIC_UMAMI_SCRIPT_URL }}
+          NEXT_PUBLIC_UMAMI_WEBSITE_ID: ${{ vars.NEXT_PUBLIC_UMAMI_WEBSITE_ID }}
+          NEXT_PUBLIC_UMAMI_DOMAINS: ${{ vars.NEXT_PUBLIC_UMAMI_DOMAINS }}
+          DEPLOY_ENVIRONMENT: ${{ inputs.environment }}
+        run: bash scripts/build-deployment-images.sh
+      - name: Publish private immutable images
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          echo "$GH_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
+          trap 'docker logout ghcr.io' EXIT
+          for image in "$WEB_IMAGE" "$WORKER_IMAGE"; do
+            docker push "$image"
+            package="${image#ghcr.io/}"
+            package="${package#*/}"
+            package="${package%%:*}"
+            visibility="$(gh api "orgs/${GITHUB_REPOSITORY_OWNER}/packages/container/$package" --jq .visibility)"
+            test "$visibility" = private
+          done
+      - name: Apply staging migrations once
+        if: inputs.environment == 'staging'
+        env:
+          DATABASE_URL: ${{ secrets.PRODUCTION_DATABASE_URL }}
+          MIGRATION_SSH_HOST: ${{ vars.MIGRATION_SSH_HOST }}
+          MIGRATION_DB_HOST: ${{ vars.MIGRATION_DB_HOST }}
+          MIGRATION_DB_PORT: ${{ vars.MIGRATION_DB_PORT }}
+          MIGRATION_SSH_KEY: ${{ secrets.MIGRATION_SSH_KEY }}
+          MIGRATION_SSH_KNOWN_HOSTS: ${{ secrets.MIGRATION_SSH_KNOWN_HOSTS }}
+        run: bash scripts/with-production-database.sh pnpm db:migrate
+      - name: Deploy both services and verify readiness
+        env:
+          COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}
+          COOLIFY_WEB_UUID: ${{ vars.COOLIFY_WEB_UUID }}
+          COOLIFY_WORKER_UUID: ${{ vars.COOLIFY_WORKER_UUID }}
+          APP_URL: ${{ vars.APP_URL }}
+        run: python3 scripts/deploy-coolify.py

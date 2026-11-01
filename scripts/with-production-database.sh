@@ -2,6 +2,7 @@
 set -euo pipefail
 : "${MIGRATION_SSH_HOST:?Configure the production SSH host}"
 : "${MIGRATION_DB_HOST:?Configure the PostgreSQL private address}"
+MIGRATION_DB_PORT="${MIGRATION_DB_PORT:-5432}"
 : "${MIGRATION_SSH_KEY:?Configure the migration-only SSH key}"
 : "${MIGRATION_SSH_KNOWN_HOSTS:?Configure the verified SSH host key}"
 umask 077
@@ -18,6 +19,6 @@ ssh -M -S "$tunnel_dir/control" -fnNT \
   -o StrictHostKeyChecking=yes -o UserKnownHostsFile="$tunnel_dir/known_hosts" \
   -o ExitOnForwardFailure=yes -o ConnectTimeout=15 \
   -o ServerAliveInterval=15 -o ServerAliveCountMax=3 \
-  -L "127.0.0.1:55432:$MIGRATION_DB_HOST:5432" \
+  -L "127.0.0.1:55432:$MIGRATION_DB_HOST:$MIGRATION_DB_PORT" \
   "saas-migrator@$MIGRATION_SSH_HOST"
 "$@"

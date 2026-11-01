@@ -21,12 +21,18 @@ COPY . .
 
 # Set environment to production for build
 ARG NEXT_PUBLIC_APP_URL
+ARG NEXT_PUBLIC_UMAMI_SCRIPT_URL
+ARG NEXT_PUBLIC_UMAMI_WEBSITE_ID
+ARG NEXT_PUBLIC_UMAMI_DOMAINS
 ENV NODE_ENV=production
 ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
 ENV SKIP_ENV_VALIDATION=1
 
 # Build the Next.js application
 RUN test -n "$NEXT_PUBLIC_APP_URL" \
+  && if [ -z "$NEXT_PUBLIC_UMAMI_SCRIPT_URL$NEXT_PUBLIC_UMAMI_WEBSITE_ID$NEXT_PUBLIC_UMAMI_DOMAINS" ]; then \
+       unset NEXT_PUBLIC_UMAMI_SCRIPT_URL NEXT_PUBLIC_UMAMI_WEBSITE_ID NEXT_PUBLIC_UMAMI_DOMAINS; \
+     fi \
   && pnpm run build
 
 # One-shot database migration image. It intentionally contains development
@@ -71,3 +77,10 @@ ENV HOSTNAME="0.0.0.0"
 # Start the application
 ENTRYPOINT ["docker-entrypoint"]
 CMD ["node", "server.js"]
+
+# Both services share every runtime layer; only their default command differs.
+FROM runner AS worker
+CMD ["node", "dist/worker/worker.mjs"]
+
+# Preserve the Web image as the default target for other hosting platforms.
+FROM runner AS web

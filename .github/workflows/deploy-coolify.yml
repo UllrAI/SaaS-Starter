@@ -12,10 +12,13 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  deploy:
+  images:
     runs-on: ubuntu-24.04
     timeout-minutes: 35
     environment: production
+    outputs:
+      web_image: ${{ steps.publish.outputs.web_image }}
+      worker_image: ${{ steps.publish.outputs.worker_image }}
     services:
       postgres:
         image: postgres:18.6
@@ -46,6 +49,7 @@ jobs:
           DEPLOY_ENVIRONMENT: production
         run: bash scripts/build-deployment-images.sh
       - name: Publish private immutable images
+        id: publish
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -60,8 +64,23 @@ jobs:
             visibility="$(gh api "orgs/${GITHUB_REPOSITORY_OWNER}/packages/container/$package" --jq .visibility)"
             test "$visibility" = private
           done
+          printf 'web_image=%s\nworker_image=%s\n' "$WEB_IMAGE" "$WORKER_IMAGE" >> "$GITHUB_OUTPUT"
+
+  # Retry this leaf job after checking the existing deployment queue. Its
+  # successful dependency retains the tested images and never builds again.
+  deploy:
+    needs: images
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    environment: production
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
       - name: Deploy both services and verify readiness
         env:
+          WEB_IMAGE: ${{ needs.images.outputs.web_image }}
+          WORKER_IMAGE: ${{ needs.images.outputs.worker_image }}
           COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}
           COOLIFY_WEB_UUID: ${{ vars.COOLIFY_WEB_UUID }}
           COOLIFY_WORKER_UUID: ${{ vars.COOLIFY_WORKER_UUID }}

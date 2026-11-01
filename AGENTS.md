@@ -211,6 +211,12 @@ pnpm stripe:sync-products
 - Reuse the configured registry login, environment secrets, restricted SSH tunnel,
   and shared business PostgreSQL instance. Never use `coolify-db` for application data.
 
+- Keep one Quality → exact-SHA release gate → tested image build → deploy chain.
+  Operational-doc-only changes skip Quality. Deploy retries rerun only the deploy
+  leaf job, reusing image job outputs; do not rebuild or rerun release migrations.
+  Coolify native R2 backups are authoritative; do not restore the retired GitHub
+  backup workflow or enable a second schedule. Keep historical backup objects.
+
 ## 10. Testing and Verification
 
 - After every meaningful change, run the narrowest relevant checks first, then the broader project checks.

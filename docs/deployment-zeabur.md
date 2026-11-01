@@ -144,20 +144,13 @@ is verified. After new writes begin, rollback requires moving those writes back
 or restoring a current backup; changing a URL to the old snapshot would lose data.
 The old Neon database is not part of the runtime or release pipeline.
 
-Zeabur automatic backups require a paid subscription on this account. Instead,
-[`database-backup.yml`](../.github/workflows/database-backup.yml) runs daily at
-19:17 UTC (03:17 Asia/Shanghai) and supports manual dispatch. It takes a consistent
-PostgreSQL 17 custom-format dump through the same restricted tunnel and uploads
-it to private R2 bucket `saas-starter-db-backups`. A bucket lifecycle rule expires
-`postgresql/` backups after 30 days. No public domain or `r2.dev` access is enabled.
-
-Set repository variable `PRODUCTION_BACKUP_ENABLED=true` and production environment
-variable `R2_BACKUP_BUCKET`. Store `R2_BACKUP_ENDPOINT`, `R2_BACKUP_ACCESS_KEY_ID`,
-and `R2_BACKUP_SECRET_ACCESS_KEY` as production environment secrets. Forks must
-configure these settings before enabling the schedule. Check failed Actions runs
-and periodically download a backup with authenticated S3 access and restore it
-into a disposable database. Daily dumps provide a recovery point of up to 24 hours;
-they are not point-in-time recovery.
+This is historical migration context. The former GitHub `database-backup.yml`
+schedule was removed after the Coolify native private R2 schedule and an actual
+restore were verified. See [current backups](deployment-coolify.md#database-and-backups).
+Historical `saas-starter-db-backups` objects remain intact; do not enable the old
+schedule or recreate a second backup pipeline from these historical instructions.
+The manual `pnpm db:backup` utility is still available with operator-supplied
+credentials, including for forks. Daily dumps are not point-in-time recovery.
 
 ## Using the workflow in a fork
 

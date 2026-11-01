@@ -41,7 +41,8 @@ from Web health. Runtime image limits are 768 MiB for Web and 512 MiB for Worker
 3. It calls `deploy-coolify.yml`, which builds Web/Worker images, migrates a
    disposable PostgreSQL 18.6 test database, and tests the actual images for database readiness,
    worker startup and non-root execution before publishing them.
-4. It updates the saved Coolify image references, drains the previous Worker,
+4. Its separate deploy leaf job reuses the successful image job outputs, updates
+   the saved Coolify image references, drains the previous Worker,
    deploys both services, and waits for deployment completion and public readiness.
 
 Image references are `ghcr.io/ullrai/saas-starter:production-sha-<full-sha>`
@@ -52,7 +53,10 @@ origin and analytics settings into its bundle. The Worker target reuses the
 completed Web build. Existing
 Playwright builds use a disposable test origin and cannot substitute for these
 deployment builds. Reuse reduces duplicate work; private repository builds still
-consume the organization's Actions allowance.
+consume the organization's Actions allowance. Changes limited to operational
+docs, README or agent instructions skip Quality; application content, code,
+dependencies, tests, scripts and workflow changes still run all checks. An
+existing successful exact-SHA Quality run gates a release without rerunning it.
 
 The GitHub production environment already has `APP_URL`, `COOLIFY_WEB_UUID`,
 `COOLIFY_WORKER_UUID`, `MIGRATION_SSH_HOST`, `MIGRATION_DB_HOST`,
@@ -64,15 +68,20 @@ setup for each release. Keep source-triggered Coolify builds disabled.
 Deployment POSTs are sent once. Read-only status requests retry transient network
 and 429/5xx failures. An uncertain POST result requires checking the deployment
 queue before retrying. CI reports success only after both deployments finish and
-the public readiness endpoint responds.
+the public readiness endpoint responds. After checking any uncertain deployment
+request, rerun only the failed `deploy / deploy` leaf job; never rerun the
+successful `images` job just to retry deployment. This reuses the already tested
+Web/Worker SHA images and avoids repeating builds, image tests or migrations.
 
 ## Database and backups
 
 Release `v0.1.21` targets `Infrastructure / production / postgres-18`, the
 shared PostgreSQL 18.6 business resource with the verified vector-capable image.
 CI, actual-image smoke tests and the logical-backup client use PostgreSQL 18.6.
-Before publishing this release, complete the coordinated final restore and runtime /
-CI connection switch in [the PostgreSQL 18 runbook](postgresql-18-migration.md).
+The coordinated final restore and runtime/CI connection switch completed before
+this release. See [the PostgreSQL 18 runbook](postgresql-18-migration.md) for
+recovery procedures; the source and target matched all 34 tables, sequence states
+and ownership, and a private R2 backup was independently restored and verified.
 Merging or passing Quality alone does not cut over the live database.
 
 The shared resource has a 2 GiB memory / 1.5 CPU limit and an operator-managed
@@ -99,10 +108,15 @@ retaining its volume and backups. Never stop the separate Coolify control databa
 
 The shared PG18 schedule backs up `saas_starter_prod` with the other business
 databases daily at 19:37 UTC to the existing private
-`coolify-backups` R2 storage, retaining 7 local and 30 remote daily backups.
+`coolify-backups` R2 storage, retaining local copies for 7 days and R2 copies for
+30 days. Both amount limits are 0 because Coolify counts executions across every
+database in the schedule; the day limits implement retention.
 When adding another database, extend this schedule's database list and verify a
-restore. Do not back up only the default `postgres` database. The old per-project
-GitHub backup schedule remains disabled to avoid duplicate backup systems.
+restore. Do not back up only the default `postgres` database.
+The redundant GitHub backup workflow has been removed; this Coolify native
+schedule is the active backup system. Retain historical backup objects. The
+manual `pnpm db:backup` utility remains available to operators or forks with their
+own isolated credentials; it is not another scheduled production pipeline.
 Daily logical dumps have an RPO of up to 24 hours; they do not provide PITR.
 
 Before cutover, restore a source custom-format dump and compare all application

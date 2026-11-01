@@ -191,3 +191,12 @@ the older PG17 source. Restore into an explicitly matching builtin `C.UTF-8`
 database and compare a held source snapshot, not independently timed live queries.
 The application and pg-boss migrations can be exercised without starting a second
 real Worker; copied production jobs must never be consumed during rehearsal.
+
+### Retrying a deployment must not rebuild its tested images
+
+A combined build/publish/deploy job repeats expensive builds and can overwrite a
+SHA tag when only the final deployment request failed. Keep image production in
+its own job, pass the tested references as outputs, and retry only the deploy
+leaf after reconciling any uncertain POST. The release migration job must not be
+rerun for that retry. Native Coolify R2 backups replace the retired GitHub backup
+schedule; workflow-file count should reflect independent duties, not duplicates.

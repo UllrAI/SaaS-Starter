@@ -2,9 +2,19 @@ name: Quality
 
 on:
   pull_request:
+    paths-ignore:
+      - "docs/**"
+      - "README*.md"
+      - "AGENTS.md"
+      - "CLAUDE.md"
   push:
     branches:
       - main
+    paths-ignore:
+      - "docs/**"
+      - "README*.md"
+      - "AGENTS.md"
+      - "CLAUDE.md"
 
 permissions:
   contents: read

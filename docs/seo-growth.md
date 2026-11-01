@@ -116,7 +116,7 @@ Asset references below resolve to maintained source and articles:
 - **Source**: [MIT repository](https://github.com/ullrai/SaaS-Starter).
 - **Architecture**: [Next.js 16 architecture](https://starter.ullrai.com/blog/nextjs-16-saas-starter-architecture),
   supported by `src/app`, `src/components/layout/app-document.tsx`, and the
-  [deployment runbook](deployment-zeabur.md).
+  [deployment runbook](deployment-coolify.md).
 - **Billing**: [Stripe production guide](https://starter.ullrai.com/blog/stripe-nextjs-billing-production-guide),
   supported by `src/lib/billing/provider.ts` and the Stripe webhook implementation.
 - **Auth**: [machine-auth guide](https://starter.ullrai.com/blog/api-keys-oauth-device-flow-saas-agents),

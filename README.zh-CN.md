@@ -52,7 +52,7 @@
 | **AI**     | [Vercel AI SDK](https://ai-sdk.dev/) v7，兼容任意 OpenAI 风格 LLM 端点                                                                                |
 | **邮件**   | [Resend](https://resend.com/), [React Email](https://react.email/)                                                                                    |
 | **表单**   | [React Hook Form](https://react-hook-form.com/), [Zod](https://zod.dev/)                                                                              |
-| **部署**   | [Zeabur](https://zeabur.com/) 或 Docker                                                                                                               |
+| **部署**   | [Coolify](https://coolify.io/) + 私有 GHCR 镜像，或 Docker                                                                                            |
 | **包管理** | [pnpm](https://pnpm.io/)                                                                                                                              |
 
 ## 🚀 快速上手
@@ -445,44 +445,30 @@ pnpm analyze:dev
 
 ## ☁️ 部署
 
-生产参考环境部署在 [Zeabur](https://zeabur.com/)，仓库同时提供可独立运行的多阶段
-Docker 构建。
+生产参考环境使用 [Coolify](https://coolify.io/)，由 GitHub Actions 构建镜像并推送至
+私有 GHCR，再由服务器拉取部署。本项目保留原有的单一 production 环境。当前资源、
+凭据复用、数据库迁移、备份和回退步骤见 [Coolify 部署手册](docs/deployment-coolify.md)。
 
-> **Zeabur 服务器九折优惠：**前往 [Zeabur](https://zeabur.com/) 购买服务器，并在
-> 结账时输入推荐码 `visoar`，即可享受 10% 折扣。
-
-将生产环境 Zeabur 服务的部署分支设为 `prod`，不要监听日常开发使用的默认分支（本仓库
-为 `main`）。推送与 `package.json` 版本一致的 `release/vX.Y.Z` tag 后，
-[`promote-release-to-prod.yml`](.github/workflows/promote-release-to-prod.yml)
-会先确认对应 commit 位于仓库默认分支的历史中，再将 `prod` 指向该 commit；只有分支
-更新成功后，Zeabur 才会开始部署。fork 后可沿用同一方案，详见
-[Zeabur 部署指南](docs/deployment-zeabur.md#using-the-workflow-in-a-fork)。
-
-1. 将通过审查的 commit 合并到默认分支，并等待 Quality workflow 通过。
-2. 配置 `.env.example` 中的全部必需变量。构建前必须把 `NEXT_PUBLIC_APP_URL`
-   设置为最终 HTTPS Origin，因为 canonical URL 与客户端配置会在构建时写入。
-   用户文件使用私有桶，升级时按[私有文件切换说明](docs/architecture-remediation.md#deployment-requirements)操作。
-3. 在 GitHub `production` 环境配置 `PRODUCTION_DATABASE_URL`；队列使用独立数据库时
-   再设置 `PRODUCTION_JOB_DATABASE_URL`。发布流程核验精确 SHA 的 Quality 成功后，
-   自动执行一次迁移，再更新生产分支。
-4. 更新 `package.json` 中的版本，然后在该 commit 上创建版本一致的
-   `release/vX.Y.Z` 附注标签（annotated tag）并推送：
+1. 更新 `package.json` 版本，将审查后的代码合并到默认分支，等待该准确提交的
+   Quality 通过。
+2. 日常发布复用现有 GitHub `production` 环境和 Coolify 环境变量。全新安装需要按
+   手册配置 `.env.example`、私有存储和受限的数据库迁移隧道；公开 Origin 和统计
+   配置会在构建时写入镜像。
+3. 推送与 `package.json` 版本一致的附注标签：
 
    ```bash
    git tag -a release/v1.2.3 -m "Release v1.2.3"
    git push origin release/v1.2.3
    ```
 
-5. 等待分支更新 workflow 与随后触发的 Zeabur 部署成功。`/api/health` 用于存活
-   检查，`/api/ready` 用于包含数据库检查的就绪探针。
-6. 每天调度一次带认证的 `POST /api/internal/uploads/cleanup`。
-7. 验证公开 Origin、两种语言 URL、认证重定向、Dashboard、`robots.txt`、
-   `sitemap.xml` 以及应用日志。
+4. 发布流程核验准确 SHA 的 Quality，单次执行数据库迁移，推进 `prod`，构建并测试
+   Web/Worker 镜像，推送至私有 GHCR，再自动部署两个 Coolify 资源。不要直接推送
+   `prod`，也不要开启另一条源码 push 自动部署路径。
+5. 核验部署结果、`/api/ready`、worker 启动、双语页面、认证回调与已登录 Dashboard。
+   定期上传清理由 worker 执行，不要再添加重复调度任务。
 
-Docker Compose 使用相同顺序，并通过一次性的 `migrate` 服务执行迁移。自托管和本地
-运行说明见 [docker/README.md](docker/README.md)。
-可选的 GitHub 维护任务属于 best-effort，且只从默认分支定时运行。fork 仓库需要显式
-启用定时 Actions，并监控最近一次成功执行；若执行时间属于 SLA，请使用平台调度器。
+旧 [Zeabur 手册](docs/deployment-zeabur.md) 仅保留为历史和回退资料，不用于当前发布。
+本地 Docker Compose 说明见 [docker/README.md](docker/README.md)。
 
 ## 📄 许可证
 

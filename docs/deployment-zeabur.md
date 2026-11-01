@@ -3,7 +3,10 @@
 This is the historical source deployment. The active deployment and release
 configuration is documented in [Coolify deployment](deployment-coolify.md).
 
-This repository's production reference deployment uses a Git-backed Zeabur
+Do not use the commands below for current releases. The source services remain
+suspended for recovery.
+
+The previous production reference deployment used a Git-backed Zeabur
 Web service, Worker service, and PostgreSQL.
 
 > **Save 10% on a Zeabur server:** Purchase a server at

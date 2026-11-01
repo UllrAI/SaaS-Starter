@@ -191,6 +191,9 @@ pnpm stripe:sync-products
 - The release workflow verifies Quality for the exact default-branch SHA and runs production migrations as a dedicated step before updating `prod`. Configure the `production` environment database secrets before releasing.
 - Web and Worker use private GHCR images built and smoke-tested on GitHub's
   Ubuntu runner. Do not enable a parallel source-push deployment in Coolify.
+- Hosting migrations must update this file, both README deployment sections,
+  the active deployment/recovery runbook, and related documentation links. Mark
+  old platform instructions as historical so future agents use the current host.
 - Reuse the configured registry login, environment secrets, restricted SSH tunnel,
   and shared business PostgreSQL instance. Never use `coolify-db` for application data.
 

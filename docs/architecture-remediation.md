@@ -48,8 +48,8 @@ immutable compliance ledger.
 
 1. Configure the GitHub `production` environment secret `PRODUCTION_DATABASE_URL`.
    Set `PRODUCTION_JOB_DATABASE_URL` only for a separate queue database. The runner
-   reaches the private Zeabur PostgreSQL through the dedicated SSH tunnel described
-   in [the deployment runbook](deployment-zeabur.md#migration-network-access).
+   reaches the private shared PostgreSQL through the dedicated SSH tunnel described
+   in [the deployment runbook](deployment-coolify.md#database-and-backups).
    Missing credentials or tunnel access block promotion.
 2. Deploy Web and Worker from the same release commit and Dockerfile. The AI Worker
    requires `LLM_API_KEY`, the same `LLM_BASE_URL`/model settings and

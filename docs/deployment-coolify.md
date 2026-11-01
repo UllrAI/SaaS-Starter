@@ -14,7 +14,8 @@ source project or the owner explicitly requests a new environment.
 - Applications: `saas-starter` and `saas-starter-worker`.
 - Public origin: `https://starter.ullrai.com`.
 - Temporary acceptance alias: `https://starter-preview.ullrai.com`, with noindex.
-  This alias serves the same production deployment; it is not staging.
+  This alias serves the same production deployment; it is not staging. Remove
+  its Coolify binding and DNS record immediately after final acceptance.
 - Database and login: `saas_starter_prod`.
 - Private upload bucket: existing `saas-starter`.
 

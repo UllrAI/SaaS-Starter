@@ -52,7 +52,7 @@ This starter kit provides a comprehensive set of powerful features to help you q
 | **AI**              | [Vercel AI SDK](https://ai-sdk.dev/) v7, any OpenAI-compatible LLM endpoint                                                                            |
 | **Email**           | [Resend](https://resend.com/), [React Email](https://react.email/)                                                                                     |
 | **Forms**           | [React Hook Form](https://react-hook-form.com/), [Zod](https://zod.dev/)                                                                               |
-| **Deployment**      | [Zeabur](https://zeabur.com/) or Docker                                                                                                                |
+| **Deployment**      | [Coolify](https://coolify.io/) with private GHCR images, or Docker                                                                                     |
 | **Package Manager** | [pnpm](https://pnpm.io/)                                                                                                                               |
 
 ## 🚀 Quick Start
@@ -487,50 +487,35 @@ After execution, bundle size analysis reports for both client and server will au
 
 ## ☁️ Deployment
 
-The production reference deployment uses [Zeabur](https://zeabur.com/). The
-repository also includes a standalone multi-stage Docker build.
+The production reference deployment uses [Coolify](https://coolify.io/) with
+private GHCR images built on GitHub Actions. This project keeps its existing
+production-only environment. Start with the [Coolify runbook](docs/deployment-coolify.md)
+for the configured resources, credentials, migrations, backups, and rollback.
 
-> **Save 10% on a Zeabur server:** Purchase a server at
-> [Zeabur](https://zeabur.com/) and enter referral code `visoar` at checkout.
-
-Configure the production Zeabur service to deploy the `prod` branch, not
-the default development branch (`main` in this repository). Pushing a
-`release/vX.Y.Z` tag matching the version in `package.json` runs
-[`promote-release-to-prod.yml`](.github/workflows/promote-release-to-prod.yml),
-which verifies that the tagged commit belongs to the repository's default
-branch (`main` at present) before moving `prod` to that commit. Zeabur deploys
-only after the promotion succeeds. Fork maintainers can reuse the same setup;
-see [the Zeabur deployment guide](docs/deployment-zeabur.md#using-the-workflow-in-a-fork).
-
-1. Merge the reviewed commit into the default branch and wait for the Quality
-   workflow to pass.
-2. Configure every required variable from `.env.example`. Set
-   `NEXT_PUBLIC_APP_URL` to the final HTTPS origin before building because
-   canonical URLs and client configuration are compiled from it. Keep the user
-   upload bucket private; see [private-file cutover](docs/architecture-remediation.md#deployment-requirements).
-3. Set `PRODUCTION_DATABASE_URL` in the GitHub `production` environment, plus
-   `PRODUCTION_JOB_DATABASE_URL` for a separate queue database. The release
-   workflow checks the exact SHA's Quality result and runs migrations before promotion.
-4. Update the version in `package.json`, then tag that commit with an annotated
-   `release/vX.Y.Z` tag using the same version and push it:
+1. Update the version in `package.json`, merge the reviewed commit to the default
+   branch, and wait for Quality to pass on that exact commit.
+2. Reuse the existing GitHub `production` environment settings and Coolify variables.
+   New installations must configure `.env.example`, private storage, and the
+   restricted migration tunnel as described in the runbook. Public origin and
+   analytics values are compiled into the image.
+3. Push an annotated `release/vX.Y.Z` tag matching `package.json`:
 
    ```bash
    git tag -a release/v1.2.3 -m "Release v1.2.3"
    git push origin release/v1.2.3
    ```
 
-5. Wait for the promotion workflow and the subsequent Zeabur deployment to
-   succeed. Use `/api/health` for liveness and `/api/ready` for database-backed
-   readiness.
-6. Schedule an authenticated `POST /api/internal/uploads/cleanup` once per day.
-7. Verify the public origin, both locale URL variants, authentication redirects,
-   Dashboard access, `robots.txt`, `sitemap.xml`, and application logs.
+4. The release workflow verifies exact-SHA Quality, applies migrations once,
+   advances `prod`, builds and smoke-tests Web/Worker images, publishes them to
+   private GHCR, and deploys both Coolify resources. Do not push directly to
+   `prod` or enable a second source-push deployment path.
+5. Verify the deployment result, `/api/ready`, worker startup, locale pages,
+   authentication redirects and authenticated Dashboard access. Worker owns
+   recurring upload cleanup; do not add a duplicate scheduled cleanup job.
 
-Docker Compose follows the same order with a one-shot `migrate` service. See
-[docker/README.md](docker/README.md) for local and self-hosted instructions.
-The optional GitHub maintenance schedule is best-effort and runs only from the
-default branch. Enable scheduled Actions explicitly in a fork, monitor its
-latest successful run, and use a platform scheduler when timing is an SLA.
+The old [Zeabur runbook](docs/deployment-zeabur.md) is historical recovery material,
+not the current deployment procedure. Local Docker Compose instructions remain
+in [docker/README.md](docker/README.md).
 
 ## 📄 License
 

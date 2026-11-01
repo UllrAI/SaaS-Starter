@@ -18,7 +18,7 @@ jobs:
     environment: production
     services:
       postgres:
-        image: postgres:17.11
+        image: postgres:18.6
         env:
           POSTGRES_DB: saas_image_test
           POSTGRES_PASSWORD: postgres

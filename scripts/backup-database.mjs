@@ -48,7 +48,7 @@ try {
         "PGDATABASE",
         "-v",
         `${directory}:/backup`,
-        "postgres:17",
+        "postgres:18.6",
         "pg_dump",
         "--format=custom",
         "--no-owner",

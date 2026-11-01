@@ -180,3 +180,14 @@ Job catalog 同时用于 Worker 和一次性数据库迁移。AI job 若在模�
 **原因**：手动暂停状态会阻止 Git trigger 创建部署，更新分支本身不会恢复服务。
 
 **正确做法**：一次性切换完成且 `prod` 已指向发布提交后，对暂停的服务执行 `service redeploy`，核对新部署 SHA 和 `suspendedAt=null`。普通 `restart` 可能恢复旧镜像；后续日常 tag 发布应保持服务运行。
+
+### PostgreSQL fixture and backup clients must follow a major-version migration
+
+Switching only the production connection leaves Quality testing PG16, image tests
+running PG17 and the historical backup helper using a PG17 client, which cannot
+dump a PG18 server. Upgrade those fixtures/client images together, while keeping
+the live connection change behind the coordinated freeze. A PG18 client can read
+the older PG17 source. Restore into an explicitly matching builtin `C.UTF-8`
+database and compare a held source snapshot, not independently timed live queries.
+The application and pg-boss migrations can be exercised without starting a second
+real Worker; copied production jobs must never be consumed during rehearsal.

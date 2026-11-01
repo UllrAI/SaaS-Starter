@@ -4,24 +4,25 @@ Coolify runs Web and Worker from private GHCR images. GitHub Actions performs
 the build and tests; the application server only pulls and starts those images.
 The existing Traefik proxy manages HTTPS. Cloudflare DNS remains proxied.
 
-## Environments
+## Production
 
-| Setting               | Production                                   | Staging                              |
-| --------------------- | -------------------------------------------- | ------------------------------------ |
-| URL                   | `https://starter.ullrai.com`                 | `https://starter-staging.ullrai.com` |
-| Release               | `release/vX.Y.Z`, then workflow-owned `prod` | Successful Quality on `main`         |
-| Database and login    | `saas_starter_prod`                          | `saas_starter_staging`               |
-| Private upload bucket | `saas-starter`                               | `saas-starter-staging`               |
+This project had only production on Zeabur and keeps only production on Coolify.
+Do not add staging during a hosting migration unless it already exists in the
+source project or the owner explicitly requests a new environment.
 
-The Coolify project is `SaaS-Starter`, with `production` and `staging`
-environments. Each contains `saas-starter` and `saas-starter-worker`. Secrets
-are shared only at the environment scope and explicitly referenced by each
-consumer. Staging starts with an empty schema, has its own session and cleanup
-secrets, omits production OAuth and analytics, and returns `noindex` headers.
-Existing external provider credentials are reused with the owner's authorization;
-Stripe remains in its existing **test mode**, including production. This does
-not create separate Stripe sandboxes or separate provider billing accounts.
-Do not run destructive external integration tests against shared providers.
+- Project / environment: `SaaS-Starter / production`.
+- Applications: `saas-starter` and `saas-starter-worker`.
+- Public origin: `https://starter.ullrai.com`.
+- Temporary acceptance alias: `https://starter-preview.ullrai.com`, with noindex.
+  This alias serves the same production deployment; it is not staging.
+- Database and login: `saas_starter_prod`.
+- Private upload bucket: existing `saas-starter`.
+
+Environment variables and existing provider credentials are migrated from Zeabur.
+Shared secrets live only at the production environment scope and are explicitly
+referenced by each consumer. Stripe remains in its existing **test mode**; this
+migration does not change the payment mode or provider accounts. Original OAuth
+callbacks remain valid because the public origin is unchanged.
 
 Web listens on 3000 as UID 1001; readiness is `/api/ready`. Worker uses
 `node dist/worker/worker.mjs`, has no public domain, and drains before replacement.
@@ -33,34 +34,29 @@ from Web health. Runtime image limits are 768 MiB for Web and 512 MiB for Worker
 
 1. PR Quality runs formatting, lint, type checks, unit/integration tests and
    Playwright against a disposable test database. Fork PRs have no deployment secrets.
-2. A successful default-branch push calls `deploy-coolify.yml` for staging.
-   It builds environment-specific Web/Worker images, migrates a disposable PG17
-   database, and tests the actual images for database readiness, worker startup
-   and non-root execution before publishing them.
-3. It applies committed staging migrations once through the restricted SSH tunnel,
-   updates the saved Coolify image references, deploys both services, and waits
-   for deployment completion and public readiness.
-4. A version-matching `release/vX.Y.Z` tag verifies successful Quality for that
-   exact default-branch commit, applies production migrations once, advances
-   `prod` with force-with-lease, then calls the same image/deployment workflow
-   for production. Never push or merge directly into `prod`.
+2. A version-matching `release/vX.Y.Z` tag verifies successful Quality for that
+   exact default-branch commit, applies production migrations once, and advances
+   `prod` with force-with-lease. Never push or merge directly into `prod`.
+3. It calls `deploy-coolify.yml`, which builds Web/Worker images, migrates a
+   disposable PG17 test database, and tests the actual images for database readiness,
+   worker startup and non-root execution before publishing them.
+4. It updates the saved Coolify image references, drains the previous Worker,
+   deploys both services, and waits for deployment completion and public readiness.
 
-Image references are `ghcr.io/ullrai/saas-starter:<environment>-sha-<full-sha>`
-and `ghcr.io/ullrai/saas-starter-worker:<environment>-sha-<full-sha>`. Packages
+Image references are `ghcr.io/ullrai/saas-starter:production-sha-<full-sha>`
+and `ghcr.io/ullrai/saas-starter-worker:production-sha-<full-sha>`. Packages
 must remain Private. Actions pushes with its short-lived `GITHUB_TOKEN`; the
 server reuses its existing read-only GHCR login. Next.js compiles the public
-origin and analytics settings into its bundle, so production and staging require
-separate builds. The Worker target reuses each completed Web build. Existing
+origin and analytics settings into its bundle. The Worker target reuses the
+completed Web build. Existing
 Playwright builds use a disposable test origin and cannot substitute for these
 deployment builds. Reuse reduces duplicate work; private repository builds still
 consume the organization's Actions allowance.
 
-Both GitHub environments already have `APP_URL`, `COOLIFY_WEB_UUID`,
+The GitHub production environment already has `APP_URL`, `COOLIFY_WEB_UUID`,
 `COOLIFY_WORKER_UUID`, `MIGRATION_SSH_HOST`, `MIGRATION_DB_HOST`,
 `MIGRATION_DB_PORT` variables and `COOLIFY_TOKEN`, `MIGRATION_SSH_KEY`,
-`MIGRATION_SSH_KNOWN_HOSTS`, `PRODUCTION_DATABASE_URL` secrets. The latter retains
-its historical name in staging but points only to the staging database. Production
-also has the three public Umami variables. Normal releases reuse these settings.
+`MIGRATION_SSH_KNOWN_HOSTS`, `PRODUCTION_DATABASE_URL` secrets. It also has the three public Umami variables. Normal releases reuse these settings.
 Rotate credentials only when needed; never commit them or repeat authentication
 setup for each release. Keep source-triggered Coolify builds disabled.
 
@@ -74,9 +70,9 @@ the public readiness endpoint responds.
 `Infrastructure / production / postgres-17` is a separate PostgreSQL 17.11
 business resource, not Coolify's internal database. It has a 1 GiB memory limit.
 Compatible future projects reuse this instance with separate databases and roles.
-Both SaaS databases preserve UTF8 and builtin `C.UTF-8` locale. Their owners have
-no superuser, create-role or create-database privileges. PUBLIC cannot connect;
-cross-environment connections are explicitly denied. This is logical isolation,
+The SaaS database preserves UTF8 and builtin `C.UTF-8` locale. Its owner has
+no superuser, create-role or create-database privileges. PUBLIC cannot connect.
+Other projects use different databases and roles; this provides logical isolation,
 not a separate failure or resource boundary.
 
 PostgreSQL has no public port. `postgres-ci-tunnel` exposes only host loopback
@@ -86,7 +82,7 @@ no shell, TTY, agent or X11 forwarding. The verified host key is pinned in GitHu
 CI forwards local 55432 through SSH and closes it after the one-shot migration.
 Docker container IP changes do not require changing CI or SSH restrictions.
 
-Coolify backs up both named databases daily at 19:17 UTC to the existing private
+Coolify backs up `saas_starter_prod` daily at 19:17 UTC to the existing private
 `coolify-backups` R2 storage, retaining 7 local and 30 remote daily backups.
 When adding another database, extend this schedule's database list and verify a
 restore. Do not back up only the default `postgres` database. The old per-project

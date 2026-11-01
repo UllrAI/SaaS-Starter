@@ -123,6 +123,4 @@ jobs:
       contents: read
       packages: write
     uses: ./.github/workflows/deploy-coolify.yml
-    with:
-      environment: production
     secrets: inherit

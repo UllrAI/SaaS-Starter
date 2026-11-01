@@ -179,8 +179,9 @@ pnpm stripe:sync-products
 
 ## 9. Production Promotion
 
-- Coolify production follows release promotion to `prod`; staging deploys only
-  after Quality succeeds on a default-branch push. See `docs/deployment-coolify.md`.
+- Coolify production follows release promotion to `prod`. This project has only
+  production; do not add staging as part of a hosting migration. Preserve the
+  source project's existing environment layout. See `docs/deployment-coolify.md`.
 - Publish production changes by pushing a `release/vX.Y.Z` tag that matches
   `package.json` on a reviewed commit from the repository's default branch.
 - `.github/workflows/promote-release-to-prod.yml` validates the tag ancestry and

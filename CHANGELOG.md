@@ -8,7 +8,7 @@ Routine formatting and test-only maintenance are omitted.
 ## 0.1.19 — 2026-11-01
 
 - Move Web and Worker deployments to Coolify with private GitHub-built images.
-- Add isolated staging and production databases, gated deployments, and shared PostgreSQL backups.
+- Add a dedicated production database, gated deployments, and shared PostgreSQL backups.
 
 ## 0.1.18 — 2026-10-22
 

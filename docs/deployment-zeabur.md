@@ -1,5 +1,8 @@
 # Zeabur deployment
 
+This is the historical source deployment. The active deployment and release
+configuration is documented in [Coolify deployment](deployment-coolify.md).
+
 This repository's production reference deployment uses a Git-backed Zeabur
 Web service, Worker service, and PostgreSQL.
 

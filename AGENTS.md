@@ -179,8 +179,9 @@ pnpm stripe:sync-products
 
 ## 9. Production Promotion
 
-- The production Zeabur service tracks `prod`, not the default development
-  branch.
+- Coolify production follows release promotion to `prod`. This project has only
+  production; do not add staging as part of a hosting migration. Preserve the
+  source project's existing environment layout. See `docs/deployment-coolify.md`.
 - Publish production changes by pushing a `release/vX.Y.Z` tag that matches
   `package.json` on a reviewed commit from the repository's default branch.
 - `.github/workflows/promote-release-to-prod.yml` validates the tag ancestry and
@@ -188,6 +189,10 @@ pnpm stripe:sync-products
 - Resolve the default branch dynamically in release automation. The current
   branch is `main`, but forks may use `master` or another name.
 - The release workflow verifies Quality for the exact default-branch SHA and runs production migrations as a dedicated step before updating `prod`. Configure the `production` environment database secrets before releasing.
+- Web and Worker use private GHCR images built and smoke-tested on GitHub's
+  Ubuntu runner. Do not enable a parallel source-push deployment in Coolify.
+- Reuse the configured registry login, environment secrets, restricted SSH tunnel,
+  and shared business PostgreSQL instance. Never use `coolify-db` for application data.
 
 ## 10. Testing and Verification
 

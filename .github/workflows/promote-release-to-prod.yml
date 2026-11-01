@@ -74,6 +74,7 @@ jobs:
           JOB_DATABASE_URL: ${{ secrets.PRODUCTION_JOB_DATABASE_URL }}
           MIGRATION_SSH_HOST: ${{ vars.MIGRATION_SSH_HOST }}
           MIGRATION_DB_HOST: ${{ vars.MIGRATION_DB_HOST }}
+          MIGRATION_DB_PORT: ${{ vars.MIGRATION_DB_PORT }}
           MIGRATION_SSH_KEY: ${{ secrets.MIGRATION_SSH_KEY }}
           MIGRATION_SSH_KNOWN_HOSTS: ${{ secrets.MIGRATION_SSH_KNOWN_HOSTS }}
         run: bash scripts/with-production-database.sh pnpm db:migrate
@@ -115,3 +116,11 @@ jobs:
             git push origin HEAD:refs/heads/prod \
               --force-with-lease="refs/heads/prod:"
           fi
+
+  deploy:
+    needs: promote
+    permissions:
+      contents: read
+      packages: write
+    uses: ./.github/workflows/deploy-coolify.yml
+    secrets: inherit

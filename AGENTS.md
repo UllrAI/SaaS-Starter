@@ -202,7 +202,17 @@ pnpm stripe:sync-products
   updates `prod`. Do not push or merge directly into `prod`.
 - Resolve the default branch dynamically in release automation. The current
   branch is `main`, but forks may use `master` or another name.
-- The release workflow verifies Quality for the exact default-branch SHA and runs production migrations as a dedicated step before updating `prod`. Configure the `production` environment database secrets before releasing.
+- The release workflow verifies Quality for the exact default-branch SHA and runs
+  required production migrations as a dedicated step before updating `prod`.
+  Skip SSH/install only when GitHub proves a previous production migration and
+  promotion succeeded and all migration inputs are unchanged. Unknown evidence or
+  inputs require migration. After restoring/changing the target database, set
+  production `FORCE_MIGRATION=true` for the next release and clear it only after
+  migration succeeds; Git diff cannot detect manual database rollback. See the
+  deployment runbook. Configure production database secrets before releasing.
+- The migrator may load `src/database`, `src/lib` and root configuration, not UI
+  components/routes/content. Update `scripts/release-migration-scope.py` whenever
+  adding a migration dependency outside that boundary; unknown paths migrate.
 - Web and Worker use private GHCR images built and smoke-tested on GitHub's
   Ubuntu runner. Do not enable a parallel source-push deployment in Coolify.
 - Hosting migrations must update this file, both README deployment sections,

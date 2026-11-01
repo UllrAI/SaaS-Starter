@@ -36,7 +36,7 @@ from Web health. Runtime image limits are 768 MiB for Web and 512 MiB for Worker
 1. PR Quality runs formatting, lint, type checks, unit/integration tests and
    Playwright against a disposable test database. Fork PRs have no deployment secrets.
 2. A version-matching `release/vX.Y.Z` tag verifies successful Quality for that
-   exact default-branch commit, applies production migrations once, and advances
+   exact default-branch commit, applies required production migrations once, and advances
    `prod` with force-with-lease. Never push or merge directly into `prod`.
 3. It calls `deploy-coolify.yml`, which builds Web/Worker images, migrates a
    disposable PostgreSQL 18.6 test database, and tests the actual images for database readiness,
@@ -73,6 +73,44 @@ request, rerun only the failed `deploy / deploy` leaf job; never rerun the
 successful `images` job just to retry deployment. This reuses the already tested
 Web/Worker SHA images and avoids repeating builds, image tests or migrations.
 
+## When a release needs database access
+
+Before installing migration dependencies or opening SSH, the release compares its
+inputs with the latest **actually successful production migration** found in the
+last 100 successful release runs. GitHub must show both the migration step and
+`prod` promotion succeeded in that run; a `prod` ref alone is not evidence. A
+release whose migration step was skipped does not replace this baseline.
+
+Unchanged inputs skip pnpm/Node setup, installation and the entire SSH migration
+step. UI, content, assets and operational documentation can change without a
+migration; a release-only `package.json` version bump is ignored. Database/schema
+files, all `src/lib` modules loaded by the queue migrator, scripts, workflow/config
+files, dependency manifests (apart from version), lockfiles, patches and unknown
+paths conservatively require migration. Renames are compared as delete + add, so
+moving a migration into documentation cannot hide it. A missing/unreachable or
+non-ancestor baseline, incomplete job evidence, API failure or uncertain comparison
+also requires migration. These fallbacks run the existing one-shot step before
+`prod` advances; migration failure still blocks promotion and deployment.
+
+To force migration, set the GitHub **production environment variable**
+`FORCE_MIGRATION=true` before the next release and remove it only after the actual
+migration step succeeds. Normal releases leave it unset. Any non-empty value
+except `false` forces execution, including a typo. **After database restore,
+replacement, connection-target change or manual schema rollback, force a migration
+before releasing/starting consumers** even when Git has not changed. Git history
+cannot detect these out-of-band database operations. When restoring without a new
+release, run the same reviewed one-shot migrator against the restored database
+before starting consumers, then force the next release once to re-establish the
+normal release evidence. Do not rerun an entire successful release just to repair
+a deployment leaf failure.
+
+The first release after introducing this decision step conservatively migrates
+because the release workflow and classifier are themselves changed inputs. The
+existing v0.1.21 run `41295676448` at
+`7d57518640bd2b023e6dc19d8ad0bd55cd01c046` is verified historical evidence, not a
+hardcoded baseline. No production migration is triggered by merging this CI-only
+change. PR/main Quality still migrates only its disposable test database.
+
 ## Database and backups
 
 Release `v0.1.21` targets `Infrastructure / production / postgres-18`, the
@@ -100,11 +138,12 @@ CI uses local port 55432 and closes it after the one-shot migration. The coordin
 updates the existing production URL secrets and `MIGRATION_DB_PORT` during cutover;
 normal releases reuse them without creating another key/account/tunnel.
 
-The former business `postgres-17` resource and its `127.0.0.1:5433` tunnel are
-historical recovery resources after cutover, not a target for new deployments.
-Fence only the old SaaS login until the operator has confirmed and cleaned every
-other PG17 consumer. The operator stops the whole old instance separately while
-retaining its volume and backups. Never stop the separate Coolify control database.
+The unused business `postgres-17` resource and its `127.0.0.1:5433` tunnel were
+explicitly authorized for deletion after cutover. Their volume and configuration
+are removed; the three historical R2 logical backups were preserved and verified.
+The independent Zeabur source remains fenced and suspended. Recover historical
+data from retained logical backups rather than expecting the deleted old volume.
+Never stop the separate Coolify control database.
 
 The shared PG18 schedule backs up `saas_starter_prod` with the other business
 databases daily at 19:37 UTC to the existing private

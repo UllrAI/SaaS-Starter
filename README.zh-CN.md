@@ -461,7 +461,8 @@ pnpm analyze:dev
    git push origin release/v1.2.3
    ```
 
-4. 发布流程核验准确 SHA 的 Quality，单次执行数据库迁移，推进 `prod`，构建并测试
+4. 发布流程核验准确 SHA 的 Quality，数据库相关输入变化或基线不明时单次迁库
+   （恢复/切库必须按手册设置 `FORCE_MIGRATION`），推进 `prod`，构建并测试
    Web/Worker 镜像，推送至私有 GHCR，再自动部署两个 Coolify 资源。不要直接推送
    `prod`，也不要开启另一条源码 push 自动部署路径。
 5. 核验部署结果、`/api/ready`、worker 启动、双语页面、认证回调与已登录 Dashboard。

@@ -60,15 +60,26 @@ jobs:
             exit 1
           fi
 
+      - name: Determine whether production migration inputs changed
+        id: migration
+        env:
+          GH_TOKEN: ${{ github.token }}
+          FORCE_MIGRATION: ${{ vars.FORCE_MIGRATION }}
+        run: python3 scripts/release-migration-scope.py
+
       - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6
+        if: steps.migration.outputs.required == 'true'
         with:
           version: 10.33.0
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        if: steps.migration.outputs.required == 'true'
         with:
           node-version: 22.23.4
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+        if: steps.migration.outputs.required == 'true'
       - name: Apply release migrations once before promotion
+        if: steps.migration.outputs.required == 'true'
         env:
           DATABASE_URL: ${{ secrets.PRODUCTION_DATABASE_URL }}
           JOB_DATABASE_URL: ${{ secrets.PRODUCTION_JOB_DATABASE_URL }}

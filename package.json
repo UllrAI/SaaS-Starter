@@ -1,6 +1,6 @@
 {
   "name": "ullrai-starter",
-  "version": "0.1.19",
+  "version": "0.1.20",
   "private": true,
   "packageManager": "pnpm@10.33.0",
   "engines": {
@@ -37,7 +37,9 @@
     "worker:start": "node dist/worker/worker.mjs",
     "worker:smoke": "node scripts/worker-smoke.mjs",
     "worker:shutdown-smoke": "node scripts/worker-shutdown-smoke.mjs",
-    "test:jobs:integration": "node --env-file-if-exists=.env --import tsx scripts/run-jobs-integration.ts"
+    "test:jobs:integration": "node --env-file-if-exists=.env --import tsx scripts/run-jobs-integration.ts",
+    "test:security-dependencies": "node --test scripts/security-dependencies-smoke.mjs",
+    "audit:security": "pnpm audit --audit-level moderate"
   },
   "dependencies": {
     "@ai-sdk/openai": "^4.0.46",
@@ -49,13 +51,13 @@
     "@shadcn/react": "^0.3.0",
     "@t3-oss/env-nextjs": "^0.13.11",
     "ai": "^7.0.77",
-    "better-auth": "^1.6.25",
+    "better-auth": "^1.7.14",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "drizzle-orm": "^0.45.2",
     "lucide-react": "^0.577.0",
     "mailchecker": "^6.0.20",
-    "next": "^16.3.8",
+    "next": "^16.4.3",
     "next-intl": "^4.13.6",
     "next-safe-action": "^8.5.3",
     "next-themes": "^0.4.6",
@@ -74,19 +76,19 @@
     "remark-gfm": "^4.0.1",
     "resend": "^6.12.4",
     "server-only": "^0.0.1",
-    "shadcn": "^4.19.0",
+    "shadcn": "^4.23.0",
     "sonner": "^2.0.7",
     "stripe": "^22.5.0",
     "tailwind-merge": "^3.6.0",
     "use-debounce": "^10.1.1",
-    "zod": "^4.4.3"
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@content-collections/core": "^0.14.2",
     "@content-collections/next": "^0.2.11",
     "@eslint/compat": "^2.1.0",
-    "@jest/globals": "^30.4.1",
-    "@next/bundle-analyzer": "^16.3.0",
+    "@jest/globals": "^30.5.2",
+    "@next/bundle-analyzer": "^16.4.3",
     "@playwright/test": "^1.60.0",
     "@shadcn/helpers": "^0.2.0",
     "@tailwindcss/postcss": "^4.3.0",
@@ -101,10 +103,10 @@
     "drizzle-kit": "^0.31.10",
     "esbuild": "0.25.12",
     "eslint": "^10.4.0",
-    "eslint-config-next": "^16.3.8",
+    "eslint-config-next": "^16.4.3",
     "eslint-config-prettier": "^10.1.8",
-    "jest": "^30.4.2",
-    "jest-environment-jsdom": "^30.4.1",
+    "jest": "^30.5.2",
+    "jest-environment-jsdom": "^30.5.2",
     "knip": "^6.29.0",
     "postcss": "^8.5.25",
     "postcss-load-config": "^6.0.1",
@@ -117,25 +119,25 @@
   },
   "pnpm": {
     "overrides": {
-      "@hono/node-server": "2.0.11",
-      "@modelcontextprotocol/sdk": "1.29.0",
+      "@hono/node-server": "2.1.5",
+      "@modelcontextprotocol/sdk": "1.32.2",
       "ai": "7.0.77",
-      "body-parser": "2.3.0",
-      "brace-expansion@^1.1.0": "1.1.18",
-      "brace-expansion@^2.0.0": "2.1.4",
-      "brace-expansion@^5.0.0": "5.0.9",
+      "body-parser": "2.4.0",
+      "brace-expansion@^1.1.0": "1.1.21",
+      "brace-expansion@^2.0.0": "2.1.7",
+      "brace-expansion@^5.0.0": "5.0.12",
       "browserslist": "4.28.7",
       "deepmerge-ts": "8.0.0",
       "diff": "8.0.3",
       "effect": "3.21.2",
       "esbuild": "0.25.12",
       "express-rate-limit": "8.3.0",
-      "fast-uri": "3.1.6",
+      "fast-uri": "3.1.9",
       "fast-xml-parser": "5.8.0",
-      "hono": "4.12.34",
-      "ip-address": "10.3.1",
+      "hono": "4.13.16",
+      "ip-address": "10.7.5",
       "js-cookie": "3.0.8",
-      "js-yaml@^3.0.0": "3.15.1",
+      "js-yaml@^3.0.0": "3.15.2",
       "lodash": "4.18.1",
       "mysql2": "3.23.1",
       "nanoid@^3.0.0": "3.3.18",
@@ -143,14 +145,24 @@
       "picomatch@^2.3.1": "2.3.2",
       "picomatch@^4.0.0": "4.0.4",
       "postcss": "8.5.25",
-      "qs": "6.16.0",
-      "serialize-javascript": "7.0.5",
-      "sharp": "0.35.4",
+      "qs": "6.17.1",
+      "serialize-javascript": "7.1.4",
+      "sharp": "0.35.5",
       "tmp": "0.2.7",
       "uuid": "11.1.1",
       "valibot": "1.4.2",
       "ws@^8.0.0": "8.21.0",
-      "yaml": "2.9.0"
+      "yaml": "2.9.0",
+      "js-yaml@^4.0.0": "4.3.2",
+      "undici@^7": "7.30.1",
+      "systeminformation": "5.33.19",
+      "smol-toml": "1.9.1",
+      "source-map-js": "1.2.2",
+      "engine.io": "6.6.11",
+      "postcss-selector-parser": "7.1.7",
+      "glob": "14.0.3",
+      "minimatch": "11.0.1",
+      "test-exclude": "8.0.0"
     },
     "peerDependencyRules": {
       "allowedVersions": {
@@ -166,10 +178,8 @@
       "sharp",
       "unrs-resolver"
     ],
-    "auditConfig": {
-      "ignoreCves": [
-        "GHSA-mh99-v99m-4gvg"
-      ]
+    "patchedDependencies": {
+      "deepmerge@4.3.1": "patches/deepmerge@4.3.1.patch"
     }
   }
 }

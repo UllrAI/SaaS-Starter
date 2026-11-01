@@ -5,6 +5,14 @@ Routine formatting and test-only maintenance are omitted.
 
 ## Unreleased
 
+## 0.1.20 — 2026-11-01
+
+- Update Next.js, Better Auth, sharp and the dependency graph to resolve the
+  available critical, high and moderate security fixes.
+- Patch deepmerge prototype poisoning locally while no upstream fixed version
+  exists, with regression checks against its actual Jest and email consumers.
+- Add a dependency audit gate to Quality and retain the full release/image checks.
+
 ## 0.1.19 — 2026-11-01
 
 - Move Web and Worker deployments to Coolify with private GitHub-built images.

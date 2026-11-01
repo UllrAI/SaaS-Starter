@@ -166,6 +166,13 @@ pnpm stripe:sync-products
 - Follow existing upload security flow in `src/lib/config/upload.ts` and related server logic.
 - Keep webhook handling idempotent and validation-first.
 - Do not bypass existing auth, permission, or validation boundaries.
+- Before releases, review dependency alerts and resolve available security updates,
+  including stale overrides, then publish through the tested release workflow.
+  Do not dismiss or ignore alerts just to make checks green. An unavailable
+  upstream fix needs a documented, tested mitigation and an accurate residual report.
+- `pnpm audit:security` blocks moderate and higher findings. The remaining low
+  deepmerge advisory has a committed pnpm patch and real-package regression tests;
+  see `SECURITY.md`. Docker dependency stages must copy `patches/` before installation.
 
 ## 8. Database Workflow
 

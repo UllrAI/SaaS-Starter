@@ -62,6 +62,8 @@ jobs:
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile
+      - run: pnpm audit:security
+      - run: pnpm test:security-dependencies
       - run: pnpm prettier:check
       - run: pnpm lint
       - run: pnpm dead-code:check

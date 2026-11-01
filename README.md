@@ -507,7 +507,9 @@ for the configured resources, credentials, migrations, backups, and rollback.
    git push origin release/v1.2.3
    ```
 
-4. The release workflow verifies exact-SHA Quality, applies migrations once,
+4. The release workflow verifies exact-SHA Quality, applies migrations once when
+   inputs changed or evidence is uncertain (database restores require the documented
+   `FORCE_MIGRATION` override),
    advances `prod`, builds and smoke-tests Web/Worker images, publishes them to
    private GHCR, and deploys both Coolify resources. Do not push directly to
    `prod` or enable a second source-push deployment path.

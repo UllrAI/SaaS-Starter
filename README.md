@@ -490,6 +490,8 @@ After execution, bundle size analysis reports for both client and server will au
 The production reference deployment uses [Coolify](https://coolify.io/) with
 private GHCR images built on GitHub Actions. This project keeps its existing
 production-only environment. Start with the [Coolify runbook](docs/deployment-coolify.md)
+PostgreSQL 18 compatibility and the coordinated upgrade are documented in the
+[database migration runbook](docs/postgresql-18-migration.md).
 for the configured resources, credentials, migrations, backups, and rollback.
 
 1. Update the version in `package.json`, merge the reviewed commit to the default

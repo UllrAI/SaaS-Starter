@@ -447,7 +447,7 @@ pnpm analyze:dev
 
 生产参考环境使用 [Coolify](https://coolify.io/)，由 GitHub Actions 构建镜像并推送至
 私有 GHCR，再由服务器拉取部署。本项目保留原有的单一 production 环境。当前资源、
-凭据复用、数据库迁移、备份和回退步骤见 [Coolify 部署手册](docs/deployment-coolify.md)。
+凭据复用、数据库迁移、备份和回退步骤见 [Coolify 部署手册](docs/deployment-coolify.md)。 PostgreSQL 18 的恢复演练与统一切换要求见 [数据库迁移手册](docs/postgresql-18-migration.md)。
 
 1. 更新 `package.json` 版本，将审查后的代码合并到默认分支，等待该准确提交的
    Quality 通过。

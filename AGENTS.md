@@ -176,6 +176,13 @@ pnpm stripe:sync-products
 
 ## 8. Database Workflow
 
+- PostgreSQL 18.6 is the validated upgrade target and CI/image-test fixture. Preserve
+  UTF8 and the existing builtin `C.UTF-8` locale when restoring PG17.11 data.
+  Follow `docs/postgresql-18-migration.md`; a fixture/backup-client update does not
+  authorize changing production connections or starting a duplicate real Worker.
+  Dump with the PG18 client, restore into application-owned isolated databases,
+  and compare table hashes, sequence state, ownership and cross-database access.
+
 - Maintain a single committed migration history in `src/database/migrations`.
 - Use `pnpm db:push` only for fast local iteration against disposable or personal development databases.
 - Use `pnpm db:generate` to create migration files that will be committed and shared across staging and production.

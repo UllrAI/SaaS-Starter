@@ -39,7 +39,7 @@ from Web health. Runtime image limits are 768 MiB for Web and 512 MiB for Worker
    exact default-branch commit, applies production migrations once, and advances
    `prod` with force-with-lease. Never push or merge directly into `prod`.
 3. It calls `deploy-coolify.yml`, which builds Web/Worker images, migrates a
-   disposable PG17 test database, and tests the actual images for database readiness,
+   disposable PostgreSQL 18.6 test database, and tests the actual images for database readiness,
    worker startup and non-root execution before publishing them.
 4. It updates the saved Coolify image references, drains the previous Worker,
    deploys both services, and waits for deployment completion and public readiness.
@@ -67,6 +67,13 @@ queue before retrying. CI reports success only after both deployments finish and
 the public readiness endpoint responds.
 
 ## Database and backups
+
+PostgreSQL 18.6 is the prepared shared-business upgrade target. CI, actual-image
+smoke tests and the logical-backup client now use this version. Production remains
+on the existing PG17.11 resource until the coordinated final restore and connection
+switch; this PR does not cut over traffic or start another real Worker. Follow
+[the PostgreSQL 18 runbook](postgresql-18-migration.md) for the tested restore,
+locale, isolation, backup and rollback requirements.
 
 `Infrastructure / production / postgres-17` is a separate PostgreSQL 17.11
 business resource, not Coolify's internal database. It has a 1 GiB memory limit.

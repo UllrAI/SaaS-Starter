@@ -5,6 +5,11 @@ Routine formatting and test-only maintenance are omitted.
 
 ## Unreleased
 
+## 0.1.23 — 2026-11-09
+
+- Upgrade React Email to the upstream renderer that removes `deepmerge` from the
+  email delivery path. Install the shadcn CLI with development and build tooling.
+
 ## 0.1.20 — 2026-11-01
 
 - Update Next.js, Better Auth, sharp and the dependency graph to resolve the

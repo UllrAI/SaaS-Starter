@@ -173,6 +173,10 @@
 
 **正确做法**:任何改动依赖(含只改 `pnpm.overrides`)的提交,顺序必须是 `pnpm install` → `pnpm prettier:format` → 提交。另外此时 `git diff --stat` 会显示 lockfile 上万行变动,那是 install 产物与格式化产物之间的中间差异;判断真实改动量要用 `git diff origin/main -- pnpm-lock.yaml`。
 
+### 全局依赖覆盖可能压低新调用方的最低版本
+
+React Email 的新渲染器要求 `deepmerge-ts` 至少为 8.0.1，仓库原来为 Prisma 加的全局覆盖却会强制安装 8.0.0。把覆盖限定到需要安全修复的上游包，并在锁文件里验证每条调用链都解析到预期版本。
+
 ### 私有文件不能经过无身份信息的图片优化请求
 
 `next/image` 的服务端优化请求不会携带访问者 session。私有上传预览应使用 `unoptimized`，由浏览器请求鉴权地址；仅取消公共桶地址而保留优化路径会让合法预览变成 401。

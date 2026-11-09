@@ -1,10 +1,13 @@
 import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 import test from "node:test";
+import { createElement } from "react";
+import { render } from "react-email";
 
 const consumers = {
   Jest: ["jest", "@jest/core", "jest-config"],
-  "React Email": ["react-email", "@react-email/render", "html-to-text"],
+  "shadcn CLI": ["shadcn"],
+  "shadcn registry": ["shadcn", "@shadcn/registry"],
 };
 
 // Resolve each consumer's transitive copy instead of adding a root dependency.
@@ -50,3 +53,13 @@ for (const [consumer, chain] of Object.entries(consumers)) {
     });
   }
 }
+
+test("React Email preserves sign-in links in HTML and plain text", async () => {
+  const url = "https://example.test/sign-in";
+  const link = createElement("a", { href: url }, "Sign in");
+
+  assert.ok((await render(link)).includes(`href="${url}"`));
+  const text = await render(link, { plainText: true });
+  assert.ok(text.includes("Sign in"));
+  assert.ok(text.includes(url));
+});

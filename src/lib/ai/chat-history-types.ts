@@ -17,6 +17,8 @@ export interface AiConversationSummary {
 export interface AiConversationPage {
   conversations: AiConversationSummary[];
   hasMore: boolean;
+  snapshot?: string;
+  reset?: true;
 }
 
 export interface AiConversationDetail {

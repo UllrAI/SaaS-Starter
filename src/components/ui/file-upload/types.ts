@@ -37,6 +37,7 @@ export class FileUploadIssueError extends Error {
 }
 
 type FileUploadItemStatus =
+  | "preparing"
   | "queued"
   | "uploading"
   | "success"

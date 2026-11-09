@@ -1,6 +1,7 @@
 import type { AppDatabase } from "@/database/client";
 import { getOwnedAiRun, readAiRunEvents } from "./durable-runs";
 import { ACTIVE_AI_RUN_STATUSES } from "./durable-types";
+import type { AiStreamLease } from "./stream-leases";
 
 export function createAiRunEventStream(
   db: AppDatabase,
@@ -8,22 +9,36 @@ export function createAiRunEventStream(
   userId: string,
   cursor: number,
   signal: AbortSignal,
+  lease: AiStreamLease,
 ) {
   const encoder = new TextEncoder();
   let cancelled = false;
+  let released = false;
+  let renewedAt = Date.now();
   let timer: ReturnType<typeof setTimeout> | undefined;
   let wake: (() => void) | undefined;
-  const stop = () => {
-    cancelled = true;
+  const cleanup = () => {
+    if (released) return;
+    released = true;
     clearTimeout(timer);
     wake?.();
+    signal.removeEventListener("abort", cleanup);
+    void lease.release().catch((error: unknown) => {
+      console.error("Could not release AI stream lease:", error);
+    });
   };
-  signal.addEventListener("abort", stop, { once: true });
+  signal.addEventListener("abort", cleanup, { once: true });
+  if (signal.aborted) cleanup();
   let lastKeepAlive = Date.now();
   return new ReadableStream<Uint8Array>({
     async pull(controller) {
       try {
         while (!cancelled && !signal.aborted) {
+          if (Date.now() - renewedAt >= 15_000) {
+            if (!(await lease.renew())) break;
+            renewedAt = Date.now();
+            if (cancelled || signal.aborted) break;
+          }
           const events = await readAiRunEvents(db, runId, cursor);
           if (cancelled || signal.aborted) break;
           for (const event of events) {
@@ -49,7 +64,7 @@ export function createAiRunEventStream(
             !ACTIVE_AI_RUN_STATUSES.some((status) => status === run.status)
           ) {
             controller.enqueue(encoder.encode("data: [DONE]\n\n"));
-            signal.removeEventListener("abort", stop);
+            cleanup();
             controller.close();
             return;
           }
@@ -60,20 +75,22 @@ export function createAiRunEventStream(
           }
           await new Promise<void>((resolve) => {
             wake = resolve;
-            timer = setTimeout(resolve, 250);
+            timer = setTimeout(resolve, 500);
           });
           wake = undefined;
         }
-        signal.removeEventListener("abort", stop);
-        controller.close();
+        cleanup();
+        if (!cancelled) controller.close();
       } catch (error) {
-        signal.removeEventListener("abort", stop);
-        if (!cancelled) controller.error(error);
+        cleanup();
+        if (cancelled) return;
+        if (signal.aborted) controller.close();
+        else controller.error(error);
       }
     },
     cancel() {
-      stop();
-      signal.removeEventListener("abort", stop);
+      cancelled = true;
+      cleanup();
     },
   });
 }

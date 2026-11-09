@@ -1,4 +1,4 @@
-import { and, eq, inArray, isNotNull, isNull } from "drizzle-orm";
+import { and, eq, inArray, isNotNull, isNull, sql } from "drizzle-orm";
 import type { AppDatabase } from "@/database/client";
 import { uploads } from "@/database/schema";
 import type { DeleteObject } from "./repository";
@@ -26,17 +26,27 @@ export async function cleanupDeletedFiles(
   db: AppDatabase,
   deleteObject: DeleteObject,
 ) {
+  const dueAt = sql`coalesce(${uploads.deleteRetryAt}, ${uploads.deletedAt})`;
+  const eligible = and(isNotNull(uploads.deletedAt), sql`${dueAt} <= now()`);
   const files = await db
-    .select()
+    .select({ id: uploads.id })
     .from(uploads)
-    .where(isNotNull(uploads.deletedAt))
-    .orderBy(uploads.deletedAt)
+    .where(eligible)
+    .orderBy(dueAt, uploads.id)
     .limit(100);
-  for (const file of files) {
+  for (const { id } of files) {
+    // Reserve the next attempt before contacting storage. Another worker can
+    // reclaim the tombstone after the delay if this worker exits mid-request.
+    const [file] = await db
+      .update(uploads)
+      .set({ deleteRetryAt: sql`now() + interval '1 minute'` })
+      .where(and(eq(uploads.id, id), eligible))
+      .returning({ fileKey: uploads.fileKey });
+    if (!file) continue;
     const result = await deleteObject(file.fileKey);
     if (result.success)
       await db
         .delete(uploads)
-        .where(and(eq(uploads.id, file.id), isNotNull(uploads.deletedAt)));
+        .where(and(eq(uploads.id, id), isNotNull(uploads.deletedAt)));
   }
 }

@@ -71,6 +71,8 @@ export const MARKETING_CLIENT_MESSAGE_KEYS = [
   "payment_status_success_description",
   "payment_status_success_title",
   "payment_status_timeout",
+  "payment_status_unverified_description",
+  "payment_status_retry_check",
   "payment_status_try_again",
   "payment_status_view_plans",
   "pricing_per_month",

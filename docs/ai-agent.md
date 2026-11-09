@@ -283,6 +283,14 @@ Add the factory to `agentFactories` in `src/lib/ai/agents/index.ts`; the chat ro
 - Returns `202` JSON `{ id, runId, conversationId, assistantMessageId, status }`.
 - Unusable payloads return `400`; changed history or concurrent admission returns `409`; budget exhaustion returns `429`.
 - Owned `GET /api/ai/runs/{runId}` exposes state; `/stream?cursor=N` replays events; `POST /cancel` stops execution. Missing or another user’s run returns `404`.
+- Up to four stream subscriptions per user are allowed across Web replicas.
+  If all slots are occupied, the stream endpoint returns `429` with
+  `Retry-After`. Retry the stream with the same cursor. Disconnecting releases
+  the slot and an abandoned lease expires after 45 seconds.
+- To paginate conversation history consistently, pass `snapshot=` on the first
+  list request and send the returned snapshot with the next offset. If the list
+  changes, the response includes `reset: true` and the first page of the new
+  snapshot. Replace the local list and resume from that page's length.
 - Provider failures are logged inside Worker and exposed as controlled stream codes, without upstream details.
 
 `AgentContext` is rebuilt from the current database profile and owned conversation inside Worker, so no field a client sends can widen

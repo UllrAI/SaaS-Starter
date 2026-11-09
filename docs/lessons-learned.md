@@ -73,6 +73,18 @@
 
 ## 测试
 
+### 聊天滚动测试要等待按钮进入可交互状态
+
+跳到最新消息的按钮隐藏时仍留在 DOM，使用透明度和 `inert` 关闭交互。`toBeVisible()` 可以在按钮仍为 `inert` 时通过。用真实滚轮触发浏览器滚动，并等待按钮的 `data-active` 变为 `true` 后再点击。
+
+### 文件准备也必须占用上传名额
+
+**现象**：上限为 1 时，两批文件可以同时通过校验，最后队列却有 2 个文件；切换 AI 会话也可能留下刚准备好的旧附件。
+
+**原因**：原先在异步准备完成后才把文件加入队列。容量检查和草稿清理只能看到已经准备好的文件。
+
+**正确做法**：在开始准备前同步登记文件，完成后只更新仍在队列里的同一 ID。验证时让两次选择在同一批 React 更新里发生，不要在两次选择之间等界面稳定。
+
 ### 从 `@jest/globals` 导入 `jest` 会让 `jest.mock` 失效
 
 **现象**:测试顶部写了 `jest.mock("sonner", () => ({ toast: { warning: jest.fn() } }))`,断言时却报 `Matcher error: received value must be a mock or spy function`,拿到的是 sonner 的真实实现。
@@ -91,9 +103,17 @@
 
 **正确做法**:在 `jest.setup.ts` 里用 Node 自带的 `node:crypto` 的 `webcrypto` 补齐。注意必须用 `Object.defineProperty`——jsdom 把 `crypto` 定义成 getter,直接赋值会失败。
 
+### 检查表达式索引要用真实的 Drizzle SQL
+
+新增表达式索引后，迁移可以通过，schema 单测却在 `JSON.parse` 报错。全局 Jest 模拟的 `sql` 返回普通对象，索引构建器把它当成列并尝试读取列配置。检查真实 schema 的测试应取消这层模拟。
+
 ---
 
 ## Next.js
+
+### 付款回跳页的翻译来自静态消息白名单
+
+即使中英文目录里的键完全一致，生产构建仍可能在付款回跳页报告 `MISSING_MESSAGE`。该静态页面只接收 `src/lib/i18n/messages.ts` 中筛出的消息。新增键要同时登记到静态白名单，并在生产构建上检查两种语言。
 
 ### 配 `deploymentId` 会削弱 Next 自带的 skew 检测
 

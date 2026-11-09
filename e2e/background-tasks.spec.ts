@@ -47,4 +47,12 @@ test("creates, polls, deduplicates, authorizes, and cancels a background task", 
 
   const cancelledPoll = await page.request.get(`/api/tasks/${created.task.id}`);
   expect((await cancelledPoll.json()).task.status).toBe("cancelled");
+
+  const repeatedCancel = await page.request.post(
+    `/api/tasks/${created.task.id}/cancel`,
+  );
+  expect(repeatedCancel.status()).toBe(200);
+  expect((await repeatedCancel.json()).task).toEqual(
+    (await cancelResponse.json()).task,
+  );
 });

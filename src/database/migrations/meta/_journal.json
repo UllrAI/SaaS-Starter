@@ -204,6 +204,13 @@
       "when": 1790950376032,
       "tag": "0028_careful_blue_blade",
       "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "7",
+      "when": 1794232015425,
+      "tag": "0029_state_machine_hardening",
+      "breakpoints": true
     }
   ]
 }

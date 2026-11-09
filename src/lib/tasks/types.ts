@@ -1,13 +1,7 @@
 import type { taskRuns } from "@/database/schema";
 
-export type TaskRunStatus =
-  | "queued"
-  | "running"
-  | "waiting"
-  | "completed"
-  | "failed"
-  | "cancelled";
 export type TaskRun = typeof taskRuns.$inferSelect;
+export type TaskRunStatus = TaskRun["status"];
 
 export interface TaskRunError {
   code: string;

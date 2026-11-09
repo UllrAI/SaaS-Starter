@@ -146,11 +146,16 @@ async function readResponse<T>(response: Response): Promise<T> {
   return response.json() as Promise<T>;
 }
 
-async function fetchConversationPage(offset: number, archived: boolean) {
+async function fetchConversationPage(
+  offset: number,
+  archived: boolean,
+  snapshot = "",
+) {
   const search = new URLSearchParams({
     offset: String(offset),
     limit: String(HISTORY_PAGE_SIZE),
     archived: String(archived),
+    snapshot,
   });
   return readResponse<AiConversationPage>(
     await fetch(`/api/ai/conversations?${search}`, { cache: "no-store" }),
@@ -219,7 +224,11 @@ export function AiChat() {
   const [conversationLoading, setConversationLoading] = useState(false);
   const [conversationCreating, setConversationCreating] = useState(false);
   const [historyLoadingMore, setHistoryLoadingMore] = useState(false);
-  const [historyHasMore, setHistoryHasMore] = useState(false);
+  const [historyPage, setHistoryPage] = useState({
+    offset: 0,
+    snapshot: "",
+    hasMore: false,
+  });
   const [historyError, setHistoryError] = useState(false);
   const [historyArchived, setHistoryArchived] = useState(false);
   const historyCollapsed = useStoredBoolean(
@@ -227,7 +236,6 @@ export function AiChat() {
     false,
   );
   const [historyMutatingId, setHistoryMutatingId] = useState<string>();
-  const [loadedConversationCount, setLoadedConversationCount] = useState(0);
   const [manualArtifacts, setManualArtifacts] = useState<CanvasArtifact[]>([]);
   const [activeArtifactId, setActiveArtifactId] = useState<string>();
   const canvasOpenPreference = useStoredBoolean(CANVAS_OPEN_STORAGE_KEY, false);
@@ -239,31 +247,42 @@ export function AiChat() {
   const workspaceRef = useRef<HTMLDivElement>(null);
   const latestAutomaticArtifactId = useRef<string | undefined>(undefined);
   const conversationRequestId = useRef(0);
+  const historyListRequestId = useRef(0);
+  const historyView = useRef({ archived: false, changing: true });
 
   const refreshConversationList = useCallback(async () => {
+    if (historyView.current.changing) return;
+    const archived = historyView.current.archived;
+    const requestId = ++historyListRequestId.current;
+    setHistoryLoadingMore(false);
     try {
-      const page = await fetchConversationPage(0, historyArchived);
+      const page = await fetchConversationPage(0, archived);
+      if (requestId !== historyListRequestId.current) return;
       setConversations((current) => {
         const active = current.find(
           (conversation) => conversation.id === activeConversationId,
         );
         return active &&
-          Boolean(active.archivedAt) === historyArchived &&
+          Boolean(active.archivedAt) === archived &&
           !page.conversations.some((item) => item.id === active.id)
           ? [active, ...page.conversations]
           : page.conversations;
       });
-      setLoadedConversationCount(page.conversations.length);
-      setHistoryHasMore(page.hasMore);
+      setHistoryPage({
+        offset: page.conversations.length,
+        snapshot: page.snapshot ?? "",
+        hasMore: page.hasMore,
+      });
       setHistoryError(false);
     } catch (refreshError) {
+      if (requestId !== historyListRequestId.current) return;
       console.error(
         "AI conversation list could not be refreshed:",
         refreshError,
       );
       setHistoryError(true);
     }
-  }, [activeConversationId, historyArchived]);
+  }, [activeConversationId]);
 
   const [reconnecting, setReconnecting] = useState(false);
   const [cancelError, setCancelError] = useState<Error>();
@@ -324,8 +343,7 @@ export function AiChat() {
     imageCompressionMaxWidth: 2048,
     maxFiles: AI_IMAGE_INPUT_MAX_FILES,
   });
-  const imageUploadItems = imageUpload.items;
-  const removeImage = imageUpload.removeFile;
+  const clearImageAttachments = imageUpload.clearFiles;
 
   const automaticArtifacts = useMemo(
     () => extractArtifacts(messages),
@@ -360,6 +378,7 @@ export function AiChat() {
     let cancelled = false;
 
     void (async () => {
+      historyView.current.changing = true;
       setHistoryLoading(true);
       try {
         let page = await fetchConversationPage(0, false);
@@ -393,9 +412,13 @@ export function AiChat() {
           )
             ? [detail.conversation, ...page.conversations]
             : page.conversations;
+        historyView.current.archived = archived;
         setHistoryArchived(archived);
-        setLoadedConversationCount(page.conversations.length);
-        setHistoryHasMore(page.hasMore);
+        setHistoryPage({
+          offset: page.conversations.length,
+          snapshot: page.snapshot ?? "",
+          hasMore: page.hasMore,
+        });
         setConversations(nextConversations);
         setActiveConversationId(detail?.conversation.id);
         latestAutomaticArtifactId.current = extractArtifacts(
@@ -419,12 +442,16 @@ export function AiChat() {
         );
         setHistoryError(true);
       } finally {
-        if (!cancelled) setHistoryLoading(false);
+        if (!cancelled) {
+          historyView.current.changing = false;
+          setHistoryLoading(false);
+        }
       }
     })();
 
     return () => {
       cancelled = true;
+      historyListRequestId.current += 1;
     };
   }, [sendMessage, setMessages]);
 
@@ -449,10 +476,6 @@ export function AiChat() {
       queueMicrotask(() => setCanvasAutomaticallyOpen(true));
     }
   }, [automaticArtifacts]);
-
-  const clearImageAttachments = useCallback(() => {
-    imageUploadItems.forEach((item) => removeImage(item.id));
-  }, [imageUploadItems, removeImage]);
 
   const resetConversationView = useCallback(() => {
     setMessages([]);
@@ -551,49 +574,70 @@ export function AiChat() {
   };
 
   const handleLoadMore = async () => {
-    if (historyLoadingMore || !historyHasMore) return;
+    if (
+      historyView.current.changing ||
+      historyLoadingMore ||
+      !historyPage.hasMore
+    )
+      return;
+    const requestId = ++historyListRequestId.current;
     setHistoryLoadingMore(true);
     try {
       const page = await fetchConversationPage(
-        loadedConversationCount,
+        historyPage.offset,
         historyArchived,
+        historyPage.snapshot,
       );
+      if (requestId !== historyListRequestId.current) return;
       setConversations((current) => {
+        if (page.reset) return page.conversations;
         const byId = new Map(current.map((item) => [item.id, item]));
         page.conversations.forEach((item) => byId.set(item.id, item));
         return [...byId.values()];
       });
-      setLoadedConversationCount(
-        (current) => current + page.conversations.length,
-      );
-      setHistoryHasMore(page.hasMore);
+      setHistoryPage({
+        offset:
+          (page.reset ? 0 : historyPage.offset) + page.conversations.length,
+        snapshot: page.snapshot ?? "",
+        hasMore: page.hasMore,
+      });
+      setHistoryError(false);
     } catch (loadMoreError) {
+      if (requestId !== historyListRequestId.current) return;
       console.error(
         "More AI conversations could not be loaded:",
         loadMoreError,
       );
       setHistoryError(true);
     } finally {
-      setHistoryLoadingMore(false);
+      if (requestId === historyListRequestId.current)
+        setHistoryLoadingMore(false);
     }
   };
 
   const handleToggleArchivedView = async () => {
-    if (historyDisabled) return;
-
+    if (historyDisabled || historyView.current.changing) return;
+    historyView.current.changing = true;
+    historyListRequestId.current += 1;
+    setHistoryLoadingMore(false);
     const nextArchived = !historyArchived;
     setHistoryLoading(true);
     setHistoryError(false);
     try {
       const page = await fetchConversationPage(0, nextArchived);
+      historyView.current.archived = nextArchived;
       setHistoryArchived(nextArchived);
       setConversations(page.conversations);
-      setLoadedConversationCount(page.conversations.length);
-      setHistoryHasMore(page.hasMore);
+      setHistoryPage({
+        offset: page.conversations.length,
+        snapshot: page.snapshot ?? "",
+        hasMore: page.hasMore,
+      });
     } catch (viewError) {
       console.error("AI conversation archive could not be loaded:", viewError);
       setHistoryError(true);
     } finally {
+      historyView.current.changing = false;
       setHistoryLoading(false);
     }
   };
@@ -602,8 +646,10 @@ export function AiChat() {
     conversationId: string,
     archived: boolean,
   ) => {
-    if (historyDisabled) return;
-
+    if (historyDisabled || historyView.current.changing) return;
+    historyView.current.changing = true;
+    historyListRequestId.current += 1;
+    setHistoryLoadingMore(false);
     setHistoryMutatingId(conversationId);
     setHistoryError(false);
     try {
@@ -611,7 +657,6 @@ export function AiChat() {
       setConversations((current) =>
         current.filter((conversation) => conversation.id !== conversationId),
       );
-      setLoadedConversationCount((current) => Math.max(0, current - 1));
 
       if (activeConversationId === conversationId) {
         conversationRequestId.current += 1;
@@ -623,6 +668,7 @@ export function AiChat() {
       console.error("AI conversation could not be archived:", archiveError);
       setHistoryError(true);
     } finally {
+      historyView.current.changing = false;
       setHistoryMutatingId(undefined);
     }
   };
@@ -725,8 +771,10 @@ export function AiChat() {
         const created = await createConversation();
         conversationId = created.id;
         setActiveConversationId(created.id);
-        setConversations((current) => [created, ...current]);
-        setLoadedConversationCount((current) => current + 1);
+        historyListRequestId.current += 1;
+        setHistoryLoadingMore(false);
+        if (!historyArchived)
+          setConversations((current) => [created, ...current]);
         replaceConversationUrl(created.id);
       } catch (creationError) {
         console.error("AI conversation could not be created:", creationError);
@@ -816,7 +864,7 @@ export function AiChat() {
     activeConversationId,
     loading: historyLoading,
     loadingMore: historyLoadingMore,
-    hasMore: historyHasMore,
+    hasMore: historyPage.hasMore,
     disabled: historyDisabled,
     error: historyError,
     archived: historyArchived,

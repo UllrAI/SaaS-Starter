@@ -965,18 +965,25 @@ describe("Admin Actions", () => {
     });
   });
 
+  function mockLockedAccounts(...targets: { id: string; role: string }[]) {
+    mockDb.select.mockReturnValue({
+      from: jest.fn().mockReturnThis(),
+      where: jest.fn().mockReturnThis(),
+      orderBy: jest.fn().mockReturnThis(),
+      for: jest
+        .fn()
+        .mockResolvedValue([
+          { id: "admin1", role: "admin", banned: false },
+          ...targets,
+        ]),
+    });
+  }
+
   describe("updateUserAction", () => {
     it("should update user successfully", async () => {
-      const mockUser = { role: "user" };
       const mockContext = { user: { id: "admin1", role: "admin" } };
 
-      mockDb.select.mockReturnValue({
-        from: jest.fn().mockReturnValue({
-          where: jest.fn().mockReturnValue({
-            limit: jest.fn().mockResolvedValue([mockUser]),
-          }),
-        }),
-      });
+      mockLockedAccounts({ id: "user1", role: "user" });
 
       mockDb.update.mockReturnValue({
         set: jest.fn().mockReturnValue({
@@ -999,13 +1006,7 @@ describe("Admin Actions", () => {
     });
 
     it("should throw error when user not found", async () => {
-      mockDb.select.mockReturnValue({
-        from: jest.fn().mockReturnValue({
-          where: jest.fn().mockReturnValue({
-            limit: jest.fn().mockResolvedValue([]),
-          }),
-        }),
-      });
+      mockLockedAccounts();
 
       const { updateUserAction } = await import("./admin/users");
 
@@ -1018,15 +1019,7 @@ describe("Admin Actions", () => {
     });
 
     it("should prevent modifying super_admin without super_admin role", async () => {
-      const mockUser = { role: "super_admin" };
-
-      mockDb.select.mockReturnValue({
-        from: jest.fn().mockReturnValue({
-          where: jest.fn().mockReturnValue({
-            limit: jest.fn().mockResolvedValue([mockUser]),
-          }),
-        }),
-      });
+      mockLockedAccounts({ id: "user1", role: "super_admin" });
 
       const { updateUserAction } = await import("./admin/users");
 
@@ -1039,15 +1032,7 @@ describe("Admin Actions", () => {
     });
 
     it("should prevent self role modification", async () => {
-      const mockUser = { role: "admin" };
-
-      mockDb.select.mockReturnValue({
-        from: jest.fn().mockReturnValue({
-          where: jest.fn().mockReturnValue({
-            limit: jest.fn().mockResolvedValue([mockUser]),
-          }),
-        }),
-      });
+      mockLockedAccounts();
 
       const { updateUserAction } = await import("./admin/users");
 
@@ -1062,15 +1047,7 @@ describe("Admin Actions", () => {
 
   describe("setUserDisabledAction", () => {
     it("should disable a user and revoke sessions", async () => {
-      mockDb.select.mockReturnValue({
-        from: jest.fn().mockReturnValue({
-          where: jest.fn().mockReturnValue({
-            limit: jest
-              .fn()
-              .mockResolvedValue([{ role: "user", banned: false }]),
-          }),
-        }),
-      });
+      mockLockedAccounts({ id: "user1", role: "user" });
 
       const deleteWhere = jest.fn().mockResolvedValue([]);
       mockDb.delete.mockReturnValue({
@@ -1094,16 +1071,6 @@ describe("Admin Actions", () => {
     });
 
     it("should prevent disabling your own account", async () => {
-      mockDb.select.mockReturnValue({
-        from: jest.fn().mockReturnValue({
-          where: jest.fn().mockReturnValue({
-            limit: jest
-              .fn()
-              .mockResolvedValue([{ role: "admin", banned: false }]),
-          }),
-        }),
-      });
-
       const { setUserDisabledAction } = await import("./admin/users");
 
       await expect(
@@ -1115,15 +1082,7 @@ describe("Admin Actions", () => {
     });
 
     it("should prevent admin from disabling super_admin", async () => {
-      mockDb.select.mockReturnValue({
-        from: jest.fn().mockReturnValue({
-          where: jest.fn().mockReturnValue({
-            limit: jest
-              .fn()
-              .mockResolvedValue([{ role: "super_admin", banned: false }]),
-          }),
-        }),
-      });
+      mockLockedAccounts({ id: "super1", role: "super_admin" });
 
       const { setUserDisabledAction } = await import("./admin/users");
 

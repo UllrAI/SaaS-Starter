@@ -30,7 +30,7 @@ export type AuthVerifyResponse = {
   };
 };
 
-async function tryRefreshToken(): Promise<string | null> {
+async function tryRefreshToken(signal?: AbortSignal): Promise<string | null> {
   const config = loadConfig();
   if (!config.refreshToken?.startsWith(CLI_REFRESH_PREFIX)) {
     return null;
@@ -38,6 +38,7 @@ async function tryRefreshToken(): Promise<string | null> {
 
   const response = await fetch(`${getBaseUrl()}/api/v1/device/refresh`, {
     method: "POST",
+    signal,
     headers: {
       "content-type": "application/json",
     },
@@ -70,6 +71,7 @@ export async function request<T>(
   method: string,
   path: string,
   body?: unknown,
+  signal?: AbortSignal,
 ): Promise<T> {
   const baseUrl = getBaseUrl();
   const token = requireAuthToken();
@@ -84,16 +86,18 @@ export async function request<T>(
 
   let response = await fetch(`${baseUrl}${path}`, {
     method,
+    signal,
     headers,
     body: body === undefined ? undefined : JSON.stringify(body),
   });
 
   if (response.status === 401 && token.startsWith(CLI_TOKEN_PREFIX)) {
-    const nextToken = await tryRefreshToken();
+    const nextToken = await tryRefreshToken(signal);
     if (nextToken) {
       headers.authorization = `Bearer ${nextToken}`;
       response = await fetch(`${baseUrl}${path}`, {
         method,
+        signal,
         headers,
         body: body === undefined ? undefined : JSON.stringify(body),
       });
@@ -110,6 +114,13 @@ export async function request<T>(
   return payload.data;
 }
 
-export async function verifyAuth(): Promise<AuthVerifyResponse> {
-  return request<AuthVerifyResponse>("GET", "/api/v1/auth/verify");
+export async function verifyAuth(
+  signal?: AbortSignal,
+): Promise<AuthVerifyResponse> {
+  return request<AuthVerifyResponse>(
+    "GET",
+    "/api/v1/auth/verify",
+    undefined,
+    signal,
+  );
 }

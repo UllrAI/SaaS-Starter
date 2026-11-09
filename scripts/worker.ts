@@ -4,6 +4,7 @@ import { createAiModels } from "@/lib/ai/models.node";
 import { createWorkerAiRuntime } from "@/lib/ai/runtime.node";
 import { configureAiGenerationWorker } from "@/lib/ai/generation-worker";
 import { reconcileAiRuns } from "@/lib/ai/durable-runs";
+import { cleanupExpiredAiStreamLeases } from "@/lib/ai/stream-leases";
 import {
   retryPendingAiUsage,
   reportAiAccountingHealth,
@@ -112,6 +113,7 @@ async function main(): Promise<void> {
         throw new Error("Storage unavailable");
       await storageClient.send(
         new DeleteObjectCommand({ Bucket: storageConfig.bucketName, Key: key }),
+        { abortSignal: AbortSignal.timeout(10_000) },
       );
       return { success: true };
     } catch {
@@ -132,6 +134,7 @@ async function main(): Promise<void> {
     await retryPendingAiUsage(database.db);
     if (Date.now() - lastAccountingReport >= 60_000) {
       await reportAiAccountingHealth(database.db);
+      await cleanupExpiredAiStreamLeases(database.db);
       lastAccountingReport = Date.now();
     }
     await finalizePendingAiRuns(database.db, storeFile);

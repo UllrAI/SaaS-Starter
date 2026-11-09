@@ -12,6 +12,7 @@ This file is the single source of truth for repository-specific agent instructio
 - Read `design.md` before user-facing design or UI work. It is the repository's visual and interaction source of truth.
 - When documentation in this file conflicts with the codebase, verify the codebase and update the documentation to match reality.
 - Read `docs/lessons-learned.md` before non-trivial work. It records counter-intuitive failures this repository has actually hit, which is exactly where prior knowledge tends to be wrong. Add an entry whenever you lose time to a surprise.
+- Consult [the application state map](docs/state-machines.md) before changing a lifecycle, retry, cancellation, or recovery flow.
 
 ## 2. Development Commands
 

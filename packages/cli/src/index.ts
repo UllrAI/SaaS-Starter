@@ -12,6 +12,7 @@ import {
 } from "./config";
 import { request, verifyAuth } from "./http";
 import { openBrowser } from "./open-browser";
+import { pollDeviceToken } from "./device-login";
 import { CLI_DISPLAY_NAME, CLI_NAME, CLI_VERSION } from "./runtime";
 
 type DeviceCodeResponse = {
@@ -20,13 +21,6 @@ type DeviceCodeResponse = {
   verificationUri: string;
   expiresIn: number;
   interval: number;
-};
-
-type DeviceTokenResponse = {
-  accessToken?: string;
-  refreshToken?: string;
-  expiresIn?: number;
-  status?: "authorization_pending" | "slow_down" | "expired";
 };
 
 function printUsage() {
@@ -48,18 +42,14 @@ function resolveBaseUrl(baseUrlOverride?: string): string {
   return baseUrlOverride;
 }
 
-function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
-}
-
 async function runLogin(options: { baseUrl?: string; noBrowser: boolean }) {
   const baseUrl = resolveBaseUrl(options.baseUrl);
   const shouldOpenBrowser = !options.noBrowser;
   const deviceHostname = hostname();
 
+  const startedAt = Date.now();
   const response = await fetch(`${baseUrl}/api/v1/device/code`, {
+    signal: AbortSignal.timeout(15_000),
     method: "POST",
     headers: {
       "content-type": "application/json",
@@ -97,64 +87,33 @@ async function runLogin(options: { baseUrl?: string; noBrowser: boolean }) {
     console.log(`Open this URL in your browser: ${browserUrl}`);
   }
 
-  let pollInterval = interval;
-  const deadline = Date.now() + expiresIn * 1000;
+  const remainingMs = startedAt + expiresIn * 1000 - Date.now();
+  const signal = AbortSignal.timeout(Math.max(0, remainingMs));
+  const credentials = await pollDeviceToken(
+    baseUrl,
+    deviceCode,
+    interval,
+    signal,
+  );
+  const config = loadConfig();
+  config.accessToken = credentials.accessToken;
+  config.refreshToken = credentials.refreshToken;
+  config.tokenExpiresAt = new Date(
+    Date.now() + (credentials.expiresIn ?? 0) * 1000,
+  ).toISOString();
+  saveConfig(config);
 
-  while (Date.now() < deadline) {
-    await sleep(pollInterval * 1000);
-
-    const tokenResponse = await fetch(`${baseUrl}/api/v1/device/token`, {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-      },
-      body: JSON.stringify({ deviceCode }),
-    });
-
-    const tokenPayload = (await tokenResponse.json()) as {
-      success: boolean;
-      data?: DeviceTokenResponse;
-      error?: { message: string };
-    };
-
-    if (!tokenResponse.ok || !tokenPayload.success || !tokenPayload.data) {
-      throw new Error(
-        tokenPayload.error?.message ?? "Failed to complete device login.",
-      );
-    }
-
-    if (tokenPayload.data.accessToken && tokenPayload.data.refreshToken) {
-      const config = loadConfig();
-      config.accessToken = tokenPayload.data.accessToken;
-      config.refreshToken = tokenPayload.data.refreshToken;
-      config.tokenExpiresAt = new Date(
-        Date.now() + (tokenPayload.data.expiresIn ?? 0) * 1000,
-      ).toISOString();
-      saveConfig(config);
-
-      const verifiedUser = await verifyAuth().catch(() => null);
-      console.log("");
-      console.log("Authenticated.");
-      if (verifiedUser) {
-        console.log(
-          `User: ${verifiedUser.user.name || verifiedUser.user.email} (${verifiedUser.user.email})`,
-        );
-      }
-      console.log(`Config: ${getConfigPath()}`);
-      return;
-    }
-
-    if (tokenPayload.data.status === "slow_down") {
-      pollInterval = Math.min(pollInterval + 1, 30);
-      continue;
-    }
-
-    if (tokenPayload.data.status === "expired") {
-      throw new Error("Device code expired. Please try again.");
-    }
+  const verifiedUser = await verifyAuth(
+    AbortSignal.any([signal, AbortSignal.timeout(5_000)]),
+  ).catch(() => null);
+  console.log("");
+  console.log("Authenticated.");
+  if (verifiedUser) {
+    console.log(
+      `User: ${verifiedUser.user.name || verifiedUser.user.email} (${verifiedUser.user.email})`,
+    );
   }
-
-  throw new Error("Authorization timed out. Please try again.");
+  console.log(`Config: ${getConfigPath()}`);
 }
 
 async function runStatus(options: { baseUrl?: string }) {

@@ -86,24 +86,36 @@ describe("durable chat transport", () => {
     ).toHaveLength(1);
   });
 
-  it("retries a transient proxy error while retaining the durable SSE cursor", async () => {
-    const start: UIMessageChunk = { type: "start", messageId: "assistant-1" };
-    const request = jest
-      .fn<typeof fetch>()
-      .mockResolvedValueOnce(Response.json({ runId: "run-1" }, { status: 202 }))
-      .mockResolvedValueOnce(events([{ id: 1, chunk: start }], false))
-      .mockResolvedValueOnce(
-        new Response("Temporary proxy failure", { status: 502 }),
-      )
-      .mockResolvedValueOnce(events([{ id: 2, chunk: { type: "finish" } }]));
-    const transport = new DurableChatTransport({ fetch: request });
-    expect(await collect(await transport.sendMessages(options))).toEqual([
-      start,
-      { type: "finish" },
-    ]);
-    expect(request.mock.calls[2][0]).toBe("/api/ai/runs/run-1/stream?cursor=1");
-    expect(request.mock.calls[3][0]).toBe("/api/ai/runs/run-1/stream?cursor=1");
-  });
+  it.each([429, 502])(
+    "retries HTTP %s while retaining the durable SSE cursor",
+    async (status) => {
+      const start: UIMessageChunk = { type: "start", messageId: "assistant-1" };
+      const request = jest
+        .fn<typeof fetch>()
+        .mockResolvedValueOnce(
+          Response.json({ runId: "run-1" }, { status: 202 }),
+        )
+        .mockResolvedValueOnce(events([{ id: 1, chunk: start }], false))
+        .mockResolvedValueOnce(
+          new Response("Temporary subscription failure", {
+            status,
+            headers: { "Retry-After": "1" },
+          }),
+        )
+        .mockResolvedValueOnce(events([{ id: 2, chunk: { type: "finish" } }]));
+      const transport = new DurableChatTransport({ fetch: request });
+      expect(await collect(await transport.sendMessages(options))).toEqual([
+        start,
+        { type: "finish" },
+      ]);
+      expect(request.mock.calls[2][0]).toBe(
+        "/api/ai/runs/run-1/stream?cursor=1",
+      );
+      expect(request.mock.calls[3][0]).toBe(
+        "/api/ai/runs/run-1/stream?cursor=1",
+      );
+    },
+  );
 
   it.each([401, 403, 404, 409, 429])(
     "fails a durable subscription with HTTP %s without retrying",

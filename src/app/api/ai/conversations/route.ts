@@ -11,6 +11,10 @@ import { checkRateLimit } from "@/lib/rate-limit";
 const querySchema = z.object({
   offset: z.coerce.number().int().min(0).default(0),
   limit: z.coerce.number().int().min(1).max(100).default(30),
+  snapshot: z
+    .string()
+    .regex(/^(?:[0-9a-f]{32})?$/)
+    .optional(),
   archived: z
     .enum(["true", "false"])
     .default("false")
@@ -33,6 +37,7 @@ export async function GET(request: NextRequest) {
   const parsed = querySchema.safeParse({
     offset: request.nextUrl.searchParams.get("offset") ?? undefined,
     limit: request.nextUrl.searchParams.get("limit") ?? undefined,
+    snapshot: request.nextUrl.searchParams.get("snapshot") ?? undefined,
     archived: request.nextUrl.searchParams.get("archived") ?? undefined,
   });
   if (!parsed.success) {

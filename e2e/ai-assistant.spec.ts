@@ -279,15 +279,12 @@ test("keeps the current turn anchored while streaming", async ({ page }) => {
     )
     .toBeLessThan(4);
 
-  await viewport.dispatchEvent("wheel", { deltaY: -1000 });
-  await viewport.evaluate((element) => {
-    element.scrollTop = 0;
-    element.dispatchEvent(new Event("scroll"));
-  });
+  await viewport.hover();
+  await page.mouse.wheel(0, -1000);
   const jumpToLatest = page.getByRole("button", {
     name: "Jump to latest message",
   });
-  await expect(jumpToLatest).toBeVisible();
+  await expect(jumpToLatest).toHaveAttribute("data-active", "true");
   await jumpToLatest.click();
   await expect
     .poll(() =>

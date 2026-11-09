@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { PgBoss, type JobResult, type JobWithMetadata } from "pg-boss";
 import { z } from "zod";
-import { and, eq, gt, inArray, isNull } from "drizzle-orm";
+import { and, eq, gt, inArray, isNull, sql } from "drizzle-orm";
 import { taskDispatches, taskRuns } from "@/database/schema";
 import { scheduleTaskContinuation } from "@/lib/tasks/dispatch";
 import type { AppDatabase } from "@/database/client";
@@ -122,9 +122,13 @@ export class JobQueue {
         and(
           eq(taskDispatches.kind, definition.name),
           isNull(taskDispatches.sentAt),
+          sql`coalesce(${taskDispatches.retryAt}, ${taskDispatches.createdAt}) <= now()`,
         ),
       )
-      .orderBy(taskDispatches.createdAt)
+      .orderBy(
+        sql`coalesce(${taskDispatches.retryAt}, ${taskDispatches.createdAt})`,
+        taskDispatches.id,
+      )
       .limit(100);
     for (const row of rows) {
       const task = await getTaskRun(db, row.taskRunId);
@@ -136,18 +140,61 @@ export class JobQueue {
         await db.delete(taskDispatches).where(eq(taskDispatches.id, row.id));
         continue;
       }
-      await this.enqueue(
-        definition,
-        {
-          taskRunId: row.taskRunId,
-          scopeKey: row.scopeKey,
-          payload: definition.schema.parse(row.payload),
-        },
-        { jobId: row.id, startAfter: row.startAfter },
-      );
+      try {
+        const payload = definition.schema.safeParse(row.payload);
+        if (payload.success) {
+          await this.enqueue(
+            definition,
+            {
+              taskRunId: row.taskRunId,
+              scopeKey: row.scopeKey,
+              payload: payload.data,
+            },
+            { jobId: row.id, startAfter: row.startAfter },
+          );
+        } else if (!(await (await this.start()).getJobById(row.kind, row.id))) {
+          // An earlier deployment may already have sent this dispatch.
+          await transitionTaskRun(db, {
+            taskRunId: row.taskRunId,
+            dispatchId: row.id,
+            from: ["queued", "waiting", "running"],
+            to: "failed",
+            patch: {
+              completedAt: new Date(),
+              error: {
+                code: "INVALID_JOB_PAYLOAD",
+                message: "The task input is no longer supported.",
+                retryable: false,
+                attempt: 0,
+              },
+            },
+          });
+          log("warn", {
+            event: "invalid_dispatch_payload",
+            jobName: row.kind,
+            taskRunId: row.taskRunId,
+            dispatchId: row.id,
+          });
+          continue;
+        }
+      } catch (error) {
+        await db
+          .update(taskDispatches)
+          .set({ retryAt: sql`now() + interval '5 seconds'` })
+          .where(
+            and(eq(taskDispatches.id, row.id), isNull(taskDispatches.sentAt)),
+          );
+        log("error", {
+          event: "dispatch_retry",
+          jobName: row.kind,
+          dispatchId: row.id,
+          error: toError(error).message,
+        });
+        continue;
+      }
       await db
         .update(taskDispatches)
-        .set({ sentAt: new Date() })
+        .set({ sentAt: new Date(), retryAt: null })
         .where(eq(taskDispatches.id, row.id));
     }
   }
@@ -309,8 +356,11 @@ export class JobQueue {
       if (busy) return;
       busy = true;
       try {
-        await this.dispatchPending(db, definition);
-        await this.reconcileTasks(db, definition.name);
+        try {
+          await this.dispatchPending(db, definition);
+        } finally {
+          await this.reconcileTasks(db, definition.name);
+        }
       } catch (error) {
         log("error", {
           event: "dispatch_retry",
@@ -395,7 +445,7 @@ export class JobQueue {
       taskRun =
         (await transitionTaskRun(db, {
           taskRunId,
-          dispatchId: taskRun?.dispatchId ? job.id : undefined,
+          dispatchId: job.id,
           from: ["waiting"],
           to: "queued",
         })) ?? (await getTaskRun(db, taskRunId));
@@ -405,12 +455,15 @@ export class JobQueue {
       taskRun =
         (await transitionTaskRun(db, {
           taskRunId,
-          dispatchId: taskRun?.dispatchId ? job.id : undefined,
+          dispatchId: job.id,
           from: ["queued"],
           to: "running",
           patch: { startedAt: taskRun.startedAt ?? new Date() },
         })) ?? (await getTaskRun(db, taskRunId));
     }
+
+    if (taskRun?.dispatchId && taskRun.dispatchId !== job.id)
+      return { id: job.id, status: "completed" };
 
     if (taskRun?.status !== "running") {
       log("info", {
@@ -434,7 +487,7 @@ export class JobQueue {
       };
       await transitionTaskRun(db, {
         taskRunId,
-        dispatchId: taskRun?.dispatchId ? job.id : undefined,
+        dispatchId: job.id,
         from: ["running"],
         to: "failed",
         patch: { error, completedAt: new Date() },
@@ -460,7 +513,7 @@ export class JobQueue {
         job.signal.aborted ||
         (await getTaskRun(db, taskRunId))?.status === "cancelled",
       updateProgress: async (progress) =>
-        (await updateTaskRunProgress(db, taskRunId, progress)) !== null,
+        (await updateTaskRunProgress(db, taskRunId, job.id, progress)) !== null,
       scheduleContinuation: async (nextPayload, startAfter) => {
         return scheduleTaskContinuation(db, {
           taskRunId,
@@ -509,7 +562,7 @@ export class JobQueue {
       const result = await definition.handler(payload.data, context);
       const completed = await transitionTaskRun(db, {
         taskRunId,
-        dispatchId: taskRun?.dispatchId ? job.id : undefined,
+        dispatchId: job.id,
         from: ["running"],
         to: "completed",
         patch: { result, progress: null, error: null, completedAt: new Date() },
@@ -536,7 +589,7 @@ export class JobQueue {
       if (permanent || retriesExhausted) {
         await transitionTaskRun(db, {
           taskRunId,
-          dispatchId: taskRun?.dispatchId ? job.id : undefined,
+          dispatchId: job.id,
           from: ["running"],
           to: "failed",
           patch: { error, completedAt: new Date() },

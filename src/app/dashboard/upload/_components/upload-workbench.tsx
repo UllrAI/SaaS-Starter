@@ -73,6 +73,8 @@ function HeadlessTileStatus({
 }) {
   const { t } = useTranslation();
   switch (status) {
+    case "preparing":
+      return <>{t("uploads_preparing")}</>;
     case "uploading":
       return (
         <>

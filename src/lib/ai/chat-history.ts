@@ -2,6 +2,7 @@ import "server-only";
 
 import { and, desc, eq, isNotNull, isNull, sql } from "drizzle-orm";
 import { db } from "@/database";
+import type { DatabaseExecutor } from "@/database/client";
 import { aiConversations, aiMessages, aiRuns } from "@/database/schema";
 import type {
   AiConversationDetail,
@@ -102,26 +103,52 @@ export async function listAiConversations(params: {
   offset: number;
   limit: number;
   archived: boolean;
+  snapshot?: string;
 }): Promise<AiConversationPage> {
-  const rows = await db
-    .select()
-    .from(aiConversations)
-    .where(
-      and(
-        eq(aiConversations.userId, params.userId),
-        params.archived
-          ? isNotNull(aiConversations.archivedAt)
-          : isNull(aiConversations.archivedAt),
-      ),
-    )
-    .orderBy(desc(aiConversations.updatedAt), desc(aiConversations.id))
-    .limit(params.limit + 1)
-    .offset(params.offset);
+  const scope = and(
+    eq(aiConversations.userId, params.userId),
+    params.archived
+      ? isNotNull(aiConversations.archivedAt)
+      : isNull(aiConversations.archivedAt),
+  );
+  async function readPage(executor: DatabaseExecutor, offset: number) {
+    const rows = await executor
+      .select()
+      .from(aiConversations)
+      .where(scope)
+      .orderBy(desc(aiConversations.updatedAt), desc(aiConversations.id))
+      .limit(params.limit + 1)
+      .offset(offset);
+    return {
+      conversations: rows.slice(0, params.limit).map(toSummary),
+      hasMore: rows.length > params.limit,
+    };
+  }
 
-  return {
-    conversations: rows.slice(0, params.limit).map(toSummary),
-    hasMore: rows.length > params.limit,
-  };
+  if (params.snapshot === undefined) return readPage(db, params.offset);
+
+  // Detect changes to membership and order, then read the page in the same
+  // database snapshot. A moved row can otherwise disappear across offsets.
+  return db.transaction(
+    async (tx) => {
+      const [{ snapshot }] = await tx
+        .select({
+          snapshot: sql<string>`md5(coalesce(string_agg(
+          ${aiConversations.id}::text || ':' || extract(epoch from ${aiConversations.updatedAt})::text,
+          ',' order by ${aiConversations.id}
+        ), ''))`,
+        })
+        .from(aiConversations)
+        .where(scope);
+      const reset = params.offset > 0 && snapshot !== params.snapshot;
+      return {
+        ...(await readPage(tx, reset ? 0 : params.offset)),
+        snapshot,
+        ...(reset ? { reset: true as const } : {}),
+      };
+    },
+    { isolationLevel: "repeatable read", accessMode: "read only" },
+  );
 }
 
 export async function setAiConversationArchived(params: {

@@ -34,6 +34,7 @@ import {
 } from "@/lib/ai/durable-runs";
 import { executeAiGeneration } from "@/lib/ai/generation-worker";
 import { createAiRunEventStream } from "@/lib/ai/event-stream";
+import { acquireAiStreamLease } from "@/lib/ai/stream-leases";
 import type { createWorkerAiRuntime } from "@/lib/ai/runtime.node";
 import type { JobHandlerContext } from "@/lib/jobs/definition";
 
@@ -197,12 +198,15 @@ describe("durable AI generation against PostgreSQL and real SDK", () => {
     const { run } = await admit();
     const harness = runtime();
     const abort = new AbortController();
+    const lease = await acquireAiStreamLease(database.db, userId);
+    if (!lease) throw new Error("Stream lease unavailable.");
     const stream = createAiRunEventStream(
       database.db,
       run.id,
       userId,
       0,
       abort.signal,
+      lease,
     );
     const reader = stream.getReader();
     const pending = reader.read();
@@ -244,6 +248,8 @@ describe("durable AI generation against PostgreSQL and real SDK", () => {
       expect(
         await getOwnedAiRun(replacement.db, run.id, "another-user"),
       ).toBeNull();
+      const replayLease = await acquireAiStreamLease(replacement.db, userId);
+      if (!replayLease) throw new Error("Replay lease unavailable.");
       const replay = await new Response(
         createAiRunEventStream(
           replacement.db,
@@ -251,6 +257,7 @@ describe("durable AI generation against PostgreSQL and real SDK", () => {
           userId,
           0,
           new AbortController().signal,
+          replayLease,
         ),
       ).text();
       expect(replay).toContain("Durable answer");

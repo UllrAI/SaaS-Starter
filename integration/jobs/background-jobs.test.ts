@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it, jest } from "@jest/globals";
 import { randomUUID } from "node:crypto";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { PgBoss } from "pg-boss";
 import { z } from "zod";
 import { createDatabaseClient } from "@/database/client";
@@ -13,8 +13,10 @@ import {
   createTaskRun,
   getTaskRun,
   transitionTaskRun,
+  updateTaskRunProgress,
 } from "@/lib/tasks/repository";
 import {
+  cancelOwnedBackgroundTask,
   createBackgroundTask,
   enqueueBackgroundTaskContinuation,
 } from "@/lib/tasks/service";
@@ -209,6 +211,41 @@ describe("background jobs with PostgreSQL", () => {
     expect(calls.get(accepted.taskRun.id)).toBe(1);
   });
 
+  it("fails an incompatible persisted payload and still dispatches later work", async () => {
+    const task = await database.db.transaction(async (tx) => {
+      const { taskRun } = await createTaskRun(tx, {
+        kind: integrationJob.name,
+        scopeKey: `${scopePrefix}:stale-schema`,
+        input: { mode: "removed" },
+      });
+      await tx
+        .update(taskRuns)
+        .set({ dispatchId: taskRun.id })
+        .where(eq(taskRuns.id, taskRun.id));
+      await tx.insert(taskDispatches).values({
+        id: taskRun.id,
+        taskRunId: taskRun.id,
+        kind: taskRun.kind,
+        scopeKey: taskRun.scopeKey,
+        payload: taskRun.input,
+      });
+      return taskRun;
+    });
+    const valid = await createTask(`${scopePrefix}:after-stale`, {
+      mode: "success",
+      delayMs: 0,
+    });
+    const failed = await waitForTask(task.id, ["failed"]);
+    expect(failed.error).toMatchObject({
+      code: "INVALID_JOB_PAYLOAD",
+      retryable: false,
+    });
+    expect(calls.get(task.id)).toBeUndefined();
+    expect((await waitForTask(valid.taskRun.id, ["completed"])).status).toBe(
+      "completed",
+    );
+  });
+
   it("recovers delivery acknowledged by the queue but not by the dispatcher", async () => {
     const enqueue = workerA.enqueue.bind(workerA);
     const uncertain = jest
@@ -385,6 +422,89 @@ describe("background jobs with PostgreSQL", () => {
 
     expect(completed.result).toEqual({ attempt: 1 });
     expect(calls.get(deferred.taskRun.id)).toBe(2);
+  });
+
+  it("returns the completion that wins a race with an owned cancellation", async () => {
+    const scopeKey = `${scopePrefix}:cancel-response`;
+    const { taskRun } = await createTaskRun(database.db, {
+      kind: integrationJob.name,
+      scopeKey,
+      input: {},
+    });
+    await transitionTaskRun(database.db, {
+      taskRunId: taskRun.id,
+      from: ["queued"],
+      to: "running",
+    });
+    const cancelInput = {
+      db: database.db,
+      queue: workerA,
+      taskRunId: taskRun.id,
+      scopeKey,
+    };
+    expect(
+      await cancelOwnedBackgroundTask({ ...cancelInput, scopeKey: "foreign" }),
+    ).toBeNull();
+
+    let cancellation: ReturnType<typeof cancelOwnedBackgroundTask> | undefined;
+    try {
+      await database.db.transaction(async (tx) => {
+        await transitionTaskRun(tx, {
+          taskRunId: taskRun.id,
+          from: ["running"],
+          to: "completed",
+          patch: { completedAt: new Date(), result: { finished: true } },
+        });
+        cancellation = cancelOwnedBackgroundTask(cancelInput);
+
+        // Release the completion only after the cancellation tries to update.
+        const deadline = Date.now() + 3_000;
+        while (Date.now() < deadline) {
+          const [activity] = await tx.execute<{ blocked: boolean }>(sql`
+            select exists (
+              select 1 from pg_stat_activity
+              where pg_backend_pid() = any(pg_blocking_pids(pid))
+            ) as blocked
+          `);
+          if (activity.blocked) return;
+          await new Promise((resolve) => setTimeout(resolve, 20));
+        }
+        throw new Error("Cancellation did not reach the locked task row.");
+      });
+
+      expect(await cancellation).toMatchObject({
+        status: "completed",
+        result: { finished: true },
+      });
+    } finally {
+      await cancellation;
+    }
+  });
+
+  it("rejects progress from a superseded dispatch after continuation starts", async () => {
+    const { taskRun } = await createTaskRun(database.db, {
+      kind: integrationJob.name,
+      scopeKey: `${scopePrefix}:progress-dispatch`,
+      input: {},
+    });
+    const previousDispatchId = randomUUID();
+    const dispatchId = randomUUID();
+    await database.db
+      .update(taskRuns)
+      .set({ dispatchId, status: "running" })
+      .where(eq(taskRuns.id, taskRun.id));
+
+    await expect(
+      updateTaskRunProgress(database.db, taskRun.id, dispatchId, { step: 2 }),
+    ).resolves.toMatchObject({ progress: { step: 2 } });
+    await expect(
+      updateTaskRunProgress(database.db, taskRun.id, previousDispatchId, {
+        step: 1,
+      }),
+    ).resolves.toBeNull();
+    expect((await getTaskRun(database.db, taskRun.id))?.progress).toEqual({
+      step: 2,
+    });
   });
 
   it("treats a provider webhook arriving after cancellation as a no-op", async () => {

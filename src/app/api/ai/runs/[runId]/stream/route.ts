@@ -3,6 +3,7 @@ import { UI_MESSAGE_STREAM_HEADERS } from "ai";
 import { db } from "@/database";
 import { readOwnedAiRunRequest } from "@/lib/ai/run-route";
 import { createAiRunEventStream } from "@/lib/ai/event-stream";
+import { acquireAiStreamLease } from "@/lib/ai/stream-leases";
 
 export async function GET(
   request: NextRequest,
@@ -22,6 +23,16 @@ export async function GET(
   ) {
     return NextResponse.json({ error: "Invalid cursor" }, { status: 400 });
   }
+  const lease = await acquireAiStreamLease(db, resolved.userId);
+  if (!lease) {
+    return NextResponse.json(
+      { error: "Too many active run streams", code: "AI_STREAM_LIMIT" },
+      {
+        status: 429,
+        headers: { "Retry-After": "1", "Cache-Control": "private, no-store" },
+      },
+    );
+  }
   return new Response(
     createAiRunEventStream(
       db,
@@ -29,6 +40,7 @@ export async function GET(
       resolved.userId,
       cursor,
       request.signal,
+      lease,
     ),
     {
       headers: {

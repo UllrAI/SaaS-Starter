@@ -1,5 +1,13 @@
 import { describe, expect, it, jest, beforeEach } from "@jest/globals";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import {
+  act,
+  fireEvent,
+  render,
+  renderHook,
+  screen,
+  waitFor,
+} from "@testing-library/react";
+import { useFileUpload } from "./file-upload/use-file-upload";
 import {
   FileUploader,
   type UploadTransport,
@@ -93,7 +101,7 @@ describe("FileUploader", () => {
     });
 
     expect(await screen.findByText("notes.txt")).toBeInTheDocument();
-    expect(screen.getByText("Queued")).toBeInTheDocument();
+    expect(await screen.findByText("Queued")).toBeInTheDocument();
   });
 
   it("supports headless usage and reports validation issues via issue codes", async () => {
@@ -111,6 +119,78 @@ describe("FileUploader", () => {
       );
     });
     expect(screen.getByTestId("item-count")).toHaveTextContent("0");
+  });
+
+  it("reserves file slots before concurrent preparations finish", async () => {
+    const { result } = renderHook(() => useFileUpload({ autoUpload: false }));
+
+    await act(async () => {
+      await Promise.all([
+        result.current.addFiles([createFile("first.txt")]),
+        result.current.addFiles([createFile("second.txt")]),
+      ]);
+    });
+
+    expect(result.current.items.map((item) => item.file.name)).toEqual([
+      "first.txt",
+    ]);
+    expect(result.current.issue?.code).toBe("too-many-files");
+  });
+
+  it("does not start an upload when a draft is cleared during preparation", async () => {
+    const startUpload = jest.fn<UploadTransport["startUpload"]>();
+    const { result } = renderHook(() =>
+      useFileUpload({ transport: { startUpload } }),
+    );
+
+    await act(async () => {
+      const preparation = result.current.addFiles([createFile("draft.txt")]);
+      result.current.clearFiles();
+      await preparation;
+    });
+
+    expect(result.current.items).toEqual([]);
+    expect(startUpload).not.toHaveBeenCalled();
+  });
+
+  it("can retry after the transport fails to start without starting twice", async () => {
+    const file = createFile("report.txt");
+    const uploadedFile: UploadedFile = {
+      contentType: file.type,
+      fileName: file.name,
+      key: "uploads/test/report.txt",
+      size: file.size,
+      url: "/api/files/report",
+    };
+    const startUpload = jest
+      .fn<UploadTransport["startUpload"]>()
+      .mockImplementationOnce(() => {
+        throw new Error("Transport unavailable");
+      })
+      .mockReturnValue({ promise: Promise.resolve(uploadedFile) });
+    const onUploadComplete = jest.fn();
+    const { result } = renderHook(() =>
+      useFileUpload({
+        autoUpload: false,
+        onUploadComplete,
+        transport: { startUpload },
+      }),
+    );
+
+    await act(async () => result.current.addFiles([file]));
+    await act(async () => result.current.uploadAll());
+    expect(result.current.items[0].status).toBe("error");
+
+    const id = result.current.items[0].id;
+    await act(async () => {
+      await Promise.all([
+        result.current.retryFile(id),
+        result.current.retryFile(id),
+      ]);
+    });
+    expect(result.current.items[0].status).toBe("success");
+    expect(startUpload).toHaveBeenCalledTimes(2);
+    expect(onUploadComplete).toHaveBeenCalledTimes(1);
   });
 
   it("uploads through a custom transport and calls onUploadComplete once", async () => {

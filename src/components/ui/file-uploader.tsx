@@ -111,6 +111,9 @@ function IssueMessage({ issue }: { issue: FileUploadIssue }) {
 }
 function QueueStatusBadge({ item }: { item: FileUploadItem }) {
   const { t } = useTranslation();
+  if (item.status === "preparing") {
+    return <Badge variant="outline">{t("uploads_preparing")}</Badge>;
+  }
   if (item.status === "success") {
     return <Badge variant="secondary">{t("uploads_uploaded")}</Badge>;
   }
@@ -132,6 +135,9 @@ function QueueStatusBadge({ item }: { item: FileUploadItem }) {
 }
 function QueueStatusText({ item }: { item: FileUploadItem }) {
   const { t } = useTranslation();
+  if (item.status === "preparing") {
+    return <>{t("uploads_preparing")}</>;
+  }
   if (item.status === "success") {
     return <>{t("uploads_uploaded")}</>;
   }
@@ -428,6 +434,7 @@ export function FileUploader({
                     type="button"
                     size="sm"
                     variant="outline"
+                    disabled={!uploader.canUpload}
                     onClick={(event) => {
                       event.stopPropagation();
                       void uploader.uploadAll();
@@ -499,6 +506,7 @@ export function FileUploader({
                 type="button"
                 size="sm"
                 variant="outline"
+                disabled={!uploader.canUpload}
                 onClick={() => {
                   void uploader.uploadAll();
                 }}

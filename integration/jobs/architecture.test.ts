@@ -1,13 +1,14 @@
-import { afterAll, beforeAll, describe, expect, it, jest } from "@jest/globals";
+import { afterAll, beforeAll, describe, expect, it } from "@jest/globals";
 import { readFile } from "node:fs/promises";
 import { randomUUID } from "node:crypto";
-import { eq, and, desc } from "drizzle-orm";
+import { eq, and, desc, sql } from "drizzle-orm";
 import { createDatabaseClient } from "@/database/client";
 import {
   users,
   aiConversations,
   aiMessages,
   aiRuns,
+  aiStreamLeases,
   aiUsageEvents,
   uploads,
   uploadIntents,
@@ -18,6 +19,11 @@ import { S3Client } from "@aws-sdk/client-s3";
 import { createFileStorage } from "@/lib/uploads/store";
 import { finalizeAiRun } from "@/lib/ai/finalize";
 import { claimAiRun } from "@/lib/ai/durable-runs";
+import { listAiConversations } from "@/lib/ai/chat-history";
+import {
+  acquireAiStreamLease,
+  cleanupExpiredAiStreamLeases,
+} from "@/lib/ai/stream-leases";
 import {
   requestFileDeletion,
   cleanupDeletedFiles,
@@ -32,6 +38,10 @@ const mockDatabase = createDatabaseClient({
 const mockEnv = { AI_DAILY_TOKEN_LIMIT: 800_000, AI_DAILY_IMAGE_LIMIT: 1 };
 const mockSend = jest.spyOn(S3Client.prototype, "send");
 jest.mock("server-only", () => ({}));
+jest.mock("next/cache", () => ({ revalidatePath: jest.fn() }));
+jest.mock("@/lib/actions/admin/shared", () => ({
+  adminAction: { schema: () => ({ action: (handler: unknown) => handler }) },
+}));
 jest.mock("@/env", () => ({
   __esModule: true,
   get default() {
@@ -105,6 +115,130 @@ afterAll(async () => {
 });
 
 describe("architecture consistency against PostgreSQL", () => {
+  it("bounds concurrent stream subscriptions and reclaims released or expired leases", async () => {
+    const results = await Promise.all(
+      Array.from({ length: 12 }, () =>
+        acquireAiStreamLease(mockDatabase.db, userId),
+      ),
+    );
+    const leases = results.filter((lease) => lease !== null);
+    expect(leases).toHaveLength(4);
+    const other = await acquireAiStreamLease(mockDatabase.db, otherId);
+    expect(other).not.toBeNull();
+    await leases[0].release();
+    expect(await acquireAiStreamLease(mockDatabase.db, userId)).not.toBeNull();
+    await mockDatabase.db
+      .update(aiStreamLeases)
+      .set({ expiresAt: sql`now() - interval '1 second'` })
+      .where(eq(aiStreamLeases.userId, userId));
+    expect(await leases[1].renew()).toBe(false);
+    await cleanupExpiredAiStreamLeases(mockDatabase.db);
+    expect(await acquireAiStreamLease(mockDatabase.db, userId)).not.toBeNull();
+    expect(await other?.renew()).toBe(true);
+  });
+
+  it("restarts an offset page when a conversation moves ahead of the previous page", async () => {
+    const [older, newer] = await mockDatabase.db
+      .insert(aiConversations)
+      .values([
+        { userId: otherId, title: "older", updatedAt: new Date("2026-01-01") },
+        { userId: otherId, title: "newer", updatedAt: new Date("2026-02-01") },
+      ])
+      .returning();
+    const options = { userId: otherId, limit: 1, archived: false };
+    const first = await listAiConversations({
+      ...options,
+      offset: 0,
+      snapshot: "",
+    });
+    expect(first.conversations[0].id).toBe(newer.id);
+    await mockDatabase.db
+      .update(aiConversations)
+      .set({ updatedAt: new Date("2026-03-01") })
+      .where(eq(aiConversations.id, older.id));
+    const rebased = await listAiConversations({
+      ...options,
+      offset: 1,
+      snapshot: first.snapshot,
+    });
+    expect(rebased.reset).toBe(true);
+    expect(rebased.conversations[0].id).toBe(older.id);
+    const next = await listAiConversations({
+      ...options,
+      offset: 1,
+      snapshot: rebased.snapshot,
+    });
+    expect(next.reset).toBeUndefined();
+    expect(next.conversations[0].id).toBe(newer.id);
+  });
+
+  it("rejects a disable request when promotion wins the account lock", async () => {
+    const actorId = `admin-race-${randomUUID()}`;
+    const targetId = `target-race-${randomUUID()}`;
+    await mockDatabase.db.insert(users).values([
+      {
+        id: actorId,
+        name: "Admin",
+        email: `${actorId}@example.invalid`,
+        emailVerified: true,
+        role: "admin",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        id: targetId,
+        name: "Target",
+        email: `${targetId}@example.invalid`,
+        emailVerified: true,
+        role: "user",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    ]);
+    const { setUserDisabledAction } = await import("@/lib/actions/admin/users");
+    const disable = setUserDisabledAction as unknown as (input: {
+      parsedInput: { id: string; disabled: boolean };
+      ctx: { user: { id: string; role: string } };
+    }) => Promise<unknown>;
+    let outcome: Promise<unknown> | undefined;
+    try {
+      await mockDatabase.db.transaction(async (tx) => {
+        await tx
+          .update(users)
+          .set({ role: "super_admin" })
+          .where(eq(users.id, targetId));
+        outcome = disable({
+          parsedInput: { id: targetId, disabled: true },
+          ctx: { user: { id: actorId, role: "admin" } },
+        }).catch((error: unknown) => error);
+        const deadline = Date.now() + 3_000;
+        while (Date.now() < deadline) {
+          const [{ blocked }] = await tx.execute<{ blocked: boolean }>(sql`
+            select exists (
+              select 1 from pg_stat_activity where pg_backend_pid() = any(pg_blocking_pids(pid))
+            ) as blocked
+          `);
+          if (blocked) return;
+          await new Promise((resolve) => setTimeout(resolve, 20));
+        }
+        throw new Error("Disable action did not reach the locked account.");
+      });
+      expect(await outcome).toEqual(
+        new Error("Insufficient permissions to modify super_admin"),
+      );
+      const [target] = await mockDatabase.db
+        .select()
+        .from(users)
+        .where(eq(users.id, targetId));
+      expect(target.role).toBe("super_admin");
+      expect(target.banned).not.toBe(true);
+    } finally {
+      await outcome;
+      await mockDatabase.db.delete(users).where(eq(users.id, actorId));
+      await mockDatabase.db.delete(users).where(eq(users.id, targetId));
+    }
+  });
+
   it("preserves unknown paid usage when migrating a Web-owned active run", async () => {
     const migration = await readFile(
       "src/database/migrations/0028_careful_blue_blade.sql",
@@ -373,7 +507,27 @@ describe("architecture consistency against PostgreSQL", () => {
         .from(uploads)
         .where(eq(uploads.id, first.id)),
     ).toHaveLength(1);
-    await cleanupDeletedFiles(mockDatabase.db, async () => ({ success: true }));
+    const [later] = await mockDatabase.db
+      .insert(uploads)
+      .values({
+        userId,
+        fileName: "later.txt",
+        fileKey: `uploads/${userId}/later.txt`,
+        url: "/api/files/content?key=later",
+        fileSize: 5,
+        contentType: "text/plain",
+        deletedAt: new Date(),
+      })
+      .returning();
+    const successfulDelete = jest.fn(async () => ({ success: true }));
+    await cleanupDeletedFiles(mockDatabase.db, successfulDelete);
+    expect(successfulDelete).toHaveBeenCalledTimes(1);
+    expect(successfulDelete).toHaveBeenCalledWith(later.fileKey);
+    await mockDatabase.db
+      .update(uploads)
+      .set({ deleteRetryAt: sql`now() - interval '1 second'` })
+      .where(eq(uploads.id, first.id));
+    await cleanupDeletedFiles(mockDatabase.db, successfulDelete);
     expect(
       await mockDatabase.db
         .select()

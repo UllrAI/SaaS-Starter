@@ -5,6 +5,7 @@ import { and, asc, count, desc, eq, ilike, inArray, or } from "drizzle-orm";
 import { z } from "zod";
 
 import { db } from "@/database";
+import type { DatabaseExecutor } from "@/database/client";
 import {
   sessions,
   subscriptions,
@@ -12,7 +13,7 @@ import {
   users,
 } from "@/database/schema";
 import { SITE_CONFIG } from "@/lib/config/site";
-import type { UserRole } from "@/lib/config/roles";
+import { hasRole, type UserRole } from "@/lib/config/roles";
 import type { UserWithSubscription } from "@/types/billing";
 import { requireAdmin } from "@/lib/auth/permissions";
 
@@ -125,31 +126,43 @@ const updateUserSchema = z.object({
   role: z.enum(userRoleEnum.enumValues).optional(),
 });
 
+async function lockManagedUser(
+  tx: DatabaseExecutor,
+  actorId: string,
+  targetId: string,
+  nextRole?: UserRole,
+) {
+  // Acquire actor and target locks in the same order for all account changes.
+  const accounts = await tx
+    .select({ id: users.id, role: users.role, banned: users.banned })
+    .from(users)
+    .where(inArray(users.id, [actorId, targetId]))
+    .orderBy(asc(users.id))
+    .for("update");
+  const actor = accounts.find((account) => account.id === actorId);
+  if (!actor || actor.banned || !hasRole(actor.role, "admin"))
+    throw new Error("Insufficient permissions to manage users");
+  const target = accounts.find((account) => account.id === targetId);
+  if (!target) throw new Error("User not found");
+  if (
+    (target.role === "super_admin" || nextRole === "super_admin") &&
+    actor.role !== "super_admin"
+  )
+    throw new Error("Insufficient permissions to modify super_admin");
+  return target;
+}
+
 export const updateUserAction = adminAction
   .schema(updateUserSchema)
   .action(async ({ parsedInput: input, ctx }) => {
-    const [targetUser] = await db
-      .select({ role: users.role })
-      .from(users)
-      .where(eq(users.id, input.id))
-      .limit(1);
-
-    if (!targetUser) throw new Error("User not found");
-    if (
-      (targetUser.role === "super_admin" || input.role === "super_admin") &&
-      ctx.user.role !== "super_admin"
-    ) {
-      throw new Error("Insufficient permissions to modify super_admin");
-    }
-    if (
-      input.id === ctx.user.id &&
-      input.role &&
-      input.role !== ctx.user.role
-    ) {
-      throw new Error("Cannot modify your own role");
-    }
-
-    await db.update(users).set(input).where(eq(users.id, input.id));
+    const { id, ...changes } = input;
+    await db.transaction(async (tx) => {
+      const target = await lockManagedUser(tx, ctx.user.id, id, changes.role);
+      if (id === ctx.user.id && changes.role && changes.role !== target.role)
+        throw new Error("Cannot modify your own role");
+      if (changes.name !== undefined || changes.role !== undefined)
+        await tx.update(users).set(changes).where(eq(users.id, id));
+    });
     console.info(
       JSON.stringify({
         component: "admin-audit",
@@ -172,21 +185,12 @@ const setUserDisabledSchema = z.object({
 export const setUserDisabledAction = adminAction
   .schema(setUserDisabledSchema)
   .action(async ({ parsedInput: input, ctx }) => {
-    const [targetUser] = await db
-      .select({ role: users.role })
-      .from(users)
-      .where(eq(users.id, input.id))
-      .limit(1);
-
-    if (!targetUser) throw new Error("User not found");
-    if (targetUser.role === "super_admin" && ctx.user.role !== "super_admin") {
-      throw new Error("Insufficient permissions to modify super_admin");
-    }
     if (input.disabled && input.id === ctx.user.id) {
       throw new Error("Cannot disable your own account");
     }
 
     await db.transaction(async (tx) => {
+      await lockManagedUser(tx, ctx.user.id, input.id);
       await tx
         .update(users)
         .set({

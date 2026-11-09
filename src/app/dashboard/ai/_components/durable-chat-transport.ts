@@ -15,7 +15,7 @@ interface TransportOptions {
   onRunAccepted?: (run: AiRunSummary) => void;
 }
 
-function waitForRetry(signal: AbortSignal, attempt: number) {
+function waitForRetry(signal: AbortSignal, attempt: number, minDelay = 0) {
   return new Promise<void>((resolve, reject) => {
     signal.throwIfAborted();
     const abort = () => {
@@ -27,7 +27,7 @@ function waitForRetry(signal: AbortSignal, attempt: number) {
         signal.removeEventListener("abort", abort);
         resolve();
       },
-      Math.min(500 * 2 ** Math.min(attempt, 4), 5_000),
+      Math.max(minDelay, Math.min(500 * 2 ** Math.min(attempt, 4), 5_000)),
     );
     signal.addEventListener("abort", abort, { once: true });
   });
@@ -142,14 +142,25 @@ export class DurableChatTransport extends DefaultChatTransport<AiMessage> {
     url: string,
     init: RequestInit & { signal: AbortSignal },
     read: (response: Response) => Promise<T>,
+    retryRateLimit = false,
   ) {
     for (let attempt = 0; ; attempt += 1) {
       try {
         const response = await this.request(url, init);
-        if (TRANSIENT_HTTP_STATUSES.has(response.status)) {
+        const retryAfter = Number(response.headers.get("Retry-After"));
+        const streamLimited =
+          retryRateLimit &&
+          response.status === 429 &&
+          Number.isFinite(retryAfter) &&
+          retryAfter > 0;
+        if (streamLimited || TRANSIENT_HTTP_STATUSES.has(response.status)) {
           await response.body?.cancel();
           this.onReconnecting(true);
-          await waitForRetry(init.signal, attempt);
+          await waitForRetry(
+            init.signal,
+            attempt,
+            streamLimited ? Math.min(retryAfter * 1000, 60_000) : 0,
+          );
           continue;
         }
         if (!response.ok) throw new Error(await response.text());
@@ -180,6 +191,7 @@ export class DurableChatTransport extends DefaultChatTransport<AiMessage> {
                 `/api/ai/runs/${encodeURIComponent(runId)}/stream?cursor=${cursor}`,
                 { signal: streamSignal, cache: "no-store" },
                 async (response) => response,
+                true,
               );
               if (!response.body)
                 throw new Error("The response body is empty.");

@@ -21,7 +21,13 @@ import {
   Sparkles,
 } from "lucide-react";
 import { LocalizedLink } from "@/components/localized-link";
-import { type ReactNode, useEffect, useRef, useState } from "react";
+import {
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { trackUmamiEvent } from "@/lib/analytics/umami";
 type PaymentStatus = "success" | "failed" | "pending" | "cancelled";
 type PaymentMode = "subscription" | "one_time";
@@ -32,14 +38,29 @@ type PaymentStatusErrorCode =
 const MAX_POLL_ATTEMPTS = 8;
 const INITIAL_POLL_DELAY_MS = 2000;
 const MAX_POLL_DELAY_MS = 15000;
-const DIRECT_STATUS_MAP: Record<
-  Exclude<PaymentStatus, "success">,
-  PaymentStatus
-> = {
-  failed: "failed",
-  pending: "pending",
-  cancelled: "cancelled",
+const REQUEST_TIMEOUT_MS = 10_000;
+
+function parsePaymentStatus(value: unknown): PaymentStatus | null {
+  return value === "success" ||
+    value === "failed" ||
+    value === "pending" ||
+    value === "cancelled"
+    ? value
+    : null;
+}
+
+interface PaymentCheck {
+  status: PaymentStatus | null;
+  paymentMode: PaymentMode | null;
+  errorCode: PaymentStatusErrorCode | null;
+}
+
+const initialCheck: PaymentCheck = {
+  status: null,
+  paymentMode: null,
+  errorCode: null,
 };
+
 interface StatusConfig {
   badgeText: ReactNode;
   badgeVariant: "default" | "destructive" | "secondary" | "outline";
@@ -151,124 +172,155 @@ function PaymentStatusErrorMessage({ code }: { code: PaymentStatusErrorCode }) {
   }
 }
 export function PaymentStatusContent() {
-  const { t } = useTranslation();
   const searchParams = useSearchParams();
-  const [status, setStatus] = useState<PaymentStatus | null>(null);
-  const [paymentMode, setPaymentMode] = useState<PaymentMode | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [errorCode, setErrorCode] = useState<PaymentStatusErrorCode | null>(
-    null,
+  const checkoutId =
+    (searchParams.get("checkout_id")?.trim() ||
+      searchParams.get("session_id")?.trim() ||
+      searchParams.get("sessionId")?.trim()) ??
+    "";
+  const statusHint = parsePaymentStatus(searchParams.get("status"));
+  const trackedCheckouts = useRef(new Set<string>());
+  const trackSuccess = useCallback((id: string, mode: PaymentMode | null) => {
+    if (trackedCheckouts.current.has(id)) return;
+    trackedCheckouts.current.add(id);
+    trackUmamiEvent("payment_success", { payment_mode: mode ?? "unknown" });
+  }, []);
+
+  return (
+    <PaymentStatusCheck
+      key={JSON.stringify([checkoutId, statusHint])}
+      checkoutId={checkoutId}
+      statusHint={statusHint}
+      trackSuccess={trackSuccess}
+    />
   );
-  const pollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const trackedSuccessRef = useRef(false);
+}
+
+function PaymentStatusCheck({
+  checkoutId,
+  statusHint,
+  trackSuccess,
+}: {
+  checkoutId: string;
+  statusHint: PaymentStatus | null;
+  trackSuccess: (id: string, mode: PaymentMode | null) => void;
+}) {
+  const { t } = useTranslation();
+  const [check, setCheck] = useState(initialCheck);
+  const [retry, setRetry] = useState(0);
+  const fallbackStatus =
+    statusHint === "failed" || statusHint === "cancelled"
+      ? statusHint
+      : "pending";
+
   useEffect(() => {
-    let isActive = true;
-    let pollAttempt = 0;
-    const abortController = new AbortController();
-    const clearPollTimeout = () => {
-      if (pollTimeoutRef.current) {
-        clearTimeout(pollTimeoutRef.current);
-        pollTimeoutRef.current = null;
-      }
-    };
-    const checkPaymentStatus = async () => {
+    if (!checkoutId) return;
+
+    const controller = new AbortController();
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const search = new URLSearchParams({ checkout_id: checkoutId });
+    if (statusHint) search.set("status", statusHint);
+
+    async function checkStatus(attempt: number) {
+      let retryAfterMs = 0;
+      let confirmedPending = false;
       try {
-        const statusParam = searchParams.get("status") as PaymentStatus;
-        const checkoutIdParam =
-          searchParams.get("checkout_id") || searchParams.get("session_id");
-        if (checkoutIdParam) {
-          pollAttempt += 1;
-          const paymentStatusParams = new URLSearchParams({
-            checkout_id: checkoutIdParam,
-          });
-          if (statusParam) {
-            paymentStatusParams.set("status", statusParam);
-          }
-          const response = await fetch(
-            `/api/payment-status?${paymentStatusParams}`,
-            {
-              signal: abortController.signal,
-            },
-          );
-          if (response.ok) {
-            const data = await response.json();
-            if (!isActive) return;
-            setStatus(data.status as PaymentStatus);
-            setPaymentMode(
-              data.paymentMode === "subscription" ||
-                data.paymentMode === "one_time"
-                ? data.paymentMode
-                : null,
-            );
-            setErrorCode(null);
-            if (data.status === "pending") {
-              if (pollAttempt >= MAX_POLL_ATTEMPTS) {
-                setErrorCode("status_check_timeout");
-              } else {
-                const delay = Math.min(
-                  INITIAL_POLL_DELAY_MS * 2 ** (pollAttempt - 1),
-                  MAX_POLL_DELAY_MS,
-                );
-                clearPollTimeout();
-                pollTimeoutRef.current = setTimeout(() => {
-                  void checkPaymentStatus();
-                }, delay);
-              }
-            }
+        const response = await fetch(`/api/payment-status?${search}`, {
+          signal: AbortSignal.any([
+            controller.signal,
+            AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+          ]),
+        });
+        if (controller.signal.aborted) return;
+
+        if (response.ok) {
+          const data = (await response.json()) as {
+            status?: unknown;
+            paymentMode?: unknown;
+          } | null;
+          if (controller.signal.aborted) return;
+          const status = parsePaymentStatus(data?.status);
+          if (!status) throw new Error("Invalid payment status response.");
+          if (status !== "pending") {
+            const mode = data?.paymentMode;
+            setCheck({
+              status,
+              paymentMode:
+                mode === "subscription" || mode === "one_time" ? mode : null,
+              errorCode: null,
+            });
             return;
           }
+          confirmedPending = true;
+        } else if (
+          response.status === 408 ||
+          response.status === 429 ||
+          response.status >= 500
+        ) {
+          const retryAfter = Number(response.headers?.get("Retry-After"));
+          if (Number.isFinite(retryAfter) && retryAfter > 0)
+            retryAfterMs = Math.min(retryAfter * 1000, 60_000);
+        } else {
           throw new Error(`Payment status request failed: ${response.status}`);
         }
-        if (statusParam && statusParam in DIRECT_STATUS_MAP) {
-          setStatus(
-            DIRECT_STATUS_MAP[statusParam as keyof typeof DIRECT_STATUS_MAP],
-          );
-          setErrorCode(null);
-          setIsLoading(false);
+      } catch (error) {
+        if (controller.signal.aborted) return;
+        const transient =
+          error instanceof TypeError ||
+          (error instanceof DOMException && error.name === "TimeoutError");
+        if (!transient) {
+          console.error("Error checking payment status:", error);
+          setCheck({
+            ...initialCheck,
+            status: fallbackStatus,
+            errorCode: "status_check_failed",
+          });
           return;
         }
-        if (statusParam === "success") {
-          setStatus("pending");
-          setErrorCode("missing_reference");
-          setIsLoading(false);
-          return;
-        }
-        setStatus("pending");
-        setErrorCode(null);
-      } catch (err) {
-        if (!isActive) return;
-        if (err instanceof DOMException && err.name === "AbortError") return;
-        console.error("Error checking payment status:", err);
-        setErrorCode("status_check_failed");
-        const statusParam = searchParams.get("status") as PaymentStatus;
-        setStatus(
-          statusParam && statusParam in DIRECT_STATUS_MAP
-            ? DIRECT_STATUS_MAP[statusParam as keyof typeof DIRECT_STATUS_MAP]
-            : "pending",
-        );
-      } finally {
-        if (isActive) setIsLoading(false);
       }
-    };
-    void checkPaymentStatus();
+
+      if (attempt >= MAX_POLL_ATTEMPTS) {
+        setCheck({
+          ...initialCheck,
+          status: confirmedPending ? "pending" : fallbackStatus,
+          errorCode: confirmedPending
+            ? "status_check_timeout"
+            : "status_check_failed",
+        });
+        return;
+      }
+
+      setCheck({ ...initialCheck, status: "pending" });
+      const delay = Math.max(
+        retryAfterMs,
+        Math.min(INITIAL_POLL_DELAY_MS * 2 ** (attempt - 1), MAX_POLL_DELAY_MS),
+      );
+      timer = setTimeout(() => void checkStatus(attempt + 1), delay);
+    }
+
+    void checkStatus(1);
     return () => {
-      isActive = false;
-      abortController.abort();
-      clearPollTimeout();
+      controller.abort();
+      clearTimeout(timer);
     };
-  }, [searchParams]); // Re-run when search params change
+  }, [checkoutId, fallbackStatus, retry, statusHint]);
+
+  const result: PaymentCheck = checkoutId
+    ? check
+    : {
+        ...initialCheck,
+        status: fallbackStatus,
+        errorCode:
+          statusHint === "success" ? ("missing_reference" as const) : null,
+      };
+  const { status, paymentMode, errorCode } = result;
 
   useEffect(() => {
-    if (status !== "success" || trackedSuccessRef.current) return;
+    if (checkoutId && status === "success")
+      trackSuccess(checkoutId, paymentMode);
+  }, [checkoutId, paymentMode, status, trackSuccess]);
 
-    trackedSuccessRef.current = true;
-    trackUmamiEvent("payment_success", {
-      payment_mode: paymentMode ?? "unknown",
-    });
-  }, [paymentMode, status]);
-
-  // Show loading state while checking status
-  if (isLoading || status === null) {
+  if (status === null) {
     return (
       <section className="bg-background flex min-h-screen items-center justify-center">
         <FocusContainer className="relative">
@@ -336,7 +388,9 @@ export function PaymentStatusContent() {
 
             {/* Description */}
             <p className="text-muted-foreground mb-8 text-lg leading-relaxed">
-              {config.description}
+              {status === "pending" && (errorCode || !checkoutId)
+                ? t("payment_status_unverified_description")
+                : config.description}
             </p>
 
             {/* Error Message */}
@@ -347,6 +401,20 @@ export function PaymentStatusContent() {
                   <PaymentStatusErrorMessage code={errorCode} />
                 </AlertDescription>
               </Alert>
+            )}
+
+            {checkoutId && errorCode && (
+              <Button
+                type="button"
+                variant="outline"
+                className="mb-4"
+                onClick={() => {
+                  setCheck(initialCheck);
+                  setRetry((current) => current + 1);
+                }}
+              >
+                {t("payment_status_retry_check")}
+              </Button>
             )}
 
             {/* Action Buttons */}

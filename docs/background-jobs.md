@@ -43,6 +43,12 @@ pg-boss group and singleton key. `groupConcurrency` expresses tenant fairness;
 the singleton queue policy closes concurrent-claim races at a limit of one. It
 does not implement provider rate limits, quotas, or billing.
 
+Dispatches that fail transiently receive a later retry time while other work
+continues. A persisted payload rejected by the current schema fails with
+`INVALID_JOB_PAYLOAD` when pg-boss has no record of delivery. If the queue
+already accepted the dispatch, its existing job remains authoritative for
+delivery and reconciliation.
+
 ## State and cancellation
 
 Product state follows these guarded transitions:
@@ -53,13 +59,17 @@ running -> waiting | completed | failed | cancelled
 waiting -> queued | failed | cancelled
 ```
 
-Every transition is a conditional `UPDATE ... WHERE status IN (...)`. Terminal
-updates and stale continuations become no-ops. Retry attempts leave a task in
-`running`; only the last failed attempt changes it to `failed`.
+Transitions check the current status in a conditional update or under a row
+lock. Terminal states cannot be rewritten. Scheduling a continuation replaces
+the dispatch ID, so the previous dispatch can no longer publish progress or a
+result. Retry attempts leave a task in `running`; a permanent or final failure
+changes it to `failed`.
 
 Authenticated clients poll `GET /api/tasks/:id` and cancel with
 `POST /api/tasks/:id/cancel`. Both routes scope the query to the current user and
-never expose raw pg-boss records.
+never expose raw pg-boss records. Cancellation returns the task that won the
+race: a newly cancelled task or the existing terminal result. Queue
+cancellation is best effort after the database records the outcome.
 
 At each meaningful handler boundary, check `context.isCancelled()`. Persist
 progress only for useful steps, not tokens or tight polling loops. For providers

@@ -47,8 +47,10 @@ export interface UseFileUploadResult {
   addFiles: (files: FileList | File[]) => Promise<void>;
   autoUpload: boolean;
   canAddMore: boolean;
+  canUpload: boolean;
   cancelFile: (id: string) => void;
   clearCompleted: () => void;
+  clearFiles: () => void;
   getInputProps: (props?: InputProps) => InputProps;
   getRootProps: (props?: RootProps) => RootProps;
   inputRef: RefObject<HTMLInputElement | null>;
@@ -169,6 +171,14 @@ function resolveUploadIssue(
   return fallback;
 }
 
+function canStartUpload(item: FileUploadItem): boolean {
+  return (
+    item.status === "queued" ||
+    item.status === "error" ||
+    item.status === "canceled"
+  );
+}
+
 export function useFileUpload({
   acceptedFileTypes = UPLOAD_CONFIG.ALLOWED_FILE_TYPES,
   autoUpload = true,
@@ -186,7 +196,7 @@ export function useFileUpload({
   const [issue, setIssue] = useState<FileUploadIssue | null>(null);
   const [isDragActive, setIsDragActive] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const activeTasksRef = useRef(new Map<string, UploadTask>());
+  const activeTasksRef = useRef(new Map<string, Pick<UploadTask, "cancel">>());
   const nextIdRef = useRef(0);
   const itemsRef = useRef(items);
   const resolvedTransport = useMemo(
@@ -194,43 +204,39 @@ export function useFileUpload({
     [transport],
   );
 
-  useEffect(() => {
-    itemsRef.current = items;
-  }, [items]);
-
-  const cleanupUploads = useCallback(() => {
-    activeTasksRef.current.forEach((task) => task.cancel?.());
-    itemsRef.current.forEach((item) => revokePreviewUrl(item.previewUrl));
+  // Async events share the current list even before React commits a render.
+  const replaceItems = useCallback((nextItems: FileUploadItem[]) => {
+    itemsRef.current = nextItems;
+    setItems(nextItems);
   }, []);
 
-  useEffect(() => cleanupUploads, [cleanupUploads]);
+  const discardFiles = useCallback(() => {
+    const previousItems = itemsRef.current;
+    const tasks = [...activeTasksRef.current.values()];
+    itemsRef.current = [];
+    activeTasksRef.current.clear();
+    previousItems.forEach((item) => revokePreviewUrl(item.previewUrl));
+    tasks.forEach((task) => task.cancel?.());
+  }, []);
+
+  useEffect(() => discardFiles, [discardFiles]);
 
   const updateItem = useCallback(
     (id: string, updater: (item: FileUploadItem) => FileUploadItem) => {
-      setItems((currentItems) => {
-        const nextItems = currentItems.map((item) =>
-          item.id === id ? updater(item) : item,
-        );
-        itemsRef.current = nextItems;
-        return nextItems;
-      });
+      const currentItems = itemsRef.current;
+      if (!currentItems.some((item) => item.id === id)) return;
+      replaceItems(
+        currentItems.map((item) => (item.id === id ? updater(item) : item)),
+      );
     },
-    [],
+    [replaceItems],
   );
 
   const uploadByIds = useCallback(
     async (ids?: string[]) => {
-      const candidates = itemsRef.current.filter((item) => {
-        if (ids && !ids.includes(item.id)) {
-          return false;
-        }
-
-        return (
-          item.status === "queued" ||
-          item.status === "error" ||
-          item.status === "canceled"
-        );
-      });
+      const candidates = itemsRef.current.filter(
+        (item) => (!ids || ids.includes(item.id)) && canStartUpload(item),
+      );
 
       if (candidates.length === 0) {
         return;
@@ -238,6 +244,11 @@ export function useFileUpload({
 
       const results = await Promise.all(
         candidates.map(async (candidate) => {
+          if (activeTasksRef.current.has(candidate.id)) return null;
+          const attempt: Pick<UploadTask, "cancel"> = {};
+          activeTasksRef.current.set(candidate.id, attempt);
+          const isCurrent = () =>
+            activeTasksRef.current.get(candidate.id) === attempt;
           updateItem(candidate.id, (item) => ({
             ...item,
             issue: undefined,
@@ -245,19 +256,18 @@ export function useFileUpload({
             status: "uploading",
           }));
 
-          const task = resolvedTransport.startUpload({
-            file: candidate.file,
-            onProgress: (progress) => {
-              updateItem(candidate.id, (item) =>
-                item.status === "uploading" ? { ...item, progress } : item,
-              );
-            },
-          });
-
-          activeTasksRef.current.set(candidate.id, task);
-
           try {
+            const task = resolvedTransport.startUpload({
+              file: candidate.file,
+              onProgress: (progress) => {
+                if (isCurrent())
+                  updateItem(candidate.id, (item) => ({ ...item, progress }));
+              },
+            });
+            attempt.cancel = () => task.cancel?.();
+            if (!isCurrent()) task.cancel?.();
             const uploadedFile = await task.promise;
+            if (!isCurrent()) return null;
 
             updateItem(candidate.id, (item) => ({
               ...item,
@@ -268,6 +278,7 @@ export function useFileUpload({
 
             return uploadedFile;
           } catch (error) {
+            if (!isCurrent()) return null;
             const nextIssue = resolveUploadIssue(error, {
               code: "upload-failed",
               fileName: candidate.file.name,
@@ -283,7 +294,7 @@ export function useFileUpload({
 
             return null;
           } finally {
-            activeTasksRef.current.delete(candidate.id);
+            if (isCurrent()) activeTasksRef.current.delete(candidate.id);
           }
         }),
       );
@@ -374,35 +385,55 @@ export function useFileUpload({
         return;
       }
 
+      const preparingItems = fileList.map(
+        (file): FileUploadItem => ({
+          file,
+          id: `upload-${nextIdRef.current++}`,
+          progress: 0,
+          status: "preparing",
+        }),
+      );
+      replaceItems([...itemsRef.current, ...preparingItems]);
+
+      const previews: (string | undefined)[] = [];
       try {
-        const preparedItems = await Promise.all(
-          fileList.map(async (file) => {
-            const processedFile = await compressImage({
-              enabled: enableImageCompression,
-              file,
-              quality: imageCompressionQuality,
-              maxHeight: imageCompressionMaxHeight,
-              maxWidth: imageCompressionMaxWidth,
-            });
-
-            return {
-              file: processedFile,
-              id: `upload-${nextIdRef.current++}`,
-              previewUrl: createPreviewUrl(processedFile),
-              progress: 0,
-              status: "queued",
-            } satisfies FileUploadItem;
-          }),
+        const preparedFiles = await Promise.all(
+          preparingItems.map(
+            async ({ file, id }) =>
+              [
+                id,
+                await compressImage({
+                  enabled: enableImageCompression,
+                  file,
+                  quality: imageCompressionQuality,
+                  maxHeight: imageCompressionMaxHeight,
+                  maxWidth: imageCompressionMaxWidth,
+                }),
+              ] as const,
+          ),
         );
-
-        const nextItems = [...itemsRef.current, ...preparedItems];
-        itemsRef.current = nextItems;
-        setItems(nextItems);
+        const filesById = new Map(preparedFiles);
+        const preparedIds: string[] = [];
+        const nextItems = itemsRef.current.map((item): FileUploadItem => {
+          const file = filesById.get(item.id);
+          if (!file) return item;
+          const previewUrl = createPreviewUrl(file);
+          previews.push(previewUrl);
+          preparedIds.push(item.id);
+          return { ...item, file, previewUrl, status: "queued" };
+        });
+        if (!preparedIds.length) return;
+        replaceItems(nextItems);
 
         if (autoUpload) {
-          void uploadByIds(preparedItems.map((item) => item.id));
+          void uploadByIds(preparedIds);
         }
       } catch {
+        previews.forEach(revokePreviewUrl);
+        const ids = new Set(preparingItems.map((item) => item.id));
+        const nextItems = itemsRef.current.filter((item) => !ids.has(item.id));
+        if (nextItems.length === itemsRef.current.length) return;
+        replaceItems(nextItems);
         setIssue({
           code: "upload-preparation-failed",
         });
@@ -416,6 +447,7 @@ export function useFileUpload({
       imageCompressionMaxWidth,
       imageCompressionQuality,
       maxFiles,
+      replaceItems,
       uploadByIds,
       validateFile,
     ],
@@ -425,48 +457,41 @@ export function useFileUpload({
     activeTasksRef.current.get(id)?.cancel?.();
   }, []);
 
-  const removeFile = useCallback((id: string) => {
-    activeTasksRef.current.get(id)?.cancel?.();
-    setIssue(null);
-
-    setItems((currentItems) => {
-      const itemToRemove = currentItems.find((item) => item.id === id);
-      revokePreviewUrl(itemToRemove?.previewUrl);
-      const nextItems = currentItems.filter((item) => item.id !== id);
-      itemsRef.current = nextItems;
-      return nextItems;
-    });
-  }, []);
-
   const retryFile = useCallback(
-    async (id: string) => {
-      updateItem(id, (item) => ({
-        ...item,
-        issue: undefined,
-        progress: 0,
-        status: "queued",
-      }));
+    (id: string) => uploadByIds([id]),
+    [uploadByIds],
+  );
 
-      await uploadByIds([id]);
+  const removeFile = useCallback(
+    (id: string) => {
+      const task = activeTasksRef.current.get(id);
+      activeTasksRef.current.delete(id);
+      const item = itemsRef.current.find((item) => item.id === id);
+      if (item) {
+        revokePreviewUrl(item.previewUrl);
+        replaceItems(itemsRef.current.filter((item) => item.id !== id));
+      }
+      task?.cancel?.();
+      setIssue(null);
     },
-    [updateItem, uploadByIds],
+    [replaceItems],
   );
 
   const clearCompleted = useCallback(() => {
-    setItems((currentItems) => {
-      currentItems.forEach((item) => {
-        if (item.status === "success") {
-          revokePreviewUrl(item.previewUrl);
-        }
-      });
+    replaceItems(
+      itemsRef.current.filter((item) => {
+        if (item.status !== "success") return true;
+        revokePreviewUrl(item.previewUrl);
+        return false;
+      }),
+    );
+  }, [replaceItems]);
 
-      const nextItems = currentItems.filter(
-        (item) => item.status !== "success",
-      );
-      itemsRef.current = nextItems;
-      return nextItems;
-    });
-  }, []);
+  const clearFiles = useCallback(() => {
+    discardFiles();
+    setItems(itemsRef.current);
+    setIssue(null);
+  }, [discardFiles]);
 
   const openFileDialog = useCallback(() => {
     if (!disabled) {
@@ -540,8 +565,10 @@ export function useFileUpload({
     addFiles,
     autoUpload,
     canAddMore: items.length < maxFiles,
+    canUpload: items.some(canStartUpload),
     cancelFile,
     clearCompleted,
+    clearFiles,
     getInputProps,
     getRootProps,
     inputRef,

@@ -198,6 +198,14 @@ function ImageAttachmentPreview({
           sizes="80px"
         />
       )}
+      {item.status === "preparing" && (
+        <div
+          role="status"
+          className="bg-background/70 absolute inset-0 grid place-items-center text-center text-xs"
+        >
+          {t("uploads_preparing")}
+        </div>
+      )}
       {(item.status === "queued" || item.status === "uploading") && (
         <div
           role="status"

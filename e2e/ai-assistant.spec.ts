@@ -438,6 +438,21 @@ test("uploads a reference image and enables an image-only message", async ({
   page,
 }) => {
   await loginAs(page, "user");
+  await page.addInitScript(() => {
+    const prepareImage = new Promise<void>((resolve) => {
+      window.addEventListener(
+        "finish-test-image-preparation",
+        () => resolve(),
+        {
+          once: true,
+        },
+      );
+    });
+    const toBlob = HTMLCanvasElement.prototype.toBlob;
+    HTMLCanvasElement.prototype.toBlob = function (...args) {
+      void prepareImage.then(() => toBlob.call(this, ...args));
+    };
+  });
 
   const publicUrl = "https://cdn.example.com/reference.png";
   const chatChunks = await createImageChatChunks(publicUrl);
@@ -496,6 +511,11 @@ test("uploads a reference image and enables an image-only message", async ({
       ),
     });
 
+  await expect(page.getByText("Preparing file", { exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Send" })).toBeDisabled();
+  await page.evaluate(() =>
+    window.dispatchEvent(new Event("finish-test-image-preparation")),
+  );
   await expect(page.getByAltText("reference.png")).toBeVisible();
   await expect(page.getByRole("button", { name: "Send" })).toBeEnabled();
   await page.getByRole("button", { name: "Send" }).click();
@@ -514,6 +534,78 @@ test("uploads a reference image and enables an image-only message", async ({
   await page.keyboard.press("Escape");
   await expect(previewDialog).toBeHidden();
   await expect(previewButton).toBeFocused();
+});
+
+test("ignores an active-list refresh after switching to the archive", async ({
+  page,
+}) => {
+  await loginAs(page, "user");
+
+  const delayed = Promise.withResolvers<void>();
+  const requestStarted = Promise.withResolvers<void>();
+  let activeRequests = 0;
+  await page.route("**/api/ai/conversations?*", async (route) => {
+    const archived =
+      new URL(route.request().url()).searchParams.get("archived") === "true";
+    if (!archived && ++activeRequests === 1) {
+      return route.fulfill({ json: { conversations: [], hasMore: false } });
+    }
+    if (!archived) {
+      requestStarted.resolve();
+      await delayed.promise;
+    }
+    const now = new Date().toISOString();
+    await route.fulfill({
+      json: {
+        conversations: [
+          {
+            id: archived ? "archived-fixture" : "active-fixture",
+            title: archived ? "Archived fixture" : "Late active fixture",
+            updatedAt: now,
+            createdAt: now,
+            archivedAt: archived ? now : null,
+          },
+        ],
+        hasMore: false,
+      },
+    });
+  });
+
+  await page.goto("/dashboard/ai");
+  const archiveButton = page.getByRole("button", {
+    name: "Archived chats",
+    exact: true,
+  });
+  await expect(archiveButton).toBeEnabled();
+  await page.evaluate(() => window.dispatchEvent(new Event("focus")));
+  await requestStarted.promise;
+  try {
+    await archiveButton.click();
+    await expect(
+      page.getByText("Archived fixture", { exact: true }),
+    ).toBeVisible();
+    const lateResponse = page.waitForResponse(
+      (response) =>
+        response.url().includes("/api/ai/conversations?") &&
+        response.url().includes("archived=false"),
+    );
+    delayed.resolve();
+    await (await lateResponse).finished();
+    await page.evaluate(
+      () =>
+        new Promise((resolve) =>
+          requestAnimationFrame(() => requestAnimationFrame(resolve)),
+        ),
+    );
+    await expect(
+      page.getByText("Late active fixture", { exact: true }),
+    ).toHaveCount(0);
+    await expect(
+      page.getByText("Archived fixture", { exact: true }),
+    ).toBeVisible();
+  } finally {
+    delayed.resolve();
+  }
 });
 
 test("archives and restores a conversation", async ({ page }) => {

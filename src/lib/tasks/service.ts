@@ -81,25 +81,26 @@ export async function cancelOwnedBackgroundTask(input: {
   taskRunId: string;
   scopeKey: string;
 }): Promise<TaskRun | null> {
-  const owned = await getOwnedTaskRun(
+  const cancelled = await cancelTaskRun(
     input.db,
     input.taskRunId,
     input.scopeKey,
   );
-  if (!owned) return null;
-
-  const cancelled = await cancelTaskRun(input.db, input.taskRunId);
-  if (!cancelled) return owned;
+  if (!cancelled)
+    return getOwnedTaskRun(input.db, input.taskRunId, input.scopeKey);
 
   try {
-    await input.queue.cancel(owned.kind, owned.dispatchId ?? owned.id);
+    await input.queue.cancel(
+      cancelled.kind,
+      cancelled.dispatchId ?? cancelled.id,
+    );
   } catch (error) {
     console.error(
       JSON.stringify({
         component: "task-api",
         event: "queue_cancel_failed",
-        taskRunId: owned.id,
-        jobName: owned.kind,
+        taskRunId: cancelled.id,
+        jobName: cancelled.kind,
         error: error instanceof Error ? error.message : String(error),
       }),
     );

@@ -550,6 +550,7 @@ export const uploads = pgTable(
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     deletedAt: timestamp("deletedAt", { withTimezone: true }),
+    deleteRetryAt: timestamp("deleteRetryAt", { withTimezone: true }),
     uploadIntentId: uuid("uploadIntentId").references(() => uploadIntents.id, {
       onDelete: "set null",
     }),
@@ -574,6 +575,9 @@ export const uploads = pgTable(
         sql`${table.fileSize} > 0`,
       ),
       fileKeyUnique: uniqueIndex("uploads_fileKey_unique").on(table.fileKey),
+      deleteQueueIdx: index("uploads_delete_queue_idx")
+        .on(sql`coalesce(${table.deleteRetryAt}, ${table.deletedAt})`, table.id)
+        .where(sql`${table.deletedAt} is not null`),
     };
   },
 );
@@ -592,15 +596,35 @@ export const taskDispatches = pgTable(
       .notNull()
       .defaultNow(),
     sentAt: timestamp("sentAt", { withTimezone: true }),
+    retryAt: timestamp("retryAt", { withTimezone: true }),
     createdAt: timestamp("createdAt", { withTimezone: true })
       .notNull()
       .defaultNow(),
   },
   (table) => ({
     pendingIdx: index("task_dispatches_pending_idx")
-      .on(table.kind, table.createdAt)
+      .on(
+        table.kind,
+        sql`coalesce(${table.retryAt}, ${table.createdAt})`,
+        table.id,
+      )
       .where(sql`${table.sentAt} is null`),
     taskIdx: index("task_dispatches_taskRunId_idx").on(table.taskRunId),
+  }),
+);
+
+export const aiStreamLeases = pgTable(
+  "ai_stream_leases",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    expiresAt: timestamp("expiresAt", { withTimezone: true }).notNull(),
+  },
+  (table) => ({
+    userIdx: index("ai_stream_leases_userId_idx").on(table.userId),
+    expiryIdx: index("ai_stream_leases_expiresAt_idx").on(table.expiresAt),
   }),
 );
 

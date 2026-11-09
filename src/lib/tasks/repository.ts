@@ -1,4 +1,4 @@
-import { and, eq, inArray, isNull } from "drizzle-orm";
+import { and, eq, inArray, isNull, or } from "drizzle-orm";
 import { isDeepStrictEqual } from "node:util";
 import type { DatabaseExecutor } from "@/database/client";
 import { taskRuns } from "@/database/schema";
@@ -31,6 +31,11 @@ const ALLOWED_TASK_TRANSITIONS: Record<
   failed: [],
   cancelled: [],
 };
+
+function matchesTaskDispatch(dispatchId: string) {
+  // A pre-outbox job may not have been adopted yet.
+  return or(eq(taskRuns.dispatchId, dispatchId), isNull(taskRuns.dispatchId));
+}
 
 export async function createTaskRun(
   db: DatabaseExecutor,
@@ -108,6 +113,7 @@ export async function transitionTaskRun(
   db: DatabaseExecutor,
   input: {
     taskRunId: string;
+    scopeKey?: string;
     dispatchId?: string;
     from: readonly TaskRunStatus[];
     to: TaskRunStatus;
@@ -135,10 +141,11 @@ export async function transitionTaskRun(
     .where(
       and(
         eq(taskRuns.id, input.taskRunId),
+        input.scopeKey === undefined
+          ? undefined
+          : eq(taskRuns.scopeKey, input.scopeKey),
         inArray(taskRuns.status, [...input.from]),
-        input.dispatchId
-          ? eq(taskRuns.dispatchId, input.dispatchId)
-          : undefined,
+        input.dispatchId ? matchesTaskDispatch(input.dispatchId) : undefined,
       ),
     )
     .returning();
@@ -148,9 +155,11 @@ export async function transitionTaskRun(
 export async function cancelTaskRun(
   db: DatabaseExecutor,
   taskRunId: string,
+  scopeKey?: string,
 ): Promise<TaskRun | null> {
   return transitionTaskRun(db, {
     taskRunId,
+    scopeKey,
     from: ["queued", "running", "waiting"],
     to: "cancelled",
     patch: { completedAt: new Date() },
@@ -160,12 +169,19 @@ export async function cancelTaskRun(
 export async function updateTaskRunProgress(
   db: DatabaseExecutor,
   taskRunId: string,
+  dispatchId: string,
   progress: Record<string, unknown>,
 ): Promise<TaskRun | null> {
   const [updated] = await db
     .update(taskRuns)
     .set({ progress, updatedAt: new Date() })
-    .where(and(eq(taskRuns.id, taskRunId), eq(taskRuns.status, "running")))
+    .where(
+      and(
+        eq(taskRuns.id, taskRunId),
+        eq(taskRuns.status, "running"),
+        matchesTaskDispatch(dispatchId),
+      ),
+    )
     .returning();
   return updated ?? null;
 }

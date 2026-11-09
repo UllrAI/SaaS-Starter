@@ -58,6 +58,11 @@ describe("PaymentStatusContent", () => {
     });
 
     expect(screen.getByText("Payment completed")).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Your payment is confirmed. Check your billing page for the latest access status.",
+      ),
+    ).toBeInTheDocument();
     expect(screen.queryByText(/Transaction ID:/)).not.toBeInTheDocument();
     expect(
       screen.getByRole("link", { name: /Access Dashboard/i }),
@@ -161,18 +166,18 @@ describe("PaymentStatusContent", () => {
     consoleErrorSpy.mockRestore();
   });
 
-  it("shows a controlled error when checkout verification returns non-2xx", async () => {
+  it("shows a controlled error for a terminal checkout verification failure", async () => {
     const consoleErrorSpy = jest
       .spyOn(console, "error")
       .mockImplementation(() => {});
     mockUseSearchParams.mockReturnValue(
       new URLSearchParams(
-        "status=pending&session_id=checkout-502",
+        "status=pending&session_id=checkout-401",
       ) as unknown as ReturnType<typeof useSearchParams>,
     );
     (global.fetch as jest.MockedFunction<typeof fetch>).mockResolvedValue({
       ok: false,
-      status: 502,
+      status: 401,
     } as Response);
 
     render(<PaymentStatusContent />);
@@ -190,7 +195,66 @@ describe("PaymentStatusContent", () => {
     consoleErrorSpy.mockRestore();
   });
 
-  it("describes verified one-time purchases as lifetime access", async () => {
+  it("treats inherited object keys in the status hint as unknown", () => {
+    mockUseSearchParams.mockReturnValue(
+      new URLSearchParams("status=__proto__") as unknown as ReturnType<
+        typeof useSearchParams
+      >,
+    );
+    render(<PaymentStatusContent />);
+    expect(
+      screen.getByRole("heading", { name: "Payment processing" }),
+    ).toBeInTheDocument();
+    expect(global.fetch).not.toHaveBeenCalled();
+  });
+
+  it("clears a previous success and retries a new checkout after a temporary rate limit", async () => {
+    jest.useFakeTimers();
+    const fetchMock = jest.mocked(global.fetch);
+    fetchMock
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ status: "success" }),
+      } as Response)
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 429,
+        headers: new Headers({ "Retry-After": "3" }),
+      } as Response)
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ status: "failed" }),
+      } as Response);
+    mockUseSearchParams.mockReturnValue(
+      new URLSearchParams("session_id=old") as unknown as ReturnType<
+        typeof useSearchParams
+      >,
+    );
+    const { rerender } = render(<PaymentStatusContent />);
+    expect(
+      await screen.findByRole("heading", { name: "Payment successful" }),
+    ).toBeInTheDocument();
+    mockUseSearchParams.mockReturnValue(
+      new URLSearchParams("sessionId=new") as unknown as ReturnType<
+        typeof useSearchParams
+      >,
+    );
+    await act(async () => rerender(<PaymentStatusContent />));
+    expect(
+      screen.queryByRole("heading", { name: "Payment successful" }),
+    ).not.toBeInTheDocument();
+    expect(fetchMock.mock.calls[1]?.[0]).toBe(
+      "/api/payment-status?checkout_id=new",
+    );
+    await act(async () => jest.advanceTimersByTime(2_999));
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    await act(async () => jest.advanceTimersByTime(1));
+    expect(
+      screen.getByRole("heading", { name: "Payment failed" }),
+    ).toBeInTheDocument();
+  });
+
+  it("confirms a one-time payment without claiming access is already active", async () => {
     mockUseSearchParams.mockReturnValue(
       new URLSearchParams("session_id=checkout-123") as unknown as ReturnType<
         typeof useSearchParams
@@ -208,11 +272,9 @@ describe("PaymentStatusContent", () => {
 
     expect(
       await screen.findByText(
-        "Your one-time purchase is complete. Lifetime access is now active, with no recurring charge.",
+        "Your one-time payment is confirmed, with no recurring charge. Check your billing page for the latest access status.",
       ),
     ).toBeInTheDocument();
-    expect(
-      screen.queryByText(/Your subscription is active/),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText(/access is now active/i)).not.toBeInTheDocument();
   });
 });

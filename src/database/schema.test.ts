@@ -25,6 +25,8 @@ import {
 import { Table } from "drizzle-orm/table";
 import { getTableConfig } from "drizzle-orm/pg-core";
 
+jest.unmock("drizzle-orm");
+
 const getIndexConfigs = (table: Record<string, unknown>) => {
   const builder = (table as any)[Table.Symbol.ExtraConfigBuilder];
   expect(builder).toBeDefined();
@@ -1553,6 +1555,7 @@ describe("Database Schema", () => {
           "uploads_userId_createdAt_idx",
           "uploads_uploadIntentId_unique",
           "uploads_fileKey_unique",
+          "uploads_delete_queue_idx",
         ]),
       );
       expect(

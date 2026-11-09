@@ -13,7 +13,7 @@ overrides:
   brace-expansion@^2.0.0: 2.1.7
   brace-expansion@^5.0.0: 5.0.12
   browserslist: 4.28.7
-  deepmerge-ts: 8.0.0
+  "@prisma/config>deepmerge-ts": 8.0.0
   diff: 8.0.3
   effect: 3.21.2
   esbuild: 0.25.12
@@ -140,8 +140,8 @@ importers:
         specifier: ^19.2.6
         version: 19.2.6(react@19.2.6)
       react-email:
-        specifier: ^6.9.1
-        version: 6.9.1(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+        specifier: ^6.11.8
+        version: 6.11.8(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       react-hook-form:
         specifier: ^7.76.1
         version: 7.76.1(react@19.2.6)
@@ -156,13 +156,10 @@ importers:
         version: 4.0.1
       resend:
         specifier: ^6.12.4
-        version: 6.12.4(@react-email/render@2.1.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6))
+        version: 6.12.4(@react-email/render@2.2.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6))
       server-only:
         specifier: ^0.0.1
         version: 0.0.1
-      shadcn:
-        specifier: ^4.23.0
-        version: 4.23.0(babel-plugin-macros@3.1.0)
       sonner:
         specifier: ^2.0.7
         version: 2.0.7(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
@@ -263,6 +260,9 @@ importers:
       prettier-plugin-tailwindcss:
         specifier: ^0.8.0
         version: 0.8.0(prettier@3.8.3)
+      shadcn:
+        specifier: ^4.23.0
+        version: 4.23.0(babel-plugin-macros@3.1.0)
       tailwindcss:
         specifier: ^4.3.0
         version: 4.3.0
@@ -3777,12 +3777,12 @@ packages:
         integrity: sha512-JtyZR+mqgBibTo8xea3B6ZRmzZiM/YeVBtUkas6zMuXjAlfIFIW2FgqeM9eLyvEaYX66vr6DJMK+4U6LV0KhNw==,
       }
 
-  "@react-email/render@2.1.0":
+  "@react-email/render@2.2.0":
     resolution:
       {
-        integrity: sha512-F+zE3O6d6sW6Aj2UjvZAA17R7tJKM7kcq2mgV6k4HCT8jeLLFaVP2txMtH1lgqYFRMZ0Gxsd37q2PRyiXLXXxA==,
+        integrity: sha512-WCtHV8ww0OYajz+idpx1jQNlO3RrvcjTihlEWozgLQZlM/1QveLU5ZdVyLTmm6WWY0wohGV0cIx9CB0HpfLJcw==,
       }
-    engines: { node: ">=20.0.0" }
+    engines: { node: ">=20.19.0" }
     peerDependencies:
       react: ^18.0 || ^19.0 || ^19.0.0-rc
       react-dom: ^18.0 || ^19.0 || ^19.0.0-rc
@@ -3819,11 +3819,13 @@ packages:
         integrity: sha512-831qok9r2t8AlxLko40y2ebgSDhenenCatLVeW/uBtnHPyhHOvG0C7TvfgecV+wHzIm5KUICgzmVpWS+IMEAeg==,
       }
 
-  "@selderee/plugin-htmlparser2@0.11.0":
+  "@selderee/plugin-htmlparser2@0.12.0":
     resolution:
       {
-        integrity: sha512-P33hHGdldxGabLFjPPpaTxVolMrzrcegejx+0GxjrIb9Zv48D8yAIA/QTDR2dFl7Uz7urX8aX6+5bCZslr+gWQ==,
+        integrity: sha512-oELmoyA6ML9jDRMV3kgcMQFKxUfBU0yFVn6yTctVaLT5ygXnxH52I3TZEgV9EhXJC68/uFvE5Daj1/25c0Xa/A==,
       }
+    peerDependencies:
+      selderee: ~0.12.0
 
   "@shadcn/helpers@0.2.0":
     resolution:
@@ -5534,6 +5536,13 @@ packages:
       }
     engines: { node: ">= 14.16.0" }
 
+  chokidar@5.0.0:
+    resolution:
+      {
+        integrity: sha512-TQMmc3w+5AxjpL8iIiwebF73dRDF4fBIieAqGn9RGCWaEVwQ6Fb2cGe31Yns0RRIzii5goJ1Y7xbMwo1TxMplw==,
+      }
+    engines: { node: ">= 20.19.0" }
+
   ci-info@4.4.0:
     resolution:
       {
@@ -5978,6 +5987,13 @@ packages:
       }
     engines: { node: ">=16.0.0" }
 
+  deepmerge-ts@8.0.2:
+    resolution:
+      {
+        integrity: sha512-uqbvqLUMrc6p0MO+WBRtTxY55hmyh94WRwI5a++PZe54X+bfVh59FSN7uWCBCW1CCVjzjnrwzfI8zidE2obMMw==,
+      }
+    engines: { node: ">=16.9.0" }
+
   deepmerge@4.3.1:
     resolution:
       {
@@ -6356,6 +6372,13 @@ packages:
     resolution:
       {
         integrity: sha512-aN97NXWF6AWBTahfVOIrB/NShkzi5H7F9r1s9mD3cDj4Ko5f2qhhVoYMibXF7GlLveb/D2ioWay8lxI97Ven3g==,
+      }
+    engines: { node: ">=0.12" }
+
+  entities@7.0.1:
+    resolution:
+      {
+        integrity: sha512-TWrgLOFUQTH994YUyl1yT4uyavY5nNB5muff+RtWaqNVCAK408b5ZnnbNAUEWLTCpum9w6arT70i1XdQ4UeOPA==,
       }
     engines: { node: ">=0.12" }
 
@@ -7256,12 +7279,12 @@ packages:
         integrity: sha512-H2iMtd0I4Mt5eYiapRdIDjp+XzelXQ0tFE4JS7YFwFevXXMmOp9myNrUvCg0D6ws8iqkRPBfKHgbwig1SmlLfg==,
       }
 
-  html-to-text@9.0.5:
+  html-to-text@10.0.1:
     resolution:
       {
-        integrity: sha512-qY60FjREgVZL03vJU6IfMV4GDjGBIoOyvuFdpBDIX9yTlDw0TjxVBQp+P8NvpdIXNJvfWBTNul7fsAQJq2FNpg==,
+        integrity: sha512-GiVhRI1BatGARSCmlXWNCjDT0cWrwBWoeduLoV0WSKAgaV/wa+hUWy5LiQLUs4UwiUrE52ZCMfBGiKD87TDPrg==,
       }
-    engines: { node: ">=14" }
+    engines: { node: ">=20.19.0" }
 
   html-url-attributes@3.0.1:
     resolution:
@@ -7275,10 +7298,10 @@ packages:
         integrity: sha512-iNpSopa+4YHX50UOk825tBy7MghmXHo/ZpLskBYN0kAr1xhH8GlIMk5bLRXcZlfP3AnLUcSuFMu8C4MdOUxA8A==,
       }
 
-  htmlparser2@8.0.2:
+  htmlparser2@10.1.0:
     resolution:
       {
-        integrity: sha512-GYdjWKDkbRLkZ5geuHs5NY1puJ+PXwP7+fHPRz06Eirsb9ugf6d8kkXav6ADhcODhFFPMIXyxkxSuMf3D6NCFA==,
+        integrity: sha512-VTZkM9GWRAtEpveh7MSF6SjjrpNVNNVJfFup7xTY3UpFtm67foy9HDVXneLtFVt4pMz5kZtgNcvCniNFb1hlEQ==,
       }
 
   http-proxy-agent@7.0.2:
@@ -8291,10 +8314,10 @@ packages:
       }
     engines: { node: ">=0.10" }
 
-  leac@0.6.0:
+  leac@0.7.0:
     resolution:
       {
-        integrity: sha512-y+SqErxb8h7nE/fiEX07jsbuhrpO9lL8eca7/Y1nuWV2moNlXhyd59iDGcRf6moVyDMbmTNzL40SUyrFU/yDpg==,
+        integrity: sha512-qMrZeyEekgdRQ9o6a4NAB2EQZrv827GJdn1vnapwSJ90hWRB4TzUSunvacPkxQ2TnNqHNI1/zSt0hlo0crG8Jw==,
       }
 
   leven@3.1.0:
@@ -9470,10 +9493,10 @@ packages:
         integrity: sha512-IInvU7fabl34qmi9gY8XOVxhYyMyuH2xUNpb2q8/Y+7552KlejkRvqvD19nMoUW/uQGGbqNpA6Tufu5FL5BZgw==,
       }
 
-  parseley@0.12.1:
+  parseley@0.13.1:
     resolution:
       {
-        integrity: sha512-e6qHKe3a9HWr0oMRVDTRhKce+bRO8VGQR3NyVwcjwrbhMmFCX9KszEV35+rn4AdilFAq9VPxP/Fe1wC9Qjd2lw==,
+        integrity: sha512-uNBJZzmb60l6p6VWLTmevizNAGnE0xoSf1n0B4q3ntegDNzcS68NRCcBDZTcyXHxt2XhBChsCuqj4M+nChvE/A==,
       }
 
   path-browserify@1.0.1:
@@ -9543,10 +9566,10 @@ packages:
         integrity: sha512-WUjGcAqP1gQacoQe+OBJsFA7Ld4DyXuUIjZ5cc75cLHvJ7dtNsTugphxIADwspS+AraAUePCKrSVtPLFj/F88w==,
       }
 
-  peberminta@0.9.0:
+  peberminta@0.10.0:
     resolution:
       {
-        integrity: sha512-XIxfHpEuSJbITd1H3EeQwpcZbTLHc+VVr8ANI9t5sit565tsI4/xK3KWTUFE2e6QiangUkh3B0jihzmGnNrRsQ==,
+        integrity: sha512-80B2AsU+I4Qdb0ZAPSfe9UwvGzwkM37IKIFEvdS3D/3Ndgv2bsuJ0bfG1+iEYO+l7Gfd4EUJmuRyq7efLgRMzQ==,
       }
 
   perfect-debounce@1.0.0:
@@ -10019,12 +10042,12 @@ packages:
     peerDependencies:
       react: ^19.2.6
 
-  react-email@6.9.1:
+  react-email@6.11.8:
     resolution:
       {
-        integrity: sha512-uUDRgFukMUXRlrsCNGlA0PZuUlQ44faI9hT/D7uMjozdumLBdHjfQttQswRYLjyLW8fFtg2HBrxAESbFU4ZKKA==,
+        integrity: sha512-dkVwUHe4hSjgydSkVs1cm8w6KK6AnXrhJ9QnAQVDW1wkaoGbqevqJ5lj4yf6WqAlaHWtJVjHcXKsz9/GTKObEQ==,
       }
-    engines: { node: ">=20.0.0" }
+    engines: { node: ">=20.19.0" }
     hasBin: true
     peerDependencies:
       react: ^18.0 || ^19.0 || ^19.0.0-rc
@@ -10146,6 +10169,13 @@ packages:
         integrity: sha512-GDhwkLfywWL2s6vEjyhri+eXmfH6j1L7JE27WhqLeYzoh/A3DBaYGEj2H/HFZCn/kMfim73FXxEJTw06WtxQwg==,
       }
     engines: { node: ">= 14.18.0" }
+
+  readdirp@5.1.1:
+    resolution:
+      {
+        integrity: sha512-Kko+Y5XQ6fM+Ce3dq3m9YGxnacYZYl9cA1wZjaF3Vbry2L3i1qVg8+CAgNPsXRArPMUMCaOR7oa9Nqntc43JKA==,
+      }
+    engines: { node: ">= 20.19.0" }
 
   recast@0.23.21:
     resolution:
@@ -10410,10 +10440,10 @@ packages:
       }
     engines: { node: ">=4" }
 
-  selderee@0.11.0:
+  selderee@0.12.0:
     resolution:
       {
-        integrity: sha512-5TF+l7p4+OsnP8BCCvSyZiSPc4x4//p5uPwK8TCnVPJYRmU2aYKMpOXvw8zM5a5JvuuCGN1jmsMwuU2W02ukfA==,
+        integrity: sha512-b1YMh3+DHZp59DLna3qVwQ5iOla/nrI6mLBNW02XxU77M3046Df6VLkoaJyFz20VsGIG5kkp+FK0kg4K4HnUFw==,
       }
 
   semver@6.3.1:
@@ -14198,10 +14228,10 @@ snapshots:
 
   "@radix-ui/rect@1.1.3": {}
 
-  "@react-email/render@2.1.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6)":
+  "@react-email/render@2.2.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6)":
     dependencies:
       entities: 4.5.0
-      html-to-text: 9.0.5
+      html-to-text: 10.0.1
       html5parser: 3.0.0
       prettier: 3.8.3
       react: 19.2.6
@@ -14225,10 +14255,11 @@ snapshots:
 
   "@sec-ant/readable-stream@0.4.1": {}
 
-  "@selderee/plugin-htmlparser2@0.11.0":
+  "@selderee/plugin-htmlparser2@0.12.0(selderee@0.12.0)":
     dependencies:
+      domelementtype: 2.3.0
       domhandler: 5.0.3
-      selderee: 0.11.0
+      selderee: 0.12.0
 
   "@shadcn/helpers@0.2.0(ai@7.0.77(zod@4.6.7))":
     optionalDependencies:
@@ -15241,6 +15272,10 @@ snapshots:
     dependencies:
       readdirp: 4.1.2
 
+  chokidar@5.0.0:
+    dependencies:
+      readdirp: 5.1.1
+
   ci-info@4.4.0: {}
 
   citty@0.1.6:
@@ -15471,6 +15506,8 @@ snapshots:
   deepmerge-ts@8.0.0:
     optional: true
 
+  deepmerge-ts@8.0.2: {}
+
   deepmerge@4.3.1(patch_hash=658bcc27776e130ae51c0ad9597d4a3a52ac867af0fc014b78714ff162845fe0):
     {}
 
@@ -15635,6 +15672,8 @@ snapshots:
   entities@4.5.0: {}
 
   entities@6.0.1: {}
+
+  entities@7.0.1: {}
 
   env-paths@2.2.1: {}
 
@@ -16382,24 +16421,24 @@ snapshots:
 
   html-escaper@2.0.2: {}
 
-  html-to-text@9.0.5:
+  html-to-text@10.0.1:
     dependencies:
-      "@selderee/plugin-htmlparser2": 0.11.0
-      deepmerge: 4.3.1(patch_hash=658bcc27776e130ae51c0ad9597d4a3a52ac867af0fc014b78714ff162845fe0)
+      "@selderee/plugin-htmlparser2": 0.12.0(selderee@0.12.0)
+      deepmerge-ts: 8.0.2
       dom-serializer: 2.0.0
-      htmlparser2: 8.0.2
-      selderee: 0.11.0
+      htmlparser2: 10.1.0
+      selderee: 0.12.0
 
   html-url-attributes@3.0.1: {}
 
   html5parser@3.0.0: {}
 
-  htmlparser2@8.0.2:
+  htmlparser2@10.1.0:
     dependencies:
       domelementtype: 2.3.0
       domhandler: 5.0.3
       domutils: 3.2.2
-      entities: 4.5.0
+      entities: 7.0.1
 
   http-proxy-agent@7.0.2:
     dependencies:
@@ -17178,7 +17217,7 @@ snapshots:
     dependencies:
       language-subtag-registry: 0.3.23
 
-  leac@0.6.0: {}
+  leac@0.7.0: {}
 
   leven@3.1.0: {}
 
@@ -18068,10 +18107,10 @@ snapshots:
     dependencies:
       entities: 6.0.1
 
-  parseley@0.12.1:
+  parseley@0.13.1:
     dependencies:
-      leac: 0.6.0
-      peberminta: 0.9.0
+      leac: 0.7.0
+      peberminta: 0.10.0
 
   path-browserify@1.0.1: {}
 
@@ -18097,7 +18136,7 @@ snapshots:
 
   pathe@2.0.3: {}
 
-  peberminta@0.9.0: {}
+  peberminta@0.10.0: {}
 
   perfect-debounce@1.0.0:
     optional: true
@@ -18382,12 +18421,12 @@ snapshots:
       react: 19.2.6
       scheduler: 0.27.0
 
-  react-email@6.9.1(react-dom@19.2.6(react@19.2.6))(react@19.2.6):
+  react-email@6.11.8(react-dom@19.2.6(react@19.2.6))(react@19.2.6):
     dependencies:
       "@babel/parser": 7.29.2
       "@babel/traverse": 7.29.0
-      "@react-email/render": 2.1.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
-      chokidar: 4.0.3
+      "@react-email/render": 2.2.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+      chokidar: 5.0.0
       commander: 13.1.0
       conf: 15.1.0
       css-tree: 3.2.1
@@ -18398,7 +18437,6 @@ snapshots:
       log-symbols: 7.0.1
       marked: 15.0.12
       mime-types: 3.0.2
-      normalize-path: 3.0.0
       nypm: 0.6.6
       picospinner: 3.0.0
       prismjs: 1.30.0
@@ -18488,6 +18526,8 @@ snapshots:
       util-deprecate: 1.0.2
 
   readdirp@4.1.2: {}
+
+  readdirp@5.1.1: {}
 
   recast@0.23.21:
     dependencies:
@@ -18594,12 +18634,12 @@ snapshots:
 
   reselect@5.1.1: {}
 
-  resend@6.12.4(@react-email/render@2.1.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6)):
+  resend@6.12.4(@react-email/render@2.2.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6)):
     dependencies:
       postal-mime: 2.7.4
       standardwebhooks: 1.0.0
     optionalDependencies:
-      "@react-email/render": 2.1.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+      "@react-email/render": 2.2.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
 
   resolve-cwd@3.0.0:
     dependencies:
@@ -18683,9 +18723,9 @@ snapshots:
       extend-shallow: 2.0.1
       kind-of: 6.0.3
 
-  selderee@0.11.0:
+  selderee@0.12.0:
     dependencies:
-      parseley: 0.12.1
+      parseley: 0.13.1
 
   semver@6.3.1: {}
 

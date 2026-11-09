@@ -19,39 +19,21 @@ async function readMessageChunks(stream: ReadableStream<UIMessageChunk>) {
   return chunks;
 }
 
-async function createStreamingChatFixture() {
-  const firstPrompt = "Explain the migration in detail";
-  const secondPrompt = "Give me the final conclusion";
-  const firstAnswer = `${Array.from(
-    { length: 120 },
-    (_, index) =>
-      `Migration detail ${index + 1} remains visible while streaming.`,
-  ).join(" ")} Final first-turn marker.`;
-  const secondAnswer = `${Array.from(
-    { length: 40 },
-    (_, index) =>
-      `Conclusion detail ${index + 1} follows the current question.`,
-  ).join(" ")} Final second-turn marker.`;
-  const chat = createChat<AiMessage>({ now: "2026-08-22T00:00:00Z" })
-    .user(firstPrompt, { id: "first-user" })
-    .assistant(firstAnswer, { id: "first-assistant" })
-    .user(secondPrompt, { id: "second-user" })
-    .assistant(secondAnswer, { id: "second-assistant" });
-  const transport = chat.transport({ delayMs: 0 });
-  const send = (messages: AiMessage[]) =>
-    transport.sendMessages({
-      abortSignal: undefined,
-      chatId: "e2e-chat",
-      messageId: undefined,
-      messages,
-      trigger: "submit-message",
-    });
-
+function createPausableTextTurn(messageId: string, deltas: string[]) {
+  const id = "text-1";
+  const start: UIMessageChunk[] = [
+    { type: "start", messageId },
+    { type: "text-start", id },
+  ];
+  const chunks: UIMessageChunk[] = [
+    ...start,
+    ...deltas.map((delta) => ({ type: "text-delta" as const, id, delta })),
+    { type: "text-end", id },
+    { type: "finish", finishReason: "stop" },
+  ];
   return {
-    firstChunks: await readMessageChunks(await send(chat.get(1))),
-    firstPrompt,
-    secondChunks: await readMessageChunks(await send(chat.get(3))),
-    secondPrompt,
+    chunks: chunks.map((chunk) => JSON.stringify(chunk)),
+    pauseAfter: deltas.slice(0, -1).map((_, index) => start.length + index + 1),
   };
 }
 
@@ -84,16 +66,16 @@ async function installChatFixture(
   fixture: {
     turns: Array<{
       chunks: string[];
+      pauseAfter?: number[];
       prompt?: string;
       rejection?: { status: number; code: string };
     }>;
-    delayMs?: number;
   },
 ) {
-  await page.addInitScript(({ turns, delayMs = 0 }) => {
+  await page.addInitScript(({ turns }) => {
     const originalFetch = window.fetch.bind(window);
     const requestBodies: string[] = [];
-    const streams = new Map<string, string[]>();
+    const streams = new Map<string, (typeof turns)[number]>();
     (
       window as unknown as { __chatRequestBodies: string[] }
     ).__chatRequestBodies = requestBodies;
@@ -136,16 +118,15 @@ async function installChatFixture(
             { status: turn.rejection.status },
           );
         const runId = `fixture-${requestBodies.length}`;
-        streams.set(runId, turn.chunks);
+        streams.set(runId, turn);
         return Response.json({ runId, status: "running" }, { status: 202 });
       }
       const runId = url.pathname.match(
         /^\/api\/ai\/runs\/(fixture-\d+)\/stream$/,
       )?.[1];
       if (!runId) return originalFetch(input, init);
-      const chunks = streams.get(runId);
-      if (!chunks)
-        return new Response("Fixture stream missing", { status: 404 });
+      const turn = streams.get(runId);
+      if (!turn) return new Response("Fixture stream missing", { status: 404 });
       const encoder = new TextEncoder();
       let chunkIndex = Number(url.searchParams.get("cursor") ?? 0);
       return new Response(
@@ -156,7 +137,7 @@ async function installChatFixture(
                 controller.close();
                 return;
               }
-              const chunk = chunks[chunkIndex];
+              const chunk = turn.chunks[chunkIndex];
               if (!chunk) {
                 controller.enqueue(encoder.encode("data: [DONE]\n\n"));
                 controller.close();
@@ -165,7 +146,13 @@ async function installChatFixture(
               controller.enqueue(
                 encoder.encode(`id: ${++chunkIndex}\ndata: ${chunk}\n\n`),
               );
-              window.setTimeout(enqueueNext, delayMs);
+              if (turn.pauseAfter?.includes(chunkIndex)) {
+                window.addEventListener("e2e:resume-chat", enqueueNext, {
+                  once: true,
+                });
+              } else {
+                window.setTimeout(enqueueNext, 0);
+              }
             };
             enqueueNext();
           },
@@ -174,6 +161,11 @@ async function installChatFixture(
       );
     };
   }, fixture);
+
+  return () =>
+    page.evaluate(() => {
+      window.dispatchEvent(new Event("e2e:resume-chat"));
+    });
 }
 
 test("rejects unauthenticated chat requests", async ({ page }) => {
@@ -250,26 +242,48 @@ test("shows the assistant composer to a signed-in user", async ({ page }) => {
 
 test("keeps the current turn anchored while streaming", async ({ page }) => {
   await loginAs(page, "user");
-  const fixture = await createStreamingChatFixture();
-
-  await installChatFixture(page, {
+  const firstPrompt = "Explain the migration in detail";
+  const secondPrompt = "Give me the final conclusion";
+  const firstSection = Array.from(
+    { length: 40 },
+    (_, index) => `Migration detail ${index + 1} remains visible.\n\n`,
+  ).join("");
+  const resumeStream = await installChatFixture(page, {
     turns: [
-      { chunks: fixture.firstChunks, prompt: fixture.firstPrompt },
-      { chunks: fixture.secondChunks, prompt: fixture.secondPrompt },
+      {
+        prompt: firstPrompt,
+        ...createPausableTextTurn("first-assistant", [
+          firstSection,
+          "Additional migration details remain visible.\n\n",
+          "Final first-turn marker.",
+        ]),
+      },
+      {
+        prompt: secondPrompt,
+        ...createPausableTextTurn("second-assistant", [
+          "Conclusion detail 1 follows the current question.\n\n",
+          "Final second-turn marker.",
+        ]),
+      },
     ],
-    delayMs: 4,
   });
 
   await page.setViewportSize({ width: 1280, height: 700 });
   await page.goto("/dashboard/ai");
   const composer = page.getByRole("textbox", { name: "Message" });
+  const sendButton = page.getByRole("button", { name: "Send" });
   const viewport = page.locator('[data-slot="message-scroller-viewport"]');
 
-  await composer.fill(fixture.firstPrompt);
-  await composer.press("Enter");
+  await composer.fill(firstPrompt);
+  await sendButton.click();
   const stopButton = page.getByRole("button", { name: "Stop" });
-  await expect(page.getByText(/Migration detail 20 remains/)).toBeVisible();
+  await expect(
+    page.getByText("Migration detail 40 remains visible."),
+  ).toBeVisible();
   await expect(stopButton).toBeVisible();
+  await expect
+    .poll(() => viewport.evaluate((element) => element.scrollTop))
+    .toBeGreaterThan(0);
   await expect
     .poll(() =>
       viewport.evaluate(
@@ -294,7 +308,10 @@ test("keeps the current turn anchored while streaming", async ({ page }) => {
       ),
     )
     .toBeLessThan(4);
-  await expect(page.getByText(/Migration detail 80 remains/)).toBeVisible();
+  await resumeStream();
+  await expect(
+    page.getByText("Additional migration details remain visible."),
+  ).toBeVisible();
   await expect(stopButton).toBeVisible();
   await expect
     .poll(() =>
@@ -304,18 +321,20 @@ test("keeps the current turn anchored while streaming", async ({ page }) => {
       ),
     )
     .toBeLessThan(4);
+  await resumeStream();
   await expect(page.getByText("Final first-turn marker.")).toBeVisible({
     timeout: 15_000,
   });
   await expect(stopButton).toBeHidden();
 
-  await composer.fill(fixture.secondPrompt);
-  await composer.press("Enter");
-  const currentQuestion = viewport.getByText(fixture.secondPrompt, {
+  await composer.fill(secondPrompt);
+  await sendButton.click();
+  const currentQuestion = viewport.getByText(secondPrompt, {
     exact: true,
   });
   await expect(page.getByText(/Conclusion detail 1 follows/)).toBeVisible();
   await expect(currentQuestion).toBeInViewport();
+  await resumeStream();
   await expect(page.getByText("Final second-turn marker.")).toBeVisible({
     timeout: 15_000,
   });

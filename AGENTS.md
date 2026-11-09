@@ -171,9 +171,9 @@ pnpm stripe:sync-products
   including stale overrides, then publish through the tested release workflow.
   Do not dismiss or ignore alerts just to make checks green. An unavailable
   upstream fix needs a documented, tested mitigation and an accurate residual report.
-- `pnpm audit:security` blocks moderate and higher findings. The remaining low
-  deepmerge advisory has a committed pnpm patch and real-package regression tests;
-  see `SECURITY.md`. Docker dependency stages must copy `patches/` before installation.
+- `pnpm audit:security` blocks moderate and higher findings. Development tooling
+  still uses the patched `deepmerge` package. See `SECURITY.md` for advisory status
+  and regression tests. Docker dependency stages must copy `patches/` before installation.
 
 ## 8. Database Workflow
 

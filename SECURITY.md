@@ -21,21 +21,20 @@ checked for duplicate `(providerId, accountId)` keys before release. Magic Link
 tokens remain hashed; old pending links and OAuth state should be restarted after
 the security upgrade. See the [official upgrade guide](https://better-auth.com/docs/guides/1-7-upgrade-guide).
 
-### Local deepmerge fix
+### deepmerge in development tooling
 
-[GHSA-gcqx-w48m-w2h4](https://github.com/advisories/GHSA-gcqx-w48m-w2h4) has no
-published fixed deepmerge version. Jest and React Email's HTML-to-text dependency
-still resolve 4.3.1. The committed `patches/deepmerge@4.3.1.patch` excludes the
-special `__proto__` key from both merge inputs in the source, CommonJS and UMD
-bundles, preventing attacker-controlled prototypes on the returned objects.
+React Email uses its upstream renderer 2.2, whose HTML-to-text dependency no
+longer uses `deepmerge`. The shadcn CLI supplies build-time CSS and code generation.
+Jest and shadcn still resolve `deepmerge` 4.3.1 as development dependencies.
 
-`pnpm test:security-dependencies` resolves the actual packages used by both
-consumers and checks poisoned targets, null-prototype targets, nested values,
-and ordinary nested/array/symbol behavior. Keep the patch and regression tests
-until a compatible upstream fix replaces them. Dependency installation in every
-Docker stage must apply the same patch.
+VulnCheck [rejected CVE-2026-93753](https://www.cve.org/CVERecord?id=CVE-2026-93753)
+on November 2, 2026. GitHub still lists
+[GHSA-gcqx-w48m-w2h4](https://github.com/advisories/GHSA-gcqx-w48m-w2h4)
+as a low-severity advisory with no fixed version. Keep the committed pnpm patch
+while that advisory is active. It excludes `__proto__` from both inputs in the
+source, CommonJS and UMD bundles. Docker installs must apply the same patch.
 
-Package-version scanners still report this one low advisory because the package
-remains 4.3.1. It is not ignored or dismissed. `pnpm audit:security` fails for any
-moderate, high or critical finding, while the real-package tests verify this
-documented local fix. A green audit threshold does not mean zero package advisories.
+`pnpm test:security-dependencies` checks the packages resolved by Jest, the
+shadcn CLI and its registry, and exercises React Email's HTML and plain-text
+rendering. `pnpm audit:security` fails for any moderate, high or critical finding.
+The full audit can still report the low advisory for the patched development package.

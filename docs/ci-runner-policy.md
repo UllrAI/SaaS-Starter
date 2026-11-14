@@ -1,12 +1,12 @@
 # CI runner policy
 
 GitHub-hosted Ubuntu 24.04 is the default for Quality and production release jobs.
-PVE is available as an opt-in once the runner and ref protections pass acceptance.
+PVE is available as an opt-in once runner access and job checks pass acceptance.
 Every pull request stays on GitHub-hosted Ubuntu.
 
 | Opt-in variable           | Labels variable             | Jobs                                                                     |
 | ------------------------- | --------------------------- | ------------------------------------------------------------------------ |
-| `PVE_BUILDS=true`         | `PVE_RUNNER_LABELS`         | Quality on protected default-branch pushes                               |
+| `PVE_BUILDS=true`         | `PVE_RUNNER_LABELS`         | Quality on default-branch pushes                                         |
 | `PVE_RELEASE_BUILDS=true` | `PVE_RELEASE_RUNNER_LABELS` | Image build and publication on protected release-tag pushes              |
 | `PVE_DEPLOY=true`         | `PVE_DEPLOY_RUNNER_LABELS`  | Release promotion and Coolify deployment on protected release-tag pushes |
 
@@ -14,7 +14,8 @@ Each labels variable is a nonempty JSON array. Use the exact label set that
 Ops confirms for the pool allowed to run this repository and job. Set the
 labels before enabling the matching switch. A generic host label such as
 `pve-101` cannot scope a job to an owner or serve as an access policy.
-A missing switch, missing labels, or unprotected ref uses GitHub-hosted Ubuntu.
+Missing switches or labels keep jobs on GitHub-hosted Ubuntu. Release jobs also
+use GitHub-hosted Ubuntu when the tag is unprotected.
 Releasing still requires the existing `release/vX.Y.Z` tag, exact-commit Quality
 check and tested images.
 
@@ -37,7 +38,7 @@ and [workflow access](https://docs.github.com/en/enterprise-cloud@latest/actions
 
 ## Acceptance
 
-Start with Quality on reviewed, protected `main` pushes. Verify that only the
+Start with Quality on reviewed `main` pushes. Verify that only the
 approved workflow and ref can reach the selected pool, and that fork PRs use
 GitHub-hosted Ubuntu. Check the confirmed labels, shared capacity, Node, pnpm,
 Docker and Buildx, Playwright OS dependencies, service networking and cleanup.

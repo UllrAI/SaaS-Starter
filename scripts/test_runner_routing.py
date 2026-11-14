@@ -9,12 +9,14 @@ WORKFLOWS = Path(__file__).resolve().parents[1] / ".github/workflows"
 
 
 class RunnerPolicyTests(unittest.TestCase):
-    def test_pve_routes_require_opt_in_and_protected_pushes(self):
+    def test_pve_routes_require_opt_in_and_trusted_pushes(self):
         default_branch = (
             "github.ref == format('refs/heads/{0}', "
             "github.event.repository.default_branch)"
         )
-        release_tag = "startsWith(github.ref, 'refs/tags/release/v')"
+        release_tag = (
+            "github.ref_protected && startsWith(github.ref, 'refs/tags/release/v')"
+        )
         expected = {
             "quality.yml": [("PVE_BUILDS", "PVE_RUNNER_LABELS", default_branch)],
             "promote-release-to-prod.yml": [
@@ -40,7 +42,7 @@ class RunnerPolicyTests(unittest.TestCase):
                     (
                         f">- ${{{{ vars.{switch} == 'true' && "
                         f"vars.{labels} != '' && "
-                        "github.event_name == 'push' && github.ref_protected && "
+                        "github.event_name == 'push' && "
                         f"{ref} && fromJSON(vars.{labels}) "
                         "|| 'ubuntu-24.04' }}"
                     )

@@ -16,10 +16,10 @@ concurrency:
 jobs:
   promote:
     runs-on: >-
-      ${{ vars.PVE_DEPLOY == 'true' && vars.PVE_RUNNER_LABELS != '' &&
+      ${{ vars.PVE_DEPLOY == 'true' && vars.PVE_DEPLOY_RUNNER_LABELS != '' &&
       github.event_name == 'push' && github.ref_protected &&
       startsWith(github.ref, 'refs/tags/release/v') &&
-      fromJSON(vars.PVE_RUNNER_LABELS) || 'ubuntu-24.04' }}
+      fromJSON(vars.PVE_DEPLOY_RUNNER_LABELS) || 'ubuntu-24.04' }}
     timeout-minutes: 15
     environment: production
 

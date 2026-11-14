@@ -58,6 +58,9 @@ docs, README or agent instructions skip Quality; application content, code,
 dependencies, tests, scripts and workflow changes still run all checks. An
 existing successful exact-SHA Quality run gates a release without rerunning it.
 
+GitHub-hosted Ubuntu is the default for release jobs. See the
+[CI runner policy](ci-runner-policy.md) for PVE acceptance and opt-in.
+
 The GitHub production environment already has `APP_URL`, `COOLIFY_WEB_UUID`,
 `COOLIFY_WORKER_UUID`, `MIGRATION_SSH_HOST`, `MIGRATION_DB_HOST`,
 `MIGRATION_DB_PORT` variables and `COOLIFY_TOKEN`, `MIGRATION_SSH_KEY`,
@@ -183,9 +186,3 @@ Web readiness and Worker startup/queue checks passed. The public origin, both
 locale pages, login/anonymous-session handling, protected-route redirect, static
 JavaScript, robots and sitemap were checked after cutover. Cloudflare remains
 proxied and validates the origin certificate with Full (strict).
-
-## PVE runner routing
-
-See [CI runner policy](ci-runner-policy.md). PVE is explicit opt-in pending
-repository runner provisioning and runtime acceptance; no cloud watcher or
-automatic retry-based fallback is added.

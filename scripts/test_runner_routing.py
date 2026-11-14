@@ -1,0 +1,47 @@
+"""Guard the trusted refs and explicit switches for PVE routing."""
+
+from pathlib import Path
+import re
+import unittest
+
+
+WORKFLOWS = Path(__file__).resolve().parents[1] / ".github/workflows"
+
+
+class RunnerPolicyTests(unittest.TestCase):
+    def test_pve_routes_require_opt_in_and_protected_pushes(self):
+        default_branch = (
+            "github.ref == format('refs/heads/{0}', "
+            "github.event.repository.default_branch)"
+        )
+        release_tag = "startsWith(github.ref, 'refs/tags/release/v')"
+        expected = {
+            "quality.yml": [("PVE_BUILDS", default_branch)],
+            "promote-release-to-prod.yml": [("PVE_DEPLOY", release_tag)],
+            "deploy-coolify.yml": [
+                ("PVE_BUILDS", release_tag),
+                ("PVE_DEPLOY", release_tag),
+            ],
+        }
+
+        for path in sorted(WORKFLOWS.glob("*.yml")):
+            with self.subTest(workflow=path.name):
+                routes = [
+                    " ".join(route.split())
+                    for route in re.findall(
+                        r"(?m)^    runs-on:([^\n]*(?:\n {6}[^\n]*)*)",
+                        path.read_text(),
+                    )
+                    if "PVE_" in route
+                ]
+                trusted_routes = [
+                    (
+                        f">- ${{{{ vars.{switch} == 'true' && "
+                        "vars.PVE_RUNNER_LABELS != '' && "
+                        "github.event_name == 'push' && github.ref_protected && "
+                        f"{ref} && fromJSON(vars.PVE_RUNNER_LABELS) "
+                        "|| 'ubuntu-24.04' }}"
+                    )
+                    for switch, ref in expected.get(path.name, [])
+                ]
+                self.assertEqual(routes, trusted_routes)

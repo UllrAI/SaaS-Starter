@@ -13,7 +13,11 @@ concurrency:
 
 jobs:
   images:
-    runs-on: ${{ vars.PVE_BUILDS == 'true' && vars.PVE_RUNNER_LABELS != '' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) || github.ref == 'refs/heads/prod' || startsWith(github.ref, 'refs/tags/release/')) && fromJSON(vars.PVE_RUNNER_LABELS) || 'ubuntu-24.04' }}
+    runs-on: >-
+      ${{ vars.PVE_BUILDS == 'true' && vars.PVE_RUNNER_LABELS != '' &&
+      github.event_name == 'push' && github.ref_protected &&
+      startsWith(github.ref, 'refs/tags/release/v') &&
+      fromJSON(vars.PVE_RUNNER_LABELS) || 'ubuntu-24.04' }}
     timeout-minutes: 35
     environment: production
     outputs:
@@ -70,7 +74,11 @@ jobs:
   # successful dependency retains the tested images and never builds again.
   deploy:
     needs: images
-    runs-on: ${{ vars.PVE_DEPLOY == 'true' && vars.PVE_RUNNER_LABELS != '' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) || github.ref == 'refs/heads/prod' || startsWith(github.ref, 'refs/tags/release/')) && fromJSON(vars.PVE_RUNNER_LABELS) || 'ubuntu-24.04' }}
+    runs-on: >-
+      ${{ vars.PVE_DEPLOY == 'true' && vars.PVE_RUNNER_LABELS != '' &&
+      github.event_name == 'push' && github.ref_protected &&
+      startsWith(github.ref, 'refs/tags/release/v') &&
+      fromJSON(vars.PVE_RUNNER_LABELS) || 'ubuntu-24.04' }}
     timeout-minutes: 25
     environment: production
     permissions:

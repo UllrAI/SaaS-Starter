@@ -25,7 +25,11 @@ concurrency:
 
 jobs:
   validate:
-    runs-on: ${{ vars.PVE_BUILDS == 'true' && vars.PVE_RUNNER_LABELS != '' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) || github.ref == 'refs/heads/prod' || startsWith(github.ref, 'refs/tags/release/')) && fromJSON(vars.PVE_RUNNER_LABELS) || 'ubuntu-24.04' }}
+    runs-on: >-
+      ${{ vars.PVE_BUILDS == 'true' && vars.PVE_RUNNER_LABELS != '' &&
+      github.event_name == 'push' && github.ref_protected &&
+      github.ref == format('refs/heads/{0}', github.event.repository.default_branch) &&
+      fromJSON(vars.PVE_RUNNER_LABELS) || 'ubuntu-24.04' }}
     timeout-minutes: 20
     services:
       postgres:
@@ -85,5 +89,10 @@ jobs:
       - run: pnpm build:worker
       - run: pnpm worker:smoke
       - run: pnpm worker:shutdown-smoke
-      - run: pnpm exec playwright install --with-deps chromium
+      - name: Install Chromium and OS dependencies
+        if: runner.environment == 'github-hosted'
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Install Chromium with preprovisioned OS dependencies
+        if: runner.environment == 'self-hosted'
+        run: pnpm exec playwright install chromium
       - run: pnpm test:e2e

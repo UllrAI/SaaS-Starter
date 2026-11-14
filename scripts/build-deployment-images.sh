@@ -20,6 +20,7 @@ docker build -f docker/Dockerfile --target worker "${args[@]}" \
   --label "org.opencontainers.image.source=https://github.com/$GITHUB_REPOSITORY" \
   --label "org.opencontainers.image.revision=$GITHUB_SHA" -t "$worker_image" .
 
+# The migrator runs on the host. The smoke containers reach Postgres by service DNS.
 database_url="postgresql://postgres:postgres@127.0.0.1:$IMAGE_TEST_POSTGRES_PORT/saas_image_test"
 DATABASE_URL="$database_url" JOB_DATABASE_URL="$database_url" pnpm db:migrate
 
@@ -67,7 +68,7 @@ web_address="$(docker port "$web_id" 3000/tcp)"
 [[ "$web_address" =~ ^127\.0\.0\.1:[0-9]+$ ]]
 ready=false
 for attempt in {1..30}; do
-  if curl -fsS --max-time 3 "http://$web_address/api/ready" && \
+  if curl --noproxy 127.0.0.1 -fsS --max-time 3 "http://$web_address/api/ready" && \
      docker logs "$worker_id" 2>&1 | grep -F '"event":"worker_ready"' >/dev/null; then
     ready=true
     break

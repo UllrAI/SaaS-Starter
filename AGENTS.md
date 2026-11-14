@@ -214,8 +214,10 @@ pnpm stripe:sync-products
 - The migrator may load `src/database`, `src/lib` and root configuration, not UI
   components/routes/content. Update `scripts/release-migration-scope.py` whenever
   adding a migration dependency outside that boundary; unknown paths migrate.
-- Web and Worker use private GHCR images built and smoke-tested on GitHub's
-  Ubuntu runner. Do not enable a parallel source-push deployment in Coolify.
+- Web and Worker use private GHCR images built and smoke-tested on GitHub-hosted
+  Ubuntu by default. See [CI runner policy](docs/ci-runner-policy.md) for PVE
+  acceptance and trusted refs. Do not enable a parallel source-push deployment
+  in Coolify.
 - Hosting migrations must update this file, both README deployment sections,
   the active deployment/recovery runbook, and related documentation links. Mark
   old platform instructions as historical so future agents use the current host.

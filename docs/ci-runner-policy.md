@@ -10,36 +10,39 @@ Every pull request stays on GitHub-hosted Ubuntu.
 | `PVE_RELEASE_BUILDS=true` | `PVE_RELEASE_RUNNER_LABELS` | Image build and publication on protected release-tag pushes              |
 | `PVE_DEPLOY=true`         | `PVE_DEPLOY_RUNNER_LABELS`  | Release promotion and Coolify deployment on protected release-tag pushes |
 
-Each labels variable is a nonempty JSON array. Use the labels reported by the
-selected pool, such as `self-hosted`, `linux`, and `x64` plus a custom pool
-label. Set its labels before its switch.
+Each labels variable is a nonempty JSON array. Use the exact label set that
+Ops confirms for the pool allowed to run this repository and job. Set the
+labels before enabling the matching switch. A generic host label such as
+`pve-101` cannot scope a job to an owner or serve as an access policy.
 A missing switch, missing labels, or unprotected ref uses GitHub-hosted Ubuntu.
 Releasing still requires the existing `release/vX.Y.Z` tag, exact-commit Quality
 check and tested images.
 
-## Runner design under review
+## PVE VM 101
 
-SaaS-Starter is public and its PVE switches are unset. The shared runner design
-is under review. GitHub documents repository access controls for runner groups
-and workflow access controls for supported plans. Check which controls UllrAI
-can use before choosing a registration model. An API permission error leaves
-those controls unverified. See [repository access](https://docs.github.com/en/actions/how-tos/manage-runners/self-hosted-runners/manage-access)
+Ops coordinates runner registration and host capacity on the shared VM 101.
+For `UllrAI/SaaS-Starter`, prefer an UllrAI organization runner pool with
+verified access for this public repository. If the organization route is
+unavailable, Ops can evaluate a repository-scoped runner instance on VM 101.
+Personal repositories use repository-scoped instances on the same VM.
+Each GitHub registration has the scope of its own organization or repository.
+Ops keeps the existing runner instances in service.
+
+Registration, runner group policy, and labels for SaaS-Starter are pending Ops
+verification. Until the pool passes acceptance, keep the PVE switches unset.
+Confirm repository and workflow access in GitHub, including the fork boundary.
+An organization API permission error leaves those controls unverified. See
+[repository access](https://docs.github.com/en/actions/how-tos/manage-runners/self-hosted-runners/manage-access)
 and [workflow access](https://docs.github.com/en/enterprise-cloud@latest/actions/how-tos/manage-runners/self-hosted-runners/manage-access).
 
-A shared organization runner group and multiple repository-scoped runners on
-one PVE host are candidates. Separate VMs, separate system accounts, rootless
-Docker, and one-job guests are possible isolation measures. Select the layout
-after checking the GitHub access policy, host and workspace isolation, and which
-jobs can reach production. Labels select eligible runners and carry no access
-policy by themselves.
-
-## Acceptance after selecting a design
+## Acceptance
 
 Start with Quality on reviewed, protected `main` pushes. Verify that only the
 approved workflow and ref can reach the selected pool, and that fork PRs use
-GitHub-hosted Ubuntu. Confirm the runner's labels, capacity, Docker and browser
-dependencies, and cleanup. Quality uses Docker-assigned loopback ports for
-PostgreSQL and an OS-assigned loopback port for Playwright. Record the SHA,
+GitHub-hosted Ubuntu. Check the confirmed labels, shared capacity, Node, pnpm,
+Docker and Buildx, Playwright OS dependencies, service networking and cleanup.
+Quality uses Docker-assigned loopback ports for PostgreSQL and an OS-assigned
+loopback port for Playwright. Record the SHA,
 runner name, run URL, and conclusion for both the first run and any same-SHA
 retry. Keep the release switches unset during Quality acceptance.
 
@@ -60,8 +63,11 @@ failed deploy job only with its verified image outputs. See
 ## Monitoring and recovery
 
 The shared CI watchdog can monitor this repository once its inventory and access
-are configured. A busy online runner may queue work. Treat API errors as unknown
-and alert only after repeated evidence of an offline runner.
+are configured. Retain any existing read-only observers until Ops verifies
+coverage for this repository, external alerts for missing watchdog heartbeats,
+and fault and recovery notifications. A busy online runner may queue work.
+Treat API errors as unknown and alert only after repeated evidence of an
+offline runner.
 
 Keep routing variables stable during a run and its retries. Investigate failures
 on the selected pool. For a Coolify deploy failure, reconcile the deployment

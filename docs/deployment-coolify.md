@@ -183,3 +183,9 @@ Web readiness and Worker startup/queue checks passed. The public origin, both
 locale pages, login/anonymous-session handling, protected-route redirect, static
 JavaScript, robots and sitemap were checked after cutover. Cloudflare remains
 proxied and validates the origin certificate with Full (strict).
+
+## PVE runner routing
+
+See [CI runner policy](ci-runner-policy.md). PVE is explicit opt-in pending
+repository runner provisioning and runtime acceptance; no cloud watcher or
+automatic retry-based fallback is added.

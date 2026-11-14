@@ -258,3 +258,10 @@ This version has breaking changes — APIs, conventions, and file structure may 
 This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
 
 <!-- END:nextjs-agent-rules -->
+
+## CI runner changes
+
+Read `docs/ci-runner-policy.md` before changing runner routing. PVE routes are
+explicit opt-in and remain disabled until isolated runner acceptance; never
+route untrusted PRs to production-capable persistent runners or infer fallback
+from a run attempt number.

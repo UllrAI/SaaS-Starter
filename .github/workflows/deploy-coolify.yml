@@ -30,7 +30,7 @@ jobs:
           POSTGRES_DB: saas_image_test
           POSTGRES_PASSWORD: postgres
         ports:
-          - 5432:5432
+          - "127.0.0.1::5432"
         options: >-
           --health-cmd "pg_isready -U postgres -d saas_image_test"
           --health-interval 5s --health-timeout 5s --health-retries 10
@@ -51,6 +51,8 @@ jobs:
           NEXT_PUBLIC_UMAMI_WEBSITE_ID: ${{ vars.NEXT_PUBLIC_UMAMI_WEBSITE_ID }}
           NEXT_PUBLIC_UMAMI_DOMAINS: ${{ vars.NEXT_PUBLIC_UMAMI_DOMAINS }}
           DEPLOY_ENVIRONMENT: production
+          IMAGE_TEST_POSTGRES_PORT: ${{ job.services.postgres.ports['5432'] }}
+          IMAGE_TEST_NETWORK: ${{ job.services.postgres.network }}
         run: bash scripts/build-deployment-images.sh
       - name: Publish private immutable images
         id: publish

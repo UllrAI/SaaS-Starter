@@ -39,8 +39,10 @@ from Web health. Runtime image limits are 768 MiB for Web and 512 MiB for Worker
    exact default-branch commit, applies required production migrations once, and advances
    `prod` with force-with-lease. Never push or merge directly into `prod`.
 3. It calls `deploy-coolify.yml`, which builds Web/Worker images, migrates a
-   disposable PostgreSQL 18.6 test database, and tests the actual images for database readiness,
-   worker startup and non-root execution before publishing them.
+   disposable PostgreSQL 18.6 test database, and tests the actual images for
+   database readiness, worker startup and non-root execution before publishing
+   them. The smoke containers use unique names on the job's Docker network.
+   PostgreSQL and Web bind to Docker-assigned loopback ports on the runner.
 4. Its separate deploy leaf job reuses the successful image job outputs, updates
    the saved Coolify image references, drains the previous Worker,
    deploys both services, and waits for deployment completion and public readiness.

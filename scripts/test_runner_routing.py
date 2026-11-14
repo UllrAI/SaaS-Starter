@@ -16,11 +16,13 @@ class RunnerPolicyTests(unittest.TestCase):
         )
         release_tag = "startsWith(github.ref, 'refs/tags/release/v')"
         expected = {
-            "quality.yml": [("PVE_BUILDS", default_branch)],
-            "promote-release-to-prod.yml": [("PVE_DEPLOY", release_tag)],
+            "quality.yml": [("PVE_BUILDS", "PVE_RUNNER_LABELS", default_branch)],
+            "promote-release-to-prod.yml": [
+                ("PVE_DEPLOY", "PVE_DEPLOY_RUNNER_LABELS", release_tag),
+            ],
             "deploy-coolify.yml": [
-                ("PVE_BUILDS", release_tag),
-                ("PVE_DEPLOY", release_tag),
+                ("PVE_RELEASE_BUILDS", "PVE_RELEASE_RUNNER_LABELS", release_tag),
+                ("PVE_DEPLOY", "PVE_DEPLOY_RUNNER_LABELS", release_tag),
             ],
         }
 
@@ -37,11 +39,11 @@ class RunnerPolicyTests(unittest.TestCase):
                 trusted_routes = [
                     (
                         f">- ${{{{ vars.{switch} == 'true' && "
-                        "vars.PVE_RUNNER_LABELS != '' && "
+                        f"vars.{labels} != '' && "
                         "github.event_name == 'push' && github.ref_protected && "
-                        f"{ref} && fromJSON(vars.PVE_RUNNER_LABELS) "
+                        f"{ref} && fromJSON(vars.{labels}) "
                         "|| 'ubuntu-24.04' }}"
                     )
-                    for switch, ref in expected.get(path.name, [])
+                    for switch, labels, ref in expected.get(path.name, [])
                 ]
                 self.assertEqual(routes, trusted_routes)

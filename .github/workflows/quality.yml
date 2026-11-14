@@ -39,16 +39,13 @@ jobs:
           POSTGRES_PASSWORD: postgres
           POSTGRES_USER: postgres
         ports:
-          - 5432:5432
+          - "127.0.0.1::5432"
         options: >-
           --health-cmd "pg_isready -U postgres -d saas_e2e"
           --health-interval 5s
           --health-timeout 5s
           --health-retries 10
     env:
-      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/saas_e2e
-      JOBS_TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/saas_e2e
-      E2E_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/saas_e2e
       BETTER_AUTH_SECRET: ci-only-secret-at-least-32-characters
       RESEND_API_KEY: re_ci_placeholder
       RESEND_EMAIL_FROM: noreply@example.com
@@ -75,6 +72,15 @@ jobs:
           node-version: 22.23.4
           cache: pnpm
 
+      - name: Configure the disposable test database
+        env:
+          POSTGRES_PORT: ${{ job.services.postgres.ports['5432'] }}
+        run: |
+          test -n "$POSTGRES_PORT"
+          database_url="postgresql://postgres:postgres@127.0.0.1:$POSTGRES_PORT/saas_e2e"
+          printf 'DATABASE_URL=%s\nJOBS_TEST_DATABASE_URL=%s\nE2E_DATABASE_URL=%s\n' \
+            "$database_url" "$database_url" "$database_url" >> "$GITHUB_ENV"
+
       - run: pnpm install --frozen-lockfile
       - run: pnpm audit:security
       - run: pnpm test:security-dependencies
@@ -84,7 +90,6 @@ jobs:
       - run: pnpm type-check
       - run: pnpm test --runInBand
       - run: python3 -m unittest discover -s scripts -p 'test_*.py'
-      # Database suites initialize only the disposable service database.
       - run: pnpm test:jobs:integration
       - run: pnpm build:worker
       - run: pnpm worker:smoke

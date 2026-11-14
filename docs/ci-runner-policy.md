@@ -27,10 +27,10 @@ check and tested images.
    group with access limited to this repository and GitHub-enforced workflow refs.
    Keep the switches unset if this restriction is unavailable.
 3. Use disposable, repository-isolated PVE workers. Verify exact labels, online
-   status, tools, Docker service networking and workspace cleanup. Quality
-   still uses fixed local ports for its database and browser server. Provision
-   Playwright OS dependencies before Quality runs. Keep sudo and access to
-   other projects outside the runner account.
+   status, tools, Docker service networking and workspace cleanup. Quality uses
+   Docker-assigned loopback ports for PostgreSQL and an OS-assigned loopback port
+   for Playwright. Provision Playwright OS dependencies before Quality runs.
+   Keep sudo and access to other projects outside the runner account.
 4. Test the full workflow with disposable databases and fixtures. Verify image
    permissions and the tested image references end to end before allowing access
    to production dependencies or credentials. Enable build and deploy separately

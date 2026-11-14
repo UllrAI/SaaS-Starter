@@ -34,6 +34,7 @@ export default defineConfig({
       E2E_TEST_SECRET: e2eTestSecret,
       NEXT_PUBLIC_APP_URL: baseURL,
       PLAYWRIGHT: "true",
+      HOSTNAME: new URL(baseURL).hostname.replace(/^\[|\]$/g, ""),
       PORT: String(port),
     },
     url: baseURL,

@@ -838,7 +838,6 @@
   "auth_click_link_in_email_sign": "点击邮件中的链接以登录。",
   "pricing_auth_protected_routes": "登录、注册、会话处理、受保护路由和管理员访问控制已经实现。",
   "settings_choose_theme": "为控制面板界面选择您喜欢的配色主题",
-  "home_generate_open_graph_images_social_cards": "为社交媒体卡片和链接预览生成开放图谱图片。",
   "home_api_keys_cli_device_login_refresh": "可直接使用内置轻量 Agent，并按需添加工具与技能；外部 Agent 则可通过 API 密钥、浏览器授权的 CLI 登录、令牌轮换和版本化端点安全接入。",
   "dashboard_payments_management": "付款管理",
   "common_displays_mobile_sidebar": "显示移动端侧边栏。",

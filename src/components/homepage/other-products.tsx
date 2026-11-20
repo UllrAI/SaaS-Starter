@@ -10,7 +10,6 @@ import {
   FlaskConical,
   Image,
   Sparkles,
-  Square,
   TrendingUp,
   Zap,
 } from "lucide-react";
@@ -49,13 +48,6 @@ export function OtherProducts({
       description: <>{t("home_product_creator_trends")}</>,
       url: "https://trendxday.com/",
       icon: TrendingUp,
-    },
-    {
-      id: "ogimage-site",
-      name: "OGimage.site",
-      description: <>{t("home_generate_open_graph_images_social_cards")}</>,
-      url: "https://ogimage.site/",
-      icon: Square,
     },
     {
       id: "hipng",

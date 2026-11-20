@@ -838,7 +838,6 @@
   "auth_click_link_in_email_sign": "Click the link in the email to sign in.",
   "pricing_auth_protected_routes": "Login, signup, session handling, protected routes, and admin gating are already implemented.",
   "settings_choose_theme": "Choose your preferred theme for the dashboard interface",
-  "home_generate_open_graph_images_social_cards": "Generate open graph images for social cards and link previews.",
   "home_api_keys_cli_device_login_refresh": "Start with the lightweight built-in agent, then add tools and skills or connect external agents through API keys, browser-approved CLI sign-in, token rotation, and versioned endpoints.",
   "dashboard_payments_management": "Payments Management",
   "common_displays_mobile_sidebar": "Displays the mobile sidebar.",

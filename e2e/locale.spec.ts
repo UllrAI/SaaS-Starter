@@ -21,6 +21,20 @@ test("redirects /en-prefixed marketing routes to canonical English paths", async
 });
 
 for (const locale of ["en", "zh-Hans"] as const) {
+  test(`home lists active lab products without OGImage (${locale})`, async ({
+    page,
+  }) => {
+    await page.goto(locale === "en" ? "/" : "/zh-Hans");
+    await expect(page.locator("html")).toHaveAttribute("lang", locale);
+    await expect(
+      page.locator("h3").filter({ hasText: "PixMiller" }),
+    ).toBeVisible();
+    await expect(page.locator('a[href*="ogimage.site"]')).toHaveCount(0);
+    await expect(
+      page.getByRole("heading", { name: /ogimage\.site/i }),
+    ).toHaveCount(0);
+  });
+
   test(`developer guide has accurate metadata, copy and source attribution (${locale})`, async ({
     page,
   }) => {
